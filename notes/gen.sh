@@ -7,6 +7,11 @@ do
         continue;
     fi
 
+    if [ $var == "header.tex" ]; then
+        echo "Not compiling header.tex";
+        continue;
+    fi
+
     # Compile regular
     echo "compile ‘"`basename $var .tex`".pdf’"
     pdflatex $var > /dev/null
