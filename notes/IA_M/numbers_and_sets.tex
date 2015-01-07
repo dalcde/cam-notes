@@ -713,15 +713,41 @@ Several proofs so far involved ``take the least integer such that'', e.g. divisi
 Then $P(n)$ is true for all $n\geq 1$.
 \end{thm}
 
-\begin{eg}
-  (Tower of Hanoi) See the image below:
-\begin{figure}[h]
-  \centering
-  \includegraphics[width = 300px]{images/ns_1.jpg}
-  \caption*{Credits: Wikimedia Commons: Evanherk - CC BY-SA 3.0}
-\end{figure}
 
-Label the pegs as A, B, C from left to right. The objective is to move the $n$ rings on peg A to peg B, with the constraints that you can only move one ring at a time, and you can never place a larger ring onto a smaller ring.
+\begin{eg}[Tower of Hanoi]
+  Referring to the image below,
+
+  \begin{center}
+    \usetikzlibrary{shapes}
+    \definecolor{darkbrown}{rgb}{0.375,0.25,0.125}
+    \tikzset{
+      disc/.style={shade, shading=radial, rounded rectangle,minimum height=.5cm,
+        inner color=#1!20, outer color=#1!60!gray},
+      disc 1/.style={disc=yellow, minimum width=15mm},
+      disc 2/.style={disc=orange, minimum width=20mm},
+      disc 3/.style={disc=red, minimum width=25mm},
+      disc 4/.style={disc=green, minimum width=33mm},
+    }
+    \begin{tikzpicture}
+      \fill [darkbrown] (-0.125,2.5mm) rectangle (.125,3.5);
+      \fill [darkbrown] (3.075,2.5mm) rectangle (3.325,3.5);
+      \fill [darkbrown] (6.275,2.5mm) rectangle (6.525,3.5);
+
+      \fill [darkbrown] (-1.6, 0) rectangle (8,0.25);
+
+      \node[disc 4,yshift={5mm}] {$n$};
+      \node[yshift={11mm}] {$\vdots$};
+      \node[disc 3,yshift={15mm}] {3};
+      \node[disc 2,yshift={20mm}] {2};
+      \node[disc 1,yshift={25mm}] {1};
+
+      \node at (0, -.25) {A};
+      \node at (3.2, -.25) {B};
+      \node at (6.4, -.25) {C};
+    \end{tikzpicture}
+  \end{center}
+
+The objective is to move the $n$ rings on peg A to peg B, with the constraints that you can only move one ring at a time, and you can never place a larger ring onto a smaller ring.
 
 Now claim that this needs exactly $2^n - 1$ moves.
 
@@ -776,7 +802,38 @@ Then $P(n)$ is true for all $n\in N$.
 \begin{eg}
   ``Evolutionary trees'' Imagine that we have a mutant that can produce two offsprings. Each offspring is either an animal or another mutant. A possible evolutionary tree is as follows:
 
-\img{ns_1}
+\tikzstyle{level 1}=[level distance=1cm, sibling distance=3.5cm]
+\tikzstyle{level 2}=[level distance=1cm, sibling distance=2cm]
+
+\begin{center}
+  \begin{tikz}
+    \node {mutant}
+    child {
+      node {mutant} edge from parent
+      child {
+        node {pig} edge from parent
+      }
+      child {
+        node {mutant} edge from parent
+        child {
+          node {slug} edge from parent
+        }
+        child {
+          node {man} edge from parent
+        }
+      }
+    }
+    child {
+      node {mutant} edge from parent
+      child {
+        node {gnu} edge from parent
+      }
+      child {
+        node {ibex} edge from parent
+      }
+    };
+  \end{tikz}
+\end{center}
 
 Let $P(n)$ be the statement $n - 1$ mutants produces $n$ animals. Given some tree with $n$ animals, remove the top mutant to get two sub-trees, with $n_1$ and $n_2$ animals, where $n_1 + n_2 = n$. If $P(k)$ is true $\forall k < n$, then $P(n_1)$ and $P(n_2)$ are true. So the total number of mutants is $1 + (n_1 - 1) + (n_2 - 1) = n - 1$. Hence by strong principle of induction, $P(n)$ is true $\forall n$.
 \end{eg}
@@ -1728,12 +1785,34 @@ This shows that we cannot biject a set to two different objects.
 \begin{proof}
    We can map $(a, b)\mapsto 2^a3^b$ injectively by the fundamental theorem of arithmetic. So $\N\times \N$ is countable.
 
-  We can also have a bijection $(a, b) \mapsto {a + b\choose 2} - a + 1$: 
-\begin{figure}[ht]
-  \centering
-  \includegraphics[width=200pt]{images/ns_2.pdf}
-  \caption*{Credits: Wikimedia Commons: Cronholm144 CC-BY-SA 3.0}
-\end{figure}
+  We can also have a bijection by counting diagonally: $(a, b) \mapsto {a + b\choose 2} - a + 1$: 
+
+  \begin{center}
+
+    \usetikzlibrary{decorations.markings}
+
+    \begin{tikzpicture}[scale=1.8]
+      \draw (0, 0) -- (0, 3.5);
+      \draw (0, 0) -- (3.8, 0);
+      \foreach \i in {1, 2, 3, 4} {
+        \node [left] at (0, \i - 1) {\i};
+        \node [below] at (\i - 1, 0) {\i};
+      }
+
+      \foreach \i in {1, 2, 3, 4} {
+        \foreach \j in {1, 2, 3, 4} {
+          \node [circle, fill = black, minimum size = 0.2cm, inner sep = 0] at (\i - 1, \j - 1) {};
+          \node [anchor = south west] at (\i - 1, \j - 1) {\pgfmathparse{(\i + \j)*(\i + \j - 1) / 2 - \i + 1}\pgfmathprintnumber{\pgfmathresult}};
+        }
+      }
+
+      \draw [dashed] (1, 0) -- (0, 1);
+      \draw [dashed] (2, 0) -- (0, 2);
+      \draw [dashed] (3, 0) -- (0, 3);
+      \draw [dashed] (3.8, 0.2) -- (.5, 3.5);
+      \draw [dashed] (3.8, 1.2) -- (1.5, 3.5);
+    \end{tikzpicture}
+  \end{center}
 \end{proof}
 
 Since $\Z$ is countable, we have an injection $\Z\to \N$, so there is an injection from $\Z\times \N\to \N\times \N \to \N$. So $\Z \times \N$ is countable. However, the rationals are the equivalence classes of $\Z\times\N$. So $\Q$ is countable.
