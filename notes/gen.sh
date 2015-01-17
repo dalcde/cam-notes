@@ -21,7 +21,7 @@ do
     parse="BEGIN{
         printing = 1;
     }
-    /begin\{thm/||/begin\{prop/||/begin\{lemma/||/begin\{cor/||/begin\{axiom/{
+    /begin\{thm/||/begin\{prop/||/begin\{lemma/||/begin\{cor/||/begin\{axiom/||/begin\{law/{
         printing = 1;
     }
 
@@ -39,7 +39,7 @@ do
         printing = 0;
     }
 
-    /end\{thm/||/end\{prop/||/end\{lemma/||/end\{cor/||/end\{axiom/{
+    /end\{thm/||/end\{prop/||/end\{lemma/||/end\{cor/||/end\{axiom/||/end\{law/{
         printing = 0;
     }"
 
@@ -52,7 +52,7 @@ do
     parse="BEGIN{
         printing = 1;
     }
-    /begin\{thm/||/begin\{prop/||/begin\{lemma/||/begin\{cor/||/begin\{axiom/||/begin\{proof/{
+    /begin\{thm/||/begin\{prop/||/begin\{lemma/||/begin\{cor/||/begin\{axiom/||/begin\{law/||/begin\{proof/{
         printing = 1;
     }
 
@@ -70,7 +70,7 @@ do
         printing = 0;
     }
 
-    /end\{thm/||/end\{prop/||/end\{lemma/||/end\{cor/||/end\{axiom/||/end\{proof/{
+    /end\{thm/||/end\{prop/||/end\{lemma/||/end\{cor/||/end\{axiom/||/end\{law/||/end\{proof/{
         printing = 0;
     }"
 
@@ -112,4 +112,4 @@ do
 done
 
 rm -vf texput.*
-rm -vf *~ *.log *.bbl *.blg *.toc *.aux \#*# *.out
+rm -vf *~ *.log *.bbl *.blg *.toc *.aux \#*# *.out *.dvi
