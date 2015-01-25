@@ -57,4 +57,109 @@ We use the observed $\mathbf{X} = \mathbf{x}$ to make inferences about $\theta$,
   \item Giving an interval estimate $(\hat{\theta}_1(\mathbf{x}), \hat{\theta}_2(\mathbf{x}))$ for $\theta$
   \item testing a hypothesis about $\theta$, e.g. whether $\theta = 0$.
 \end{itemize}
+\section{Estimation, bias and mean squared error}
+Suppose that $X_1, \cdots, X_n$ are iid, each with a probability density/mass function $f_X(x|\theta)$. We know $f_X$ but not $\theta$.
+
+\begin{defi}[Statistic]
+  A \emph{statistic} is an estimate of $\theta$. It is a function $T$ of a data. If $\mathbf{X} = \mathbf{x} = (x_1, \cdots, x_n)$, then our estimate is written as $\hat{\theta} = T(\mathbf{x})$. $T(\mathbf{X})$ is an \emph{estimator} of $\theta$.
+
+  The distribution of $T = T(\mathbf{X})$ is its sampling distribution.
+
+  Note that capital $\mathbf{X}$ denotes a random variable and $\mathbf{x}$ is an observed value. So $T(\mathbf{X})$ is a random variable and $T(\mathbf{x})$ is a particular value.
+\end{defi}
+
+\begin{eg}
+  Let $X_1, \cdots, X_n$ is an iid $N(\mu, 1)$. A possible estimator for $\mu$ is
+  \[
+    T(\mathbf{X}) = \frac{1}{n}\sum X_i.
+  \]
+  The for any particular observed sample $\mathbf{x}$, our estimate is
+  \[
+    T(\mathbf{x}) = \frac{1}{n}\sum x_i.
+  \]
+  Recall that in general, if $X_i \sim N(\mu_i, \sigma_i^2)$, then $\sum X_i \sim N(\sum \mu_i, \sum \sigma_i^2)$, which can be proved by moment-generating functions.
+  
+  So we have $T(\mathbf{X})\sim N(\mu, 1/n)$. Note that by the Central Limit Theorem, even if $X_1$ were not normal, we still have $T(\mathbf{X})\sim N(\mu, 1/n)$ for large values of $n$.
+\end{eg}
+
+\begin{defi}[Bias]
+  Let $\hat{\theta} = T(\mathbf{X})$ be an estimator of $\theta$. The \emph{bias} of $\hat{\theta}$ is the difference between its expected value and true value.
+  \[
+    \bias(\hat{\theta}) = \E_\theta(\hat{\theta}) - \theta.
+  \]
+  Note that the subscript $_\theta$ does not represent the random variable, but the thing we want to estimate. This is inconsistent with the use for, say the pmf.
+
+  An estimator is \emph{unbiased} if it has no bias, i.e. $\E_\theta(\hat{\theta}) = \theta$.
+\end{defi}
+To find out $\E_\theta (T)$, we can either find the distribution of $T$ and find its expected value, or evaluate $T$ as a function of $\mathbf{X}$ directly, and find its expected value. 
+
+\begin{eg}
+  In the above example, $\E_\mu(T) =\mu$. So $T$ is unbiased for $\mu$. 
+\end{eg}
+\subsection{Mean squared error}
+In general, we prefer estimators whose sampling distributions ``cluster more closely'' around the true value of $\theta$.
+\begin{defi}[Mean squared error]
+  The \emph{mean squared error} of an estimator $\hat{\theta}$ is $\E_\theta[(\hat{\theta} - \theta)^2]$.
+
+  Sometimes, we use the \emph{root mean squared error}, that is the square root of the above.
+\end{defi}
+For an unbiased estimator, the mean squared error is just the variance. In general,
+\begin{align*}
+  \E_\theta[(\hat{\theta} - \theta)^2] &= \E_\theta[(\hat{\theta} - E_\theta(\hat{\theta}) + \E_\theta(\hat{\theta}) - \theta)^2]\\
+  &= \E_\theta[(\hat{\theta} - E_\theta(\hat{\theta}))^2] + \E_\theta(\hat{\theta}) - \theta]^2 + 2[\E_\theta(\hat{\theta}) - \theta]\E_\theta[\hat{\theta} - \E_\theta(\hat{\theta})]\\
+  &= \var(\hat{\theta}) + \bias^2(\hat{\theta}).
+\end{align*}
+%complete this
+Sometimes it can be preferable to have a biased estimator with a low variance - sometimes know as the ``bias-variance tradeoff''.
+
+For example, suppose $X\sim \binomial(n, \theta)$. The standard estimator is $T_U = \mathbf{X}/n$, which is unbiased. $T_U$ has variance
+\[
+  \var_\theta(T_U) = \var_\theta(\mathbf{X})/n^2 = \theta(1 - \theta)/n.
+\]
+Consider an alternative estimator 
+\[
+  T_B = \frac{X + 1}{n + 2} = w\frac{X}{n} + (1 - w)\frac{1}{2},
+\]
+where $w = n/(n + 2)$. This can be interpreted to be a weighted average (by the sample size) of the sample mean and $1/2$. We have
+\[
+  \E_\theta(T_B) - \theta = \frac{n\theta + 1}{n + 2} - \theta = (1 - w)\left(\frac{1}{2} - \theta\right),
+\]
+and is biased. However,
+\[
+  \var_\theta(T_B) = \frac{\var_\theta(\mathbf{X})}{(n + 2)^2} = w^2\theta(1 - \theta)/n
+\]
+Now
+\[
+  \mse (T_U) = \var_\theta(T_U) + \bias^2(T_U) = \theta(1 - \theta)/n.
+\]
+and
+\[
+  \mse (T_B) = \var_\theta(T_B) + \bias^2(T_B) = w^2\frac{\theta(1 - \theta)}{n} + (1 - w)^2\left(\frac{1}{2} - \theta\right)^2
+\]
+We can plot the mean squared error for possible values of $\theta$. Here we plot the case where $n =1 0$.
+\begin{center}
+  \begin{tikzpicture}[xscale=6,yscale=100]
+    \draw [dashed, domain=0:1] plot (\x, {\x * (1 - \x) / 10});
+    \node [above] at (0.5, 0.025) {unbiased estimator};
+    \draw [domain=0:1] plot (\x, {25 * \x * (1 - \x) / 360 + (1 - 5/6)*(1 - 5/6)*(0.5 - \x)*(0.5 - \x)}) node [right] {biased estimator};
+    \draw [->] (0, 0) -- (1.1, 0) node [right] {$\theta$};
+    \draw [->] (0, 0) -- (0, 0.035) node [above] {mse};
+    \foreach \x in {0, 0.2, 0.4, 0.6, 0.8, 1.0} {
+      \draw (\x, 0) -- (\x, -0.002) node [below] {\x};
+    }
+    \foreach \y in {0, 0.01, 0.02, 0.03} {
+      \draw (0, \y) -- (-.03, \y) node [left] {\y};
+    }
+  \end{tikzpicture}
+\end{center}
+%plot
+We see that this biased estimator has smaller MSE unless $\theta$ has extreme values.
+
+Also, suppose $X\sim \Poisson(\lambda)$, and for some reason, you want to estimate $\theta = [P(\mathbf{X} = 0)]^2 = e^{-2\lambda}$. Then any estimator $T(\mathbf{X})$ must satisfy $\E_\theta(T(\mathbf{X})) = \theta$, or equivalently,
+\[
+  E_\lambda(T(\mathbf{X})) = e^{-\lambda}\sum_{x = 0}^\infty T(x) \frac{\lambda^x}{x!} = e^{-2\lambda}.
+\]
+Then the only function $T$ that can satisfy this equation is $T(X) = (-1)^X$.
+
+Then the only unbiased estimator estimate $e^{-2\lambda}$ to be $1$ if $X$ is even, -1 if $X$ is odd. CLEARLY crazy. 
 \end{document}

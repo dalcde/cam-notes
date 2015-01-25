@@ -16,7 +16,28 @@ pdfkeywords={Cambridge Mathematics Maths Math II Lent Logic and Set Theory}]{hyp
 \begin{document}
 \maketitle
 {\small
-}
+  \noindent\textbf{Ordinals and cardinals}\\
+  Well-orderings and order-types. Examples of countable ordinals. Uncountable ordinals and Hartogs' lemma. Induction and recursion for ordinals. Ordinal arithmetic. Cardinals; the hierarchy of alephs. Cardinal arithmetic.\hspace*{\fill} [5]
+
+  \vspace{10pt}
+  \noindent\textbf{Posets and Zorn's lemma}\\
+  Partially ordered sets; Hasse diagrams, chains, maximal elements. Lattices and Boolean algebras. Complete and chain-complete posets; fixed-point theorems. The axiom of choice and Zorn's lemma. Applications of Zorn's lemma in mathematics. The well-ordering principle.\hspace*{\fill} [5]
+
+  \vspace{10pt}
+  \noindent\textbf{Propositional logic}\\
+  The propositional calculus. Semantic and syntactic entailment. The deduction and completeness theorems. Applications: compactness and decidability.\hspace*{\fill} [3]
+
+  \vspace{10pt}
+  \noindent\textbf{Predicate logic}\\
+  The predicate calculus with equality. Examples of first-order languages and theories. Statement of the completeness theorem; *sketch of proof*. The compactness theorem and the Lowenheim-Skolem theorems. Limitations of first-order logic. Model theory.\hspace*{\fill} [5]
+
+  \vspace{10pt}
+  \noindent\textbf{Set theory}\\
+  Set theory as a first-order theory; the axioms of ZF set theory. Transitive closures, epsilon-induction and epsilon-recursion. Well-founded relations. Mostowski's collapsing theorem. The rank function and the von Neumann hierarchy.\hspace*{\fill} [5]
+  
+  \vspace{10pt}
+  \noindent\textbf{Consistency}\\
+  *Problems of consistency and independence*\hspace*{\fill} [1]}
 
 \tableofcontents
 
@@ -143,7 +164,7 @@ While semantic implication captures the idea of truthfulness, syntactic implicat
 
 Our system of deduction composes of the following axioms:
 \begin{enumerate}
-  \item $p\Rightarrow(q\Rightarrow q)$
+  \item $p\Rightarrow(q\Rightarrow p)$
   \item $[p\Rightarrow(q\Rightarrow r)]\Rightarrow[(p\Rightarrow q)\Rightarrow(p \Rightarrow r)]$
   \item $(\neg\neg p)\Rightarrow p$
 \end{enumerate}
@@ -254,12 +275,107 @@ This is the \emph{completeness theorem}, made up of two directions:
   \item Adequacy: If $S\models t$, $S\vdash t$.  ``Our axioms are strong enough to be able to deduce, from $S$, \emph{all} semantic consequences of $S$.''
 \end{enumerate}
 
-\begin{prop}[Soundness]
-  If $S\subset L$, $t\in L$, then if $S\vdash t$, then $S\models t$.
+\begin{prop}[Soundness theorem]
+  If $S\vdash t$, then $S\models t$.
 \end{prop}
 
 \begin{proof}
   Given valuation $v$ with $v(s) = 1$ for all $s\in S$, we need to show that $v(t) = 1$. But $v(p) = 1$ for all axioms $p$, and $v(p) = 1$ for all $p\in S$, and if $v(p) = 1$ and $v(p\Rightarrow q) = 1$, then $v(q) = 1$. Hence each line $t_i$ in a proof $t_1, \cdots, t_n$ of from $S$ has $v(t_i) = 1$. 
 \end{proof}
-This works because we know that all axioms of tautologies. 
+This works because we know that all axioms of tautologies.
+
+We first prove a special case of adequacy:
+\begin{defi}[Consistent]
+  $S$ is \emph{inconsistent} if $S\vdash \bot$. $S$ is \emph{consistent} if it is not inconsistent.
+\end{defi}
+
+We prove the following statement:
+\begin{thm}[Model existence theorem]
+  If $S\models \bot$, then $S\vdash \bot$. i.e., if $S$ has no model, then $S$ is consistent. i.e. If $S$ is consistent, then $S$ has a model.
+
+  \note Some books call this the ``completeness theorem'', because the rest of the completeness theorem follows trivially from this. 
+\end{thm}
+
+In fact, this would imply adequacy. Indeed if $S\models t$, then  $S\cup \{\neg t\}\models \bot$. Hence $S\cup \{\neg t\}\vdash \bot$ by our special case. So $S\vdash \neg \neg t$ by the deduction theorem. But $\vdash (\neg\neg t)\Rightarrow t$ by Axiom 3. So $S\vdash t$.
+
+\begin{proof}
+  The idea is that we'd like to define $v: L \to \{0, 1\}$ by
+  \[
+    p\mapsto
+    \begin{cases}
+      1 & \text{if } p\in S\\
+      0 & \text{if } p\in S
+    \end{cases}
+  \]
+  However, this is obviously going to fail, because we might have implications of $S$ that are not in $S$, i.e. $S$ is not \emph{deductively closed} (deductively closed means $S\vdash p$ implies $p\in S$). Yet this is not a serious problem - we take the deductive closure first.
+
+  But there is a more serious problem. There might be a $p$ with $S\not\vdash p$ and $S\not\vdash \neg p$. This is the case if $p$ never appears in $S$. We'll try to extend $S$ to ``swallow up'' half of $L$. i.e. we give $p$ an arbitrary truth value, without making $S$ inconsistent. The meat of this proof is then to see that we can ``swallow up'' propositions consistently.
+
+  We first try to swallow up one proposition only.
+  
+  \noindent\textbf{Claim.} For consistent $S\subset L$ and $p\in L$, we have $S\cup \{p\}$ or $S\cup \{\neg p\}$ consistent.
+
+  Suppose instead that $S\cup \{p\} \vdash \bot$ and $S\cup \{\neg p\}\vdash \bot$.Then by the deduction theorem, $S\vdash p$ and $S\vdash \neg p$. So $S\vdash \bot$.
+
+  As a general rule of mathematics, after doing it for one thing, we do it for infinitely many things.
+
+  Now we suppose $L$ is countable. So we can list $L$ as $\{t_1, t_2, \cdots\}$.
+
+  Let $S_0 = S$. Then let $S_1 = S\cup \{t_1\}$ or $S\cup \{\neg t_1\}$ such that $S_1$ is consistent, and let $S_2 = S_1 \cup \{t_2\}$ or $S_1\cup \{\neg t_2\}$ such that $S_2$ is consistent. Continue inductively.
+
+  Set $\bar{S} = S_0\cup S_1\cup S_2\cdot$. Then $p\in \bar{S}$ or $\neg p\in \bar{S}$ for each $p\in l$ by construction. Also $\bar S$ is consistent (If $\bar S\vdash \bot$, then some $S_n\vdash \bot$ since proofs are finite, but all $S_n$ are consistent). Finally, we check that $\bar S$ is deductively closed, since if $\bar S\models p$, and $p\not\in \bar S$, then $\neg p\not\in \bar S$. Then $\bar S$ would be inconsistent.
+
+  Define $v: L\to \{0, 1\}$ by
+  \[
+    p \mapsto
+    \begin{cases}
+      1 & \text{if }p\in \bar S\\
+      0 & \text{if not}
+    \end{cases}.
+  \]
+  We claim this is a valuation:
+
+  $v(\bot) = 0$ as $\bot \not\in \bar S$ (since $\bar S$ is consistent).
+
+  For $p\Rightarrow q$,
+  \begin{enumerate}
+    \item If $v(p) = 1, v(q) = 0$, we have $p\in \bar S$, $q\not\in \bar S$. We want to show $p\Rightarrow q\not\in \bar S$. But if $p\Rightarrow q\in \bar S$, then $\bar S \vdash q$ by MP. Hence $q\in \bar S$ since $\bar S$ is deductively closed.
+    \item If $v(q) = 1$, then $q\in \bar S$. We want $p\Rightarrow q\in \bar S$. But $\vdash p\Rightarrow (p\Rightarrow q)$ (Axiom 1). So $p\Rightarrow q \in \bar S$ by deductive closure.
+    \item If $v(p) = 0$, then $p\not\in \bar S$. So $\neg p\in \bar S$, and we want $p\Rightarrow q\in \bar S$. So we want to show $\neg p\vdash p\Rightarrow q$. By the deduction theorem, this is equivalent to $\{p, \neg p\} \vdash q$. But $\{p, \neg p\}\vdash \bot$. So it is enough to show $\bot \vdash q$. But $\bot \models \neg \neg q$ by Axiom 1 (since $\bot \Rightarrow (\neg q\Rightarrow \bot)$). It is a theorem that $\neg \neg q\Rightarrow q$. So $\bot \vdash q$. 
+  \end{enumerate}
+\end{proof}
+Note that this is the place where we really use Axiom 3 for the first time.
+
+However, what if the primitives $P$ are not countable? (e.g. $P = \{p_r: r\in \R\}$) This proof would not work, and we will need Zorn's Lemma (c.f. later lectures).
+
+By remark before our theorem, we have
+\begin{cor}[Adequacy theorem]
+  Let $S\subset L$, $t\in L$. Then $S\models t$ implies $S\vdash t$. 
+\end{cor}
+
+\begin{thm}[Completeness theorem]
+  Le $S\subset L$ and $t\in L$. Then $S\models t$ if and only if $S\vdash t$.
+\end{thm}
+
+\begin{proof}
+  ($\Leftarrow$): Soundness. ($\Rightarrow $) Adequacy.
+\end{proof}
+
+This has two nice consequences.
+\begin{cor}[Compactness theorem]
+  Let $S\subset L$ and $t\in L$ with $S\models t$. The some finite $S'\subset S$ has $S'\models t$.
+\end{cor}
+
+\begin{proof}
+  Trivial with $\models$ replaced by $\vdash$, because proofs are finite.
+\end{proof}
+The special case $t = \bot$ says, if every finite subset of $S$ has a models, then $S$ has a model. This is also called the compactness theorem.
+
+\begin{cor}[Decidability theorem]
+  Let finite $S\subset L$, $t\in L$. Then there exists an algorithm that determines, in finite time, whether or not $S\vdash t$.
+\end{cor}
+This is \emph{very} surprising because proofs are HARD TO FIND!
+\begin{proof}
+  Trivial with $\vdash$ replaced by $\models$, by making a truth table.
+\end{proof}
 \end{document}

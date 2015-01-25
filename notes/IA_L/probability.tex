@@ -376,4 +376,146 @@ This approximation can be improved:
     \frac{\binom{26}{13}\binom{26}{13}}{\binom{52}{26}} = 0.2181.
   \]
 \end{eg}
+\section{Axiomatic approach}
+\begin{defi}[Probability space]
+  A \emph{probability space} is a triple $(\Omega, \F, P)$. $\Omega$ is the \emph{sample space}, $\F$ is a collection of subsets of $\Omega$. $P: \F\to [0, 1]$ is the \emph{probability measure}. $\F$ has to satisfy the following axioms:
+  \begin{enumerate}
+    \item $\emptyset, \Omega\in \mathbf{F}$.
+    \item $A\in \F \Rightarrow  A^C\in \F$.
+    \item $A_1, A_2, \cdots, \in \F \Rightarrow \bigcup_{i = 1}^\infty \in \F$.
+  \end{enumerate}
+  And $P$ has to satisfy the following \emph{Kolmogorov axioms}:
+  \begin{enumerate}
+    \item $o \leq P(A) \leq 1 $ for all $A\in \F$
+    \item $P(\Omega) = 1$
+    \item For any countable collection of events $A_1, A_2, \cdots$ which are disjoint, i.e. $A_i\cap A_j = \emptyset$ for all $i, j$, then
+      \[
+        P\left(\bigcup_i A_i\right) = \sum_i P(A_i).
+      \]
+  \end{enumerate}
+  We say $P(A)$ is the probability of the event $A$.
+\end{defi}
+
+\begin{defi}[Probability distribution]
+  Let $\Omega = \{\omega_1, \omega_2, \cdots\}$. Choose $\{p_1, p_2, \cdots, \}$ such that $\sum_{i}^\infty = 1$. Let $p(\omega_i) = p_i$. Then define
+  \[
+    P(A) = \sum_{\omega_i\in A} p(\omega_i).
+  \]
+  This $P(A)$ satisfies the above axioms, and $p_1, p_2, \cdots$ is the \emph{probability distribution}
+\end{defi}
+
+\begin{thm}\leavevmode
+  \begin{enumerate}
+    \item $P(\emptyset) = 0$
+    \item $P(A^C) + 1 - P(A)$
+    \item $A\subseteq B \Rightarrow P(A) \leq P(B)$
+    \item $P (A\subseteq B) = P(A) + P(B) - P(A\cap B)$.
+    \item Let $A_1\subseteq A_2\subseteq A_3\subseteq \cdots$. Then
+      \[
+        P\left(\bigcup_1^\infty A_i\right) = \lim_{n\to \infty} P(A_n).
+      \]
+      This states that $P$ is a continuous set function.
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item $\Omega$ and $\emptyset$ are disjoint. So $P(\Omega) + P(\emptyset) = P(\Omega \cup \emptyset) = P(\Omega)$. So $P(\emptyset) = 0$.
+    \item $P(\Omega) = 1 = P(A) + P(A^C)$ since $A$ and $A^C$ are disjoint.
+    \item Write $B = A\cup (B\cap A^C)$. Then $P(B) = P(A) + P(B\cap A^C) \geq P(A)$.
+    \item $P(A\cup B) = P(A) + P(B\cap A^C)$. We also know that $P(B) = P(A\cap B) + P(B\cap A^C)$. Then the result follows.
+    \item c.f. Lecture 7
+  \end{enumerate}
+\end{proof}
+
+From above, we know that $P(A\cup B) \leq P(A) + P(B)$. So we say that $P$ is a \emph{subadditive} function.  We also know that $P(A\cap B) + P(A \cup B) \leq P(A) + P(B)$ (in fact they are equal!). We say $P$ is \emph{submodular}.
+
+\subsection{Boole's inequality}
+This is also known as the ``union bound''.
+\begin{thm}[Boole's inequality]
+  For any $A_1, A_2, \cdots$,
+  \[
+    P\left(\bigcup_{i = 1}^\infty A_i\right) \leq \sum_{i =1}^\infty P(A_i).
+  \]
+\end{thm}
+
+\begin{proof}
+  The axiom states a similar formula that only holds for disjoint sets. So we need a clever trick to make them disjoint. We define
+  \begin{align*}
+    B_1 &= A_1\\
+    B_2 &= A_2\setminus B_1\\
+    B_i &= A_i\setminus \bigcup_{k = 1}^{i -1 }A_k.
+  \end{align*}
+  So we know that
+  \[
+    \bigcup B_i = \bigcup A_i.
+  \]
+  But the $B_i$ are disjoint. So our Axiom (iii) gives
+  \[
+    P(\bigcup_i A_i) = P(\bigcup _i B_i) = \sum_i P(B_i) \leq \sum_i P(A_i).
+  \]
+  Where the last inequality follows from (iii) of the theorem above.
+\end{proof}
+
+\begin{eg}
+  Suppose we have countably infinite number of biased coins. Let $A_k = [k$th toss head$]$ and $P(A_k) = p_k$. Suppose $\sum_1^\infty p_k < \infty$. What is the probability that there are infinitely many heads?
+
+  The event ``there is at least one more head after the $i$th coin toss'' is $\bigcup_{k = i}^\infty A_k$. There are infinitely many heads if and only if there are unboundedly many coin tosses, i.e. no matter how high $i$ is, there is still at least more more head after the $i$th toss.
+
+  So the probability required is
+  \[
+    P\left(\bigcap_{i = 1}^\infty\bigcup _{k = i}^\infty A_k\right) \leq \lim_{i \to \infty} P\left(\bigcup_{k = i}A_k\right)= \lim_{i\to \infty}\sum_{k = i}^\infty p_k \to 0
+  \]
+  Therefore $P($infinite number of heads$) = 0$.
+\end{eg}
+
+\begin{eg}[Erdos 1947]
+  Is it possible to colour a complete $n$-graph (i.e. a graph of $n$ vertices with edges between every pair of vertices) red and black such that no $k$-vertex complete subgraph with monochrome edges?
+
+  Erd\"os said this is possible if
+  \[
+    \binom{n}{k} 2^{1 - \binom{k}{2}} < 1.
+  \]
+  We colour edges randomly, and let $A_i=[i$th subgraph has monochrome edges$]$. Then the probability that at least one subgraph has monochrome edges is
+  \[
+    P\left(\bigcup A_i\right) \leq \sum_i P(A_i) = \binom{n}{k} 2\cdot 2^{-\binom{k}{2}}.
+  \]
+  The last expression is obtained since there are $\binom{n}{k}$ ways to choose a subgraph; a monochrome subgraph can be either red or black, thus the multiple of 2; and the probability of getting all red (or black) is $2^{-\binom{k}{2}}$.
+
+  If this probability is less than 1, then there must be a way to colour them in which it is impossible to find a monochrome subgraph, or else the probability is 1.
+\end{eg}
+
+\subsection{Inclusion-exclusion formula}
+\begin{thm}[Inclusion-exclusion formula]
+  \begin{align*}
+    P\left(\bigcup_i^n A_i\right) &= \sum_1^n P(A_i) - \sum_{i_1 < i_2} P(A_{i_1}\cap A_{j_2}) + \sum_{i_1 < i_2 < i_3}P(A_{i_1}\cap A_{i_2} \cap A_{i_3}) - \cdots\\
+    &+ (-1)^{n - 1} P(A_1\cap \cdots \cap A_n).
+  \end{align*}
+\end{thm}
+
+\begin{proof}
+  Perform induction on $n$. $n = 2$ is proven above.
+
+  Then
+  \[
+    P(A_1\cup A_2\cup \cdots A_n) = P(A_1) = P(A_2\cup\cdots\cup A_n) - P\left(\bigcup_{i = 2}^n (A_1\cap A_i)\right).
+  \]
+  and we can apply the induction hypothesis for $n - 1$.
+\end{proof}
+
+\begin{eg}
+  Let $1, 2, \cdots, n$ be randomly permuted to $\pi(1), \pi(2), \cdots, \pi(n)$. If 
+  $i \not= \pi(i)$ for all $i$, we say we have a \emph{derangement}.
+
+  Let $A_i = [i = \pi(i)]$.
+
+  Then
+  \begin{align*}
+    P\left(\bigcup _{i = 1}^n A_i\right) &= \sum_{k} P(A_k) - \sum_{k_1 < k_2} P(A_{k_1} \cap A_{k_2}) + \cdots\\
+    &= n\cdot \frac{1}{n} - \binom{n}{2}\frac{1}{n}\frac{1}{n - 1} + \binom{n}{3}\frac{1}{n}\frac{1}{n - 1}\frac{1}{n - 2}\\
+    &= 1 - \frac{1}{2!} + \frac{1}{3!} - \cdots + (-1)^{n - 1}\frac{1}{n!}\\
+    &\to e^{-1}
+  \end{align*}
+  So the probability of derangement is $1 - P(\bigcup A_k) = 1 - e^{-1}\approx 0.632$.
+\end{eg}
 \end{document}
