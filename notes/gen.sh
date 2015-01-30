@@ -83,7 +83,7 @@ do
     parse="BEGIN{
         printing = 1;
     }
-    /begin\{defi/{
+    /begin\{defi/||/begin\{notation/{
         printing = 1;
     }
 
@@ -101,7 +101,7 @@ do
         printing = 0;
     }
 
-    /end\{defi/{
+    /end\{defi/||/begin\{notation/{
         printing = 0;
     }"
 

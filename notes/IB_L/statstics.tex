@@ -43,19 +43,19 @@ In this course, we focus on formal \emph{statistical inference}. In the process,
 \end{itemize}
 In particular, we perform parametric inference:
 
-We assume a random variable $X$ takes values in $\mathcal{X}$. We assume its distribution belongs to a family of distribution (e.g. Poisson) indexed by a scalar or vector parameter $\theta$, taking values in some parameter space $\Theta$. We call this a \emph{parametric family}.
+We assume a random variable $X$ takes values in $\mathcal{X}$. We assume its distribution belongs to a family of distribution (eg. Poisson) indexed by a scalar or vector parameter $\theta$, taking values in some parameter space $\Theta$. We call this a \emph{parametric family}.
 
 For example, we can have $X\sim \text{Poisson}(\mu)$ and $\theta = \mu\in\Theta = (0, \infty)$.
 
 We assume that we already which family it belongs to, and then try to find out $\theta$.
 
-Suppose $X_1, X_2, \cdots, X_n$ are iid with the same distribution as $X$. Then $\mathbf{X} = (X_1, X_2, \cdots, X_n)$ is a simple random sample (i.e. our data).
+Suppose $X_1, X_2, \cdots, X_n$ are iid with the same distribution as $X$. Then $\mathbf{X} = (X_1, X_2, \cdots, X_n)$ is a simple random sample (ie. our data).
 
 We use the observed $\mathbf{X} = \mathbf{x}$ to make inferences about $\theta$, such as
 \begin{itemize}
   \item giving an estimate $\hat{\theta}(\mathbf{x})$ of the true value of $\theta$.
   \item Giving an interval estimate $(\hat{\theta}_1(\mathbf{x}), \hat{\theta}_2(\mathbf{x}))$ for $\theta$
-  \item testing a hypothesis about $\theta$, e.g. whether $\theta = 0$.
+  \item testing a hypothesis about $\theta$, eg. whether $\theta = 0$.
 \end{itemize}
 \section{Estimation, bias and mean squared error}
 Suppose that $X_1, \cdots, X_n$ are iid, each with a probability density/mass function $f_X(x|\theta)$. We know $f_X$ but not $\theta$.
@@ -89,7 +89,7 @@ Suppose that $X_1, \cdots, X_n$ are iid, each with a probability density/mass fu
   \]
   Note that the subscript $_\theta$ does not represent the random variable, but the thing we want to estimate. This is inconsistent with the use for, say the pmf.
 
-  An estimator is \emph{unbiased} if it has no bias, i.e. $\E_\theta(\hat{\theta}) = \theta$.
+  An estimator is \emph{unbiased} if it has no bias, ie. $\E_\theta(\hat{\theta}) = \theta$.
 \end{defi}
 To find out $\E_\theta (T)$, we can either find the distribution of $T$ and find its expected value, or evaluate $T$ as a function of $\mathbf{X}$ directly, and find its expected value. 
 
@@ -109,7 +109,6 @@ For an unbiased estimator, the mean squared error is just the variance. In gener
   &= \E_\theta[(\hat{\theta} - E_\theta(\hat{\theta}))^2] + \E_\theta(\hat{\theta}) - \theta]^2 + 2[\E_\theta(\hat{\theta}) - \theta]\E_\theta[\hat{\theta} - \E_\theta(\hat{\theta})]\\
   &= \var(\hat{\theta}) + \bias^2(\hat{\theta}).
 \end{align*}
-%complete this
 Sometimes it can be preferable to have a biased estimator with a low variance - sometimes know as the ``bias-variance tradeoff''.
 
 For example, suppose $X\sim \binomial(n, \theta)$. The standard estimator is $T_U = \mathbf{X}/n$, which is unbiased. $T_U$ has variance
@@ -136,7 +135,7 @@ and
 \[
   \mse (T_B) = \var_\theta(T_B) + \bias^2(T_B) = w^2\frac{\theta(1 - \theta)}{n} + (1 - w)^2\left(\frac{1}{2} - \theta\right)^2
 \]
-We can plot the mean squared error for possible values of $\theta$. Here we plot the case where $n =1 0$.
+We can plot the mean squared error for possible values of $\theta$. Here we plot the case where $n = 10$.
 \begin{center}
   \begin{tikzpicture}[xscale=6,yscale=100]
     \draw [dashed, domain=0:1] plot (\x, {\x * (1 - \x) / 10});
@@ -152,7 +151,6 @@ We can plot the mean squared error for possible values of $\theta$. Here we plot
     }
   \end{tikzpicture}
 \end{center}
-%plot
 We see that this biased estimator has smaller MSE unless $\theta$ has extreme values.
 
 Also, suppose $X\sim \Poisson(\lambda)$, and for some reason, you want to estimate $\theta = [P(\mathbf{X} = 0)]^2 = e^{-2\lambda}$. Then any estimator $T(\mathbf{X})$ must satisfy $\E_\theta(T(\mathbf{X})) = \theta$, or equivalently,
@@ -162,4 +160,234 @@ Also, suppose $X\sim \Poisson(\lambda)$, and for some reason, you want to estima
 Then the only function $T$ that can satisfy this equation is $T(X) = (-1)^X$.
 
 Then the only unbiased estimator estimate $e^{-2\lambda}$ to be $1$ if $X$ is even, -1 if $X$ is odd. CLEARLY crazy. 
+\section{Sufficiency}
+``Sufficiency'' is the question ``Is there a statistic $T(\mathbf{X})$ that in some sense contains all the information about $\theta$ that is in the sample?'' This is important in ``big data'' in which we have to store a large number of data.
+
+\begin{eg}
+  Let $X_1, \cdots X_n$ be iid $\Bernoulli(\theta)$, so that $\P(X_i = 1) = 1 - \P(X_i = 0) = \theta$ for some $0 < \theta < 1$. So
+  \[
+    f_{\mathbf{X}} (\mathbf{x}|\theta) = \prod_{i = 1}^n \theta^{x_i}(1 - \theta)^{1 - x_i} = \theta^{\sum x_i}(1 - \theta)^{n - \sum x_i}.
+  \]
+  This depends on the data only through $T(\mathbf{X}) = \sum x_i$, the total number of ones. Note that $T(\mathbf{X})\sim \binomial(n, \theta)$.
+
+  If $T(\mathbf{x}) = t$, then
+  \[
+    f_{\mathbf{X}|T = t} = \frac{\P_\theta(\mathbf{X} = \mathbf{x}, T = t}{\P_\theta T = t} = \frac{\P_\theta(\mathbf{X} = \mathbf{x})}{T = t}.
+  \]
+  Where the last equality comes because since if $\mathbf{X} = \mathbf{x}$, then $T$ must be equal to $t$. This is equal to
+  \[
+    \frac{\theta^{\sum x_i}(1 - \theta)^{n - \sum x_i}}{\binom{n}{t}\theta^t (1 - \theta)^{n - t}} = \binom{n}{t}^{-1}.
+  \]
+  So we know that the conditional distribution of $\mathbf{X}$ given $T = t$ does not depend on $\theta$. So if we know $T$, then additional knowledge of $\mathbf{x}$ does not give more information about $\theta$.
+\end{eg}
+
+\begin{defi}[Sufficient statistic]
+  A statistic $T$ is \emph{sufficient} for $\theta$ if the conditional distribution of $\mathbf{X}$ given $T$ does not depend on $\theta$.
+\end{defi}
+
+In practice, we find them as follows:
+\begin{thm}[The factorization criterion]
+  $T$ is sufficient for $\theta$ iff $f_{\mathbf{X}}(\mathbf{x} |\theta) = g(T(\mathbf{x}), \theta)h(\mathbf{x})$ for some functions $g$ and $h$.
+\end{thm}
+
+\begin{proof}
+  (discrete case only)
+
+  Suppose $f_\mathbf{X}(\mathbf{x}|\theta) = g(T(\mathbf{x}, \theta)h(\mathbf{x})$. If $T(\mathbf{x}) = t$, then
+  \begin{align*}
+    f_{\mathbf{X}|T = t}(\mathbf{x}|T = t) &= \frac{\P_\theta(\mathbf{X} = \mathbf{x}, T(\mathbf{X}) = t)}{\P_\theta (T = t)}\\
+    &= \frac{g(T(\mathbf{x}), \theta)h(\mathbf{x})}{\sum_{\{x:T(\mathbf{x}) = t\}}g(T(\mathbf{x}), \theta)h(\mathbf{x})}\\
+    &=\frac{g(t, \theta)h(\mathbf{x})}{g(t, \theta)\sum h(\mathbf{x})}\\
+    &= \frac{h(\mathbf{x})}{\sum h(\mathbf{x})}
+  \end{align*}
+  which doesn't depend on $\theta$. So $T$ is sufficient.
+
+  Now suppose $T$ is sufficient so that the conditional distribution of $\mathbf{X}|T = t$ does not depend on $\theta$. If $T(\mathbf{x}) = t$, then
+  \[
+    \P_\theta(\mathbf{X} = \mathbf{x}) = \P_\theta(\mathbf{X} = \mathbf{x}, T=t') = \P_\theta(\mathbf{X} = \mathbf{x}|T = t)\P_\theta (T = t).
+  \]
+
+  The first factor does not depend on $\theta$ by assumption; call it $h(\mathbf{x})$. Let the second factor be $g(t, \theta)$, and so we have the required factorisation.
+\end{proof}
+
+\begin{eg}
+  Continuing the above example,
+  \[
+    f_\mathbf{X}(\mathbf{x}|\theta) = \theta^{\sum x_i}(1 - \theta)^{n - \sum x_i}.
+  \]
+  Take $g(t, \theta) = \theta^t(1 - \theta)^{n - t}$ and $h(\mathbf{x}) = 1$ to see that $T(\mathbf{X}) = \sum X_i$ is sufficient for $\theta$.
+\end{eg}
+
+\begin{eg}
+  Let $X_1, \cdots, X_n$ be iid $U[0, \theta]$. Write $1_{[A]}$ for the indicator function of $A$. We have
+  \[
+    f_\mathbf{X}(\mathbf{x}|\theta) = \prod_{i = 1}^n \frac{1}{\theta}1_{[0 \leq x_i\leq \theta]} = \frac{1}{\theta^n}1_{[\max_i x_i \leq \theta]}1_{[\min_i x_i\geq 0]}.
+  \]
+  So $T = \max_i x_i$ is sufficient.
+\end{eg}
+
+Note that sufficient statistics are not unique. If $T$ is sufficient for $\theta$, then so is any 1-1 function of $T$. $\mathbf{X}$ is always sufficient for $\theta$ as well, but it is not of much use.
+
+
+The sample space $\mathcal{X}^n$ is partitioned by $T$ into sets $\{\mathbf{x}\in \mathcal{X}: t(\mathbf{X}) = t\}$. If $T$ is sufficient, then this data reduction does not lose any information on $\theta$. We seek a sufficient statistic that achieves the maximum-possible reduction.
+
+\begin{defi}[Minimal sufficiency]
+  A sufficient statistic $T(\mathbf{x})$ is minimal if it is a function of every other sufficient statistic, ie. if $T'(\mathbf{X})$ is also sufficient, then $T'(\mathbf{X}) = T'(\mathbf{Y}) \Rightarrow  T(\mathbf{X}) = T(\mathbf{Y})$. ie. it has the coarsest partitions.
+\end{defi}
+
+We can find them using the following theorem:
+\begin{thm}
+  Suppose $T = T(\mathbf{X})$ is a statistic such that $f_\mathbf{X}(\mathbf{x}; \theta)/f_\mathbf{X}(\mathbf{y}; \theta)$ is a constant as a function of $\theta$ if and only if $T(\mathbf{x}) = T(\mathbf{y})$. Then $T$ is minimal sufficient for $\theta$.
+\end{thm}
+
+\begin{eg}
+  Suppose $X_1, \cdots, X_n$ are iid $N(\mu, \sigma^2)$. Then
+  \begin{align*}
+    \frac{f_\mathbf{X}(\mathbf{x}|\mu, \sigma^2)}{f_\mathbf{X}(\mathbf{y}|\mu, \sigma^2)} &= \frac{(2\pi\sigma^2)^{-n/2}\exp\left\{-\frac{1}{2\sigma^2}\sum_i(x_i - \mu)^2\right\}}{(2\pi\sigma^2)^{-n/2}\exp\left\{-\frac{1}{2\sigma^2}\sum_i(y_i - \mu)^2\right\}}\\
+    &=\exp\left\{-\frac{1}{2\sigma^2}\left(\sum_i x_i^2 - \sum_i y_i^2\right) + \frac{\mu}{\sigma^2}\left(\sum_{i}x_i - \sum_i y_i\right)\right\}.
+  \end{align*}
+  This is a constant function of $(\mu, \sigma^2)$ iff  $\sum_i x_i^2 = \sum_i y_i^2$ and $\sum_i x_i = \sum_i y_i$. So $T(\mathbf{X}) = (\sum_i X_i^2, \sum_i X_i)$ is minimal sufficient for $(\mu, \sigma^2)$.
+\end{eg}
+\note If the range of $\mathbf{X}$ depends on $\theta$, then ``$f_\mathbf{X}(\mathbf{x}; \theta)/f_\mathbf{X}(\mathbf{y};\theta)$ is constant in $\theta$'' means ``$f_\mathbf{X}(\mathbf{x}; \theta = c(\mathbf{x}, \mathbf{y})f_\mathbf{X}(\mathbf{y}; \theta)$''
+
+\begin{thm}[Rao-Blackwell Theorem]
+  Let $T$ be a sufficient statistic for $\theta$ and let $\tilde{\theta}$ be an estimator for $\theta$ with $\E(\tilde{\theta}^2) < \infty$ for all $\theta$. Let $\hat{\theta} = \E[\hat{\theta}|T]$. Then for all $\theta$,
+  \[
+    \E[(\hat{\theta} - \theta)^2] \leq \E[(\tilde{\theta} - \theta)^2].
+  \]
+  The inequality is strict unless $\tilde{\theta}$ is a function of $T$.
+\end{thm}
+
+\begin{proof}
+  By the conditional expectation formula, we have $\E(\hat{\theta}) = \E[\E(\tilde{\theta}|T)] = E(\tilde{\theta})$. So they have the same bias.
+
+  By the conditional variance formula,
+  \[
+    \var(\tilde{\theta}) = \E[\var (\tilde{\theta}|T)] + \var [\E(\tilde{\theta}|T)] = \E[\var(\tilde{\theta}|T)] + \var(\hat{\theta}).
+  \]
+  Hence $\var(\tilde{\theta}) \geq \var (\hat{\theta})$. So $\mse(\tilde{\theta} \geq \mse\hat{\theta})$, with equality only if $\var(\tilde{\theta}|T) = 0$.
+\end{proof}
+\note
+\begin{enumerate}
+  \item Since $T$ is sufficient for $\theta$, the conditional distribution of $\mathbf{X}$ given $T = t$ does not depend on $\theta$. Hence $\hat{\theta} = \E[\tilde{\theta}(\mathbf{X})|T]$ does not depend on $\theta$, and so is a genuine estimator.
+  \item The theorem says that given any estimator, we can find one that is a function of a sufficient statistic that is at least as good in terms of mean squared error of estimation.
+  \item If $\tilde{\theta}$ is unbiased, then so is $\hat{\theta}$.
+  \item If $\tilde{\theta}$ is already a function of $T$, then $\hat{\theta} = \tilde{\theta}$.
+\end{enumerate}
+
+\begin{eg}
+  Suppose $X_1, \cdots, X_n$ are iid $\Poisson(\lambda)$, and let $\theta = e^{-\lambda}$ (ie. $\P(X_1 = 0)$. Then
+  \[
+    p_\mathbf{X}(\mathbf{x}|\lambda) =\frac{-e^{n\lambda}\lambda^{\sum x_i}}{\prod x_i!}.
+  \]
+  So
+  \[
+    p_\mathbf{X}(\mathbf{x}|\theta) = \frac{\theta^n(-\log \theta)^{\sum x_i}}{\prod x_i!}.
+  \]
+  We see that $T = \sum X_i$ is sufficient for $\theta$, and $\sum X_i \sim \Poisson (n\lambda)$.
+
+  We use an easy estimator $\theta$ is $\tilde{\theta} = 1_{X_1 = 0}$, which is unbiased. (ie. if we observe nothing in the first oservation period, we assume the event is impossible) Then
+  \begin{align*}
+    \E[\tilde{\theta}| T = t] &= \P(X_1 = 0|\sum_1^n X_i = t)\\
+    &= \frac{\P(X_1 = 0)\P(\sum_2^n X_i = t)}{\P(\sum_1^n X_i = t}\\
+    &= \left(\frac{n - 1}{n}^t\right).
+  \end{align*}
+  So $\hat{\theta} = (1 - 1/n)^{\sum x_i}$. This approximately $(1 - 1/n)^{n\bar{X}} \approx e^{-\bar X} = e^{-\hat{\lambda}}$, which makes sense.
+\end{eg}
+
+\begin{eg}
+  Let $X_1, \cdots X_n$ be iid $U[0, \theta]$, and suppose that we want to estimate $\theta$. We have shown above that $T = \max X_i$ is sufficient for $\theta$. Let $\hat{\theta} = 2X_1$, and unbiased estimator. Then
+  \begin{align*}
+    \E[\tilde{\theta}|T = t] &= 2\E[X_1|\max X_i = t]\\
+    &= 2(E[X_1|\max X_i = t, X_1 = \max X_i]\P(X_1 = \max X_i)\\
+    &+ \E[X_1|\max X_i = t, X_1 \not= \max X_i] \P(X_1 \not= \max X_i))\\
+    &= 2\left(t\times \frac{1}{n} + \frac{t}{2}\frac{n - 1}{n}\right)\\
+    &= \frac{n + 1}{n}t.
+  \end{align*}
+  So $\hat{\theta} = \frac{n + 1}{n}\max X_i$.
+\end{eg}
+
+\section{Likelihood}
+Maximum likelihood estimation is one of the most important and widely used methods for finding estimations. Let $X_1, \cdots , X_n$ be random variables with joint pdf/pmg $f_\mathbf{X}(\mathbf{x}|\theta)$. We observe $\mathbf{X} = \mathbf{x}$.
+
+\begin{defi}[Likelihood]
+  The \emph{likelihood} of $\theta$ is $\like(\theta) = f_\mathbf{X}(\mathbf{x} | \theta)$, regarded as a function of $\theta$. The \emph{maximum likelihood estimator} (mle) of $\theta$ is the value of $\theta$ that maximizes $\like (\theta)$.
+\end{defi}
+It is often easier to maximize the \emph{log-likelihood}.
+
+If $X_1, \cdots, X_n$ are iid, each with pdf/pmf $f_X(x|\theta)$, then
+\begin{align*}
+  \like(\theta) &= \prod_{i = 1}^n f_X(x_i|\theta)\\
+  \log\like (\theta) &= \sum_{i = 1}^n \log f_X(x_i|\theta).
+\end{align*}
+
+\begin{eg}
+  Let $X_1, \cdots, X_n$ be iid $\Bernoulli(p)$. Then
+  \[
+    l(p) =\log\like(p) = (\sum x_i)\log p + (n - \sum x_i)\log(1 - p).
+  \]
+  Thus
+  \[
+    \frac{\d l}{\d p} = \frac{\sum x_i}{p} - \frac{n - \sum x_i}{1 - p}.
+  \]
+  This is zero when $p = \sum x_i /n$, and this is the maximum likelihood estimator. (and is unbiased)
+\end{eg}
+
+\begin{eg}
+  Let $X_1, \cdots, X_n$ be iid $N(\mu, \sigma^2)$, $\theta = (\mu, \sigma^2)$. Then
+  \[
+    l(\mu, \sigma^2) = \log\like(\mu, \sigma^2) = -\frac{n}{2}\log (2\pi) - \frac{n}{2}\log (\sigma^2) - \frac{1}{2\sigma^2}\sum (x_i - \mu)^2.
+  \]
+  This is maximized when
+  \[
+    \frac{\partial l}{\partial\mu} = \frac{\partial l}{\partial \sigma^2} = 0.
+  \]
+  We have
+  \[
+    \frac{\partial l}{\partial \mu} = -\frac{1}{\sigma^2}\sum (x_i - \mu), \quad \frac{\partial l}{\sigma^2} = -\frac{n}{2\sigma^2} + \frac{1}{2\sigma^4}\sum (x_i - \mu)^2.
+  \]
+  So the solution, hence maximum likelihood estimator is $(\hat{\mu}, \hat{\sigma}^2) = (\bar x, S_{xx}/n)$, where $\bar{x} = \frac{1}{n}\sum x_i$ and $S_{xx} = \sum(x_i - \bar{x})^2$.
+
+  We shall see later that $S_XX/s^2 = \frac{n\hat{\sigma}^2}{\sigma^2}\sim \chi_{n - 1}^2$, and so $\E(\hat{\sigma}^2) = \frac{(n - 1)\sigma^2}{n}$, ie. $\hat{\sigma}^2$ is biased.
+\end{eg}
+
+\begin{eg}
+  Let $X_1, \cdots X_n$ be iid $U(0, \theta)$. This is the ``German tank problem'': suppose the American army discovers some German tanks that are sequentially numbered, i.e. the first tank is numbered 1, the second is numbered 2, etc. Then if $\theta$ tanks are produced, then the probability distribution of the tank number is $U(0, \theta)$. Suppose we have discovered $n$ tanks whose numbers are $x_1, x_2, \cdots, x_n$, and we want to estimate $\theta$, the total number of tanks produced. We want to find the maximum likelihood estimator.
+  
+  Then
+  \[
+    \like(\theta) = \frac{1}{\theta^n}1_{[\max x_i \leq \theta]}1_{[\min x_i\geq 0]}.
+  \]
+  So for $\theta\geq \max _i$, $\like (\theta) = 1/\theta^n$ and is decreasing as $\theta$ increases, while for $\theta < \max x_i$, $\like (\theta) = 0$. Hence the value $\hat{\theta} = \max x_i$ maximizes the likelihood.
+
+  Is $\hat{\theta}$ unbiased? First we need to find the distribution of $\hat{\theta}$. For $0 \leq t \leq \theta$, the distribution function of $\hat{\theta}$ is
+  \[
+    F_{\hat{\theta}}(t) = P(\hat{\theta} \leq t) = \P(X_i \leq t, \text{all }i) = (\P(X_i \leq t))^n = \left(\frac{t}{\theta}\right)^n,
+  \]
+  Differentiating with respect to $T$, we find the $pdf f_{\hat{\theta}} = \frac{nt^{n - 1}}{\theta^n}$. Hence
+  \[
+    \E(\hat{\theta}) = \int_0^\theta t\frac{nt^{n - 1}}{\theta^n} \;\d t = \frac{n\theta}{n + 1}.
+  \]
+  So $\hat{\theta}$ is biased, but asymptotically unbiased.
+\end{eg}
+
+\note
+\begin{enumerate}
+  \item if $T$ is sufficient for $\theta$, then the likelihood is $g(T(\mathbf{x}), \theta)h(\mathbf{x})$, which depends on $\theta$ through $T(\mathbf{x})$. To maximise this as a function of $\theta$, we only need to maximize $g$, and so the mle $\hat{\theta}$ is a function of the sufficient statistic.
+  \item If $\phi = h(\theta)$ with $h$ injective, then the mle of $\phi =h(\hat{\theta})$. If the mle of $\theta$ is $\hat{\theta}$, then the mle of $\theta^2$ is $\hat{\theta}^2$.
+  \item Often there is no closed form for the mle, and we have to find $\hat{\theta}$ numerically.
+\end{enumerate}
+
+\begin{eg}
+  Smarties come in $k$ equally frequent colours, but suppose we do not know $k$. Assume that we sample with replacement (although this is unhygienic).
+
+  Our first Smarties are Red, Purple, Red, Yellow. Then
+  \begin{align*}
+  \like(k)&=\P_k(\text{1st is a new colour})\P_k(\text{2nd is a new colour})\\\
+  & \P_k(\text{3rd matches 1st})\P_k(\text{4th is a new colour})\\
+  &= 1\times \frac{k - 1}{k}\times \frac{1}{k}\times \frac{k - 2}{k}\\
+  &= \frac{(k- - 1)(k - 2)}{k^3}.
+\end{align*}
+The maximum likelihood is 5 (by trial and error), even though it is not much likelier than the others.
+\end{eg}
 \end{document}
