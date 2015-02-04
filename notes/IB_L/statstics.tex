@@ -7,11 +7,11 @@
   pdftitle={Part IB - Statistics},
 pdfkeywords={Cambridge Mathematics Maths Math IB Lent Statistics}]{hyperref}
 
-\input{header}
-
 \title{Part IB - Statistics}
 \author{Lectured by D. Spiegelhalter}
 \date{Lent 2015}
+
+\input{header}
 
 \begin{document}
 \maketitle
@@ -386,8 +386,114 @@ If $X_1, \cdots, X_n$ are iid, each with pdf/pmf $f_X(x|\theta)$, then
   \like(k)&=\P_k(\text{1st is a new colour})\P_k(\text{2nd is a new colour})\\\
   & \P_k(\text{3rd matches 1st})\P_k(\text{4th is a new colour})\\
   &= 1\times \frac{k - 1}{k}\times \frac{1}{k}\times \frac{k - 2}{k}\\
-  &= \frac{(k- - 1)(k - 2)}{k^3}.
+  &= \frac{(k - 1)(k - 2)}{k^3}.
 \end{align*}
 The maximum likelihood is 5 (by trial and error), even though it is not much likelier than the others.
+\end{eg}
+
+\section{Confidence intervals}
+\begin{defi}
+  A $100\gamma\%$ ($0 < \gamma < 1$) \emph{confidence interval} (CO) for $\theta$ is a random interval $(A(\mathbf{X}), B(\mathbf{X}))$ such that $\P(A(\mathbf{X}) < \theta < B(\mathbf{X})) = \gamma$, no matter what the true value of $\theta$ may be.
+\end{defi}
+
+Notice that it is endpoints of the interval are random quantities, while $\theta$ is a fixed constant we want to find out.
+
+We can interpret this in terms of repeat sampling. If we calculate $(A(\mathbf{x}), B(\mathbf{x}))$ for a large number of samples $\mathbf{x}$, then approximately $100\gamma\%$ of them will cover the true value of $\theta$.
+
+IMPORTANT: having observed some data $\mathbf{x}$ and calculated $95\%$ confidence interval, we \emph{cannot} say that $\theta$ has 95\% chance of being within the interval.
+
+\begin{eg}
+  Suppose $X_1, \cdots, X_n$ are iid $N(\theta, 1)$. Find a $95\%$ confidence interval for $\theta$.
+
+  We know $\bar X \sim N(\theta, \frac{1}{n}\sigma^2)$, so that $\sqrt{n}(\bar X - \theta)\sim N(0, 1)$.
+
+  Let $z_1, z_2$ be such that $\phi(z_2) - \phi(z_1) = 0.95$, where $\phi$ is the standard normal distribution function.
+
+  We have $\P[z_1 < \sqrt{n}(\bar X - \theta) < z_2] = 0.95$, which can be rearranged to give
+  \[
+    \P\left[\bar X - \frac{z_2}{\sqrt{n}} < \theta < \bar X - \frac{z_1}{\sqrt{n}}\right] = 0.95.
+  \]
+  so that
+  \[
+    \left(\bar X - \frac{z_2}{\sqrt{n}}, \bar X - \frac{z_1}{\sqrt{n}}\right).
+  \]
+  There are many possible choices for $z_1$ and $z_2$. Since $N(0, 1)$ density is symmetric, the shortest such interval is obtained by $z_2 = z_{0.025} = -z_1$. We can also choose other values such as $z_1 = -\infty$, $z_2 = 1.64$, but we usually choose symmetric end points.
+\end{eg}
+The above example illustrates a common procedure for finding confidence intervals:
+\begin{itemize}
+  \item Find a quantity $R(\mathbf{X}, \theta)$ such that the $\P_\theta$-distribution of $R(\mathbf{X}, \theta)$ does not depend on $\theta$. This is called a \emph{pivot}. In our example, $R(\mathbf{X}, \theta) = \sqrt{n}(\bar X - \theta)$.
+  \item Write down a probability statement of the form $\P_\theta(c_1 < R(\mathbf{X}, \theta) < c_2) = \gamma$.
+  \item Rearrange the inequalities inside $\P(\ldots)$ to find the interval.
+\end{itemize}
+\note
+\begin{enumerate}
+  \item Usually $C_1, c_2$ are percentage points from a know standardised distribution, often equitailed so that use, say, $2.5\%$ and $97.5\%$ points for a $95\%$ confidence interval. We could use, say $0\%$ and $95\%$, but the interval would generally be wider.
+  \item We can have confidence intervals for vector parameters.
+  \item IF $(A(\mathbf{x}, B(\mathbf{x}))$ is a $100\gamma\%$ confidence interval for $\theta$, and $T(\theta)$ is a monotone increasing function of $\theta$, then $(T(A(\mathbf{x})), T(B(\mathbf{x})))$ is a $100\gamma\%$ confidence interval for $T(\theta)$.
+\end{enumerate}
+\begin{eg}
+  Suppose $X_1, \cdots, X_{50}$ are iid $N(0, \sigma^2)$. Find a $99\%$ confidence interval for $\sigma^2$.
+
+  We know that $X_i/\sigma \sim N(0, 1)$. So $\displaystyle\frac{1}{\sigma^2}\sum_{i = 1}^{50}X_i^2 \sim \chi^2_{50}$.
+
+  So $R(\mathbf{X}, \sigma^2) = \sum_{i = 1}^{50} X_2^2/\sigma^2$ is a pivot.
+
+  Recall that $\chi_n^2(\alpha)$ is the upper $100\alpha\%$ point of $\chi_n^2$, ie.
+  \[
+    \P(\chi_n^2 \leq \chi_n^2(\alpha)) = 1 - \alpha.
+  \]
+  So we have $c_1 = \chi_{50}^2(0.995) = 27.99$ and $c_2 = \chi_{50}^2(0.005) = 79.49$.
+
+  So
+  \[
+    \P \left(c_1 < \frac{\sum X_i^2}{\sigma^2} < c_2\right) = 0.99,
+  \]
+  and so
+  \[
+    \P\left(\frac{\sum X_i^2}{c_2} < \sigma^2 < \frac{\sum X_i^2}{c_1}\right) = 0.99.
+  \]
+  Furthermore, a $99\%$ confidence interval for $\sigma$ is $\left(\sqrt{\frac{\sum X_i^2}{c_2}}, \sqrt{\frac{\sum X_i^2}{c_1}}\right)$.
+\end{eg}
+
+\begin{eg}
+  Suppose $X_1, \cdots, X_n$ are iid $\Bernoulli(p)$. Find an approximate confidence interval for $p$.
+
+  The mle of $p$ is $\hat p = \sum X_i/n$.
+
+  By the Central Limit theorem, $\hat{p}$ is approximately $N(p, p(1 - p)/n)$ for large $n$.
+
+  So $\displaystyle \frac{\sqrt{n}(\hat{p} - p)}{\sqrt{p(1 - p)}}$ is approximately $N(0, 1)$ for large $n$. So we have
+  \[
+    \P\left(\hat p - z_{(1 - \gamma)/2}\sqrt{\frac{p(1 - p)}{n}} < p < \hat{p} + z_{(1 - \gamma)/2}\sqrt{\frac{p(1 - p)}{n}}\right)\approx \gamma.
+  \]
+  But $p$ is unknown! So we approximate it by $\hat{p}$ to get a confidence interval for $p$ when $n$ is large:
+  \[
+    \P\left(\hat p - z_{(1 - \gamma)/2}\sqrt{\frac{\hat p(1 - \hat p)}{n}} < p < \hat{p} + z_{(1 - \gamma)/2}\sqrt{\frac{\hat p(1 - \hat p)}{n}}\right)\approx \gamma.
+  \]
+\end{eg}
+
+\begin{eg}
+  Suppose an opinion poll says $20\%$ are going to vote $UKIP$, based on a random sample of $1,000$ people. What might the true proportion be?
+
+  We assume we have an observation of $x = 200$ from a $\binomial(n, p)$ distribution with $n = 1,000$. Then $\hat p = x/n = 0.2$ is an unbiased estimate, also the mle. 
+  Now $\var(X/n) = \frac{p(1 - p)}{n}\approx \frac{\hat p(1 - \hat p}{n} = 0.00016$.
+
+  So a $85\%$ confidence interval is
+  \[
+    \left(\hat p - 1.96\sqrt{\frac{\hat p(1 - \hat p)}{n}}, \hat p + 1.96\sqrt{\frac{\hat p(1 - \hat p)}{n}}\right) = 0.20 \pm 1.96\times 0.013 = (0.175, 0.225),
+  \]
+  \note Since $p(1 - p)\leq 1/4$ for all $0 \leq p \leq 1$, then a conservative $95\%$ interval is $\hat p \pm 1.96\sqrt{1/4n} \approx \hat p \pm \sqrt{1/n}$. So whatever proportion is reported, it will be 'accurate' to $\pm 1/\sqrt{n}$. 
+\end{eg}
+
+\begin{eg}
+  Suppose $X_1, X_2$ are iid from $U(\theta - 1/2, \theta + 1/2)$. What is a sensible $50\%$ confidence interval for $\theta$?
+
+  Consider the probability of getting one observation on each side of $\theta$:
+  \[
+    \P_\theta(\min(X_1, X_2) \leq \theta \leq \max(X_1, X_2)) = \frac{1}{2}.
+  \]
+  So $(\min(X_1, X_2), \max (X_1, X_2))$ is a confidence interval for $\theta$.
+
+  But suppose $|X_1 - X_2| \geq \frac{1}{2}$, e.g. $x_1 = 0.2, x_2 = 0.9$, then we \emph{know} that, in this particular case, $\theta$ \emph{must} lie in $(\min (X_1, X_2), \max(X_1, X_2))$. This means that we can get a much narrower $50\%$ confidence interval! So guaranteed sampling properties does not necessarily mean a sensible conclusion in all cases.
 \end{eg}
 \end{document}
