@@ -109,7 +109,7 @@ For an unbiased estimator, the mean squared error is just the variance. In gener
   &= \E_\theta[(\hat{\theta} - E_\theta(\hat{\theta}))^2] + \E_\theta(\hat{\theta}) - \theta]^2 + 2[\E_\theta(\hat{\theta}) - \theta]\E_\theta[\hat{\theta} - \E_\theta(\hat{\theta})]\\
   &= \var(\hat{\theta}) + \bias^2(\hat{\theta}).
 \end{align*}
-Sometimes it can be preferable to have a biased estimator with a low variance - sometimes know as the ``bias-variance tradeoff''.
+Sometimes it can be preferable to have a biased estimator with a low variance - sometimes know as the ``bias-variance trade-off''.
 
 For example, suppose $X\sim \binomial(n, \theta)$. The standard estimator is $T_U = \mathbf{X}/n$, which is unbiased. $T_U$ has variance
 \[
@@ -495,5 +495,158 @@ The above example illustrates a common procedure for finding confidence interval
   So $(\min(X_1, X_2), \max (X_1, X_2))$ is a confidence interval for $\theta$.
 
   But suppose $|X_1 - X_2| \geq \frac{1}{2}$, e.g. $x_1 = 0.2, x_2 = 0.9$, then we \emph{know} that, in this particular case, $\theta$ \emph{must} lie in $(\min (X_1, X_2), \max(X_1, X_2))$. This means that we can get a much narrower $50\%$ confidence interval! So guaranteed sampling properties does not necessarily mean a sensible conclusion in all cases.
+\end{eg}
+\section{Bayesian estimation}
+So far we have seen the \emph{frequentist} approach to a statistical inference, ie. inferential statements about $\theta$ are interpreted in terms of repeat sampling. For example, the confidence interval is what's the probability that the interval will contain $\theta$, not the probability that $\theta$ lies in the interval.
+
+In contrast, the Bayesian approach treats $\theta$ as a random variable taking values in $\Theta$. The investigator's information and beliefs about the possible values of $\theta$ before any observation of data, are summarised by a \emph{prior distribution} $\pi(\theta)$. When $\mathbf{X} = \mathbf{x}$ are observed, the extra information about $\theta$ is combined with the prior to obtain the \emph{posterior distribution} $\pi(\theta|\mathbf{x})$ for $\theta$ given $\mathbf{X} = \mathbf{x}$.
+
+There has been a long-running argument between the two approaches. Recently, things have settled down, and Bayesian methods are seen to be appropriate in huge numbers of application where one seeks to assess a probability about a ``state of the world''. For example, spam filters will assess the probability that a specific email is a spam, even though from a frequentist's point of view, this is nonsense, because the email either is or is not a spam, and it makes no sense to assign a probability to the email's being a spam.
+
+In Bayesian inference, we usually have some \emph{prior} knowledge about the distribution of $\theta$ (eg. between $0$ and $1$). After collecting some data, we will find a \emph{posterior} distribution of $\theta$ given $\mathbf{X} = \mathbf{x}$.
+
+\begin{defi}[Prior and posterior distribution]
+  The \emph{prior distribution} of $\theta$ is the probability distribution of the value of $\theta$ before conducting the experiment. We usually write as $\pi(\theta)$. 
+
+  The \emph{posterior distribution} of $\theta$ is the probability distribution of the value of $\theta$ given an outcome of the experiment $\mathbf{x}$. We write as $\pi(\theta|\mathbf{x})$.
+\end{defi}
+By Bayes' theorem, the distributions are related by
+\[
+  \pi(\theta|\mathbf{x}) = \frac{f_{\mathbf{X}}(\mathbf{x}|\theta)\pi(\theta)}{f_{\mathbf{X}}(\mathbf{x})}.
+\]
+Thus
+\begin{align*}
+  \pi(\theta|\mathbf{x}) &\propto f_{\mathbf{X}}(\mathbf{x}|\theta)\pi(\theta).\\
+  \text{posterior} &\propto \text{likelihood}\times\text{prior}.
+\end{align*}
+where the constant of proportionality is chosen to make the total mass of the posterior distribution equal to one. Usually, we use this form, instead of attempting to calculate $f_\mathbf{X}(\mathbf{x})$.
+
+In practice, we can recognise the family for $\pi(\theta|\mathbf{x})$. It should be clear that the data enter through the likelihood, so the inference is automatically based on any sufficient inference.
+
+\begin{eg}
+  Suppose I have $3$ coins in my pocket. One is $3:1$ in favour of tails, one is a fair coin, and one is $3:1$ in favour of heads.
+
+  I randomly select one coin and flip it once, observing a head. What is the probability that I have chosen coin 3?
+
+  Let $X = 1$ denote the event that I observe a head, $X = 0$ if a tail. Let $\theta$ denote the probability of a head. So $\theta$ is either 0.25, 0.5 or 0.75.
+
+  Our prior distribution is $\theta(\theta = 0.25) = \pi(\theta = 0.5) = \pi(\theta = 0.75) = 1/3$.
+
+  The probability mass function $f_X(x|\theta) = \theta^x(1 - \theta)^{1 - x}$. So we have to following results:
+
+  \begin{tabular}{ccccc}
+    \toprule
+    $\theta$ & $\pi(\theta)$ & $f_X(x = 1|\theta)$ & $f_X(x = 1|\theta)\pi(\theta)$ & $\pi(x)$\\
+    \midrule
+    0.25 & 0.33 & 0.25 & 0.0825 & 0.167\\
+    0.50 & 0.33 & 0.50 & 0.1650 & 0.333\\
+    0.75 & 0.33 & 0.75 & 0.2475 & 0.500\\
+    \midrule
+    Sum & 1.00 & 1.50 & 0.4950 & 1.000\\
+    \bottomrule
+  \end{tabular}
+
+  So if we observe a head, then there is now a $50\%$ chance that we have picked the third coin.
+\end{eg}
+
+\begin{eg}
+  Suppose we are interested in the true mortality risk $\theta$ in a hospital $H$ which is about to try a new operation. On average in the country, around $10\%$ of the people die, but mortality rates in different hospitals vary from around $3\%$ to around $20\%$. Hospital $H$ has no deaths in their first 10 operations. What should we believe about $\theta$?
+
+  Let $X_i = 1$ if the $i$th patient in $H$ dies. The
+  \[
+    f_{\mathbf{x}}(\mathbf{x}|\theta) = \theta^{\sum x_i}(1 - \theta)^{n - \sum x_i}.
+  \]
+  Suppose a priori that $\theta\sim \betaD(a, b)$ for some unknown $a > 0, b > 0$ so that
+  \[
+    \pi(\theta)\propto \theta^{a - 1}(1 - \theta)^{b - 1}.
+  \]
+  Then the posteriori is
+  \[
+    \pi(\theta|\mathbf{x})\propto f_{\mathbf{x}}(\mathbf{x}|\theta)\pi(\theta)\propto \theta^{\sum x_i + a - 1}(1 - \theta)^{n- \sum x_i + b - 1}.
+  \]
+  We recognize this as $\betaD(\sum x_i + a, n - \sum x_i + b)$. So
+  \[
+    \pi(\theta|\mathbf{x}) = \frac{\theta^{\sum x_i + a - 1}(1 - \theta)^{n - \sum x_i + b - 1}}{B(\sum x_i + a, n - \sum x_i + b)}.
+  \]
+
+  In practice, we need to find a Beta prior distribution that matches our information from other hospitals. It turns out that $\betaD(a = 3, b = 27)$ prior distribution has mean 0.1 and $\P(0.03 < \theta < .20) = 0.9$.
+
+  Then we observe data $\sum x_i = 0$, $n = 0$. So the posterior is $\betaD(\sum x_i + a, n - \sum x_i + b) = \betaD(3, 37)$.
+
+  This has a mean of $3/40 = 0.075$.
+
+  Even though nobody has died so far, the mle is $0$, which does not seem plausible. But we have a higher mean than $0$ because we take into account the data from other hospitals.
+\end{eg}
+
+For this problem, a beta prior leads to a beta posterior. We say that the beta family is a \emph{conjugate} family of prior distribution for Bernoulli samples.
+
+Suppose that $a = b = 1$ so that $\pi (\theta) = 1$ for $0 < \theta < 1$ - the uniform distribution. Then the posterior is $\betaD(\sum x_i + 1, n - \sum x_i + 1)$, with properties
+
+\begin{tabular}[]{cccc}
+  \toprule
+  &mean & mode & variance\\
+  \midrule
+  prior & 1/2 & non-unique & 1/12\\
+  posterior & $\displaystyle \frac{\sum x_i + 1}{n + 2}$ & $\displaystyle \frac{\sum x_i}{n}$ & $\displaystyle\frac{(\sum x_i + 1)(n - \sum x_i + 1)}{(n + 2)^2(n + 3)}$\\
+  \bottomrule
+\end{tabular}
+
+Note that the mode of the posterior is the mle.
+
+The posterior mean estimator, $\frac{\sum x_i + 1}{n + 2}$ is discussed in Lecture 2, where we showed that this estimator had smaller mse than the mle for non-extreme value of $\theta$. This is known as the Laplace's estimator.
+
+The posterior variance is bounded above by $1/(4(n + 3))$, and this is smaller than the prior variance, and is smaller for larger $n$.
+
+Again, note that the posterior automatically depends on the data through the sufficient statistic.
+
+Let $L(\theta, a)$ be the loss incurred in estimating the value of a parameter to be $a$ when the true value is $\theta$.
+
+A common loss functions are quadratic loss $L(\theta, a) = (\theta - a)^2$, absolute error loss $L(\theta, a) = |\theta - a|$, but we can have others.
+
+When our estimate is $a$, the expected posterior loss is $a$, the expected posterior loss is
+\[
+  h(a) = \int L(\theta, a)\pi(\theta|\mathbf{x})\;\d \theta.
+\]
+\begin{defi}[Bayes estimator]
+  The \emph{Bayes estimator} $\hat{\theta}$ is the estimator that minimises the expected posterior loss.
+\end{defi}
+
+For quadratic loss,
+\[
+  h(a) = \int (a - \theta)^2 \pi(\theta|\mathbf{x})\;\d \theta.
+\]
+$h'(a) = 0$ if 
+\[
+  a\int \pi (\theta|\mathbf{x})\;\d \theta = \int \theta \pi(\theta|\mathbf{x}\;\d \theta.
+\]
+So $\hat{\theta} = \int \theta\pi(\theta|\mathbf{x})\;\d \theta$, the \emph{posterior mean}, minimises $h(a)$.
+
+For absolute error loss,
+\begin{align*}
+  h(a) &= \int |\theta - a|\pi(\theta|\mathbf{x})\;\d \theta\\
+  &= \int_{-\infty}^a (a - \theta)\pi(\theta|\mathbf{x}) = \;\d \theta + \int_a^\infty (\theta - a)\pi(\theta|\mathbf{x})\;\d \theta\\
+  &= a\int_{-\infty}^a \pi(\theta|\mathbf{x})\;\d \theta - \int_{-\infty}^a\theta\pi(\theta|\mathbf{x})\;\d \theta\\
+  &+ \int_a^\infty \theta\pi(\theta|\mathbf{x})\;\d \theta - a\int_a^\infty \pi(\theta|\mathbf{x})\;\d \theta.
+\end{align*}
+Now $h'(a) = 0$ if
+\[
+  \int_{-\infty}^a \pi(\theta|\mathbf{x})\;\d \theta = \int_a^\infty \pi(\theta|\mathbf{x})\;\d \theta.
+\]
+This occurs when each side is $1/2$. So $\hat{\theta}$ is the \emph{posterior median}.
+
+\begin{eg}
+  Suppose that $X_1, \cdots , X_n$ are iid $N(\mu, 1)$, and that a prior $\mu\sim N(0, \tau^{-2})$ for unknown $\tau^{-2}$. So $\tau$ is the certainty of our prior knowledge.
+
+  The posterior is given by
+  \begin{align*}
+    \pi(\mu|\mathbf{x})&\propto f_\mathbf{x}(\mathbf{x}|\mu)\pi(\mu)\\
+    &\propto \exp\left[-\frac{1}{2}\sum(x_i - \mu)^2\right]\exp\left[-\frac{\mu^2\tau^2}{2}\right]\\
+    &\propto \exp\left[-\frac{1}{2}(n + \tau^2)\left\{\mu - \frac{\sum x_i}{n + \tau^2}\right\}^2\right]
+  \end{align*}
+  which is a normal distribution. So the posterior distribution of $\mu$ given $\mathbf{x}$ is a normal distribution with mean $\sum x_i/(n + \tau^2)$ and variance $1/(n + \tau^2)$.
+
+  The normal density is symmetric, and so the posterior mean and the posterior media have the same value $\sum x_i/(n + \tau^2)$.
+
+  This is the optimal estimator for both quadratic and absolute loss.
 \end{eg}
 \end{document}
