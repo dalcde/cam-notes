@@ -1063,4 +1063,145 @@ While there are many examples of posets, all we care about are actually power se
     \item In (vii), $\{a, b\}$ has upper bounds $c, d, e$, but has no \emph{least} upper bound.
   \end{enumerate}
 \end{eg}
+
+\begin{defi}[Complete poset]
+  A poset $X$ is \emph{complete} if every $S\subseteq X$ has a supremum. In particular, it has a greatest element (ie. $x$ such that $\forall y: x \geq y$), namely $\sup X$, and least element (ie. $x$ such that $\forall y: x \leq y$), namely $\sup \emptyset$.
+\end{defi}
+\note This does \emph{not} require that $S$ is bounded above or non-empty. This is different to metric space completeness.
+
+\begin{eg}\leavevmode
+  \begin{itemize}
+    \item $\R$ is not complete because $\R$ itself has no supremum.
+    \item $[0, 1]$ is complete because every subset is bounded above, and so has a least upper bound. Also, $\emptyset$ has a supremum of $0$.
+    \item $(0, 1)$ is not complete because $(0, 10)$ has no upper bound.
+    \item $\P(S)$ For any $S$ is \emph{always} complete, because given any $\{A_i: i\in A\}$, where each $A_i\subseteq S$, $\bigcup A_i$ is its supremum.
+  \end{itemize}
+\end{eg}
+
+Now we are going to derive fixed-point theorems for complete posets. We start with a few definitions:
+
+\begin{defi}[Fixed point]
+  A \emph{fixed point} of a function $f:X\to X$ is an $x$ such that $f(x) = x$.
+\end{defi}
+
+\begin{defi}[Order-preserving function]
+  For a poset $X$, $f: X\to X$ is \emph{order-preserving} of $x \leq y \Rightarrow  f(x) \leq f(y)$.
+\end{defi}
+
+\begin{eg}\leavevmode
+  \begin{itemize}
+    \item On $\N$, $x\mapsto x + 1$ is order-preserving
+    \item On $\Z$, $x\mapsto x - 1$ is order-preserving
+    \item On $(0, 1)$, $x\mapsto \frac{1 + x}{2}$ is order-preserving (this is halving the distance to $1$).
+    \item On $\P(S)$, let some fixed $i\in S$. Then $A\mapsto A\cup \{i\}$ is order-preserving.
+  \end{itemize}
+\end{eg}
+Not every order-preserving $f$ has a fixed point (eg. first two above). However, we have
+\begin{thm}[Knaster-Tarski fixed point theorem]
+  Let $X$ be a complete poset, and $f: X\to X$ be a order-preserving function. Then $f$ has a fixed point.
+\end{thm}
+
+\begin{proof}
+  To show that $f(x) = x$, we need $f(x) \leq x$ and $f(x) \geq x$. Let's not be too greedy and just want half of it:
+
+  Let $E = \{x: x \leq f(x)\}$. Let $s = \sup E$. We claim that this is a fixed point, by showing $f(s) \leq s$ and $s \leq f(s)$.
+
+  To show $s \leq f(s)$, we use the fact that $s$ is the least upper bound. So if $f(s)$ is also an upper bound, then $s \leq f(s)$. Now let $x \in E$. So $x\leq s$. Therefore $f(x) \leq f(s)$ by order-preservingness. Since $x \leq f(x)$ (by definition of $E$) $x \leq f(x) \leq f(s)$.
+
+  To show $f(s) \leq s$, we simply have to show $f(s) \in E$, since $s$ is an upper bound. But we already know $s \leq f(s)$. By order-preservingness, $f(s) \leq f(f(s))$. So $f(s)\in E$ by definition.
+\end{proof}
+While this proof looks rather simple, we need to first establish that $s \leq f(s)$, then use this fact to show $f(s) \leq s$. If we decided to show $f(s) \leq s$ first, then we would fail!
+
+This is a typical application of Knaster-Tarski:
+\begin{cor}[Cantor-Schr\"oder-Bernstein theorem]
+  Let $A, B$ be sets. Let $f: A\to B$ and $g: B\to A$ be injections. Then there is a bijection $h: A\to B$. 
+\end{cor}
+
+\begin{proof}
+  We try to partition $A$ into $P$ and $Q$, and $B$ into $R$ and $S$, such that $f(P) = R$ and $g(S) = Q$. Then we let $h = f$ on $R$ and $g^{-1}$ on $Q$.
+
+  Since $S = B\setminus R$ and $Q = A \setminus P$, so we want
+  \[
+    P = A\setminus g(B\setminus f(P))
+  \]
+  Since the function $A\setminus g(B\setminus f(P))$ from $\P(A)$ to $\P(A)$ is order-preserving. So done by Knaster-Tarski (and $\P(A)$ is complete).
+
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (-1, 0) ellipse (0.5 and 1.3);
+      \draw (-1.5, 0) -- (-0.5, 0);
+      \node at (-1, -0.5) {$Q$};
+      \node at (-1, 0.5) {$P$};
+      \draw (1, 0) ellipse (0.5 and 1.3);
+      \draw (0.5, 0) -- (1.5, 0);
+      \node at (1, -0.5) {$S$};
+      \node at (1, 0.5) {$R$};
+      \draw [->] (-0.4, 0.7) -- (0.4, 0.7) node [pos = 0.5, above] {$f$};
+      \draw [->] (0.4, -0.7) -- (-0.4, -0.7) node [pos = 0.5, above] {$g$};
+    \end{tikzpicture}
+  \end{center}
+\end{proof}
+
+\begin{defi}[Maximal element]
+  In a poset $X$, $x\in X$ is maximal if no $y\in X$ has $y > x$.
+\end{defi}
+
+\begin{eg}
+  In
+  \begin{center}
+    \begin{tikzpicture}[grow=up]
+      \node {a}
+      child {
+        node {b} edge from parent
+        child {
+          node {c} edge from parent
+        }
+      }
+      child {
+        node {d} edge from parent
+        child {
+          node {e} edge from parent
+        }
+      };
+    \end{tikzpicture}
+  \end{center}
+  $c$ and $e$ are maximal
+\end{eg}
+
+Not every poset has a maximal element, eg. $\N, \Q, \R$. In each of these, not only are they incomplete. They have chains that are not bounded above.
+
+\begin{thm}[Zorn's lemma]
+  Assuming Axiom of Choice, let $X$ be a (non-empty) poset in which every chain has an upper bound. Then it has a maximal element.
+\end{thm}
+\note that ``non-empty'' is not strictly necessary, because if $X$ is an empty poset, then the empty chain has no upper bound. So the conditions can never be satisfied.
+
+We ``hunt'' for the maximal element. We start with $x_0$. If it is maximal, done. If not, we find a bigger $x_1$. If $x_1$ is maximal, done. Otherwise, keep go on.
+
+If we never meet a maximal element, then we have an infinite chain. This has an upper bound $x_\omega$. If this is maximal, done. If not, find $x_{\omega + 1}$. Keep going on.
+
+We have not yet reached a contradiction. But suppose we never meet a maximal element. If $X$ is countable, and we reach $x_{\omega_1}$, then we have found uncountably many elements in a countable set!
+
+Since the ordinals can be arbitrarily large (Hartog's lemma), if we never reach a maximal element, then we can get find more elements that $X$ has.
+
+
+\begin{proof}
+  Suppose not. So for each $x\in x$, we have $x'\in X$ with $x' > x$. We denote the-element-larger-than-$x$ by $x'$.
+
+  We know that each chain $C$ has an upper bound, asy $u(C)$.
+
+  Let $\gamma = \gamma(X)$, the ordinal-larger-than-$X$ by Hartog's lemma.
+
+  We pick $x\in X$, and define $x_\alpha$ for $\alpha < \gamma$ recursively by
+  \begin{itemize}
+    \item $x_0 = x$
+    \item $x_{\alpha^+} = x_\alpha'$
+    \item $x_{\lambda} = u(\{x_\alpha: \alpha < \lambda\})'$ for non-zero limit $\lambda$
+  \end{itemize}
+  (note that $\{x_\alpha: \alpha < \lambda\}$ is a chain by induction )
+
+  Then $\alpha \mapsto x_n$ is an injection from $\gamma\to X$.
+\end{proof}
+\note We could also have $x_\lambda = u(\{x_\alpha : \alpha < \lambda\})$, and it is still an injection, but we put the ``prime'' just to save some lines of proof.
+
+\note The proof of Zorn was easy, but only because we are given ordinals, definition by recursion, and Hartog's.
 \end{document}
