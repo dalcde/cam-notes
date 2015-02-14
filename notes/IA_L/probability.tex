@@ -98,7 +98,7 @@ Consider an experiment that has a random outcome.
 \begin{defi}[Probability]
   Suppose $\Omega = \{\omega_1,\omega_2, \cdots, \omega_N\}$. Let $A\subseteq \Omega$ be an event. Then the \emph{probability} of $A$ is
   \[
-    P(A) = \frac{\text{Number of outcomes in } A}{\text{Number of outcomes in }\omega} = \frac{|A|}{N}
+    \P(A) = \frac{\text{Number of outcomes in } A}{\text{Number of outcomes in }\omega} = \frac{|A|}{N}
   \]
 \end{defi}
 
@@ -168,7 +168,7 @@ We can also have sampling with replacement, but we require each item to be chose
 
   We solve this by finding the probability of no match, $1 - f(r)$. The total number of possibilities of birthday combinations is $365^r$. For nobody to have the same birthday, the first person can have any birthday. The second has 364 else to choose, etc.
   \[
-    P(\text{no match}) = \frac{365\cdot 364\cdot 363 \cdots (366 - r)}{365\cdot 365\cdot 365 \cdots 365}
+    \P(\text{no match}) = \frac{365\cdot 364\cdot 363 \cdots (366 - r)}{365\cdot 365\cdot 365 \cdots 365}
   \]
   If we calculate this with a computer, we find that $f(22) = 0.475695$ and $f(23) = 0.507297$.
 
@@ -351,7 +351,6 @@ Now we prove Stirling's Formula:
     \frac{I_{2n}}{I_{2n + 1}} = \pi(2n + 1)\left[\frac{( (2n)!)^2}{2^{4n + 1}(n!)^4}\right] \sim \pi(2n + 1)\frac{1}{ne^{2A}}\to \frac{2\pi}{e^{2A}}.
   \]
   Since the last expression is equal to 1, we know that $A = \log\sqrt{2\pi}$
-%finish this
 \end{proof}
 
 \begin{eg}
@@ -362,7 +361,7 @@ Now we prove Stirling's Formula:
 \end{eg}
 
 This approximation can be improved:
-\begin{prop}[(non-examinable)]
+\begin{prop}[non-examinable]
   We use the $1/12n$ term from the proof above to get a better approximation:
   \[
     \sqrt{2\pi}n^{n + 1/2}e^{-n} + \frac{1}{12n + 1} \leq n! \leq \sqrt{2\pi} n^{n + 1/2} e^{-n} + \frac{1}{12n}.
@@ -383,16 +382,16 @@ This approximation can be improved:
     \item $A\in \F \Rightarrow  A^C\in \F$.
     \item $A_1, A_2, \cdots, \in \F \Rightarrow \bigcup_{i = 1}^\infty \in \F$.
   \end{enumerate}
-  And $P$ has to satisfy the following \emph{Kolmogorov axioms}:
+  And $\P$ has to satisfy the following \emph{Kolmogorov axioms}:
   \begin{enumerate}
-    \item $o \leq P(A) \leq 1 $ for all $A\in \F$
-    \item $P(\Omega) = 1$
+    \item $0 \leq \P(A) \leq 1 $ for all $A\in \F$
+    \item $\P(\Omega) = 1$
     \item For any countable collection of events $A_1, A_2, \cdots$ which are disjoint, ie. $A_i\cap A_j = \emptyset$ for all $i, j$, then
       \[
-        P\left(\bigcup_i A_i\right) = \sum_i P(A_i).
+        \P\left(\bigcup_i A_i\right) = \sum_i \P(A_i).
       \]
   \end{enumerate}
-  We say $P(A)$ is the probability of the event $A$.
+  We say $\P(A)$ is the probability of the event $A$.
 \end{defi}
 
 \begin{defi}[Probability distribution]
@@ -1467,4 +1466,308 @@ Note that we cannot relax the ``independent'' condition. For example, if $X_1 = 
   where ``as'' means ``almost surely''.
 \end{thm}
 Proof is left for Part II because it is too hard.
-\end{document}
+
+\section{Probability generating functions.}
+Consider a random variable $X$, taking values $0, 1, 2, \cdots$. Let $p_r = P(X = r)$.
+\begin{defi}[Probability generating function (pgf)]
+  The \emph{probability generating function (pgf)} of $X$ is
+  \[
+    p(z) = \E[z^X] = \sum_{r = 0}^\infty \P(X = r)z^r = p_0 + p_1z + p_2z^2\cdots = \sum_0^\infty p_rz^r.
+  \]
+  This is a power series (or polynomial), and converges if $|z| \leq 1$, since
+  \[
+    |p(z)| \leq \sum_r p_r |z^r| \leq \sum_r p_r = 1.
+  \]
+  We sometimes write as $P_X(z)$ to indicate the random variable.
+\end{defi}
+
+\begin{eg}
+  Consider a fair die. Then $p_r = 1/6$ for $r = 1, \cdots, 6$. Then
+  \[
+    p(z) = \E[z^X] = \frac{1}{6}(z + z^2 + .., + z^6) = \frac{1}{6}z\left(\frac{1 - z^6}{1 - z}\right).
+  \]
+\end{eg}
+
+\begin{thm}
+  The distribution of $X$ is uniquely determined by its probability generating function.
+\end{thm}
+
+\begin{proof}
+  $p_0 = p(0)$, $p_1 = p'(0)$ etc. (where $p'$ is the derivative of $p$) In general,
+  \[
+    \left. \frac{\d ^i}{\d z^i}p(z) \right|_{z = 0} = \frac{r!}{(r - i)!}p_i.
+  \]
+  So we can recover $(p_0, p_1, \cdots)$ from $p(z)$.
+\end{proof}
+
+\begin{thm}[Abel's lemma]
+  \[
+    \E[X] = \lim_{z\to 1}p'(z).
+  \]
+  If $p'(z)$ is continuous, then simply $\E[X] = p'(1)$.
+\end{thm}
+
+\begin{proof}
+  \[
+    p'(z) = \sum_1^\infty rp_r z^{r - 1} \leq \sum_1^\infty rp_r = \E[X].
+  \]
+  for $z \geq 1$. So
+  \[
+    \lim_{z\to 1}p'(z) \leq \E[X].
+  \]
+  If we pick $N$ large, then
+  \[
+    \sum_{1}^N rp_r \geq \E[X] - \varepsilon.
+  \]
+  So
+  \[
+    \E[X] - \varepsilon \leq \sum_1^N rp_r = \lim_{z\to 1}\sum _1^N rp_r z^r\leq \lim_{z \to 1} \sum_1^\infty rp_r z^r = \lim_{z\to 1} p' (z).
+  \]
+  So $\E[X] \leq \lim\limits_{z \to 1}p'(z)$.
+\end{proof}
+
+\begin{thm}
+  \[
+    \E[X(X - 1)] = \lim_{z \to 1}p''(z).
+  \]
+\end{thm}
+\begin{proof}
+  Same as above.
+\end{proof}
+
+\begin{eg}
+  Consider the Poisson distribution. Then
+  \[
+    p_r = \P(X = r) = \frac{1}{r!}\lambda^r e^{-\lambda}.
+  \]
+  Then
+  \[
+    p(z) = \E[z^X] = \sum_0^\infty z^r \frac{1}{r!}\lambda^r e^{-\lambda} = e^{\lambda z}e^{-\lambda} = e^{\lambda(z - 1)}.
+  \]
+  We can have a sanity check: $p(1) = 1$, which makes sense, since $p(1)$ is the sum of probabilities.
+
+  We have
+  \[
+    \E[X]= \left.\frac{\d }{\d z}e^{\lambda(z - 1)}\right|_{z = 1} = \lambda,
+  \]
+  and
+  \[
+    \E[X(X - 1)] = \left.\frac{\d ^2}{\d x^2}e^{\lambda(z - 1)}\right|_{z = 1} = \lambda^2
+  \]
+  So
+  \[
+    \var(X) = \E[X^2] - \E[X]^2 = \lambda^2 + \lambda - \lambda^2 = \lambda.
+  \]
+\end{eg}
+
+\begin{thm}
+  Suppose $X_1, X_2, \cdots, X_n$ are independent random variables with pgfs $p_1, p_2, \cdots, p_n$. Then the pgf of $X_1 + X_2 + \cdots + X_n$ is $p_1(z)p_2(z)\cdots p_n(z)$.
+\end{thm}
+
+\begin{proof}
+  \[
+    \E[z^{X_1 + \cdots + X_n}] = \E[z^{X_1}\cdots z^{X_n}] = \E[z^{X_1}]\cdots\E[z^{X_n}] = p_1(z)\cdots p_n(z).
+  \]
+\end{proof}
+
+\begin{eg}
+  Let $X\sim B(n, p)$. Then
+  \[
+    p(z) = \sum_{r = 0}^{n} \P(X = r)z^r = \sum \binom{n}{r} p^r(1 - p)^{n - r}z^r = (pz + (1 - p))^n = (pz + q)^n.
+  \]
+  So $p(z)$ is the product of $n$ copies of $pz + q$. But that is the pgf of $Y\sim B(1, p)$.
+
+  This shows that $X = Y_1 + Y_2 + \cdots + Y_n$ (which we already knew).
+\end{eg}
+
+\begin{eg}
+  If $X$ and $Y$ are independent Poisson random variables with parameters $\lambda, \mu$ respectively, then
+  \[
+    \E[t^{X + Y}] = \E[t^X]\E[t^Y] = e^{\lambda(t - 1)}e^{\mu(t - 1)} = e^{(\lambda + \mu)(t - 1)}
+  \]
+  So $X + Y\sim P(\lambda + \mu)$.
+
+  We can also do it directly:
+  \[
+    P(X + Y = r) = \sum_{i = 0}^r \P(X = i, Y = r - i) = \sum_{i = 0}^r \P(X = i)\P(X = r - i),
+  \]
+  but is much more complicated.
+\end{eg}
+
+We can use pgf-like functions to obtain some combinatorial results.
+\begin{eg}
+  Suppose we want to tile a $2\times n$ bathroom by $2\times 1$ tiles. One way to do it is
+  \begin{center}
+    \begin{tikzpicture}
+     \draw (0, 0) rectangle (6, 2);
+     \draw (1, 0) rectangle (3, 1);
+     \draw (1, 1) rectangle (3, 2);
+     \draw (4, 0) rectangle (6, 1);
+     \draw (4, 1) rectangle (6, 2);
+    \end{tikzpicture}
+  \end{center}
+  We can do it recursively: suppose there are $f_n$ ways to tile a $2\times n$ grid. Then if we start tiling, the first tile is either vertical, in which we have $f_{n - 1}$ ways to tile the remaining ones; or the first tile is horizontal, in which we have $f_{n - 2}$ ways to tile the remaining. So
+  \[
+    f_n = f_{n - 1} + f_{n - 2},
+  \]
+  which is simply the Fibonacci sequence, with $f_0 = f_1 = 1$. 
+
+  Let
+  \[
+    F(z) = \sum_{n = 0}^\infty f_nz^n.
+  \]
+  Then from our recurrence relation, we obtain
+  \[
+    f_nz^n = f_{n - 1}z^n + f_{n - 2}z^n.
+  \]
+  So
+  \[
+    \sum_{n = 2}^\infty f_n z^n = \sum_{n = 2}^{\infty} f_{n - 1}z^n + \sum_{n = 2}^\infty f_{n - 2}z^n.
+  \]
+  Since $f_0 = f_1 = 1$, we have
+  \[
+    F(z) - f_0 - zf_1 = z(F(z) - f_0) + z^2F(z).
+  \]
+  Thus $F(z) = (1 - z - z^2)^{-1}$. If we write
+  \[
+    \alpha_1 = \frac{1}{2}(1 + \sqrt{5}),\quad \alpha_2 = \frac{1}{2}(1 - \sqrt{5}).
+  \]
+  then we have
+  \begin{align*}
+    F(z) &= (1 - z - z^2)^{-1}\\
+    &= \frac{1}{(1 - \alpha_1 z)(1 - \alpha_2 z)}\\
+    &= \frac{1}{\alpha_1 - \alpha_2}\left(\frac{\alpha_1}{1 - \alpha_1 z} - \frac{\alpha_2}{1 - \alpha_2 z}\right)\\
+    &= \frac{1}{\alpha_1 - \alpha_2}\left(\alpha_1 \sum_{n = 0}^\infty \alpha_1^nz^n - \alpha_2\sum_{n = 0}^\infty \alpha_2^n z^n\right).
+  \end{align*}
+\end{eg}
+
+We can also consider \emph{Dyck words}, such as (), or  ((())()), ie any list of brackets that match (cf Lisp).
+
+There is only one Dyck word of length 2, (). There are 2 of length 4, (()) and ()(). Similarly, there are 5 Dyck words of length 5.
+
+Let $C_n$ be the number of Dyck words of length $2n$. Each Dyck word can be split written as $(w_1)w_2$, where $w_1$ and $w_2$ are Dyck words. Since the lengths of $w_1$ and $w_2$ must sum up to $2(n -1)$,
+\[
+  C_{n + 1} = \sum_{i = 0}^n C_iC_{n - i}.\tag{*}
+\]
+We again use pgf-like functions: let
+\[
+  c(x) = \sum_{n = 0}^\infty C_n x^n.
+\]
+From $(*)$, we can show that
+\[
+  c(x) = 1 + xc(x)^2.
+\]
+We can solve to show that
+\[
+  c(x) = \frac{1 - \sqrt{1 - 4x}}{2x} = \sum_0^\infty \binom{2n}{n}\frac{x^n}{n + 1},
+\]
+noting that $C_0 = 1$. Then
+\[
+  C_n = \frac{1}{n + 1}\binom{2n}{n}.
+\]
+
+\section{Conditional expectation}
+\subsection{Conditional distribution and expectation}
+\begin{defi}[Conditional distribution]
+  Let $X$ and $Y$ be random variables (in general not independent) with joint distribution $P(X = x, Y = y)$. Then the \emph{marginal distribution} (or simply \emph{distribution} of $X$ is
+  \[
+    P(X = x) = \sum_{y\in \Omega_u}\P(X = x, Y = y).
+  \]
+  The \emph{conditional distribution} of $X$ given $Y$ is
+  \[
+    \P(X = x|Y = y) = \frac{\P(X = x, Y = y)}{\P(Y = y)}.
+  \]
+  The \emph{conditional expectation} of $X$ given $Y$ is
+  \[
+    \E[X|Y = y] = \sum_{x\int \Omega_X}x\P(X = x|Y = y).
+  \]
+  We can view this as a random variable: given a value of $Y$, we return the expectation of $X$.
+\end{defi}
+
+\begin{eg}
+  Consider a dice roll. Let $Y = 1$ denote an even roll and $Y + 0$ denote an odd roll. Let $X$ be the outcome. Then $\E[X|Y] = 3 + Y$, ie 4 if even, 3 if odd.
+\end{eg}
+
+\begin{eg}
+  Let $X_1, \cdots, X_n$ be iid $B(1, p)$. Let $Y = X_1 + \cdots + X_n$. Then
+  \begin{align*}
+    \P(X_1 = 1|Y = r) &= \frac{\P(X_1 = 1, \sum_{2}^n X_i = r - 1)}{\P(Y = r}\\
+    &= \frac{p\binom{n - 1}{r - 1}p^{r - 1}(1 - p)^{(n - 1) - (r - 1)}}{\binom{n}{r} p^r (1 - p)^{n - 1}} = \frac{r}{n}.
+  \end{align*}
+  So
+  \[
+    \E[X_1|Y] = 1 \cdot \frac{r}{n} + 0\left(1 - \frac{r}{n}\right) = \frac{r}{n} = \frac{Y}{n},
+  \]
+  Showing that $\E[X|Y]$ is a random variable.
+\end{eg}
+\subsection{Properties of conditional expectation}
+\begin{thm}
+  If $X$ and $Y$ are independent, then
+  \[
+    \E[X|Y] = \E[X]
+  \]
+\end{thm}
+
+\begin{proof}
+  \begin{align*}
+    \E[X|Y = y] &= \sum_{x}x\P(X = x|Y = y)\\
+    &= \sum_x x\P(X = x)\\
+    &= \E[X]
+  \end{align*}
+\end{proof}
+
+We know that the expected value of a dice roll given it is even is 4, and the expected value given it is odd is 3. Since it is equally likely to be even or odd, the expected value of the dice roll is 3.5. This is formally captured by
+\begin{thm}[Tower property of conditional expectation]
+  \[
+    \E_Y[\E_X[X|Y]] = \E_X[X],
+  \]
+  where the subscripts indicate what variable the expectation is taken over.
+\end{thm}
+
+\begin{proof}
+  \begin{align*}
+    \E_Y[\E_X[X|Y]] &= \sum_y \P(Y = y)\E[X|Y = y]\\
+    &= \sum _y P(Y = y) \sum_{x}x\P(X = x|Y = y)\\
+    &= \sum_x\sum_y x\P(X = x, Y = y)\\
+    &= \sum _x x\sum_y \P(X = x, Y = y)\\
+    &= \sum_x x\P(X = x)\\
+    &= \E[X].
+  \end{align*}
+\end{proof}
+This is also called the law of total expectation. We can state it as: suppose $A_1, A_2, \cdots, A_n$ is a partition of $\Omega$. Then
+\[
+  \E[X] = \sum_{i: \P(A_i) > 0}\E[X|A_i]\P(A_i).
+\]
+\subsection{Sums with a random number of terms}
+We would like to consider a sum with a random number of terms. For example, an insurance company may receive a random number of claims, each demanding a random amount of money. Then we have a sum of a random number of terms.
+
+\begin{eg}
+Let $X_1, X_2, \cdots, X_n$ be iid with pgf $p(z) = \E{z^X}$. Let $N$ be a random variable independent of $X_i$ with pgf $h(z)$. What is the pgf of $S_n = X_1 + \cdots + X_N$?
+
+\begin{align*}
+  \E[z^{S_n}] &= \E[z^{X_1 + \cdots + X_N}]\\
+  &= \E_N[\underbrace{\E_{X_i}<++>[z^{X_1 + \ldots + X_N}|N]}_{\text{assuming fixed }N}]\\
+  &= \sum_{n = 0}^\infty \P(N = n) \E[z^{X_1 + X_2 + \cdots + X_n}]\\
+  &= \sum_{n = 0}^\infty \P(N = n) \E[z^{X_1}] \E[z^{X_2}]\cdots\E[z^{X_n}]\\
+  &= \sum_{n = 0}^\infty \P(N = n) (\E[z^{X_1}])^n\\
+  &= \sum_{n = 0}^\infty \P(N = n) p(z)^n \\
+  &= h(p(z))
+\end{align*}
+since $h(x) = \sum_{n = 0}^\infty \P(N = n) x^n$.
+
+So
+\begin{align*}
+  \E[S_N] &= \left.\frac{\d }{\d z}h(p(z))\right|_{z = 1}\\
+  &= h'(p(1))p'(1)\\
+  &= \E[N]\E[X_1]
+\end{align*}
+To calculate the variance, use the fact that
+\[
+  \E[S_n(S_n - 1)] = \left.\frac{\d ^2}{\d z^2}h(p(z))\right|_{z = 1}.
+\]
+Then we can find that
+\[
+  \var (S_N) = \E[N]\var(X_1) + \E[X_1^2]\var(N).
+\]
+\end{eg}
+\end{document} 

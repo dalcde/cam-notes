@@ -776,7 +776,7 @@ Here the hypothesis are not treated symmetrically. $H_0$ has precedence over $H_
 \begin{eg}
   Suppose $X_1, \cdots, X_n$ are iid $N(\mu, \sigma_0^2)$, where $\sigma_0^2$ is known. We want to find the best size $\alpha$ test of $H_0: \mu = \mu_0$ against $H_1: \mu - \mu_1$, where $\mu_0$ and $\mu_1$ are known fixed values with $\mu_1 > \mu_0$. Then
   \begin{align*}
-    \Lambda_\mathbf{x}(H_0; H_1) &= \frac{(2\pi\sigma_0^2)^{-n/2}\exp\left(-\frac{1}{2\sigma^2_0}\sum(x_i - \mu_1)^2\right)}{(2\pi\sigma_0^2)^{-n/2}\exp\left(-\frac{1}{2\sigma^2_0}\sum(x_i - \mu_1)^2\right)}\\
+    \Lambda_\mathbf{x}(H_0; H_1) &= \frac{(2\pi\sigma_0^2)^{-n/2}\exp\left(-\frac{1}{2\sigma^2_0}\sum(x_i - \mu_1)^2\right)}{(2\pi\sigma_0^2)^{-n/2}\exp\left(-\frac{1}{2\sigma^2_0}\sum(x_i - \mu_0)^2\right)}\\
     &= \exp\left(\frac{\mu_1 - \mu_0}{\sigma_0^2}n\bar x + \frac{n(\mu_0^2 - \mu_1^2)}{2\sigma_0^2}\right).
   \end{align*}
   This is an increasing function of $\bar x$, so for any $k$, $\Lambda_x > k\Leftrightarrow \bar x > c$ for some $c$. Hence we reject $H_0$ if $\bar x > c$, where $c$ is chosen such that $\P(\bar X > c | H_0) = \alpha$.
@@ -807,4 +807,129 @@ Our observed value $z$ will be in the rejected region iff $z > k \Leftrightarrow
 In general, the $p$-value is sometimes called the ``observed significance level'' of $\mathbf{x}$ and is the probability under $H_0$ of seeing data that are ``more extreme'' than our observed data $\mathbf{x}$. Extreme observations are viewed as providing evidence against $H_0$.
 
 \note The $p$-value has Uniform$(0, 1)$ pdf under the null hypothesis.
+\section{Composite hypotheses}
+For composite hypotheses like $H:\theta \geq 0$, the error probabilities do not have a single value. We define
+\begin{defi}[Power function]
+  The \emph{power function} is
+  \[
+    W(\theta) = \P(\mathbf{X}\in C|\theta) = \P(\text{reject }H_0|\theta),
+  \]
+\end{defi}
+We want $W(\theta)$ to be small on $H_0$ and large on $H_1$.
+
+\begin{defi}[Size]
+  The \emph{size} of the test is
+  \[
+    \alpha =\sup_{\theta\in \Theta_0}W(\theta),
+  \]
+\end{defi}
+It is the worst possible size.
+
+For $\theta\in \Theta_1$, $1 - W(\theta) = \P(\text{Type II error}|\theta)$.
+
+Sometimes the Neyman-Pearson theory can be extended to one-sided alternatives.
+
+For example, in the previous example, we have shown that the most powerful size $\alpha$ test of $H_0: \mu = \mu_0$ versus $H_1: \mu = \mu_1$ (where $\mu_1 > \mu_0$) is given by
+\[
+  C = \{x: \frac{\sqrt{n}(\bar x - \mu_0)}{\sigma_0} >  z_\alpha\}.
+\]
+The critical region depends on $\mu_0, n \sigma_0, \alpha$, and the fact that $\mu_1 > \mu_0$. It does NOT depend on the particular value of $\mu_1$. This test is then uniformly the most powerful size $\alpha$ for testing $H_0: \mu = \mu_0$ against $H_1: \mu> \mu_0$.
+
+\begin{defi}[Uniformly most powerful test]
+  A test specified by a critical region $C$ is \emph{uniformly most powerful} (UMP) size $\alpha$ test for test $H_0:\theta\in \Theta_0$ against $H_1: \theta \in \Theta_1$ if
+  \begin{enumerate}
+    \item $\sup_{\theta\in \Theta_0} W(\theta) = \alpha$.
+    \item For any other test $C^*$ with size $\leq \alpha$ and with power function $W^*$, we have $W(\theta) \geq W^*(\theta)$ for all $\theta\in \Theta_1$.
+  \end{enumerate}
+  Note that these may not exist. However, likelihood ratio test often work.
+\end{defi}
+
+\begin{eg}
+  Suppose $X_1, \cdots, X_n$ are iid where $\sigma_0$ is known, and we wish to test $H_0: \mu\leq \mu_0$ against $H_1: \mu > \mu_0$.
+
+  First consider testing $H_0': \mu = \mu_0$ against $H_1': \mu = \mu_1$, where $\mu_1 > \mu_0$. The Neyman-Pearson test of size $\alpha$ of $H_0'$ against $H_1'$ has
+  \[
+    C = \left\{x: \frac{\sqrt{n}(\bar x - \mu_0)}{\sigma_0} >  z_\alpha\right\}.
+  \]
+  We show that $C$ is in fact UMP for the composite hypotheses $H_0$ against $H_1$. For $\mu\in \R$, the power function is
+  \begin{align*}
+    W(\mu) &= \P_\mu(\text{reject } H_0)\\
+    &= \P_\mu\left(\frac{\sqrt{n}(\bar X - \mu_0)}{\sigma_0} > z_\alpha\right)\\
+    &= \P_\mu\left(\frac{\sqrt{n}(\bar X - \mu)}{\sigma_0} > z_\alpha + \frac{\sqrt{n}(\mu_0 - \mu)}{\sigma_0}\right)\\
+    &= 1 - \Phi\left(z_\alpha + \frac{\sqrt{n}(\mu_0 - \mu)}{\sigma_0}\right)
+  \end{align*}
+  To show this is UMP, we know that $W(\mu_0) = \alpha$ (by plugging in). $W(\mu)$ is an increasing function of $\mu$. So
+  \[
+    \sup_{ \mu \leq \mu_0} W(\mu) =- \alpha.
+  \]
+  So the first condition is satisfied.
+
+  For the second condition, observe that for any $\mu > \mu_0$, the Neyman Pearson size $\alpha$ test of $H_0'$ vs $H_1'$ has critical region $C$. Let $C^*$ and $W^*$ belong to any other test of $H_0$ vs $H_1$ of size $\leq \alpha$. Then $C^*$ can be regarded as a test of $H_0$ vs $H_1$ of size $\leq \alpha$, and NP-Lemma says that $W^*(\mu_1) \leq W(\mu_1)$. This holds for all $\mu_1 > \mu_0$. So the condition is satisfied and it is UMP.
+\end{eg}
+We now consider likelihood ratio tests for more general situations.
+\begin{defi}[Likelihood of a composite hypothesis]
+  The \emph{likelihood} of a composite hypothesis $H:\theta\in \Theta$ given data $\mathbf{x}$ to be
+  \[
+    L_x(H) = \sup_{\theta\in \Theta}f(\mathbf{x}|\theta).
+  \]
+\end{defi}
+So far we have considered disjoint hypotheses $\Theta_0, \Theta_1$, but we are not interested in any specific alternative. So it is easier to take $\Theta_1 = \Theta$ rather than $\Theta \setminus\Theta_0$. Then
+\[
+  \Lambda_x (H_0; H_1) = \frac{L_x(H_1}{L_x(H_0)}=\frac{\sup_{\theta\in \Theta_1}f(\mathbf{x}|\theta)}{\sup_{\theta\in \Theta_0}f(\mathbf{x}|\theta)} \geq 1,
+\]
+with large values of $\Lambda$ indicating departure from $H_0$.
+
+\begin{eg}
+  Single sample: testing a given mean, known variance ($z$-test). Suppose that $X_1, \cdots, X-n$ are iid $N(\mu, \sigma_0^2)$, with $\sigma_0^2$ known, and we wish to test $H_0: \mu = \mu_0$ against $H_1 = \mu \not= \mu_0$ (for given constant $\mu_0$).
+
+  Here $\Theta_0 = \{\mu_0\}$ and $\Theta = \R$.
+  For the denominator, we have $\sup_\Theta f(\mathbf{x}|\mu) = f(\mathbf{x}|\hat{\mu})$, where $\hat{\mu}$ is the mle. We know that $\hat{\mu} = \bar x$. Hence
+  \begin{align*}
+    \Lambda_\mathbf{x}(H_0; H_1) &= \frac{(2\pi\sigma_0^2)^{-n/2}\exp\left(-\frac{1}{2\sigma^2_0}\sum(x_i - \bar x)^2\right)}{(2\pi\sigma_0^2)^{-n/2}\exp\left(-\frac{1}{2\sigma^2_0}\sum(x_i - \mu_0)^2\right)}\\
+    &= \exp\left(\frac{\mu_1 - \mu_0}{\sigma_0^2}n\bar x + \frac{n(\mu_0^2 - \mu_1^2)}{2\sigma_0^2}\right).
+  \end{align*}
+  Then $H_0$ is rejected if $\Lambda_x$ is large.
+
+  To make our lives easier, we can use the logarithm instead:
+  \[
+    2\log \Lambda(H_0;H_1) = \frac{1}{\sigma_0^2}\left[\sum (x_i - \mu_0)^2 - \sum (x_i - \bar x)^2\right] = \frac{n}{\sigma_0^2}(\bar x - \mu_0)^2.
+  \]
+  So we can reject $H_0$ if we have 
+  \[
+    \left|\frac{\sqrt{n}(\bar x - \mu_0)}{\sigma_0}\right| > c
+  \]
+  for some $c$. 
+  
+  We know that under $H_0$, $\displaystyle Z = \frac{\sqrt{n}(\bar X - \mu_0)}{\sigma_0}\sim N(0, 1)$. So the size $\alpha$ generalised likelihood test rejects $H_0$ if
+  \[
+    \left|\frac{\sqrt{n}(\bar x - \mu_0}{\sigma_0}\right| > z_{\alpha/2}.
+  \]
+  Alternatively, since $\displaystyle \frac{n(\bar X - \mu_0)}{\sigma_0^2}\sim \chi_1^2$, we reject $H_0$ if
+  \[
+    \frac{n(\bar X - \mu_0)^2}{\sigma_0^2} > \chi_1^2(\alpha),
+  \]
+  (check that $z_{\alpha/2}^2 = \chi_1^2(\alpha)$).
+
+  Note that this is a two-tailed test - ie. reject $H_0$ both for high and low values of $\bar x$.
+\end{eg}
+
+The next theorem allows us to use likelihood ratio tests even when we cannot find the exact relevant null distribution.
+
+First consider the ''size`` or ''dimension`` of our hypotheses: suppose that $H_0$ imposes $p$ independent restrictions on $\Theta$. So for example, if $\Theta = \{\theta: \theta = (\theta_1, \cdots, \theta_k)\}$, and we have
+\begin{itemize}
+  \item $H_0: \theta_{i_1} = a_1, \theta_{i_2} = a_2, \cdots \theta_{i_p} = a_p$
+  \item $H_0: A\theta = \mathbf{b}$ (with $A$ $p\times k$, $\mathbf{b}$ $p\times 1$ given)
+  \item $H_0: \theta_i = f_i(\varphi), i = 1, \cdots, k$ for some $\varphi = (\varphi_1, \cdots, \varphi_{k - p}$
+\end{itemize}
+We say $\Theta$ has $k$ free parameters and $\Theta_0$ has $k - p$ free parameters. We write $|\Theta_0| = k - p$ and $|\Theta| = k$.
+
+\begin{thm}[Generalized likelihood ratio theorem]
+  Suppose $\Theta_0 \subseteq \Theta_1$ and $|\Theta_1| - |\Theta_0| = p$. Then under regularity conditions, as $n\to \infty$, with $\mathbf{X} = (X_1, \cdots, X_n)$ , all $X_i$ iid, we have, if $H_0$ is true,
+  \[
+    2\log \Lambda_\mathbf{X}(H_0:H_1)\sim \chi_p^2.
+  \]
+  If $H_0$ is not true, then $2\log \Lambda$ tends to be larger. We reject $H_0$ if $2\log \Lambda > c$, where $c = \chi_p^2(\alpha)$ for a test of approximately size $\alpha$.
+\end{thm}
+
+For example, in our example above, $|\Theta_1| - |\Theta_0| = 1$, and in this case, we saw that under $H_0$, $2\log \Lambda \sim \chi_1^2$ \emph{exactly} for all $n$ in that particular case, rather than just approximately.
 \end{document}
