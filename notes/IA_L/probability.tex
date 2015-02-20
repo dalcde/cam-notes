@@ -1746,7 +1746,7 @@ Let $X_1, X_2, \cdots, X_n$ be iid with pgf $p(z) = \E{z^X}$. Let $N$ be a rando
 
 \begin{align*}
   \E[z^{S_n}] &= \E[z^{X_1 + \cdots + X_N}]\\
-  &= \E_N[\underbrace{\E_{X_i}<++>[z^{X_1 + \ldots + X_N}|N]}_{\text{assuming fixed }N}]\\
+  &= \E_N[\underbrace{\E_{X_i}[z^{X_1 + \ldots + X_N}|N]}_{\text{assuming fixed }N}]\\
   &= \sum_{n = 0}^\infty \P(N = n) \E[z^{X_1 + X_2 + \cdots + X_n}]\\
   &= \sum_{n = 0}^\infty \P(N = n) \E[z^{X_1}] \E[z^{X_2}]\cdots\E[z^{X_n}]\\
   &= \sum_{n = 0}^\infty \P(N = n) (\E[z^{X_1}])^n\\
@@ -1770,4 +1770,443 @@ Then we can find that
   \var (S_N) = \E[N]\var(X_1) + \E[X_1^2]\var(N).
 \]
 \end{eg}
+\section{Branching processes}
+\subsection{Branching processes}
+Branching processes are used to model population growth by reproduction. Consider $X_0, X_1, \cdots$, where $X_n$ is the number of individuals in a generation. We assume the following:
+\begin{enumerate}
+  \item $X_0 = 1$
+  \item Each individual lives for unit time and produces $k$ offspring with probability $p_k$.
+  \item Suppose all offspring behave independently. Then
+    \[
+      X_{n + 1} = Y_1^n + Y_2^n + \cdots + Y_{X_n}^n,
+    \]
+    where $Y_i^n$ are iid random variables, which is the same as $X_1$ (the superscript denotes the generation).
+\end{enumerate}
+\subsection{Generating function of a branching process}.
+Let $f(z)$ be the pgf of $Y_i^n$. Then
+\[
+  F(z) = E[z^{Y_i^n}] = E[z^{X_1}] = \sum_{k = 0}^\infty f_k z^k.
+\]
+Define
+\[
+  F_n(z) = E[z^{X_n}].
+\]
+\begin{thm}
+  \[
+    F_{n + 1}(z) = F_n(F(z)) = F(F(F(\cdots F(z) \cdots )))) = F(F_n(z)).
+  \]
+\end{thm}
+
+\begin{proof}
+  \begin{align*}
+    F_{n + 1}(z) &= \E[z^{X_{n + 1}}]\\
+    &= \E[\E[z^{X_{n + 1}}|X_n]]\\
+    &= \sum_{k = 0}^\infty \P(X_n = k)\E[z^{X_{n + 1}}|X_n = k]\\
+    &= \sum_{k = 0}^\infty \P(X_n = k)\E[z^{Y_1^n + \cdots + Y_k^n}|X_n = k]\\
+    &= \sum_{k = 0}^\infty \P(X_n = k)\E[z^{Y_1}]\E[z^{Y_2}]\cdots\E[z^{Y_n}]\\
+    &= \sum_{k = 0}^\infty \P(X_n = k)(\E[z^{X_1}])^k\\
+    &= \sum_{k = 0}\P(X_n = k)F(z)^k\\
+    &= F_n(F(z))
+  \end{align*}
+\end{proof}
+
+\begin{thm}[mean and variance of population size]
+  Suppose $\E[X_1] = \sum k f_k = \mu$ and $\var (X_1) \E[(X - \mu)^2] = \sum (k - \mu)^2 f_k < \infty$.
+
+  Then $\E[X_n] = \mu^n$, and
+  \[
+    \var X_n = \frac{\sigma^2\mu^{n - 1}(\mu^n - 1}{\mu - 1},
+  \]
+  if $\mu \not = 1$, $n\sigma^2$ if $\mu = 1$.
+\end{thm}
+\begin{proof}
+\begin{align*}
+  \E[X_n] &= \E[\E[X_n|X_{n - 1}]]\\
+  &= \E[\mu X_{n - 1}]\\
+  &= \mu \E[X_{n - 1}]\\
+\end{align*}
+Then by induction, $\E[X_n] = \mu^n$ (since $X_0 = 1$).
+
+To calculate the variance, note that
+\[
+  \var (X_n) = \E[X_n^2] - (\E[X_n])^2
+\]
+and hence
+\[
+  \E[X_n^2] = \var(X_n) + (\E[X])^2
+\]
+We then calculate
+\begin{align*}
+  \E[X_n^2] &= \E[\E[X_n^2|X_{n - 1}]]\\
+  &= \E[\var(X_n) + (\E[X])^2 | X_{n - 1}]\\
+  &= \E[X_{n - 1}\var (X_1) + (\mu X_{n - 1})^2]\\
+  &= \E[X_{n - 1}\sigma^2 + (\mu X_{n - 1})^2]\\
+  &= \sigma^2 \mu^{n - 1} + \mu^2 \E[X_{n - 1}^2]
+\end{align*}
+So
+\begin{align*}
+  \var X_n &= \E[X_n^2] - (\E[X_n])^2 \\
+  &= \mu^2 \E[X_{n -1}^2] + \sigma^2 \mu^{n - 1} - \mu^2 (\E[X_{n - 1}])^2\\
+  &= \mu^2(\E[X_{n - 1}^2] - \E[X_{n - 1}]^2) + \sigma^2\mu^{n - 1}\\
+  &= \mu^2 \var (X_{n - 1}) + \sigma^2 \mu^{n -1 }\\
+  &= \mu^4 \var(X_{n - 2}) + \sigma^2(\mu^{n - 1} + \mu^n)\\
+  &= \cdots\\
+  &= \mu^{2(n - 1)}\var (X_1) + \sigma^2 (\mu^{n - 1} + \mu^{n} + \cdots + \mu^{2n - 3})\\
+  &= \sigma^2\mu^{n - 1}(1 + \mu + \cdots + \mu^{n - 1}).
+\end{align*}
+Of course, we can also obtain this using the probability generating functions.
+\end{proof}
+\subsection{Probability of extinction}
+Let $A_n$ be the event $X_n = 0$, ie extinction has occurred by the $n$th generation. Let $q$ be the probability that extinction eventually occurs. Then
+\[
+  A = \bigcup_{n = 1}^\infty A_n = [\text{extinction eventually occurs}].
+\]
+Since $A_1 \subseteq A_2 \subseteq A_3 \subseteq \cdots$, we know that
+\[
+  q = \P(A) = \lim_{n\to \infty} \P(A_n) = \lim_{n \to \infty} \P(X_n = 0).
+\]
+But
+\[
+  \P(X_n = 0) = F_n(0),
+\]
+since $F_n(0) = \sum \P(X_n = k)z^k$. We know that
+\[
+  F(q) = F\left(\lim_{n\to \infty} F_n(0)\right) = \lim_{n \to \infty} \lim_{n\to \infty} F(F_n(0)) = \lim_{n\to \infty}F_{n + 1}(0) = q.
+\]
+So
+\[
+  F(q) = q.
+\]
+Alternatively, using the law of total probability
+\[
+  q = \sum_k \P(X_1 = k) \P(\text{extinction}|X_1 = k) = \sum_k f_k q^k = F(q),
+\]
+where the second equality comes from the fact that for the whole population to go extinct, each individual population must go extinct.
+
+\begin{thm}
+  The probability of extinction $q$ is the smallest root to the equation $q = F(q)$. Suppose $\mu = \E[X_1]$, then if $\mu \leq 1$, then $q = 1$; if $\mu > 1$, then $q < 1$.
+\end{thm}
+
+\begin{proof}
+  To show that it is the smallest root, let $\alpha$ be the smallest root. Then note that $0 \leq \alpha \Rightarrow F(0) \leq F(\alpha) = \alpha$ since $F$ is increasing (proof: write the function out!). Hence $F(F(0) \leq \alpha$. Continuing inductively, $F_n(0) \leq \alpha$ for all $n$. So
+  \[
+    q = \lim_{n \to \infty}F_n(0) \leq \alpha.
+  \]
+  So $q = \alpha$.
+
+  To show that $q = 1$ when $\mu \leq 1$, we show that $q = 1$ is the only root. We know that $F'(z), F''(z) \geq 0$ for $z\in (0, 1)$ (proof: write it out again!). So $F$ is increasing and convex. Since $F'(1) = \mu \leq 1$, it must look like this:
+
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (0, 0) -- (4, 0) node [right] {$z$};
+      \draw (0, 0) -- (0, 4) node [above] {$F(z)$};
+      \draw [dashed] (0, 0) -- (4, 4);
+      \draw (0, 2.3) .. controls (2, 2.5) .. (4, 4);
+    \end{tikzpicture}
+  \end{center}
+  So $z = 1$ is the only root.
+\end{proof}
+
+\section{Random walk and gambler's ruin}
+\subsection{Random walks}
+\begin{defi}[Random walk]
+  Let $X_1, \cdots, X_n$ be iid random variables such that $X_n = +1$ with probability $p$, and $-1$ with probability $1 - p$. Let $S_n = S_0 + X_1 + \cdots + X_n$. wlog, $S_0 = 0$. Then $(S_0, S_1, \cdots, S_n)$ is a \emph{1-dimensional random walk}.
+
+  If $p = q = \frac{1}{2}$, we say it is a \emph{symmetric random walk}.
+\end{defi}
+
+\subsection{Gambler's ruin}
+\begin{eg}
+  A gambler starts with $\$z$, with $z < a$, and plays a game in which he wins $\$1$ or loses $\$ 1$ at each turn with probabilities $p$ and $q$ respectively. What are 
+  \[
+    p_z = \P(\text{random walk hits $a$ before } 0 | \text{starts at } z),
+  \]
+  and
+  \[
+    q_z = \P(\text{random walk hits 0 before }a | \text{starts at }z)?
+  \]
+  He either wins his first game, with probability $p$, or loses with probability $q$. Then
+  \[
+    p_z = qp_{z - 1} + pp_{z + 1},
+  \]
+  for $0 < z < a$, and $p_0 = 0, p_a = 1$.
+
+  Try $p_z = t^z$. Then
+  \[
+    pt^2 - t + q = (pt - q)(t - 1) = 0,
+  \]
+  noting that $p = 1 - q$. If $p \not = q$, then
+  \[
+    p_z = A1^2 + B\left(\frac{q}{p}\right)^z.
+  \]
+  Since $p_z = 0$, $A = -B$. Since $p_a = 1$, we obtain
+  \[
+    p_z = \frac{1 - (p/q)^z}{1 - (p/q)^a}.
+  \]
+  If $p = q$, then $p_z = A + Bz = z/a$.
+
+  Similarly, (or perform the substitutions $p\mapsto q$, $q\mapsto p$ and $z \mapsto a - z$)
+  \[
+    q_z = \frac{(p/q)^z - (q/p)^a}{1 - (p/q)^a}
+  \]
+  if $p\not = q$, and
+  \[
+    q_z = \frac{a - z}{z}
+  \]
+  if $p = q$. Since $p_z + q_z = 1$, we know that the game will eventually end. 
+
+  What if $a\to \infty$? What is the probability of going bankrupt?
+  \begin{align*}
+    \P(\text{path hits 0 ever}) &= \P\left(\bigcup_{a = z+1}^\infty [\text{path hits 0 before }a]\right)\\
+    &= \lim_{a\to \infty}\P(\text{path hits 0 before }a)\\
+    &= \lim_{a\to \infty}q_z\\
+    &= \begin{cases}
+      (p/q)^z & p > q\\
+      1 & p \leq q.
+    \end{cases}
+  \end{align*}
+\end{eg}
+
+\subsection{Duration of the game}
+Let $D_z =$ expected time until the random walk hits $0$ or $a$, starting from $z$. We first show that this is bounded. We know that there is one simple way to hit $0$ or $a$: get $+1$ or $-1$ for $a$ times in a row. This happens with probability $p^a + q^a$, and takes $a$ steps. So even if this were the only way to hit $0$ or $a$, the expected duration would be $\frac{a}{p^a + q^a}$. So we must have
+\[
+  D_z \leq \frac{a}{p^a + q^a}
+\]
+This is a \emph{very} crude bound, but it is sufficient to show that it is bounded, and we can meaningfully apply formulas to this finite quantity.
+
+We have
+\begin{align*}
+  D_z = \E[\text{duration}]\\
+  &= \E[\E[\text{duration}|X_1]]\\
+  &= p\E[\text{duration}|X_1 = 1] + q\E[\text{duration}|X_1 = -1]\\
+  &= p(1 + D_{z + 1}) + q(1 - D_{z - 1})\\
+\end{align*}
+So
+\[
+  D_z = 1 + pD_{z + 1} + qD_{z - 1},
+\]
+subject to $D_0 = D_a = 0$.
+
+We first find a particular solution by trying $D_z = Cz$. Then
+\[
+  Cz = 1 + pC(z + 1) = qC(z - 1).
+\]
+So
+\[
+  C = \frac{1}{q - p},
+\]
+for $p \not = q$. The we find the complementary solution:
+\[
+  pt^2 - t + q = 0,
+\]
+which has roots $1$ and $q/p$. So the general solution is
+\[
+  D_z = A + B\left(\frac{q}{p}\right)^z + \frac{z}{q - p}.
+\]
+Putting in the boundary conditions,
+\[
+  D_z = \frac{z}{q - p} - \frac{a}{q - p} \cdot \frac{1 - (q/p)^z}{1 - (q/p)^a}.
+\]
+If $p = q$, then to find the particular solution, we have to try
+\[
+  D_z = Cz^2.
+\]
+Then we find $C = -1$. So
+\[
+  D_z = -z^2 + A + Bz.
+\]
+Then the boundary conditions give
+\[
+  D_2 = z(a - z).
+\]
+\subsection{Use of generating functions in random variables}
+Let $U_{z,n} = \P(\text{random walk absorbed at 0 at }n|\text{start in }z)$.
+
+We have the following conditions: $U_{0, 0} = 1$; $U_{z, 0 = 0}$ for $0 < z \leq a$; $U_{0, n} = U_{a, n} = 0$ for $n > 0$.
+
+We define a pgf-like function.
+\[
+  U_z(s) = \sum_{n = 0 }^\infty U_{z, n}s^n.
+\]
+We know that
+\[
+  U_{z, n + 1} = p U_{z + 1, n} + qU_{z - 1}, n.
+\]
+Multiply by $s^{n + 1}$ and sum on $n = 0, 1, \cdots$. Then
+\[
+  U_z(s) = psU(z + 1)(s) + qsU_{z - 1}(s).
+\]
+We try $U_z(s) = [\lambda(s)]^z$. Then
+\[
+  \lambda(s) = ps\lambda(s)^2 + s.
+\]
+Then
+\[
+  \lambda_1(s), \lambda_2(s) = \frac{1 \pm \sqrt{1 - 4pqs^2}}{2ps}.
+\]
+So
+\[
+  U_z(s) = A(s) \lambda_1(s)^z + B(s)\lambda_z(s)^2.
+\]
+Since $U_0(s) = 1$ and $U_a(s) = 0$, we know that
+\[
+  A(s) + B(s) = 1
+\]
+and
+\[
+  A(s)\lambda_1(s)^a + B(s)\lambda_2(s)^a = 0.
+\]
+Then we fined that
+\[
+  U_z(s) = \frac{\lambda_1(s)^a\lambda_2(s)^z - \lambda_2(s)^a\lambda_1(s)^z}{\lambda_1(s)^a - \lambda_2(s)^a}.
+\]
+Since $\lambda_1(s)\lambda_2(s) = \frac{q}{p}$, we can ``simplify'' this to obtain
+\[
+  U_z(s) = \left(\frac{q}{p}\right)^z \cdot \frac{\lambda_1(s)^{a - z} - \lambda_2(s)^{a - z}}{\lambda_1(s)^a - \lambda_2(s)^a}.
+\]
+We see that $U_z(1) = q_z$. We can apply the same method to find the generating function for absorption at $a$, say $V_z(s)$. Then the generating function for the duration is $U + Z$. Hence the expected duration $D_z = U'_z(1) + V'_z(1).$
+\section{Continuous random variables}
+Consider $\Omega$ with a \emph{continuum} of outcomes, like $\Omega = \{\omega: 0 \leq \omega \leq 2\pi\}$ (eg. a spinner). Then we have
+\[
+  \P(\omega \in [0, \theta]) = \frac{\theta}{2\pi}, \quad 0 \leq \theta \leq 2\pi.
+\]
+\begin{defi}[Continuous random variable]
+  A \emph{continuous random variable} $X$ is a real-valued function $X: \Omega \to \R$ such that
+  \[
+    \P(a \leq X \leq b) = \int_a^b f(x) \;\d x,
+  \]
+  where $f$ is the \emph{probability density function}, which satisfies
+  \begin{itemize}
+    \item $f \geq 0)$
+    \item $\int_{-\infty}^\infty f(x) = 1$.
+  \end{itemize}
+\end{defi}
+Note that $\P(X = a) = 0$ since it is $\int_a^a f(x)\;\d x$. Then we also have
+\[
+  \P(\bigcup_{a\in \Q} [X = a]) = 0,
+\]
+since it is a countable union of probability 0 events (and axiom 3 states that the probability of the countable union is the sum of probabilities, ie. 0)
+
+Informally, 
+\[
+  \P(X \in [x, x + \delta x]) = \int_x^{x + \delta x} f(z) \;\d z \approx f(x) \delta x.
+\]
+
+\begin{defi}[Cumulative distribution function]
+  The \emph{cumulative distribution function} (or simply \emph{distribution function}) of a random variable $X$ (discrete, continuous, or neither) is
+  \[
+    F(x) = \P(X \leq x).
+  \]
+\end{defi}
+We can see that $F(x)$ is increasing and $F(x) \to 1$ as $x\to \infty$.
+
+In the case of continuous random variables, we have
+\[
+  f(x) = \int_\infty^x f(z) \;\d z.
+\]
+Then $F$ is continuous and differentiable. In general, $F'(x) = f(x)$ whenever $F$ is differentiable.
+
+The name of \emph{continuous} random variables comes from the fact that $F(x)$ is (absolutely) continuous.
+
+The cdf of a continuous random variable might look like this:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (0, 0) -- (3, 0);
+    \draw [->] (0, 0) -- (0, 2) node [above] {$\P$};
+    \draw (0, 0) parabola (2.5, 1.5);
+  \end{tikzpicture}
+\end{center}
+
+The cdf of a discrete random variable might look like this:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (0, 0) -- (3, 0);
+    \draw [->] (0, 0) -- (0, 2) node [above] {$\P$};
+    \draw (0, 0) -- (1, 0) -- (1, 0.5) -- (2, 0.5) -- (2, 1) -- (3, 1) -- (3, 1.5);
+  \end{tikzpicture}
+\end{center}
+
+The cdf of a random variable that is neither discrete nor continuous might look like this:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (0, 0) -- (3, 0);
+    \draw [->] (0, 0) -- (0, 2) node [above] {$\P$};
+    \draw (0, 0) parabola (1, 1);
+    \draw (1, 1) -- (2.5, 1) -- (2.5, 2);
+    \node [circ] at (2.5, 2) {};
+  \end{tikzpicture}
+\end{center}
+Note that we always have
+\[
+  \P(a \leq x \leq b) = F(b) - F(a) = \int_a^b f(x)\;\d x.
+\]
+
+\subsection{Certain important distributions}
+\begin{defi}[Uniform distribution]
+  The \emph{uniform distribution} on $[a, b]$ has pdf
+  \[
+    f(x) = \frac{1}{b - a}.
+  \]
+  Then
+  \[
+    F(x) = \int_a^x f(z)\;\d z = \frac{x - a}{b - a}
+  \]
+  for $a \leq x \leq b$.
+
+  If $X$ follows a uniform distribution on $[a, b]$, we write $X\sim U[a, b]$.
+\end{defi}
+\begin{defi}[Exponential random variable]
+  The \emph{exponential random variable with parameter $\lambda$} has pdf
+  \[
+    f(x) = \lambda 1^{-\lambda x}
+  \]
+  and
+  \[
+    F(x) = 1 - e^{-\lambda x}
+  \]
+  for $x \geq 0$.
+
+  We write $X \sim \mathcal{E}(\lambda)$.
+\end{defi}
+
+Then
+\[
+  \P(a \leq x \leq b) = \int_a^b f(z) \;\d z = e^{-\lambda } - e^{-\lambda b}.
+\]
+\begin{prop}
+  The exponential random variable is \emph{memoryless}, ie.
+  \[
+    \P(X \geq x + z | X \geq x) = \P(X \geq z).
+  \]
+  This means that, say if $X$ measures the lifetime of a light bulb, knowing it has already lasted for 3 hours does not give any information about how much longer it will last.
+\end{prop}
+\note The geometric random variable is the discrete memoryless random variable.
+
+\begin{proof}
+  \begin{align*}
+    \P(X \geq x + z | X \geq x) &= \frac{\P(X \geq x + z)}{\P(X \geq x)}\\
+    &= \frac{\int_{x + z}^\infty f(u)\;\d u}{\int_x^\infty f(u)\;\d u}\\
+    &= \frac{e^{-\lambda(x + z)}}{e^{-\lambda x}}\\
+    &= e^{-\lambda z}\\
+    &= \P(X \geq z).
+  \end{align*}
+\end{proof}
+
+Similarly, given that, you have lived for $x$ days, what is the probability of dying within the next $\delta x$ days?
+\begin{align*}
+  \P(X \leq x + \delta x | X \geq x) &= \frac{\P(X \leq X \leq x + \delta x}{\P(X \geq x)}\\
+  &= \frac{\lambda e^{-\lambda x} \delta x}{e^{-\lambda x}}\\
+  &= \lambda \delta x.
+\end{align*}
+So it is independent of how old you currently are, assuming your survival follows an exponential distribution.
+
+In general, we can define the hazard rate to be
+\[
+  h(x) = \frac{f(x)}{1 - F(x)}.
+\]
+Then
+\[
+  \P(x \leq X \leq x + \delta x | X \geq x) = \frac{\P(x \leq X \leq x + \delta x}{\P(X \geq x)} = \frac{\d x f(x)}{1 - F(x)} = \delta x\cdot h(x).
+\]
+In the case of exponential distribution, $h(x)$ is constant.
 \end{document} 
