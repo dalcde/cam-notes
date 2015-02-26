@@ -45,7 +45,7 @@ In particular, we perform parametric inference:
 
 We assume a random variable $X$ takes values in $\mathcal{X}$. We assume its distribution belongs to a family of distribution (eg. Poisson) indexed by a scalar or vector parameter $\theta$, taking values in some parameter space $\Theta$. We call this a \emph{parametric family}.
 
-For example, we can have $X\sim \text{Poisson}(\mu)$ and $\theta = \mu\in\Theta = (0, \infty)$.
+For example, we can have $X\sim \Poisson(\mu)$ and $\theta = \mu\in\Theta = (0, \infty)$.
 
 We assume that we already which family it belongs to, and then try to find out $\theta$.
 
@@ -1264,4 +1264,513 @@ On the other hand, if we have a test for $H_0: \theta = \theta_0$, then the conf
 
   Then $I(\mathbf{X}) = \{\mu: \mathbf{X}\in A(\mu)\} = \{\mu:\sqrt{n}(\bar X - \mu)| < 1.96\%\}$. So a $95\%$ confidence set for $\mu$ is $(\bar X - 1.96/\sqrt{n}, \bar X + 1.96/\sqrt{n})$.
 \end{eg}
+\section{Multivariate Normal theory}
+A random (column) vector $\mathbf{X} = (X_1, \cdots, X_n)^T$ has mean
+\[
+  \boldsymbol\mu = \E[\mathbf{X}] = (\E(X_1), \cdots, \E(X_n))^T = (\mu_1, \cdots, \mu_n)^T,
+\]
+and covariance matrix
+\[
+  \cov (\mathbf{X}) = \E[(\mathbf{X} - \boldsymbol\mu)(\mathbf{X} - \boldsymbol\mu)^T] = (\cov(X_i, X_j))_{ij},
+\]
+provided they exist, of course.
+
+For an $m\times n$ matrix $A$,
+\[
+  \E[A\mathbf{X}] = A\boldsymbol\mu,
+\]
+and
+\[
+  \cov (A\mathbf{X}) = A\cov(\mathbf{X})A^T,\tag{1}
+\]
+since
+\[
+  \cov(A\mathbf{X}) = \E[(A\mathbf{X} -\E[A\mathbf{X}])(AX - \E[AX])^Y] = \E[A(X - \E[X])(X - \E[X])^T A^T].
+\]
+We can also define the covariance $\cov(V, W)$ to be a matrix with $(i, j)$ element $\cov(V_i, W_j)$. Then $\cov(A\mathbf{X}, B\mathbf{X}) = A\cov (\mathbf{X}) B^T$.
+
+Recall that a univariate normal $X\sim N(\mu, \sigma^2)$ has density
+\[
+  f_X(x; \mu, \sigma^2) = \frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{1}{2}\frac{(x - \mu)^2}{\sigma^2}\right),
+\]
+with moment generating function
+\[
+  M_X(s) = \E[e^{sX}] = \exp(\mu s + \frac{1}{2}\sigma^2 s^2).
+\]
+We say $\mathbf{X}$ has a multivariate if, for every $\mathbf{t}\in \\mathbf{R}$, if, for every $\mathbf{t}\in \R^n$, the random variable $\mathbf{t}^T\mathbf{X}$ (ie. $\mathbf{t}\cdot \mathbf{X}$) has a normal distribution.
+
+If $\E[\mathbf{X}] = \boldsymbol\mu$ and $\cov (\mathbf{X}) = \Sigma$, we write $\mathbf{X}\sim N_n(\boldsymbol\mu, \Sigma)$.
+
+Note that $\Sigma$ is symmetric and is non-negative definite because by (1),
+\[
+  \mathbf{t}^T\Sigma \mathbf{t} = \var(\mathbf{t}^T\mathbf{X}) \geq 0.
+\]
+Also, by (1),
+\[
+  M_{\mathbf{t}^T \mathbf{X}}(s) = \E[e^{s\mathbf{t}^T\mathbf{X}}] = \exp\left(\mathbf{t}^T\mu s + \frac{1}{2}t\mathbf{t}^T\Sigma \mathbf{t}s^2\right).
+\]
+Hence $\mathbf{X}$ has mgf
+\[
+  M_\mathbf{X}(\mathbf{t}) = \E[e^{\mathbf{t}^T \mathbf{X}}]= M_{\mathbf{t}^T\mathbf{X}}(1) = \exp\left(\mathbf{t}^T\boldsymbol\mu + \frac{1}{2}\mathbf{t}^T \Sigma \mathbf{t})\right).\tag{2}
+\]
+
+\begin{prop}\leavevmode
+  \begin{enumerate}
+    \item If $\mathbf{X} \sim \mu, \Sigma)$, and $A$ is an $m\times n$ matrix, then $A\mathbf{X} \sim N_m (A\boldsymbol\mu, A\Sigma A^T)$.
+    \item IF $\mathbf{X}\sim N_n(\mathbf{0}, \sigma^2 I)$, then
+      \[
+        \frac{|\mathbf{X}|^2}{\sigma^2} = \frac{\mathbf{X}^T\mathbf{X}}{\sigma^2}\sum \frac{X_i^2}{\sigma ^2}\sim \chi_n^2.
+      \]
+  \end{enumerate}
+\end{prop}
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item From example sheet 3
+    \item Immediate from definition of $\chi_n^2$.
+  \end{enumerate}
+\end{proof}
+
+\begin{notation}
+  We often write $|\mathbf{X}|^2 = \sigma^2 \chi_n^2$.
+\end{notation}
+
+\begin{prop}
+  Let $\mathbf{X}\sim N_n(\mu_\Sigma)$. We split $\mathbf{X}$ up into two parts: $\mathbf{X} =
+  \begin{pmatrix}
+    \mathbf{X}_1\\
+    \mathbf{X}_2
+  \end{pmatrix}$, where $\mathbf{X}_i$ is a $n_i \times 1$ column vector and $n_1 + n_2 = n$.
+
+  Similarly write
+  \[
+    \boldsymbol\mu = 
+    \begin{pmatrix}
+      \boldsymbol\mu_1\\
+      \boldsymbol\mu_2
+    \end{pmatrix}
+    ,\quad
+    \Sigma =
+    \begin{pmatrix}
+      \Sigma_{11} & \Sigma_{12}\\
+      \Sigma_{21} & \Sigma_{22}
+    \end{pmatrix},
+  \]
+  where $\Sigma_{ij}$ is an $n_i\times n_j$ matrix.
+
+  Then
+  \begin{enumerate}
+    \item $\mathbf{X}_i \sim N_{n_i}(\boldsymbol\mu, \Sigma_{ii})$
+    \item $\mathbf{X}_1$ and $\mathbf{X}_2$ are independent iff $\Sigma_{12} = 0$.
+  \end{enumerate}
+\end{prop}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item See Example Sheet 3.
+    \item From (2), $M_\mathbf{X}(\mathbf{t}) = \exp(\mathbf{t}^T \boldsymbol\mu + \frac{1}{2}\mathbf{t}^T\Sigma\mathbf{t})$ for each $\mathbf{t}\in \R^n$. We write $\mathbf{t} = \begin{pmatrix}\mathbf{t}_1\\\mathbf{t}_2\end{pmatrix}$. Then this is equal to
+      \[
+        M_\mathbf{X}(\mathbf{t})\exp(\mathbf{t}_1^T\boldsymbol\mu_1 + \mathbf{t}_2^T \Sigma_{11}\mathbf{t}_1 + \frac{1}{2}\mathbf{t}_2^T \Sigma_{22}\mathbf{t}_2 + \frac{1}{2}\mathbf{t}_1^T \sum_{12}\mathbf{t}_2 + \frac{1}{2}\mathbf{t}_2^T \Sigma_{21}\mathbf{t}_1).
+      \]
+      From (i), we know that $M_{\mathbf{X}_i} = \exp(\mathbf{t}_i^T\boldsymbol\mu_i + \frac{1}{2}\mathbf{t}_i^T \Sigma_{ii}\mathbf{t}_i)$. So $M_\mathbf{X}(\mathbf{t}) = M_{\mathbf{X}_1}(\mathbf{t}_1)M_{\mathbf{X}_2}(\mathbf{t}_2)$ for all $\mathbf{t}$ if and only if $\Sigma_{12} = 0$.
+  \end{enumerate}
+\end{proof}
+
+\begin{prop}
+  When $\Sigma$ is a positive definite, then $\mathbf{X}$ has pdf
+  \[
+    f_\mathbf{X}(\mathbf{x}; \mu, \Sigma) = \frac{1}{|\Sigma|^2} \left(\frac{1}{\sqrt{2\pi}}\right)^n \exp\left[-\frac{1}{2}(\mathbf{x} - \boldsymbol\mu)^T\Sigma^{-1}(\mathbf{x} - \boldsymbol\mu)\right].
+  \]
+\end{prop}
+\subsection{Normal random samples}
+Now consider $\bar X = \frac{1}{n}\sum X_i$, and $S_{XX} = \sum(X_i - \bar X)^2$ for univariate normal data.
+
+\begin{thm}[Joint distribution of $\bar X$ and $S_{XX}$]
+  Suppose $X_1, \cdots, X_n$ are iid $N(\mu, \sigma^2)$ and $\bar X = \frac{1}{n} \sum X_i$, and $S_{XX} = \sum (X_i - \bar X)^2$. Then
+  \begin{enumerate}
+    \item $\bar X \sim N(\mu, \sigma^2/n)$
+    \item $S_{XX}/\sigma^2 \sim \chi_{n - 1}^2$.
+    \item $\bar X$ and $S_{XX}$ are independent.
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}
+  We can write the joint density as $\mathbf{X} = \sim N_n(\boldsymbol\mu, \sigma^2I)$, where $\boldsymbol\mu = \mu \mathbf{1}$ ($\mathbf{1}$ is an $n\times 1$ column vectors of 1's).
+
+  Let $A$ be an $n\times n$ orthogonal matrix with the first row all $1/\sqrt{n}$ (the other rows are not important). One possible such matrix is
+  \[
+    A =
+    \begin{pmatrix}
+      \frac{1}{\sqrt{n}} & \frac{1}{\sqrt{n}} & \frac{1}{\sqrt{n}} & \frac{1}{\sqrt{n}} & \cdots & \frac{1}{\sqrt{n}}\\
+      \frac{1}{\sqrt{2\times 1}} & \frac{-1}{\sqrt{2\times 1}} & 0 & 0 & \cdots & 0\\
+      \frac{1}{\sqrt{3\times 2}} & \frac{1}{\sqrt{3\times 2}} & \frac{-2}{\sqrt{3\times 2}} & 0 \cdots & 0\\
+      \vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+      \frac{1}{\sqrt{n(n - 1)}} & \frac{1}{\sqrt{n(n - 1)}} & \frac{1}{\sqrt{n(n - 1)}} & \frac{1}{\sqrt{n(n - 1)}} & \cdots & \frac{-(n - 1)}{\sqrt{n(n - 1)}} \\    
+    \end{pmatrix}
+  \]
+  Now define $\mathbf{Y} = A\mathbf{X}$. Then 
+  \[
+    \mathbf{Y} \sim N_n(A\boldsymbol\mu, A\sigma^2IA^T) \sim N_n(A\boldsymbol\mu, \sigma^2 I).
+  \]
+  We have
+  \[
+    A\boldsymbol\mu = (\sqrt{n}\mu, 0, \cdots, 0)^T.
+  \]
+  So $Y_1 \sim N(\sqrt{n}\mu, \sigma^2)$ and $Y_i \sim N(0, \sigma^2)$ for $i = 2, \cdots, n$. Also, $Y_1, \cdots, Y_n$ are independent, since the covariance matrix is every non-diagonal term $0$.
+
+  But from the definition of $A$, we have
+  \[
+    Y_1 = \frac{1}{\sqrt{n}}\sum_{i = 1}^n X_i = \sqrt{n} \bar X.
+  \]
+  So $\sqrt{n} \bar X \sim N(\sqrt{n}, \sigma^2)$, or $\bar X \sim N(\mu, \sigma^2)$. Also
+  \begin{align*}
+    Y_2^2 + \cdots + T_n^2 &= \mathbf{Y}^T\mathbf{Y} - Y_1^2\\
+    &= \mathbf{X}^TA^TA\mathbf{X} - Y_1^2\\
+    &= \mathbf{X}^\mathbf{X} - n\bar X^2\\
+    &= \sum_{i = 1}^n X_i^2 - n\bar X^2\\
+    &= \sum_{i = 1}^n (X_i - \bar X)^2 \\
+    &= S_{XX}.
+  \end{align*}
+  So $S_{XX} = Y_2^2 + \cdots + Y^2_n \sim \sigma^2 \chi_{n - 1}^2$.
+
+  Finally, since $Y_1$ and $Y_2, \cdots, Y_n$ Are independent, so are $\bar X$ and $S_{XX}$.
+\end{proof}
+\subsection{Student's \texorpdfstring{$t$}{t}-distribution}
+Suppose that $Z$ and $Y$ are independent, $Z\sim N(0, 1)$, $Z\sim N(0, 1)$ and $Y\sim \chi_k^2$. Then $T = Z/\sqrt{Y/k}$ is said to have a $t$-distribution on $k$ degrees of freedom, and we write $T\sim t_k$.
+
+The density of $t_k$ turns out to be
+\[
+  f_T(t) = \frac{\Gamma((k + 1)/2)}{\Gamma(k/2)} \frac{1}{\sqrt{\pi k}}\left(1 + \frac{t^2}{k}\right)^{-(k+1)/2}.
+\]
+This density is symmetric, bell-shaped, and has a maximum at $t = 0$, which is rather like the standard normal density. However, it can be shown that $\P(T > t) > \P(Z > t)$, ie. the $T$ distribution has a ``fatter'' tail. Also, as $k \to \infty$, $t_k$ approaches a normal distribution.
+
+\begin{prop}
+  If $k > 1$, then $\E_k(T) = 0$.
+ 
+  If $k > 2$, then $\var_k(T) = \frac{k}{k - 2}$.
+
+  If $k = 2$, then $\var_k(T) = \infty$.
+
+  In all other cases, the values are undefined. In particular, the $k = 1$ case, known as the Cauchy distribution, has undefined mean and variance.
+\end{prop}
+
+\begin{notation}
+  We write $t_k(\alpha)$ be the upper $100\alpha\%$ point of the $t_k$ distribution, so that $\P(T > t_k(\alpha)) = \alpha$.
+\end{notation}
+
+The typical application is to random samples with unknown mean \emph{and} variance.
+
+Let $X_1, \cdots, X_n$ be iid $\N(\mu, \sigma^2)$. Then $\bar X \sim N(\mu, \sigma^2/n)$. So $Z = \frac{\sqrt{n}(\bar X - \mu}{\sigma} \sim N(0, 1)$.
+
+Also, $S_{XX}/\sigma^2 \sim \chi^2_{n - 1}$ and is independent of $\bar X$, hence $Z$. So
+\[
+  \frac{\sqrt{n}(\bar X - \mu)/\sigma}{\sqrt{S_{XX}/((n - 1)\sigma^2)}} \sim t_{n - 1},
+\]
+or
+\[
+  \frac{\sqrt{n}(\bar X - \mu)}{\sqrt{S_{XX}/(b - 1)}} \sim t_{n - 1}.
+\]
+We write $\tilde{\sigma}^2 = \frac{S_{XX}}{n - 1}$ (note that this is the unbiased estimator). Then a $100(1 - \alpha)\%$ confidence interval for $\mu$ is found from
+\[
+  1 - \alpha = \P\left(-t_{n - 1}\left(\frac{\alpha}{2}\right) \leq \frac{\sqrt{n}(\bar X - \mu)}{\tilde{\sigma}} \leq t_{n - 1}\left(\frac{\alpha}{2}\right)\right).
+\]
+This has endpoints
+\[
+  \bar X \pm \frac{\tilde{\sigma}}{\sqrt{n}}t_{n - 1}\left(\frac{\alpha}{2}\right).
+\]
+
+\section{Linear models}
+Linear models can be used to explain or model the relationship between a \emph{response} (or \emph{dependent}) variable, and one or more \emph{explanatory} variables (or \emph{covariates} or \emph{predictors}).
+
+Here we will \emph{not} assume normality. Turns out we can derive LOTS of results without assuming normality.
+
+\begin{eg}
+  How do motor insurance claim rates (response) depend on the age and sex of the driver, and where they live (explanatory variables)? 
+\end{eg}
+
+Suppose we have $p$ covariates $x_j$, and we have $n$ observations $Y_i$. We assume $n > p$, or else things get tricky. Then each observation can be written as
+\[
+  Y_i = \beta_1 x_{i1} + \cdots + \beta_p x_{ip} + \varepsilon_i.\tag{1}
+\]
+for $i = 1, \cdots, n$. Here
+\begin{itemize}
+  \item $\beta_1, \cdots, \beta_p$ are unknown, fixed parameters we wish to work out (with $n > p$)
+  \item $x_{i1}, \cdots, x_{ip}$ are the values of the $p$ covariates for the $i$th response (which are all known).
+  \item $\varepsilon_1, \cdots, \varepsilon_n$ are independent (or possibly just uncorrelated) random variables with mean 0 and variance $\sigma^2$.
+\end{itemize}
+We think of the $\beta_j x_{ij}$ terms to be the causal effects of $x_{ij}$ and $\varepsilon_i$ to be a random fluctuation (error term).
+
+Then we clearly have
+\begin{itemize}
+  \item $\E(Y_i) = \beta_1 x_{i1} + \cdots \beta_px_{ip}$.
+  \item $\var(Y_i) = \var(\varepsilon_i) = \sigma^2$.
+  \item $Y_1, \cdots, Y_n$ are independent.
+\end{itemize}
+Note that (1) is linear in the parameters $\beta_1, \cdots, \beta_p$. Obviously the real world can be much more complicated. But this is much easier to work with.
+
+\begin{eg}
+  For each of 24 males, the maximum volume of oxygen uptake in the blood and the time taken to run 2 miles (in minutes) were measured. We want to know how the time taken depends on oxygen uptake.
+
+  For each individual $i$, we let $Y_i$ be the time to run 2 miles, and $x_i$ be the maximum volume of oxygen uptake, $i = 1, \cdots, 24$. We might want to fit a straight line to it. So a possible model is
+  \[
+    Y_i = a + bx_i + \varepsilon_i,
+  \]
+  her $\varepsilon_i$ are independent random variables with variance $\sigma^2$, and $a$ and $b$ are constants.
+\end{eg}
+
+The subscripts in the equation makes it tempting to write them as matrices:
+\[
+  \mathbf{Y} =
+  \begin{pmatrix}
+    Y_1\\
+    \vdots\\
+    Y_n
+  \end{pmatrix}, \quad
+  X =
+  \begin{pmatrix}
+    x_{11} & \cdots & x_{1p}\\
+    \vdots & \ddots & \vdots\\
+    x_{n1} & \cdots & x_{np}.
+  \end{pmatrix},\quad
+  \boldsymbol\beta = 
+  \begin{pmatrix}
+    \beta_1\\
+    \vdots\\
+    \beta_p
+  \end{pmatrix}, \quad
+  \boldsymbol\varepsilon = 
+  \begin{pmatrix}
+    \varepsilon_1\\
+    \vdots\\
+    \varepsilon_n
+  \end{pmatrix}
+\]
+Then the equation becomes
+\[
+  \mathbf{Y} = X\boldsymbol\beta + \boldsymbol\varepsilon.\tag{2}
+\]
+We also have
+\begin{itemize}
+  \item $\E(\varepsilon) = \mathbf{O}$.
+  \item $\cov (\mathbf{Y}) = \sigma^2 I$.
+\end{itemize}
+We assume throughout that $X$ has full rank $p$, ie. the columns are independent, and that the error variance is the same for each observation. We say this is the \emph{homoscedastic} case, as opposed to \emph{heteroscedastic}.
+
+\begin{eg}
+  Continuing our example, we have, in matrix form
+  \[
+    \mathbf{Y} =
+    \begin{pmatrix}
+      Y_1\\
+      \cdots\\
+      Y_{24}
+    \end{pmatrix}, \quad
+    X =
+    \begin{pmatrix}
+      1 & x_1\\
+      \vdots & \vdots \\
+      1 & x_{24}
+    \end{pmatrix}, \quad
+    \boldsymbol\beta = 
+    \begin{pmatrix}
+      a\\
+      b
+    \end{pmatrix}, \quad
+    \boldsymbol\varepsilon = 
+    \begin{pmatrix}
+      \varepsilon_1\\
+      \vdots\\
+      \varepsilon_{24}.
+    \end{pmatrix}
+  \]
+  Then
+  \[
+    \mathbf{Y} = X\boldsymbol\beta + \boldsymbol\varepsilon.
+  \]
+\end{eg}
+
+\begin{defi}[Least squares estimator]
+  In a linear model $\mathbf{Y} = X\boldsymbol\beta + \boldsymbol\varepsilon$, the \emph{least squares estimator} $\hat{\boldsymbol\beta}$ of $\boldsymbol\beta$ minimizes
+  \begin{align*}
+    S(\boldsymbol\beta) &= \|\mathbf{Y} - X\boldsymbol\beta\|^2\\
+    &= (\mathbf{Y} - X\boldsymbol\beta)^T(\mathbf{Y} - X\boldsymbol\beta)\\
+    &= (Y_i - x_{ij\beta_j})^2
+  \end{align*}
+  with implicit summation over $i$ and $j$.
+
+  If we plot the points on a graph, then the least square estimators minimizes the (square of the) vertical distance between the points and the line.
+\end{defi}
+
+To minimize it, we want
+\[
+  \left.\frac{\partial S}{\partial \beta_k}\right|_{\boldsymbol\beta = \hat{\boldsymbol\beta}} = 0
+\]
+for all $k$. So
+\[
+  -2 x_{ik}(Y_i - x_{ij\hat{\beta}_j}) = 0
+\]
+for each $k$ (with implicit summation over $i$ and $j$), ie.
+\[
+  x_{ik}x_{ij}\hat{\beta_j} = x_{ik}Y_i
+\]
+for all $k$. Putting this back in matrix form, we have
+\begin{prop}
+  The least squares estimator satisfies
+  \[
+    X^TX\hat{\boldsymbol\beta} = X^T\mathbf{Y}.\tag{3}
+  \]
+\end{prop}
+We could also have derived this by completing the square of $(\mathbf{Y} - X\boldsymbol\beta)^T(\mathbf{Y} - X\boldsymbol\beta)$, but is more complicated.
+
+In order to find $\hat{\boldsymbol\beta}$, our life would be much easier if $X^TX$ has an inverse. Fortunately, it always does. We assumed that $X$ is of full rank $p$. Then
+\[
+  \mathbf{t}X^TX\mathbf{t} = (X\mathbf{t})^T(X\mathbf{t}) = \|X\mathbf{t}\|^2 > 0
+\]
+for $\mathbf{t}\not= \mathbf{0}$ in $\R^p$ (the last inequality is since if there were a $\mathbf{t}$ such that $\|X\mathbf{t}\| = 0$, then we would have produced a linear combination of the columns of $X$ that gives $\mathbf{0}$). So $X^TX$ is positive definite, and hence has an inverse. So
+\[
+  \hat{\boldsymbol\beta} = (X^TX)^{-1} X^T\mathbf{Y},\tag{4}
+\]
+which is linear in $\mathbf{Y}$.
+
+We have
+\[
+  \mathbf{E}(\hat{\boldsymbol\beta}) = (X^TX^{-1})X^T\E[\mathbf{Y}] = (X^TX)^{-1}X^TX\boldsymbol\beta = \boldsymbol\beta.
+\]
+So $\hat{\boldsymbol\beta}$ is an unbiased estimator for $\boldsymbol\beta$. Also
+\[
+  \cov(\boldsymbol\beta) = (X^TX)^{-1}X^T \cov(\mathbf{Y})X(X^TX)^{-1} = \sigma^2(X^TX)^{-1} ,\tag{5}
+\]
+since $\cov \mathbf{Y} = \sigma^2 I$.
+
+\subsection{Simple linear regression}
+What we did above was \emph{so} complicated. If we have a simple linear regression model
+\[
+  Y_i = a + b_{x_i + \varepsilon_i}.
+\]
+then we can reparameterise it to
+\[
+  Y_i = a' + b(x_i - \bar x) + \varepsilon_i,\tag{6}
+\]
+where $\bar x = \sum x_i/n$ and $a' = a + b\bar x$. Since $\sum (x_i - \bar x) = 0$, this leads to simplified calculations.
+
+In matrix form,
+\[
+  X = 
+  \begin{pmatrix}
+    1 & (x_1 - \bar x)\\
+    \vdots & \vdots \\
+    1 & (x_{24} - \bar x)
+  \end{pmatrix}.
+\]
+(the off-diagonals are all 0 since $\sum (x_i - \bar x) = 0$. So
+\[
+  X^TX =
+  \begin{pmatrix}
+    n & 0\\
+    0 & S_{xx}
+  \end{pmatrix},
+\]
+where $S_{xx} = \sum (x_i - \bar x)^2$.
+
+Hence
+\[
+  (X^TX)^{-1} = 
+  \begin{pmatrix}
+    \frac{1}{n} & 0\\
+    0 & \frac{1}{S_{xx}}
+  \end{pmatrix}
+\]
+So
+\[
+  \hat{\boldsymbol\beta} = (X^TX^{-1})X^T \mathbf{Y} =
+  \begin{pmatrix}
+    \bar Y \\
+    \frac{S_{xY}}{S_{xx}}
+  \end{pmatrix},
+\]
+where $S_{xY} = \sum Y_i(x_i - \bar x)$.
+
+Hence the estimated intercept is $\hat{a} = \bar y$, and the estimated gradient is
+\begin{align*}
+  \hat{b} &= \frac{S_{xy}}{S_{xx}}\\
+  &= \frac{\sum_i y_i(x_i - \bar x)}{\sum_i (x_i - \bar x)^2}\\
+  &= \frac{\sum_i (y_i - \bar y)(x_i - \bar x)}{\sqrt{\sum_i (x_i - \bar x)^2\sum_i (y_i - \bar y)^2}}\times \sqrt{\frac{S_{yy}}{S_{xx}}}\tag{$*$}\\
+  &= r \times \sqrt{\frac{S_{yy}}{S_{xx}}}.
+\end{align*}
+We have $(*)$ since $\sum \bar y(x_i - \bar x) = 0$, so we can add it to the nominator. Then the other square root things are just multiplying and dividing by the same things.
+
+So the gradient is the \emph{Pearson product-moment correlation coefficient} $r$ times the ratio of the empirical standard deviations of the $y$'s and $x$'s. (Note that the gradient is the same whether the $x$'s are standardised to have mean 7 or not.
+
+Hence from (5),  $\cov(\hat{\boldsymbol\beta}) = (X^TX)^{-1}\sigma^2$, and so from our expression of $(X^TX)^{-1}$.
+\[
+  \var(\hat{a}') = \var (\bar Y) = \frac{\sigma^2}{n}, \quad\var(\hat{b}) = \frac{\sigma^2}{S_{xx}}.
+\]
+Note that these estimators are uncorrelated.
+
+Note also that these are obtained without any explicit distributional assumptions.
+
+\begin{eg}
+  Continuing our previous example, we have $\bar y = 826.5$, $S_{xx} = 783.5 = 28.0^2$, $S_{xy} = -10077$, $S_{yy} = 444^2$, $r = -0.81$, $\hat b = -12.9$.
+\end{eg}
+
+\begin{thm}[Gauss Markov theorem]
+  In a full rank linear model, let $\hat{\boldsymbol\beta}$ be the least squares estimator of $\boldsymbol\beta$ and let $\boldsymbol\beta^*$ be any other unbiased estimator for $\boldsymbol\beta$ which is linear in the $Y_i$'s. Then
+  \[
+    \var(\mathbf{t}^T\hat{\boldsymbol\beta} \leq \var (\mathbf{t}^T\boldsymbol\beta^*).
+  \]
+  for all $\mathbf{t}\in \R^p$. We say that $\hat{\boldsymbol\beta}$ is the \emph{best linear unbiased estimator} of $\boldsymbol\beta$ (BLUE).
+\end{thm}
+
+\begin{proof}
+  Since $\boldsymbol\beta^*$ is linear in the $Y_i$'s, $\boldsymbol\beta^* = A\mathbf{Y}$ for some $p\times n$ matrix $A$. Since $\boldsymbol\beta^*$ is unbiased,  we have that $\boldsymbol\beta = \E[\boldsymbol\beta^*] = AX\boldsymbol\beta$ for all $\boldsymbol\beta\in \R^p$. So $AX = I_p$. Now
+  \begin{align*}
+    \cov(\boldsymbol\beta^*) &= \E[(\boldsymbol\beta^* - \boldsymbol\beta)(\boldsymbol\beta^* - \boldsymbol\beta)^T]\\
+    &= \E(AX\boldsymbol\beta + A\boldsymbol\varepsilon - \boldsymbol\beta)(AX\boldsymbol\beta + A\boldsymbol\varepsilon - \boldsymbol\beta)^T\\
+    &= \E(A\boldsymbol\varepsilon\boldsymbol\varepsilon^TA^T)\text{ since }AX\boldsymbol\beta = \boldsymbol\beta\\
+    &= A(\sigma^2I)A^T\\
+    &= \sigma^2 AA^T.
+  \end{align*}
+
+  Now $\boldsymbol\beta^* - \hat{\boldsymbol\beta} = (A - (X^TX)^{-1}X^T)\mathbf{Y} = B\mathbf{Y}$, for some $B$. Then
+  \[
+    BX = AX - (X^TX^{-1})X^TX = I_p - I_p = 0.
+  \]
+  Hence
+  \begin{align*}
+    \cov(\boldsymbol\beta^*) &= \sigma^2AA^T\\ 
+    &= \sigma^2(B + (X^TX)^{-1}X^T)(B + (X^TX)^{-1}X^T)^T\\
+    &= \sigma^2(BB^T + (X^TX)^{-1})\\
+    &= \sigma^2 BB^T + \cov(\hat{\boldsymbol\beta}).
+  \end{align*}
+  Note that in the second line, the cross-terms disappear since $BX = 0$.
+
+  So for any $\mathbf{t}\in \R^p$, we have
+  \begin{align*}
+    \var(\mathbf{t}^T\boldsymbol\beta^*) &= \mathbf{t}^T\cov(\boldsymbol\beta^*)\mathbf{t} \\
+    &= \mathbf{t}^T\cov (\hat{\boldsymbol\beta})\mathbf{t} + \mathbf{t}^TBB^T\mathbf{t}\sigma^2\\
+    &= \var(\mathbf{t}^T \hat{\boldsymbol\beta}) + \sigma^2\|B^T\mathbf{t}\|^2\\
+    &\geq \var (\mathbf{t}^T\hat{\mathbf{B}}).
+  \end{align*}
+  Taking $\mathbf{t} = (0, \cdots, 1, 0, \cdots, 0)^T$ with a $1$ in the $i$th position, we have
+  \[
+    \var(\hat{\beta_i}) \leq \var(\beta_i^*).
+  \]
+\end{proof}
+
+\begin{defi}[Fitted values and residuals]
+  $\hat{\mathbf{Y}} = X\hat{\boldsymbol\beta}$ is the \emph{vector of fitted values}. These are what our model says $\mathbf{Y}$ should be.
+
+  $\mathbf{R} = \mathbf{Y} - \hat{\mathbf{Y}}$ is the \emph{vector of residuals}. These are the deviations of our model from reality.
+  
+  The sum of \emph{residual sum of squares} is
+  \[
+    \mathrm{RSS} = \|\mathbf{R}\|^2 = \mathbf{R}^T\mathbf{R} = (\mathbf{Y} - X\hat{\boldsymbol\beta}^T(\mathbf{Y} - X\hat{\boldsymbol\beta}).
+  \]
+\end{defi}
+Note that $X^T\mathbf{R} = X^T(\mathbf{Y} - \hat{\mathbf{Y}}) = X^T\mathbf{Y} - X^TX\hat{\boldsymbol\beta} = 0$ by (3). So $\mathbf{R}$ is orthogonal to the column space of $X$.
+
+Write $\hat{\mathbf{Y}} = X\hat{\boldsymbol\beta} = X(X^TX)^{-1}X^T\mathbf{Y} = P\mathbf{Y}$, where $P = X(X^TX)^{-1}X^T$.
+
+$P$ represents an orthogonal projection of $\R^n$ onto the space spanned by the columns of $X$, ie. it projects the actual data $\mathbf{Y}$ to the fitted values $\hat{\mathbf{Y}}$.
+
+We have $P^2 = P$ ($P$ is idempotent) and $P^T = P$ (symmetric).
 \end{document}

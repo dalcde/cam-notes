@@ -1664,7 +1664,7 @@ Predicate logic is also called ``first-order logic''. It is ``first-order'' beca
 
   Hence $S\vdash (\forall x)(p\Rightarrow r)$.
 
-  If $x$ is not free in $p$, then we get $S\vdash p\Rightarrow (forall x)r$ by Axiom 7 (and MP).
+  If $x$ is not free in $p$, then we get $S\vdash p\Rightarrow (\forall x)r$ by Axiom 7 (and MP).
 
   If $x$ \emph{is} free in $p$, then we did not use premise $p$ in our proof $r$ from $S\cup \{p\}$ (by the conditions of the use of Gen). So $S\vdash r$, and hence $S\vdash (\forall x)r$ by Gen. So $S\vdash p\Rightarrow (\forall x)r$.
 \end{proof}
@@ -1707,8 +1707,187 @@ We need several ideas to prove the lemma:
     This is similar to the problem we had in the propositional logic case, where we didn't know what to do with $p_3$ if $S$ only talks about $p_1$ and $p_1$. So we first extend $S$ to a maximal consistent (or \emph{complete}) $\bar S$.
 
   \item Next problem: For $S =$ ``fields with a square root of 2'', ie. $S$ is the field axioms plus $(\exists x)(xx = 1 + 1)$. However, there is no closed term $t$ which is equivalent to $\sqrt{2}$. We say we lack \emph{witnesses} to the statement $(\exists x)(xx = 1 + 1)$. So we add a witness. We add a constant $c$ to the language, and add the axiom ``$cc = 1 + 1$'' to $S$. We do this for each such existential statement.
-  \item Now what? We have added new symbols to $S$, so our new $S$ is no longer complete! Of course, we go back to (iii), and take the completion again. Then we have new existential statements to take care of, and we do (iv) again. Then we're back to (iii) again! It won't terminate!
 
-    So we keep on going, and final take the union of all stages.
-\end{enumerate}
+  \item Now what? We have added new symbols to $S$, so our new $S$ is no longer complete! Of course, we go back to (iii), and take the completion again. Then we have new existential statements to take care of, and we do (iv) again. Then we're back to (iii) again! It won't terminate! 
+      
+      So we keep on going, and final take the union of all stages.
+  \end{enumerate}
+
+\begin{proof}(non-examinable)
+  Suppose we have a consistent $S$ in the language $L = L(\Omega, \Pi)$. Extend $S$ to a consistent $S_1$ such that $p\in \S_1$ or $(\neg p)\in S$ for each sentence $p\in L$ (by applying Zorn's lemma to get a maximal consistent $S_1$). In particular, $S_1$ is \emph{complete}, meaning $S_1\vdash p$ or $S_1 \vdash \neg p$ for all $p$.
+
+  Then for each sentence of the form $(\exists x)p\in S_1$, add a new constant $c$ to $L$ and add $p[c/x]$ to $S_1$ - obtaining $T_1$ in language $L_1 = L(\Omega \cup C_1, \Pi)$. It is easy to check that $T_1$ is consistent.
+
+  Extend $T_1$ to a complete theory $S_2\subseteq L_1$, and add witnesses to form $T_2 \subseteq L_2 = L(\Omega \cup C_1 \cup C_2, \Pi)$. Continue inductively.
+
+  Let $\bar S = S_1 \cup S_2 \cup \cdots$ in language $\bar L = L_1\cup L_2\cup \cdots$ (ie. $\bar L = L(\Omega\cup C_1\cup C_2\cup\cdots, \Pi)$).
+
+  \begin{claim}
+    $\bar S$ is consistent, complete, and has witnesses (ie. If $(\exists x)p \in \bar S$, then $p[t/x]\in \bar S$ For some term $t$.
+  \end{claim}
+
+  It is consistent since if $\bar S \vdash \bot$, then some $S_n \vdash \bot$. But all $S_n$ are consistent. So $\bar S$ is consistent.
+
+  To show completeness, for sentence $p\in \bar L$, we have $p\in L_n$ for some $n$, as $p$ has only finitely many symbols.  So $S_{n + 1} \vdash p$ or $S_{n + 1}\vdash \neg p$. Hence $\bar S \vdash p$ or $\bar S \vdash \neg p$.
+
+  If $(\exists x)p \in \bar S$, then $(\exists x) p\in S_n$ for some $n$. Hence (by construction of $T_n$), we have $p[c/x] \in T_n$ for some constant $c$.
+
+  Now define an equivalence relation $\sim$ on closed term of $\bar L$ by $s\sim t$ if $\bar S\vdash (s = t)$ (check: this is an equivalence relation). Let $A$ be the set of equivalence classes. Define
+  \begin{enumerate}
+    \item $f_A([t_1],\cdots, [t_n]) = [f t_1, \cdots, t_n]$ for each formula $f\in \Omega$, $\alpha(f) = n$.
+    \item $\phi_A = \{([t_1], \cdots, [t_n]): \bar S \vdash \phi(t_1, \cdots, t_n)\}$ for each relation $\phi \in \Pi$ and $\alpha (\phi) = n$.
+  \end{enumerate}
+  It is easy to check that this is well-defined.
+
+  \begin{claim}
+    For each sentence $p$, $\bar S\vdash p$ (ie. $p\in \bar S$) if and only if $p$ holds in $A$, ie. $p_A = 1$.
+  \end{claim}
+  We prove this by an easy induction.
+  \begin{itemize}
+    \item Atomic sentences:
+      \begin{itemize}
+        \item $\bot$: $\bar S \vdash \bot$, and $\bot_A = 0$. So good.
+        \item $s = t$: $\bar S \vdash s = t$ iff $[s] = [t]$ (by definition) iff $s_A = t_A$ (since $s_A$ is defined as $[s]$!) iff $(s = t)_A$. So done.
+        \item $\phi t_1, \cdots, t_n$ is the same.
+      \end{itemize}
+    \item Induction step:
+      \begin{itemize}
+        \item $p\Rightarrow q$ $\bar S\vdash (p \Rightarrow  q)$ iff $\bar S \vdash (\neg p)$ or $\bar S\vdash q$ (justification: if $\bar S \not\vdash \neg p$ and $\bar S\not\vdash q$, then $\bar S\vdash p$ and $\bar S \vdash \neg q$ by completeness, hence $\bar S\vdash \neg(p\Rightarrow q)$, contradiction). This is true iff $p_A = 0$ or $q_A = 0$ iff $(p\Rightarrow q)_A = 1$.
+        \item $(\exists x)p$. $\bar S \vdash (\exists x)p$ iff $\bar S\vdash p[t/x]$ for some closed term $t$. This is true since $\bar S$ has witnesses. Now this holds iff $p[t/x]_A = 1$ for some closed term $A$ (by induction). This is the same as saying $(\exists x)p$ holds in $A$ (because $A$ is the set of (equivalence classes of) closed terms).
+      \end{itemize}
+      \note Here it is convenient to pretend $\exists$ is a primitive symbol instead of $\forall$. Then we can define $(\forall x) p$ to be $\neg (\exists x)\neg p$, instead of the other way round. It is clear that the two approaches are equivalent, but using $\exists $ as primitive makes the proof look clearer here.
+  \end{itemize}
+  Hence $A$ is a model of $\bar S$. Hence it is also a model of $S$. So $S$ has a model.
+\end{proof}
+\note if $L$ is countable (ie. $\Omega, \Pi$ are countable), then Zorn is not lemma.
+
+Hence
+\begin{cor}[Adequacy adequacy]
+  Let $S$ be a theory, and $p$ a sentence. Then $S\models p$ implies $S\vdash p$.
+\end{cor}
+
+\begin{thm}[G\"odel's Completeness theorem (for first order logic)]
+  Let $S$ be a theory, $p$ and sentence. Then $S\vdash p$ if and only if $S \models p$.
+\end{thm}
+
+\begin{proof}
+  $(\Rightarrow)$ Soundness, $(\Leftarrow)$ Adequacy.
+\end{proof}
+
+\begin{cor}[Compactness theorem]
+  Let $S$ be a theory such that every finite subset of $S$ has a model. Then so does $S$.
+\end{cor}
+
+\begin{proof}
+  Trivial if we replace ``has a model'' with ``is consistent'', because proofs are finite.
+\end{proof}
+
+We can look at some applications of this:
+
+Can we axiomatize the theory of finite groups (in the language of groups)? ie. is there a set of sentences $T$ such that models of $T$ are finite groups.
+
+\begin{cor}
+  The theory of finite groups cannot be axiomatized (in the language of groups).
+\end{cor}
+It is extraordinary that we can \emph{prove} this, as opposed to just ``believing it should be true''.
+
+\begin{proof}
+  Suppose theory $T$ has models all finite groups and nothing else.  Let $T'$ be $T$ together with
+  \begin{itemize}
+    \item $(\exists x_1)(\exists x_2)(x_1 \not = x_2)$ (intuitively, $|G| \geq 2$)
+    \item $(\exists x_1)(\exists x_2)(\exists x_3)(x_1 \not= x_2 \not= x_3)$ (intuitively, $|G| \geq 3$)
+    \item $\cdots$
+  \end{itemize}
+  Then $T'$ has no model (since each model has to be simultaneously arbitrarily large and finite). But every finite subset of  $T'$ does have a model (eg. $\Z_n$ for some $n$). Contradiction.
+\end{proof}
+\note We \emph{are} using the full power of completeness (via compactness). This proof isn't ``easy''!
+
+\begin{cor}
+  Let $S$ be a theory with arbitrarily large models. Then $S$ has an infinite model.
+
+  ``Finiteness is not a first-order property''
+\end{cor}
+
+\begin{proof}
+  Same as above.
+\end{proof}
+
+Similarly, we have
+\begin{cor}[Upward L\"owenheim-Skolem theorem]
+  Let $S$ be a theory with an infinite model. Then $S$ has an uncountable model.
+\end{cor}
+
+\begin{proof}
+  Add constants $C_i: i\in I\}$ to $L$ for some uncountable $I$.
+
+  Let $T = S\bigcup\{\text{``}c_i \not= c_j\text{''}: i\in I, i \not = j\}$.
+
+  Then any finite $T' \subseteq T$ has a model, since it can only mention finitely many of the $C_i$. So any infinite model of $S$ will do. Hence by compactness, $T$ has a model
+\end{proof}
+Similarly, we have a model for $S$ that does not inject into $X$, for any chosen set $X$, e.g. add $\gamma(X)$ constants, or $\P(X)$ constants.
+
+\begin{eg}
+  There exists an infinite field ($\Q$). So there exists an uncountable field (eg. $\R$). Also, there is a field that does not inject into $\P(\P(\R))$, say,
+\end{eg}
+
+\begin{thm}[Downward L\"owenheim-Skolem theorem]
+  Let $L$ be a countable language (ie. $\Omega$ and $\Pi$ are countable). Then if $S$ has a model, then it has a countable model.
+\end{thm}
+
+\begin{proof}
+  The model constructed in the proof of model existence theorem is countable.
+\end{proof}
+
+\subsection{Peano Arithmetic}
+We try to make the usual axioms for $\N$ into a first-order theory. Take $\Omega = \{0, s, +, \times\}$, and $\Pi = \emptyset$. The arities are $\alpha(0) = 0, \alpha(s) = 1, \alpha(+) = \alpha(\times) = 2$.
+
+The operation $s$ is the \emph{successor} operation, which should be thought of as  ``+1''
+
+Our axioms are
+\begin{defi}[Peano's axioms]
+  The axioms of \emph{Peano's arithmetic} (PA) are
+  \begin{enumerate}
+    \item $(\forall x)(\neg(s(x) = 0))$.
+    \item $(\forall x)(\forall y)((s(x) = s(y)) \Rightarrow (x = y))$.
+    \item $(\forall y_1)\cdots (\forall y_n)[(p[0/x] \wedge (\forall x)(p \Rightarrow [s(x)/x])\Rightarrow (\forall x)p]$. This is actually infinitely many axioms - one for each formula $p$, free variables $y_1, \cdots, y_n, x$ (ie. it is an axiom scheme).
+    \item $(\forall x)(x + 0 = x)$.
+    \item $(\forall x)(\forall y)(x + s(y) = s(x + y))$.
+    \item $(\forall x)(x \times 0 = 0)$.
+    \item $(\forall x)(\forall y)(x\times s(y) = (x + y) + x)$.
+  \end{enumerate}
+  \note Our first guess at writing axiom 3 would be 
+  \[
+    [p[0/x] \wedge (\forall x)(p\Rightarrow p[s(x)/x])] \Rightarrow (\forall x)p.
+  \]
+  But say we want to show by induction (on $x$) that for all $y$, the set $\{x: x\geq  y\}$ satisfies some properties. We want to be able to prove it for all cases of $y$ altogether, instead of proving it once for $0$, once for $1$, once for $1 + 1$ etc. This is important, since we might have an uncountable model of PA, and we cannot name all $y$. So we allow ourselves to put a $(\forall y)$ in front. When we actually think about it, we can just forget about the $(\forall y_i)$s. But just remember that formally we need them.
+\end{defi}
+Then PA has a model $\N$ that is infinite. So it has an uncountable model by Upward L\"owenheim-Skolem. But this model is not isomorphic to $\N$. Does this contradict the fact that the usual axioms \emph{do} characterize the naturals uniquely?
+
+No! Axiom 3 is not \emph{full} induction, but a ``first-order'' version. The proper induction axiom talks about \emph{subsets} of $\N$, ie. 
+\[
+  (\forall S\subseteq \N )((0 \in S \wedge x\in S \Rightarrow  s(x)\in S)\Rightarrow S=\N).
+\]
+However, there are uncountably many subsets of $\N$, and countably many formulae $p$. So our Axiom 3 only talks about \emph{some} subsets of $\N$, not all.
+
+Now the question is: is PA complete?
+
+G\"odel's incompleteness theorem says: no! So we have $p$ with PA$\not\vdash p$ and $PA\not\vdash \neg p$.
+
+Hence, there is a $p$ that is true in $\N$, but PA$\vdash p$.
+
+note that this does not contradict G\"odel's completeness theory. The completeness theorem tells us that if $p$ holds in \emph{every} model of PA (not just in $\N$), then $PA\vdash p$.
+
+\section{Set theory}
+We'll treat set theory as ``just another first-order theory'', with signatures, structures etc.
+
+The axioms we use are ``Zermeo-Fraenkel set theory''.
+\begin{defi}[Zermelo-Fraenkel set theory]
+  \emph{Zermelo-Fraenkel set theory} (ZF) has language $\Omega = \emptyset$, $\Pi = \{\in\}$, with arity 2.
+
+  ZF will have 2 to get started, 4 to build things, and 3 more one might not realize were needed.
+
+  Then a ``universe of sets'' will simply mean a model of these axioms, a pair $(V, \in)$, where $V$ is a set and $\in$ is a binary relation on $V$ in which the axioms are true (officially, we should write $\in_V$, but it's so \emph{weird} that we don't do it).
+
+  But each model $(V, \in)$ will (hopefully) contain a copy of all of maths, and so will look very complicated.
+\end{defi}
 \end{document}
