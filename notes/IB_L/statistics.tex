@@ -1773,4 +1773,434 @@ Write $\hat{\mathbf{Y}} = X\hat{\boldsymbol\beta} = X(X^TX)^{-1}X^T\mathbf{Y} = 
 $P$ represents an orthogonal projection of $\R^n$ onto the space spanned by the columns of $X$, ie. it projects the actual data $\mathbf{Y}$ to the fitted values $\hat{\mathbf{Y}}$.
 
 We have $P^2 = P$ ($P$ is idempotent) and $P^T = P$ (symmetric).
+\subsection{Linear models with normal assumptions}
+\begin{eg}
+  Suppose we want to measure the resistivity of silicon wafers. We have five instruments, and five wafers were measured by each instrument (so we have 25 wafers in total). The results are as follows:
+
+  \begin{tabular}{ccccccc}
+    \toprule
+    & & \multicolumn{5}{c}{Wafer}\\
+    & & 1 & 2 & 3 & 4 & 5\\
+    \midrule
+    \multirow{5}{*}{\rotatebox[origin=c]{90}{Instrument}}
+    & 1 & 130.5 & 112.4 & 118.9 & 125.7 & 134.0\\
+    & 2 & 130.4 & 138.2 & 116.7 & 132.6 & 104.2\\
+    & 3 & 113.0 & 120.5 & 128.9 & 103.4 & 118.1\\
+    & 4 & 128.0 & 117.5 & 114.9 & 114.9 & 98.8\\
+    & 5 & 121.2 & 110.5 & 118.5 & 100.5 & 120.9\\
+    \bottomrule
+  \end{tabular}
+
+  Let $Y_{i,j}$ be the resistivity of the $y$th wafer measured by instrument $i$, where $i, j = 1, \cdots, 5$. A possible model is
+  \[
+    Y_{i,j} = \mu_i + \varepsilon_{i, j},
+  \]
+  where $\varepsilon_{ij}$ Are independent $N(0, \sigma^2)$ random variables, and the $\mu_i$'s are unknown constants.
+
+  This can be written in matrix form, with
+  \[
+    \mathbf{Y} =
+    \begin{pmatrix}
+      Y_{1, 1}\\\vdots\\Y_{1, 5}\\
+      Y_{2, 1}\\\vdots\\Y_{2, 5}\\
+      \vdots\\
+      Y_{5, 1}\\\vdots\\Y_{5, 5}\\
+    \end{pmatrix}, \quad
+    X = 
+    \begin{pmatrix}
+      1 & 0 & \cdots & 0\\
+      \vdots & \vdots & \ddots & \vdots\\
+      1 & 0 & \cdots & 0\\
+      0 & 1 & \cdots & 0\\
+      \vdots & \vdots & \ddots & \vdots\\
+      0 & 1 & \cdots& 0\\
+      \vdots & \vdots & \ddots & \vdots\\
+      0 & 0 & \cdots & 1\\
+      \vdots & \vdots & \ddots & \vdots\\
+      0 & 0 & \cdots & 1
+    \end{pmatrix}, \quad
+    \boldsymbol\beta = 
+    \begin{pmatrix}
+      \mu_1\\ \mu_2\\ \mu_3\\ \mu_4\\ \mu_5
+    \end{pmatrix}, \quad
+    \boldsymbol\varepsilon = 
+    \begin{pmatrix}
+      \varepsilon_{1, 1} \\ \vdots \\ \varepsilon_{1, 5}\\
+      \varepsilon_{2, 1} \\ \vdots \\ \varepsilon_{2, 5}\\ \vdots\\
+      \varepsilon_{5, 1} \\ \vdots \\ \varepsilon_{5, 5}\\
+    \end{pmatrix}
+  \]
+  Then
+  \[
+    \mathbf{Y} = X\boldsymbol\beta + \boldsymbol\varepsilon.
+  \]
+  We have
+  \[
+    X^TX = 
+    \begin{pmatrix}
+      5 & 0 & \cdots & 0\\
+      0 & 5 & \cdots & 0\\
+      \vdots & \vdots & \ddots & \vdots\\
+      0 & 0 & \cdots & 5
+    \end{pmatrix}
+  \]
+  Hence
+  \[
+    (X^TX)^{-1} = 
+    \begin{pmatrix}
+      \frac{1}{5} \\ 0 & \cdots & 0\\
+      0 & \frac{1}{5} & \cdots & 0\\
+      \vdots & \vdots & \ddots & \vdots\\
+      0 & 0 & \cdots & \frac{1}{5}
+    \end{pmatrix}
+  \]
+  So we have
+  \[
+    \hat{\boldsymbol\mu} = (X^TX)^{-1}X^T\mathbf{Y} = 
+    \begin{pmatrix}
+      \bar Y_1 \\\vdots\\ \bar Y_5
+    \end{pmatrix}
+  \]
+  The residual sum of squares is
+  \[
+    \mathrm{RSS} = \sum_{i = 1}^5 \sum_{j = 1}^5 (Y_{i, j} - \hat{\mu}_i)^2 = \sum_{i = 1}^5 \sum_{j = 1}^5 (Y_{i, j} - \bar Y_i)^2 = 2170.
+  \]
+  This has $n - p = 25 - 5 = 20$ degrees of freedom. We will later see that $\bar \sigma = \sqrt{\mathrm{RSS}/(n - p)} = 10.4$.
+
+  Note that we still haven't used normality!
+\end{eg}
+
+We now make a normal assumption:
+\[
+  \mathbf{Y} = X\boldsymbol\beta + \boldsymbol\varepsilon,\quad \boldsymbol\beta\sim N_n(\mathbf{0}, \sigma^2 I),\quad \rank(X) = p < n.
+\]
+This is a special case of the linear model of Lecture 12, so all previous results hold.
+
+Since $\mathbf{Y} = N_n(X\boldsymbol\beta, \sigma^2 I)$, the log-likelihood is
+\[
+  \ell(\boldsymbol, \sigma^2) = -\frac{n}{2}\log 2\pi - \frac{n}{2}\log \sigma^2 - \frac{1}{2\sigma^2}S(\boldsymbol\beta),
+\]
+where
+\[
+  S(\boldsymbol\beta) = (\mathbf{Y} - X\boldsymbol\beta)^T(\mathbf{Y} - X\boldsymbol\beta).
+\]
+If we want to maximizing $\ell$ with respect to $\boldsymbol\beta$, we have to maximize the only term containing $\boldsymbol\beta$, ie. $S(\boldsymbol\beta)$. So
+\begin{prop}
+  Under normal assumptions the maximum likelihood estimator for a linear model is
+  \[
+    \hat{\boldsymbol\beta} = (X^TX)^{-1}X^T\mathbf{Y},
+  \]
+  which is the same as the least squares estimator.
+\end{prop}
+This isn't coincidence! Historically, when Gauss devised the normal distribution, he designed it so that the least squares estimator is the same as the maximum likelihood estimator.
+
+To obtain the MLE for $\sigma^2$, we require
+\[
+  \left.\frac{\partial \ell}{\partial \sigma^2}\right|_{\hat{\boldsymbol\beta}, \hat{\sigma}^2} = 0,
+\]
+ie.
+\[
+  -\frac{n}{2\sigma^2} + \frac{S(\hat{\boldsymbol\beta})}{2 \hat{\sigma}^4} = 0
+\]
+So
+\[
+  \hat{\sigma} = \frac{1}{n}S(\hat{\boldsymbol\beta}) = \frac{1}{n}(\mathbf{Y} - X\hat{\boldsymbol\beta})^T(\mathbf{Y} - X\hat{\boldsymbol\beta}) = \frac{1}{n}\mathrm{RSS}.
+\]
+Our ultimate goal now is to show that $\hat{\boldsymbol\beta}$ and $\hat{\sigma}^2$ are independent. Then we can apply our other standard results such as the $t$-distribution.
+
+First recall that the matrix $P = X(X^TX)^{-1}X^T$ that projects $\mathbf{Y}$ to $\hat{\mathbf{Y}}$ is idempotent and symmetric. We will prove the following properties of it:
+\begin{lemma}\leavevmode
+  \begin{enumerate}
+    \item If $\mathbf{Z}\sim N_n(\mathbf{0}, \sigma^2 I)$ and $A$ is $n\times n$, symmetric, idempotent with rank $r$, then $\mathbf{Z}^TA\mathbf{Z} \sim \sigma^2 \chi_r^2$.
+    \item For a symmetric idempotent matrix $A$, $\rank(A) = \tr(A)$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item Since $A$ is idempotent, $A^2 = A$ by definition. So eigenvalues of $A$ are either 0 or 1 (since $\lambda \mathbf{x} = A\mathbf{x} = A^2 \mathbf{x} = \lambda^2 \mathbf{x}$).
+
+      Since $A$ is also symmetric, it is diagonalizable. So there exists an orthogonal $Q$ such that
+      \[
+        \Lambda = Q^TAQ = \diag(\lambda_1, \cdots, \lambda_n) = \diag(1, \cdots, 1, 0, \cdots, 0)
+      \]
+      with $r$ copies of 1 and $n - r$ copies of $0$.
+
+      Let $\mathbf{W} = Q^T\mathbf{Z}$. So $\mathbf{Z} = Q\mathbf{W}$. Then $\mathbf{W}\sim N_n(\mathbf{0}, \sigma^2 I)$, since $\cov(\mathbf{W}) = Q^T\sigma^2 IQ = \sigma^2$. Then
+      \[
+        \mathbf{Z}^TA\mathbf{Z} = \mathbf{W}^T Q^TAQ\mathbf{W} = \mathbf{W}^T\Lambda \mathbf{W} = \sum_{i = 1}^r w_i^2 \sim \chi_r^2.
+      \]
+    \item
+      \begin{align*}
+        \rank (A) &= \rank (\Lambda)\\
+        &= \tr (\Lambda)\\
+        &= \tr (Q^TAQ)\\
+        &= \tr (AQ^TQ)\\
+        &= \tr {A}
+      \end{align*}
+  \end{enumerate}
+\end{proof}
+
+\begin{thm}[]
+  For the normal linear model $\mathbf{Y}\sim N_n(X\boldsymbol\beta, \sigma^2 I)$,
+  \begin{enumerate}
+    \item $\hat{\boldsymbol\beta} \sim N_p(\boldsymbol\beta, \sigma^2(X^TX)^{-1})$
+    \item RSS$\sim \sigma^2 \chi_{n - p}^2$, and so $\hat{\sigma}^2 \sim \frac{\sigma^2}{n}\chi_{n -p}^2$.
+    \item $\hat{\boldsymbol\beta}$ and $\hat{\sigma}^2$ are independent.
+  \end{enumerate}
+\end{thm}
+
+The proof is not particularly elegant - it is just a whole lot of linear algebra!
+
+\begin{proof}\leavevmode
+  \begin{itemize}
+    \item We have $\hat{\boldsymbol\beta} = (X^TX)^{-1}X^T\mathbf{Y}$. Call this $C\mathbf{Y}$ for later use. Then $\hat {\boldsymbol\beta}$ has a normal distribution with mean 
+      \[
+        (X^TX)^{-1}X^T(X\boldsymbol\beta) = \boldsymbol\beta
+      \]
+      and covariance 
+      \[
+        (X^TX)^{-1}X^T(\sigma^2 I)[(X^TX)^{-1}X^T]^T = \sigma^2(X^TX)^{-1}.
+      \]
+      So
+      \[
+        \hat{\boldsymbol\beta}\sim N_p(\boldsymbol\beta, \sigma^2(X^TX)^{-1}).
+      \]
+    \item
+      Our previous lemma says that $\mathbf{Z}^TA\mathbf{Z}\sim \sigma^2 \chi_r^2$. So we pick our $\mathbf{Z}$ and $A$ so that $\mathbf{Z}^TA\mathbf{Z} = \mathrm{RSS}$, and $r$, the degrees of freedom of $A$, is $n - p$.
+
+      Let $\mathbf{Z} = \mathbf{Y} - X\boldsymbol\beta$ and $A = (I_n - P)$, where $P = X(X^TX)^{-1}X^T$. We first check that the conditions of the lemma hold:
+
+      Since $\mathbf{Y}\sim N_n(X\boldsymbol\beta, \sigma^2 I)$, $\mathbf{Z} = \mathbf{Y} - X\boldsymbol\beta\sim N_n(\mathbf{0}, \sigma^2 I)$.
+
+      Since $P$ is idempotent, $I_n - P$ also is (check!). We also have
+      So
+      \[
+        \rank(I_n - P) = \tr(I_n - P) = n - p.
+      \]
+      Therefore the conditions of the lemma hold.
+
+      To get the final useful result, we want to show that the RSS is indeed $\mathbf{Z}^TA\mathbf{Z}$. We simplify the expressions of RSS and $\mathbf{Z}^TA\mathbf{Z}$ and show that they are equal:
+      \[
+        \mathbf{Z}^TA\mathbf{Z} = (\mathbf{Y} - X\boldsymbol\beta)^T(I_n - P)(\mathbf{Y} - X\boldsymbol\beta)=\mathbf{Y}^T(I_n - P)\mathbf{Y}.
+      \]
+      Noting the fact that $(I_n - P)X = \mathbf{0}$.
+      
+      Writing $\mathbf{R} = \mathbf{Y} - \hat{\mathbf{Y}} = (I_n - P)\mathbf{Y}$, we have
+      \[
+        \mathrm{RSS} = \mathbf{R}^T\mathbf{R} = \mathbf{Y}^T(I_n - P)\mathbf{Y},
+      \]
+      using the symmetry and idempotence of $I_n - P$.
+
+      Hence $\mathrm{RSS} = \mathbf{Z}^TA\mathbf{Z} \sim \sigma^2\chi^2_{n - p}$. Then
+      \[
+        \hat{\sigma}^2 = \frac{\mathrm{RSS}}{n}\sim \frac{\sigma^2}{n}\chi^2_{n- p}.
+      \]
+    \item Let $V = \begin{pmatrix}\hat{\boldsymbol\beta}\\\mathbf{R}\end{pmatrix} = D\mathbf{Y}$, where $D = \begin{pmatrix}C\\I_n - P\end{pmatrix}$ is a $(p + n)\times n$ matrix.
+
+      Since $\mathbf{Y}$ is multivariate, $V$ is multivariate with
+      \begin{align*}
+        \cov (V) &= D\sigma^2ID^T\\
+        &= \sigma^2
+        \begin{pmatrix}
+          CC^T & C(I_n - P)^T\\
+          (I_n - P)C^T & (I_n - P)(I_n - P)^T
+        \end{pmatrix}\\
+        &= 
+        \sigma^2
+        \begin{pmatrix}
+          CC^T & C(I_n - P)\\
+          (I_n - P)C^T & (I_n - P)
+        \end{pmatrix}\\
+        &= \sigma^2
+        \begin{pmatrix}
+          CC^T & 0\\
+          0 & I_n - p
+        \end{pmatrix}
+      \end{align*}
+      Using $C(I_n - P) = 0$ (since $(X^TX)^{-1}X^T(I_n - P) = 0$ since $(I_n - P)X = 0$ - check!).
+
+      Hence $\hat{\boldsymbol\beta}$ and $\mathbf{R}$ are independent since the off-diagonal covariant terms are 0. So $\hat{\boldsymbol\beta}$ and RSS=$\mathbf{R}^T\mathbf{R}$ are independent. So $\hat{\boldsymbol\beta}$ and $\hat{\sigma}^2$ are independent.
+  \end{itemize}
+\end{proof}
+
+From (ii), $\E(\mathrm{RSS}) = \sigma^2(n - p)$. So $\tilde{\sigma}^2 = \frac{\mathrm{RSS}}{n - p}$ is an unbiased estimator of $\sigma^2$. $\tilde{\sigma}$ is often known as the \emph{residual standard error} on $n - p$ degrees of freedom.
+\subsection{The \texorpdfstring{$F$}{F} distribution}
+\begin{defi}[$F$ distribution]
+  Suppose $U$ and $V$ are independent with $U\sim \chi_m^2$ and $V\sim \chi_n^2$. The $X = \frac{U/m}{V/n}$ is said to have an \emph{$F$-distribution} on $m$ and $n$ degrees of freedom. We write $X\sim F_{m, n}$
+\end{defi}
+Since $U$ and $V$ have mean $m$ and $n$ respectively, $U/m$ and $V/n$ are approximately $1$. So $F$ is often approximately $1$.
+
+\begin{prop}
+  If $X\sim F_{m, n}$, then $1/X\sim F_{n, m}$.
+\end{prop}
+
+Let $F_{m, n}(\alpha)$ be the upper $100\alpha\%$ point for the $F_{m, n}$-distribution so that if $X\sim F_{m, n}$, then $\P(X > F_{m, n}(\alpha)) = \alpha$.
+
+If we need, say, the lower $5\%$ point of $F_{m, n}$, then we find the upper $5\%$ point of $F_{n, m}$, and use $\P(F_{m, n} < 1/x) = \P(F_{n, m} > x)$.
+
+Note further that it is immediate from definitions of $t_n$ and $F_{1, n}$ that if $Y\sim t_n$, then $Y^2\sim F_{1, n}$, it is a ratio of independent $\chi_1^2$ and $\chi_n^2$ variables.
+
+\subsection{Inference for \texorpdfstring{$\boldsymbol\beta$}{beta}}
+We know that $\hat{\boldsymbol\beta} \sim N_p(\boldsymbol\beta, \sigma^2(X^TX)^{-1})$. So
+\[
+  \hat{\boldsymbol\beta}_j \sim N(B_j, \sigma^2(X^TX)^{-1}_{jj}).
+\]
+The \emph{standard error} of $\hat{\beta}_j$ is
+\[
+  \mathrm{SE}(\hat{\beta}_j) = \sqrt{\tilde{\sigma}^2 (X^TX)_jj^{-1}},
+\]
+where $\tilde{\sigma}^2 = \mathrm{RSS}/(n - p)$. Unlike the actual variance $\sigma^2(X^TX)^{-1}_{jj}$, the standard error is calculable from our data.
+
+Then
+\[
+  \frac{\hat{\beta}_j - \nu_j}{\mathrm{SE}(\hat{\beta}_j} = \frac{\hat{\beta} - \beta_j}{\sqrt{\tilde{\sigma}^2(X^TX)^{-1}_{jj}}} = \frac{(\hat{\beta}_j - \beta_j/\sqrt{\sigma^2(X^TX)_{jj}^{-1}}}{\sqrt{\mathrm{RSS}/((n - p)\sigma^2)}}
+\]
+By writing it in this somewhat weird form, we now recognize both the numerator and denominator. The numerator is a standard normal $N(0, 1)$, and the denominator is an independent $\sqrt{\chi^2_{n - p}/(n - p)}$, as we have previously shown. But a standard normal divided by $\chi^2$ is, by definition, the $t$ distribution. So
+\[
+  \frac{\hat{\beta}_j - \beta_j}{\mathrm{SE}(\hat{\beta}_j)} \sim t_{n - p}.
+\]
+So a $100(1 - \alpha)\%$ confidence interval for $\beta_j$ has end points $\hat{\beta}_j\pm \mathrm{SE}(\hat{\beta}_j)t_{n - p}(\frac{\alpha}{2})$.
+
+If we want to test $H_0: \beta_j = 0$, use the fact that under $H_0$, $\frac{\hat{\beta}_j - \beta_j}{\mathrm{SE}(\hat{\beta}_j)} \sim t_{n - p}$.
+
+\subsection{Simple linear regression}
+We assume that
+\[
+  Y_i = a' + b(x_i - \bar x) + \varepsilon_i,
+\]
+where $\bar x = \sum x_i/n$ and $\varepsilon_i$ are iid $N(0, \sigma^2)$ for $i = 1, \cdots, n$.
+
+Then we have
+\begin{align*}
+  \hat{a}' &= \bar Y \sim N\left(a', \frac{\sigma^2}{n}\right)\\
+  \hat{b} &= \frac{S_{xY}}{S_{xx}}\sim N\left(b, \frac{\sigma^2}{S_{xx}}\right)\\
+  \hat{Y}_i &= \hat{a}' + \hat{b}(x_i - \bar x)\\
+  \mathrm{RSS} &= \sum_i (Y_i - \hat{Y_i})^2 \sim \sigma^2 \chi_{n - 2}^2,
+\end{align*}
+and $(\hat{a}', \hat{b})$ and $\hat{\sigma}^2 = \text{RSS}/n$ are independent, as we have previously shown.
+
+Note that $\hat{\sigma}^2$ is the maximum likelihood estimator, and we divide by $n$, while $\tilde{\sigma}^2$ is the unbiased estimator, where we divide by $n - p$.
+
+\begin{eg}
+  We have seen that $\tilde{\sigma}^2 = \frac{\mathrm{RSS}}{n - p} = \frac{67968}{24 - 2} = 3089 = 55.6^2$.
+
+  So the standard error of $\hat{\beta}$ is
+  \[
+    \mathrm{SE}(\hat{b}) = \sqrt{\tilde{\sigma}^2(X^TX)_{22}^{-1}} = \sqrt{\frac{3089}{S_{xx}}} = \frac{55.6}{28.0} = 1.99.
+  \]
+  So a $95\%$ interval for $b$ has end points
+  \[
+    \hat{b}\pm \mathrm{SE}(\hat{b})\times t_{n - p}(0.025) = 12.9\pm 1.99*t_{22}(0.025) = (-17.0, -8.8).
+  \]
+  % complete
+\end{eg}
+\subsection{Expected response at \texorpdfstring{$\mathbf{x}^*$}{x*}}
+Let $\mathbf{x}^*$ be a new vector of values for the explanatory variables.
+
+The expected response at $\mathbf{x}^*$ is $\E[Y|\mathbf{x}^*] = \mathbf{x}^{*T}\boldsymbol\beta$. We estimate this by $\mathbf{x}^{*T}\hat{\boldsymbol\beta}$. Then we have
+\[
+  \mathbf{x}^{*T}(\hat{\boldsymbol\beta} - \boldsymbol\beta)\sim N(0, \sigma^2\mathbf{x}^{*T}(X^TX)^{-1}\mathbf{x}^*).
+\]
+(the variance comes from $\mathbf{x}^{*T}\cov \hat{\boldsymbol\beta} \mathbf{x}^*$)
+
+Let $\tau^2 = \mathbf{x}^{*T} (X^TX)^{-1}\mathbf{x}^*$. Then
+\[
+  \frac{\mathbf{x}^{*T}(\hat{\boldsymbol\beta} - \boldsymbol\beta}{\tilde{\sigma}\tau}\sim t_{n - p}.
+\]
+Then a confidence interval for the expected response $\mathbf{x}^{*T}\boldsymbol\beta$ has end points
+\[
+  \mathbf{x}^{*T}\boldsymbol\beta \pm \tilde{\sigma}\tau t_{n - p}\left(\frac{\alpha}{2}\right).
+\]
+\begin{eg}
+  Previous example continued:
+
+  Suppose we wish to estimate the time to run 2 miles for a man with an oxygen take-up measurement of 50. Here $\mathbf{x}^{*T} = (1, (5 0 \bar x))$, where $\bar x = 48.6$.
+
+  The estimated expected response at $\mathbf{x}^{*T}$ is
+  \[
+    \mathbf{x}^{*T}\hat{\boldsymbol\beta} = \hat{a}' + (50 - 48.5)\times \hat{b} = 826.5 - 1.4\times 12.9 = 808.5,
+  \]
+  which is obtained by plugging $\mathbf{x}^{*T}$ into our fitted line.
+
+  We find
+  \[
+    \tau^2 = \mathbf{x}^{*T}(X^TX)^{-1}\mathbf{x}^* = \frac{1}{n} + \frac{\mathbf{x}^{*2}}{S_{xx}} = \frac{1}{24} + \frac{1.4^2}{783.5} = 0.044 = 0.21^2.
+  \]
+  So a $95\%$ confidence interval for $\E[Y|\mathbf{x}^* = 50 - \bar x]$ is
+  \[
+    \mathbf{x}^{*T}\hat{\boldsymbol\beta}\pm \tilde{\sigma}\tau t_{n - p}\left(\frac{\alpha}{2}\right) = 808.5 \pm 55.6 \times 0.21 \times 2.07 = (783.6, 832.2).
+  \]
+  Note that this is the confidence interval for the predicted \emph{expected value}, NOT the confidence interval for the actual obtained value.
+\end{eg}
+The predicted response at $\mathbf{x}^*$ is $Y^* = \mathbf{x}^*\boldsymbol\beta + \varepsilon^*$, where $\varepsilon^*\sim N(0, \sigma^2)$, and $Y^*$ is independent of $Y_1, \cdots, Y_n$. Here we have more uncertainties in our prediction: $\boldsymbol\beta$ and $\varepsilon^*$.
+
+We predict $\hat{Y}$ by $\mathbf{x}^{*T}\hat{\boldsymbol\beta}$.
+
+A $100(1 - \alpha)\%$ \emph{prediction interval} for $Y^*$ is an interval $I(\mathbf{Y})$ such that $\P(Y^*\in i(\mathbf{Y})) = 1 - \alpha$, where the probability is over the joint distribution of $Y^*, Y_1, \cdots, Y_n)$. So $I$ is a random function of the past data $\mathbf{Y}$ that outputs an interval.
+
+Observe that $\hat{Y}^* - Y^* = \mathbf{x}^{*T}(\hat{\boldsymbol\beta} - \boldsymbol\beta) - \varepsilon^*$. So
+\[
+  \E[\hat{Y}^* - Y^*] = \mathbf{x}^{*T}(\boldsymbol\beta - \boldsymbol\beta) = 0,
+\]
+Hence $\hat{Y}^*$ is an unbiased estimator of $Y^*$.
+
+To find the variance, we use that fact that $\mathbf{x}^{*T}(\hat{\boldsymbol\beta} - \boldsymbol\beta)$ and $\varepsilon^*$ are independent, and the variance of the sum of independent variables is the sum of the variances. So
+\begin{align*}
+  \var(\hat{Y}^* - Y^*) &= \var (\mathbf{x}^{*T}(\hat{\boldsymbol\beta})) + \var (\varepsilon^*)\\
+  &= \sigma^2 \mathbf{x}^{*T}(X^TX)^{-1}\mathbf{x}^* + \sigma^2.\\
+  &= \sigma^2(\tau^2 + 1).
+\end{align*}
+We can see this as the uncertainty in the regression line $\sigma^2\tau^2$, plus the wobble about the regression line $\sigma^2$. So
+\[
+  \hat{Y}^* - Y^* \sim N(0, \sigma^2(\tau^2 + 1)).
+\]
+We therefore find that
+\[
+  \frac{\hat{Y}^* - Y^*}{\tilde{\sigma}\sqrt{\tau^2 + 1}} \sim t_{n - p}.
+\]
+So the interval with endpoints
+\[
+  \mathbf{x}^{*T}\hat{\boldsymbol\beta} \pm \tilde{\sigma}\sqrt{\tau^2 + 1}t_{n- - p}\left(\frac{\alpha}{2}\right)
+\]
+is a $95\%$ prediction interval for $Y^*$. We don't call this a confidence interval - confidence intervals are about finding parameters of the distribution, while the \emph{prediction} interval is about our predictions.
+
+\begin{eg}
+  A $95\%$ prediction interval for $Y^*$ at $\mathbf{x}^{*T} = (1, (50 - \bar x))$ is
+  \[
+    \mathbf{x}^{*T}\pm \tilde{\sigma}\sqrt{\tau^2 + 1}t_{n - p}\left(\frac{\alpha}{2}\right) = 808.5\pm 55.6 \times 1.02 \times 2.07 = (691.1, 925.8).
+  \]
+  Note that this is \emph{much} wider than our our expected response! This is since there are three sources of uncertainty: we don't know what $\sigma$ is, what $\hat{b}$ is, and the random $\varepsilon$ fluctuation!
+\end{eg}
+
+\begin{eg}
+  Other example continued: Suppose we wish to estimate the expected resistivity of a new wafer in the first instrument. Here $\mathbf{x}^{*T} = (1, 0, \cdots, 0)$ (recall that $\mathbf{x}$ is an indicator vector to indicate which instrument is used).
+
+  The estimated response at $\mathbf{x}^{*T}$ is
+  \[
+    \mathbf{x}^{*T}\hat{\boldsymbol\mu} = \hat{\mu}_1 = \bar{y_1} = 124.3
+  \]
+  We find
+  \[
+    \tau^2 = \mathbf{x}^{*T}(X^TX)^{-1}\mathbf{x}^* = \frac{1}{5}.
+  \]
+  SO a $95\%$ confidence interval for $\E[Y_{1*}]$ is
+  \[
+    \mathbf{x}^{*T}\hat{\boldsymbol\mu}\pm \tilde{\sigma}\tau t_{n - p}\left(\frac{\alpha}{2}\right) = 124.3 \pm \frac{10.4}{\sqrt{5}}\times 2.09 = (114.6, 134.0).
+  \]
+  Note that we are using an estimate of $\sigma$ obtained from all five instruments. If we had only used the data from the first instrument, $\sigma$ would be estimated as
+  \[
+    \tilde{\sigma}_1 = \sqrt{ \frac{\sum_{j = 1}^5y_{1,j} - \bar{y_1}}{5 - 1}} = 8.74.
+  \]
+  The observed $95\%$ confidence interval for $\mu_1$ would have been
+  \[
+    \bar {y_1} \pm \frac{\tilde{\sigma}_1}{\sqrt{5}}t_4\left(\frac{\alpha}{2}\right) = 124.3\pm 3.91\times 2.78 = (113.5, 135.1),
+  \]
+  which is \emph{slightly} wider. Usually it is much wider, but in this special case, we only get little difference since the data from the first instrument is relatively tighter than the others.
+
+  A $95\%$ prediction interval for $Y_1^*$ at $\mathbf{x}^{*T} = (1, 0, \cdots, 0)$ is
+  \[
+    \mathbf{x}^{*T} \hat{\boldsymbol\mu} \pm \tilde{\sigma}\sqrt{\tau^2 + 1} t_{n - p}\left(\frac{\alpha}{2}\right) = 124.3 \pm 10.42 \times 1.1\times 2.07 = (100.5, 148.1).
+  \]
+\end{eg}
 \end{document}
