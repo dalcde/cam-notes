@@ -3213,4 +3213,166 @@ The joint mgf of the bivariate normal is
 \[
   m(\theta_1, \theta_2) = e^{\theta_1\mu_1 + \theta_2 \mu_2 + \frac{1}{2}(\theta_1\sigma_1^2 + 2\theta_1\theta_2\rho\sigma_1\sigma_2 + \sigma_1\sigma_2^2)}.
 \]
+\section{Central limit theorem}
+Suppose $X_1, \cdots, X_n$ are iid random variables with mean $\mu$ and variance $\sigma^2$. Let $S_n = X_1 + \cdots + X_n$. Then 
+\[
+  \var(S_n/\sqrt{n}) = \var\left(\frac{S_n - n \mu}{\sqrt{n}}\right) = \sigma^2.
+\]
+\begin{thm}[Central limit theorem]
+  Let $X_1, \cdots, X_n$ be iid random variables with $\E[X_i] = \mu$, $\var(X_i) = \sigma^2 < \infty$. Define
+  \[
+    S_n = X_1 + \cdots + X_n.
+  \]
+  Then for all finite intervals $(a, b)$,
+  \[
+    \lim_{n \to \infty}\P\left(a \leq \frac{S_{n} - n\mu}{\sigma\sqrt{n}} \leq b\right) = \int_a^b \frac{1}{\sqrt{2\pi}} e^{-\frac{1}{2}t^2}\;\d t.
+  \]
+  Note that the final term is the pdf of a standard normal. We say
+  \[
+    \frac{S_n - n\mu}{\sigma\sqrt{n}} \to_{D} N(0, 1).
+  \]
+\end{thm}
+
+To show this, we will use the continuity theorem without proof:
+\begin{thm}[Continuity thm]
+  If the random variables $X_1, X_2, \cdots$ have mgfs $m_1(\theta), m_2(\theta), \cdots$ and $m_i(\theta) \to m(\theta)$ as $i\to\infty$ for all $\theta$, then $X_i \to_D $ the random variable with mgf $m(\theta)$.
+\end{thm}
+
+We now provide a sketch-proof of the central limit theorem:
+\begin{proof}
+  Let $\mu = 0, \sigma^2 = 1$ (replace $X_i$ with $\frac{X_i - \mu}{\sigma}$).
+
+  Then
+  \begin{align*}
+    m_{X_i}(\theta) &= \E[e^{\theta X_i}] = 1 + \theta \E[X_i] + \frac{\theta^2}{2!} \E[X_i^2] + \cdots\\
+    &=1 + \frac{\theta^2}{2} + \frac{1}{3!}\theta^3 \E[X_i^3] + \cdots
+  \end{align*}
+  Now consider $S_n/\sqrt{n}$. Then
+  \begin{align*}
+    \E[e^{\theta S_n/\sqrt{n}}] &= \E[e^{\theta(X_1 + \ldots + X_n)/\sqrt{n}}]\\
+    &= \E[e^{\theta X_1/\sqrt{n}}] \cdots \E[e^{\theta X_n/\sqrt{n}}]\\
+    &= \left(\E[e^{\theta X_1/\sqrt{n}}]\right)^n\\
+    &= \left(1 + \frac{1}{2}\theta^2 \frac{1}{n} + \frac{1}{3!}\E[X^3]\frac{1}{n^{3/2}}\right)^{n}\\
+    &\to e^{\frac{1}{2}\theta^2}
+  \end{align*}
+  as $n \to \infty$ since $(1 + a/n)^n \to e^a$. And this is the mgf of the standard normal. Then the result follows from the continuity theorem.
+\end{proof}
+Note that this is not a very formal proof, since we have to require $\E[X^3]$ to be finite. Also, sometimes the moment generating function is not defined. But this will work for many ``nice'' distributions we will ever meet.
+
+The proper proof uses the characteristic function
+\[
+  \chi_X(\theta) = E[e^{i\theta X}].
+\]
+\subsection{Normal approximation to binomial}
+Let $X_i \sim B(1, p)$. Then $S_n \sim B(n, p)$. So $\E[S_n] = np$ and $\var (S_n) = p(1 - p)$. So
+\[
+  \frac{S_n - np}{\sqrt{np(1 - p)}} \to_D N(0, 1).
+\]
+
+\begin{eg}
+  Suppose two planes fly a route. Each of $n$ passengers chooses a plane at random. The number of people choosing plane 1 is $S\sim B(n, \frac{1}{2})$. Suppose the plane has $s$ seats. What is
+  \[
+    f(s) = \P(S > s),
+  \]
+  ie. the plane is over-booked? We have
+  \[
+    f(s) = \P(S > s) = \P\left(\frac{S - n/2}{\sqrt{n\cdot \frac{1}{2}\cdot \frac{1}{2}}} > \frac{s - n/2}{\sqrt{n}/2}\right).
+  \]
+  Since
+  \[
+    \frac{S - np}{\sqrt{n}/2}\sim N(0, 1),
+  \]
+  we have
+  \[
+    f(s) \approx 1 - \Phi\left(\frac{s - n/2}{\sqrt{n}/2}\right).
+  \]
+  eg, if $n = 1000$ and $s = 537$, then $\frac{S_n - n/2}{\sqrt{n}/2}\approx 2.34$, $\Phi(2.34)\approx 0.99$, and $f(s) \approx 0.01$. So the probability of overbooking is $1/100$ with 74 extra seats as buffer.
+\end{eg}
+
+\begin{eg}
+  An unknown proportion $p$ of the electorate will vote Labour. It is desired to find $p$ without an error not exceeding $0.005$. How large should the sample be?
+
+  We estimate by
+  \[
+    p' = \frac{S_n}{n},
+  \]
+  where $X_i\sim B(1, p)$. Then
+  \begin{align*}
+    \P(|p' - p| \leq 0.005) &= \P(|S_n - np| \leq 0.005n)\\
+    &= \P\left(\underbrace{\frac{|S_n - np|}{\sqrt{np(1 - p)}}}_{\approx N(0, 1)} \leq \frac{0.005n}{\sqrt{np(1 - p)}}\right)
+  \end{align*}
+  We want $|p' - p| \leq 0.005$ with probability $\geq 0.95$. Then we want
+  \[
+    \frac{0.005n}{\sqrt{np(1 - p)}} \geq \Phi^{-1}(0.975) = 1.96.
+  \]
+  (we use 0.975 instead of 0.95 since we are doing a two-tailed test) Since the maximum possible value of $p(1 - p)$ is $1/4$, we have
+  \[
+    n \geq 38416.
+  \]
+  In practice, we go by
+  \[
+    \P(|p' < p| \leq 0.03) \geq 0.95
+  \]
+  This just requires $n \geq 1068$.
+\end{eg}
+
+\begin{eg}[Estimating $\pi$ with Buffonl's needle]
+  Recall that if we randomly toss a needle of length $\ell$ to a floor marked with parallel lines a distance $L$ apart, the probability that the needle hits the line is $p = \frac{2\ell}{\pi L}$.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (-3, -1) -- (3, -1);
+      \draw (-3, 1) -- (3, 1);
+      \draw (-2, -0.1) -- (-0.5, 0.7) node [anchor = south east, pos = 0.5] {$\ell$};
+      \draw [->] (-2, -0.1) -- (-2, 1) node [left, pos = 0.5] {$X$};
+      \draw [->] (-2, 1) -- (-2, -0.1);
+      \draw [dashed] (-2.5, -0.1) -- (-0.5, -0.1);
+      \draw (-1.5, -0.1) arc (0:29:0.5);
+      \node at (-1.2, 0.1) {$\theta$};
+      \draw [->] (2, -1) -- (2, 1) node [right, pos = 0.5] {$L$};
+      \draw [->] (2, 1) -- (2, -1);
+    \end{tikzpicture}
+  \end{center}
+  Suppose we toss the pin $n$ times, and it hits the line $N$ times. Then
+  \[
+    N\approx N(np, np(1 - p))
+  \]
+  by the Central limit theorem.
+
+  Then
+  \begin{align*}
+    \hat{\pi} &= \frac{2\ell}{(N/n) L} \\
+    &= \frac{\pi 2\ell/(\pi L)}{\E[N/n] + (N/n - \E[N]/n}\\
+    &= \frac{\pi p}{p + (p' - p)}\\
+    &= \pi \left(1 - \frac{p' - p}{p} + \cdots \right)
+  \end{align*}
+  Hence
+  \[
+    \hat\pi - \pi \approx \frac{p - p'}{p}.
+  \]
+  Since
+  \[
+    p' \sim N\left(p, \frac{p(1 - p)}{n}\right).
+  \]
+  So
+  \[
+    \hat \pi - \pi \sim N\left(0, \frac{\pi^2 p(1 - p)}{np^2}\right) = N\left(0, \frac{\pi^2(1 - p)}{np}\right)
+  \]
+  We want a small variance, and that occurs when $p$ is the largest. Since $p = 2\ell/\pi L$, this is maximized with $\ell = L$. So
+  \[
+    p = \frac{2}{\pi},
+  \]
+  and
+  \[
+    \hat \pi - \pi \approx N\left(0, \frac{(\pi - 2)\pi^2}{2n}\right).
+  \]
+  If we want to estimate $\pi$ to 3 dp,
+  \[
+    \P(|\hat \pi - \pi| \leq 0.001) \geq 0.95
+  \]
+  iff
+  \[
+    0.001\sqrt{\frac{2n}{(\pi - 2)(\pi^2)}} \geq \Phi^{-1}(0.975) = 1.96
+  \]
+  So $n\geq 2.15 \times 10^7$.
+\end{eg}
 \end{document}
