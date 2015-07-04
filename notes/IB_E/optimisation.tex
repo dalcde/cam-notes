@@ -44,10 +44,10 @@ The Ford-Fulkerson algorithm and the max-flow min-cut theorems in the rational c
 \end{defi}
 \note we have a lot of vectors here, but we do not bold them, since almost everything is going to be a vector.
 
-This is the most general form of the problem. What if we want to do something more fancy? If we want to maximize $f$ instead of minimizing, we can minimize $-f$. What if we want our constraints to be an inequality in the form $h(x) \geq b$? We can introduce a \emph{slack variable} $z$, make the functional constraint as $h(x) - z = b$, and add the regional constraint $z \geq 0$. So all is good, and this is in fact the most general form.
+This is the most general form of the problem. If we want to maximize $f$ instead of minimizing, we can minimize $-f$. If we want our constraints to be an inequality in the form $h(x) \geq b$, we can introduce a \emph{slack variable} $z$, make the functional constraint as $h(x) - z = b$, and add the regional constraint $z \geq 0$. So all is good, and this is in fact the most general form.
 
 \subsection{Linear programming}
-Linear programming is, unsurprisingly, the case where everything's linear. We can write our problem as:
+Linear programming is, surprisingly, the case where everything's linear. We can write our problem as:
 
 \begin{center}
   minimize $c^Tx$ subject to
@@ -61,8 +61,7 @@ Linear programming is, unsurprisingly, the case where everything's linear. We ca
 \end{center}
 where we've explicitly written out the different forms the constraints can take.
 
-We can write this in a different way, which is known as the general form:
-This is too clumsy. We claim that these can be written into the following forms:
+This is too clumsy. We claim (without proof) that these can be written into the following forms:
 
 \begin{defi}[General and standard form]
   The \emph{general form} of a linear program is
@@ -154,20 +153,20 @@ However, this is obviously not a sufficient condition. Any such point can be a m
 
 We have the following lemma:
 \begin{lemma}
-  If $f$ is twice differentiable, then it is convex on a convex set $S$ if the Hessian matrix
+  Let $f$ be twice differentiable. Then $f$ is convex on a convex set $S$ if the Hessian matrix
   \[
     Hf_{ij} = \frac{\partial^2 f}{\partial x_i \partial x_j}
   \]
-  is positive semidefinite on $S$, where this fancy term means:
+  is positive semidefinite for all $x\in S$, where this fancy term means:
 \end{lemma}
 
 \begin{defi}[Positive-semidefinite]
-  A matrix $H$ is \emph{positive semi-definite} if $v^T Hv \geq 0$ for all $x\in S$ and $v\in \R^n$.
+  A matrix $H$ is \emph{positive semi-definite} if $v^T Hv \geq 0$ for all $v\in \R^n$.
 \end{defi}
 
 Which leads to the following theorem:
 \begin{thm}
-  Let $X\subseteq \R^n$ be convex, $f: \R^n \to \R$ be twice differentiable on $X$. Let $x^* \in X$ satisfy $\nabla f(x^*) = 0$ and $Hf(x)$ is positive semidefinite for all $x\in X$. Then $x^*$ minimizes $f$ on $X$.
+  Let $X\subseteq \R^n$ be convex, $f: \R^n \to \R$ be twice differentiable on $X$. If $x^* \in X$ satisfy $\nabla f(x^*) = 0$ and $Hf(x)$ is positive semidefinite for all $x\in X$, then $x^*$ minimizes $f$ on $X$.
 \end{thm}
 We will not prove these.
 
@@ -194,7 +193,7 @@ We could as well have used
 \[
   L(x, \lambda) = f(x) + \lambda^T(h(x) - b).
 \]
-since we just have to switch the sign of $\lambda$. So we don't have to worry about getting the sign wrong.
+since we just have to switch the sign of $\lambda$. So we don't have to worry about getting the sign of $\lambda$ wrong when defining the Lagrangian.
 
 If we minimize $L$ over both $x$ and $\lambda$, then we will magically find the minimal solution subject to the constrains. Sometimes.
 
@@ -204,6 +203,8 @@ If we minimize $L$ over both $x$ and $\lambda$, then we will magically find the 
     L(x^* ,\lambda^*) = \inf_{x\in X}L(x, \lambda^*)\quad\text{and}\quad h(x^*) = b.
   \]
   Then $x^*$ is optimal for ($P$).
+
+  Alternatively, if $x^*$ minimizes $L$ for a fixed $\lambda^*$, and $x^*$ satisfies the constraints, then $x^*$ minimizes $f$.
 \end{thm}
 This looks like a pretty powerful result, but it turns out that it is quite easy to prove.
 
@@ -232,12 +233,12 @@ This looks like a pretty powerful result, but it turns out that it is quite easy
   \end{align*}
   We want to pick a $\lambda^*$ and $x^*$ such that $L(x^*, \lambda^*)$ is minimal. Then for our $\lambda^*$, $L(x, \lambda^*)$  must have a finite minimum!
 
-  We note that $(-2 - \lambda_1)x_3$ does not have a finite minimum unless $\lambda_1 = -2$. Also, the terms in $x_1$ and $x_2$ do not have a finite minimum unless $\lambda_2 < 0$.
+  We note that $(-2 - \lambda_1)x_3$ does not have a finite minimum unless $\lambda_1 = -2$, since $x_3$ can take any value. Also, the terms in $x_1$ and $x_2$ do not have a finite minimum unless $\lambda_2 < 0$.
 
   With these in mind, we find a minimum by setting all first derivatives to be $0$:
   \begin{align*}
     \frac{\partial L}{\partial x_1} &= 1 - \lambda_1 - 2\lambda_2 x_1 = 3 - 2\lambda_2x_1\\
-    \frac{\partial L}{\partial x_1} &= -1 - \lambda_1 - 2\lambda_2 x_2 = 1 - 2\lambda_2 x_2
+    \frac{\partial L}{\partial x_2} &= -1 - \lambda_1 - 2\lambda_2 x_2 = 1 - 2\lambda_2 x_2
   \end{align*}
   Since these must be both $0$, we must have
   \[
@@ -279,7 +280,10 @@ To minimize $f(x)$ subject to $h(x) \leq b$, $x\in X$, we proceed as follows:
     \[
       L(x, z, \lambda) = f(x) - \lambda^T(f(x) + z - b).
     \]
-  \item Find $Y = \{\lambda: \inf_{x\in X, z\geq 0}L(x, z, \lambda) > -\infty\}$.
+  \item Find 
+    \[
+      Y = \left\{\lambda: \inf_{x\in X, z\geq 0}L(x, z, \lambda) > -\infty\right\}.
+    \]
   \item For each $\lambda\in Y$, minimize $L(x, z, \lambda)$, ie. find
     \[
       x^*(\lambda)\in X,\quad z^*(\lambda) \geq 0
@@ -296,22 +300,8 @@ To minimize $f(x)$ subject to $h(x) \leq b$, $x\in X$, we proceed as follows:
 Then by the Lagrangian sufficiency condition, $x^*(\lambda^*)$ is optimal for the constrained problem.
 
 \subsection{Complementary Slackness}
-If we introduce a slack variable $z$, we note that $z_j$ can be made arbitrarily large in magnitude. We don't want it to be able to become arbitrarily negative, because we need a finite minimum. So we want $\lambda_j z_j$ to be always positive. So $\lambda\in Y$ requires either that $\lambda_j \geq 0$ or $\lambda_j \leq 0$, depending on the sign of $z_j$ and $b_j$.
+If we introduce a slack variable $z$, we note that changing the value of $z_j$ does not affect our objective function, and we are allowed to pick any positive $z$. Hence if the corresponding Lagrange multiplier is $\lambda_j$, then we must have $(z^*(\lambda))_j \lambda_j = 0$. This is since by definition $z^*(\lambda)_j$ minimizes $z_j \lambda_j$. Hence if $z_j \lambda_j \not= 0$, we can tweak the values of $z_j$ to make a smaller $z_j \lambda_j$.
 
-We can get a stronger result - for every $\lambda\in Y$ and $j = 1, \cdots, m$,
-\begin{align*}
-  (z^*(\lambda))_j \not= 0 &\Rightarrow \lambda_j = 0\\
-  \lambda_j \not= 0 &\Rightarrow (z^*(\lambda))_j = 0.
-\end{align*}
-This can be phrased as ``exactly one of $(z^*(\lambda))_j$ and $\lambda_j$ is $0$''.
-
-This is due to the minimality of $z^*(\lambda)$. If $\lambda_j, z_j \not= 0$, then by making $z^*_j$ slightly smaller in magnitude, $\lambda_j z_j$ can get smaller.
-
-If we don't want slack variables, we can write this as
-\begin{align*}
-  (h(x^*(\lambda^*)))_j > b_j &\Rightarrow \lambda_j^* = 0\\
- \lambda_j^* > 0 &\Rightarrow (h(x^*(\lambda^*)))_j = b_j.
-\end{align*}
 This makes our life easier since our search space is smaller.
 
 \begin{eg}
@@ -335,35 +325,29 @@ This makes our life easier since our search space is smaller.
   By complementary slackness, $\lambda_1 z_1 = \lambda_2 z_2 = 0$. We can then consider the cases $\lambda_1 = 0$ and $z_1 = 0$ separately, and save a lot of algebra.
 \end{eg}
 
-\section{Shadow prices and Lagrange Duality}
 \subsection{Shadow prices}
-Let
-\[
-  \phi(b) = \inf \{f(x): h(x) = b, x\in X\}.
-\]
-Note that this allows infinite values of $\phi$. If there is no $x$ that satisfies $h(x) = b, x\in X$, then the infimum is positive infinity. If $f(x)$ can be unboundedly small, then $\phi(b) = -\infty$.
-
+We can understand Lagrange multipliers intuitively via the following theorem:
 \begin{thm}[]
-  Suppose $f$ and $h$ are continuously differentiable on $\R^n$, and that there exist unique functions $x^*: \R^m \to \R^n$, $\lambda^*: \R^m \to \R^n$ ($m$ is the dimension of $b$, $n$ is the dimension of $x$), such that for each $b\in \R^m$, 
+  Consider the problem
+  \begin{center}
+    minimize $f(x)$ subject to $h(x) = b$.
+  \end{center}
+  Here we assume all functions are continuously differentiable. Suppose that for each $b\in \R^n$, $\phi(b)$ is the optimal value of $f$ and $\lambda^*$ is the corresponding Lagrange multiplier. Then
   \[
-    \lambda^*(b) \geq 0 \text{ and } f(x^*(b)) = \phi(b).
-  \]
-  If $x^*$ and $\lambda^*$ are continuously differentiable, then for $i = 1, \cdots, m$, we have
-  \[
-    \frac{\partial \phi}{\partial b_i}(b) = \lambda_i^*(b).
+    \frac{\partial \phi}{\partial b_i} = \lambda_i^*.
   \]
 \end{thm}
-$\frac{\partial \phi}{\partial b_i}$ should be interpreted as follows: think of $b$ as the total amount of resources we have, and $h(x)$ is the amount of resources we need if we produce $x$ many goods. Then $\frac{\partial \phi}{\partial b_i}$ is how much more we will be able to produce when our available resources change.
-
 Proof is omitted, as it is just a tedious application of chain rule etc.
 
-The result also holds when the functional constraints are inequality constraints: if the $i$th constraint at an optimal solution does not hold with equality, then the Lagrange multiplier is $0$ by complementary slackness. Also, the partial derivative of $\phi$ with respect to $b_i$ also has to be $0$, since changing the upper bound doesn't affect us if we are not at the limit.
+This can be interpreted as follows: suppose we are a factory which is capable of producing $m$ different kinds of goods. Since we have finitely many resources, and producing stuff requires resources, $h(x) = b$ limits the amount of goods we can produce. Now of course, if we have more resources, ie. we change the value of $b$, we will be able to produce more/less stuff, and thus generate more profit. The change in profit per change in $b$ is given by $\frac{\partial \phi}{\partial b_i}$, which is the value of $\lambda$.
+
+The result also holds when the functional constraints are inequality constraints. If the $i$th constraint holds with equality at the optimal solution, then the above reasoning holds. Otherwise, if it is not held with equality, then the Lagrange multiplier is $0$ by complementary slackness. Also, the partial derivative of $\phi$ with respect to $b_i$ also has to be $0$, since changing the upper bound doesn't affect us if we are not at the limit. So they are equal.
 \subsection{Lagrange duality}
-Suppose the problem is
+Consider the problem
 \begin{center}
   minimize $f(x)$ subject to $h(x) = b$, $x\in X$.
 \end{center}
-Denote this as $D$.
+Denote this as $P$.
 
 The Lagrangian is
 \[
@@ -373,7 +357,7 @@ Define the dual function $g: \R^m \to \R$ as
 \[
   g(\lambda) = \inf_{x\in X}L(x, \lambda).
 \]
-ie, if we fix $\lambda$, how small we can get $L$ to be. As before, let
+ie, we fix $\lambda$, and see how small we can get $L$ to be. As before, let
 \[
   Y = \{\lambda\in \R^n: g(\lambda) > -\infty\}.
 \]
@@ -430,49 +414,20 @@ It turns out that problems satisfying strong duality are exactly those for which
   \begin{center}
     maximize $\frac{10}{4\lambda_2} + 4\lambda_2 - 10$ subject to $\lambda_2 < 0$.
   \end{center}
-
   The maximum is attained for
   \[
-    \lambda_2 = -\sqrt{\frac{5}{8}}.
+    \lambda_2 = -\sqrt{\frac{5}{8}}
   \]
-  So the primal and dual have the same optimal value.
+  After calculating the values of $g$ and $f$, we can see that the primal and dual do have the same optimal value.
 \end{eg}
 
 Right now, what we've got isn't helpful, because we won't know if our problem satisfies strong duality!
 
-\section{Conditions for strong duality}
 \subsection{Supporting hyperplanes and convexity}
-Consider
-\[
-  \phi(b) = \inf\{f(x): h(x) = b, x\in X\}.
-\]
-Fix $b\in \R^m$ and consider $\phi(c)$ as a function $c\in \R^m$. Further consider the hyperplane given by $\lambda: \R^m \to \R$ where $\alpha(c) = \beta + \lambda^T(c - b)$.
-
-\begin{center}
-  \begin{tikzpicture}
-    \draw [->] (-2, 0) -- (2, 0) node [right] {c};
-    \draw [->] (0, -1) -- (0, 2);
-    \node [anchor = north east] {b};
-    \draw plot [smooth, tension=0.8] coordinates {(-2, 0.5) (-1, 1.5) (0.2, 1) (2, 1.6)} node [right] {$\phi$};
-    \draw (-2, -0.5) -- (2, 1) node [right] {$\alpha$};
-    \node [circ] at (0, 0.25) {};
-    \node [anchor = south east] at (0, 0.25) {$\beta$};
-  \end{tikzpicture}
-\end{center}
-
-We can try to determine $\phi(b)$ as follows:
-\begin{enumerate}
-  \item For each $\lambda$ (slope of line $\alpha$), find 
-    \[
-      \beta_\lambda = \max \{\beta: \beta + \lambda^T(c - b) \leq \phi(c)\text{ for all }c\}
-    \]
-    ie. we push up the line as far as possible while remaining below $\phi(c)$.
-  \item Choose $\lambda$ to maximize $\beta_\lambda$. This is what maximizes the dual function $g(\lambda)$.
-\end{enumerate}
-We see weak duality as $\max_\lambda \beta_\lambda \leq \phi(b)$.
+We use the fancy term ``hyperplane'' to denote planes in higher dimensions (in an $n$-dimensional space, a hyperplane has $n - 1$ dimensions).
 
 \begin{defi}[Supporting hyperplane]
-  A hyperplane $\alpha: \R^m \to \R$ is \emph{supporting} to $\phi$ at $b$ if for all $c$, $\alpha(c) = \phi(b) + \lambda^T(c - b)$, ie. $\beta = \phi(b)$, and $\phi(c) \geq \alpha(c)$ for all $c$.
+  A hyperplane $\alpha: \R^m \to \R$ is \emph{supporting} to $\phi$ at $b$ if $\alpha$ intersects $\phi$ at $b$ and  $\phi(c) \geq \alpha(c)$ for all $c$.
 
   \begin{center}
     \begin{tikzpicture}
@@ -480,7 +435,7 @@ We see weak duality as $\max_\lambda \beta_\lambda \leq \phi(b)$.
       \draw (-1, 2) parabola bend (0, 0.5) (1, 2) node [above] {$\phi$};
       \node [circ] at (0.4, 0.75) {};
       \node [right] at (0.4, 0.75) {$\phi(b)$};
-      \draw (-0.7, -0.5) -- (1.5, 2) node [right] {supporting hyperplane};
+      \draw (-0.7, -0.5) -- (1.5, 2) node [right] {$\alpha$};
     \end{tikzpicture}
   \end{center}
 \end{defi}
@@ -490,17 +445,25 @@ We see weak duality as $\max_\lambda \beta_\lambda \leq \phi(b)$.
 \end{thm}
 
 \begin{proof}
-  $(\Leftarrow)$ Suppose there is a supporting hyperplane. Then by definition there exists $\lambda\in \R^m$ such that for all $c\in \R^m$,
+  $(\Leftarrow)$ Suppose there is a supporting hyperplane. Then since the plane passes through $\phi(b)$, it must be of the form
   \[
-    \phi(b) + \lambda^T(c - b) \leq \phi(c).
+    \alpha(c) = \phi(b) + \lambda^T(c - b).
+  \]
+  Since this is supporting, for all $c\in \R^m$,
+  \[
+    \phi(b) + \lambda^T(c - b) \leq \phi(c),
+  \]
+  or
+  \[
+    \phi(b) \leq \phi(c) - \lambda^T(c - b),
   \]
   This implies that
   \begin{align*}
     \phi(b) &\leq \inf_{c\in \R^m}(\phi(c) - \lambda^T(c - b))\\
     &= \inf_{c\in \R^m}\inf_{x\in X(c)}(f(x) - \lambda^T(h(x) - b))\\
-    \intertext{Since $\phi(c) = \inf_{x\in X(c)} f(x)$ and $h(x) = c$ for $x\in X(c)$}
+    \intertext{(since $\phi(c) = \inf\limits_{x\in X(c)} f(x)$ and $h(x) = c$ for $x\in X(c)$)}
     &= \inf_{x\in X}L(x, \lambda).\\
-    \intertext{since $\bigcup_{c\in \R^m}X(c) = X$, which is true since for any $x\in X$, we have $x\in X(h(x))$.}
+    \intertext{(since $\bigcup\limits_{c\in \R^m}X(c) = X$, which is true since for any $x\in X$, we have $x\in X(h(x))$)}
     &= g(\lambda)
   \end{align*}
   By weak duality, $g(\lambda) \leq \phi(b)$. So $\phi(b) = g(\lambda)$. So strong duality holds.
@@ -511,7 +474,7 @@ We see weak duality as $\max_\lambda \beta_\lambda \leq \phi(b)$.
     &= \inf_{x\in X}L(x, \lambda)\\
     &\leq \inf_{x\in X(c)} L(x, \lambda)\\
     &= \inf_{x\in X(c)} (f(x) - \lambda^T(h(x) - b))\\
-    &= \phi(c) - \lambda^T(c - n)
+    &= \phi(c) - \lambda^T(c - b)
   \end{align*}
   So $\phi(b) + \lambda^T(c - b) \leq \phi(c)$. So this defines a supporting hyperplane.
 \end{proof}
@@ -520,14 +483,14 @@ We see weak duality as $\max_\lambda \beta_\lambda \leq \phi(b)$.
   Suppose that $\phi: \R^m \to \R$ is convex and $b\in\R^m$ lies in the interior of the set of points where $\phi$ is finite. Then there exists a supporting hyperplane to $\phi$ at $b$.
 \end{thm}
 
-This is still not helpful, since we don't know what $\phi$ is! So now we have a sufficient condition for Lagrange multipliers to work:
+We're having some progress, but this is still not helpful, since we don't know what $\phi$ is! So now we have a sufficient condition for Lagrange multipliers to work:
 \subsection{A sufficient condition for convexity of \texorpdfstring{$\phi$}{phi}}
-\begin{thm}[]
+\begin{thm}
   Let 
   \[
-    \phi(b) = \inf_{x} \{f(x): h(x) \leq b, x\in X\}
+    \phi(b) = \inf_{x\in X} \{f(x): h(x) \leq b\}
   \]
-  Then $\phi$ is convex if $X, f, h$ are convex, assuming feasibility and boundedness.
+  If $X, f, h$ are convex, then so is $\phi$ (assuming feasibility and boundedness).
 \end{thm}
 
 \begin{proof}
@@ -545,7 +508,7 @@ This is still not helpful, since we don't know what $\phi$ is! So now we have a 
   So $x\in X(b)$. Since $\phi(x)$ is an optimal solution, by convexity of $f$, 
   \begin{align*}
     \phi(b) &\leq f(x)\\
-    &= f(\delta x_1 + (1 - \delta x_2))\\
+    &= f(\delta x_1 + (1 - \delta) x_2)\\
     &\leq \delta f(x_1) + (1 - \delta)f(x_2)
    \end{align*}
    This holds for any $x_1\in X(b_1)$ and $x_2 \in X(b_2)$. So by taking infimum of the right hand side,
@@ -562,7 +525,7 @@ So
 \end{thm}
 
 \section{Solutions of linear programs}
-We first illustrate the general idea with the case of a 2d linear program
+We first illustrate the general idea with the case of a 2D linear program
 
 \begin{center}
   maximize $x_1 + x_2$ subject to
@@ -617,12 +580,7 @@ In general, if both the constraints and the objective functions are linear, then
 
 Consider again the linear program in standard form, ie.
 \begin{center}
-  \emph{max}imize $c^T x$ subject to
-  \begin{align*}
-    Ax &= b\\
-    x &\geq 0
-  \end{align*}
-  where $A \in \R^{m\times n}$ and $b\in \R^m$.
+  \emph{maximize} $c^T x$ subject to $Ax = b, x \geq 0$, where $A \in \R^{m\times n}$ and $b\in \R^m$.
 \end{center}
 
 \begin{defi}[Basic solution and basis]
@@ -713,11 +671,11 @@ This is the generalization of the statement in 2D, and we are not going to prove
 
   Since $c^T x = \delta c^T y + (1 - \delta)c^Tz$, we must have that $c^T x = c^T y = c^T z$, ie. $y$ and $z$ are also optimal.
 
-  Since $y \geq 0$ and $z \geq 0$, $x = \delta y + (1 - \delta z)$ implies that $y_i = z_i = 0$ whenever $x_i = 0$.
+  Since $y \geq 0$ and $z \geq 0$, $x = \delta y + (1 - \delta) z$ implies that $y_i = z_i = 0$ whenever $x_i = 0$.
 
   So the non-zero entries of $y$ and $z$ is a subset of the non-zero entries of $x$. So $y$ and $z$ have at most $r$ non-zero entries, which must occur in rows where $x$ is also non-zero.
 
-  If $y$ or $z$ has strictly fewer than $r$ non-zero entries, then we are done. Otherwise, let 
+  If $y$ or $z$ has strictly fewer than $r$ non-zero entries, then we are done. Otherwise, for any $\hat{\delta}$ (not necessarily in $(0, 1)$),let 
   \[
     x_{\hat{\delta}} = \hat{\delta} y + (1 - \hat{\delta}) z = z + \hat{\delta}(y - z).
   \]
@@ -740,7 +698,7 @@ Then, by convexity of $f$,
   f(x) \leq \sum_{i = 1}^k \delta_i f(x^i) \leq \max_i f(x^i)
 \]
 So any point in the interior cannot be better than the extreme points.
-\section{Linear programming duality}
+\subsection{Linear programming duality}
 Consider the linear program in general form with slack variables,
 
 \begin{center}
@@ -754,9 +712,9 @@ The Lagrangian is
 \]
 Since $x, z$ can be arbitrarily positive, this has a finite minimum if and only if
 \[
-  \lambda\in Y = \{\lambda: c^T - \lambda^TA \geq 0, \lambda^T \geq 0\}.
+  c^T - \lambda^TA \geq 0, \lambda^T \geq 0.
 \]
-For $\lambda\in Y$, the minimum of $L(x, z, \lambda)$ is attained when $(c^T - \lambda^T A)x$ and $\lambda^T z = 0$ by complementary slackness. So
+Call the feasible set $Y$. Then for fixed $\lambda\in Y$, the minimum of $L(x, z, \lambda)$ is attained when $(c^T - \lambda^T A)x$ and $\lambda^T z = 0$ by complementary slackness. So
 \[
   g(\lambda) = \inf_{(x, z) \in X} L(x, z, \lambda) = \lambda^T b.
 \]
@@ -900,10 +858,10 @@ The dual is thus
   \[
     c^Tx = c^Tx - \lambda^T(Ax - b) = (c^T - \lambda^T A)x + \lambda^T b = \lambda^Tb.
   \]
-  And by weak duality, $x$ and $\lambda$ are optimal.
+  Hence by weak duality, $x$ and $\lambda$ are optimal.
 \end{proof}
-\section{Simplex method}
-We start with an example, showing what we do, then explain the logic, behind, then do a more proper example.
+\subsection{Simplex method}
+We start with an example, showing what we do, then explain the logic behind, then do a more proper example.
 
 \begin{eg}
   Consider the following problem:
@@ -995,8 +953,8 @@ The general tableau is then
 This might look really scary, and it is! Without caring too much about how the formulas for the cells come from, we see the identity matrix on the left, which is where we find our basic feasible solution. Below that is the row for the objective function. The values of this row must be $0$ for the basis columns.
 
 On the right-most column, we have $A_B^{-1}b$, which is our $x_B$. Below that is $-c_B^TA_B^{-1}b$, which is the negative of our objective function $c_B^Tx_B$.
-\subsection{The simplex tableau}
-So
+\subsubsection{The simplex tableau}
+We have
 \begin{align*}
   f(x) &= c^T x \\
   &= c_B^T x_B + c_N^T x_N\\
@@ -1005,15 +963,15 @@ So
 \end{align*}
 We will maximize $c^T x$ by choosing a basis such that $c_N^T - c_B^T A_B^{-1}A_N \leq 0$, ie. non-positive everywhere and $A_B^{-1}b \geq 0$.
 
-In this case, for any feasible solution $x\in \R^n$, we must have $x_N \geq 0$. So $(c_N^T - c_B^TA_B^{-1}A_N)x_N \leq 0$ and
+If this is true, then for any feasible solution $x\in \R^n$, we must have $x_N \geq 0$. So $(c_N^T - c_B^TA_B^{-1}A_N)x_N \leq 0$ and
 \[
   f(x) \leq c_B^T A_B^{-1}b.
 \]
 So if we choose $x_B = A_B^{-1}b$, $x_N = 0$, then we have an optimal solution.
 
-What if $(c_N^T - c_B^T A_B^{-1}A_N) \not\leq 0$? Say $(c_N^T - c_B^T A_B^{-1}A_N)_i > 0$.
+Hence our objective is to pick a basis that makes $c_N^T - c_B^T A_B^{-1}A_N \leq 0$ while keeping $A_B^{-1}b \geq 0$. To do this, suppose this is not attained. Say $(c_N^T - c_B^T A_B^{-1}A_N)_i > 0$.
 
-We can increase the value of the objective function by increasing $(x_N)_i$. As we increase $(x_N)_i$, we have to satisfy the functional constraints. We can keep increasing $(x_N)_i$ until another variable hits $0$, say $(x_B)_j$. Then we will have to stop.
+We can increase the value of the objective function by increasing $(x_N)_i$. As we increase $(x_N)_i$, we have to satisfy the functional constraints. So the value of other variables will change as well. We can keep increasing $(x_N)_i$ until another variable hits $0$, say $(x_B)_j$. Then we will have to stop.
 
 However, if it so happens that we can increase $(x_N)_i$ indefinitely without other things hitting $0$, our problem is unbounded.
 
@@ -1021,7 +979,7 @@ The effect of this is that we have switched basis by removing $(x_B)_j$ and addi
 
 The simplex method is a systematic way of doing the above procedure.
 
-\subsection{Using the Tableau}
+\subsubsection{Using the Tableau}
 Consider a tableau of the form
 \begin{center}
 \begin{tabular}{cc}
@@ -1042,10 +1000,14 @@ The simplex method proceeds as follows:
   \item We update the tableau by multiplying row $i$ by $1/a_{ij}$ (such that the new $a_{ij} = 1$), and add a $(-a_{kj}/a_{ij})$ multiple of row $i$ to each row $k \not= i$, including $k = 0$ (so that $a_{kj} = 0$ for all $k \not= i$)
 
     We have a basic feasible solution, since our choice of $a_{ij}$ makes all right-hand columns positive after subtracting (apart from $a_{00}$).
+  \item \texttt{GOTO} (ii).
 \end{enumerate}
 
+Now visit the example at the beginning of the section to see how this is done in practice. Then read the next section for a more complicated example.
 \subsection{The two-phase simplex method}
 Sometimes we don't have a nice identity matrix to start with. In this case, we need to use the \emph{two-phase simplex method} to first find our first basic feasible solution, then to the actual optimization.
+
+This method is illustrated by example.
 \begin{eg}
   Consider the problem
   \begin{center}
@@ -1091,18 +1053,18 @@ Sometimes we don't have a nice identity matrix to start with. In this case, we n
 
   Our simplex tableau is
   \begin{center}
-  \begin{tabular}{cccccccc}
-    \toprule
-    $x_1$ & $x_2$ & $z_1$ & $z_2$ & $z_3$ & $y_1$ & $y_2$ \\
-    \midrule
-    1 & 1 & -1 & 0 & 0 & 1 & 0 & 1\\
-    2 & -1 & 0 & -1 & 0 & 0 & 1 & 1\\
-    0 & 3 & 0 & 0 & 1 & 0 & 0 & 2\\
-    \midrule
-    -6 & -3 & 0 & 0 & 0 & 0 & 0 & 0\\
-    0 & 0 & 0 & 0 & 0 & -1 & -1 & 0\\
-    \bottomrule
-  \end{tabular}
+    \begin{tabular}{cccccccc}
+      \toprule
+      $x_1$ & $x_2$ & $z_1$ & $z_2$ & $z_3$ & $y_1$ & $y_2$ \\
+      \midrule
+      1 & 1 & -1 & 0 & 0 & 1 & 0 & 1\\
+      2 & -1 & 0 & -1 & 0 & 0 & 1 & 1\\
+      0 & 3 & 0 & 0 & 1 & 0 & 0 & 2\\
+      \midrule
+      -6 & -3 & 0 & 0 & 0 & 0 & 0 & 0\\
+      0 & 0 & 0 & 0 & 0 & -1 & -1 & 0\\
+      \bottomrule
+    \end{tabular}
   \end{center}
   Note that we keep both our original and ``kill-$y_i$'' objectives, but now we only care about the second one. We will keep track of the original objective so that we can use it in the second phase.
 
@@ -1187,31 +1149,38 @@ Sometimes we don't have a nice identity matrix to start with. In this case, we n
   Note that we previously said that the bottom right entry is the negative of the optimal value, not the optimal value itself! This is correct, since in the tableau, we are maximizing $-6x_1 - 3x_2$, whose maximum value is $-5$. So the minimum value of $6x_1 + 3x_2$ is $5$.
 \end{eg}
 \section{Non-cooperative games}
-We mostly focus on games with two players.
+Here we have a short digression to game theory. We mostly focus on games with two players.
 
 \subsection{Games and Solutions}
 \begin{defi}[Bimatrix game]
-  A two-player game, or \emph{bimatrix game}, is given by $P, Q\in \R^{m\times n}$. Player 1, or the \emph{row player}, chooses a row $i\in \{1, \cdots, m\}$, while player 2, the \emph{column player}, chooses a column $j\in \{1, \cdots, n\}$. These happen simultaneously. Players then get payoffs $P_{ij}$ and $Q_{ij}$ respectively.
+  A two-player game, or \emph{bimatrix game}, is given by two matrices $P, Q\in \R^{m\times n}$. Player 1, or the \emph{row player}, chooses a row $i\in \{1, \cdots, m\}$, while player 2, the \emph{column player}, chooses a column $j\in \{1, \cdots, n\}$. These are selected without knowledge of the other player's decisions. The two players then get payoffs $P_{ij}$ and $Q_{ij}$ respectively.
 \end{defi}
 
 \begin{defi}[Strategy]
   Players are allowed to play randomly. The set of \emph{strategies} the row player can have is
   \[
-    X = \{x\in \R^m, x \geq 0, \sum x_i = 1\}
+    X = \{x\in \R^m: x \geq 0, \sum x_i = 1\}
   \]
   and the column player has strategies
   \[
-    Y = \{y\in \R^m, y \geq 0, \sum y_i = 1\}
+    Y = \{y\in \R^n: y \geq 0, \sum y_i = 1\}
   \]
   Each vector corresponds to the probabilities of selecting each row or column.
 
-  The strategy profile $(x, y)\in X\times Y$ induces a lottery, and we write $p(x, y) = x^T Py$ for the expected payoff of the row player.
+  A strategy profile $(x, y)\in X\times Y$ induces a lottery, and we write $p(x, y) = x^T Py$ for the expected payoff of the row player.
 
-  If $x_i = 1$ for some $i$, we call $x$ a \emph{pure strategy}.
+  If $x_i = 1$ for some $i$, ie. we always pick $i$, we call $x$ a \emph{pure strategy}.
 \end{defi}
 
 \begin{eg}[Prisoner's dilemma]
-  Each player can either choose $S$ or $T$, with payoffs
+  Suppose Alice and Bob commit a crime together, and are caught by the police. They can choose to remain silent ($S$) or testify ($T$). Different options will lead to different outcomes:
+  \begin{itemize}
+    \item Both keep silent: the police has little evidence and they go to jail for 2 years.
+    \item One testifies and one remains silent: the one who testifies gets awarded and is freed, while the other gets stuck in jail for 10 years.
+    \item Both testify: they both go to jail for 5 years.
+  \end{itemize}
+
+  We can represent this by a payoff table:
   \begin{center}
     \begin{tabular}{ccc}
       \toprule
@@ -1224,14 +1193,13 @@ We mostly focus on games with two players.
   \end{center}
   For example, if the row player chooses $S$ and the column player chooses $T$, then the payoff of the row player is $0$ and the payoff of the column player is $3$.
 
-  This comes from the following hypothetical scenario: 
+  Note that higher payoff is desired, so a longer serving time corresponds to a lower payoff. Also, payoffs are interpreted relatively, so replacing $(0, 3)$ with $(0, 100)$ (and $(3, 0)$ with $(100, 0)$) in the payoff table would make no difference.
 
-  Alice and Bob commit a crime together, and are caught by the police. They can choose to remain silent ($S$) or testify ($T$). If both keep silent, the police has little evidence and they go to jail for a short period of time, hence the $(2, 2)$ payoff. If one testifies and one remains silent, the one who testifies gets awarded and is freed (payoff $3$), while the other gets stuck in jail for a long time (payoff $0$). If both testify, then they both go to jail and the payoffs are $(1, 1)$.
-
-  The problem is that regardless of what the other person does, it is always strictly better to testify than not. We say $T$ is a \emph{dominant strategy}, and $(1, 1)$ is \emph{Pareto dominated} by $(2, 2)$.
+  Here we see that regardless of what the other person does, it is always strictly better to testify than not (unless you want to be nice). We say $T$ is a \emph{dominant strategy}, and $(1, 1)$ is \emph{Pareto dominated} by $(2, 2)$.
 \end{eg}
 
-\begin{eg}[Chicken]\leavevmode
+\begin{eg}[Chicken]
+  The game of \emph{Chicken} is as follows: two people drive their cars towards each other at high speed. If they collide, they will die. Hence they can decide to chicken out ($C$) or continue driving ($D$). If both don't chicken, they die, which is bad. If one chickens and the other doesn't the person who chicken looks silly (but doesn't die). If both chicken out, they both look slightly silly. This can be represented by the following table:
   \begin{center}
     \begin{tabular}{ccc}
       \toprule
@@ -1242,9 +1210,7 @@ We mostly focus on games with two players.
       \bottomrule
     \end{tabular}
   \end{center}
-  The story is this: Two people drive a car towards each other. They can choose to continue driving, or chicken out and swerve away. If both don't chicken, they die, and the payoffs are both $(0, 0)$. If one chickens and the other doesn't, the person who chickens has a low payoff $1$ (but better than dying) while the person who didn't has a high payoff $3$. If both chicken out, their payoffs are in the middle, $(2, 2)$, since they don't die, but both are chickens.
-
-  Here there is no dominating strategy, so we need a different way of deciding.
+  Here there is no dominating strategy, so we need a different way of deciding what to do.
 
   Instead, we define the \emph{security level} of the row player to be
   \[
@@ -1261,7 +1227,7 @@ We mostly focus on games with two players.
       x &\geq 0
     \end{align*}
   \end{center}
-  It should be clear that the maximin strategy is to chicken. However, this isn't really what we are looking for, since if both players employ this maximin strategy, it would be better for you to chicken out.
+  Here the maximin strategy is to chicken. However, this isn't really what we are looking for, since if both players employ this maximin strategy, it would be better for you to not chicken out.
 \end{eg}
 
 \begin{defi}[Best response and equilibrium]
@@ -1277,13 +1243,14 @@ We mostly focus on games with two players.
 \end{eg}
 
 \begin{thm}[Nash, 1961]
-  Every bimatrix game has an equilibrium game.
+  Every bimatrix game has an equilibrium.
 \end{thm}
 
 \subsection{The minimax theorem}
 \begin{defi}[Zero-sum game]
   A bimatrix game is a \emph{zero-sum game}, or matrix game, if $q_{ij} = -p_{ij}$ for all $i, j$, ie. the total payoff is always 0.
 \end{defi}
+To specify a matrix game, we only need one matrix, not two, since the matrix of the other player is simply the negative of the matrix of the first.
 
 \begin{thm}[von Neumann, 1928]
   If $P\in \R^{m\times n}$. Then
@@ -1294,9 +1261,9 @@ We mostly focus on games with two players.
   \[
     \max_{x\in X}\min_{y\in Y} p(x, y) = -\max_{y\in Y}\min_{x\in X} -p(x, y).
   \]
-  The left hand side is the worst payoff the row player can get if he employs the maximin strategy. The right hand side is the worst payoff the column player can get if he uses his maximin strategy.
-  
-  The theorem states that the two both sides will end up with the same maximin strategy, and this will form an equilibrium.
+  The left hand side is the worst payoff the row player can get if he employs the minimax strategy. The right hand side is the worst payoff the column player can get if he uses his minimax strategy.
+
+  The theorem says that if both players employ the minimax strategy, then this is an equilibrium.
 \end{thm}
 
 \begin{proof}
@@ -1315,14 +1282,15 @@ We mostly focus on games with two players.
   \]
   where $w\in \R$ and $y\in \R^n$ are Lagrange multipliers. This is equal to
   \[
-    \left(1 - \sum_{j = 1}^n y_j\right)v + \sum_{i = 1}^m \left(\sum_{j = 1}^n p_{ij}y_j - w\right)x_i- \sum_{j = 1}^n w_j z_j + w.
+    \left(1 - \sum_{j = 1}^n y_j\right)v + \sum_{i = 1}^m \left(\sum_{j = 1}^n p_{ij}y_j - w\right)x_i- \sum_{j = 1}^n y_j z_j + w.
   \]
-  The dual is therefore
+  This has finite minimum for all $v\in \R, x \geq 0$ iff $\sum y_i = 1$, $\sum p_{ij}y_j \leq w$ for all $i$, and $y \geq 0$. The dual is therefore
   \begin{center}
     minimize $w$ subject to
     \begin{align*}
-      \sum_{j = 1}^m p_{ij}y_j &\leq w\quad\text{ for all }i\\
-      \sum_{y_j} &= 1
+      \sum_{j = 1}^n p_{ij}y_j &\leq w\quad\text{ for all }i\\
+      \sum_{j = 1}^n {y_j} &= 1\\
+      y &\geq 0
     \end{align*}
   \end{center}
   This corresponds to the column player choosing a strategy $(y_i)$ such that the expected payoff is bounded above by $w$.
@@ -1330,7 +1298,8 @@ We mostly focus on games with two players.
   The optimum value of the dual is $\displaystyle\min_{y\in Y}\max_{x\in X}p(x, y)$. So the result follows from strong duality.
 \end{proof}
 
-\begin{thm}[]
+In general, the equilibrium are given by
+\begin{thm}
   $(x, y)\in X\times Y$ is an equilibrium of the matrix game with payoff matrix $P$ if and only if
   \begin{align*}
     \min_{y'\in Y} p(x, y') &= \max_{x' \in X}\min_{y'\in Y} p(x', y')\\
@@ -1341,11 +1310,11 @@ We mostly focus on games with two players.
 
 Proof is in the second example sheet.
 
-\section{The minimum-cost flow problem}
-We will need some definitions from graph theory.
+\section{Network problems}
 \subsection{Definitions}
+We will need some definitions from graph theory.
 \begin{defi}[Directed graph/network]
-  A \emph{directed graph} or \emph{network} is a pair $G = (V, E)$, where $V$ is the set of vertices and $E\subseteq V\times V$ is the set of edges.
+  A \emph{directed graph} or \emph{network} is a pair $G = (V, E)$, where $V$ is the set of vertices and $E\subseteq V\times V$ is the set of edges. If $(u, v)\in E$, we say there is an edge from $u$ to $v$.
 \end{defi}
 
 \begin{defi}[Degree]
@@ -1381,9 +1350,9 @@ Let $G = (V, E)$ be a directed graph. Let the number of vertices be $|V| = n$ an
 
 Each component of the vector $b_i$ denotes the amount of flow entering or leaving each vertex $i\in V$. If $b_i > 0$, we call $i\in V$ a source. For example, if we have a factory at $b_i$ that produces stuff, $b_i$ will be positive. This is only the amount of stuff produced or consumed in the vertex, and not how many things flow through the vertex.
 
-$c_{ij}$ is the cost of transferring one unit of stuff from vertex $i$ to vertex $j$ (fill entries with $0$ if there is no edge between the vertices), and $\underline{m}_{ij}$ and $\overline{m}_{ij}$ denote the lower and upper bounds on the amount of flow along $(i, j)\in E$.
+$c_{ij}$ is the cost of transferring one unit of stuff from vertex $i$ to vertex $j$ (fill entries with $0$ if there is no edge between the vertices), and $\underline{m}_{ij}$ and $\overline{m}_{ij}$ denote the lower and upper bounds on the amount of flow along $(i, j)\in E$ respectively.
 
-$x\in \R^{n\times n}$ is a minimum-cost flow if it minimizes the cost of transferring stuff, ie. it is an optimal solution to the problem
+$x\in \R^{n\times n}$ is a minimum-cost flow if it minimizes the cost of transferring stuff, while satisfying the constraints, ie. it is an optimal solution to the problem
 \begin{center}
   minimize $\displaystyle\sum_{(i, j)\in E}c_{ij}x_{ij}$ subject to
   \[
@@ -1404,13 +1373,13 @@ This problem is a linear program. In theory, we can write it into the general fo
 \]
 However, using this huge matrix to solve this problem by the simplex method is not very efficient. So we will look for better solutions.
 
-Note that for the system to be closed, we must have
+Note that for the system to make sense, we must have
 \[
   \sum_{i\in V}b_i = 0.
 \]
-To simplify the problem, we can convert it into an equivalent \emph{circulation problem} where $b_i = 0$ for all $i$. We do this by adding an additional vertex where we send all the extra $b_i$ to. (eg if a vertex has $b_i = -1$, then it takes in more stuff than it gives out, so we can mandate it to send out one extra unit to the additional vertex, and then $b_i = 0$).
+To simplify the problem, we can convert it into an equivalent \emph{circulation problem}, where $b_i = 0$ for all $i$. We do this by adding an additional vertex where we send all the extra $b_i$ to. (eg if a vertex has $b_i = -1$, then it takes in more stuff than it gives out, so we can mandate it to send out one extra unit to the additional vertex, and then $b_i = 0$).
 
-An \emph{uncapacitated problem} is a case where $\underline{m}_{ij} = 0$and $\overline{m}_{ij} = \infty$ for all $(i, j) \in E$. An uncapacitated problem is either unbounded, or bounded. If it is bounded, then it is equivalent to a problem with finite capacities, since we can add a bound greater than what the optimal solution wants.
+An \emph{uncapacitated problem} is a case where $\underline{m}_{ij} = 0$ and $\overline{m}_{ij} = \infty$ for all $(i, j) \in E$. An uncapacitated problem is either unbounded or bounded. If it is bounded, then it is equivalent to a problem with finite capacities, since we can add a bound greater than what the optimal solution wants.
 
 We are going to show that this can be reduced to a simpler problem:
 
@@ -1450,19 +1419,36 @@ We now claim that every (bounded) minimum cost-flow problem can be reduced to th
   For every $i\in V$, add a consumer with demand $\left(\sum_{k: (i, k)\in E}\overline{m}_{ik}\right) - b_i$.
 
   For every $(i, j)\in E$, add a supplier with supply $\overline{m}_{ij}$, an edge to consumer $i$ with cost $c_{(ij, i)} = 0$ and an edge to consumer $j$ with cost $c_{(ij, j)} = c_{ij}$.
-  % insert diagram
 
-  We now claim that there is a one-to-one correspondence between flows in the original problem and the new problem, and they have equal costs.
+  \begin{center}
+    \begin{tikzpicture}
+      \node [draw, circle, inner sep=0, minimum width=0.6cm] (ij) at (0, 0) {$ij$};
+      \node [draw, circle, inner sep=0, minimum width=0.6cm] (i) at (2, 1) {$i$};
+      \node [draw, circle, inner sep=0, minimum width=0.6cm] (j) at (2, -1) {$j$};
+      \draw [->] (ij) -- (i) node [pos=0.5, above] {$0$};
+      \draw [->] (ij) -- (j) node [pos=0.5, below] {$c_{ij}$};
+      \draw [->] (-1.5, 0) node [left] {$\overline{m}_{ij}$} -- (ij);
+      \draw [->] (i) -- +(1.5, 0) node [right] {$\sum_{k: (i, k)\in E}\overline{m}_{ik} - b_i$};
+      \draw [->] (j) -- +(1.5, 0) node [right] {$\sum_{k: (j, k)\in E}\overline{m}_{jk} - b_j$};
+    \end{tikzpicture}
+  \end{center}
+  The idea is that if the capacity of the edge $(i, j)$ is, say, 5, in the original network, and we want to transport $3$ along this edge, then in the new network, we send $3$ units from $ij$ to $j$, and $2$ units to $i$.
 
-  For any flow $X$, the flow on $(ij, j)$ is $x_{ij}$ and the flow on $(ij, i)$ is $\overline{m}_{ij} - x_{ij}$.  The total flow into $i$ is then
+  The tricky part of the proof is to show that we have the same constraints in both graphs.
+
+  For any flow $x$ in the original network, the corresponding flow on $(ij, j)$ is $x_{ij}$ and the flow on $(ij, i)$ is $\overline{m}_{ij} - x_{ij}$.  The total flow into $i$ is then
   \[
-    \sum_{k: (i, j)\in E})(\overline{m}_{ik} - x_{ij}) + \sum_{k: (k, i)\in E}x_{ki} = \sum_{k: (i, k)\in E}\overline{m}_{ik} - b_i.
+   \sum_{k: (i, j)\in E}(\overline{m}_{ik} - x_{ij}) + \sum_{k: (k, i)\in E}x_{ki}
   \]
-  This will be the case if and only if
+  This satisfies the constraints of the new network if and only if
+  \[
+   \sum_{k: (i, j)\in E}(\overline{m}_{ik} - x_{ij}) + \sum_{k: (k, i)\in E}x_{ki} = \sum_{k: (i, k)\in E}\overline{m}_{ik} - b_i,
+  \]
+  which is true if and only if
   \[
     b_i + \sum_{k:(k, i)\in E}x_{ki} - \sum_{k: (i, k)\in E}x_{ik} = 0,
   \]
-  which is exactly the flow conservation constraint for the node $i$ in the original minimal-cost flow problem.
+  which is exactly the constraint for the node $i$ in the original minimal-cost flow problem.
 \end{proof}
 To solve the transportation problem, it is convenient to have two sets of Lagrange multipliers, one for the supplier constraints and one for the consumer constraint. Then the Lagrangian of the transportation problem can be written as
 \[
@@ -1482,96 +1468,94 @@ At an optimum, complementary slackness entails that
 \]
 for all $i, j$.
 
-We will have a simplex tableau as follows:
+In this case, we have a tableau as follows:
 \newcommand\bb[1]{\multicolumn{1}{|c|}{#1}}
 \newcommand\bbb[1]{\multicolumn{2}{c|}{#1}}
+\newcommand\bbbb[1]{\multicolumn{2}{c}{#1}}
 \begin{center}
   \begin{tabular}{c|cc|cc|cc|cc|c}
-    & \bbb{$\mu_1$} & \bbb{$\mu_2$} & \bbb{$\mu_3$} & \bbb{$\mu_4$}\\\hline
+    \multicolumn{1}{c}{ } & \bbbb{$\mu_1$} & \bbbb{$\mu_2$} & \bbbb{$\mu_3$} & \bbbb{$\mu_4$}\\\cline{2-9}
     & \bbb{$\lambda_1 - \mu_1$} & \bbb{$\lambda_1 - \mu_2$} & \bbb{$\lambda_1 - \mu_3$} & \bbb{$\lambda_1 - \mu_4$}\\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-    $\lambda_1$ & $x_{11}$ & \bb{$c_{11}$} & $x_{12}$ & \bb{$c_{12}$} & $x_{13}$ & \bb{$c_{13}$} & $x_{14}$ & \bb{$c_{14}$} & $s_1$\\\hline
+    $\lambda_1$ & $x_{11}$ & \bb{$c_{11}$} & $x_{12}$ & \bb{$c_{12}$} & $x_{13}$ & \bb{$c_{13}$} & $x_{14}$ & \bb{$c_{14}$} & $s_1$\\\cline{2-9}
     & \bbb{$\lambda_2 - \mu_1$} & \bbb{$\lambda_2 - \mu_2$} & \bbb{$\lambda_2 - \mu_3$} & \bbb{$\lambda_2 - \mu_4$}\\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-    $\lambda_2$ & $x_{21}$ & \bb{$c_{21}$} & $x_{22}$ & \bb{$c_{22}$} & $x_{23}$ & \bb{$c_{23}$} & $x_{24}$ & \bb{$c_{24}$} & $s_1$\\\hline
+    $\lambda_2$ & $x_{21}$ & \bb{$c_{21}$} & $x_{22}$ & \bb{$c_{22}$} & $x_{23}$ & \bb{$c_{23}$} & $x_{24}$ & \bb{$c_{24}$} & $s_1$\\\cline{2-9}
     & \bbb{$\lambda_3 - \mu_1$} & \bbb{$\lambda_3 - \mu_2$} & \bbb{$\lambda_3 - \mu_3$} & \bbb{$\lambda_3 - \mu_4$}\\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-    $\lambda_3$ & $x_{31}$ & \bb{$c_{31}$} & $x_{32}$ & \bb{$c_{32}$} & $x_{33}$ & \bb{$c_{33}$} & $x_{34}$ & \bb{$c_{34}$} & $s_1$\\\hline
-    & \bbb{$d_1$} & \bbb{$d_2$} & \bbb{$d_3$} & \bbb{$d_4$}\\
+    $\lambda_3$ & $x_{31}$ & \bb{$c_{31}$} & $x_{32}$ & \bb{$c_{32}$} & $x_{33}$ & \bb{$c_{33}$} & $x_{34}$ & \bb{$c_{34}$} & $s_1$\\\cline{2-9}
+    \multicolumn{1}{c}{ }& \bbbb{$d_1$} & \bbbb{$d_2$} & \bbbb{$d_3$} & \bbbb{$d_4$}\\
   \end{tabular}
 \end{center}
 We have a row for each supplier and a column for each consumer.
 \begin{eg}
-  Suppose we have three suppliers with supplies $8, 10, 9$, and 4 consumers with demands $4, 5, 8, 8$.
+  Suppose we have three suppliers with supplies $8, 10$ and $9$, and 4 consumers with demands $4, 5, 8, 8$.
 
   It is easy to create an initial feasible solution - we just start from the first consumer and first supplier, and supply as much as we can until one side runs out of stuff.
 
   We first fill our tableau with our feasible solution.
   \begin{center}
     \begin{tabular}{c|cc|cc|cc|cc|c}
-      &   &        &   &        &   &        &   &        & \\\hline
+      \cline{2-9}
       &   &        &   &        &   &        &   &        & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      & 6 & \bb{5} & 2 & \bb{3} &   & \bb{4} &   & \bb{6} & 8\\\hline
+      & 6 & \bb{5} & 2 & \bb{3} &   & \bb{4} &   & \bb{6} & 8\\\cline{2-9}
       &   &        &   &        &   &        &   &        & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      &   & \bb{2} & 3 & \bb{7} & 7 & \bb{4} &   & \bb{1} & 10\\\hline
+      &   & \bb{2} & 3 & \bb{7} & 7 & \bb{4} &   & \bb{1} & 10\\\cline{2-9}
       &   &        &   &        &   &        &   &        & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      &   & \bb{5} &   & \bb{6} & 1 & \bb{2} & 8 & \bb{4} & 9\\\hline
-      & \bbb{6}   & \bbb{5} &\bbb{8} & \bbb{8} &
+      &   & \bb{5} &   & \bb{6} & 1 & \bb{2} & 8 & \bb{4} & 9\\\cline{2-9}
+      \multicolumn{1}{c}{ }& \bbbb{6}   & \bbbb{5} &\bbbb{8} & \bbbb{8} &
     \end{tabular}
   \end{center}
   \begin{center}
     \begin{tikzpicture}
-      \node at (0, 0) [circ] {};
+      \node (s1) at (0, 0) [circ] {};
       \node at (0, 0) [left] {$8 = s_1$};
-      \node at (0, -1) [circ] {};
+      \node (s2) at (0, -1) [circ] {};
       \node at (0, -1) [left] {$10 = s_2$};
-      \node at (0, -2) [circ] {};
+      \node (s3) at (0, -2) [circ] {};
       \node at (0, -2) [left] {$9 = s_3$};
 
-      \node at (1, 0) [circ] {};
-      \node at (1, 0) [right] {$d_1 = 6$};
-      \node at (1, -1) [circ] {};
-      \node at (1, -1) [right] {$d_2 = 5$};
-      \node at (1, -2) [circ] {};
-      \node at (1, -2) [right] {$d_3 = 8$};
-      \node at (1, -3) [circ] {};
-      \node at (1, -3) [right] {$d_4 = 8$};
+      \node (d1) at (2, 0) [circ] {};
+      \node at (2, 0) [right] {$d_1 = 6$};
+      \node (d2) at (2, -1) [circ] {};
+      \node at (2, -1) [right] {$d_2 = 5$};
+      \node (d3) at (2, -2) [circ] {};
+      \node at (2, -2) [right] {$d_3 = 8$};
+      \node (d4) at (2, -3) [circ] {};
+      \node at (2, -3) [right] {$d_4 = 8$};
 
-      \draw [->] (0, 0) -- (1, 0) node [pos=0.5, above] {\tiny 6};
-      \draw [->] (0, 0) -- (1, -1) node [pos=0.5, above] {\tiny 2};
-      \draw [->] (0, -1) -- (1, -1) node [pos=0.5, above] {\tiny 3};
-      \draw [->] (0, -1) -- (1, -2) node [pos=0.5, above] {\tiny 7};
-      \draw [->] (0, -2) -- (1, -2) node [pos=0.5, above] {\tiny 1};
-      \draw [->] (0, -2) -- (1, -3) node [pos=0.5, above] {\tiny 8};
+      \draw [->] (s1) -- (d1) node [pos=0.5, above] {\tiny 6};
+      \draw [->] (s1) -- (d2) node [pos=0.5, above] {\tiny 2};
+      \draw [->] (s2) -- (d2) node [pos=0.5, above] {\tiny 3};
+      \draw [->] (s2) -- (d3) node [pos=0.5, above] {\tiny 7};
+      \draw [->] (s3) -- (d3) node [pos=0.5, above] {\tiny 1};
+      \draw [->] (s3) -- (d4) node [pos=0.5, above] {\tiny 8};
     \end{tikzpicture}
   \end{center}
-  % insert diagram
   We see that our basic feasible solution corresponds to a spanning tree. In general, if we have $n$ suppliers and $m$ consumers, then we have $n + m$ vertices, and hence $n + m - 1$ edges. So we have $n + m - 1$ dual constraints. So we can arbitrarily choose one Lagrange multiplier, and the other Lagrange multipliers will follow. We choose $\lambda_1 = 0$. Since we require
   \[
     (c_{ij} - \lambda_i + \mu_i)x_{ij} = 0,
   \]
-  for edges in the spanning tree, $x_{ij} \not= 0$. So $c_{ij} - \lambda_i + \mu_i = 0$. Hence we must have $\mu_1 = - - \lambda_i + \mu_i = 0$. Hence we must have $\mu_1 = -5$. We can fill in the values of the other Lagrange multipliers as follows, and obtain
+  for edges in the spanning tree, $x_{ij} \not= 0$. So $c_{ij} - \lambda_i + \mu_i = 0$. Hence we must have $\mu_1 = -5$. We can fill in the values of the other Lagrange multipliers as follows, and obtain
 
   \begin{center}
-    \begin{tabular}{c|cc|cc|cc|cc|c}
-      & \bbb{-5} & \bbb{-3} & \bbb{0} & \bbb{-2}\\\hline
-      &   &        &   &        &   &        &   &        & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      0 & 6 & \bb{5} & 2 & \bb{3} &   & \bb{4} &   & \bb{6} & 8\\\hline
-      &   &        &   &        &   &        &   &        & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      4 &   & \bb{2} & 3 & \bb{7} & 7 & \bb{4} &   & \bb{1} & 10\\\hline
-      &   &        &   &        &   &        &   &        & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      2 &   & \bb{5} &   & \bb{6} & 1 & \bb{2} & 8 & \bb{4} & 9\\\hline
-      & \bbb{6}   & \bbb{5} &\bbb{8} & \bbb{8} &
+    \begin{tabular}{c|cc|cc|cc|cc|}
+      \multicolumn{1}{c}{ }& \bbbb{-5} & \bbbb{-3} & \bbbb{0} & \bbbb{-2}\\\cline{2-9}
+      &   &        &   &        &   &        &   &       \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+      0 & 6 & \bb{5} & 2 & \bb{3} &   & \bb{4} &   & \bb{6}\\\cline{2-9}
+      &   &        &   &        &   &        &   &       \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+      4 &   & \bb{2} & 3 & \bb{7} & 7 & \bb{4} &   & \bb{1}\\\cline{2-9}
+      &   &        &   &        &   &        &   &       \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+      2 &   & \bb{5} &   & \bb{6} & 1 & \bb{2} & 8 & \bb{4}\\\cline{2-9}
     \end{tabular}
   \end{center}
   We can fill in the values of $\lambda_i - \mu_i$:
   \begin{center}
-    \begin{tabular}{c|cc|cc|cc|cc|c}
-      & \bbb{-5} & \bbb{-3} & \bbb{0} & \bbb{-2}\\\hline
+    \begin{tabular}{c|cc|cc|cc|cc|}
+      \multicolumn{1}{c}{ }& \bbbb{-5} & \bbbb{-3} & \bbbb{0} & \bbbb{-2}\\\cline{2-9}
       &   &        &   &        & \bbb{0} & \bbb{2} \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      0 & 6 & \bb{5} & 2 & \bb{3} &   & \bb{4} &   & \bb{6} & 8\\\hline
-      & \bbb9       &   &        &   &        & \bbb{6}     & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      4 &   & \bb{2} & 3 & \bb{7} & 7 & \bb{4} &   & \bb{1} & 10\\\hline
-      & \bbb{7} & \bbb{5}  &   &        &   &        & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      2 &   & \bb{5} &   & \bb{6} & 1 & \bb{2} & 8 & \bb{4} & 9\\\hline
-      & \bbb{6}   & \bbb{5} &\bbb{8} & \bbb{8} &
+      0 & 6 & \bb{5} & 2 & \bb{3} &   & \bb{4} &   & \bb{6}\\\cline{2-9}
+      & \bbb9       &   &        &   &        & \bbb{6}    \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+      4 &   & \bb{2} & 3 & \bb{7} & 7 & \bb{4} &   & \bb{1}\\\cline{2-9}
+      & \bbb{7} & \bbb{5}  &   &        &   &       \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+      2 &   & \bb{5} &   & \bb{6} & 1 & \bb{2} & 8 & \bb{4}\\\cline{2-9}
     \end{tabular}
   \end{center}
   The dual feasibility condition is
@@ -1580,71 +1564,123 @@ We have a row for each supplier and a column for each consumer.
   \]
   If it is satisfied everywhere, we have optimality. Otherwise, will have to do something.
 
-  What we do is add an edge, say from 10 to the second 8. Then we have created a cycle. We keep increasing the flow on the new edge. This causes the values on other edges to change by flow conservation. So we keep doing this until some other edge reaches zero.
+  What we do is add an edge, say from the second supplier to the second consumer. Then we have created a cycle. We keep increasing the flow on the new edge. This causes the values on other edges to change by flow conservation. So we keep doing this until some other edge reaches zero.
 
   If we increase flow by, say, $\delta$, we have
   \begin{center}
-    \begin{tabular}{c|cc|cc|cc|cc|c}
-      &  &  &  & &&&&\\\hline
-      &   &        &   &     &&&   &  &  \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      & $6 - \delta$ & \bb{5} & $2 + \delta$ & \bb{3} &   & \bb{4} &   & \bb{6} & 8\\\hline
-      &        &   &        &   & &&       &      & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      & $\delta$ & \bb{2} & $3 - \delta$ & \bb{7} & 7 & \bb{4} &   & \bb{1} & 10\\\hline
-      &  &   &   &        &   &    &    & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      &   & \bb{5} &   & \bb{6} & 1 & \bb{2} & 8 & \bb{4} & 9\\\hline
-      & \bbb{6}   & \bbb{5} &\bbb{8} & \bbb{8} &
+    \begin{tabular}{c|cc|cc|cc|cc|}
+      \cline{2-9}
+      &   &        &   &     &&&   &  \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+      & $6 - \delta$ & \bb{5} & $2 + \delta$ & \bb{3} &   & \bb{4} &   & \bb{6}\\\cline{2-9}
+      &        &   &        &   & &&       &     \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+      & $\delta$ & \bb{2} & $3 - \delta$ & \bb{7} & 7 & \bb{4} &   & \bb{1}\\\cline{2-9}
+      &  &   &   &        &   &    &  & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+      &   & \bb{5} &   & \bb{6} & 1 & \bb{2} & 8 & \bb{4}\\\cline{2-9}
     \end{tabular}
   \end{center}
+
+  \begin{center}
+    \begin{tikzpicture}
+      \node (s1) at (0, 0) [circ] {};
+      \node at (0, 0) [left] {$8 = s_1$};
+      \node (s2) at (0, -1) [circ] {};
+      \node at (0, -1) [left] {$10 = s_2$};
+      \node (s3) at (0, -2) [circ] {};
+      \node at (0, -2) [left] {$9 = s_3$};
+
+      \node (d1) at (2, 0) [circ] {};
+      \node at (2, 0) [right] {$d_1 = 6$};
+      \node (d2) at (2, -1) [circ] {};
+      \node at (2, -1) [right] {$d_2 = 5$};
+      \node (d3) at (2, -2) [circ] {};
+      \node at (2, -2) [right] {$d_3 = 8$};
+      \node (d4) at (2, -3) [circ] {};
+      \node at (2, -3) [right] {$d_4 = 8$};
+
+      \draw [->] (s1) -- (d1) node [pos=0.5, above] {\tiny $6 - \delta$};
+      \draw [->] (s1) -- (d2) node [pos=0.5, above] {\tiny $2 + \delta$};
+      \draw [->] (s2) -- (d2) node [pos=0.5, above] {\tiny $3 - \delta$};
+      \draw [->] (s2) -- (d3) node [pos=0.5, above] {\tiny 7};
+      \draw [->] (s3) -- (d3) node [pos=0.5, above] {\tiny 1};
+      \draw [->] (s3) -- (d4) node [pos=0.5, above] {\tiny 8};
+      \draw [dashed, ->] (s2) -- (d1) node [pos=0.3, above] {\tiny $\delta$};
+    \end{tikzpicture}
+  \end{center}
+
 
   The maximum value of $\delta$ we can take is $3$. So we end up with
 
   \begin{center}
-    \begin{tabular}{c|cc|cc|cc|cc|c}
-      & \bbb{-5} & \bbb{-3} & \bbb{-7} & \bbb{-9} &\\\hline
-      &      &   &     &    & \bbb7   &  \bbb9  \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      0 & 3 & \bb{5} & 5 & \bb{3} &   & \bb{4} &   & \bb{6} & 8\\\hline
-      &   &        & \bbb0      &   &        &  \bbb9 \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      -3 & 3 & \bb{2} &  & \bb{7} & 7 & \bb{4} &   & \bb{1} & 10\\\hline
-      & \bbb0       & \bbb{-2}        &    &    & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      -5 &   & \bb{5} &   & \bb{6} & 1 & \bb{2} & 8 & \bb{4} & 9\\\hline
-      & \bbb{6}   & \bbb{5} &\bbb{8} & \bbb{8} &
+    \begin{tabular}{c|cc|cc|cc|cc|}
+      \cline{2-9}
+      &      &   &     &    &    & &&   \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+       & 3 & \bb{5} & 5 & \bb{3} &   & \bb{4} &   & \bb{6}\\\cline{2-9}
+      &   &        & &      &   &        &  & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+       & 3 & \bb{2} &  & \bb{7} & 7 & \bb{4} &   & \bb{1}\\\cline{2-9}
+      & &       &         &    &    & & &\\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+       &   & \bb{5} &   & \bb{6} & 1 & \bb{2} & 8 & \bb{4}\\\cline{2-9}
     \end{tabular}
   \end{center}
 
-  Note that we have to re-compute the Lagrange multipliers. We see a violation at the bottom right. So we do it again:
+  We re-compute the Lagrange multipliers to obtain
   \begin{center}
-    \begin{tabular}{c|cc|cc|cc|cc|c}
-      & & & & & & & & &\\\hline
+    \begin{tabular}{c|cc|cc|cc|cc|}
+      \multicolumn{1}{c}{ }& \bbbb{-5} & \bbbb{-3} & \bbbb{-7} & \bbbb{-9}\\\cline{2-9}
+      &      &   &     &    & \bbb7   &  \bbb9  \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+      0 & 3 & \bb{5} & 5 & \bb{3} &   & \bb{4} &   & \bb{6}\\\cline{2-9}
+      &   &        & \bbb0      &   &        &  \bbb9 \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+      -3 & 3 & \bb{2} &  & \bb{7} & 7 & \bb{4} &   & \bb{1}\\\cline{2-9}
+      & \bbb0       & \bbb{-2}        &    &    & & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+      -5 &   & \bb{5} &   & \bb{6} & 1 & \bb{2} & 8 & \bb{4}\\\cline{2-9}
+    \end{tabular}
+  \end{center}
+
+  We see a violation at the bottom right. So we do it again:
+
+  \begin{center}
+    \begin{tabular}{c|cc|cc|cc|cc|}
+      \cline{2-9}
       &      &   &     &    & &   &  &  \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      & 3 & \bb{5} & 5 & \bb{3} &   & \bb{4} &   & \bb{6} & 8\\\hline
+      & 3 & \bb{5} & 5 & \bb{3} &   & \bb{4} &   & \bb{6}\\\cline{2-9}
       &   &        & &      &   &        &  & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      & 3 & \bb{2} &  & \bb{7} & $7 - \delta$ & \bb{4} & $\delta$ & \bb{1} & 10\\\hline
-      &        & &&        &    &    & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      &   & \bb{5} &   & \bb{6} & $1 + \delta$ & \bb{2} & $8 - \delta$ & \bb{4} & 9\\\hline
-      & \bbb{6}   & \bbb{5} &\bbb{8} & \bbb{8} &
+      & 3 & \bb{2} &  & \bb{7} & $7 - \delta$ & \bb{4} & $\delta$ & \bb{1}\\\cline{2-9}
+      &     &   & &&        &    &    & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+      &   & \bb{5} &   & \bb{6} & $1 + \delta$ & \bb{2} & $8 - \delta$ & \bb{4}\\\cline{2-9}
     \end{tabular}
   \end{center}
 
   The maximum possible value of $\delta$ is 7. So we have
   \begin{center}
-    \begin{tabular}{c|cc|cc|cc|cc|c}
-      & \bbb{-5} & \bbb{-3} & \bbb{-2} & \bbb{-4} &\\\hline
+    \begin{tabular}{c|cc|cc|cc|cc|}
+      \cline{2-9}
+      &      &   &     &    & &   &  &  \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+      & 3 & \bb{5} & 5 & \bb{3} &   & \bb{4} &   & \bb{6}\\\cline{2-9}
+      &   &        & &      &   &     &  & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+      & 3 & \bb{2} &  & \bb{7} &  & \bb{4} & 7 & \bb{1}\\\cline{2-9}
+      & & & &      &    &  &  & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
+      &   & \bb{5} &   & \bb{6} & 8 & \bb{2} & 1 & \bb{4}\\\cline{2-9}
+    \end{tabular}
+  \end{center}
+
+  Calculating the Lagrange multipliers gives
+  \begin{center}
+    \begin{tabular}{c|cc|cc|cc|cc|}
+      \multicolumn{1}{c}{}& \bbbb{-5} & \bbbb{-3} & \bbbb{-2} & \bbbb{-4} \\\cline{2-9}
       &      &   &     &    & \bbb2   &  \bbb4  \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      0 & 3 & \bb{5} & 5 & \bb{3} &   & \bb{4} &   & \bb{6} & 8\\\hline
+      0 & 3 & \bb{5} & 5 & \bb{3} &   & \bb{4} &   & \bb{6}\\\cline{2-9}
       &   &        & \bbb0      &   \bbb{-1}     &  & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      -3 & 3 & \bb{2} &  & \bb{7} &  & \bb{4} & 7 & \bb{1} & 10\\\hline
+      -3 & 3 & \bb{2} &  & \bb{7} &  & \bb{4} & 7 & \bb{1}\\\cline{2-9}
       & \bbb{5} & \bbb{3}      &    &  &  & \\\cline{3-3}\cline{5-5}\cline{7-7}\cline{9-9}
-      0 &   & \bb{5} &   & \bb{6} & 8 & \bb{2} & 1 & \bb{4} & 9\\\hline
-      & \bbb{6}   & \bbb{5} &\bbb{8} & \bbb{8} &
+      0 &   & \bb{5} &   & \bb{6} & 8 & \bb{2} & 1 & \bb{4}\\\cline{2-9}
     \end{tabular}
   \end{center}
   No more violations. Finally. So this is the optimal solution.
 \end{eg}
 
-\section{The maximum flow problem}
+\subsection{The maximum flow problem}
 Suppose we have a network $(V, E)$ with a single source $1$ and a single sink $n$. There is no costs in transportation, but each edge has a capacity. We want to transport as much stuff from $1$ to $n$ as possible.
 
-We can turn this into a minimum-cost flow problem. We add an edge from $n$ to $1$ with $-1$ cost and infinite capacity. Then the minimal cost flow will cause as much stuff to flow from $n$ to $1$ as possible. So the same amount of stuff will have to flow from $1$ to $n$ through the network.
+We can turn this into a minimum-cost flow problem. We add an edge from $n$ to $1$ with $-1$ cost and infinite capacity. Then the minimal cost flow will maximize the flow from $n$ to $1$ as possible. So the same amount of stuff will have to flow from $1$ to $n$ through the network.
 
 We can write this is problem as
 \begin{center}
@@ -1664,7 +1700,7 @@ We can write this is problem as
 
 However, we don't have to turn it into a minimum-cost flow problem. There are easier ways to solve the problem, using the \emph{max-flow min-cut theorem}.
 
-\subsection{The max-flow min-cut theorem}
+\subsubsection{The max-flow min-cut theorem}
 
 \begin{defi}[Cut]
   Suppose $G = (V, E)$ with capacities $C_{ij}$ for $(i, j)\in E$. A \emph{cut} of $G$ is a partition of $V$ into two sets.
@@ -1728,7 +1764,7 @@ This says that the flow through the cut is less than the capacity through the cu
   \]
 \end{proof}
 
-\subsection{Ford-Fulkerson algorithm}
+\subsubsection{Ford-Fulkerson algorithm}
 The algorithm is simple:
 \begin{enumerate}
   \item Start from a feasible flow $x$, eg. $x = \mathbf{0}$.
@@ -1760,7 +1796,7 @@ The max-flow min-cut theorem plays a role in step (ii). We can immediately prove
       \node at (2, -1) [circ] {};
     \end{tikzpicture}
   \end{center}
-  We can keep adding flow until we reach (red is flow, black is capacity)
+  We can keep adding flow until we reach
   \begin{center}
     \begin{tikzpicture}[xscale=2]
       \node at (0, 0) [circ] {-};
@@ -1789,7 +1825,7 @@ The max-flow min-cut theorem plays a role in step (ii). We can immediately prove
       \node at (2, -1) [circ] {};
     \end{tikzpicture}
   \end{center}
-  We know this is an optimum, since our total flow is $6$, and we can draw a cut with capacity 6:
+  (red is flow, black is capacity). We know this is an optimum, since our total flow is $6$, and we can draw a cut with capacity 6:
   \begin{center}
     \begin{tikzpicture}[xscale=2]
       \node at (0, 0) [circ] {-};
