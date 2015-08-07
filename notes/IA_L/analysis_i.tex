@@ -1,15 +1,9 @@
 \documentclass[a4paper]{article}
 
-\usepackage[pdftex,
-  hidelinks,
-  pdfauthor={Dexter Chua},
-  pdfsubject={Cambridge Maths Notes: Part IA - Analysis I},
-  pdftitle={Part IA - Analysis I},
-pdfkeywords={Cambridge Mathematics Maths Math IA Lent Analysis I}]{hyperref}
-
-\title{Part IA - Analysis I}
-\author{Lectured by W. T. Gowers\\\small Notes taken by Dexter Chua}
-\date{Lent 2015}
+\def\npart {IA}
+\def\nterm {Lent 2015}
+\def\nlecturer {W. T. Gowers}
+\def\ncourse {Analysis I}
 
 \input{header}
 
@@ -25,7 +19,7 @@ Continuity of real- and complex-valued functions defined on subsets of $\R$ and 
 
 \vspace{10pt}
 \noindent\textbf{Differentiability}\\
-Differentiability of functions from $\R$ to $\R$. Derivative of sums and products. The chain rule. Derivative of the inverse function. Rolle's theorem; the mean value theorem. One-dimensional version of the inverse function theorem. Taylor's theorem from $\R$ to $\R$; Lagrange’s form of the remainder. Complex differentiation.\hspace*{\fill} [5]
+Differentiability of functions from $\R$ to $\R$. Derivative of sums and products. The chain rule. Derivative of the inverse function. Rolle's theorem; the mean value theorem. One-dimensional version of the inverse function theorem. Taylor's theorem from $\R$ to $\R$; Lagrange's form of the remainder. Complex differentiation.\hspace*{\fill} [5]
 
 \vspace{10pt}
 \noindent\textbf{Power series}\\
@@ -37,16 +31,29 @@ Definition and basic properties of the Riemann integral. A non-integrable functi
 
 \tableofcontents
 
+\setcounter{section}{-1}
+\section{Introduction}
+In IA Differential Equations, we studied calculus in a non-rigorous setting. While we did define differentiation (properly) as a limit, we did not define what a limit was. We didn't even have a proper definition of integral, and just mumbled something about it being an infinite sum.
+
+In Analysis, one of our main goals is to put calculus on a rigorous foundation. We will provide unambiguous definitions of what it means to take a limit, a derivative and an integral. Based on these definitions, we will prove the results we've had such as the product rule, quotient rule and chain rule. We will also rigorously prove the fundamental theorem of calculus, which states that the integral is the inverse operation to the derivative.
+
+However, this is not all Analysis is about. We will study all sorts of limiting (``infinite'') processes. We can see integration as an infinite sum, and differentiation as dividing two infinitesimal quantities. In Analysis, we will also study infinite series such as $1 + \frac{1}{4} + \frac{1}{9} + \frac{1}{16} + \cdots$, as well as limits of infinite sequences.
+
+Another important concept in Analysis is \emph{continuous functions}. In some sense, continuous functions are functions that preserve limit processes. While their role in this course is just being ``nice'' functions to work with, they will be given great importance when we study metric and topological spaces.
+
+This course is continued in IB Analysis II, where we study uniform convergence (a stronger condition for convergence), calculus of multiple variables and metric spaces.
 \section{The real number system}
-One can define real numbers as ``decimals'' consisting of infinitely many digits. However, while this is legitimate, it is not a convenient definition to work with. Instead, we define the real numbers to be ``an ordered field with the least upper bound property''. Then we can show that the decimals form ``an ordered field with the least upper bound property'' if we really want to.
+We are all familiar with real numbers - they are ``decimals'' consisting of infinitely many digits. When we really want to study real numbers, while this definition is technically valid, it is not a convenient definition to work with. Instead, we take an \emph{axiomatic} approach. We define the real numbers to be a set that satisfies certain properties, and, if we really want to, show that the decimals satisfy these properties. In particular, we define real numbers to be an ordered field with the least upper bound property.
+
+We'll now define what it means to be an ``ordered field with the least upper bound property''.
 \begin{defi}[Field]
   A \emph{field} is a set $\F$ with two binary operations $+$ and $\times$ that satisfies all the familiar properties satisfied by addition and multiplication in $\Q$, namely
   \begin{enumerate}
-    \item Associativity: $\forall a, b, c\in \F$, $a + (b + c) = (a + b) + c$ and $a\times (b\times c) = (a\times b)\times c$
-    \item Commutativity: $\forall a, b\in \F$, $a + b = b + a$ and $a\times b= b\times a$
-    \item Identity: $\exists 0, 1\in \F$ such that $\forall a$, $a + 0 = a$ and $a\times 1 = a$.
-    \item Inverses: $\forall a\in \F$, $\exists (-a)\in \F$ such that $a + (-a) = 0$. If $a\not= 0$, then $\exists a^{-1}$ such that $a\times a^{-1} = 1$.
-    \item Distributivity: $\forall a, b, c\in \F$, $a\times (b + c) = (a\times b) + (a\times c)$
+    \item $(\forall a, b, c)\,a + (b + c) = (a + b) + c$ and $a\times (b\times c) = (a\times b)\times c$ \hfill (associativity)
+    \item $(\forall a, b)\,a + b = b + a$ and $a\times b= b\times a$ \hfill (commutativity)
+    \item $\exists 0, 1$ such that $(\forall a)a + 0 = a$ and $a\times 1 = a$ \hfill (identity)
+    \item $\forall a\,\exists (-a)$ such that $a + (-a) = 0$. If $a\not= 0$, then $\exists a^{-1}$ such that $a\times a^{-1} = 1$. \hfill (inverses)
+    \item $(\forall a, b, c)\, a\times (b + c) = (a\times b) + (a\times c)$ \hfill (distributivity)
   \end{enumerate}
 \end{defi}
 
@@ -57,12 +64,13 @@ One can define real numbers as ``decimals'' consisting of infinitely many digits
 \begin{defi}[Totally ordered set]
   An \emph{(totally) ordered set} is a set $X$ with a relation $<$ that satisfies
   \begin{enumerate}
-    \item Transitivity: if $x, y, z\in X$, $x < y$ and $y < z$, then $x < z$
-    \item Trichotomy: if $x, y\in X$, exactly one of $x < y, x = y, y < x$ holds
+    \item If $x, y, z\in X$, $x < y$ and $y < z$, then $x < z$ \hfill (transitivity)
+    \item If $x, y\in X$, exactly one of $x < y, x = y, y < x$ holds \hfill (trichotomy)
   \end{enumerate}
 \end{defi}
 We call it a \emph{totally} ordered set, as opposed to simply an ordered set, when we want to emphasize the order is total, ie. every pair of elements are related to each other, as opposed to a \emph{partial order}, where ``exactly one'' in trichotomy is replaced with ``at most one''.
 
+Now to define an ordered field, we don't simply ask for a field with an order. The order has to interact nicely with the field operations. 
 \begin{defi}[Ordered field]
   An \emph{ordered field} is a field $\F$ with a relation $<$ that makes $\F$ into an ordered set such that
   \begin{enumerate}
@@ -80,12 +88,12 @@ We call it a \emph{totally} ordered set, as opposed to simply an ordered set, wh
 \end{proof}
 
 \begin{defi}[Least upper bound]
-  Let $X$ be an ordered set and let $A\subseteq X$. An \emph{upper bound} for $A$ is an element $x\in X$ such that $\forall a\in A(a \leq x)$. If $A$ has an upper bound, then we say that $A$ is \emph{bounded above}.
+  Let $X$ be an ordered set and let $A\subseteq X$. An \emph{upper bound} for $A$ is an element $x\in X$ such that $(\forall a\in A)\,a \leq x$. If $A$ has an upper bound, then we say that $A$ is \emph{bounded above}.
 
   An upper bound $x$ for $A$ is a \emph{least upper bound} or \emph{supremum} if nothing smaller that $x$ is an upper bound. That is, we need
   \begin{enumerate}
-    \item $\forall a\in A(a \leq x)$
-    \item $\forall y < x(\exists a\in A(a \geq y))$
+    \item $(\forall a\in A)\,a \leq x$
+    \item $(\forall y < x)(\exists a\in A)\,a \geq y$
   \end{enumerate}
 
   We usually write $\sup A$ for the supremum of $A$ when it exists. If $\sup A\in A$, then we call it $\max A$, the maximum of $A$.
@@ -108,23 +116,26 @@ Obvious modifications give rise to definitions of lower bound, greatest lower bo
 \begin{defi}[Real numbers]
   The \emph{real numbers} is an ordered field with the least upper bound property.
 \end{defi}
-Of course, it is \emph{very} important to show that this field is unique and there is at least one field that satisfies this property! But we are not doing that in this course.
+Of course, it is \emph{very} important to show that such a thing exists, or else we will be studying nothing. It is also nice to show that such a field is unique (up to isomorphism). However, we will not prove these in the course.
 
+In a field, we can define the ``natural numbers'' to be $2 = 1 + 1$, $3 + 1 + 2$ etc. Then an important property of the real numbers is
 \begin{lemma}[Archimedean property v1)]
-  Let $\F$ be an ordered field with the least upper bound property. Then the set $\{1, 2, 3, \cdots\}$ is not bounded above. (Note that these need not refer to natural numbers. We simply define $1$ to be the multiplicative identity, $2 = 1 + 1$, $3 = 1 + 2$ etc.)
+  Let $\F$ be an ordered field with the least upper bound property. Then the set $\{1, 2, 3, \cdots\}$ is not bounded above.
 \end{lemma}
 
 \begin{proof}
   If it is bounded above, then it has a supremum $x$. But then $x - 1$ is not an upper bound. So we can find $n\in \{1, 2, 3, \cdots\}$ such that $n> x - 1$. But then $n + 1 > x$, but $x$ is supposed to be an upper bound.
 \end{proof}
 
-While the Archimedean property seems to be trivially true for all ordered fields even if they do not have the least upper bound property. However, there are ordered fields in which the integers are bounded above.
+Is the least upper bound property required to prove the Archimedean property? It seems like \emph{any} ordered field should satisfy this even if they do not have the least upper bound property. However, it turns out there are ordered fields in which the integers are bounded above.
 
-For example, consider the field of rational functions, ie. functions in the form $\frac{P(x)}{Q(x)}$ with $P(x), Q(x)$ being polynomials. We order two functions $\frac{P(x)}{Q(x)}, \frac{R(s)}{S(x)}$ as follows: these two functions intersect only finitely many times because $P(x)S(x) = R(x)Q(x)$ has only finitely many roots. After the last intersection, the function whose value is greater counts as the greater function. It can be checked that these form an ordered field.
+Consider the field of rational functions, ie. functions in the form $\frac{P(x)}{Q(x)}$ with $P(x), Q(x)$ being polynomials, under the usual addition and multiplication. We order two functions $\frac{P(x)}{Q(x)}, \frac{R(s)}{S(x)}$ as follows: these two functions intersect only finitely many times because $P(x)S(x) = R(x)Q(x)$ has only finitely many roots. After the last intersection, the function whose value is greater counts as the greater function. It can be checked that these form an ordered field.
 
 In this field, the integers are the constant functions $1, 2, 3, \cdots$, but it is bounded above since the function $x$ is greater than all of them.
 
 \section{Convergence of sequences}
+Having defined real numbers, the first thing we will study is sequences. We will want to study what it means for a sequence to \emph{converge}. Intuitively, we would like to say that $1, \frac{1}{2}, \frac{1}{3}, \frac{1}{4},\cdots$ converges to $0$, while $1, 2, 3, 4, \cdots$ diverges. However, the actual formal definition of convergence is rather hard to get right, and historically there have been failed attempts that produced spurious results.
+\subsection{Definitions}
 \begin{defi}[Sequence]
   A \emph{sequence} is, formally, a function $a: \N \to \R$ (or $\C$). Usually (ie. always), we write $a_n$ instead of $a(n)$. Instead of $a$, we usually write it as $(a_n)$, $(a_n)_1^\infty$ or $(a_n)_{n = 1}^\infty$ to indicate it is a sequence.
 \end{defi}
@@ -132,11 +143,13 @@ In this field, the integers are the constant functions $1, 2, 3, \cdots$, but it
 \begin{defi}[Convergence of sequence]
   Let $(a_n)$ be a sequence and $\ell\in \R$. Then $a_n$ \emph{converges to} $\ell$, \emph{tends to} $\ell$, or $a_n \to \ell$ , if
   \[
-    \forall \varepsilon > 0\;\exists N\; \forall n\geq N:\;|a_n - \ell| < \varepsilon.
+    (\forall \varepsilon > 0)(\exists N)(\forall n\geq N)\,|a_n - \ell| < \varepsilon.
   \]
+  We say $\ell$ is the \emph{limit} of $(a_n)$.
 \end{defi}
-One can think of $\exists N : \forall n\geq N$ as saying ``eventually always'', or as ``from some point on''. So the definition means, if $a_n\to \ell$, then given any $\varepsilon$, there eventually, everything in the sequence is within $\varepsilon$ of $\ell$.
+One can think of $(\exists N)(\forall n\geq N)$ as saying ``eventually always'', or as ``from some point on''. So the definition means, if $a_n\to \ell$, then given any $\varepsilon$, there eventually, everything in the sequence is within $\varepsilon$ of $\ell$.
 
+We'll now provide an alternative form of the Archimedean property. This is the form that is actually useful.
 \begin{lemma}[Archimedean property v2]
   $1/n \to 0$.
 \end{lemma}
@@ -149,11 +162,11 @@ Note that the red parts correspond to the \emph{definition} of a sequence. This 
 \begin{defi}[Bounded sequence]
   A sequence $(a_n)$ is \emph{bounded} if
   \[
-    \exists C\;\forall n:\;|a_n| \leq C.
+    (\exists C)(\forall n)\,|a_n| \leq C.
   \]
   A sequence is \emph{eventually bounded} if
   \[
-    \exists C\; \exists N\; \forall n\geq N:\; |a_n| \leq C.
+    (\exists C)(\exists N)(\forall n\geq N)\, |a_n| \leq C.
   \]
 \end{defi}
 The definition of an \emph{eventually bounded} sequence seems a bit daft. Clearly every eventually bounded sequence is bounded! Indeed it is:
@@ -162,7 +175,7 @@ The definition of an \emph{eventually bounded} sequence seems a bit daft. Clearl
 \end{lemma}
 
 \begin{proof}
-  Let $C$ and $N$ be such that $\forall n\geq N\; |a_n| \leq C$. Then $\forall n \in \N$, $|a_n| \leq \max\{|a_1|, \cdots, |a_{N - 1}|, C\}$.
+  Let $C$ and $N$ be such that $(\forall n\geq N)\,|a_n| \leq C$. Then $\forall n \in \N$, $|a_n| \leq \max\{|a_1|, \cdots, |a_{N - 1}|, C\}$.
 \end{proof}
 
 The proof is rather trivial. However, most of the time it is simpler to prove that a sequence is eventually bounded, and this lemma saves us from writing that long line every time.
@@ -185,6 +198,7 @@ Here we prove the things that we think are obviously true, eg. sums and products
   \]
 \end{proof}
 
+We want to prove that the product of convergent sequences is convergent. However, we will not do it in one go. Instead, we separate it into many smaller parts.
 \begin{lemma}[Scalar multiplication of sequences]
   Let $a_n \to a$ and $\lambda \in \R$. Then $\lambda a_n \to \lambda a$.
 \end{lemma}
@@ -196,11 +210,11 @@ Here we prove the things that we think are obviously true, eg. sums and products
 \end{proof}
 
 \begin{lemma}
-  Let $(a_n)$ be bounded $b_n \to 0$. Then $a_nb_n \to 0$.
+  Let $(a_n)$ be bounded and $b_n \to 0$. Then $a_nb_n \to 0$.
 \end{lemma}
 
 \begin{proof}
-  Let $C\not=0$ be such that $\forall n:\; |a_n|\leq C$. Let $\varepsilon > 0$. Then $\exists N$ such that $\forall n\geq N$, $|b_n| < \varepsilon/C$. Then $|a_nb_n| < \varepsilon$.
+  Let $C\not=0$ be such that $(\forall n)\, |a_n|\leq C$. Let $\varepsilon > 0$. Then $\exists N$ such that $(\forall n\geq N)\, |b_n| < \varepsilon/C$. Then $|a_nb_n| < \varepsilon$.
 \end{proof}
 
 \begin{lemma}
@@ -225,10 +239,10 @@ Here we prove the things that we think are obviously true, eg. sums and products
   (alternative) Observe that $a_nb_n - ab = (a_n - a) b_n + (b_n - b)a$. We know that $a_n - a \to 0$ and $b_n - b\to 0$. Since $(b_n)$ is bounded, so $(a_n - a)b_n + (b_n - b)a \to 0$. So $a_nb_n \to ab$.
 \end{proof}
 
-Note that we no longer write ``Let $\varepsilon > 0$''. In the beginning, we have no lemmas proven. So we must prove everything from first principles and use the definition. However, after we have proven the lemmas, we can simply use them instead of using first principles. This is similar to in calculus, where we use first principles to prove the product rule and chain rule, then no longer use first principles afterwards.
+Note that in this proof, we no longer write ``Let $\varepsilon > 0$''. In the beginning, we have no lemmas proven. So we must prove everything from first principles and use the definition. However, after we have proven the lemmas, we can simply use them instead of using first principles. This is similar to in calculus, where we use first principles to prove the product rule and chain rule, then no longer use first principles afterwards.
 
 \begin{lemma}[Quotient of sequences]
-  Let $(a_n)$ be a sequence such that $\forall n \not= 0$. Suppose that $a_n \to a$ and $a\not = 0$. Then $1/a_n \to 1/a$.
+  Let $(a_n)$ be a sequence such that $(\forall n)\, a_n \not= 0$. Suppose that $a_n \to a$ and $a\not = 0$. Then $1/a_n \to 1/a$.
 \end{lemma}
 
 \begin{proof}
@@ -267,7 +281,7 @@ Note that we no longer write ``Let $\varepsilon > 0$''. In the beginning, we hav
   \[
     \frac{n^2 + 3}{(n + 5)(2n - 1)} \to \frac{1}{2}.
   \]
-  Write
+  We can obtain this by
   \[
     \frac{n^2 + 3}{(n + 5)(2n - 1)} = \frac{1 + 3/n^2}{(1 + 5/n)(2 - 1/n)} \to \frac{1}{2},
   \]
@@ -285,7 +299,7 @@ Note that we no longer write ``Let $\varepsilon > 0$''. In the beginning, we hav
   \[
     (1 + \delta)^n \geq \binom{n}{k + 1}\delta^{k + 1}.
   \]
-  Then if $n\geq 2k$,
+  Also, for $n\geq 2k$,
   \[
     \binom{n}{k + 1} = \frac{n(n - 1)\cdots(n - k)}{(k + 1)!} \geq \frac{(n/2)^{k + 1}}{(k + 1)!}.
   \]
@@ -296,6 +310,7 @@ Note that we no longer write ``Let $\varepsilon > 0$''. In the beginning, we hav
 \end{eg}
 
 \subsection{Monotone-sequences property}
+Recall that we characterized the least upper bound property. It turns out that there is an alternative characterization of real number using sequences, known as the \emph{monotone-sequences property}. In this section, we will show that the two characterizations are equivalent, and use the monotone-sequences property to deduce some useful results.
 \begin{defi}[Monotone sequence]
   A sequence $(a_n)$ is \emph{increasing} if $a_n\leq a_{n + 1}$ for all $n$.
 
@@ -304,7 +319,7 @@ Note that we no longer write ``Let $\varepsilon > 0$''. In the beginning, we hav
   A sequence is \emph{(strictly) monotone} if it is (strictly) increasing or (strictly) decreasing.
 \end{defi}
 
-\begin{defi}[Monotone sequences property]
+\begin{defi}[Monotone-sequences property]
   An ordered field has the \emph{monotone sequences property} if every increasing sequence that is bounded above converges.
 \end{defi}
 
@@ -319,7 +334,16 @@ We want to show that the monotone sequences property is equivalent to the least 
   Let $\varepsilon > 0$. Since $s = \sup \{a_n: n\in \N\}$, there exists an $N$ such that $a_N > s - \varepsilon$. Then since $(a_n)$ is increasing, $\forall n \geq N$, we have $s - \varepsilon < a_N \leq a_n \leq s$. So $|a_n - s| < \epsilon$.
 \end{proof}
 
-Before showing the other way implication, we first prove the following lemma:
+We first prove a handy lemma.
+\begin{lemma}
+  Let $(a_n)$ be a sequence and suppose that $a_n \to a$. If $(\forall n)\, a_n \leq x$, then $a\leq x$.
+\end{lemma}
+
+\begin{proof}
+  If $a > x$, then set $\epsilon = a - x$. Then we can find $N$ such that $a_N > x$. Contradiction.
+\end{proof}
+
+Before showing the other way implication, we will need the following:
 \begin{lemma}
   Monotone-sequences property $\Rightarrow$ Archimedean property.
 \end{lemma}
@@ -327,39 +351,29 @@ Before showing the other way implication, we first prove the following lemma:
 \begin{proof}
   We prove version 2, ie. that $1/n \to 0$.
 
-  Since $1/n > 0$ and is decreasing, by MSP, it converges. Let $\delta$ be the limit. We must have $\delta \geq 0$, since if $\delta < 0$, then there would exist $n$ with $3\delta/2 < 1/n < \delta/2 < 0$. Contradiction.
+  Since $1/n > 0$ and is decreasing, by MSP, it converges. Let $\delta$ be the limit. By the previous lemma, we must have $\delta \geq 0$.
 
   If $\delta > 0$, then we can find $N$ such that $1/N < 2\delta$. But then for all $n \geq 4N$, we have $1/n \leq 1/(4N) < \delta/2$. Contradiction. Therefore $\delta = 0$.
 \end{proof}
 
 \begin{lemma}
-  Monotone sequences property $\Rightarrow$ least upper bound property.
+  Monotone-sequences property $\Rightarrow$ least upper bound property.
 \end{lemma}
 
 \begin{proof}
   Let $A$ be a non-empty set that's bounded above. Pick $u_0, v_0$ such that $u_0$ is not an upper bound for $A$ and $v_0$ is an upper bound. Now do a repeated bisection: having chosen $u_n$ and $v_n$ such that $u_n$ is not an upper bound and $v_n$ is, if $(u_n + v_n)/2$ is an upper bound, then let $u_{n + 1} = u_n$, $v_{n + 1} = (u_n + v_n)/2$. Otherwise, let $u_{n + 1} = (u_n + v_n)/2$, $v_{n + 1} = v_n$.
 
-  Then $u_0 \leq u_1 \leq u_2 \leq \cdots$ and $v_0\geq v_1 \geq v_2 \geq \cdots$. Then
+  Then $u_0 \leq u_1 \leq u_2 \leq \cdots$ and $v_0\geq v_1 \geq v_2 \geq \cdots$. We also have
   \[
     v_n - u_n = \frac{v_0 - u_0}{2^n} \to 0.
   \]
-  Note that here we used the Archimedean property since to prove $1/2^n \to 0$, we sandwich it with $1/n$. But to show $1/n\to 0$, we need the Archimedean property.
-
   By the monotone sequences property, $u_n\to s$ (since $(u_n)$ is bounded above by $v_0$). Since $v_n - u_n \to 0$, $v_n \to s$. We now show that $s = \sup A$.
 
   If $s$ is not an upper bound, then there exists $a\in A$ such that $a > s$. Since $v_n \to s$, then there exists $m$ such that $v_m < a$, contradicting the fact that $v_m$ is an upper bound.
 
   To show it is the \emph{least} upper bound, let $t < s$. Then since $u_n \to s$, we can find $m$ such that $u_m > t$. So $t$ is not an upper bound. Therefore $s$ is the least upper bound.
 \end{proof}
-
-\begin{lemma}
-  Let $(a_n)$ be a sequence and suppose that $a_n \to a$. If $\forall n$, $a_n \leq x$, then $a\leq x$.
-\end{lemma}
-
-\begin{proof}
-  If $a > x$, then set $\epsilon = a - x$. Then we can find $N$ such that $a_N > x$. Contradiction.
-\end{proof}
-\note this can be used to streamline some of our earlier arguments, eg. the monotone sequences property implies $1/n \to 0$.
+Why do we need to prove the Archimedean property first? In the proof above, we secretly used the it. When showing that $v_n - u_n \to 0$, we required the fact that $\frac{1}{2^n} \to 0$. To prove this, we sandwiched it with $\frac{1}{n}$. But to show $\frac{1}{n}\to 0$, we need the Archimedean property.
 
 \begin{lemma}
   A sequence can have at most 1 limit.
@@ -369,22 +383,14 @@ Before showing the other way implication, we first prove the following lemma:
 Let $(a_n)$ be a sequence, and suppose $a_n \to x$ and $a_n\to y$. Let $\epsilon > 0$ and pick $N$ such that $\forall n \geq N$, $|a_n - x| < \varepsilon/2$ and $|a_n - y| < \varepsilon/2$. Then $|x - y| \leq |x - a_N| + |a_N - y| < \varepsilon/2 + \varepsilon/2 = \varepsilon$. Since $\epsilon$ was arbitrary, $x$ must equal $y$.
 \end{proof}
 
-\begin{defi}[Subsequence]
-  Let $(a_n)$ be a sequence. A \emph{subsequence} of $(a_n)$ is a sequence of the form $a_{n_1}, a_{n_2}, \cdots$, where $n_1 < n_2 < \cdots$.
-\end{defi}
-
-\begin{eg}
-  $1, 1/4, 1/9, 1/16, \cdots$ is a subsequence of $1, 1/2, 1/3, \cdots$.
-\end{eg}
-
 \begin{lemma}[Nested intervals property]
-  Let $\F$ be an ordered field with the monotone sequences property. Let $I_1\supseteq I_2 \supseteq \cdots$ be closed bounded non-empty intervals. Then $\bigcap_{n = 1}^\infty I_n \neq \emptyset$.
+  Let $\F$ be an ordered field with the monotone sequences property. Let $I_1\supseteq I_2 \supseteq \cdots$ be closed bounded non-empty intervals. Then $\bigcap_{n = 1}^\infty I_n \not= \emptyset$.
 \end{lemma}
 
 \begin{proof}
-  Let $T_n = [a_n, b_n]$ for each $n$. Then $a_1 \leq a_2 \leq\cdots$ and $b_1 \geq b_2\geq \cdots$. For each $n$, $a_n \leq b_n \leq b_1$. So the sequence $a_n$ is bounded above. So by the monotone sequences property, it has a limit $a$. For each $n$, $a_n\leq a$, since if ever we had $a_n > a$, then $\forall m \geq n$, $a_m \geq a_n\Rightarrow a > a$, which is a contradiction.
+  Let $T_n = [a_n, b_n]$ for each $n$. Then $a_1 \leq a_2 \leq\cdots$ and $b_1 \geq b_2\geq \cdots$. For each $n$, $a_n \leq b_n \leq b_1$. So the sequence $a_n$ is bounded above. So by the monotone sequences property, it has a limit $a$. For each $n$, we must have $a_n\leq a$. Otherwise, say $a_n > a$. Then for all $m \geq n$, we have $a_m \geq a_n > a$. This implies that $a > a$, which is nonsense.
 
-  Also, for each fixed $n$, we have that $\forall m\geq n$, $a_m \leq b_m \leq b_n$. So $a \leq b_n$. Thus, for all $n$, $a_n \leq a \leq b_n \Rightarrow a\in I_n$. So $a\in \bigcap_{n = 1}^\infty I_n$.
+  Also, for each fixed $n$, we have that $\forall m\geq n$, $a_m \leq b_m \leq b_n$. So $a \leq b_n$. Thus, for all $n$, $a_n \leq a \leq b_n$. So $a\in I_n$. So $a\in \bigcap_{n = 1}^\infty I_n$.
 \end{proof}
 
 We can use this to prove that the reals are uncountable:
@@ -396,6 +402,16 @@ We can use this to prove that the reals are uncountable:
   Suppose the contrary. Let $x_1, x_2, \cdots$ be a list of all real numbers. Find an interval that does not contain $x_1$. Within that interval, find an interval that does not contain $x_2$. Continue \emph{ad infinitum}. Then the intersection of all these intervals is non-empty, but the elements in the intersection are not in the list. Contradiction.
 \end{proof}
 
+A powerful consequence of this is the \emph{Bolzano-Weierstrass theorem}. This is formulated in terms of subsequences:
+\begin{defi}[Subsequence]
+  Let $(a_n)$ be a sequence. A \emph{subsequence} of $(a_n)$ is a sequence of the form $a_{n_1}, a_{n_2}, \cdots$, where $n_1 < n_2 < \cdots$.
+\end{defi}
+
+\begin{eg}
+  $1, 1/4, 1/9, 1/16, \cdots$ is a subsequence of $1, 1/2, 1/3, \cdots$.
+\end{eg}
+
+
 \begin{thm}[Bolzano-Weierstrass theorem]
   Let $\F$ be an ordered field with the monotone sequences property (ie. $\F = \mathbb{R}$).
 
@@ -403,7 +419,7 @@ We can use this to prove that the reals are uncountable:
 \end{thm}
 
 \begin{proof}
-  Let $u_0$ and $v_0$ be a lower and upper bound, respectively, for a sequence $(a_n)_1^{\infty}$. By repeated bisection, we can find a sequence of intervals $[u_0, v_0] \supseteq [u_1, v_1]\supseteq [u_2,v_2] \supseteq\cdots$ such that $v_n - u_n = (v_0 - u_0)/2^n$, and such that each $[u_n, v_n]$ contains infinitely many terms of $(a_n)$.
+  Let $u_0$ and $v_0$ be a lower and upper bound, respectively, for a sequence $(a_n)$. By repeated bisection, we can find a sequence of intervals $[u_0, v_0] \supseteq [u_1, v_1]\supseteq [u_2,v_2] \supseteq\cdots$ such that $v_n - u_n = (v_0 - u_0)/2^n$, and such that each $[u_n, v_n]$ contains infinitely many terms of $(a_n)$.
 
   By the nested intervals property, $\bigcap_{n = 1}^\infty [u_n, v_n] \neq \emptyset$. Let $x$ belong to the intersection. Now pick a subsequence $a_{n_1}, a_{n_2}, \cdots$ such that $a_{n_k} \in [u_k, v_k]$. We can do this because $[u_k, v_k]$ contains infinitely many $a_n$, and we have only picked finitely many of them. We will show that $a_{n_k} \to x$.
 
@@ -413,10 +429,12 @@ We can use this to prove that the reals are uncountable:
 \end{proof}
 
 \subsection{Cauchy sequences}
+The third characterization of real numbers is in terms of Cauchy sequences. Cauchy convergence is an alternative way of defining convergent sequences without needing to mention limits. This allows us to say $\{3, 3.1, 3.14, 3.141, 3.1415, \cdots\}$ is \emph{Cauchy convergent} in $\Q$ even though the limit $\pi$ is not in $\Q$.
+
 \begin{defi}[Cauchy sequence]
   A sequence $(a_n)$ is \emph{Cauchy} if
   \[
-    \forall \varepsilon > 0\; \exists N\; \forall p, q\geq N:\; |a_p - a_q| < \varepsilon.
+    (\forall \varepsilon > 0)(\exists N)(\forall p, q\geq N)\, |a_p - a_q| < \varepsilon.
   \]
 \end{defi}
 Roughly, a sequence if Cauchy if all terms are eventually close to each other (as opposed to close to a limit).
@@ -442,6 +460,7 @@ Roughly, a sequence if Cauchy if all terms are eventually close to each other (a
   \]
 \end{proof}
 
+An important result we have is that in $\R$, Cauchy convergence and regular convergence are equivalent.
 \begin{thm}[The general principle of convergence]
   Let $\F$ be an ordered field with the monotone-sequence property. Then every Cauchy sequence of $\F$ converges.
 \end{thm}
@@ -450,20 +469,18 @@ Roughly, a sequence if Cauchy if all terms are eventually close to each other (a
 Let $(a_n)$ be a Cauchy sequence. Then it is eventually bounded, since $\exists N$, $\forall n \geq N$, $|a_n - a_N| \leq 1$ by the Cauchy condition. So it is bounded. Hence by Bolzano-Weierstrass, it has a convergent subsequence. Then $(a_n)$ converges to the same limit.
 \end{proof}
 
-Note that the definition of a convergent sequence is
-\[
-  \exists l\; \forall \varepsilon > 0\; \exists N\; \forall n\geq N\; |a_n - l| < \varepsilon,
-\]
-while that of Cauchy convergence is
-\[
-  \forall \varepsilon > 0\; \exists N\; \forall p, q\geq N\; |a_p - a_q| < \varepsilon.
-\]
-In the first definition, $l$ quantifies over all real numbers, which is uncountable. However, in the second definition, we only have to quantify over natural numbers, which is countable (by the Archimedean property, we only have to consider the cases $\varepsilon = 1/n$).
+\begin{defi}[Complete ordered field]
+  An ordered field in which every Cauchy sequence converges is called \emph{complete}.
+\end{defi}
 
-Since they are equivalent, the second definition is preferred from a logic-simplicity point of view.
+Hence we say that $\R$ is a complete ordered field.
+
+However, not every complete ordered field is (isomorphic to) $\R$. For example, we can take the rational functions as before, then take the Cauchy completion of it (ie. add all the limits we need). Then it is already to large to be the reals (it still doesn't have the Archimedean property) but is a complete ordered field.
+
+To show that completeness implies the monotone-sequences property, we need an additional condition: the Archimedean property.
 
 \begin{lemma}
-  Let $\F$ be an ordered field with the Archimedean property such that every Cauchy sequence converges. The $\F$ satisfies the monotone sequences property.
+  Let $\F$ be an ordered field with the Archimedean property such that every Cauchy sequence converges. The $\F$ satisfies the monotone-sequences property.
 \end{lemma}
 
 \begin{proof}
@@ -471,7 +488,7 @@ Since they are equivalent, the second definition is preferred from a logic-simpl
 
   Let $(a_n)$ be an increasing sequence. If $(a_n)$ is not Cauchy, then
   \[
-    \exists \varepsilon > 0\; \forall N\; \exists p, q > N:\; |a_p - a_q| \geq \varepsilon.
+    (\exists \varepsilon > 0)(\forall N)(\exists p, q > N)\,|a_p - a_q| \geq \varepsilon.
   \]
   wlog let $p > q$. Then
   \[
@@ -492,12 +509,21 @@ Since they are equivalent, the second definition is preferred from a logic-simpl
   So by the Archimedean property, $(a_{n_k})$, and hence $(a_n)$, is unbounded.
 \end{proof}
 
-\begin{defi}[Complete ordered field]
-  An ordered field (with an appropriate metric) in which every Cauchy sequence converges is called \emph{complete}.
-\end{defi}
-\note We can have complete ordered field that are not the reals, if they do not have the Archimedean property. For example, we can take the rational functions as before, then take the Cauchy completion of it (ie. add all the limits we need). Then it is already to large to be the reals (it doesn't have the Archimedean property) but is a complete ordered field.
+Note that the definition of a convergent sequence is
+\[
+  (\exists l)(\forall \varepsilon > 0)(\exists N)(\forall n\geq N)\, |a_n - l| < \varepsilon,
+\]
+while that of Cauchy convergence is
+\[
+  (\forall \varepsilon > 0)(\exists N)(\forall p, q\geq N)\, |a_p - a_q| < \varepsilon.
+\]
+In the first definition, $l$ quantifies over all real numbers, which is uncountable. However, in the second definition, we only have to quantify over natural numbers, which is countable (by the Archimedean property, we only have to consider the cases $\varepsilon = 1/n$).
+
+Since they are equivalent in $\R$, the second definition is sometimes preferred when we care about logical simplicity.
 
 \subsection{Limit supremum and infimum}
+Here we will define the limit supremum and infimum. While these are technically not part of the course, eventually some lecturers will magically assume students know this definition. So we might as well learn it here.
+
 \begin{defi}[Limit supremum/infimum]
   Let $(a_n)$ be a bounded sequence. We define the \emph{limit supremum} as
   \[
@@ -514,7 +540,7 @@ Since they are equivalent, the second definition is preferred from a logic-simpl
 \begin{eg}
   Take the sequence
   \[
-    2, -1, 1\frac{1}{2}, -\frac{1}{2}, 1\frac{1}{3}, -\frac{1}{3}, \cdots
+    2, -1, \frac{3}{2}, -\frac{1}{2}, \frac{4}{3}, -\frac{1}{3}, \cdots
   \]
   Then the limit supremum is $1$ and the limit infimum is $0$.
 \end{eg}
@@ -530,7 +556,7 @@ Since they are equivalent, the second definition is preferred from a logic-simpl
 \begin{proof}
   If $a_n \to a$, then let $\varepsilon > 0$. Then
   \[
-    \exists n\; \forall m\geq n:\; a - \varepsilon \leq a_m \leq a + \varepsilon.
+    (\exists n)(\forall m\geq n)\, a - \varepsilon \leq a_m \leq a + \varepsilon.
   \]
   It follows that
   \[
@@ -540,7 +566,6 @@ Since they are equivalent, the second definition is preferred from a logic-simpl
   \[
     \liminf a_n = \limsup a_n = a.
   \]
-
   Conversely, if $\liminf a_n = \limsup a_n = a$, then let $\varepsilon > 0$. Then we can find $n$ such that
   \[
     \inf_{m\geq n} a_m > a - \varepsilon\text{ and }\sup _{m \geq n} a_m < a + \varepsilon.
@@ -549,6 +574,9 @@ Since they are equivalent, the second definition is preferred from a logic-simpl
 \end{proof}
 
 \section{Convergence of infinite sums}
+In this chapter, we investigate which infinite \emph{sums}, as opposed to sequences, converge. We would like to say $1 + \frac{1}{2} + \frac{1}{4} + \frac{1}{8} + \cdots = 2$, while $1 + 1 + 1 + 1 + \cdots$ does not converge. The majority of the chapter is coming up with different tests to figure out if infinite sums converge.
+
+\subsection{Infinite sums}
 \begin{defi}[Convergence of infinite sums and partial sums]
   Let $(a_n)$ be a real sequence. For each $N$, define
   \[
@@ -563,15 +591,16 @@ Since they are equivalent, the second definition is preferred from a logic-simpl
   We call $S_N$ the $N$th \emph{partial sum}.
 \end{defi}
 
+There is an immediate necessary condition for a series to converge.
 \begin{lemma}
   If $\displaystyle\sum_{n = 1}^\infty a_n$ converges. Then $a_n \to 0$.
 \end{lemma}
 
 \begin{proof}
-  Let $\displaystyle\sum_{n = 1}^{\infty} a_n = s$. Then $S_N \to s$ and $S_{N - 1} \to s$. Then $a_N = S_N - S_{N - 1} \to 0$.
+  Let $\displaystyle\sum_{n = 1}^{\infty} a_n = s$. Then $S_n \to s$ and $S_{n - 1} \to s$. Then $a_n = S_n - S_{n - 1} \to 0$.
 \end{proof}
 
-However, \textbf{\textit{THE CONVERSE IS FALSE}}!!!
+However, the converse is false!
 \begin{eg}[Harmonic series]
   If $a_n = 1/n$, then $a_n \to 0$ but $\sum a_n = \infty$.
 
@@ -589,9 +618,9 @@ However, \textbf{\textit{THE CONVERSE IS FALSE}}!!!
   \]
   We can prove this by considering the partial sums:
   \[
-    \sum_{n = 0}^\infty \rho^n = \frac{1 - \rho^{N + 1}}{1 - \rho}.
+    \sum_{n = 0}^N \rho^n = \frac{1 - \rho^{N + 1}}{1 - \rho}.
   \]
-  But $\rho^{N + 1} \to 0$. So this tends to $1/(1 - \rho)$.
+  Since $\rho^{N + 1} \to 0$, this tends to $1/(1 - \rho)$.
 \end{eg}
 
 \begin{eg}
@@ -612,17 +641,17 @@ However, \textbf{\textit{THE CONVERSE IS FALSE}}!!!
   The sequence $(S_n)$ is increasing and bounded above. So the result follows form the monotone sequences property.
 \end{proof}
 
+The simplest convergence test we have is the \emph{comparison test}. Roughly speaking, it says that if $0 \leq a_n \leq b_n$ for all $n$ and $\sum b_n$ converges, then $\sum a_n$ converges. However, we will prove a much more general form here for convenience.
 \begin{lemma}[Comparison test]
   Let $(a_n)$ and $(b_n)$ be non-negative sequences, and suppose that $\exists C, N$ such that $\forall n\geq N$, $a_n \leq Cb_n$.Then if $\sum b_n$ converges, then so does $\sum a_n$.
 \end{lemma}
+
 \begin{proof}
   Let $M > N$. Also for each $R$, let $S_R = \sum_{n = 1}^R a_n$ and $T_R = \sum_{n = 1}^R b_n$. We want $S_R$ to be bounded above.
   \[
     S_M - S_N = \sum_{n = N + 1}^M a_n \leq C\sum _{n = N + 1}^M b_n \leq C\sum_{n = N + 1}^\infty b_n.
   \]
   So $\forall M\geq N$, $S_M \leq S_n + C\sum_{n = N + 1}^\infty b_n$. Since the $S_M$ are increasing and bounded, it must converge.
-
-  \note $N$ is fixed from the very beginning in the statement of the lemma.
 \end{proof}
 
 \begin{eg}\leavevmode
@@ -631,8 +660,8 @@ However, \textbf{\textit{THE CONVERSE IS FALSE}}!!!
     \item $\sum \frac{n}{2^n}$ converges.
 
       If $n \geq 4$, then $n \leq 2^{n/2}$. That's because $4 = 2^{4/2}$ and for $n\geq 4$, $(n + 1)/n < \sqrt{2}$, so when we increase $n$, we multiply the right side by a greater number by the left. Hence by the comparison test, it is sufficient to show that $\sum 2^{n/2}/2^n = \sum 2^{-n/2}$ converges, which it does (geometric series).
-    \item $\sum 1/\sqrt{n}$ diverges, since $1/\sqrt{n} \geq 1/n$. So if it converged, then so would $\sum 1/n$, but $\sum 1/n$ diverges.
-    \item $\sum 1/n^2$ converges, since for $n \geq 2$, $1/n^2 \leq 1/[n(n - 1)]$, and we have proven that the latter converges.
+    \item $\sum \frac{1}{\sqrt{n}}$ diverges, since $\frac{1}{\sqrt{n}} \geq \frac{1}{n}$. So if it converged, then so would $\sum \frac{1}{n}$, but $\sum \frac{1}{n}$ diverges.
+    \item $\sum \frac{1}{n^2}$ converges, since for $n \geq 2$, $\frac{1}{n^2} \leq \frac{1}{n(n - 1)}$, and we have proven that the latter converges.
     \item Consider $\displaystyle \sum_{n = 1}^\infty \frac{n + 5}{n^3 - 7n^2/2}$. We show this converges by noting
       \[
         n^3 - \frac{7n^2}{2} = n^2\left(n - \frac{7}{2}\right).
@@ -664,20 +693,21 @@ However, \textbf{\textit{THE CONVERSE IS FALSE}}!!!
 \end{eg}
 
 \subsection{Absolute convergence}
+Here we'll consider two stronger conditions for convergence - absolute convergence and uniform convergence. We'll prove that these two conditions are in fact equivalent.
 \begin{defi}[Absolute convergence]
-  A series $\sum_{a_n}$ \emph{converges absolutely} if the series $\sum |a_n|$ converges.
+  A series $\sum a_n$ \emph{converges absolutely} if the series $\sum |a_n|$ converges.
 \end{defi}
 
 \begin{eg}
-  The series $\sum_{n + 1}\frac{(-1)^{n = 1}}{n} = 1 - \frac{1}{2} + \frac{1}{3} - \frac{1}{4} + \cdots$ converges, but not absolutely.
+  The series $\sum \frac{(-1)^{n + 1}}{n} = 1 - \frac{1}{2} + \frac{1}{3} - \frac{1}{4} + \cdots$ converges, but not absolutely.
 
   To see the convergence, note that
   \[
     a_{2n - 1} + a_{2n} = \frac{1}{2n - 1} - \frac{1}{2n} = \frac{1}{2n(2n- 1)}.
   \]
-  It is easy to compare with $1/n^2$ to get that the partial sums $S_{2n}$ converges. But $S_{2n + 1} - S_{2n} = 1/(2n + 1) \to 0$, so the $S_{2n + 1}$ converge to the same limit.
+  It is easy to compare with $1/n^2$ to get that the partial sums $S_{2n}$ converges. But $S_{2n + 1} - S_{2n} = 1/(2n + 1) \to 0$, so the $S_{2n + 1}$ converges to the same limit.
 
-  Then it does not converge absolutely, because the sum of the absolute values is the harmonic series.
+  It does not converge absolutely, because the sum of the absolute values is the harmonic series.
 \end{eg}
 
 \begin{lemma}
@@ -687,7 +717,7 @@ However, \textbf{\textit{THE CONVERSE IS FALSE}}!!!
 \begin{proof}
   We know that $\sum |a_n|$ converges. Let $S_n = \sum_{n = 1}^N a_n$ and $T_N = \sum_{n = 1}^N |a_n|$.
 
-  We know two ways to show random sequences converge, without knowing what they converge to, namely Monotone sequences and Cauchy sequences. Since $S_n$ is not monotone, we shall try Cauchy sequences.
+  We know two ways to show random sequences converge, without knowing what they converge to, namely monotone-sequences and Cauchy sequences. Since $S_n$ is not monotone, we shall try Cauchy sequences.
 
   If $p > q$, then
   \[
@@ -720,6 +750,7 @@ However, \textbf{\textit{THE CONVERSE IS FALSE}}!!!
   Therefore the sequence of partial sums is Cauchy.
 \end{proof}
 
+The converse is also true.
 \begin{thm}
   If $\sum a_n$ converges unconditionally, then it converges absolutely.
 \end{thm}
@@ -751,7 +782,7 @@ We can prove an even stronger result:
 \end{lemma}
 
 \begin{proof}
-  Let $\varepsilon > 0$. We know that both $\sum |a_n|$ and $\sum|a_{\pi(n)}|$ converge. So let $M$ be such that $\sum_{n > M}|a_n| < \frac{\varepsilon}{2}$ and $\sum_{n > M}|a_{\pi(n)}| < \frac{\pi}{2}$.
+  Let $\varepsilon > 0$. We know that both $\sum |a_n|$ and $\sum|a_{\pi(n)}|$ converge. So let $M$ be such that $\sum_{n > M}|a_n| < \frac{\varepsilon}{2}$ and $\sum_{n > M}|a_{\pi(n)}| < \frac{\varepsilon}{2}$.
 
   Now $N$ be large enough such that
   \[
@@ -761,18 +792,21 @@ We can prove an even stronger result:
   \[
     \{\pi(1), \cdots, \pi(M)\}\subseteq \{1, \cdots, N\}.
   \]
-  Then for every $n\geq N$,
+  Then for every $K\geq N$,
   \[
-    \left|\sum_{n = 1}^N a_n - \sum_{n = 1}^N a_{\pi(n)}\right| \leq \sum_{n = M + 1}^N |a_n| + \sum_{n = M + 1}^N |a_{\pi(n)}| < \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon.
+    \left|\sum_{n = 1}^K a_n - \sum_{n = 1}^K a_{\pi(n)}\right| \leq \sum_{n = M + 1}^K |a_n| + \sum_{n = M + 1}^K |a_{\pi(n)}| < \frac{\varepsilon}{2} + \frac{\varepsilon}{2} = \varepsilon.
   \]
   We have the first inequality since given our choice of $M$ and $N$, the first $M$ terms of the $\sum a_n$ and $\sum  a_{\pi(n)}$ sums are cancelled by some term in the huge sum.
 
-  So $\forall n \geq N$, the partial sums differ by at most $\varepsilon$. So $|\sum a_n - \sum a_{\pi(n)}| \leq \varepsilon$.
+  So $\forall K \geq N$, the partial sums up to $K$ differ by at most $\varepsilon$. So $|\sum a_n - \sum a_{\pi(n)}| \leq \varepsilon$.
+
+  Since this is true for all $\varepsilon$, we must have $\sum a_n = \sum a_{\pi(n)}$.
 \end{proof}
 
 \subsection{Convergence tests}
+We'll now come up with a \emph{lot} of convergence tests.
 \begin{lemma}[Alternating sequence test]
-  Let $(a_n)$ be a decreasing sequence of non-negative reals, and suppose that $a_n \to 0$. Then $\displaystyle \sum_{n = 1}^\infty (-1)^{n + 1}a_n$ converges, ie. ($a_1 - a_2 + a_3 - a_4 + \cdots$ converges).
+  Let $(a_n)$ be a decreasing sequence of non-negative reals, and suppose that $a_n \to 0$. Then $\displaystyle \sum_{n = 1}^\infty (-1)^{n + 1}a_n$ converges, ie. $a_1 - a_2 + a_3 - a_4 + \cdots$ converges.
 \end{lemma}
 
 \begin{proof}
@@ -788,7 +822,7 @@ We can prove an even stronger result:
   \]
   and $(S_{2n + 1})$ is a decreasing sequence. Also $S_{2n + 1} - S_{2n} = a_{2n + 1} \geq 0$.
 
-  It follows from the monotone sequences property that $(S_{2n})$ and $(S_{2n + 1})$ converge (they are bounded since $0 \leq S_{2n} \leq S_{2n + 1} \leq a_1$).
+  Hence we obtain the bounds $0 \leq S_{2n} \leq S_{2n + 1} \leq a_1$. It follows from the monotone sequences property that $(S_{2n})$ and $(S_{2n + 1})$ converge.
 
   Since $S_{2n + 1} - S_{2n} = a_{2n + 1} \to 0$, they converge to the same limit.
 \end{proof}
@@ -799,7 +833,7 @@ We can prove an even stronger result:
   \]
 \end{eg}
 
-\begin{lemma}[Ratio test v1]
+\begin{lemma}[Ratio test]
   We have three versions:
   \begin{enumerate}
     \item If $\exists c < 1$ such that
@@ -809,7 +843,7 @@ We can prove an even stronger result:
       for all $n$, then $\sum a_n$  converges.
     \item If $\exists c < 1$ and $\exists N$ such that
       \[
-        \forall n \geq N:\; \frac{|a_{n + 1}|}{|a_n|} \leq c,
+        (\forall n \geq N)\, \frac{|a_{n + 1}|}{|a_n|} \leq c,
       \]
       then $\sum a_n$  converges. Note that just because the ratio is always less than $1$ does not mean it converges. It has to be always less than a fixed number $c$. Otherwise the test will say that $\sum 1/n$ converges.
     \item If $\exists \rho \in (-1, 1)$ such that
@@ -823,19 +857,19 @@ We can prove an even stronger result:
 \begin{proof}\leavevmode
   \begin{enumerate}
     \item $|a_n| \leq c^{n - 1}|a_1|$. Since $\sum c^n$ converges, so does $\sum |a_n|$ by comparison test. So $\sum a_n$ converges absolutely, so it converges.
-    \item For all $k\geq 0$, we have $|a_{N + k}|\leq c^k|A_n|$. So the series $\sum |a_{N + k}|$ converges, and therefore so does $\sum |a_k|$.
-    \item If $\frac{a_{n + 1}}{a_n} \to \rho$, then $\frac{|a_{n + 1}|}{|a_n|} \to |\rho|$. So (setting $\varepsilon = (1 - |\rho|)/2$) there exists $N$ such that $\forall n \geq N$, $\frac{|a_{n + 1}|}{|a_n|} \leq \frac{1 + |\rho|}{2} < 1$. So the result follows form (ii).
+    \item For all $k\geq 0$, we have $|a_{N + k}|\leq c^k|A_N|$. So the series $\sum |a_{N + k}|$ converges, and therefore so does $\sum |a_k|$.
+    \item If $\frac{a_{n + 1}}{a_n} \to \rho$, then $\frac{|a_{n + 1}|}{|a_n|} \to |\rho|$. So (setting $\varepsilon = (1 - |\rho|)/2$) there exists $N$ such that $\forall n \geq N$, $\frac{|a_{n + 1}|}{|a_n|} \leq \frac{1 + |\rho|}{2} < 1$. So the result follows from (ii).
   \end{enumerate}
 \end{proof}
 
 \begin{eg}
   If $|b| < 1$, then $\sum  nb^n$ converges, since
   \[
-    \frac{a_{n + 1}}{a_n} = \frac{(n + 1) a^{n + 1}}{na^n} = \left(1 + \frac{1}{n}\right) a\to a < 1.
+    \frac{a_{n + 1}}{a_n} = \frac{(n + 1) b^{n + 1}}{nb^n} = \left(1 + \frac{1}{n}\right) b\to b < 1.
   \]
   So it converges.
 
-  \note we can evaluate this directly by evaluating $\displaystyle\sum _{i = 0}^\infty \sum_{n = i}^\infty a^n$.
+  We can also evaluate this directly by considering $\displaystyle\sum _{i = 0}^\infty \sum_{n = i}^\infty b^n$.
 \end{eg}
 
 The following two tests were taught at the end of the course, but are included here for the sake of completeness.
@@ -869,15 +903,15 @@ The following two tests were taught at the end of the course, but are included h
 
 After we formally define integrals, we will prove the integral test:
 \begin{thm}[Integral test]
-  Let $f: [1, \infty] \to \R$ be a decreasing non-negative function. Then $\sum_{n = 1}^n f(n)$ converges iff $\int_1^\infty f(x)\;\d x < \infty$.
+  Let $f: [1, \infty] \to \R$ be a decreasing non-negative function. Then $\sum_{n = 1}^\infty f(n)$ converges iff $\int_1^\infty f(x)\;\d x < \infty$.
 \end{thm}
 
 \subsection{Complex versions}
-Most definitions in the course so far carry over unchanged to the complex numbers. eg., $z_n \to z$ iff $\forall \varepsilon > 0\;\exists N\;\forall n\geq N:\; |z_n - z| < \varepsilon$.
+Most definitions in the course so far carry over unchanged to the complex numbers. eg., $z_n \to z$ iff $(\forall \varepsilon > 0)(\exists N)(\forall n\geq N)\, |z_n - z| < \varepsilon$.
 
 Two exceptions are least upper bound and monotone sequences, because the complex numbers do not have an ordering! (It cannot be made into an ordered field because the square of every number in an ordered field has to be positive) Fortunately, Cauchy sequences still work.
 
-We can prove most analogues of the theorems so far by looking at the real and imaginary parts.
+We can prove the complex versions of most theorems so far by looking at the real and imaginary parts.
 
 \begin{eg}
   Let $(z_n)$ be a Cauchy sequence in $\C$. Let $z_n = x_n+ iy_n$. Then $(x_n)$ and $(y_n)$ are Cauchy. So they converge, from which it follows that $z_n = x_n + iy_n$ converges.
@@ -893,6 +927,7 @@ Finally, the proof that absolutely convergent sequences converge still works. It
   If $|z| < 1$, then $\sum nz^n$ converges. Proof is the same as above.
 \end{eg}
 
+However, we do have an extra test for complex sums.
 \begin{lemma}[Abel's test]
   Let $a_1 \geq a_2 \geq \cdots \geq 0$, and suppose that $a_n \to 0$. Let $z\in \C$ such that $|z| = 1$ and $z \not= 1$. Then $\sum a_n z^n$ converges.
 \end{lemma}
@@ -915,28 +950,29 @@ Finally, the proof that absolutely convergent sequences converge still works. It
 Note that here we transformed the sum $\sum a_n(z^{n + 1} - z^n)$ into $a_N z^{N + 1} - a_M z^M + \sum (a_n - a_{n + 1})z^{n + 1}$. What we have effectively done is a discrete analogue of integrating by parts.
 
 \begin{eg}
-  The series $\sum z^n/n$ converges if $|z| < 1$ or if $|z| = 1$ and $z = 1$, and it diverges if $z = 1$ or $|z| > 1$.
+  The series $\sum z^n/n$ converges if $|z| < 1$ or if $|z| = 1$ and $z \not= 1$, and it diverges if $z = 1$ or $|z| > 1$.
 
   The cases $|z| < 1$ and $|z| > 1$ are trivial from the ratio test, and Abel's test is required for the $|z| = 1$ cases.
 \end{eg}
 \section{Continuous functions}
+\subsection{Continuous functions}
 \begin{defi}[Continuous function]
   Let $A\subseteq \R$, $a\in A$, and $f: A\to \R$. Then $f$ is \emph{continuous at} $a$ if
   \[
-    \forall \varepsilon > 0\; \exists \delta > 0\; \forall y\in A:\; |y - a| < \delta \Rightarrow  |f(y) - f(a)| < \varepsilon.
+    (\forall \varepsilon > 0)(\exists \delta > 0)(\forall y\in A)\, |y - a| < \delta \Rightarrow |f(y) - f(a)| < \varepsilon.
   \]
   $f$ is \emph{continuous} if it is continuous at each every $a\in A$. That is
   \[
-    \forall a\in A\; \forall \varepsilon > 0\; \exists \delta > 0\; \forall y\in A:\; |y - a| < \delta \Rightarrow  |f(y) - f(a)| < \varepsilon.
+    (\forall a\in A)(\forall \varepsilon > 0)(\exists \delta > 0)(\forall y\in A)\, |y - a| < \delta \Rightarrow  |f(y) - f(a)| < \varepsilon.
   \]
 \end{defi}
 Intuitively, $f$ is continuous at $a$ if we can obtain $f(a)$ as accurately as we wish by using more accurate values of $a$ (the definition says that if we want to approximate $f(a)$ by $f(y)$ to within accuracy $\varepsilon$, we just have to get our $y$ to within $\delta$ of $a$ for some $\delta$).
 
-For example, given the function
+For example, suppose we have the function
 \[
   f(x) = \begin{cases} 0 & x \leq \pi\\ 1& x > \pi\end{cases}.
 \]
-Suppose we have a computer program that computes this function (which we don't know the formula for), and we want to know what $f(\pi)$ is. Since we cannot input $\pi$ (it has infinitely many digits), we can try $3$, and it gives $0$. Then we try $3.14$, and it gives $0$ again. If we try $3.1416$, it gives $1$ (since $\pi = 3.1415926\cdots < 3.1416$). We keep giving more and more digits of $\pi$, but the result keeps oscillating between $0$ and $1$. We have no hope of what $f(\pi)$ might be, even approximately. So this $f$ is discontinuous at $\pi$.
+Suppose that we don't know what the function actually is, but we have a computer program that computes this function. We want to know what $f(\pi)$ is. Since we cannot input $\pi$ (it has infinitely many digits), we can try $3$, and it gives $0$. Then we try $3.14$, and it gives $0$ again. If we try $3.1416$, it gives $1$ (since $\pi = 3.1415926\cdots < 3.1416$). We keep giving more and more digits of $\pi$, but the result keeps oscillating between $0$ and $1$. We have no hope of what $f(\pi)$ might be, even approximately. So this $f$ is discontinuous at $\pi$.
 
 However, if we have the function $g(x) = x^2$, then we \emph{can} find the (approximate) value of $g(\pi)$. We can first try $g(3)$ and obtain $9$. Then we can try $g(3.14) = 9.8596$, $g(3.1416) = 9.86965056$ etc. We can keep trying and obtain more and more accurate values of $g(\pi)$. So $g$ is continuous at $\pi$.
 
@@ -946,6 +982,8 @@ However, if we have the function $g(x) = x^2$, then we \emph{can} find the (appr
     \item The function $f(x) = x$ is continuous (take $\delta = \varepsilon$).
   \end{itemize}
 \end{eg}
+
+The definition of continuity of a function looks rather like the definition of convergence. In fact, they are related by the following lemma:
 
 \begin{lemma}
   The following two statements are equivalent for a function $f: A\to \R$.
@@ -958,13 +996,13 @@ However, if we have the function $g(x) = x^2$, then we \emph{can} find the (appr
 \begin{proof}
   (i)$\Rightarrow$(ii) Let $\varepsilon > 0$ Since $f$ is continuous at $a$,
   \[
-    \exists \delta > 0\; \forall y\in A:\; |y-a|< \delta \Rightarrow |f(y) - f(a)| < \varepsilon.
+    (\exists \delta > 0)(\forall y\in A)\, |y-a|< \delta \Rightarrow |f(y) - f(a)| < \varepsilon.
   \]
-  We want $N$ such that $\forall n \geq N$, $|f(a_n) - f(a)| < \varepsilon$. It is therefore enough to find $N$ such that $\forall n\geq N$, $|a_n - a < \delta|$. Since $a_n \to a$, such an $N$ exists.
+  We want $N$ such that $\forall n \geq N$, $|f(a_n) - f(a)| < \varepsilon$. By continuity, it is enough to find $N$ such that $\forall n\geq N$, $|a_n - a| < \delta$. Since $a_n \to a$, such an $N$ exists.
 
   (ii)$\Rightarrow$(i) We prove the contrapositive: Suppose $f$ is not continuous at $a$. Then
   \[
-    \exists \varepsilon > 0\;\forall \delta > 0 \exists y\in A: |y - a| < \delta \text{ and }|f(y) - f(a)| \geq \varepsilon.
+    (\exists \varepsilon > 0)(\forall \delta > 0)(\exists y\in A)\, |y - a| < \delta \text{ and }|f(y) - f(a)| \geq \varepsilon.
   \]
   For each $n$, we can therefore pick $a_n \in A$ such that $|a_n - a| < \frac{1}{n}$ and $|f(a_n) - f(a)| \geq \varepsilon$. But then $a_n \to a$ (by Archimedean property), but $f(a_n) \not\to f(a)$.
 \end{proof}
@@ -992,6 +1030,7 @@ However, if we have the function $g(x) = x^2$, then we \emph{can} find the (appr
       Then $f(a)$ is discontinuous. For example, let $a_n = 1/[(2n + 0.5)\pi]$. Then $a_n\to 0$ and $f(a_n) \to 1 \not= f(0)$.
   \end{enumerate}
 \end{eg}
+We can use this sequence definition as the definition for continuous functions. This has the advantage of being cleaner to write and easier to work with. In particular, we can reuse a lot of our sequence theorems to prove the analogous results for continuous functions.
 
 \begin{lemma}
   Let $A\subseteq \R$ and $f, g: A\to \R$ be continuous functions. Then
@@ -1013,13 +1052,13 @@ However, if we have the function $g(x) = x^2$, then we \emph{can} find the (appr
         f(a_n) + g(a_n) \to f(a) + g(a) = (f + g)(a).
       \]
   \end{enumerate}
-  With exactly the same technique for (ii) and (iii).
+  (ii) and (iii) are proved in exactly the same way.
 \end{proof}
 
 With this lemma, from the fact that constant functions and $f(x) = x$ are continuous, we know that all polynomials are continuous. Similarly, rational functions $P(x)/Q(x)$ are continuous except when $Q(x) = 0$.
 
 \begin{lemma}
-  Let $f: A\to B$ ad $g: B\to \R$. Then if $f$ and $g$ are continuous, $g\circ f: A\to \R$ is continuous.
+  Let $A, B\subseteq \R$ and $f: A\to B$, $g: B\to \R$. Then if $f$ and $g$ are continuous, $g\circ f: A\to \R$ is continuous.
 \end{lemma}
 
 \begin{proof}
@@ -1032,7 +1071,8 @@ With this lemma, from the fact that constant functions and $f(x) = x$ are contin
   \end{enumerate}
 \end{proof}
 
-\begin{thm}
+There are two imporant theorems regarding continuous functions - the maximum value theorem and the intermediate value theorem.
+\begin{thm}[Maximum value theorem]
   Let $[a, b]$ be a closed interval in $\R$ and let $f: [a, b] \to \R$ be continuous. Then $f$ is bounded and attains it bounds, i.e. $f(x) = \sup f$ for some $x$, and $f(y) = \inf f$ for some $y$.
 \end{thm}
 
@@ -1053,15 +1093,15 @@ With this lemma, from the fact that constant functions and $f(x) = x$ are contin
 \begin{proof}
   We have several proofs:
   \begin{enumerate}
-    \item Let $A = \{x: f(x) < 0\}$ and let $s = \sup A$. We shall show that $f(s) = 0$ (this is similar to the proof that $\sqrt{2}$ exists in Numbers and Sets). If $f(s) < 0$, then setting $\varepsilon = |f(s)|$ in the definition of continuity, we can find $\delta > 0$ such that $\forall y$, $|y - s| < \delta \Rightarrow f(y) < f(s) < 0$. Then $s + \delta/2 \in A$, so $s$ is not an upper bound. Contradiction.
+    \item Let $A = \{x: f(x) < 0\}$ and let $s = \sup A$. We shall show that $f(s) = 0$ (this is similar to the proof that $\sqrt{2}$ exists in Numbers and Sets). If $f(s) < 0$, then setting $\varepsilon = |f(s)|$ in the definition of continuity, we can find $\delta > 0$ such that $\forall y$, $|y - s| < \delta \Rightarrow f(y) < 0$. Then $s + \delta/2 \in A$, so $s$ is not an upper bound. Contradiction.
 
-    If $f(s) > 0$, by the same argument, we can find $\delta > 0$ such that $\forall y$, $|y - s| < \delta \Rightarrow  f(y) > f(s) > 0$. So $s - \delta/2$ is a smaller upper bound.
+    If $f(s) > 0$, by the same argument, we can find $\delta > 0$ such that $\forall y$, $|y - s| < \delta \Rightarrow  f(y) > 0$. So $s - \delta/2$ is a smaller upper bound.
   \item Let $a_0 = a$, $b_0 = b$. By repeated bisection, construct nested intervals $[a_n, b_n]$ such that $b_n - a_n = \frac{b_0 - a_0}{2^n}$ and $f(a_n) < 0 \leq f(b_n)$. Then by the nested intervals property, we can find $x\in \cap_{n = 0}^\infty [a_n, b_n]$. Since $b_n - a_n \to 0$, $a_n, b_n \to x$.
 
     Since $f(a_n) < 0$ for every $n$, $f(x) \leq 0$. Similarly, since $f(b_n) \geq 0$ for every $n$, $f(x) \geq 0$. So $f(x) = 0$.
   \end{enumerate}
 \end{proof}
-\note It is easy to generalize this to get that, if $f(a) < c < f(b)$, then $\exists x\in (a, b)$ such that $f(x) = c$, by applying the result to $f(x) - c$. Also, we can assume instead that $f(b) < c < f(a)$ and obtain the same result by looking at $-f(x)$.
+It is easy to generalize this to get that, if $f(a) < c < f(b)$, then $\exists x\in (a, b)$ such that $f(x) = c$, by applying the result to $f(x) - c$. Also, we can assume instead that $f(b) < c < f(a)$ and obtain the same result by looking at $-f(x)$.
 
 \begin{cor}
   Let $f: [a, b]\to [c, d]$ be a continuous strictly increasing function with $f(a) = c$, $f(b) = d$. Then $f$ is invertible and its inverse is continuous.
@@ -1075,6 +1115,8 @@ With this lemma, from the fact that constant functions and $f(x) = x$ are contin
 With this corollary, we can create more continuous functions, e.g. $\sqrt{x}$.
 
 \subsection{Continuous induction*}
+Continuous induction is a generalization of induction on natural numbers. It provides an alternative mechanism to prove certain results we have shown.
+
 \begin{prop}[Continuous induction v1]
   Let $a < b$ and let $A\subseteq [a, b]$ have the following properties:
   \begin{enumerate}
@@ -1090,8 +1132,8 @@ With this corollary, we can create more continuous functions, e.g. $\sqrt{x}$.
 
   If $s\not= b$, then by (ii), we can find $y\in A$ such that $y > s$.
 \end{proof}
-We can use this to prove the intermediate value theorem.
 
+It can also be formulated as follows:
 \begin{prop}[Continuous induction v2]
   Let $A\subseteq [a, b]$ and suppose that
   \begin{enumerate}
@@ -1118,22 +1160,22 @@ We reprove intermediate value theorem here:
 \end{thm}
 
 \begin{proof}
-  Assume that $f$ is continuous. Suppose $f(a) < 0 < f(b)$. Assume that $\forall x: f(x) \not =0$, and derive a contradiction.
+  Assume that $f$ is continuous. Suppose $f(a) < 0 < f(b)$. Assume that $(\forall x)\, f(x) \not =0$, and derive a contradiction.
 
   Let $A = \{x: f(x) < 0\}$ Then $a\in A$. If $x\in A$, then $f(x) < 0$, and by continuity, we can find $\delta > 0$ such that $|y - x| < \delta\Rightarrow  f(y) < 0$. So if $x\not= b$, then we can find $y\in A$ such that $y > x$.
 
   We prove the contrapositive of the last condition, i.e.
   \[
-    x\not\in A\Rightarrow \exists \delta > 0: \forall y\in A: y\not\in(x - \varepsilon, x].
+    x\not\in A\Rightarrow (\exists \delta > 0)(\forall y\in A)\, y\not\in(x - \delta, x].
   \]
-  If $x\in A$, then $f(x) > 0$ (we assume that $f$ is never zero. If not, we're done). Then by continuity, $\exists \delta > 0$ such that $|y - x| < \delta \Rightarrow  f(y) > 0$. So $y\not\in A$.
+  If $x\not\in A$, then $f(x) > 0$ (we assume that $f$ is never zero. If not, we're done). Then by continuity, $\exists \delta > 0$ such that $|y - x| < \delta \Rightarrow  f(y) > 0$. So $y\not\in A$.
 
   Hence by continuous induction, $b\in A$. Contradiction.
 \end{proof}
 
 Now we prove that continuous functions in closed intervals are bounded.
 \begin{thm}
-  Let $[a, b]$ be a closed interval in $\R$ and let $f: [a, b] \to \R$ be continuous. Then $f$ is bounded and attains it bounds, i.e. $f(x) = \sup f$ for some $x$, and $f(y) = \inf f$ for some $y$.
+  Let $[a, b]$ be a closed interval in $\R$ and let $f: [a, b] \to \R$ be continuous. Then $f$ is bounded.
 \end{thm}
 
 \begin{proof}
@@ -1144,6 +1186,7 @@ Now we prove that continuous functions in closed intervals are bounded.
   So we are done by continuous induction.
 \end{proof}
 
+Finally, we can prove a theorem that we have not yet proven.
 \begin{defi}[Cover of a set]
   Let $A\subseteq \R$. A \emph{cover} of $A$ by open intervals is a set $\{I_\gamma: \gamma\in \Gamma\}$ where each $I_\gamma$ is an open interval and $A \subseteq \bigcup_{\gamma\in \Gamma}$ $I_\gamma$.
 
@@ -1161,7 +1204,7 @@ Not every cover has a finite subcover. For example, the cover $\{(\frac{1}{n}, 1
 
   Then $a\in A$ since $a$ must belong to some $I_\gamma$.
 
-  If $x\in A$, then pick $\gamma$ such that $x\in I_\gamma$. The if $x\not = b$, then since $I_\gamma$ is an open interval, it contains $[x, y]$ for some $y > x$. Then $[a, y]$ can be covered by finitely many $I_\gamma$, by taking a finite cover for $[a, x]$ and the $I_\gamma$ that contains $x$.
+  If $x\in A$, then pick $\gamma$ such that $x\in I_\gamma$. Then if $x\not = b$, since $I_\gamma$ is an open interval, it contains $[x, y]$ for some $y > x$. Then $[a, y]$ can be covered by finitely many $I_\gamma$, by taking a finite cover for $[a, x]$ and the $I_\gamma$ that contains $x$.
 
   Now suppose that $\forall \varepsilon > 0, \exists y\in A$ such that $y\in (x - \varepsilon, x]$.
 
@@ -1179,7 +1222,7 @@ We can use Heine-Borel to prove that continuous functions on $[a, b]$ are bounde
 \begin{proof}
   Let $f: [a, b]\to \R$ be continuous. Then by continuity,
   \[
-    \forall x\in [a, b] \;\exists \delta_x > 0\; \forall y:\;|y - x| < \delta_x\Rightarrow |f(y) - f(x)| < 1.
+    (\forall x\in [a, b])(\exists \delta_x > 0)(\forall y)\, |y - x| < \delta_x\Rightarrow |f(y) - f(x)| < 1.
   \]
   Let $\gamma = [a, b]$ and for each $x\in \gamma$, let $I_x = (x - \delta_x, x + \delta_x)$. So by Heine-Borel, we can find $x_1, \cdots, x_n$ such that $[a, b]\subseteq \bigcup_1^n (x_i - \delta_{x_i}, x_i + \delta_{x_i})$.
 
@@ -1187,15 +1230,17 @@ We can use Heine-Borel to prove that continuous functions on $[a, b]$ are bounde
 \end{proof}
 
 \section{Differentiability}
+In the remainder of the course, we will properly develop calculus, and put differentiation and integration on a rigorous foundation. Every notion will be given a proper definition which we will use to prove results like the product and quotient rule.
 \subsection{Limits}
+First of all, we need the notion of limits. Recall that we've previously had limits for \emph{sequences}. Now, we will define limits for functions.
 \begin{defi}[Limit of functions]
   Let $A\subseteq \R$ and let $f: A\to \R$. We say
   \[
     \lim_{x\to a}f(x) = \ell,
   \]
-  if
+  or ``$f(x) \to \ell$ as $x \to a$'', if
   \[
-    \forall \varepsilon > 0\;\exists \delta > 0\;\forall x\in A:\; 0 < |x - a| < \delta \Rightarrow  |f(x) - \ell| < \varepsilon.
+    (\forall \varepsilon > 0)(\exists \delta > 0)(\forall x\in A)\, 0 < |x - a| < \delta \Rightarrow  |f(x) - \ell| < \varepsilon.
   \]
   We couldn't care less what happens when $x = a$, hence the strict inequality $0 < |x - a|$. In fact, $f$ doesn't even have to be defined at $x = a$.
 \end{defi}
@@ -1218,9 +1263,6 @@ We can use Heine-Borel to prove that continuous functions on $[a, b]$ are bounde
   We will see a proof later after we define what $\sin$ means.
 \end{eg}
 
-\begin{notation}
-  We also write ``$f(x)\to \ell$ as $x\to a$'' for $\lim\limits_{x\to a}f(x) = \ell$.
-\end{notation}
 We notice that the definition of the limit is suspiciously similar to that of continuity. In fact, if we define
 \[
   g(x) =
@@ -1239,6 +1281,7 @@ The previous limit theorems of sequences apply here as well
 \end{prop}
 
 \subsection{Differentiation}
+Similar to what we did in IA Differential Equations, we define the derivative as a limit.
 \begin{defi}[Differentiable function]
   $f$ is \emph{differentiable} at $a$ with derivative $\lambda$ if
   \[
@@ -1246,13 +1289,13 @@ The previous limit theorems of sequences apply here as well
   \]
   Equivalently, if
   \[
-    \lim_{h\to 0}\frac{f(a + h) - f(x)}{h} = \lambda.
+    \lim_{h\to 0}\frac{f(a + h) - f(a)}{h} = \lambda.
   \]
   We write $\lambda = f'(x)$.
 \end{defi}
 Here we see why, in the definition of the limit, we say that we don't care what happens when $x = a$. In our definition here, our function is 0/0 when $x = a$, and we can't make any sense out of what happens when $x = a$.
 
-Alternatively, write the definition of differentiation as
+Alternatively, we write the definition of differentiation as
 \[
   \frac{f(x + h) - f(x)}{h} = f'(x) + \epsilon(h),
 \]
@@ -1260,10 +1303,9 @@ where $\epsilon(h) \to 0$ as $h \to 0$. Rearranging, we can deduce that
 \[
   f(x + h) = f(x) + hf'(x) + h\epsilon(h),
 \]
+Note that by the definition of the limit, we don't have to care what value $\epsilon$ takes when $h = 0$. It can be $0$, $\pi$ or $10^{10^{10}}$. However, we usually take $\epsilon(0) = 0$ so that $\epsilon$ is continuous.
 
-Note that this equation remains true if we set $\epsilon(0) = 0$ (or anything - say $\pi$, but if $\epsilon(0) = 0$, then $\epsilon$ is continuous at $0$).
-
-Note also that $\frac{h\varepsilon(h)}{h}\to 0$ as $h\to 0$. We often write $o(h)$ for a function with the property that $\frac{o(h)}{h}\to 0$ as $h\to 0$ (cf. Differential Equations). So
+Using the small-$o$ notation, we usually write $o(h)$ for a function that satisfies $\frac{o(h)}{h}\to 0$ as $h\to 0$. Hence we have
 \begin{prop}
   \[
     f(x + h) = f(x) + hf'(x) + o(h).
@@ -1285,12 +1327,14 @@ Conversely, we have
   \]
 \end{proof}
 
+We can take derivatives multiple times, and get multiple derivatives.
 \begin{defi}[Multiple derivatives]
-  This is defined recursively: $f$ is $(n + 1)$-times differentiable if it is $n$-times differentiable and its $n$-th derivative $f^{(n)}$ is differentiable. We write $f^{(n + 1)}$ for the derivative of $f^{(n)}$, ie. then $(n + 1)$th derivative of $f$.
+  This is defined recursively: $f$ is $(n + 1)$-times differentiable if it is $n$-times differentiable and its $n$-th derivative $f^{(n)}$ is differentiable. We write $f^{(n + 1)}$ for the derivative of $f^{(n)}$, ie. the $(n + 1)$th derivative of $f$.
 
   Informally, we will say $f$ is $n$-times differentiable if we can differentiate it $n$ times, and the $n$th derivative is $f^{(n)}$.
 \end{defi}
 
+We can prove the usual rules of differentiation using the small $o$-notation. It can also be proven by considering limits directly, but the notation will become a bit more daunting.
 \begin{lemma}[Sum and product rule]
   Let $f, g$ be differentiable at $x$. Then $f + g$ and $fg$ are differentiable at $x$, with
   \begin{align*}
@@ -1308,7 +1352,7 @@ Conversely, we have
     &= [f(x) + hf'(x) + o(h)][g(x) + hg'(x) + o(h)]\\
     &= f(x)g(x) + h[f'(x)g(x) + f(x)g'(x)]\\
     &+ \underbrace{o(h)[g(x) + f(x) + hf'(x) + hg'(x) + o(h)] + h^2f'(x)g'(x)}_{\text{error term}}\\
-    \intertext{By limit theorems, the error term is $o(h)$}
+    \intertext{By limit theorems, the error term is $o(h)$. So we can write this as}
     &= f(x) + h(f'(x)g(x) + f(x)g'(x)) + o(h).
   \end{align*}
 \end{proof}
@@ -1319,17 +1363,14 @@ Conversely, we have
 
 \begin{proof}
   In this proof, we use $h\epsilon(h)$ instead of $o(h)$.
-
   \begin{align*}
     (g\circ f)(x + h) &= g(f(x + h))\\
     &= g[f(x) + \underbrace{hf'(x) + h\epsilon_1(h)}_{\text{the ``}h\text{'' term}}]\\
-    \intertext{where $\epsilon_1(h) \to 0$ and $\epsilon_1(0) = 0$}
     &= g(f(x)) + \big(fg'(x) + h\epsilon_1(h)\big)g'(f(x))\\
     &+ \big(hf'(x) + h\epsilon_1(h)\big)\epsilon_2(hf'(x) + h\epsilon_1(h))\\
     &= g\circ f(x) + hg'(f(x))f'(x)\\
     &+ \underbrace{h\Big[\epsilon_1(h)g'(f(x)) + \big(f'(x) + \epsilon_1(h)\big)\epsilon_2\big(hf'(x) + h\epsilon_1(h)\big)\Big]}_{\text{error term}}.
   \end{align*}
-
   We want to show that the error term is $o(h)$, ie. it divided by $h$ tends to $0$ as $h\to 0$.
 
   But $\epsilon_1(h)g'(f(x))\to 0$, $f'(x) + \epsilon_1(h)$ is bounded, and $\epsilon_2(hf'(x) + h\epsilon_1(h))\to 0$ because $hf'(x) + h\epsilon_1(h) \to 0$ and $\epsilon_2(0) = 0$. So our error term is $o(h)$.
@@ -1337,10 +1378,10 @@ Conversely, we have
 
 \begin{eg}\leavevmode
   \begin{enumerate}
-    \item Constant functions are differentiable with derivative $0$
-    \item $f(x) = \lambda x$ is differentiable with derivative $\lambda$
-    \item By induction, $x^n$ is differentiable with derivative $nx^{n - 1}$ (product rule)
-    \item Hence all polynomials are differentiable
+    \item Constant functions are differentiable with derivative $0$.
+    \item $f(x) = \lambda x$ is differentiable with derivative $\lambda$.
+    \item Using the product rule, we can show that $x^n$ is differentiable with derivative $nx^{n - 1}$ by induction.
+    \item Hence all polynomials are differentiable.
   \end{enumerate}
 \end{eg}
 
@@ -1402,7 +1443,6 @@ Note that the conditions will (almost) always require $f$ to be differentiable o
   \[
     f'(x) = \frac{1}{g'(f(x))} = \frac{1}{2x^{1/2}} = \frac{1}{2}x^{-1/2}.
   \]
-
   Similarly, we can show that the derivative of $x^{1/q}$ is $\frac{1}{q}x^{1/q - 1}$.
 
   Then let's take $x^{p/q} = (x^{1/q})^p$. By the chain rule, its derivative is
@@ -1412,6 +1452,8 @@ Note that the conditions will (almost) always require $f$ to be differentiable o
 \end{eg}
 
 \subsection{Differentiation theorems}
+Everything we've had so far is something we already know. It's just that now we can prove them rigorously. In this section, we will come up with genuinely new theorems, including but not limited to \emph{Taylor's theorem}, which gives us Taylor's series.
+
 \begin{thm}[Rolle's theorem]
   Let $f$ be continuous on a closed interval $[a, b]$ (with $a < b$) and differentiable on $(a, b)$. Suppose that $f(a) = f(b)$. Then there exists $x\in (a, b)$ such that $f'(x) = 0 $.
 \end{thm}
@@ -1430,7 +1472,7 @@ It is intuitively obvious: if you move up and down, and finally return to the sa
       \geq 0 & h < 0
     \end{cases}
   \]
-  since $f(x + h) - f(x) \leq 0$ by maximality of $f(x)$. As we take the limit as $h\to 0$, we know that $f'(x) \leq 0$ and $f'(x) \geq 0$. So $f'(x) = 0$.
+  since $f(x + h) - f(x) \leq 0$ by maximality of $f(x)$. By considering both sides as we take the limit $h\to 0$, we know that $f'(x) \leq 0$ and $f'(x) \geq 0$. So $f'(x) = 0$.
 \end{proof}
 
 \begin{cor}[Mean value theorem]
@@ -1452,9 +1494,8 @@ It is intuitively obvious: if you move up and down, and finally return to the sa
   \end{center}
 \end{cor}
 
+The mean value theorem is sometimes described as ``rotate your head and apply Rolle's''. However, if we actually rotate it, we might end up with a non-function. What we actually want is a shear.
 \begin{proof}
-  The mean value theorem is often described as ``rotate your head and apply Rolle's''. However, if we actually rotate it, we might end up with a non-function. What we actually want is a shear.
-
   Let
   \[
     g(x) = f(x) - \frac{f(b) - f(a)}{b - a}x.
@@ -1470,6 +1511,7 @@ It is intuitively obvious: if you move up and down, and finally return to the sa
   as required.
 \end{proof}
 
+We've always assumed that if a function has a positive derivative everywhere, then the function is increasing. However, it turns out that this is really hard to prove directly. It does, however, follow quite immediately from the mean value theorem.
 \begin{eg}
   Suppose $f'(x) > 0$ for every $x\in (a, b)$. Then for $u, v$ in $[a, b]$, we can find $w\in (u, v)$ such that
   \[
@@ -1477,7 +1519,7 @@ It is intuitively obvious: if you move up and down, and finally return to the sa
   \]
   It follows that $f(v) > f(u)$. So $f$ is strictly increasing.
 
-  Similarly, if $f'(x) \geq 2$ for every $x$ and $f(0) = 0$, then $f(1) \geq 2$, since we can find $x\in (0, 1)$ such that
+  Similarly, if $f'(x) \geq 2$ for every $x$ and $f(0) = 0$, then $f(1) \geq 2$, or else we can find $x\in (0, 1)$ such that
   \[
     2\leq f'(x) = \frac{f(1) - f(0)}{1 - 0} = f(1).
   \]
@@ -1498,6 +1540,7 @@ Note that this not only requires $f$ to be differentiable, but the derivative it
   Then done by the inverse function theorem.
 \end{proof}
 
+Finally, we are going to prove Taylor's theorem. To do so, we will first need some lemmas.
 \begin{thm}[Higher-order Rolle's theorem]
   Let $f$ be continuous on $[a, b]$ ($a < b$) and $n$-times differentiable on an open interval containing $[a, b]$. Suppose that
   \[
@@ -1548,7 +1591,7 @@ for $j = 0, 1, \cdots, n - 1$. To get $p(b) = f(b)$, we use our $n$th degree pol
 \[
   p(x) = Q(x) + \frac{(x - a)^n}{(b - a)^n}\big(f(b) - Q(b)\big).
 \]
-Then our final term does not mess up our first $n - 1$ derivatives, and $p(b)=  f(b)$.
+Then our final term does not mess up our first $n - 1$ derivatives, and gives $p(b)=  f(b)$.
 
 By the previous corollary, we can find $x\in (a, b)$ such that
 \[
@@ -1566,15 +1609,15 @@ Alternatively,
 \[
   f(b) = f(a) + (b - a)f'(a) + \cdots + \frac{(b - a)^{n - 1}}{(n- 1)!}f^{(n - 1)}(a) + \frac{(b - a)^n}{n!}f^{(n)}(x).
 \]
-Setting $h = b - a$, we can rewrite this as
-\begin{thm}[Taylor's theorem]
+Setting $b = a + h$, we can rewrite this as
+\begin{thm}[Taylor's theorem with the Lagrange form of remainder]
   \[
     f(a + h) = \underbrace{f(a) + hf'(a) + \cdots + \frac{h^{n - 1}}{(n - 1)!}f^{(n - 1)}(a)}_{(n - 1)\text{-degree approximation to }f\text{ near }a} + \underbrace{\frac{h^n}{n!}f^{(n)}(x)}_{\text{error term}}.
   \]
   for some $x\in (a, a + h)$.
-
-  \note Strictly speaking, we only proved it for the case when $h > 0$, but we can easily show it holds for $h < 0$ too by considering $g(x) = f(-x)$.
 \end{thm}
+Strictly speaking, we only proved it for the case when $h > 0$, but we can easily show it holds for $h < 0$ too by considering $g(x) = f(-x)$.
+
 Note that the remainder term is \emph{not} necessarily small, but this often gives us the best $(n - 1)$-degree approximation to $f$ near $a$. For example, if $f^{(n)}$ is bounded by $C$ near $a$, then
 \[
   \left|\frac{h^n}{n!}f^{(n)}(x)\right| \leq \frac{C}{n!}|h|^n = o(h^{n - 1}).
@@ -1595,17 +1638,20 @@ Note that the remainder term is \emph{not} necessarily small, but this often giv
   \[
     f(x) = \sum_{k = 0}^{n - 1}\frac{x^k}{k!} + \frac{f^{(n)}(u)}{n!}x^n.
   \]
-  We must show that the remainder term $\frac{f^{(n)}(u)}{n!}x^n \to 0$ as $n \to \infty$. (\note $x$ is fixed, but $u$ can depend on $n$)
+  We must show that the remainder term $\frac{f^{(n)}(u)}{n!}x^n \to 0$ as $n \to \infty$. Note here that $x$ is fixed, but $u$ can depend on $n$.
 
-  But we know that $f^{(u)} = f(u)$, but since $f$ is differentiable, it is continuous, and is bounded on $[0, x]$. Suppose $|f(u)| \leq C$ on $[0, x]$. Then
+  But we know that $f^{(n)}(u) = f(u)$, but since $f$ is differentiable, it is continuous, and is bounded on $[0, x]$. Suppose $|f(u)| \leq C$ on $[0, x]$. Then
   \[
     \left|\frac{f^{(n)(u)}}{n!}x^n\right| \leq \frac{C}{n!}|x|^n \to 0
   \]
-  from limit theorems.
+  from limit theorems. So it follows that
+  \[
+    f(x) = 1 + x + \frac{x^2}{2!} + \frac{x^3}{3!} + \cdots = \sum_{n = 0}^\infty \frac{x^n}{n!}.
+  \]
 \end{eg}
 \subsection{Complex differentiation}
 \begin{defi}[Complex differentiability]
-  Let $f: \C \to \C$ (or more generally, from $A\subseteq \C \to \C$), then $f$ is differentiable at $z$ with derivative $f'(z)$ if
+  Let $f: \C \to \C$. Then $f$ is differentiable at $z$ with derivative $f'(z)$ if
   \[
     \lim_{h \to 0}\frac{f(z + h) - f(z)}{h}\text{ exists and equals }f'(z).
   \]
@@ -1616,7 +1662,7 @@ Note that the remainder term is \emph{not} necessarily small, but this often giv
 \end{defi}
 This is exactly the same definition with real differentiation, but has very different properties!
 
-All the usual rules - chain rule, product rule etc. also apply (with the same proofs). Also the derivatives of polynomials are what you expect.
+All the usual rules - chain rule, product rule etc. also apply (with the same proofs). Also the derivatives of polynomials are what you expect. However, there are some more interesting cases.
 
 \begin{eg}
   $f(z) = \bar z$ is \emph{not} differentiable.
@@ -1628,12 +1674,13 @@ All the usual rules - chain rule, product rule etc. also apply (with the same pr
     \end{cases}
   \]
 \end{eg}
-The weirdness is because we often think of $\C$ as $\R^2$, but they are not the same. For example, reflection is a linear map in $\R^2$, but not in $\C$. A linear map in $\C$ is something in the form $x \mapsto bx$, which can only be a dilation or rotation, not reflections or other weird things.
+If this seems weird, this is because we often think of $\C$ as $\R^2$, but they are not the same. For example, reflection is a linear map in $\R^2$, but not in $\C$. A linear map in $\C$ is something in the form $x \mapsto bx$, which can only be a dilation or rotation, not reflections or other weird things.
 
 \begin{eg}
   $f(z) = |z|$ is also not differentiable. If it were, then $|z|^2$ would be as well (by the product rule). So would $\frac{|z|^2}{z} = \bar z$ when $z \not= 0$ by the quotient rule. At $z = 0$, it is certainly not differentiable, since it is not even differentiable on $\R$.
 \end{eg}
 \section{Complex power series}
+Before we move on to integration, we first have a look at complex power series. This will allow us to define the familiar exponential and trigonometric functions.
 \begin{defi}[Complex power series]
   A \emph{complex power series} is a series of the form
   \[
@@ -1642,8 +1689,9 @@ The weirdness is because we often think of $\C$ as $\R^2$, but they are not the 
   when $z\in \C$ and $a_n\in \C$ for all $n$. When it converges, it is a function of $z$.
 \end{defi}
 
+When considering complex power series, a very important concept is the \emph{radius of convergence}. To make sense of this concept, we first need the following lemma:
 \begin{lemma}
-  Suppose that $\sum_{n = 0}^\infty a_nz^n$ converges and $|w| < |z|$, then $\sum a_n w^n$ converges. Moreover, $\sum a_nw^n$ converges absolutely.
+  Suppose that $\sum a_nz^n$ converges and $|w| < |z|$, then $\sum a_n w^n$ converges (absolutely).
 \end{lemma}
 
 \begin{proof}
@@ -1661,7 +1709,7 @@ The weirdness is because we often think of $\C$ as $\R^2$, but they are not the 
   \]
   which converges (geometric series). So by the comparison test, $\sum a_nw^n$ converges absolutely.
 \end{proof}
-\note It follows that if $\sum a_nz^n$ does not converge, and $|w| > |z|$, then $\sum a_nw^n$ does not converge.
+It follows that if $\sum a_nz^n$ does not converge and $|w| > |z|$, then $\sum a_nw^n$ does not converge.
 
 Now let $R = \sup\{|z|: \sum a_nz^n$ converges $\}$ ($R$ may be infinite). If $|z| < R$, then we can find $z_0$ with $|z_0|\in (|z|, R]$ such that $\sum_n^\infty a_nz_0^n$ converges. So by lemma above, $\sum a_n z^n$ converges. If $|z| > R$, then $\sum a_nz^n$ diverges by definition of $R$.
 
@@ -1693,6 +1741,8 @@ Now let $R = \sup\{|z|: \sum a_nz^n$ converges $\}$ ($R$ may be infinite). If $|
   The series $\displaystyle \sum_{n = 1}^\infty \frac{z^{n}}{n^2}$ converges for $|z| \leq 1$ and diverges for $|z| > 1$.
 \end{eg}
 
+As evidenced by the above examples, the ratio test can be used to find the radius of convergence. We also have an alternative test based on the $n$-th root.
+
 \begin{lemma}
   The radius of convergence of a power series $\sum a_nz^n$ is
   \[
@@ -1704,7 +1754,7 @@ Now let $R = \sup\{|z|: \sum a_nz^n$ converges $\}$ ($R$ may be infinite). If $|
 \begin{proof}
   Suppose $|z| < 1/\limsup \sqrt[n]{|a_n|}$. Then $|z| \limsup \sqrt[n]{|a_n|} < 1$. Therefore there exists $N$ and $\varepsilon > 0$ such that
   \[
-    \sup_{n \geq N}|z|\sqrt[n]{|a_n|} \leq 1 -  \frac{1}{\varepsilon}
+    \sup_{n \geq N}|z|\sqrt[n]{|a_n|} \leq 1 -  \varepsilon
   \]
   by the definition of $\limsup$. Therefore
   \[
@@ -1816,7 +1866,7 @@ and equate coefficients of $z^n$, you get
     &= e^{z + w}.
   \end{align*}
 \end{proof}
-\note if $(c_n)$ is the convolution of $(a_n)$ and $(b_n)$, then the convolution of $(a_nz^n)$ and $(b_nz^n)$ is $(c_nz^n)$. Therefore if both $\sum a_n z^n$ and $\sum b_nz^n$ converge absolutely, then their product is $\sum c_n z^n$.
+Note that if $(c_n)$ is the convolution of $(a_n)$ and $(b_n)$, then the convolution of $(a_nz^n)$ and $(b_nz^n)$ is $(c_nz^n)$. Therefore if both $\sum a_n z^n$ and $\sum b_nz^n$ converge absolutely, then their product is $\sum c_n z^n$.
 
 Note that we have now completed the proof that the derivative of $e^z$ is $e^z$.
 
@@ -1931,10 +1981,11 @@ We first prove some (seemingly arbitrary and random) lemmas to build up the proo
   \]
   and simplify.
 \end{proof}
-\note this implies
+This implies that
 \[
-  (z + h)^n - z^n - nhz^{n - 1} = h^2((z + h)^{n - 2} + 2z(z + h)^{n - 3} + \cdots + (n - 1)z^{n - 2}).
+  (z + h)^n - z^n - nhz^{n - 1} = h^2((z + h)^{n - 2} + 2z(z + h)^{n - 3} + \cdots + (n - 1)z^{n - 2}),
 \]
+which is actually the form we need.
 \begin{lemma}
   Let $a_n z^n$ have radius of convergence $R$, and let $|z| < R$. Then $\sum na_n z^{n - 1}$ converges (absolutely).
 \end{lemma}
@@ -1974,7 +2025,7 @@ We first prove some (seemingly arbitrary and random) lemmas to build up the proo
   \]
   We started summing from $n = 2$ since the $n = 0$ and $n = 1$ terms are 0. Using our first lemma, we are left with
   \[
-    h^2\sum_{n = 2}^\infty a_n \big((z + h)^{n - 2} + 2z(z + h)^{n - 3} + \cdots + (n - 1)z^{n - 2}\big)
+    j^2\sum_{n = 2}^\infty a_n \big((z + h)^{n - 2} + 2z(z + h)^{n - 3} + \cdots + (n - 1)z^{n - 2}\big)
   \]
   We want the huge infinite series to be bounded, and then the whole thing is a bounded thing times $h^2$, which is definitely $o(h)$.
 
@@ -2029,6 +2080,10 @@ Also,
   \]
 \end{prop}
 \section{The Riemann Integral}
+Finally, we can get to integrals. There are many ways to define an integral, which can have some subtle differences. The definition we will use here is the \emph{Riemann integral}, which is the simplest definition, but is also the weakest one, in the sense that many functions are \emph{not} Riemann integrable but integrable under other definitions.
+
+Still, the definition of the Riemann integral is not too straightforward, and requires a lot of preliminary definitions.
+\subsection{Riemann Integral}
 \begin{defi}[Dissections]
   Let $[a, b]$ be a closed interval. A \emph{dissection} of $[a, b]$ is sequence $a = x_0 < x_1 < x_2 < \cdots < x_n = b$.
 \end{defi}
@@ -2135,6 +2190,7 @@ Using the picture above, this is because if we cut up the dissections into small
   \]
 \end{proof}
 
+Finally, we can define the integral.
 \begin{defi}[Upper, lower, and Riemann integral]
   The \emph{upper integral} is
   \[
@@ -2148,11 +2204,9 @@ Using the picture above, this is because if we cut up the dissections into small
 
   If this exists, we say $f$ is \emph{Riemann integrable}.
 \end{defi}
-We will later prove the \emph{fundamental theorem of calculus}, which says that integration is the reverse of differentiation. But why don't we simply define integration as anti-differentiation, and prove that it is the area of the curve? There are things that we cannot find (a closed form of) the anti-derivative of, say $e^{-x^2}$. In these cases, we wouldn't want to say the integral doesn't exist - it surely does according to this definition!
+We will later prove the \emph{fundamental theorem of calculus}, which says that integration is the reverse of differentiation. But why don't we simply define integration as anti-differentiation, and prove that it is the area of the curve? There are things that we cannot find (a closed form of) the anti-derivative of, like $e^{-x^2}$. In these cases, we wouldn't want to say the integral doesn't exist - it surely does according to this definition!
 
-\note If $f$ is unbounded above in $[a, b]$, then for any dissection $\mathcal{D}$, there must be some $i$ such that $f$ is unbounded on $[x_{i - 1}, x_i]$. So $M_i = \infty$. So $U_\mathcal{D} f = \infty$.
-
-Similarly, if $f$ is unbounded below, then $L_{\mathcal{D}} f = -\infty$. So unbounded functions are not Riemann integrable.
+There is an immediate necessary condition for Riemann integrability - boundedness. If $f$ is unbounded above in $[a, b]$, then for any dissection $\mathcal{D}$, there must be some $i$ such that $f$ is unbounded on $[x_{i - 1}, x_i]$. So $M_i = \infty$. So $U_\mathcal{D} f = \infty$. Similarly, if $f$ is unbounded below, then $L_{\mathcal{D}} f = -\infty$. So unbounded functions are not Riemann integrable.
 
 \begin{eg}
   Let $f(x) = x$ on $[a, b]$. Intuitively, we know that the integral is $(b^2 - a^2)/2$, and we will show this using the definition above. Let $\mathcal{D} = x_0 < x_1 < \cdots < x_n$ be a dissection. Then
@@ -2202,12 +2256,13 @@ Similarly, if $f$ is unbounded below, then $L_{\mathcal{D}} f = -\infty$. So unb
     \overline{\int_0^1}f(x)\;\d x = 1, \quad \underline{\int_0^1}f(x)\;\d x = 0.
   \]
   So $f$ is \emph{not} Riemann integrable.
+
+  Of course, this function is not interesting at all. The whole point of its existence is to show undergraduates that there are some functions that are not integrable!
 \end{eg}
-\note This function is not interesting at all. The whole point of its existence is to show undergraduates that there are some functions that are not integrable!
 
+Note that it is important to say that the function is not \emph{Riemann} integrable. There are other notions for integration in which this function is integrable. For example, this function is \emph{Lebesgue-integrable}.
 
-\note It is important to say that it is not \emph{Riemann} integrable. There are other notions for integration in which this function is integrable. For example, this function is \emph{Lebesgue-integrable}.
-
+Using the definition to show integrability is often cumbersome. Most of the time, we use the \emph{Riemann's integrability criterion}, which follows rather immediately from the definition, but is much nicer to work with.
 \begin{prop}[Riemann's integrability criterion]
   This is sometimes known as Cauchy's integrability criterion.
 
@@ -2216,7 +2271,6 @@ Similarly, if $f$ is unbounded below, then $L_{\mathcal{D}} f = -\infty$. So unb
     U_\mathcal{D} - L_\mathcal{D} < \varepsilon.
   \]
 \end{prop}
-This is rather trivial and expected result, but it is useful since usually it is easier to show this than to use the definition of integrability directly.
 
 \begin{proof}
   $(\Rightarrow)$ Suppose that $f$ is integrable. Then (by definition of Riemann integrability), there exist $\mathcal{D}_1$ and $\mathcal{D}_2$ such that
@@ -2250,11 +2304,10 @@ This is rather trivial and expected result, but it is useful since usually it is
   So $f$ is integrable.
 \end{proof}
 
-We want to prove that integration is linear, ie
+The next big result we want to prove is that integration is linear, ie
 \[
   \int_a^b (\lambda f(x) + \mu g(x))\;\d x = \lambda\int_a^b f(x)\;\d x + \mu\int_a^bg(x)\;\d x.
 \]
-
 We do this step by step:
 \begin{prop}
   Let $f: [a, b] \to \R$ be integrable, and $\lambda \geq 0$. Then $\lambda f$ is integrable, and
@@ -2332,7 +2385,7 @@ So we now have that
 \[
   \int_a^b (\lambda f(x) + \mu g(x))\;\d x = \lambda\int_a^b f(x)\;\d x + \mu\int_a^bg(x)\;\d x.
 \]
-
+We will prove more ``obvious'' results.
 \begin{prop}
   Let $f, g: [a, b] \to \R$ be integrable, and suppose that $f(x) \leq g(x)$ for every $x$. Then
   \[
@@ -2371,7 +2424,7 @@ So we now have that
   \]
   So the result follows from Riemann's integrability criterion.
 \end{proof}
-\note Combining these two propositions, we get that if
+Combining these two propositions, we get that if
 \[
   |f(x) - g(x)| \leq C,
 \]
@@ -2405,7 +2458,7 @@ for every $x\in[a, b]$, then
   \[
     L_{\mathcal{D}_1}(f) + L_{\mathcal{D}_2}(f) = L_{\mathcal{D}'}(f) \geq L_\mathcal{D} (f).
   \]
-  Since $U_\mathcal{D}(f) - L_\mathcal{D}(f) < 2\varepsilon$, and both $U_{\mathcal{D}_2}(f) - L_{\mathcal{D}_2} (f)$ and $U_{\mathcal{D}_1}(f) - L_{\mathcal{D}_1} (f)$ are greater than or equal to $0$, we have $U_{\mathcal{D}_1} (f) - L_{\mathcal{D}_1} (f)$ and $U_{\mathcal{D}_2}(f) - L_{\mathcal{D}_2}(f)$ are less that $2\varepsilon$. Since $\varepsilon$ is arbitrary, it follows that the restrictions of $f$ to $[a, b]$ and $[b, c]$ are both Riemann integrable. Furthermore,
+  Since $U_\mathcal{D}(f) - L_\mathcal{D}(f) < 2\varepsilon$, and both $U_{\mathcal{D}_2}(f) - L_{\mathcal{D}_2} (f)$ and $U_{\mathcal{D}_1}(f) - L_{\mathcal{D}_1} (f)$ are non-negative, we have $U_{\mathcal{D}_1} (f) - L_{\mathcal{D}_1} (f)$ and $U_{\mathcal{D}_2}(f) - L_{\mathcal{D}_2}(f)$ are less that $2\varepsilon$. Since $\varepsilon$ is arbitrary, it follows that the restrictions of $f$ to $[a, b]$ and $[b, c]$ are both Riemann integrable. Furthermore,
   \[
     \int_a^b f(x)\;\d x + \int_b^c f(x)\;\d x \leq U_{\mathcal{D}_1}(f) + U_{\mathcal{D}_2}(f) = U_{\mathcal{D}'}(f) \leq U_{\mathcal{D}}(f) \leq \int_a^c f(x)\;\d x + \varepsilon.
   \]
@@ -2420,20 +2473,27 @@ for every $x\in[a, b]$, then
   The other direction is left as an (easy) exercise.
 \end{proof}
 
-\begin{thm}
-  Let $a < b$ and let $f: [a, b] \to \R$ be continuous. Then $f$ is uniformly continuous.
-\end{thm}
+\begin{prop}
+  Let $f, g: [a, b] \to \R$ be integrable. Then $fg$ is integrable.
+\end{prop}
 
 \begin{proof}
-  Suppose that $f$ is not uniformly continuous. Then
+  Let $C$ be such that $|f(x)|, |g(x)| \leq C$ for every $x\in [a, b]$. Write $L_i$ and $\ell_i$ for the $\sup$ and $\inf$ of $g$ in $[x_{i - 1}, x_i]$. Now let $\mathcal{D}$ be a dissection, and for each $i$, let $u_i$ and $v_i$ be two points in $[x_{i - 1}, x_i]$.
+
+  We will pretend that $u_i$ and $v_i$ are the maximum and minimum when we write the proof, but we cannot assert that they are, since $fg$ need not have maxima and minima. We will then note that since our results hold for arbitrary $u_i$ and $v_i$, it must hold when $fg$ is at its supremum and infimum.
+
+  We find what we pretend is the difference between the upper and lower sum:
+  \begin{align*}
+    &\quad \left|\sum_{i = 1}^n \big(x_i - x_{i - 1})(f(v_i)g(v_i) - f(u_i)g(u_i)\big)\right| \\
+    &= \left|\sum_{i = 1}^{n}(x_i - x_{i - 1})\big(f(v_i)(g(v_i) - g(u_i)) + (f(v_i - f(u_i))g(u_i))\big)\right|\\
+    &\leq \sum_{i = 1}^n \big(C(L_i - \ell_i) + (M_i - m_i)C\big)\\
+    &=C(U_\mathcal{D}g - L_\mathcal{D}g + U_\mathcal{D}f - L_\mathcal{D}f).
+  \end{align*}
+  Since $u_i$ and $v_i$ are arbitrary, it follows that
   \[
-    \exists \varepsilon >0\; \forall \delta > 0\; \exists x, y:\; |x - y| \leq \delta \text{ and }|f(x) - f(y)| \geq \varepsilon.
+    U_\mathcal{D}(fg) - L_\mathcal{D}(fg) \leq C(U_\mathcal{D}f - L_\mathcal{D}f + U_\mathcal{D}g - L_\mathcal{D}g).
   \]
-  Therefore, we can find sequences $(x_n), (y_n)$ such that for every $n$, we have
-  \[
-    |x_n - y_n| \leq \frac{1}{n}\text{ and }|f(x_n) - f(y_n)| \geq \varepsilon.
-  \]
-  Then by Bolzano-Weierstrass theorem, we can find a subsequence $(x_{n_k})$ converging to some $x$. Since $|x_{n_k} - y_{n_k}| \leq \frac{1}{n_k}$, $y_{n_k}\to x$ as well. But $|f(x_{n_k}) - f(y_{n_k})| \geq \varepsilon$ for every $k$. So $f(x_{n_k})$ and $f(y_{n_k})$ cannot both converge to the same limit. So $f$ is not continuous at $x$.
+  Since $C$ is fixed, and we can get $U_\mathcal{D} f - L_\mathcal{D}f$ and $U_\mathcal{D}g - L_\mathcal{D}g$ arbitrary small (since $f$ and $g$ are integrable), we can get $U_\mathcal{D}(fg) - L_\mathcal{D}(fg)$ arbitrarily small. So the result follows.
 \end{proof}
 
 \begin{thm}
@@ -2495,11 +2555,11 @@ Pictorially, we see that the difference between the upper and lower sums is tota
 To calculate the total area, we can stack the red areas together to get something of width $\frac{\varepsilon}{f(b) - f(a)}$ and height $f(b) - f(a)$. So the total area is just $\varepsilon$.
 
 \begin{lemma}
-  Let $a < b$ and let $f$ be a bounded function from $[a, b] \to \R$ that is continuous on $(a, n)$. Then $f$ is integrable.
+  Let $a < b$ and let $f$ be a bounded function from $[a, b] \to \R$ that is continuous on $(a, b)$. Then $f$ is integrable.
 \end{lemma}
 An example where this would apply is $\int_0^1 \sin \frac{1}{x}$. It gets nasty near $x = 0$, but its ``nastiness'' is confined to $x = 0$ only. So as long as its nastiness is sufficiently contained, it would still be integrable.
 
-The idea of the proof is to integrate from a point $x_1$ very near $a$ up to a point $x_{n - 1}$ very close to $b$. Since $f$ is bounded, the regions $[a, x_1]$ and $[x_{n - 1}, b]$ is small enough to not cause trouble.
+The idea of the proof is to integrate from a point $x_1$ very near $a$ up to a point $x_{n - 1}$ very close to $b$. Since $f$ is bounded, the regions $[a, x_1]$ and $[x_{n - 1}, b]$ are small enough to not cause trouble.
 
 \begin{proof}
   Let $\varepsilon > 0$. Suppose that $|f(x)| \leq C$ for every $x\in [a, b]$. Let $x_0 = a$ and pick $x_1$ such that $x_1 - x_0 < \frac{\varepsilon}{8C}$. Also choose $z$ between $x_1$ and $b$ such that $b - z < \frac{\varepsilon}{8C}$.
@@ -2538,6 +2598,7 @@ The idea of the proof is to integrate from a point $x_1$ very near $a$ up to a p
   Partition $[a, b]$ into intervals $I_1, \cdots, I_k$, on each of which $f$ is (bounded and) continuous. Hence for every $I_j$ with end points $x_{j - 1}$, $x_j$, $f$ is integrable on $[x_{j - 1}, x_j]$ (which may not equal $I_j$, eg. $I_j$ could be $[x_{j - 1}, x_j)$). But then by the additivity property of integration, we get that $f$ is integrable on $[a, b]$
 \end{proof}
 
+We defined Riemann integration in a very general way - we allowed \emph{arbitrary} dissections, and took the extrama over all possible dissection. Is it possible to just consider some particular nice dissections instead? Perhaps unsurprisingly, yes! It's just that we opt to define it the general way so that we can easily talk about things like least common refinements.
 \begin{lemma}
   Let $f: [a, b] \to \R$ be Riemann integrable, and for each $n$, let $\mathcal{D}_n$ be the dissection $a = x_0 < x_1 < \cdots < x_n = b$, where $x_i = a + \frac{i(b - a)}{n}$ for each $i$. Then
   \[
@@ -2548,7 +2609,6 @@ The idea of the proof is to integrate from a point $x_1$ very near $a$ up to a p
     L_{\mathcal{D}_n}f \to \int_a^b f(x)\;\d x.
   \]
 \end{lemma}
-This shows that we needn't have defined Riemann integration with arbitrary dissections, but only these nice, uniform dissections. However, we opt to define it the general way so that we can easily talk about things like least common refinements.
 
 \begin{proof}
   Let $\varepsilon > 0$. We need to find an $N$. The only thing we know is that $f$ is Riemann integrable, so we use it:
@@ -2565,7 +2625,7 @@ This shows that we needn't have defined Riemann integration with arbitrary disse
   \]
   Also, the sums $U_{\mathcal{D}_n}f$ and $U_\mathcal{D'}f$ are the same, except that at most $m$ of the subintervals $[x_{i - 1}, x_i]$ are subdivided in $\mathcal{D}'$.
 
-  For each interval that gets chopped up, the upper sum decreases by at most $\frac{n - a}{n}2 C$. Therefore
+  For each interval that gets chopped up, the upper sum decreases by at most $\frac{b - a}{n}\cdot 2C$. Therefore
   \[
     U_{\mathcal{D}_n}f - U_{\mathcal{D}'}f \leq \frac{b - a}{n}2C\cdot m.
   \]
@@ -2617,7 +2677,7 @@ We now prove that the fundamental theorem of calculus, which says that integrati
 \end{proof}
 
 \begin{cor}
-  If $f$ is continuously differentiable on $[a, b]$, then
+  If $F$ is continuously differentiable on $[a, b]$, then
   \[
     \int_a^b f'(t)\;\d t = f(b) - f(a).
   \]
@@ -2640,69 +2700,50 @@ We now prove that the fundamental theorem of calculus, which says that integrati
 \end{proof}
 
 \begin{thm}[Fundamental theorem of calculus, part 2]
-  Let $F: [a, b] \to \R$ be a differentiable function with derivative $f$, and suppose that $f$ is integrable. Then
+  Let $f: [a, b] \to \R$ be a differentiable function, and suppose that $f'$ is integrable. Then
   \[
-    \int_a^b f(t)\;\d t = F(b) - F(a).
+    \int_a^b f'(t)\;\d t = f(b) - f(a).
   \]
 \end{thm}
-Note that this is a stronger result than the corollary above, since it does not require that $f$ is continuous.
+Note that this is a stronger result than the corollary above, since it does not require that $f'$ is continuous.
 
 \begin{proof}
   Let $\mathcal{D}$ be a dissection $x_0 < x_1 < \cdots < x_n$. We want to make use of this dissection. So write
   \[
-    F(b) - F(a) = \sum_{i = 1}^n (F(x_i) - F(x_{i - 1})).
+    f(b) - f(a) = \sum_{i = 1}^n (f(x_i) - f(x_{i - 1})).
   \]
-  For each $i$, there exists $u_i\in (x_{i - 1}, x_i)$ such that $F(x_i) - f(x_{i - 1j}) = (x_i - x_{i - 1})f(u_i)$ by the mean value theorem. So
+  For each $i$, there exists $u_i\in (x_{i - 1}, x_i)$ such that $f(x_i) - f(x_{i - 1j}) = (x_i - x_{i - 1})f'(u_i)$ by the mean value theorem. So
   \[
-    F(b) - F(a) = \sum_{i = 1}^n (x_i - x_{i - 1})f(u_i).
+    f(b) - f(a) = \sum_{i = 1}^n (x_i - x_{i - 1})f'(u_i).
   \]
-  We know that $f(u_i)$ is somewhere between $\sup\limits_{x\in[x_i, x_{i - 1}]}f(x)$ and $\inf\limits_{x\in[x_i, x_{i - 1}]}f(x)$ by definition. Therefore
+  We know that $f'(u_i)$ is somewhere between $\sup\limits_{x\in[x_i, x_{i - 1}]}f'(x)$ and $\inf\limits_{x\in[x_i, x_{i - 1}]}f'(x)$ by definition. Therefore
   \[
-    L_\mathcal{D} f \leq F(b) - F(a) \leq U_\mathcal{D} f.
+    L_\mathcal{D} f' \leq f(b) - f(a) \leq U_\mathcal{D} f'.
   \]
-  Since $f$ is integrable and $\mathcal{D}$ was arbitrary, $L_\mathcal{D}f$ and $U_\mathcal{D}f$ can both get arbitrarily close to $\int_a^b f(t)\;\d t$. So
+  Since $f'$ is integrable and $\mathcal{D}$ was arbitrary, $L_\mathcal{D}f'$ and $U_\mathcal{D}f'$ can both get arbitrarily close to $\int_a^b f'(t)\;\d t$. So
   \[
-    F(b) - F(a) = \int_a^b f(t)\;\d t.
+    f(b) - f(a) = \int_a^b f'(t)\;\d t.
   \]
 \end{proof}
+Note that the condition that $f'$ is integrable is essential. It is possible to find a differentiable function whose derivative is not integrable! You will be asked to find it in the example sheet.
 
-\begin{prop}
-  Let $f, g: [a, b] \to \R$ be integrable. Then $fg$ is integrable.
-\end{prop}
-
-\begin{proof}
-  Let $C$ be such that $|f(x)|, |g(x)| \leq C$ for every $x\in [a, b]$. Write $L_i$ and $\ell_i$ for the $\sup$ and $\inf$ of $g$ in $[x_{i - 1}, x_i]$. Now let $\mathcal{D}$ be a dissection, and for each $i$, let $u_i$ and $v_i$ be two points in $[x_{i - 1}, x_i]$.
-
-  We will pretend that $u_i$ and $v_i$ are the maximum and minimum when we write the proof, but we cannot assert that they are, since $fg$ need not have maxima and minima. We will then note that since our results hold for arbitrary $u_i$ and $v_i$, it must hold when $fg$ is at its supremum and infimum.
-
-  We find what we pretend is the difference between the upper and lower sum:
-  \begin{align*}
-    &\quad \left|\sum_{i = 1}^n \big(x_i - x_{i - 1})(f(v_i)g(v_i) - f(u_i)g(u_i)\big)\right| \\
-    &= \left|\sum_{i = 1}^{n}(x_i - x_{i - 1})\big(f(v_i)(g(v_i) - g(u_i)) + (f(v_i - f(u_i))g(u_i))\big)\right|\\
-    &\leq \sum_{i = 1}^n \big(C(L_i - \ell_i) + (M_i - m_i)C\big)\\
-    &=C(U_\mathcal{D}g - L_\mathcal{D}g + U_\mathcal{D}f - L_\mathcal{D}f).
-  \end{align*}
-  Since $u_i$ and $v_i$ are arbitrary, it follows that
-  \[
-    U_\mathcal{D}(fg) - L_\mathcal{D}(fg) \leq C(U_\mathcal{D}f - L_\mathcal{D}f + U_\mathcal{D}g - L_\mathcal{D}g).
-  \]
-  Since $C$ is fixed, and we can get $U_\mathcal{D} f - L_\mathcal{D}f$ and $U_\mathcal{D}g - L_\mathcal{D}g$ arbitrary small (since $f$ and $g$ are integrable), we can get $U_\mathcal{D}(fg) - L_\mathcal{D}(fg)$ arbitrarily small. So the result follows.
-\end{proof}
+Using the fundamental theorem of calculus, we can easily prove integration by parts:
 \begin{thm}[Integration by parts]
-  Let $f, g:[a, b]\to \R$ be integrable such that $f'$ and $g'$ exist. Then
+  Let $f, g:[a, b]\to \R$ be integrable such that everything below exists. Then
   \[
     \int_a^b f(x)g'(x)\;\d x = f(b)g(b) - f(a)g(a) - \int_a^b f'(x)g(x)\;\d x.
   \]
 \end{thm}
 
 \begin{proof}
-  Note that $f(x)g'(x) + f'(x)g(x)$ is integrable by sum/product rules. Also,
+  By the fundamental theorem of calculus,
   \[
-    \int_a^b (f(x)g'(x) + f'(x)g(x))\;\d x = \int_a^b(fg)'(x)\;\d x = f(b)g(b) - f(a)g(a)
+    \int_a^b (f(x)g'(x) + f'(x)g(x))\;\d x = \int_a^b(fg)'(x)\;\d x = f(b)g(b) - f(a)g(a).
   \]
-  by the fundamental theorem of calculus.
+  The result follows after rearrangement.
 \end{proof}
 
+Recall that when we first had Taylor's theorem, we said it had the Lagrange form of the remainder. There are many other forms of the remainder term. Here we will look at the integral form:
 \begin{thm}[Taylor's theorem with the integral form of the remainder]
   Let $f$ be $n + 1$ times differentiable on $[a, b]$ with with $f^{(n + 1)}$ continuous. Then
   \begin{align*}
@@ -2727,7 +2768,7 @@ Note that this is a stronger result than the corollary above, since it does not 
   \end{align*}
   So done.
 \end{proof}
-Note that the form of the integral remainder is rather weird and unexpected. How could we have come up with it? We might start with the fundamental theorem of algebra an d integrate by parts. The first attempt would be to integrate $1$ to $t$ and differentiate $f'(t)$ to $f^{(2)}(t)$. So we have
+Note that the form of the integral remainder is rather weird and unexpected. How could we have come up with it? We might start with the fundamental theorem of algebra and integrate by parts. The first attempt would be to integrate $1$ to $t$ and differentiate $f'(t)$ to $f^{(2)}(t)$. So we have
 \begin{align*}
   f(b) &= f(a) + \int_a^b f'(t)\;\d t\\
   &= f(a) + [tf'(t)]_a^b - \int_a^b tf^{(2)}(t)\;\d t\\
@@ -2739,7 +2780,7 @@ Note that the form of the integral remainder is rather weird and unexpected. How
 \end{align*}
 Then we can see that the right thing to integrate is $(b - t)$ and continue to obtain the result.
 
-\begin{thm}[Integration by substituttion]
+\begin{thm}[Integration by substitution]
   Let $f: [a, b] \to \R$ be continuous. Let $g: [u, v] \to \R$ be continuously differentiable, and suppose that $g(u) = a, g(v) = b$, and $f$ is defined everywhere on $g([u, v])$ (and still continuous). Then
   \[
     \int_a^b f(x)\;\d x = \int_u^v f(g(t))g'(t)\;\d t.
@@ -2797,6 +2838,7 @@ It is sometimes sensible to talk about integrals of unbounded functions or integ
   \]
 \end{eg}
 
+Finally, we can prove the integral test, whose proof we omitted when we first began.
 \begin{thm}[Integral test]
   Let $f: [1, \infty] \to \R$ be a decreasing non-negative function. Then $\sum_{n = 1}^\infty f(n)$ converges iff $\int_1^\infty f(x)\;\d x < \infty$.
 \end{thm}
