@@ -6,7 +6,6 @@
 \def\nlecturer {D. Spiegelhalter}
 \def\ncourse {Statistics}
 \def\nofficial {http://www.statslab.cam.ac.uk/Dept/People/djsteaching/teaching15.html}
-\def\nnotready {}
 
 \input{header}
 
@@ -43,15 +42,15 @@ We will use the observed $\mathbf{X} = \mathbf{x}$ to make inferences about the 
   \item testing a hypothesis about $\theta$, eg. whether $\theta = 0$.
 \end{itemize}
 \section{Estimation}
-Suppose that $X_1, \cdots, X_n$ are iid, each with a probability density/mass function $f_X(x; \theta)$. We know $f_X$ but not $\theta$.
+\subsection{Estimators}
+The goal of estimations is as follows: we are given iid's $X_1, \cdots, X_n$, and we know that their probability density/mass function is $f_X(x; \theta)$ for some unknown theta. We know $f_X$ but not $\theta$. For example, we might know that they follow a Poisson distribution, but we do not know what the mean is. The objective is to estimate the value of $\theta$.
 
 \begin{defi}[Statistic]
   A \emph{statistic} is an estimate of $\theta$. It is a function $T$ of the data. If we write the data as $\mathbf{x} = (x_1, \cdots, x_n)$, then our estimate is written as $\hat{\theta} = T(\mathbf{x})$. $T(\mathbf{X})$ is an \emph{estimator} of $\theta$.
 
-  The distribution of $T = T(\mathbf{X})$ is its sampling distribution.
-
-  Note that capital $\mathbf{X}$ denotes a random variable and $\mathbf{x}$ is an observed value. So $T(\mathbf{X})$ is a random variable and $T(\mathbf{x})$ is a particular value.
+  The distribution of $T = T(\mathbf{X})$ is the \emph{sampling distribution} of the statistic.
 \end{defi}
+Note that we adopt the convention where capital $\mathbf{X}$ denotes a random variable and $\mathbf{x}$ is an observed value. So $T(\mathbf{X})$ is a random variable and $T(\mathbf{x})$ is a particular value we obtain after experiments.
 
 \begin{eg}
   Let $X_1, \cdots, X_n$ is an iid $N(\mu, 1)$. A possible estimator for $\mu$ is
@@ -62,12 +61,11 @@ Suppose that $X_1, \cdots, X_n$ are iid, each with a probability density/mass fu
   \[
     T(\mathbf{x}) = \frac{1}{n}\sum x_i.
   \]
-  Recall that in general, if $X_i \sim N(\mu_i, \sigma_i^2)$, then $\sum X_i \sim N(\sum \mu_i, \sum \sigma_i^2)$, which can be proved by moment-generating functions.
+  What is the sampling distribution of $T$? Recall from IA Probability that in general, if $X_i \sim N(\mu_i, \sigma_i^2)$, then $\sum X_i \sim N(\sum \mu_i, \sum \sigma_i^2)$, which is something we can prove by considering moment-generating functions.
 
-  So we have $T(\mathbf{X})\sim N(\mu, 1/n)$. Note that by the Central Limit Theorem, even if $X_i$ were not normal, we still have $T(\mathbf{X})\sim N(\mu, 1/n)$ for large values of $n$.
+  So we have $T(\mathbf{X})\sim N(\mu, 1/n)$. Note that by the Central Limit Theorem, even if $X_i$ were not normal, we still have $T(\mathbf{X})\sim N(\mu, 1/n)$ for large values of $n$, but here we get the normal distribution even for small values of $n$.
 \end{eg}
-
-The estimator $\frac{1}{n}\sum X_i$ we had above is a rather sensible estimator. However, we can also have silly estimators such as $T(\mathbf{X}) = X_1$, or even $T(\mathbf{X}) = 0.32$ always.
+The estimator $\frac{1}{n}\sum X_i$ we had above is a rather sensible estimator. Of course, we can also have silly estimators such as $T(\mathbf{X}) = X_1$, or even $T(\mathbf{X}) = 0.32$ always.
 
 \begin{defi}[Bias]
   Let $\hat{\theta} = T(\mathbf{X})$ be an estimator of $\theta$. The \emph{bias} of $\hat{\theta}$ is the difference between its expected value and true value.
@@ -83,9 +81,13 @@ To find out $\E_\theta (T)$, we can either find the distribution of $T$ and find
 \begin{eg}
   In the above example, $\E_\mu(T) =\mu$. So $T$ is unbiased for $\mu$.
 \end{eg}
-\subsection{Mean squared error}
-Given an estimator, we want to know how good the estimator is. One possible measure is the \emph{mean squared error}:
 
+\subsection{Mean squared error}
+Given an estimator, we want to know how good the estimator is. We have just come up with the concept of the \emph{bias} above. However, this is generally not a good measure of how good the estimator is.
+
+For example, if we do 1000 random trials $X_1, \cdots, X_{1000}$, we can pick our estimator as $T(\mathbf{X}) = X_1$. This is an unbiased estimator, but is really bad because we have just wasted the data from the other 999 trials. On the other hand, $T'(\mathbf{X}) = 0.01 + \frac{1}{1000}\sum X_i$ is biased (with a bias of $0.01$), but is in general much more trustworthy than $T$. In fact, at the end of the section, we will construct cases where the only possible unbiased estimator is a completely silly estimator to use.
+
+Instead, a commonly used measure is the \emph{mean squared error}.
 \begin{defi}[Mean squared error]
   The \emph{mean squared error} of an estimator $\hat{\theta}$ is $\E_\theta[(\hat{\theta} - \theta)^2]$.
 
@@ -141,9 +143,9 @@ We can plot the mean squared error for possible values of $\theta$. Here we plot
 \end{center}
 We see that this biased estimator has smaller MSE unless $\theta$ has extreme values.
 
-We showed above that sometimes biased estimators could give better mean squared errors. In some cases, not only could unbiased estimators be worse - they could be completely nonsense.
+We see that sometimes biased estimators could give better mean squared errors. In some cases, not only could unbiased estimators be worse - they could be completely nonsense.
 
-Also, suppose $X\sim \Poisson(\lambda)$, and for some reason, you want to estimate $\theta = [P(X = 0)]^2 = e^{-2\lambda}$. Then any unbiased estimator $T(X)$ must satisfy $\E_\theta(T(X)) = \theta$, or equivalently,
+Suppose $X\sim \Poisson(\lambda)$, and for some reason, you want to estimate $\theta = [P(X = 0)]^2 = e^{-2\lambda}$. Then any unbiased estimator $T(X)$ must satisfy $\E_\theta(T(X)) = \theta$, or equivalently,
 \[
   E_\lambda(T(X)) = e^{-\lambda}\sum_{x = 0}^\infty T(x) \frac{\lambda^x}{x!} = e^{-2\lambda}.
 \]
@@ -151,50 +153,54 @@ We see that the only function $T$ that can satisfy this equation is $T(X) = (-1)
 
 Thus the unbiased estimator would estimate $e^{-2\lambda}$ to be $1$ if $X$ is even, -1 if $X$ is odd. This is clearly nonsense.
 \subsection{Sufficiency}
-``Sufficiency'' is the question ``Is there a statistic $T(\mathbf{X})$ that in some sense contains all the information about $\theta$ that is in the sample?'' This is important in ``big data'' in which we have to store a large number of data.
+Often, we do experiments just to find out the value of $\theta$. For example, we might want to estimate what proportion of the population supports some political candidate. We are seldom interested in the data points themselves, and just want to learn about the big picture. This leads us to the concept of a \emph{sufficient statistic}. This is a statistic $T(\mathbf{X})$ that contains all information we have about $\theta$ in the sample.
 
 \begin{eg}
   Let $X_1, \cdots X_n$ be iid $\Bernoulli(\theta)$, so that $\P(X_i = 1) = 1 - \P(X_i = 0) = \theta$ for some $0 < \theta < 1$. So
   \[
     f_{\mathbf{X}} (\mathbf{x}|\theta) = \prod_{i = 1}^n \theta^{x_i}(1 - \theta)^{1 - x_i} = \theta^{\sum x_i}(1 - \theta)^{n - \sum x_i}.
   \]
-  This depends on the data only through $T(\mathbf{X}) = \sum x_i$, the total number of ones. Note that $T(\mathbf{X})\sim \binomial(n, \theta)$.
+  This depends on the data only through $T(\mathbf{X}) = \sum x_i$, the total number of ones.
 
-  If $T(\mathbf{x}) = t$, then
+  Suppose we are now given that $T(\mathbf{X}) = t$. Then what is the distribution of $\mathbf{X}$? We have
   \[
-    f_{\mathbf{X}|T = t} = \frac{\P_\theta(\mathbf{X} = \mathbf{x}, T = t)}{\P_\theta T = t} = \frac{\P_\theta(\mathbf{X} = \mathbf{x})}{T = t}.
+    f_{\mathbf{X}|T = t}(\mathbf{x}) = \frac{\P_\theta(\mathbf{X} = \mathbf{x}, T = t)}{\P_\theta (T = t)} = \frac{\P_\theta(\mathbf{X} = \mathbf{x})}{P_\theta(T = t)}.
   \]
   Where the last equality comes because since if $\mathbf{X} = \mathbf{x}$, then $T$ must be equal to $t$. This is equal to
   \[
     \frac{\theta^{\sum x_i}(1 - \theta)^{n - \sum x_i}}{\binom{n}{t}\theta^t (1 - \theta)^{n - t}} = \binom{n}{t}^{-1}.
   \]
-  So we know that the conditional distribution of $\mathbf{X}$ given $T = t$ does not depend on $\theta$. So if we know $T$, then additional knowledge of $\mathbf{x}$ does not give more information about $\theta$.
+  So the conditional distribution of $\mathbf{X}$ given $T = t$ does not depend on $\theta$. So if we know $T$, then additional knowledge of $\mathbf{x}$ does not give more information about $\theta$.
 \end{eg}
 
 \begin{defi}[Sufficient statistic]
   A statistic $T$ is \emph{sufficient} for $\theta$ if the conditional distribution of $\mathbf{X}$ given $T$ does not depend on $\theta$.
 \end{defi}
 
-In practice, we find them as follows:
+There is a convenient theorem that allows us to find sufficient statistics.
 \begin{thm}[The factorization criterion]
-  $T$ is sufficient for $\theta$ iff $f_{\mathbf{X}}(\mathbf{x} |\theta) = g(T(\mathbf{x}), \theta)h(\mathbf{x})$ for some functions $g$ and $h$.
+  $T$ is sufficient for $\theta$ iff
+  \[
+    f_{\mathbf{X}}(\mathbf{x} |\theta) = g(T(\mathbf{x}), \theta)h(\mathbf{x})
+  \]
+  for some functions $g$ and $h$.
 \end{thm}
 
 \begin{proof}
-  (discrete case only)
+  We will prove the discrete case only.
 
-  Suppose $f_\mathbf{X}(\mathbf{x}|\theta) = g(T(\mathbf{x}, \theta))h(\mathbf{x})$. If $T(\mathbf{x}) = t$, then
+  Suppose $f_\mathbf{X}(\mathbf{x}|\theta) = g(T(\mathbf{x}), \theta)h(\mathbf{x})$. If $T(\mathbf{x}) = t$, then
   \begin{align*}
-    f_{\mathbf{X}|T = t}(\mathbf{x}|T = t) &= \frac{\P_\theta(\mathbf{X} = \mathbf{x}, T(\mathbf{X}) = t)}{\P_\theta (T = t)}\\
-    &= \frac{g(T(\mathbf{x}), \theta)h(\mathbf{x})}{\sum_{\{x:T(\mathbf{x}) = t\}}g(T(\mathbf{x}), \theta)h(\mathbf{x})}\\
+    f_{\mathbf{X}|T = t}(\mathbf{x}) &= \frac{\P_\theta(\mathbf{X} = \mathbf{x}, T(\mathbf{X}) = t)}{\P_\theta (T = t)}\\
+    &= \frac{g(T(\mathbf{x}), \theta)h(\mathbf{x})}{\sum_{\{\mathbf{x}:T(\mathbf{x}) = t\}}g(T(\mathbf{x}), \theta)h(\mathbf{x})}\\
     &=\frac{g(t, \theta)h(\mathbf{x})}{g(t, \theta)\sum h(\mathbf{x})}\\
     &= \frac{h(\mathbf{x})}{\sum h(\mathbf{x})}
   \end{align*}
   which doesn't depend on $\theta$. So $T$ is sufficient.
 
-  Now suppose $T$ is sufficient so that the conditional distribution of $\mathbf{X}|T = t$ does not depend on $\theta$. If $T(\mathbf{x}) = t$, then
+  Now suppose $T$ is sufficient so that the conditional distribution of $\mathbf{X}|T = t$ does not depend on $\theta$.Then
   \[
-    \P_\theta(\mathbf{X} = \mathbf{x}) = \P_\theta(\mathbf{X} = \mathbf{x}, T=t) = \P_\theta(\mathbf{X} = \mathbf{x}|T = t)\P_\theta (T = t).
+    \P_\theta(\mathbf{X} = \mathbf{x}) = \P_\theta(\mathbf{X} = \mathbf{x}, T=T(\mathbf{x})) = \P_\theta(\mathbf{X} = \mathbf{x}|T = T(\mathbf{x}))\P_\theta (T = T(\mathbf{x})).
   \]
   The first factor does not depend on $\theta$ by assumption; call it $h(\mathbf{x})$. Let the second factor be $g(t, \theta)$, and so we have the required factorisation.
 \end{proof}
@@ -208,26 +214,56 @@ In practice, we find them as follows:
 \end{eg}
 
 \begin{eg}
-  Let $X_1, \cdots, X_n$ be iid $U[0, \theta]$. Write $1_{[A]}$ for the indicator function of $A$. We have
+  Let $X_1, \cdots, X_n$ be iid $U[0, \theta]$. Write $1_{[A]}$ for the indicator function of an arbitrary set $A$. We have
   \[
     f_\mathbf{X}(\mathbf{x}|\theta) = \prod_{i = 1}^n \frac{1}{\theta}1_{[0 \leq x_i\leq \theta]} = \frac{1}{\theta^n}1_{[\max_i x_i \leq \theta]}1_{[\min_i x_i\geq 0]}.
+  \]
+  If we let $T = \max_i x_i$, then we have
+  \[
+    f_\mathbf{X}(\mathbf{x}|\theta) = \underbrace{\frac{1}{\theta^n}1_{[t \leq \theta]}}_{g(t, \theta)}\quad \underbrace{1_{[\min_i x_i \geq 0]}}_{h(\mathbf{x})}.
   \]
   So $T = \max_i x_i$ is sufficient.
 \end{eg}
 
-Note that sufficient statistics are not unique. If $T$ is sufficient for $\theta$, then so is any 1-1 function of $T$. $\mathbf{X}$ is always sufficient for $\theta$ as well, but it is not of much use.
+Note that sufficient statistics are not unique. If $T$ is sufficient for $\theta$, then so is any 1-1 function of $T$. $\mathbf{X}$ is always sufficient for $\theta$ as well, but it is not of much use. How can we decide if a sufficient statistic is ``good''?
 
+Given any statistic $T$, we can partition the sample space $\mathcal{X}^n$ into sets $\{\mathbf{x}\in \mathcal{X}: T(\mathbf{X}) = t\}$. Then after an experiment, instead of recording the actual value of $\mathbf{x}$, we can simply record the partition $\mathbf{x}$ falls into. If there are less partitions than possible values of $\mathbf{x}$, then effectively there is less information we have to store.
 
-The sample space $\mathcal{X}^n$ is partitioned by $T$ into sets $\{\mathbf{x}\in \mathcal{X}: t(\mathbf{X}) = t\}$. If $T$ is sufficient, then this data reduction does not lose any information on $\theta$. We seek a sufficient statistic that achieves the maximum-possible reduction.
+If $T$ is sufficient, then this data reduction does not lose any information about $\theta$. The ``best'' sufficient statistic would be one in which we achieve the maximum possible reduction. This is known as the \emph{minimal sufficient statistic}. The formal definition we take is the following:
 
 \begin{defi}[Minimal sufficiency]
-  A sufficient statistic $T(\mathbf{x})$ is minimal if it is a function of every other sufficient statistic, ie. if $T'(\mathbf{X})$ is also sufficient, then $T'(\mathbf{X}) = T'(\mathbf{Y}) \Rightarrow  T(\mathbf{X}) = T(\mathbf{Y})$. ie. it has the coarsest partitions.
+  A sufficient statistic $T(\mathbf{X})$ is \emph{minimal} if it is a function of every other sufficient statistic, ie. if $T'(\mathbf{X})$ is also sufficient, then $T'(\mathbf{X}) = T'(\mathbf{Y}) \Rightarrow  T(\mathbf{X}) = T(\mathbf{Y})$.
 \end{defi}
 
-We can find them using the following theorem:
+Again, we have a handy theorem to find minimal statistics:
 \begin{thm}
-  Suppose $T = T(\mathbf{X})$ is a statistic such that $f_\mathbf{X}(\mathbf{x}; \theta)/f_\mathbf{X}(\mathbf{y}; \theta)$ is a constant as a function of $\theta$ if and only if $T(\mathbf{x}) = T(\mathbf{y})$. Then $T$ is minimal sufficient for $\theta$.
+  Suppose $T = T(\mathbf{X})$ is a statistic that satisfies
+  \begin{center}
+    $\displaystyle\frac{f_\mathbf{X}(\mathbf{x}; \theta)}{f_\mathbf{X}(\mathbf{y}; \theta)}$ is a constant as a function of $\theta$ if and only if $T(\mathbf{x}) = T(\mathbf{y})$.
+  \end{center}
+  Then $T$ is minimal sufficient for $\theta$.
 \end{thm}
+\begin{proof}
+  First we have to show sufficiency. We will use the factorization criterion to do so.
+
+  Firstly, for each possible $t$, pick a favorite $\mathbf{x}_t$ such that $T(\mathbf{x}_t) = t$.
+
+  Now let $\mathbf{x}\in \mathcal{X}^N$ and let $T(\mathbf{x}) = t$. So $T(\mathbf{x}) = T(\mathbf{x}_t)$. By the hypothesis, $\frac{f_\mathbf{X}(\mathbf{x}; \theta)}{f_\mathbf{X}(\mathbf{x}_t: \theta)}$ does not depend on $\theta$. Let this be $h(\mathbf{x})$. Let $g(t, \theta) = f_\mathbf{X}(\mathbf{x}_t, \theta)$. Then
+  \[
+    f_\mathbf{X}(\mathbf{x}; \theta) = f_\mathbf{X}(\mathbf{x}_t; \theta) \frac{f_\mathbf{X}(\mathbf{x}; \theta)}{f_\mathbf{X}(\mathbf{x}_t: \theta)} = g(t, \theta) h(\mathbf{x}).
+  \]
+  So $T$ is sufficient for $\theta$.
+
+  To show that this is minimal, suppose that $S(\mathbf{X})$ is also sufficient. By the factorization criterion, there exist functions $g_S$ and $h_S$ such that
+  \[
+    f_\mathbf{X}(\mathbf{x}; \theta) = g_S(S(\mathbf{x}), \theta) h_S(\mathbf{x}).
+  \]
+  Now suppose that $S(\mathbf{x}) = S(\mathbf{y})$. Then
+  \[
+    \frac{f_\mathbf{X}(\mathbf{x}; \theta)}{f_\mathbf{X}(\mathbf{y}; \theta)} = \frac{g_S(S(\mathbf{x}), \theta)h_S(\mathbf{x})}{g_S(S(\mathbf{y}), \theta)h_S(\mathbf{y})} = \frac{h_S(\mathbf{x})}{h_S(\mathbf{y})}.
+  \]
+  This means that the ratio $\frac{f_\mathbf{X}(\mathbf{x}; \theta)}{f_\mathbf{X}(\mathbf{y}; \theta)}$ does not depend on $\theta$. By the hypothesis, this implies that $T(\mathbf{x}) = T(\mathbf{y})$. So we know that $S(\mathbf{x}) = S(\mathbf{y})$ implies $T(\mathbf{x}) = T(\mathbf{y})$. So $T$ is a function of $S$. So $T$ is minimal sufficient.
+\end{proof}
 
 \begin{eg}
   Suppose $X_1, \cdots, X_n$ are iid $N(\mu, \sigma^2)$. Then
@@ -237,15 +273,17 @@ We can find them using the following theorem:
   \end{align*}
   This is a constant function of $(\mu, \sigma^2)$ iff  $\sum_i x_i^2 = \sum_i y_i^2$ and $\sum_i x_i = \sum_i y_i$. So $T(\mathbf{X}) = (\sum_i X_i^2, \sum_i X_i)$ is minimal sufficient for $(\mu, \sigma^2)$.
 \end{eg}
-\note If the range of $\mathbf{X}$ depends on $\theta$, then ``$f_\mathbf{X}(\mathbf{x}; \theta)/f_\mathbf{X}(\mathbf{y};\theta)$ is constant in $\theta$'' means ``$f_\mathbf{X}(\mathbf{x}; \theta = c(\mathbf{x}, \mathbf{y})f_\mathbf{X}(\mathbf{y}; \theta)$''
 
 \begin{thm}[Rao-Blackwell Theorem]
-  Let $T$ be a sufficient statistic for $\theta$ and let $\tilde{\theta}$ be an estimator for $\theta$ with $\E(\tilde{\theta}^2) < \infty$ for all $\theta$. Let $\hat{\theta} = \E[\hat{\theta}|T]$. Then for all $\theta$,
+  Let $T$ be a sufficient statistic for $\theta$ and let $\tilde{\theta}$ be an estimator for $\theta$ with $\E(\tilde{\theta}^2) < \infty$ for all $\theta$. Let $\hat{\theta}(\mathbf{x}) = \E[\tilde{\theta}(\mathbf{X})|T(\mathbf{X}) = T(\mathbf{x})]$. Then for all $\theta$,
   \[
     \E[(\hat{\theta} - \theta)^2] \leq \E[(\tilde{\theta} - \theta)^2].
   \]
   The inequality is strict unless $\tilde{\theta}$ is a function of $T$.
 \end{thm}
+Here we have to be careful with our definition of $\hat{\theta}$. It is defined as the expected value of $\tilde{\theta}(\mathbf{X})$. And this could potentially depend on the actual value of $\theta$. Fortunately, since $T$ is sufficient for $\theta$, the conditional distribution of $\mathbf{X}$ given $T = t$ does not depend on $\theta$. Hence $\hat{\theta} = \E[\tilde{\theta}(\mathbf{X})|T]$ does not depend on $\theta$, and so is a genuine estimator.
+
+Using this theorem, given any estimator, we can find one that is a function of a sufficient statistic and is at least as good in terms of mean squared error of estimation. Moreover, if the original estimator $\tilde{\theta}$ is unbiased, so is the new $\hat{\theta}$. Also, if $\tilde{\theta}$ is already a function of $T$, then $\hat{\theta} = \tilde{\theta}$.
 
 \begin{proof}
   By the conditional expectation formula, we have $\E(\hat{\theta}) = \E[\E(\tilde{\theta}|T)] = E(\tilde{\theta})$. So they have the same bias.
@@ -254,18 +292,11 @@ We can find them using the following theorem:
   \[
     \var(\tilde{\theta}) = \E[\var (\tilde{\theta}|T)] + \var [\E(\tilde{\theta}|T)] = \E[\var(\tilde{\theta}|T)] + \var(\hat{\theta}).
   \]
-  Hence $\var(\tilde{\theta}) \geq \var (\hat{\theta})$. So $\mse(\tilde{\theta} \geq \mse\hat{\theta})$, with equality only if $\var(\tilde{\theta}|T) = 0$.
+  Hence $\var(\tilde{\theta}) \geq \var (\hat{\theta})$. So $\mse\tilde{\theta}) \geq \mse(\hat{\theta})$, with equality only if $\var(\tilde{\theta}|T) = 0$.
 \end{proof}
-\note
-\begin{enumerate}
-  \item Since $T$ is sufficient for $\theta$, the conditional distribution of $\mathbf{X}$ given $T = t$ does not depend on $\theta$. Hence $\hat{\theta} = \E[\tilde{\theta}(\mathbf{X})|T]$ does not depend on $\theta$, and so is a genuine estimator.
-  \item The theorem says that given any estimator, we can find one that is a function of a sufficient statistic that is at least as good in terms of mean squared error of estimation.
-  \item If $\tilde{\theta}$ is unbiased, then so is $\hat{\theta}$.
-  \item If $\tilde{\theta}$ is already a function of $T$, then $\hat{\theta} = \tilde{\theta}$.
-\end{enumerate}
 
 \begin{eg}
-  Suppose $X_1, \cdots, X_n$ are iid $\Poisson(\lambda)$, and let $\theta = e^{-\lambda}$ (ie. $\P(X_1 = 0)$. Then
+  Suppose $X_1, \cdots, X_n$ are iid $\Poisson(\lambda)$, and let $\theta = e^{-\lambda}$, which is the probability that $X_1 = 0$. Then
   \[
     p_\mathbf{X}(\mathbf{x}|\lambda) =\frac{-e^{n\lambda}\lambda^{\sum x_i}}{\prod x_i!}.
   \]
@@ -275,7 +306,7 @@ We can find them using the following theorem:
   \]
   We see that $T = \sum X_i$ is sufficient for $\theta$, and $\sum X_i \sim \Poisson (n\lambda)$.
 
-  We use an easy estimator $\theta$ is $\tilde{\theta} = 1_{X_1 = 0}$, which is unbiased. (ie. if we observe nothing in the first observation period, we assume the event is impossible) Then
+  We start with an easy estimator $\theta$ is $\tilde{\theta} = 1_{X_1 = 0}$, which is unbiased (ie. if we observe nothing in the first observation period, we assume the event is impossible). Then
   \begin{align*}
     \E[\tilde{\theta}| T = t] &= \P\left(X_1 = 0|\sum_1^n X_i = t\right)\\
     &= \frac{\P(X_1 = 0)\P(\sum_2^n X_i = t)}{\P(\sum_1^n X_i = t)}\\
@@ -285,28 +316,28 @@ We can find them using the following theorem:
 \end{eg}
 
 \begin{eg}
-  Let $X_1, \cdots X_n$ be iid $U[0, \theta]$, and suppose that we want to estimate $\theta$. We have shown above that $T = \max X_i$ is sufficient for $\theta$. Let $\hat{\theta} = 2X_1$, and unbiased estimator. Then
+  Let $X_1, \cdots X_n$ be iid $U[0, \theta]$, and suppose that we want to estimate $\theta$. We have shown above that $T = \max X_i$ is sufficient for $\theta$. Let $\hat{\theta} = 2X_1$, an unbiased estimator. Then
   \begin{align*}
     \E[\tilde{\theta}|T = t] &= 2\E[X_1|\max X_i = t]\\
-    &= 2(E[X_1|\max X_i = t, X_1 = \max X_i]\P(X_1 = \max X_i)\\
-    &+ \E[X_1|\max X_i = t, X_1 \not= \max X_i] \P(X_1 \not= \max X_i))\\
+    &= 2\E[X_1|\max X_i = t, X_1 = \max X_i]\P(X_1 = \max X_i)\\
+    &+ 2\E[X_1|\max X_i = t, X_1 \not= \max X_i] \P(X_1 \not= \max X_i)\\
     &= 2\left(t\times \frac{1}{n} + \frac{t}{2}\frac{n - 1}{n}\right)\\
     &= \frac{n + 1}{n}t.
   \end{align*}
-  So $\hat{\theta} = \frac{n + 1}{n}\max X_i$.
+  So $\hat{\theta} = \frac{n + 1}{n}\max X_i$ is our new estimator.
 \end{eg}
 
 \subsection{Likelihood}
-Maximum likelihood estimation is one of the most important and widely used methods for finding estimations. Let $X_1, \cdots , X_n$ be random variables with joint pdf/pmg $f_\mathbf{X}(\mathbf{x}|\theta)$. We observe $\mathbf{X} = \mathbf{x}$.
+There are many possible estimators we can pick. Among all of them, the maximum likelihood estimator is one of the most important and widely used ones. Let $X_1, \cdots , X_n$ be random variables with joint pdf/pmg $f_\mathbf{X}(\mathbf{x}|\theta)$. We observe $\mathbf{X} = \mathbf{x}$.
 
 \begin{defi}[Likelihood]
-  The \emph{likelihood} of $\theta$ is $\like(\theta) = f_\mathbf{X}(\mathbf{x} | \theta)$, regarded as a function of $\theta$. The \emph{maximum likelihood estimator} (mle) of $\theta$ is the value of $\theta$ that maximizes $\like (\theta)$.
+  The \emph{likelihood} of $\theta$ is $\like(\theta) = f_\mathbf{X}(\mathbf{x} | \theta)$, regarded as a function of $\theta$. The \emph{maximum likelihood estimator} (mle) of $\theta$ is an estimator that picks the value of $\theta$ that maximizes $\like (\theta)$.
 \end{defi}
-It is often easier to maximize the \emph{log-likelihood}.
+Often there is no closed form for the mle, and we have to find $\hat{\theta}$ numerically.
 
-If $X_1, \cdots, X_n$ are iid, each with pdf/pmf $f_X(x|\theta)$, then
+In practice, instead of maximizing the likelihood, it is often easier to maximize the \emph{log-likelihood}. In particular, if $X_1, \cdots, X_n$ are iid, each with pdf/pmf $f_X(x|\theta)$, then
 \begin{align*}
-  \like(\theta) &= \prod_{i = 1}^n f_X(x_i|\theta)\\
+  \like(\theta) &= \prod_{i = 1}^n f_X(x_i|\theta),\\
   \log\like (\theta) &= \sum_{i = 1}^n \log f_X(x_i|\theta).
 \end{align*}
 
@@ -319,11 +350,11 @@ If $X_1, \cdots, X_n$ are iid, each with pdf/pmf $f_X(x|\theta)$, then
   \[
     \frac{\d l}{\d p} = \frac{\sum x_i}{p} - \frac{n - \sum x_i}{1 - p}.
   \]
-  This is zero when $p = \sum x_i /n$, and this is the maximum likelihood estimator. (and is unbiased)
+  This is zero when $p = \sum x_i /n$. So this is the maximum likelihood estimator (and is unbiased).
 \end{eg}
 
 \begin{eg}
-  Let $X_1, \cdots, X_n$ be iid $N(\mu, \sigma^2)$, $\theta = (\mu, \sigma^2)$. Then
+  Let $X_1, \cdots, X_n$ be iid $N(\mu, \sigma^2)$, and we want to estimate $\theta = (\mu, \sigma^2)$. Then
   \[
     l(\mu, \sigma^2) = \log\like(\mu, \sigma^2) = -\frac{n}{2}\log (2\pi) - \frac{n}{2}\log (\sigma^2) - \frac{1}{2\sigma^2}\sum (x_i - \mu)^2.
   \]
@@ -351,21 +382,14 @@ If $X_1, \cdots, X_n$ are iid, each with pdf/pmf $f_X(x|\theta)$, then
 
   Is $\hat{\theta}$ unbiased? First we need to find the distribution of $\hat{\theta}$. For $0 \leq t \leq \theta$, the distribution function of $\hat{\theta}$ is
   \[
-    F_{\hat{\theta}}(t) = P(\hat{\theta} \leq t) = \P(X_i \leq t, \text{all }i) = (\P(X_i \leq t))^n = \left(\frac{t}{\theta}\right)^n,
+    F_{\hat{\theta}}(t) = P(\hat{\theta} \leq t) = \P(X_i \leq t \text{ for all }i) = (\P(X_i \leq t))^n = \left(\frac{t}{\theta}\right)^n,
   \]
-  Differentiating with respect to $T$, we find the $pdf f_{\hat{\theta}} = \frac{nt^{n - 1}}{\theta^n}$. Hence
+  Differentiating with respect to $T$, we find the pdf $f_{\hat{\theta}} = \frac{nt^{n - 1}}{\theta^n}$. Hence
   \[
     \E(\hat{\theta}) = \int_0^\theta t\frac{nt^{n - 1}}{\theta^n} \;\d t = \frac{n\theta}{n + 1}.
   \]
   So $\hat{\theta}$ is biased, but asymptotically unbiased.
 \end{eg}
-
-\note
-\begin{enumerate}
-  \item if $T$ is sufficient for $\theta$, then the likelihood is $g(T(\mathbf{x}), \theta)h(\mathbf{x})$, which depends on $\theta$ through $T(\mathbf{x})$. To maximise this as a function of $\theta$, we only need to maximize $g$, and so the mle $\hat{\theta}$ is a function of the sufficient statistic.
-  \item If $\phi = h(\theta)$ with $h$ injective, then the mle of $\phi =h(\hat{\theta})$. If the mle of $\theta$ is $\hat{\theta}$, then the mle of $\theta^2$ is $\hat{\theta}^2$.
-  \item Often there is no closed form for the mle, and we have to find $\hat{\theta}$ numerically.
-\end{enumerate}
 
 \begin{eg}
   Smarties come in $k$ equally frequent colours, but suppose we do not know $k$. Assume that we sample with replacement (although this is unhygienic).
@@ -380,16 +404,21 @@ If $X_1, \cdots, X_n$ are iid, each with pdf/pmf $f_X(x|\theta)$, then
 The maximum likelihood is 5 (by trial and error), even though it is not much likelier than the others.
 \end{eg}
 
+How does the mle relate to sufficient statistics? Suppose that $T$ is sufficient for $\theta$. Then the likelihood is $g(T(\mathbf{x}), \theta)h(\mathbf{x})$, which depends on $\theta$ through $T(\mathbf{x})$. To maximise this as a function of $\theta$, we only need to maximize $g$. So the mle $\hat{\theta}$ is a function of the sufficient statistic.
+
+Note that if $\phi = h(\theta)$ with $h$ injective, then the mle of $\phi$ is given by $h(\hat{\theta})$. For example, if the mle of $\theta$ is $\hat{\theta}$, then the mle of $\theta^2$ is $\hat{\theta}^2$.
+
 \subsection{Confidence intervals}
 \begin{defi}
-  A $100\gamma\%$ ($0 < \gamma < 1$) \emph{confidence interval} (CO) for $\theta$ is a random interval $(A(\mathbf{X}), B(\mathbf{X}))$ such that $\P(A(\mathbf{X}) < \theta < B(\mathbf{X})) = \gamma$, no matter what the true value of $\theta$ may be.
+  A $100\gamma\%$ ($0 < \gamma < 1$) \emph{confidence interval} for $\theta$ is a random interval $(A(\mathbf{X}), B(\mathbf{X}))$ such that $\P(A(\mathbf{X}) < \theta < B(\mathbf{X})) = \gamma$, no matter what the true value of $\theta$ may be.
 \end{defi}
+It is also possible to have confidence intervals for vector parameters.
 
-Notice that it is endpoints of the interval are random quantities, while $\theta$ is a fixed constant we want to find out.
+Notice that it is the endpoints of the interval that are random quantities, while $\theta$ is a fixed constant we want to find out.
 
 We can interpret this in terms of repeat sampling. If we calculate $(A(\mathbf{x}), B(\mathbf{x}))$ for a large number of samples $\mathbf{x}$, then approximately $100\gamma\%$ of them will cover the true value of $\theta$.
 
-IMPORTANT: having observed some data $\mathbf{x}$ and calculated $95\%$ confidence interval, we \emph{cannot} say that $\theta$ has 95\% chance of being within the interval.
+It is important to know that having observed some data $\mathbf{x}$ and calculated $95\%$ confidence interval, we \emph{cannot} say that $\theta$ has 95\% chance of being within the interval, since $\theta$ is a fixed value and either is or is not in the interval.
 
 \begin{eg}
   Suppose $X_1, \cdots, X_n$ are iid $N(\theta, 1)$. Find a $95\%$ confidence interval for $\theta$.
@@ -414,12 +443,9 @@ The above example illustrates a common procedure for finding confidence interval
   \item Write down a probability statement of the form $\P_\theta(c_1 < R(\mathbf{X}, \theta) < c_2) = \gamma$.
   \item Rearrange the inequalities inside $\P(\ldots)$ to find the interval.
 \end{itemize}
-\note
-\begin{enumerate}
-  \item Usually $C_1, c_2$ are percentage points from a know standardised distribution, often equitailed so that use, say, $2.5\%$ and $97.5\%$ points for a $95\%$ confidence interval. We could use, say $0\%$ and $95\%$, but the interval would generally be wider.
-  \item We can have confidence intervals for vector parameters.
-  \item IF $(A(\mathbf{x}, B(\mathbf{x}))$ is a $100\gamma\%$ confidence interval for $\theta$, and $T(\theta)$ is a monotone increasing function of $\theta$, then $(T(A(\mathbf{x})), T(B(\mathbf{x})))$ is a $100\gamma\%$ confidence interval for $T(\theta)$.
-\end{enumerate}
+Usually $c_1, c_2$ are percentage points from a known standardised distribution, often equitailed. For example, we pick $2.5\%$ and $97.5\%$ points for a $95\%$ confidence interval. We could also use, say $0\%$ and $95\%$, but this generally results in a wider interval.
+
+Note that if $(A(\mathbf{x}), B(\mathbf{x}))$ is a $100\gamma\%$ confidence interval for $\theta$, and $T(\theta)$ is a monotone increasing function of $\theta$, then $(T(A(\mathbf{x})), T(B(\mathbf{x})))$ is a $100\gamma\%$ confidence interval for $T(\theta)$.
 \begin{eg}
   Suppose $X_1, \cdots, X_{50}$ are iid $N(0, \sigma^2)$. Find a $99\%$ confidence interval for $\sigma^2$.
 
@@ -437,11 +463,11 @@ The above example illustrates a common procedure for finding confidence interval
   \[
     \P \left(c_1 < \frac{\sum X_i^2}{\sigma^2} < c_2\right) = 0.99,
   \]
-  and so
+  and hence
   \[
     \P\left(\frac{\sum X_i^2}{c_2} < \sigma^2 < \frac{\sum X_i^2}{c_1}\right) = 0.99.
   \]
-  Furthermore, a $99\%$ confidence interval for $\sigma$ is $\left(\sqrt{\frac{\sum X_i^2}{c_2}}, \sqrt{\frac{\sum X_i^2}{c_1}}\right)$.
+  Using the remark above, we know that a $99\%$ confidence interval for $\sigma$ is $\left(\sqrt{\frac{\sum X_i^2}{c_2}}, \sqrt{\frac{\sum X_i^2}{c_1}}\right)$.
 \end{eg}
 
 \begin{eg}
@@ -459,32 +485,35 @@ The above example illustrates a common procedure for finding confidence interval
   \[
     \P\left(\hat p - z_{(1 - \gamma)/2}\sqrt{\frac{\hat p(1 - \hat p)}{n}} < p < \hat{p} + z_{(1 - \gamma)/2}\sqrt{\frac{\hat p(1 - \hat p)}{n}}\right)\approx \gamma.
   \]
+  Note that we have made a lot of approximations here, but it would be difficult to do better than this.
 \end{eg}
 
 \begin{eg}
-  Suppose an opinion poll says $20\%$ are going to vote $UKIP$, based on a random sample of $1,000$ people. What might the true proportion be?
+  Suppose an opinion poll says $20\%$ of the people are going to vote UKIP, based on a random sample of $1,000$ people. What might the true proportion be?
 
-  We assume we have an observation of $x = 200$ from a $\binomial(n, p)$ distribution with $n = 1,000$. Then $\hat p = x/n = 0.2$ is an unbiased estimate, also the mle.
-  Now $\var(X/n) = \frac{p(1 - p)}{n}\approx \frac{\hat p(1 - \hat p}{n} = 0.00016$.
+  We assume we have an observation of $x = 200$ from a $\binomial(n, p)$ distribution with $n = 1,000$. Then $\hat p = x/n = 0.2$ is an unbiased estimate, and also the mle.
 
-  So a $85\%$ confidence interval is
+  Now $\var(X/n) = \frac{p(1 - p)}{n}\approx \frac{\hat p(1 - \hat p)}{n} = 0.00016$. So a $85\%$ confidence interval is
   \[
     \left(\hat p - 1.96\sqrt{\frac{\hat p(1 - \hat p)}{n}}, \hat p + 1.96\sqrt{\frac{\hat p(1 - \hat p)}{n}}\right) = 0.20 \pm 1.96\times 0.013 = (0.175, 0.225),
   \]
-  \note Since $p(1 - p)\leq 1/4$ for all $0 \leq p \leq 1$, then a conservative $95\%$ interval is $\hat p \pm 1.96\sqrt{1/4n} \approx \hat p \pm \sqrt{1/n}$. So whatever proportion is reported, it will be 'accurate' to $\pm 1/\sqrt{n}$.
+  If we don't want to make that many approximations, we can note that $p(1 - p)\leq 1/4$ for all $0 \leq p \leq 1$. So a conservative $95\%$ interval is $\hat p \pm 1.96\sqrt{1/4n} \approx \hat p \pm \sqrt{1/n}$. So whatever proportion is reported, it will be 'accurate' to $\pm 1/\sqrt{n}$.
 \end{eg}
 
 \begin{eg}
   Suppose $X_1, X_2$ are iid from $U(\theta - 1/2, \theta + 1/2)$. What is a sensible $50\%$ confidence interval for $\theta$?
 
-  Consider the probability of getting one observation on each side of $\theta$:
+  We know that each $X_i$ is equally likely to be less than $\theta$ or greater than $\theta$. So there is $50\%$ chance that we get one observation on each side, ie.
   \[
     \P_\theta(\min(X_1, X_2) \leq \theta \leq \max(X_1, X_2)) = \frac{1}{2}.
   \]
-  So $(\min(X_1, X_2), \max (X_1, X_2))$ is a confidence interval for $\theta$.
+  So $(\min(X_1, X_2), \max (X_1, X_2))$ is a 50\% confidence interval for $\theta$.
 
-  But suppose $|X_1 - X_2| \geq \frac{1}{2}$, e.g. $x_1 = 0.2, x_2 = 0.9$, then we \emph{know} that, in this particular case, $\theta$ \emph{must} lie in $(\min (X_1, X_2), \max(X_1, X_2))$. This means that we can get a much narrower $50\%$ confidence interval! So guaranteed sampling properties does not necessarily mean a sensible conclusion in all cases.
+  But suppose $|X_1 - X_2| \geq \frac{1}{2}$, e.g. $x_1 = 0.2, x_2 = 0.9$, then we \emph{know} that, in this particular case, $\theta$ \emph{must} lie in $(\min (X_1, X_2), \max(X_1, X_2))$, and we don't have just 50\% ``confidence''!
+
+  This is why after we calculate a confidence interval, we should not say ``there is $100(1 - \alpha)\%$ chance that $\theta$ lies in here''. The confidence interval just says that ``if we keep making these intervals, $100(1 - \alpha)\%$ of them will contain $\theta$''. But if have calculated a \emph{particular} confidence interval, the probability that that \emph{particular} interval contains $\theta$ is \emph{not} $100(1 - \alpha)\%$.
 \end{eg}
+
 \subsection{Bayesian estimation}
 So far we have seen the \emph{frequentist} approach to a statistical inference, ie. inferential statements about $\theta$ are interpreted in terms of repeat sampling. For example, the confidence interval is what's the probability that the interval will contain $\theta$, not the probability that $\theta$ lies in the interval.
 
@@ -510,7 +539,7 @@ Thus
 \end{align*}
 where the constant of proportionality is chosen to make the total mass of the posterior distribution equal to one. Usually, we use this form, instead of attempting to calculate $f_\mathbf{X}(\mathbf{x})$.
 
-In practice, we can recognise the family for $\pi(\theta|\mathbf{x})$. It should be clear that the data enter through the likelihood, so the inference is automatically based on any sufficient inference.
+It should be clear that the data enters through the likelihood, so the inference is automatically based on any sufficient statistic.
 
 \begin{eg}
   Suppose I have $3$ coins in my pocket. One is $3:1$ in favour of tails, one is a fair coin, and one is $3:1$ in favour of heads.
@@ -522,19 +551,19 @@ In practice, we can recognise the family for $\pi(\theta|\mathbf{x})$. It should
   Our prior distribution is $\theta(\theta = 0.25) = \pi(\theta = 0.5) = \pi(\theta = 0.75) = 1/3$.
 
   The probability mass function $f_X(x|\theta) = \theta^x(1 - \theta)^{1 - x}$. So we have to following results:
-
-  \begin{tabular}{ccccc}
-    \toprule
-    $\theta$ & $\pi(\theta)$ & $f_X(x = 1|\theta)$ & $f_X(x = 1|\theta)\pi(\theta)$ & $\pi(x)$\\
-    \midrule
-    0.25 & 0.33 & 0.25 & 0.0825 & 0.167\\
-    0.50 & 0.33 & 0.50 & 0.1650 & 0.333\\
-    0.75 & 0.33 & 0.75 & 0.2475 & 0.500\\
-    \midrule
-    Sum & 1.00 & 1.50 & 0.4950 & 1.000\\
-    \bottomrule
-  \end{tabular}
-
+  \begin{center}
+    \begin{tabular}{ccccc}
+      \toprule
+      $\theta$ & $\pi(\theta)$ & $f_X(x = 1|\theta)$ & $f_X(x = 1|\theta)\pi(\theta)$ & $\pi(x)$\\
+      \midrule
+      0.25 & 0.33 & 0.25 & 0.0825 & 0.167\\
+      0.50 & 0.33 & 0.50 & 0.1650 & 0.333\\
+      0.75 & 0.33 & 0.75 & 0.2475 & 0.500\\
+      \midrule
+      Sum & 1.00 & 1.50 & 0.4950 & 1.000\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
   So if we observe a head, then there is now a $50\%$ chance that we have picked the third coin.
 \end{eg}
 
@@ -559,26 +588,24 @@ In practice, we can recognise the family for $\pi(\theta|\mathbf{x})$. It should
   \]
   In practice, we need to find a Beta prior distribution that matches our information from other hospitals. It turns out that $\betaD(a = 3, b = 27)$ prior distribution has mean 0.1 and $\P(0.03 < \theta < .20) = 0.9$.
 
-  Then we observe data $\sum x_i = 0$, $n = 0$. So the posterior is $\betaD(\sum x_i + a, n - \sum x_i + b) = \betaD(3, 37)$.
+  Then we observe data $\sum x_i = 0$, $n = 0$. So the posterior is $\betaD(\sum x_i + a, n - \sum x_i + b) = \betaD(3, 37)$. This has a mean of $3/40 = 0.075$.
 
-  This has a mean of $3/40 = 0.075$.
-
-  Even though nobody has died so far, the mle is $0$, which does not seem plausible. But we have a higher mean than $0$ because we take into account the data from other hospitals.
+  This leads to a different conclusion than a frequentist analysis. Since nobody has died so far, the mle is $0$, which does not seem plausible. Using a Bayesian approach, we have a higher mean than $0$ because we take into account the data from other hospitals.
 \end{eg}
 
 For this problem, a beta prior leads to a beta posterior. We say that the beta family is a \emph{conjugate} family of prior distribution for Bernoulli samples.
 
 Suppose that $a = b = 1$ so that $\pi (\theta) = 1$ for $0 < \theta < 1$ - the uniform distribution. Then the posterior is $\betaD(\sum x_i + 1, n - \sum x_i + 1)$, with properties
-
-\begin{tabular}[]{cccc}
-  \toprule
-  &mean & mode & variance\\
-  \midrule
-  prior & 1/2 & non-unique & 1/12\\
-  posterior & $\displaystyle \frac{\sum x_i + 1}{n + 2}$ & $\displaystyle \frac{\sum x_i}{n}$ & $\displaystyle\frac{(\sum x_i + 1)(n - \sum x_i + 1)}{(n + 2)^2(n + 3)}$\\
-  \bottomrule
-\end{tabular}
-
+\begin{center}
+  \begin{tabular}[]{cccc}
+    \toprule
+    &mean & mode & variance\\
+    \midrule
+    prior & 1/2 & non-unique & 1/12\\
+    posterior & $\displaystyle \frac{\sum x_i + 1}{n + 2}$ & $\displaystyle \frac{\sum x_i}{n}$ & $\displaystyle\frac{(\sum x_i + 1)(n - \sum x_i + 1)}{(n + 2)^2(n + 3)}$\\
+    \bottomrule
+  \end{tabular}
+\end{center}
 Note that the mode of the posterior is the mle.
 
 The posterior mean estimator, $\frac{\sum x_i + 1}{n + 2}$ is discussed in Lecture 2, where we showed that this estimator had smaller mse than the mle for non-extreme value of $\theta$. This is known as the Laplace's estimator.
@@ -587,11 +614,13 @@ The posterior variance is bounded above by $1/(4(n + 3))$, and this is smaller t
 
 Again, note that the posterior automatically depends on the data through the sufficient statistic.
 
-Let $L(\theta, a)$ be the loss incurred in estimating the value of a parameter to be $a$ when the true value is $\theta$.
+After we come up with the posterior distribution, we have to decide what estimator to use. In the case above, we used the posterior mean, but this might not be the best estimator.
 
-A common loss functions are quadratic loss $L(\theta, a) = (\theta - a)^2$, absolute error loss $L(\theta, a) = |\theta - a|$, but we can have others.
+To determine what is the ``best'' estimator, we first need a \emph{loss function}. Let $L(\theta, a)$ be the loss incurred in estimating the value of a parameter to be $a$ when the true value is $\theta$.
 
-When our estimate is $a$, the expected posterior loss is $a$, the expected posterior loss is
+Common loss functions are quadratic loss $L(\theta, a) = (\theta - a)^2$, absolute error loss $L(\theta, a) = |\theta - a|$, but we can have others.
+
+When our estimate is $a$, the expected posterior loss is
 \[
   h(a) = \int L(\theta, a)\pi(\theta|\mathbf{x})\;\d \theta.
 \]
@@ -605,14 +634,18 @@ For quadratic loss,
 \]
 $h'(a) = 0$ if
 \[
-  a\int \pi (\theta|\mathbf{x})\;\d \theta = \int \theta \pi(\theta|\mathbf{x}\;\d \theta.
+  \int (a - \theta) \pi(\theta|\mathbf{x})\;\d \theta = 0,
 \]
-So $\hat{\theta} = \int \theta\pi(\theta|\mathbf{x})\;\d \theta$, the \emph{posterior mean}, minimises $h(a)$.
+or
+\[
+  a \int \pi(\theta|\mathbf{x})\;\d \theta = \int \theta \pi(\theta|\mathbf{x})\;\d \theta,
+\]
+Since $\int \pi (\theta|\mathbf{x})\;\d \theta = 1$, the Bayes estimator is $\hat{\theta} = \int \theta\pi(\theta|\mathbf{x})\;\d \theta$, the \emph{posterior mean}.
 
 For absolute error loss,
 \begin{align*}
   h(a) &= \int |\theta - a|\pi(\theta|\mathbf{x})\;\d \theta\\
-  &= \int_{-\infty}^a (a - \theta)\pi(\theta|\mathbf{x}) = \;\d \theta + \int_a^\infty (\theta - a)\pi(\theta|\mathbf{x})\;\d \theta\\
+  &= \int_{-\infty}^a (a - \theta)\pi(\theta|\mathbf{x})\;\d \theta + \int_a^\infty (\theta - a)\pi(\theta|\mathbf{x})\;\d \theta\\
   &= a\int_{-\infty}^a \pi(\theta|\mathbf{x})\;\d \theta - \int_{-\infty}^a\theta\pi(\theta|\mathbf{x})\;\d \theta\\
   &+ \int_a^\infty \theta\pi(\theta|\mathbf{x})\;\d \theta - a\int_a^\infty \pi(\theta|\mathbf{x})\;\d \theta.
 \end{align*}
@@ -639,7 +672,7 @@ This occurs when each side is $1/2$. So $\hat{\theta}$ is the \emph{posterior me
 \end{eg}
 
 \begin{eg}
-  Suppose that $X_1, \cdots, X_n$ Are iid $\Poisson(\lambda)$ random variables, and $\lambda$ has an exponential distribution with mean $1$.So $\pi(\lambda) = e^{-\lambda}.$
+  Suppose that $X_1, \cdots, X_n$ are iid $\Poisson(\lambda)$ random variables, and $\lambda$ has an exponential distribution with mean $1$. So $\pi(\lambda) = e^{-\lambda}.$
 
   The posterior distribution is given by
   \[
@@ -658,29 +691,31 @@ This occurs when each side is $1/2$. So $\hat{\theta}$ is the \emph{posterior me
 \end{eg}
 
 \section{Hypothesis testing}
-\subsection{Simple hypotheses}
-Let $X_1, \cdots, X_n$ be iid, each taking values in $\mathcal{X}$, each with unknown pdf/pmf $f$, and suppose that we have two hypotheses, $H_0$ and $H_1$ about $f$.
+Often in statistics, we have some \emph{hypothesis} to test. For example, we want to test whether a drug can lower the chance of a heart attack. Often, we will have two hypotheses to compare: the \emph{null hypothesis} states that the drug is useless, while the \emph{alternative hypothesis} states that the drug is useful. Quantitatively, suppose that the chance of heart attack without the drug is $\theta_0$ and the chance with the drug is $\theta$. Then the null hypothesis is $H_0: \theta = \theta_0$, while the alternative hypothesis is $H_1: \theta \not= \theta_0$.
 
-On the basis of data $\mathbf{X} = \mathbf{x}$, we make a choice between the two hypotheses.
+It is important to note that the null hypothesis and alternative hypothesis are not on equal footing. By default, we assume the null hypothesis is true. For us to reject the null hypothesis, we need a \emph{lot} of evidence to prove that. This is since we consider incorrectly rejecting the null hypothesis to be a much more serious problem than rejecting it when we should not. For example, it is relatively okay to reject a drug when it is actually useful, but it is terrible to distribute drugs to patients when the drugs are actually useless. Alternatively, it is more serious to deem an innocent person guilty than to say a guilty person is innocent.
+
+In general, let $X_1, \cdots, X_n$ be iid, each taking values in $\mathcal{X}$, each with unknown pdf/pmf $f$. We have two hypotheses, $H_0$ and $H_1$, about $f$. On the basis of data $\mathbf{X} = \mathbf{x}$, we make a choice between the two hypotheses.
 
 \begin{eg}\leavevmode
   \begin{itemize}
     \item A coin has $\P(\text{Heads}) = \theta$, and is thrown independently $n$ times. We could have $H_0:\theta = \frac{1}{2}$ versus $H_1: \theta = \frac{3}{4}.$
-    \item Suppose $X_1, .., X_n$ are iid discrete random variables. We could have $H_0:$ the distribution is Poisson with unknown mean, and $H_1:$ the distribution is not Poisson. This is not a goodness-of-fit test.
-    \item General parametric cases: $X_1, \cdots , X_n$ are iid with density $f(x|\theta)$, with $H_0: \theta\in \Theta_0$ and $H_1:\theta\in \Theta_1$, with $\Theta_0\cap \Theta_1 = \emptyset$.
+    \item Suppose $X_1, .., X_n$ are iid discrete random variables. We could have $H_0:$ the distribution is Poisson with unknown mean, and $H_1:$ the distribution is not Poisson.
+    jitem General parametric cases: Let $X_1, \cdots , X_n$ be iid with density $f(x|\theta)$. $f$ is known while $\theta$ is unknown. Then our hypotheses are $H_0: \theta\in \Theta_0$ and $H_1:\theta\in \Theta_1$, with $\Theta_0\cap \Theta_1 = \emptyset$.
     \item We could have $H_0: f = f_0$ and $H_1 = f = f_1$, where $f_0$ and $f_1$ are densities that are completely specified but do not come form the same parametric family.
   \end{itemize}
 \end{eg}
 
-\begin{defi}[Simple hypotehsis]
-  A \emph{simple hypothesis} $H$ specifies $f$ completely (eg. $H_0: \theta = \frac{1}{2}$). Otherwise, $H$ is a \emph{composite hypothesis} $H_1$.
+\begin{defi}[Simple and composite hypotheses]
+  A \emph{simple hypothesis} $H$ specifies $f$ completely (eg. $H_0: \theta = \frac{1}{2}$). Otherwise, $H$ is a \emph{composite hypothesis}.
 \end{defi}
 
+\subsection{Simple hypotheses}
 \begin{defi}[Critical region]
   For testing $H_0$ against an alternative hypothesis $H_1$, a test procedure has to partition $\mathcal{X}^n$ into two disjoint exhaustive regions $C$ and $\bar C$, such that if $\mathbf{x}\in C$, then $H_0$ is rejected, and if $\mathbf{x}\in \bar C$, then $H_0$ is not rejected. $C$ is the \emph{critical region}.
 \end{defi}
 
-When performing a test, we may either arrive at a correct conclusion, or make one of two types of error:
+When performing a test, we may either arrive at a correct conclusion, or make one of the two types of error:
 \begin{defi}[Type I and II error]\leavevmode
   \begin{enumerate}
     \item \emph{Type I error}: reject $H_0$ when $H_0$ is true.
@@ -699,78 +734,96 @@ When $H_0$ and $H_1$ are both simple, let
 The \emph{size} of the test is $\alpha$, and $1 - \beta$ is the \emph{power} of the test to detect $H_1$.
 \end{defi}
 
+If we have two simple hypotheses, a relatively straightforward test is the \emph{likelihood ratio test}.
 \begin{defi}[Likelihood]
-  The \emph{likelihood} of a simple hypothesis $H\theta = \theta^*$ given data $\mathbf{x}$ is
+  The \emph{likelihood} of a simple hypothesis $H: \theta = \theta^*$ given data $\mathbf{x}$ is
   \[
-    L_x(H) = f_\mathbf{X}(\mathbf{x}|\theta = \theta^*).
+    L_\mathbf{x}(H) = f_\mathbf{X}(\mathbf{x}|\theta = \theta^*).
   \]
   The \emph{likelihood ratio} of two simple hypotheses $H_0, H_1$ given data $\mathbf{x}$ is
   \[
-    \Lambda_\mathbf{x}(H_0; H_1) = \frac{L_x(H_1)}{L_x(H_0)}.
+    \Lambda_\mathbf{x}(H_0; H_1) = \frac{L_\mathbf{x}(H_1)}{L_\mathbf{x}(H_0)}.
   \]
   A \emph{likelihood ratio test} (LR test) is one where the critical region $C$ is of the form
   \[
-    C = \{\mathbf{x}: \Lambda_x (H_0; H_1) > k\}
+    C = \{\mathbf{x}: \Lambda_\mathbf{x} (H_0; H_1) > k\}
   \]
   for some $k$.
 \end{defi}
 
 \begin{lemma}[Neyman-Pearson lemma]
-  Suppose $H_0: f = f_0$, $F_1: f = f_1$, where $f_0$ and $f_1$ are continuous densities that are nonzero on the same regions. Then among all tests of size less than or equal to $\alpha$, the test with smallest probability of a Type II error is given by $C = \{\mathbf{x}: f_1(\mathbf{x})/f_0(\mathbf{x}) > k\}$, where $k$ is chosen such that $\alpha=\P(\text{reject }H_0|H_0) = \P(\mathbf{X}\in C| H_0) = \int_C f_0(\mathbf{x})\;\d \mathbf{x}$.
+  Suppose $H_0: f = f_0$, $H_1: f = f_1$, where $f_0$ and $f_1$ are continuous densities that are nonzero on the same regions. Then among all tests of size less than or equal to $\alpha$, the test with the largest power is the likelihood ratio test of size $\alpha$.
+
 \end{lemma}
 
 \begin{proof}
-  The given $C$ specifies a likelihood ratio test with size $\alpha$. Let
+  Under the likelihood ratio test, our critical region is
   \[
-    \beta = \P(\mathbf{X}\not\in C|f_1) = \int_{\bar C}f_x(\mathbf{x})\;\d \mathbf{x}.
+    C = \{\mathbf{x}: f_1(\mathbf{x})/f_0(\mathbf{x}) > k\},
   \]
-  Let $C^*$ be the critical region of any other test with size less than or equal to $\alpha$.
-
-  Let $\alpha^* = \P(X\in C^*|f_0$ and $\beta^* = \P(\mathbf{X}\not\in C^*|f_1)$. We want to show $\beta \leq \beta^*$.
+  where $k$ is chosen such that $\alpha=\P(\text{reject }H_0|H_0) = \P(\mathbf{X}\in C| H_0) = \int_C f_0(\mathbf{x})\;\d \mathbf{x}$. The probability of Type II error is given by
+  \[
+    \beta = \P(\mathbf{X}\not\in C|f_1) = \int_{\bar C}f_1(\mathbf{x})\;\d \mathbf{x}.
+  \]
+  Let $C^*$ be the critical region of any other test with size less than or equal to $\alpha$. Let $\alpha^* = \P(X\in C^*|f_0)$ and $\beta^* = \P(\mathbf{X}\not\in C^*|f_1)$. We want to show $\beta \leq \beta^*$.
 
   We know $\alpha^* \leq \alpha$, ie
   \[
     \int_{C^*}f_0(\mathbf{x})\;\d \mathbf{x}\leq \int_Cf_0(\mathbf{x}) \;\d \mathbf{x}.
   \]
-  Also, on $C$, we have $f_1(\mathbf{x}) > kf_0*(\mathbf{x})$, while on $\bar C$ we have $f_1(\mathbf{x}) \leq kf_0(\mathbf{x})$. So
-  \[
-    \int_{\bar C^*\cap C} f_1(\mathbf{x}) \;\d \mathbf{x} \geq k\int_{\bar C^*\cap C}f_0(\mathbf{x}) \;\d \mathbf{x},\quad \int_{\bar C\cap C^*}f_1(\mathbf{x}) \;\d \mathbf{x} \leq k\int_{\bar C\cap C^*}f_0 (\mathbf{x})\;\d \mathbf{x}.
-  \]
+  Also, on $C$, we have $f_1(\mathbf{x}) > kf_0(\mathbf{x})$, while on $\bar C$ we have $f_1(\mathbf{x}) \leq kf_0(\mathbf{x})$. So
+  \begin{align*}
+    \int_{\bar C^*\cap C} f_1(\mathbf{x}) \;\d \mathbf{x} &\geq k\int_{\bar C^*\cap C}f_0(\mathbf{x}) \;\d \mathbf{x}\\
+    \int_{\bar C\cap C^*}f_1(\mathbf{x}) \;\d \mathbf{x} &\leq k\int_{\bar C\cap C^*}f_0 (\mathbf{x})\;\d \mathbf{x}.
+  \end{align*}
   Hence
   \begin{align*}
-    \beta - \beta^* &= \int_{\bar C}f_x(\mathbf{x}) \;\d \mathbf{x} - \int_{\bar C^*}f_1(\mathbf{x})\;\d \mathbf{x}\\
+    \beta - \beta^* &= \int_{\bar C}f_1(\mathbf{x}) \;\d \mathbf{x} - \int_{\bar C^*}f_1(\mathbf{x})\;\d \mathbf{x}\\
     &= \int_{\bar C\cap C^*} f_1(\mathbf{x}) \;\d \mathbf{x} + \int_{\bar C\cap \bar C^*}f_1(\mathbf{x})\;\d \mathbf{x} \\
     &\quad - \int_{\bar C^*\cap C} f_1(\mathbf{x}) \;\d \mathbf{x} - \int_{\bar C\cap \bar C^*}f_1(\mathbf{x})\;\d \mathbf{x}\\
+    &= \int_{\bar C \cap C^*}f_1(\mathbf{x})\;\d \mathbf{x} - \int_{\bar C^*\cap C}f_1(\mathbf{x})\;\d \mathbf{x}\\
     &\leq k\int_{\bar C \cap C^*}f_0(\mathbf{x})\;\d \mathbf{x} - k\int_{\bar C^*\cap C}f_0(\mathbf{x})\;\d \mathbf{x}\\
     &= k\left\{\int_{\bar C\cap C^*}f_0(\mathbf{x})\;\d \mathbf{x} + \int_{C \cap C^*}f_0(\mathbf{x})\;\d \mathbf{x}\right\} \\
     &\quad- k\left\{\int_{\bar C^*\cap C}f_0(\mathbf{x})\;\d \mathbf{x} + \int_{C\cap C^*}f_0(\mathbf{x})\;\d \mathbf{x}\right\}\\
     &= k(\alpha^* - \alpha)\\
     &\leq 0.
   \end{align*}
-  % diagram
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [fill=mblue!50!white] (0, 0) rectangle (2.5, 1);
+      \draw [fill=mred!50!white] (2.5, 0) rectangle (4, 1);
+      \draw (0, 1) rectangle (2.5, 4);
+      \draw [fill=mgreen!50!white] (2.5, 1) rectangle (4, 4);
+
+      \node at (0, 0.5) [left] {$C^*$};
+      \node at (0, 2.5) [left] {$\bar{C^*}$};
+
+      \node at (1.25, 4) [above] {$\bar{C}$};
+      \node at (3.26, 4) [above] {$C$};
+
+      \node [align=center] at (1.25, 0.5) {$C^*\cap \bar C$ \\\small $(f_1 < kf_0)$};
+      \node [align=center] at (3.25, 2.5) {$\bar{C^*}\cap C$ \\\small $(f_1 \geq kf_0)$};
+      \node [align=center] at (3.25, 0.5) {$C^*\cap C$};
+
+      \draw [decorate, decoration={brace}] (2.5, 0) -- (0, 0) node [pos=0.5, below] {$\beta/H_1$};
+      \draw [decorate, decoration={brace}] (4, 0) -- (2.5, 0) node [pos=0.5, below] {$\alpha/H_0$};
+
+      \draw [decorate, decoration={brace}] (4, 1) -- (4, 0) node [pos=0.5, right] {$\alpha^*/H_0$};
+      \draw [decorate, decoration={brace}] (4, 4) -- (4, 1) node [pos=0.5, right] {$\beta^*/H_1$};
+    \end{tikzpicture}
+  \end{center}
 \end{proof}
-
-\note We assume continuous densities to ensure that a LR test of exactly size $\alpha$ exists. Then Neyman-Pearson Lemma shows that $\alpha$ and $\beta$ cannot both be arbitrarily small. It says that the most powerful test (ie the one with the smallest Type II error probability), among tests with size smaller or equal to $\alpha$, is the size $\alpha$ likelihood ratio test.
-
-Thus we should fix $\P(\text{Type I error})$ at some level $\alpha$ and then use the Neyman-Pearson Lemma to find the best test.
-
-Here the hypothesis are not treated symmetrically. $H_0$ has precedence over $H_1$ and a Type I error is treated as more serious than a Type II error (eg it is more serious to claim an innocent person is guilty than to say a guilty person is innocent)
-
-\begin{defi}[Null and alternative hypothesis]
-  $H_0$ is the null hypothesis and $H_1$ is the alternative hypothesis. The null hypothesis is that of ``no change'' (eg a drug is not helpful), and is assumed unless there is significant reason not to think so. The alternative hypothesis a departure from $H_0$ that is of interest to us.
-
-  We would rather not reject $H_0$ when we should, that to reject $H_0$ when we shouldn't.
-\end{defi}
+Here we assumed the $f_0$ and $f_1$ are continuous densities. However, this assumption is need just to ensure that the likelihood ratio test of exactly size $\alpha$ exists. Even with non-continuous distributions, the likelihood ratio test is still a good idea.
 
 \begin{eg}
-  Suppose $X_1, \cdots, X_n$ are iid $N(\mu, \sigma_0^2)$, where $\sigma_0^2$ is known. We want to find the best size $\alpha$ test of $H_0: \mu = \mu_0$ against $H_1: \mu - \mu_1$, where $\mu_0$ and $\mu_1$ are known fixed values with $\mu_1 > \mu_0$. Then
+  Suppose $X_1, \cdots, X_n$ are iid $N(\mu, \sigma_0^2)$, where $\sigma_0^2$ is known. We want to find the best size $\alpha$ test of $H_0: \mu = \mu_0$ against $H_1: \mu = \mu_1$, where $\mu_0$ and $\mu_1$ are known fixed values with $\mu_1 > \mu_0$. Then
   \begin{align*}
     \Lambda_\mathbf{x}(H_0; H_1) &= \frac{(2\pi\sigma_0^2)^{-n/2}\exp\left(-\frac{1}{2\sigma^2_0}\sum(x_i - \mu_1)^2\right)}{(2\pi\sigma_0^2)^{-n/2}\exp\left(-\frac{1}{2\sigma^2_0}\sum(x_i - \mu_0)^2\right)}\\
     &= \exp\left(\frac{\mu_1 - \mu_0}{\sigma_0^2}n\bar x + \frac{n(\mu_0^2 - \mu_1^2)}{2\sigma_0^2}\right).
   \end{align*}
   This is an increasing function of $\bar x$, so for any $k$, $\Lambda_x > k\Leftrightarrow \bar x > c$ for some $c$. Hence we reject $H_0$ if $\bar x > c$, where $c$ is chosen such that $\P(\bar X > c | H_0) = \alpha$.
 
-  Under $H_0$, $\bar X \sim N(\mu_0. \sigma_0^2/n)$, so $Z = \sqrt{n}(\bar X - \mu_0)/\sigma_0 \sim N(0, 1)$.
+  Under $H_0$, $\bar X \sim N(\mu_0, \sigma_0^2/n)$, so $Z = \sqrt{n}(\bar X - \mu_0)/\sigma_0 \sim N(0, 1)$.
 
   Since $\bar x > c\Leftrightarrow z > c'$ for some $c'$, the size $\alpha$ test rejects $H_0$ if
   \[
@@ -780,9 +833,9 @@ Here the hypothesis are not treated symmetrically. $H_0$ has precedence over $H_
 
   From tables, $z_{0.05} = 1.645$. We have $z = 0.4$ and this is less than $1.645$. So $\mathbf{x}$ is not in the rejection region.
 
-  We do not reject $H_0$ at the 5\% level; the data are consistent with $H_0$.
+  We do not reject $H_0$ at the 5\% level and say that the data are consistent with $H_0$.
 
-  This does NOT mean that $H_0$ is ``true'', just that it is not false.
+  Note that this does not mean that we \emph{accept} $H_0$.  While we don't have sufficient reason to believe it is false, we also don't have sufficient reason to believe it is true.
 
   This is called a $z$-\emph{test}.
 \end{eg}
@@ -793,9 +846,8 @@ Our observed value $z$ will be in the rejected region iff $z > k \Leftrightarrow
   The quantity $p^*$ is called the \emph{$p$-value} of our observed data $\mathbf{x}$. For the example above, $z = 0.4$ and so $p^* = 1 - \Phi(0.4) = 0.3446$.
 \end{defi}
 
-In general, the $p$-value is sometimes called the ``observed significance level'' of $\mathbf{x}$ and is the probability under $H_0$ of seeing data that are ``more extreme'' than our observed data $\mathbf{x}$. Extreme observations are viewed as providing evidence against $H_0$.
+In general, the $p$-value is sometimes called the ``observed significance level'' of $\mathbf{x}$. This is the probability under $H_0$ of seeing data that is ``more extreme'' than our observed data $\mathbf{x}$. Extreme observations are viewed as providing evidence against $H_0$.
 
-\note The $p$-value has Uniform$(0, 1)$ pdf under the null hypothesis.
 \subsection{Composite hypotheses}
 For composite hypotheses like $H:\theta \geq 0$, the error probabilities do not have a single value. We define
 \begin{defi}[Power function]
@@ -812,7 +864,7 @@ We want $W(\theta)$ to be small on $H_0$ and large on $H_1$.
     \alpha =\sup_{\theta\in \Theta_0}W(\theta),
   \]
 \end{defi}
-It is the worst possible size.
+This is the worst possible size we can get.
 
 For $\theta\in \Theta_1$, $1 - W(\theta) = \P(\text{Type II error}|\theta)$.
 
@@ -820,9 +872,9 @@ Sometimes the Neyman-Pearson theory can be extended to one-sided alternatives.
 
 For example, in the previous example, we have shown that the most powerful size $\alpha$ test of $H_0: \mu = \mu_0$ versus $H_1: \mu = \mu_1$ (where $\mu_1 > \mu_0$) is given by
 \[
-  C = \{x: \frac{\sqrt{n}(\bar x - \mu_0)}{\sigma_0} >  z_\alpha\}.
+  C = \left\{x: \frac{\sqrt{n}(\bar x - \mu_0)}{\sigma_0} >  z_\alpha\right\}.
 \]
-The critical region depends on $\mu_0, n \sigma_0, \alpha$, and the fact that $\mu_1 > \mu_0$. It does NOT depend on the particular value of $\mu_1$. This test is then uniformly the most powerful size $\alpha$ for testing $H_0: \mu = \mu_0$ against $H_1: \mu> \mu_0$.
+The critical region depends on $\mu_0, n, \sigma_0, \alpha$, and the fact that $\mu_1 > \mu_0$. It does NOT depend on the particular value of $\mu_1$. This test is then uniformly the most powerful size $\alpha$ for testing $H_0: \mu = \mu_0$ against $H_1: \mu> \mu_0$.
 
 \begin{defi}[Uniformly most powerful test]
   A test specified by a critical region $C$ is \emph{uniformly most powerful} (UMP) size $\alpha$ test for test $H_0:\theta\in \Theta_0$ against $H_1: \theta \in \Theta_1$ if
@@ -830,11 +882,11 @@ The critical region depends on $\mu_0, n \sigma_0, \alpha$, and the fact that $\
     \item $\sup_{\theta\in \Theta_0} W(\theta) = \alpha$.
     \item For any other test $C^*$ with size $\leq \alpha$ and with power function $W^*$, we have $W(\theta) \geq W^*(\theta)$ for all $\theta\in \Theta_1$.
   \end{enumerate}
-  Note that these may not exist. However, likelihood ratio test often work.
+  Note that these may not exist. However, likelihood ratio test often works.
 \end{defi}
 
 \begin{eg}
-  Suppose $X_1, \cdots, X_n$ are iid where $\sigma_0$ is known, and we wish to test $H_0: \mu\leq \mu_0$ against $H_1: \mu > \mu_0$.
+  Suppose $X_1, \cdots, X_n$ are iid $N(\mu, \sigma_0^2)$ where $\sigma_0$ is known, and we wish to test $H_0: \mu\leq \mu_0$ against $H_1: \mu > \mu_0$.
 
   First consider testing $H_0': \mu = \mu_0$ against $H_1': \mu = \mu_1$, where $\mu_1 > \mu_0$. The Neyman-Pearson test of size $\alpha$ of $H_0'$ against $H_1'$ has
   \[
@@ -853,7 +905,7 @@ The critical region depends on $\mu_0, n \sigma_0, \alpha$, and the fact that $\
   \]
   So the first condition is satisfied.
 
-  For the second condition, observe that for any $\mu > \mu_0$, the Neyman Pearson size $\alpha$ test of $H_0'$ vs $H_1'$ has critical region $C$. Let $C^*$ and $W^*$ belong to any other test of $H_0$ vs $H_1$ of size $\leq \alpha$. Then $C^*$ can be regarded as a test of $H_0$ vs $H_1$ of size $\leq \alpha$, and NP-Lemma says that $W^*(\mu_1) \leq W(\mu_1)$. This holds for all $\mu_1 > \mu_0$. So the condition is satisfied and it is UMP.
+  For the second condition, observe that for any $\mu > \mu_0$, the Neyman Pearson size $\alpha$ test of $H_0'$ vs $H_1'$ has critical region $C$. Let $C^*$ and $W^*$ belong to any other test of $H_0$ vs $H_1$ of size $\leq \alpha$. Then $C^*$ can be regarded as a test of $H_0'$ vs $H_1'$ of size $\leq \alpha$, and NP-Lemma says that $W^*(\mu_1) \leq W(\mu_1)$. This holds for all $\mu_1 > \mu_0$. So the condition is satisfied and it is UMP.
 \end{eg}
 We now consider likelihood ratio tests for more general situations.
 \begin{defi}[Likelihood of a composite hypothesis]
@@ -864,12 +916,12 @@ We now consider likelihood ratio tests for more general situations.
 \end{defi}
 So far we have considered disjoint hypotheses $\Theta_0, \Theta_1$, but we are not interested in any specific alternative. So it is easier to take $\Theta_1 = \Theta$ rather than $\Theta \setminus\Theta_0$. Then
 \[
-  \Lambda_x (H_0; H_1) = \frac{L_x(H_1}{L_x(H_0)}=\frac{\sup_{\theta\in \Theta_1}f(\mathbf{x}|\theta)}{\sup_{\theta\in \Theta_0}f(\mathbf{x}|\theta)} \geq 1,
+  \Lambda_\mathbf{x} (H_0; H_1) = \frac{L_\mathbf{x}(H_1)}{L_\mathbf{x}(H_0)}=\frac{\sup_{\theta\in \Theta_1}f(\mathbf{x}|\theta)}{\sup_{\theta\in \Theta_0}f(\mathbf{x}|\theta)} \geq 1,
 \]
 with large values of $\Lambda$ indicating departure from $H_0$.
 
 \begin{eg}
-  Single sample: testing a given mean, known variance ($z$-test). Suppose that $X_1, \cdots, X-n$ are iid $N(\mu, \sigma_0^2)$, with $\sigma_0^2$ known, and we wish to test $H_0: \mu = \mu_0$ against $H_1 = \mu \not= \mu_0$ (for given constant $\mu_0$).
+  Single sample: testing a given mean, known variance ($z$-test). Suppose that $X_1, \cdots, X_n$ are iid $N(\mu, \sigma_0^2)$, with $\sigma_0^2$ known, and we wish to test $H_0: \mu = \mu_0$ against $H_1: \mu \not= \mu_0$ (for given constant $\mu_0$).
 
   Here $\Theta_0 = \{\mu_0\}$ and $\Theta = \R$.
   For the denominator, we have $\sup_\Theta f(\mathbf{x}|\mu) = f(\mathbf{x}|\hat{\mu})$, where $\hat{\mu}$ is the mle. We know that $\hat{\mu} = \bar x$. Hence
@@ -891,7 +943,7 @@ with large values of $\Lambda$ indicating departure from $H_0$.
 
   We know that under $H_0$, $\displaystyle Z = \frac{\sqrt{n}(\bar X - \mu_0)}{\sigma_0}\sim N(0, 1)$. So the size $\alpha$ generalised likelihood test rejects $H_0$ if
   \[
-    \left|\frac{\sqrt{n}(\bar x - \mu_0}{\sigma_0}\right| > z_{\alpha/2}.
+    \left|\frac{\sqrt{n}(\bar x - \mu_0)}{\sigma_0}\right| > z_{\alpha/2}.
   \]
   Alternatively, since $\displaystyle \frac{n(\bar X - \mu_0)}{\sigma_0^2}\sim \chi_1^2$, we reject $H_0$ if
   \[
@@ -906,14 +958,14 @@ The next theorem allows us to use likelihood ratio tests even when we cannot fin
 
 First consider the ''size`` or ''dimension`` of our hypotheses: suppose that $H_0$ imposes $p$ independent restrictions on $\Theta$. So for example, if $\Theta = \{\theta: \theta = (\theta_1, \cdots, \theta_k)\}$, and we have
 \begin{itemize}
-  \item $H_0: \theta_{i_1} = a_1, \theta_{i_2} = a_2, \cdots \theta_{i_p} = a_p$
-  \item $H_0: A\theta = \mathbf{b}$ (with $A$ $p\times k$, $\mathbf{b}$ $p\times 1$ given)
-  \item $H_0: \theta_i = f_i(\varphi), i = 1, \cdots, k$ for some $\varphi = (\varphi_1, \cdots, \varphi_{k - p}$
+  \item $H_0: \theta_{i_1} = a_1, \theta_{i_2} = a_2, \cdots \theta_{i_p} = a_p$; or
+  \item $H_0: A\theta = \mathbf{b}$ (with $A$ $p\times k$, $\mathbf{b}$ $p\times 1$ given); or
+  \item $H_0: \theta_i = f_i(\varphi), i = 1, \cdots, k$ for some $\varphi = (\varphi_1, \cdots, \varphi_{k - p})$.
 \end{itemize}
 We say $\Theta$ has $k$ free parameters and $\Theta_0$ has $k - p$ free parameters. We write $|\Theta_0| = k - p$ and $|\Theta| = k$.
 
 \begin{thm}[Generalized likelihood ratio theorem]
-  Suppose $\Theta_0 \subseteq \Theta_1$ and $|\Theta_1| - |\Theta_0| = p$. Then under regularity conditions, as $n\to \infty$, with $\mathbf{X} = (X_1, \cdots, X_n)$ , all $X_i$ iid, we have, if $H_0$ is true,
+  Suppose $\Theta_0 \subseteq \Theta_1$ and $|\Theta_1| - |\Theta_0| = p$. Let $\mathbf{X} = (X_1, \cdots, X_n)$ with all $X_i$ iid. Then if $H_0$ is true, as $n\to \infty$,
   \[
     2\log \Lambda_\mathbf{X}(H_0:H_1)\sim \chi_p^2.
   \]
@@ -924,43 +976,43 @@ For example, in our example above, $|\Theta_1| - |\Theta_0| = 1$, and in this ca
 
 \subsection{Tests of goodness-of-fit and independence}
 \subsubsection{Goodness-of-fit of a fully-specified null distribution}
-Suppose the observation space $\mathcal{X}$ is partitioned into $k$ sets, and let $p_i$ be the probability that an observation is in set $i$ for $i = 1, \cdots, k$.
+So far, we have considered relatively simple cases where we are attempting to figure out, say, the mean. However, in reality, more complicated scenarios arise. For example, we might want to know if a dice is fair, ie. if the probability of getting each number is exactly $\frac{1}{6}$. Our null hypothesis would be that $p_1 = p_2 = \cdots = p_6 = \frac{1}{6}$, while the alternative hypothesis allows any possible values of $p_i$.
 
-Consider testing $H_0:$ the $p_i$'s arise from a fully specified model against $H_1:$ the $p_i$'s are unrestricted (but we must still have $p_i \geq 0, \sum p_i = 1$, of course).
+In general, suppose the observation space $\mathcal{X}$ is partitioned into $k$ sets, and let $p_i$ be the probability that an observation is in set $i$ for $i = 1, \cdots, k$. We want to test ``$H_0:$ the $p_i$'s arise from a fully specified model'' against ``$H_1:$ the $p_i$'s are unrestricted (apart from the obvious $p_i \geq 0, \sum p_i = 1$)''.
 
 \begin{eg}
-  Birth month of admissions to Oxford and Cambridge in 2012.
-
-  \noindent\begin{tabular}{cccccccccccc}
-    \toprule
-    Sep & Oct & Nov & Dec & Jan & Feb & Mar & Apr & May & Jun & Jul & Aug\\
-    470 & 515 & 470 & 457 & 473 & 381 & 466 & 457 & 437 & 396 & 384 & 394\\
-    \bottomrule
-  \end{tabular}
-
+  The following table lists the birth months of admissions to Oxford and Cambridge in 2012.
+  \begin{center}
+    \begin{tabular}{cccccccccccc}
+      \toprule
+      Sep & Oct & Nov & Dec & Jan & Feb & Mar & Apr & May & Jun & Jul & Aug\\
+      470 & 515 & 470 & 457 & 473 & 381 & 466 & 457 & 437 & 396 & 384 & 394\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
   Is this compatible with a uniform distribution over the year?
 
   Out of $n$ independent observations, let $N_i$ be the number of observations in $i$th set. So $(N_1,\cdots, N_k)\sim \multinomial(n; p_1, \cdots, p_n)$.
 
   For a generalized likelihood ratio test of $H_0$, we need to find the maximised likelihood under $H_0$ and $H_1$.
 
-  Under $H_1$: $\like(p_1, \cdots, p_k) \propto p_1^{m_1}\cdots p_k^{m_k}$. So the log likelihood is $l = \text{constant} + \sum n_i \log p_i$. We want to maximise this subject to $\sum p_i = 1$. Using the Lagrange multiplier, we will find that the mle is$\hat{p_i}/n$. Also $|\Theta_1| = k - 1$ (not $k$, since they must sum up to 1).
+  Under $H_1$, $\like(p_1, \cdots, p_k) \propto p_1^{n_1}\cdots p_k^{n_k}$. So the log likelihood is $l = \text{constant} + \sum n_i \log p_i$. We want to maximise this subject to $\sum p_i = 1$. Using the Lagrange multiplier, we will find that the mle is $\hat{p_i} = n_i/n$. Also $|\Theta_1| = k - 1$ (not $k$, since they must sum up to 1).
 
-  Under $H_0$, the values of $p_i$ are specified completely, say $p_i = \tilde{p}_i$. So $|\Theta_0| = 0$. We find that
+  Under $H_0$, the values of $p_i$ are specified completely, say $p_i = \tilde{p}_i$. So $|\Theta_0| = 0$. Using our formula for $\hat{p_i}$, we find that
   \[
     2\log \Lambda = 2\log\left(\frac{\hat{p}_1^{n_1}\cdots \hat{p}_k^{n_k}}{\tilde{p}_{1}^{n_1}\cdots \tilde{p}_k^{n_k}}\right) = 2\sum n_i \log \left(\frac{n_i}{n\tilde{p}_i}\right)\tag{1}
   \]
   Here $|\Theta_1| - |\Theta_0| = k - 1$. So we reject $H_0$ if $2\log \Lambda > \chi_{k - 1}^2(\alpha)$ for an approximate size $\alpha$ test.
 
-  Under $H_0$ (no effect of month of birth), $\tilde{p}_i$ is the proportion of births in month $i$ in 1993/1994 - this is \emph{not} simply proportional to the number of days in month, as there is for example an excess of September births (the ``Christmas effect''). So
+  Under $H_0$ (no effect of month of birth), $\tilde{p}_i$ is the proportion of births in month $i$ in 1993/1994 - this is \emph{not} simply proportional to the number of days in each month (or even worse, $\frac{1}{12}$), as there is for example an excess of September births (the ``Christmas effect''). So
 
   Then
   \[
     2\log \Lambda = 2\sum n_i \log\left(\frac{n_i}{n\tilde{p}_i}\right) = 44.9.
   \]
-  $\P(\chi_11^2 > 44.86) = 3\times 10^{-9}$, which is our $p$-value. Since this is certainly less than 0.001, we can reject $H_0$ At the $0.1\%$ level, or can say ``significant at the $0.1\%$ level''.
+  $\P(\chi_{11}^2 > 44.86) = 3\times 10^{-9}$, which is our $p$-value. Since this is certainly less than 0.001, we can reject $H_0$ at the $0.1\%$ level, or can say the result is ``significant at the $0.1\%$ level''.
 
-  \note The traditional levels for comparison are $\alpha = 0.04, 0.01, 0.001$, roughly corresponding to ``evidence'', ``strong evidence'' and ``very strong evidence''.
+  The traditional levels for comparison are $\alpha = 0.04, 0.01, 0.001$, roughly corresponding to ``evidence'', ``strong evidence'' and ``very strong evidence''.
 \end{eg}
 A similar common situation has $H_0: p_i = p_i(\theta)$ for some parameter $\theta$ and $H_1$ as before. Now $|\Theta_0|$ is the number of independent parameters to be estimated under $H_0$.
 
@@ -971,38 +1023,43 @@ Under $H_0$, we find mle $\hat{\theta}$ by maximizing $n_i \log p_i (\theta)$, a
 The degrees of freedom are $k - 1 - |\Theta_0|$.
 
 \subsubsection{Pearson's Chi-squared test}
-Notice that the two log likelihoods are of the same form. Let $o_i = n_i$ (observed number) and let $e_i = n\tilde{p_i}$ or $np_i(\hat{\theta})$. Let $\delta_i = o_i - e_i$. Then
+Notice that the two log likelihoods are of the same form. In general, let $o_i = n_i$ (observed number) and let $e_i = n\tilde{p_i}$ or $np_i(\hat{\theta})$ (expected number). Let $\delta_i = o_i - e_i$. Then
 \begin{align*}
   2\log \Lambda &= 2\sum o_i \log \left(\frac{o_i}{e_i}\right)\\
   &= 2\sum (e_i + \delta_i) \log\left(1 + \frac{\delta_i}{e_i}\right)\\
-  &= 2\sum \left(\delta_i + \frac{\delta_i^2}{e_i} - \frac{\delta_i^2}{2e_i}\right)\\
+  &= 2\sum (e_i + \delta_i) \left(\frac{\delta_i}{e_i} - \frac{\delta_i^2}{2e_i^2} + O(\delta_i^3)\right)\\
+  &= 2\sum \left(\delta_i + \frac{\delta_i^2}{e_i} - \frac{\delta_i^2}{2e_i} + O(\delta_i^3)\right)\\
   \intertext{We know that $\sum \delta_i = 0$ since $\sum e_i = \sum o_i$. So}
-  &= \sum \frac{\delta_i^2}{e_i}\\
-  &= \sum\frac{(o_i - e_0)^2}{e_i},
+  &\approx \sum \frac{\delta_i^2}{e_i}\\
+  &= \sum\frac{(o_i - e_i)^2}{e_i}.
 \end{align*}
-where we have assumed $\log\left(1 + \frac{\delta_i}{e_i} - \frac{\delta_i^2}{2e_i^2}\right)$.
+This is known as the \emph{Pearson's Chi-squared test}.
 
 \begin{eg}
-  Mendel crossed 556 smooth yellow male peas with wrinkled green peas. From the progeny let
+  Mendel crossed 556 smooth yellow male peas with wrinkled green peas. From the progeny, let
   \begin{enumerate}
     \item $N_1$ be the number of smooth yellow peas,
     \item $N_2$ be the number of smooth green peas,
     \item $N_3$ be the number of wrinkled yellow peas,
     \item $N_4$ be the number of wrinkled green peas.
   \end{enumerate}
-  We wish to test the goodness of fit of the model $H_0: (p_1, p_2, p_3, p_4) = \left(\frac{9}{16}, \frac{3}{16}, \frac{3}{16}, \frac{1}{16}\right)$.
+  We wish to test the goodness of fit of the model
+  \begin{center}
+    $H_0: (p_1, p_2, p_3, p_4) = \left(\frac{9}{16}, \frac{3}{16}, \frac{3}{16}, \frac{1}{16}\right)$.
+  \end{center}
+  Suppose we observe $(n_1, n_2, n_3, n_4) = (315, 108, 102, 31)$.
 
-  We find $(e_1, e_2, e_3, e_4) = (312.75, 104.25, 104.25, 34.75)$. So $2\log \Lambda = 0.618$ and $\sum \frac{(o_i - e_i)^2}{e_i} = 0.604$.
+  We find $(e_1, e_2, e_3, e_4) = (312.75, 104.25, 104.25, 34.75)$. The actual $2\log \Lambda = 0.618$ and the approximation we had is $\sum \frac{(o_i - e_i)^2}{e_i} = 0.604$.
 
-  Here $|\Theta_0| = 0$ and $|\Theta_1| = 4 - = 3$. So we refer to test statistics $\chi_3^2(\alpha)$.
+  Here $|\Theta_0| = 0$ and $|\Theta_1| = 4 - 1 = 3$. So we refer to test statistics $\chi_3^2(\alpha)$.
 
-  Since $\chi_3^2(0.05) = 7.815$, we see that neither value is significant at $5\%$. So there is no evidence against Mendel's theory. In fact, the $p$-value is approximately $\P(\chi_3^2 > 0.6) \approx 0.96$.
+  Since $\chi_3^2(0.05) = 7.815$, we see that neither value is significant at $5\%$. So there is no evidence against Mendel's theory. In fact, the $p$-value is approximately $\P(\chi_3^2 > 0.6) \approx 0.96$. This is a \emph{really} good fit, so good that people suspect the numbers were not genuine.
 \end{eg}
 
 \begin{eg}
   In a genetics problem, each individual has one of the three possible genotypes, with probabilities $p_1, p_2, p_3$. Suppose we wish to test $H_0: p_o = p_i(\theta)$, where
   \[
-    p_1(\theta) = \theta^2,\quad p_2 2\theta(1 - \theta), \quad p_3(\theta) = (1 - \theta)^2.
+    p_1(\theta) = \theta^2,\quad p_2 = 2\theta(1 - \theta), \quad p_3(\theta) = (1 - \theta)^2.
   \]
   for some $\theta \in (0, 1)$.
 
@@ -1012,7 +1069,7 @@ where we have assumed $\log\left(1 + \frac{\delta_i}{e_i} - \frac{\delta_i^2}{2e
   \]
   We find that $\hat{\theta} = \frac{2n_1 + n_2}{2n}$. Also, $|\Theta_0| = 1$ and $|\Theta_1| = 2$.
 
-  Now substitute $p_i(\hat{\theta}$ into (2), or find the corresponding Pearson's chi-squared statistic, and refer to $\chi_1^2$.
+  After conducting an experiment, we can substitute $p_i(\hat{\theta})$ into (2), or find the corresponding Pearson's chi-squared statistic, and refer to $\chi_1^2$.
 \end{eg}
 
 \subsubsection{Testing independence in contingency tables}
@@ -1022,7 +1079,6 @@ where we have assumed $\log\left(1 + \frac{\delta_i}{e_i} - \frac{\delta_i^2}{2e
 
 \begin{eg}
   500 people with recent car changes were asked about their previous and new cars. The results are as follows:
-
   \begin{center}
     \begin{tabular}{ccccc}
       \toprule
@@ -1033,7 +1089,6 @@ where we have assumed $\log\left(1 + \frac{\delta_i}{e_i} - \frac{\delta_i^2}{2e
       & Small & 18 & 51 & 81\\\bottomrule
     \end{tabular}
   \end{center}
-
   This is a two-way contingency table: Each person is classified according to the previous car size and new car size.
 \end{eg}
 Consider a two-way contingency table with $r$ rows and $c$ columns. For $i = 1, \cdots, r$ And $j = 1, \cdots, c$, let $p_{ij}$ be the probability that an individual selected from the population under consideration is classified in row $i$ and column $j$. (ie. in the $(i, j)$ cell of the table).
@@ -1046,7 +1101,7 @@ Let $n_{i+} = \sum_j n_{ij}$ and $n_{+j} = \sum_i n_{ij}$. So $n_{++} = n$.
 
 We have
 \[
-  (N_{11}, N_{12}, \cdots, N_{1c}, n_{21}, \cdots, N_{rc}) \sim \multinomial (n; p_{11}, p_{12}, \cdots, p_{1c}, p_{21}, \cdots, p_{rc}).
+  (N_{11}, N_{12}, \cdots, N_{1c}, N_{21}, \cdots, N_{rc}) \sim \multinomial (n; p_{11}, p_{12}, \cdots, p_{1c}, p_{21}, \cdots, p_{rc}).
 \]
 We may be interested in testing the null hypothesis that the two classifications are independent. So we test
 \begin{itemize}
@@ -1057,13 +1112,13 @@ Of course we have the usual restrictions like $p_{++} = 1$, $p_{ij} \geq 0$.
 
 Under $H_1$, the mle's are $\hat{p_{ij}} = \frac{n_{ij}}{n}$.
 
-Under $H-0$, using Lagrangian methods, the mle's are $\hat{p}_{i+} = \frac{n_{i+}}{n}$ and $\hat{p}_{+j} = \frac{n_{+j}}{n}$.
+Under $H_0$, the mle's are $\hat{p}_{i+} = \frac{n_{i+}}{n}$ and $\hat{p}_{+j} = \frac{n_{+j}}{n}$.
 
 Write $o_{ij} = n_{ij}$ and $e_{ij} = n\hat{p}_{i+}\hat{p}_{+j} = n_{i+}n_{+j}/n$.
 
 Then
 \[
-  2\log \Lambda = 2\sum_{i = 1}^r \sum_{j = 1}^c o_{ij}\log\left(\frac{o_{ij}}{e_{ij}}\right) \approx \sum_{i = 1}^r \sum_{j = 1}^c \frac{(o_{ij} - e_{ij})^2}{e_{ij}}
+  2\log \Lambda = 2\sum_{i = 1}^r \sum_{j = 1}^c o_{ij}\log\left(\frac{o_{ij}}{e_{ij}}\right) \approx \sum_{i = 1}^r \sum_{j = 1}^c \frac{(o_{ij} - e_{ij})^2}{e_{ij}}.
 \]
 using the same approximating steps for Pearson's Chi-squared test.
 
@@ -1074,31 +1129,29 @@ We have $|\Theta_1| = rc - 1$, because under $H_1$ the $p_{ij}$'s sum to one. Al
 
 \begin{eg}
   In our previous example, we wish to test $H_0$: the new and previous car sizes are independent. The actual data is:
-
-  \begin{tabular}{cccccc}
-    \toprule
-     & & & New car &\\
-     & & Large & Medium & Small & \textbf{Total}\\\midrule
-     \multirow{4}{*}{\rotatebox[origin=c]{90}{Previous}\;\rotatebox[origin=c]{90}{car}}& Large & 56 & 52 & 42 & \textbf{150}\\
-     & Medium & 50 & 83 & 67 & \textbf{120}\\
-     & Small & 18 & 51 & 81 & \textbf{150}\\\cmidrule{2-6}
-     & \textit{Total} & \textit{124} & \textit{186} & \textit{190} & \textit{\textbf{500}}\\\bottomrule
-  \end{tabular}
-
-  \vspace{3pt}
+  \begin{center}
+    \begin{tabular}{cccccc}
+      \toprule
+      & & & New car &\\
+      & & Large & Medium & Small & \textbf{Total}\\\midrule
+      \multirow{4}{*}{\rotatebox[origin=c]{90}{Previous}\;\rotatebox[origin=c]{90}{car}}& Large & 56 & 52 & 42 & \textbf{150}\\
+      & Medium & 50 & 83 & 67 & \textbf{120}\\
+      & Small & 18 & 51 & 81 & \textbf{150}\\\cmidrule{2-6}
+      & \textit{Total} & \textit{124} & \textit{186} & \textit{190} & \textit{\textbf{500}}\\\bottomrule
+    \end{tabular}
+  \end{center}
   while the expected values given by $H_0$ is
-  \vspace{3pt}
-
-  \begin{tabular}{cccccc}
-    \toprule
-     & & & New car &\\
-     & & Large & Medium & Small & \textbf{Total}\\\midrule
-     \multirow{4}{*}{\rotatebox[origin=c]{90}{Previous}\;\rotatebox[origin=c]{90}{car}}& Large & 37.2 & 55.8 & 57.0 & \textbf{150}\\
-     & Medium & 49.6 & 74.4 & 76.0 & \textbf{120}\\
-     & Small & 37.2 & 55..8 & 57.0 & \textbf{150}\\\cmidrule{2-6}
-     & \textit{Total} & \textit{124} & \textit{186} & \textit{190} & \textit{\textbf{500}}\\\bottomrule
-  \end{tabular}
-
+  \begin{center}
+    \begin{tabular}{cccccc}
+      \toprule
+      & & & New car &\\
+      & & Large & Medium & Small & \textbf{Total}\\\midrule
+      \multirow{4}{*}{\rotatebox[origin=c]{90}{Previous}\;\rotatebox[origin=c]{90}{car}}& Large & 37.2 & 55.8 & 57.0 & \textbf{150}\\
+      & Medium & 49.6 & 74.4 & 76.0 & \textbf{120}\\
+      & Small & 37.2 & 55.8 & 57.0 & \textbf{150}\\\cmidrule{2-6}
+      & \textit{Total} & \textit{124} & \textit{186} & \textit{190} & \textit{\textbf{500}}\\\bottomrule
+    \end{tabular}
+  \end{center}
   Note the margins are the same. It is quite clear that they do not match well, but we can find the $p$ value to be sure.
 
   $\displaystyle\sum\sum \frac{(o_{ij} - e_{ij})^2}{e_{ij}} = 36.20$, and the degrees of freedom is $(3 - 1)(3 - 1) = 4$.
@@ -1111,23 +1164,21 @@ We have $|\Theta_1| = rc - 1$, because under $H_1$ the $p_{ij}$'s sum to one. Al
 \subsubsection{Tests of homogeneity}
 \begin{eg}
   150 patients were randomly allocated to three groups of 50 patients each. Two groups were given a new drug at different dosage levels, and the third group received a placebo. The responses were as shown in the table below.
-
-  \begin{tabular}{ccccc}
-    \toprule
-    & Improved & No difference & Worse & \textbf{Total}\\\midrule
-    Placebo & 18 & 17 & 15 & \textbf{50}\\
-    Half dose & 20 & 10 & 20 & \textbf{50}\\
-    Full dose & 25 & 13 & 12& \textbf{50}\\\midrule
-    \textit{Total} & \textit{63} & \textit{40} & \textit{47} & \textbf{\textit{150}}\\\bottomrule
-  \end{tabular}
-
+  \begin{center}
+    \begin{tabular}{ccccc}
+      \toprule
+      & Improved & No difference & Worse & \textbf{Total}\\\midrule
+      Placebo & 18 & 17 & 15 & \textbf{50}\\
+      Half dose & 20 & 10 & 20 & \textbf{50}\\
+      Full dose & 25 & 13 & 12& \textbf{50}\\\midrule
+      \textit{Total} & \textit{63} & \textit{40} & \textit{47} & \textbf{\textit{150}}\\\bottomrule
+    \end{tabular}
+  \end{center}
   Here the row totals are fixed in advance, in contrast to our last section, where the row totals are random variables.
 
   For the above, we may be interested in testing $H_0:$ the probability of ``improved'' is the same for each of the three treatment groups, and so are the probabilities of ``no difference'' and ``worse'', ie. $H_0$ says that we have homogeneity down the rows.
 \end{eg}
-In general, we have independent observations from $r$ multinomial distributions, each of which has $c$ categories,
-
-ie. we observe an $r\times c$ table $(n_{ij})$, for $i = 1, \cdots, r$ and $j = 1, \cdots, c$, where
+In general, we have independent observations from $r$ multinomial distributions, each of which has $c$ categories, ie. we observe an $r\times c$ table $(n_{ij})$, for $i = 1, \cdots, r$ and $j = 1, \cdots, c$, where
 \[
   (N_{i1}, \cdots, N_{ic}) \sim \multinomial(n_{i+}, p_{i1}, \cdots, p_{ic})
 \]
@@ -1142,7 +1193,7 @@ for $j = 1, \cdots, c$,  and
 \]
 Using $H_1$,
 \[
-  \like((p_{ij})) = \prod_{i = 1}^r \frac{n_{i+}!}{n_{i1}!\cdots n_{ic}!}p_{i1}^{n_{i1}} \cdots p_{ic}^{n_{ic}},
+  \like(p_{ij}) = \prod_{i = 1}^r \frac{n_{i+}!}{n_{i1}!\cdots n_{ic}!}p_{i1}^{n_{i1}} \cdots p_{ic}^{n_{ic}},
 \]
 and
 \[
@@ -1162,7 +1213,7 @@ Hence
 \]
 which is the same as what we had last time, when the row totals are unrestricted!
 
-We have $|\Theta_1| = r(c - 1)$ and $|\Theta_0| = c - 1$. So the degrees of freedom is $r(c - 1) - (c - 1) = (r - 1)(c - 1)$, and under $H_0$, $2\log\Lambda$ is approximately $\chi^2_{r - 1)(c - 1)}$. Again, it is exactly the same as what we had last time!
+We have $|\Theta_1| = r(c - 1)$ and $|\Theta_0| = c - 1$. So the degrees of freedom is $r(c - 1) - (c - 1) = (r - 1)(c - 1)$, and under $H_0$, $2\log\Lambda$ is approximately $\chi^2_{(r - 1)(c - 1)}$. Again, it is exactly the same as what we had last time!
 
 We reject $H_0$ if $2\log \Lambda > \chi_{(r - 1)(c - 1)}^2 (\alpha)$ for an approximate size $\alpha$ test.
 
@@ -1172,27 +1223,27 @@ If we let $o_{ij}= n_{ij}, e_{ij} = \frac{n_{i+}n_{+j}}{n_{++}}$, and $\delta_{i
 \]
 \begin{eg}
   Continuing our previous example, our data is
-
-  \begin{tabular}{ccccc}
-    \toprule
-    & Improved & No difference & Worse & \textbf{Total}\\\midrule
-    Placebo & 18 & 17 & 15 & \textbf{50} \\
-    Half dose & 20 & 10 & 20 & \textbf{50} \\
-    Full dose & 25 & 13 & 12& \textbf{50} \\\midrule
-    \textit{Total} & \textit{6}3 & \textit{40} & \textit{47} & \textbf{\textit{150}} \\ \bottomrule
-  \end{tabular}
-
+  \begin{center}
+    \begin{tabular}{ccccc}
+      \toprule
+      & Improved & No difference & Worse & \textbf{Total}\\\midrule
+      Placebo & 18 & 17 & 15 & \textbf{50} \\
+      Half dose & 20 & 10 & 20 & \textbf{50} \\
+      Full dose & 25 & 13 & 12& \textbf{50} \\\midrule
+      \textit{Total} & \textit{6}3 & \textit{40} & \textit{47} & \textbf{\textit{150}} \\ \bottomrule
+    \end{tabular}
+  \end{center}
   The expected under $H_0$ is
-
-  \begin{tabular}{ccccc}
-    \toprule
-    & Improved & No difference & Worse &\textbf{Total}\\\midrule
-    Placebo   & 21 & 13.3 & 15.7 & \textbf{50} \\
-    Half dose & 21 & 13.3 & 15.7 & \textbf{50}\\
-    Full dose & 21 & 13.3 & 15.7 & \textbf{50}\\\midrule
-    \textit{Total}& \textit{63} & \textit{40} & \textit{47} & \textbf{\textit{150}}\\ \bottomrule
-  \end{tabular}
-
+  \begin{center}
+    \begin{tabular}{ccccc}
+      \toprule
+      & Improved & No difference & Worse &\textbf{Total}\\\midrule
+      Placebo   & 21 & 13.3 & 15.7 & \textbf{50} \\
+      Half dose & 21 & 13.3 & 15.7 & \textbf{50}\\
+      Full dose & 21 & 13.3 & 15.7 & \textbf{50}\\\midrule
+      \textit{Total}& \textit{63} & \textit{40} & \textit{47} & \textbf{\textit{150}}\\ \bottomrule
+    \end{tabular}
+  \end{center}
   We find $2\log \Lambda = 5.129$, and we refer this to $\chi_4^2$. Clearly this is not significant, as the mean of $\chi_4^2$ is $4$, and is something we would expect to happen solely by chance.
 
   We can calculate the $p$-value: from tables, $\chi_4^2(0.05) = 9.488$, so our observed value is not significant at $5\%$, and the data are consistent with $H_0$.
@@ -1248,36 +1299,47 @@ On the other hand, if we have a test for $H_0: \theta = \theta_0$, then the conf
 \begin{eg}
   Suppose $X_1, \cdots, X_n$ are iid $N(\mu, 1)$ random variables and we want a $95\%$ confidence set for $\mu$.
 
-  One way is to use the theorem and find the confidence set that belongs to the hypothesis test that we found in the previous example. We find a test of size 0.05 of $H_0 : \mu= \mu_0$ against $H_1: \mu\not= \mu_0$ that rejects $H_0$ when $|\sqrt{n}(\bar x - \mu_0)| > 1.96$ (where 1.96 is the upper $2.5\%$ point of $N(0, 1)$.
+  One way is to use the theorem and find the confidence set that belongs to the hypothesis test that we found in the previous example. We find a test of size 0.05 of $H_0 : \mu= \mu_0$ against $H_1: \mu\not= \mu_0$ that rejects $H_0$ when $|\sqrt{n}(\bar x - \mu_0)| > 1.96$ (where 1.96 is the upper $2.5\%$ point of $N(0, 1)$).
 
-  Then $I(\mathbf{X}) = \{\mu: \mathbf{X}\in A(\mu)\} = \{\mu:\sqrt{n}(\bar X - \mu)| < 1.96\%\}$. So a $95\%$ confidence set for $\mu$ is $(\bar X - 1.96/\sqrt{n}, \bar X + 1.96/\sqrt{n})$.
+  Then $I(\mathbf{X}) = \{\mu: \mathbf{X}\in A(\mu)\} = \{\mu:|\sqrt{n}(\bar X - \mu)| < 1.96\%\}$. So a $95\%$ confidence set for $\mu$ is $(\bar X - 1.96/\sqrt{n}, \bar X + 1.96/\sqrt{n})$.
 \end{eg}
-\section{Multivariate Normal theory}
-A random (column) vector $\mathbf{X} = (X_1, \cdots, X_n)^T$ has mean
+\subsection{Multivariate normal theory}
+\subsubsection{Multivariate normal distribution}
+So far, we have only worked with scalar random variables or a vector of iid random variables. In general, we can have a random (column) vector $\mathbf{X} = (X_1, \cdots, X_n)^T$, where the $X_i$ are correlated.
+
+The mean of this vector is given by
 \[
-  \boldsymbol\mu = \E[\mathbf{X}] = (\E(X_1), \cdots, \E(X_n))^T = (\mu_1, \cdots, \mu_n)^T,
+  \boldsymbol\mu = \E[\mathbf{X}] = (\E(X_1), \cdots, \E(X_n))^T = (\mu_1, \cdots, \mu_n)^T.
 \]
-and covariance matrix
+Instead of just the variance, we have the covariance matrix
 \[
   \cov (\mathbf{X}) = \E[(\mathbf{X} - \boldsymbol\mu)(\mathbf{X} - \boldsymbol\mu)^T] = (\cov(X_i, X_j))_{ij},
 \]
 provided they exist, of course.
 
-For an $m\times n$ matrix $A$,
+We can multiply the vector $\mathbf{X}$ by an $m\times n$ matrix $A$. Then we have
 \[
   \E[A\mathbf{X}] = A\boldsymbol\mu,
 \]
 and
 \[
-  \cov (A\mathbf{X}) = A\cov(\mathbf{X})A^T,\tag{1}
+  \cov (A\mathbf{X}) = A\cov(\mathbf{X})A^T.\tag{1}
 \]
-since
-\[
-  \cov(A\mathbf{X}) = \E[(A\mathbf{X} -\E[A\mathbf{X}])(AX - \E[AX])^Y] = \E[A(X - \E[X])(X - \E[X])^T A^T].
-\]
-We can also define the covariance $\cov(V, W)$ to be a matrix with $(i, j)$ element $\cov(V_i, W_j)$. Then $\cov(A\mathbf{X}, B\mathbf{X}) = A\cov (\mathbf{X}) B^T$.
+The last one comes from
+\begin{align*}
+  \cov(A\mathbf{X}) &= \E[(A\mathbf{X} -\E[A\mathbf{X}])(A\mathbf{X} - \E[A\mathbf{X}])^T] \\
+  &= \E[A(\mathbf{X} - \E\mathbf{X})(\mathbf{X} - \E\mathbf{X})^T A^T]\\
+  &= A\E[(\mathbf{X} - \E\mathbf{X})(\mathbf{X} - \E\mathbf{X})^T]A^T.
+\end{align*}
+If we have two random vectors $\mathbf{V}, \mathbf{W}$, we can define the covariance $\cov(\mathbf{V}, \mathbf{W})$ to be a matrix with $(i, j)$th element $\cov(V_i, W_j)$. Then $\cov(A\mathbf{X}, B\mathbf{X}) = A\cov (\mathbf{X}) B^T$.
 
-Recall that a univariate normal $X\sim N(\mu, \sigma^2)$ has density
+An important distribution is a \emph{multivariate normal distribution}. We say $\mathbf{X}$ has a multivariate normal distribution if, for every $\mathbf{t}\in \R^n$, the random variable $\mathbf{t}^T\mathbf{X}$ (ie. $\mathbf{t}\cdot \mathbf{X}$) has a normal distribution. If $\E[\mathbf{X}] = \boldsymbol\mu$ and $\cov (\mathbf{X}) = \Sigma$, we write $\mathbf{X}\sim N_n(\boldsymbol\mu, \Sigma)$.
+
+Note that $\Sigma$ is symmetric and is positive semi-definite because by (1),
+\[
+  \mathbf{t}^T\Sigma \mathbf{t} = \var(\mathbf{t}^T\mathbf{X}) \geq 0.
+\]
+So what is the pdf of a multivariate normal? And what is the moment generating function? Recall that a (univariate) normal $X\sim N(\mu, \sigma^2)$ has density
 \[
   f_X(x; \mu, \sigma^2) = \frac{1}{\sqrt{2\pi}\sigma} \exp\left(-\frac{1}{2}\frac{(x - \mu)^2}{\sigma^2}\right),
 \]
@@ -1285,45 +1347,35 @@ with moment generating function
 \[
   M_X(s) = \E[e^{sX}] = \exp(\mu s + \frac{1}{2}\sigma^2 s^2).
 \]
-We say $\mathbf{X}$ has a multivariate if, for every $\mathbf{t}\in \\mathbf{R}$, if, for every $\mathbf{t}\in \R^n$, the random variable $\mathbf{t}^T\mathbf{X}$ (ie. $\mathbf{t}\cdot \mathbf{X}$) has a normal distribution.
-
-If $\E[\mathbf{X}] = \boldsymbol\mu$ and $\cov (\mathbf{X}) = \Sigma$, we write $\mathbf{X}\sim N_n(\boldsymbol\mu, \Sigma)$.
-
-Note that $\Sigma$ is symmetric and is non-negative definite because by (1),
+Hence for any $\mathbf{t}$, the moment generating function of $\mathbf{t}^T\mathbf{X}$ is given by
 \[
-  \mathbf{t}^T\Sigma \mathbf{t} = \var(\mathbf{t}^T\mathbf{X}) \geq 0.
-\]
-Also, by (1),
-\[
-  M_{\mathbf{t}^T \mathbf{X}}(s) = \E[e^{s\mathbf{t}^T\mathbf{X}}] = \exp\left(\mathbf{t}^T\mu s + \frac{1}{2}t\mathbf{t}^T\Sigma \mathbf{t}s^2\right).
+  M_{\mathbf{t}^T \mathbf{X}}(s) = \E[e^{s\mathbf{t}^T\mathbf{X}}] = \exp\left(\mathbf{t}^T\boldsymbol\mu s + \frac{1}{2}\mathbf{t}^T\Sigma \mathbf{t}s^2\right).
 \]
 Hence $\mathbf{X}$ has mgf
 \[
-  M_\mathbf{X}(\mathbf{t}) = \E[e^{\mathbf{t}^T \mathbf{X}}]= M_{\mathbf{t}^T\mathbf{X}}(1) = \exp\left(\mathbf{t}^T\boldsymbol\mu + \frac{1}{2}\mathbf{t}^T \Sigma \mathbf{t})\right).\tag{2}
+  M_\mathbf{X}(\mathbf{t}) = \E[e^{\mathbf{t}^T \mathbf{X}}]= M_{\mathbf{t}^T\mathbf{X}}(1) = \exp\left(\mathbf{t}^T\boldsymbol\mu + \frac{1}{2}\mathbf{t}^T \Sigma \mathbf{t}\right).\tag{2}
 \]
 
 \begin{prop}\leavevmode
   \begin{enumerate}
-    \item If $\mathbf{X} \sim \mu, \Sigma)$, and $A$ is an $m\times n$ matrix, then $A\mathbf{X} \sim N_m (A\boldsymbol\mu, A\Sigma A^T)$.
+    \item If $\mathbf{X} \sim N_n(\mu, \Sigma)$, and $A$ is an $m\times n$ matrix, then $A\mathbf{X} \sim N_m (A\boldsymbol\mu, A\Sigma A^T)$.
     \item IF $\mathbf{X}\sim N_n(\mathbf{0}, \sigma^2 I)$, then
       \[
-        \frac{|\mathbf{X}|^2}{\sigma^2} = \frac{\mathbf{X}^T\mathbf{X}}{\sigma^2}\sum \frac{X_i^2}{\sigma ^2}\sim \chi_n^2.
+        \frac{|\mathbf{X}|^2}{\sigma^2} = \frac{\mathbf{X}^T\mathbf{X}}{\sigma^2} = \sum \frac{X_i^2}{\sigma ^2}\sim \chi_n^2.
       \]
+      Instead of writing $|\mathbf{X}|^2/\sigma^2 \sim \chi_n^2$, we often just say $|\mathbf{X}|^2 \sim \sigma^2 \chi_n^2$.
   \end{enumerate}
 \end{prop}
+
 \begin{proof}\leavevmode
   \begin{enumerate}
-    \item From example sheet 3
+    \item See Example Sheet 3.
     \item Immediate from definition of $\chi_n^2$.
   \end{enumerate}
 \end{proof}
 
-\begin{notation}
-  We often write $|\mathbf{X}|^2 = \sigma^2 \chi_n^2$.
-\end{notation}
-
 \begin{prop}
-  Let $\mathbf{X}\sim N_n(\mu_\Sigma)$. We split $\mathbf{X}$ up into two parts: $\mathbf{X} =
+  Let $\mathbf{X}\sim N_n(\mu, \Sigma)$. We split $\mathbf{X}$ up into two parts: $\mathbf{X} =
   \begin{pmatrix}
     \mathbf{X}_1\\
     \mathbf{X}_2
@@ -1355,11 +1407,11 @@ Hence $\mathbf{X}$ has mgf
 \begin{proof}\leavevmode
   \begin{enumerate}
     \item See Example Sheet 3.
-    \item From (2), $M_\mathbf{X}(\mathbf{t}) = \exp(\mathbf{t}^T \boldsymbol\mu + \frac{1}{2}\mathbf{t}^T\Sigma\mathbf{t})$ for each $\mathbf{t}\in \R^n$. We write $\mathbf{t} = \begin{pmatrix}\mathbf{t}_1\\\mathbf{t}_2\end{pmatrix}$. Then this is equal to
+    \item From (2), $M_\mathbf{X}(\mathbf{t}) = \exp(\mathbf{t}^T \boldsymbol\mu + \frac{1}{2}\mathbf{t}^T\Sigma\mathbf{t})$ for each $\mathbf{t}\in \R^n$. We write $\mathbf{t} = \begin{pmatrix}\mathbf{t}_1\\\mathbf{t}_2\end{pmatrix}$. Then the mgf is equal to
       \[
-        M_\mathbf{X}(\mathbf{t})\exp(\mathbf{t}_1^T\boldsymbol\mu_1 + \mathbf{t}_2^T \Sigma_{11}\mathbf{t}_1 + \frac{1}{2}\mathbf{t}_2^T \Sigma_{22}\mathbf{t}_2 + \frac{1}{2}\mathbf{t}_1^T \sum_{12}\mathbf{t}_2 + \frac{1}{2}\mathbf{t}_2^T \Sigma_{21}\mathbf{t}_1).
+        M_\mathbf{X}(\mathbf{t}) = \exp\left(\mathbf{t}_1^T\boldsymbol\mu_1 + \mathbf{t}_2^T \Sigma_{11}\mathbf{t}_1 + \frac{1}{2}\mathbf{t}_2^T \Sigma_{22}\mathbf{t}_2 + \frac{1}{2}\mathbf{t}_1^T \Sigma_{12}\mathbf{t}_2 + \frac{1}{2}\mathbf{t}_2^T \Sigma_{21}\mathbf{t}_1\right).
       \]
-      From (i), we know that $M_{\mathbf{X}_i} = \exp(\mathbf{t}_i^T\boldsymbol\mu_i + \frac{1}{2}\mathbf{t}_i^T \Sigma_{ii}\mathbf{t}_i)$. So $M_\mathbf{X}(\mathbf{t}) = M_{\mathbf{X}_1}(\mathbf{t}_1)M_{\mathbf{X}_2}(\mathbf{t}_2)$ for all $\mathbf{t}$ if and only if $\Sigma_{12} = 0$.
+      From (i), we know that $M_{\mathbf{X}_i}(\mathbf{t}_i) = \exp(\mathbf{t}_i^T\boldsymbol\mu_i + \frac{1}{2}\mathbf{t}_i^T \Sigma_{ii}\mathbf{t}_i)$. So $M_\mathbf{X}(\mathbf{t}) = M_{\mathbf{X}_1}(\mathbf{t}_1)M_{\mathbf{X}_2}(\mathbf{t}_2)$ for all $\mathbf{t}$ if and only if $\Sigma_{12} = 0$.
   \end{enumerate}
 \end{proof}
 
@@ -1369,8 +1421,10 @@ Hence $\mathbf{X}$ has mgf
     f_\mathbf{X}(\mathbf{x}; \mu, \Sigma) = \frac{1}{|\Sigma|^2} \left(\frac{1}{\sqrt{2\pi}}\right)^n \exp\left[-\frac{1}{2}(\mathbf{x} - \boldsymbol\mu)^T\Sigma^{-1}(\mathbf{x} - \boldsymbol\mu)\right].
   \]
 \end{prop}
-\subsection{Normal random samples}
-Now consider $\bar X = \frac{1}{n}\sum X_i$, and $S_{XX} = \sum(X_i - \bar X)^2$ for univariate normal data.
+Note that $\Sigma$ is always positive semi-definite. The conditions just forbid the case $|\Sigma| = 0$, since this would lead to dividing by zero.
+
+\subsubsection{Normal random samples}
+We wish to use our knowledge about multivariate normals to study univariate normal data. In particular, we want to prove the following:
 
 \begin{thm}[Joint distribution of $\bar X$ and $S_{XX}$]
   Suppose $X_1, \cdots, X_n$ are iid $N(\mu, \sigma^2)$ and $\bar X = \frac{1}{n} \sum X_i$, and $S_{XX} = \sum (X_i - \bar X)^2$. Then
@@ -1382,7 +1436,7 @@ Now consider $\bar X = \frac{1}{n}\sum X_i$, and $S_{XX} = \sum(X_i - \bar X)^2$
 \end{thm}
 
 \begin{proof}
-  We can write the joint density as $\mathbf{X} = \sim N_n(\boldsymbol\mu, \sigma^2I)$, where $\boldsymbol\mu = \mu \mathbf{1}$ ($\mathbf{1}$ is an $n\times 1$ column vectors of 1's).
+  We can write the joint density as $\mathbf{X} \sim N_n(\boldsymbol\mu, \sigma^2I)$, where $\boldsymbol\mu = (\mu, \mu, \cdots, \mu)$.
 
   Let $A$ be an $n\times n$ orthogonal matrix with the first row all $1/\sqrt{n}$ (the other rows are not important). One possible such matrix is
   \[
@@ -1397,7 +1451,7 @@ Now consider $\bar X = \frac{1}{n}\sum X_i$, and $S_{XX} = \sum(X_i - \bar X)^2$
   \]
   Now define $\mathbf{Y} = A\mathbf{X}$. Then
   \[
-    \mathbf{Y} \sim N_n(A\boldsymbol\mu, A\sigma^2IA^T) \sim N_n(A\boldsymbol\mu, \sigma^2 I).
+    \mathbf{Y} \sim N_n(A\boldsymbol\mu, A\sigma^2IA^T) = N_n(A\boldsymbol\mu, \sigma^2 I).
   \]
   We have
   \[
@@ -1409,21 +1463,23 @@ Now consider $\bar X = \frac{1}{n}\sum X_i$, and $S_{XX} = \sum(X_i - \bar X)^2$
   \[
     Y_1 = \frac{1}{\sqrt{n}}\sum_{i = 1}^n X_i = \sqrt{n} \bar X.
   \]
-  So $\sqrt{n} \bar X \sim N(\sqrt{n}, \sigma^2)$, or $\bar X \sim N(\mu, \sigma^2)$. Also
+  So $\sqrt{n} \bar X \sim N(\sqrt{n}\mu, \sigma^2)$, or $\bar X \sim N(\mu, \sigma^2/n)$. Also
   \begin{align*}
-    Y_2^2 + \cdots + T_n^2 &= \mathbf{Y}^T\mathbf{Y} - Y_1^2\\
+    Y_2^2 + \cdots + Y_n^2 &= \mathbf{Y}^T\mathbf{Y} - Y_1^2\\
     &= \mathbf{X}^TA^TA\mathbf{X} - Y_1^2\\
-    &= \mathbf{X}^\mathbf{X} - n\bar X^2\\
+    &= \mathbf{X}^T\mathbf{X} - n\bar X^2\\
     &= \sum_{i = 1}^n X_i^2 - n\bar X^2\\
     &= \sum_{i = 1}^n (X_i - \bar X)^2 \\
     &= S_{XX}.
   \end{align*}
   So $S_{XX} = Y_2^2 + \cdots + Y^2_n \sim \sigma^2 \chi_{n - 1}^2$.
 
-  Finally, since $Y_1$ and $Y_2, \cdots, Y_n$ Are independent, so are $\bar X$ and $S_{XX}$.
+  Finally, since $Y_1$ and $Y_2, \cdots, Y_n$ are independent, so are $\bar X$ and $S_{XX}$.
 \end{proof}
 \subsection{Student's \texorpdfstring{$t$}{t}-distribution}
-Suppose that $Z$ and $Y$ are independent, $Z\sim N(0, 1)$, $Z\sim N(0, 1)$ and $Y\sim \chi_k^2$. Then $T = Z/\sqrt{Y/k}$ is said to have a $t$-distribution on $k$ degrees of freedom, and we write $T\sim t_k$.
+\begin{defi}[$t$-distribution]
+  Suppose that $Z$ and $Y$ are independent, $Z\sim N(0, 1)$  and $Y\sim \chi_k^2$. Then $T = Z/\sqrt{Y/k}$ is said to have a $t$-distribution on $k$ degrees of freedom, and we write $T\sim t_k$.
+\end{defi}
 
 The density of $t_k$ turns out to be
 \[
@@ -1438,16 +1494,16 @@ This density is symmetric, bell-shaped, and has a maximum at $t = 0$, which is r
 
   If $k = 2$, then $\var_k(T) = \infty$.
 
-  In all other cases, the values are undefined. In particular, the $k = 1$ case, known as the Cauchy distribution, has undefined mean and variance.
+  In all other cases, the values are undefined. In particular, the $k = 1$ case, this is known as the Cauchy distribution, has undefined mean and variance.
 \end{prop}
 
 \begin{notation}
   We write $t_k(\alpha)$ be the upper $100\alpha\%$ point of the $t_k$ distribution, so that $\P(T > t_k(\alpha)) = \alpha$.
 \end{notation}
 
-The typical application is to random samples with unknown mean \emph{and} variance.
+Why would we define such a weird distribution? The typical application is to study random samples with unknown mean \emph{and} unknown variance.
 
-Let $X_1, \cdots, X_n$ be iid $\N(\mu, \sigma^2)$. Then $\bar X \sim N(\mu, \sigma^2/n)$. So $Z = \frac{\sqrt{n}(\bar X - \mu}{\sigma} \sim N(0, 1)$.
+Let $X_1, \cdots, X_n$ be iid $\N(\mu, \sigma^2)$. Then $\bar X \sim N(\mu, \sigma^2/n)$. So $Z = \frac{\sqrt{n}(\bar X - \mu)}{\sigma} \sim N(0, 1)$.
 
 Also, $S_{XX}/\sigma^2 \sim \chi^2_{n - 1}$ and is independent of $\bar X$, hence $Z$. So
 \[
@@ -1455,7 +1511,7 @@ Also, $S_{XX}/\sigma^2 \sim \chi^2_{n - 1}$ and is independent of $\bar X$, henc
 \]
 or
 \[
-  \frac{\sqrt{n}(\bar X - \mu)}{\sqrt{S_{XX}/(b - 1)}} \sim t_{n - 1}.
+  \frac{\sqrt{n}(\bar X - \mu)}{\sqrt{S_{XX}/(n - 1)}} \sim t_{n - 1}.
 \]
 We write $\tilde{\sigma}^2 = \frac{S_{XX}}{n - 1}$ (note that this is the unbiased estimator). Then a $100(1 - \alpha)\%$ confidence interval for $\mu$ is found from
 \[
@@ -1467,13 +1523,14 @@ This has endpoints
 \]
 
 \section{Linear models}
+\subsection{Linear models}
 Linear models can be used to explain or model the relationship between a \emph{response} (or \emph{dependent}) variable, and one or more \emph{explanatory} variables (or \emph{covariates} or \emph{predictors}).
-
-Here we will \emph{not} assume normality. Turns out we can derive LOTS of results without assuming normality.
 
 \begin{eg}
   How do motor insurance claim rates (response) depend on the age and sex of the driver, and where they live (explanatory variables)?
 \end{eg}
+
+It is important to note that (unless otherwise specified), we do \emph{not} assume normality in our calculations here.
 
 Suppose we have $p$ covariates $x_j$, and we have $n$ observations $Y_i$. We assume $n > p$, or else things get tricky. Then each observation can be written as
 \[
@@ -1498,11 +1555,26 @@ Note that (1) is linear in the parameters $\beta_1, \cdots, \beta_p$. Obviously 
 \begin{eg}
   For each of 24 males, the maximum volume of oxygen uptake in the blood and the time taken to run 2 miles (in minutes) were measured. We want to know how the time taken depends on oxygen uptake.
 
+  We might get the results
+  \begin{center}
+    \begin{tabular}{ccccccccc}
+      \toprule
+      Oxygen & 42.3 & 53.1 & 42.1 & 50.1 & 42.5 & 42.5 & 47.8 & 49.9 \\
+      Time & 918 & 805 & 892 & 962 & 968 & 907 & 770 & 743 \\
+      \midrule
+      Oxygen & 36.2 & 49.7 & 41.5 & 46.2 & 48.2 & 43.2 & 51.8 & 53.3\\
+      Time & 1045 & 810 & 927 & 813 & 858 & 860 & 760 & 747\\
+      \midrule
+      Oxygen & 53.3 & 47.2 & 56.9 & 47.8 & 48.7 & 53.7 & 60.6 & 56.7\\
+      Time & 743 & 803 & 683 & 844 & 755 & 700 & 748 & 775\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
   For each individual $i$, we let $Y_i$ be the time to run 2 miles, and $x_i$ be the maximum volume of oxygen uptake, $i = 1, \cdots, 24$. We might want to fit a straight line to it. So a possible model is
   \[
     Y_i = a + bx_i + \varepsilon_i,
   \]
-  her $\varepsilon_i$ are independent random variables with variance $\sigma^2$, and $a$ and $b$ are constants.
+  where $\varepsilon_i$ are independent random variables with variance $\sigma^2$, and $a$ and $b$ are constants.
 \end{eg}
 
 The subscripts in the equation makes it tempting to write them as matrices:
@@ -1538,7 +1610,7 @@ Then the equation becomes
 \]
 We also have
 \begin{itemize}
-  \item $\E(\varepsilon) = \mathbf{O}$.
+  \item $\E(\boldsymbol\varepsilon) = \mathbf{0}$.
   \item $\cov (\mathbf{Y}) = \sigma^2 I$.
 \end{itemize}
 We assume throughout that $X$ has full rank $p$, ie. the columns are independent, and that the error variance is the same for each observation. We say this is the \emph{homoscedastic} case, as opposed to \emph{heteroscedastic}.
@@ -1549,7 +1621,7 @@ We assume throughout that $X$ has full rank $p$, ie. the columns are independent
     \mathbf{Y} =
     \begin{pmatrix}
       Y_1\\
-      \cdots\\
+      \vdots\\
       Y_{24}
     \end{pmatrix}, \quad
     X =
@@ -1581,7 +1653,7 @@ We assume throughout that $X$ has full rank $p$, ie. the columns are independent
   \begin{align*}
     S(\boldsymbol\beta) &= \|\mathbf{Y} - X\boldsymbol\beta\|^2\\
     &= (\mathbf{Y} - X\boldsymbol\beta)^T(\mathbf{Y} - X\boldsymbol\beta)\\
-    &= (Y_i - x_{ij\beta_j})^2
+    &= (Y_i - x_{ij}\beta_j)^2
   \end{align*}
   with implicit summation over $i$ and $j$.
 
@@ -1621,18 +1693,18 @@ which is linear in $\mathbf{Y}$.
 
 We have
 \[
-  \mathbf{E}(\hat{\boldsymbol\beta}) = (X^TX^{-1})X^T\E[\mathbf{Y}] = (X^TX)^{-1}X^TX\boldsymbol\beta = \boldsymbol\beta.
+  \E(\hat{\boldsymbol\beta}) = (X^TX^{-1})X^T\E[\mathbf{Y}] = (X^TX)^{-1}X^TX\boldsymbol\beta = \boldsymbol\beta.
 \]
 So $\hat{\boldsymbol\beta}$ is an unbiased estimator for $\boldsymbol\beta$. Also
 \[
-  \cov(\boldsymbol\beta) = (X^TX)^{-1}X^T \cov(\mathbf{Y})X(X^TX)^{-1} = \sigma^2(X^TX)^{-1} ,\tag{5}
+  \cov(\hat{\boldsymbol\beta}) = (X^TX)^{-1}X^T \cov(\mathbf{Y})X(X^TX)^{-1} = \sigma^2(X^TX)^{-1} ,\tag{5}
 \]
 since $\cov \mathbf{Y} = \sigma^2 I$.
 
 \subsection{Simple linear regression}
 What we did above was \emph{so} complicated. If we have a simple linear regression model
 \[
-  Y_i = a + b_{x_i + \varepsilon_i}.
+  Y_i = a + bx_i + \varepsilon_i.
 \]
 then we can reparameterise it to
 \[
@@ -1649,7 +1721,7 @@ In matrix form,
     1 & (x_{24} - \bar x)
   \end{pmatrix}.
 \]
-(the off-diagonals are all 0 since $\sum (x_i - \bar x) = 0$. So
+Since $\sum (x_i - \bar x) = 0$, in $X^TX$, the off-diagonals are all $0$, and we have
 \[
   X^TX =
   \begin{pmatrix}
@@ -1688,7 +1760,7 @@ We have $(*)$ since $\sum \bar y(x_i - \bar x) = 0$, so we can add it to the nom
 
 So the gradient is the \emph{Pearson product-moment correlation coefficient} $r$ times the ratio of the empirical standard deviations of the $y$'s and $x$'s. (Note that the gradient is the same whether the $x$'s are standardised to have mean 7 or not.
 
-Hence from (5),  $\cov(\hat{\boldsymbol\beta}) = (X^TX)^{-1}\sigma^2$, and so from our expression of $(X^TX)^{-1}$.
+Hence from (5),  $\cov(\hat{\boldsymbol\beta}) = (X^TX)^{-1}\sigma^2$, and so from our expression of $(X^TX)^{-1}$,
 \[
   \var(\hat{a}') = \var (\bar Y) = \frac{\sigma^2}{n}, \quad\var(\hat{b}) = \frac{\sigma^2}{S_{xx}}.
 \]
@@ -1697,31 +1769,35 @@ Note that these estimators are uncorrelated.
 Note also that these are obtained without any explicit distributional assumptions.
 
 \begin{eg}
-  Continuing our previous example, we have $\bar y = 826.5$, $S_{xx} = 783.5 = 28.0^2$, $S_{xy} = -10077$, $S_{yy} = 444^2$, $r = -0.81$, $\hat b = -12.9$.
+  Continuing our previous oxygen/time example, we have $\bar y = 826.5$, $S_{xx} = 783.5 = 28.0^2$, $S_{xy} = -10077$, $S_{yy} = 444^2$, $r = -0.81$, $\hat b = -12.9$.
 \end{eg}
 
 \begin{thm}[Gauss Markov theorem]
   In a full rank linear model, let $\hat{\boldsymbol\beta}$ be the least squares estimator of $\boldsymbol\beta$ and let $\boldsymbol\beta^*$ be any other unbiased estimator for $\boldsymbol\beta$ which is linear in the $Y_i$'s. Then
   \[
-    \var(\mathbf{t}^T\hat{\boldsymbol\beta} \leq \var (\mathbf{t}^T\boldsymbol\beta^*).
+    \var(\mathbf{t}^T\hat{\boldsymbol\beta}) \leq \var (\mathbf{t}^T\boldsymbol\beta^*).
   \]
   for all $\mathbf{t}\in \R^p$. We say that $\hat{\boldsymbol\beta}$ is the \emph{best linear unbiased estimator} of $\boldsymbol\beta$ (BLUE).
 \end{thm}
 
 \begin{proof}
-  Since $\boldsymbol\beta^*$ is linear in the $Y_i$'s, $\boldsymbol\beta^* = A\mathbf{Y}$ for some $p\times n$ matrix $A$. Since $\boldsymbol\beta^*$ is unbiased,  we have that $\boldsymbol\beta = \E[\boldsymbol\beta^*] = AX\boldsymbol\beta$ for all $\boldsymbol\beta\in \R^p$. So $AX = I_p$. Now
+  Since $\boldsymbol\beta^*$ is linear in the $Y_i$'s, $\boldsymbol\beta^* = A\mathbf{Y}$ for some $p\times n$ matrix $A$.
+
+  Since $\boldsymbol\beta^*$ is an unbiased estimator, we must have $\E[\boldsymbol\beta^*] = \boldsymbol\beta$. However, since $\beta^* = A\mathbf{Y}$, $\E[\boldsymbol\beta^*] = A\E[\mathbf{Y}] = AX\boldsymbol\beta$. So we must have $\boldsymbol\beta = AX\boldsymbol\beta$. Since this holds for any $\boldsymbol\beta$, we must have $AX = I_p$. Now
   \begin{align*}
     \cov(\boldsymbol\beta^*) &= \E[(\boldsymbol\beta^* - \boldsymbol\beta)(\boldsymbol\beta^* - \boldsymbol\beta)^T]\\
+    &= \E[(A\mathbf{Y} - \boldsymbol\beta)(A\mathbf{Y} - \boldsymbol\beta)^T]\\
     &= \E(AX\boldsymbol\beta + A\boldsymbol\varepsilon - \boldsymbol\beta)(AX\boldsymbol\beta + A\boldsymbol\varepsilon - \boldsymbol\beta)^T\\
-    &= \E(A\boldsymbol\varepsilon\boldsymbol\varepsilon^TA^T)\text{ since }AX\boldsymbol\beta = \boldsymbol\beta\\
+    \intertext{Since $AX\boldsymbol\beta = \boldsymbol\beta$, this is equal to}
+    &= \E(A\boldsymbol\varepsilon(A\boldsymbol\varepsilon)^T)\\
     &= A(\sigma^2I)A^T\\
     &= \sigma^2 AA^T.
   \end{align*}
-  Now $\boldsymbol\beta^* - \hat{\boldsymbol\beta} = (A - (X^TX)^{-1}X^T)\mathbf{Y} = B\mathbf{Y}$, for some $B$. Then
+  Now let $\boldsymbol\beta^* - \hat{\boldsymbol\beta} = (A - (X^TX)^{-1}X^T)\mathbf{Y} = B\mathbf{Y}$, for some $B$. Then
   \[
     BX = AX - (X^TX^{-1})X^TX = I_p - I_p = 0.
   \]
-  Hence
+  By definition, we have $A\mathbf{Y} = B\mathbf{Y} + (X^TX)^{-1}X^T \mathbf{Y}$. So $A = B + (X^TX)^{-1}X^T$. Hence
   \begin{align*}
     \cov(\boldsymbol\beta^*) &= \sigma^2AA^T\\
     &= \sigma^2(B + (X^TX)^{-1}X^T)(B + (X^TX)^{-1}X^T)^T\\
@@ -1750,7 +1826,7 @@ Note also that these are obtained without any explicit distributional assumption
 
   The sum of \emph{residual sum of squares} is
   \[
-    \mathrm{RSS} = \|\mathbf{R}\|^2 = \mathbf{R}^T\mathbf{R} = (\mathbf{Y} - X\hat{\boldsymbol\beta}^T(\mathbf{Y} - X\hat{\boldsymbol\beta}).
+    \mathrm{RSS} = \|\mathbf{R}\|^2 = \mathbf{R}^T\mathbf{R} = (\mathbf{Y} - X\hat{\boldsymbol\beta})^T(\mathbf{Y} - X\hat{\boldsymbol\beta}).
   \]
 \end{defi}
 Note that $X^T\mathbf{R} = X^T(\mathbf{Y} - \hat{\mathbf{Y}}) = X^T\mathbf{Y} - X^TX\hat{\boldsymbol\beta} = 0$ by (3). So $\mathbf{R}$ is orthogonal to the column space of $X$.
@@ -1759,11 +1835,12 @@ Write $\hat{\mathbf{Y}} = X\hat{\boldsymbol\beta} = X(X^TX)^{-1}X^T\mathbf{Y} = 
 
 $P$ represents an orthogonal projection of $\R^n$ onto the space spanned by the columns of $X$, ie. it projects the actual data $\mathbf{Y}$ to the fitted values $\hat{\mathbf{Y}}$.
 
-We have $P^2 = P$ ($P$ is idempotent) and $P^T = P$ (symmetric).
+The projection matrix $P$ is idempotent and symmetric, ie. $P^2 = P$ and $P^T = P$.
 \subsection{Linear models with normal assumptions}
+So far, we have not assumed anything about our variables. In particular, we have not assumed that they are normal. So what further information can we obtain by assuming normality?
+
 \begin{eg}
   Suppose we want to measure the resistivity of silicon wafers. We have five instruments, and five wafers were measured by each instrument (so we have 25 wafers in total). The results are as follows:
-
   \begin{center}
     \begin{tabular}{ccccccc}
       \toprule
@@ -1779,12 +1856,11 @@ We have $P^2 = P$ ($P$ is idempotent) and $P^T = P$ (symmetric).
       \bottomrule
     \end{tabular}
   \end{center}
-
-  Let $Y_{i,j}$ be the resistivity of the $y$th wafer measured by instrument $i$, where $i, j = 1, \cdots, 5$. A possible model is
+  Let $Y_{i,j}$ be the resistivity of the $j$th wafer measured by instrument $i$, where $i, j = 1, \cdots, 5$. A possible model is
   \[
     Y_{i,j} = \mu_i + \varepsilon_{i, j},
   \]
-  where $\varepsilon_{ij}$ Are independent $N(0, \sigma^2)$ random variables, and the $\mu_i$'s are unknown constants.
+  where $\varepsilon_{ij}$ are independent $N(0, \sigma^2)$ random variables, and the $\mu_i$'s are unknown constants.
 
   This can be written in matrix form, with
   \[
@@ -1861,19 +1937,19 @@ We have $P^2 = P$ ($P$ is idempotent) and $P^T = P$ (symmetric).
 
 We now make a normal assumption:
 \[
-  \mathbf{Y} = X\boldsymbol\beta + \boldsymbol\varepsilon,\quad \boldsymbol\beta\sim N_n(\mathbf{0}, \sigma^2 I),\quad \rank(X) = p < n.
+  \mathbf{Y} = X\boldsymbol\beta + \boldsymbol\varepsilon,\quad \boldsymbol\varepsilon\sim N_n(\mathbf{0}, \sigma^2 I),\quad \rank(X) = p < n.
 \]
-This is a special case of the linear model of Lecture 12, so all previous results hold.
+This is a special case of the linear model we just had, so all previous results hold.
 
 Since $\mathbf{Y} = N_n(X\boldsymbol\beta, \sigma^2 I)$, the log-likelihood is
 \[
-  \ell(\boldsymbol, \sigma^2) = -\frac{n}{2}\log 2\pi - \frac{n}{2}\log \sigma^2 - \frac{1}{2\sigma^2}S(\boldsymbol\beta),
+  \ell(\boldsymbol\beta, \sigma^2) = -\frac{n}{2}\log 2\pi - \frac{n}{2}\log \sigma^2 - \frac{1}{2\sigma^2}S(\boldsymbol\beta),
 \]
 where
 \[
   S(\boldsymbol\beta) = (\mathbf{Y} - X\boldsymbol\beta)^T(\mathbf{Y} - X\boldsymbol\beta).
 \]
-If we want to maximizing $\ell$ with respect to $\boldsymbol\beta$, we have to maximize the only term containing $\boldsymbol\beta$, ie. $S(\boldsymbol\beta)$. So
+If we want to maximize $\ell$ with respect to $\boldsymbol\beta$, we have to maximize the only term containing $\boldsymbol\beta$, ie. $S(\boldsymbol\beta)$. So
 \begin{prop}
   Under normal assumptions the maximum likelihood estimator for a linear model is
   \[
@@ -2020,30 +2096,31 @@ From (ii), $\E(\mathrm{RSS}) = \sigma^2(n - p)$. So $\tilde{\sigma}^2 = \frac{\m
 \end{defi}
 Since $U$ and $V$ have mean $m$ and $n$ respectively, $U/m$ and $V/n$ are approximately $1$. So $F$ is often approximately $1$.
 
+It should be very clear from definition that
 \begin{prop}
   If $X\sim F_{m, n}$, then $1/X\sim F_{n, m}$.
 \end{prop}
 
-Let $F_{m, n}(\alpha)$ be the upper $100\alpha\%$ point for the $F_{m, n}$-distribution so that if $X\sim F_{m, n}$, then $\P(X > F_{m, n}(\alpha)) = \alpha$.
+We write $F_{m, n}(\alpha)$ be the upper $100\alpha\%$ point for the $F_{m, n}$-distribution so that if $X\sim F_{m, n}$, then $\P(X > F_{m, n}(\alpha)) = \alpha$.
 
-If we need, say, the lower $5\%$ point of $F_{m, n}$, then we find the upper $5\%$ point of $F_{n, m}$, and use $\P(F_{m, n} < 1/x) = \P(F_{n, m} > x)$.
+Suppose that we have the upper $5\%$ point for all $F_{n, m}$. Using these information, it is easy to find the \emph{lower} $5\%$ point for $F_{n, m}$ since we know that $\P(F_{m, n} < 1/x) = \P(F_{n, m} > x)$, which is where the above proposition comes useful.
 
-Note further that it is immediate from definitions of $t_n$ and $F_{1, n}$ that if $Y\sim t_n$, then $Y^2\sim F_{1, n}$, it is a ratio of independent $\chi_1^2$ and $\chi_n^2$ variables.
+Note that it is immediate from definitions of $t_n$ and $F_{1, n}$ that if $Y\sim t_n$, then $Y^2\sim F_{1, n}$, ie. it is a ratio of independent $\chi_1^2$ and $\chi_n^2$ variables.
 
 \subsection{Inference for \texorpdfstring{$\boldsymbol\beta$}{beta}}
 We know that $\hat{\boldsymbol\beta} \sim N_p(\boldsymbol\beta, \sigma^2(X^TX)^{-1})$. So
 \[
-  \hat{\boldsymbol\beta}_j \sim N(B_j, \sigma^2(X^TX)^{-1}_{jj}).
+  \hat{\beta}_j \sim N(\beta_j, \sigma^2(X^TX)^{-1}_{jj}).
 \]
-The \emph{standard error} of $\hat{\beta}_j$ is
+The \emph{standard error} of $\hat{\beta}_j$ is defined to be
 \[
-  \mathrm{SE}(\hat{\beta}_j) = \sqrt{\tilde{\sigma}^2 (X^TX)_jj^{-1}},
+  \mathrm{SE}(\hat{\beta}_j) = \sqrt{\tilde{\sigma}^2 (X^TX)_{jj}^{-1}},
 \]
 where $\tilde{\sigma}^2 = \mathrm{RSS}/(n - p)$. Unlike the actual variance $\sigma^2(X^TX)^{-1}_{jj}$, the standard error is calculable from our data.
 
 Then
 \[
-  \frac{\hat{\beta}_j - \nu_j}{\mathrm{SE}(\hat{\beta}_j} = \frac{\hat{\beta} - \beta_j}{\sqrt{\tilde{\sigma}^2(X^TX)^{-1}_{jj}}} = \frac{(\hat{\beta}_j - \beta_j/\sqrt{\sigma^2(X^TX)_{jj}^{-1}}}{\sqrt{\mathrm{RSS}/((n - p)\sigma^2)}}
+  \frac{\hat{\beta}_j - \beta_j}{\mathrm{SE}(\hat{\beta}_j)} = \frac{\hat{\beta}_j - \beta_j}{\sqrt{\tilde{\sigma}^2(X^TX)^{-1}_{jj}}} = \frac{(\hat{\beta}_j - \beta_j)/\sqrt{\sigma^2(X^TX)_{jj}^{-1}}}{\sqrt{\mathrm{RSS}/((n - p)\sigma^2)}}
 \]
 By writing it in this somewhat weird form, we now recognize both the numerator and denominator. The numerator is a standard normal $N(0, 1)$, and the denominator is an independent $\sqrt{\chi^2_{n - p}/(n - p)}$, as we have previously shown. But a standard normal divided by $\chi^2$ is, by definition, the $t$ distribution. So
 \[
@@ -2051,10 +2128,10 @@ By writing it in this somewhat weird form, we now recognize both the numerator a
 \]
 So a $100(1 - \alpha)\%$ confidence interval for $\beta_j$ has end points $\hat{\beta}_j\pm \mathrm{SE}(\hat{\beta}_j)t_{n - p}(\frac{\alpha}{2})$.
 
-If we want to test $H_0: \beta_j = 0$, use the fact that under $H_0$, $\frac{\hat{\beta}_j - \beta_j}{\mathrm{SE}(\hat{\beta}_j)} \sim t_{n - p}$.
+In particular, if we want to test $H_0: \beta_j = 0$, we use the fact that under $H_0$, $\frac{\hat{\beta}_j}{\mathrm{SE}(\hat{\beta}_j)} \sim t_{n - p}$.
 
 \subsection{Simple linear regression}
-We assume that
+We can apply our results to the case of simple linear regression. We have
 \[
   Y_i = a' + b(x_i - \bar x) + \varepsilon_i,
 \]
@@ -2069,42 +2146,44 @@ Then we have
 \end{align*}
 and $(\hat{a}', \hat{b})$ and $\hat{\sigma}^2 = \text{RSS}/n$ are independent, as we have previously shown.
 
-Note that $\hat{\sigma}^2$ is the maximum likelihood estimator, and we divide by $n$, while $\tilde{\sigma}^2$ is the unbiased estimator, where we divide by $n - p$.
+Note that $\hat{\sigma}^2$ is obtained by dividing RSS by $n$, and is the maximum likelihood estimator. On the other hand, $\tilde{\sigma}$ is obtained by dividing RSS by $n - p$, and is an unbiased estimator.
 
 \begin{eg}
-  We have seen that $\tilde{\sigma}^2 = \frac{\mathrm{RSS}}{n - p} = \frac{67968}{24 - 2} = 3089 = 55.6^2$.
-
+  Using the oxygen/time example, we have seen that
+  \[
+    \tilde{\sigma}^2 = \frac{\mathrm{RSS}}{n - p} = \frac{67968}{24 - 2} = 3089 = 55.6^2.
+  \]
   So the standard error of $\hat{\beta}$ is
   \[
     \mathrm{SE}(\hat{b}) = \sqrt{\tilde{\sigma}^2(X^TX)_{22}^{-1}} = \sqrt{\frac{3089}{S_{xx}}} = \frac{55.6}{28.0} = 1.99.
   \]
   So a $95\%$ interval for $b$ has end points
   \[
-    \hat{b}\pm \mathrm{SE}(\hat{b})\times t_{n - p}(0.025) = 12.9\pm 1.99*t_{22}(0.025) = (-17.0, -8.8).
+    \hat{b}\pm \mathrm{SE}(\hat{b})\times t_{n - p}(0.025) = 12.9\pm 1.99*t_{22}(0.025) = (-17.0, -8.8),
   \]
-  % complete
+  using the fact that $t_{22}(0.025) = 2.07$.
+
+  Note that this interval does not contain $0$. So if we want to carry out a size $0.05$ test of $H_0: b = 0$ (they are uncorrelated) vs $H_1: b \not= 0$ (they are correlated), the test statistic would be$\frac{\hat{b}}{\mathrm{SE}(\hat{b})} = \frac{-12.9}{1.99} = -6.48$. Then we reject $H_0$ because this is less than $-t_{22}(0.025) = -2.07$.
 \end{eg}
 \subsection{Expected response at \texorpdfstring{$\mathbf{x}^*$}{x*}}
-Let $\mathbf{x}^*$ be a new vector of values for the explanatory variables.
+After performing the linear regression, we can now make \emph{predictions} from it. Suppose that $\mathbf{x}^*$ is a new vector of values for the explanatory variables.
 
-The expected response at $\mathbf{x}^*$ is $\E[Y|\mathbf{x}^*] = \mathbf{x}^{*T}\boldsymbol\beta$. We estimate this by $\mathbf{x}^{*T}\hat{\boldsymbol\beta}$. Then we have
+The expected response at $\mathbf{x}^*$ is $\E[\mathbf{Y}|\mathbf{x}^*] = \mathbf{x}^{*T}\boldsymbol\beta$. We estimate this by $\mathbf{x}^{*T}\hat{\boldsymbol\beta}$. Then we have
 \[
-  \mathbf{x}^{*T}(\hat{\boldsymbol\beta} - \boldsymbol\beta)\sim N(0, \sigma^2\mathbf{x}^{*T}(X^TX)^{-1}\mathbf{x}^*).
+  \mathbf{x}^{*T}(\hat{\boldsymbol\beta} - \boldsymbol\beta)\sim N(0, \mathbf{x}^{*T} \cov(\hat{\boldsymbol\beta})\mathbf{x}^*) = N(0, \sigma^2\mathbf{x}^{*T}(X^TX)^{-1}\mathbf{x}^*).
 \]
-(the variance comes from $\mathbf{x}^{*T}\cov \hat{\boldsymbol\beta} \mathbf{x}^*$)
-
 Let $\tau^2 = \mathbf{x}^{*T} (X^TX)^{-1}\mathbf{x}^*$. Then
 \[
-  \frac{\mathbf{x}^{*T}(\hat{\boldsymbol\beta} - \boldsymbol\beta}{\tilde{\sigma}\tau}\sim t_{n - p}.
+  \frac{\mathbf{x}^{*T}(\hat{\boldsymbol\beta} - \boldsymbol\beta)}{\tilde{\sigma}\tau}\sim t_{n - p}.
 \]
 Then a confidence interval for the expected response $\mathbf{x}^{*T}\boldsymbol\beta$ has end points
 \[
-  \mathbf{x}^{*T}\boldsymbol\beta \pm \tilde{\sigma}\tau t_{n - p}\left(\frac{\alpha}{2}\right).
+  \mathbf{x}^{*T}\hat{\boldsymbol\beta} \pm \tilde{\sigma}\tau t_{n - p}\left(\frac{\alpha}{2}\right).
 \]
 \begin{eg}
   Previous example continued:
 
-  Suppose we wish to estimate the time to run 2 miles for a man with an oxygen take-up measurement of 50. Here $\mathbf{x}^{*T} = (1, (5 0 \bar x))$, where $\bar x = 48.6$.
+  Suppose we wish to estimate the time to run 2 miles for a man with an oxygen take-up measurement of 50. Here $\mathbf{x}^{*T} = (1, 50 - \bar x)$, where $\bar x = 48.6$.
 
   The estimated expected response at $\mathbf{x}^{*T}$ is
   \[
@@ -2120,20 +2199,17 @@ Then a confidence interval for the expected response $\mathbf{x}^{*T}\boldsymbol
   \[
     \mathbf{x}^{*T}\hat{\boldsymbol\beta}\pm \tilde{\sigma}\tau t_{n - p}\left(\frac{\alpha}{2}\right) = 808.5 \pm 55.6 \times 0.21 \times 2.07 = (783.6, 832.2).
   \]
-  Note that this is the confidence interval for the predicted \emph{expected value}, NOT the confidence interval for the actual obtained value.
 \end{eg}
+Note that this is the confidence interval for the predicted \emph{expected value}, NOT the confidence interval for the actual obtained value.
+
 The predicted response at $\mathbf{x}^*$ is $Y^* = \mathbf{x}^*\boldsymbol\beta + \varepsilon^*$, where $\varepsilon^*\sim N(0, \sigma^2)$, and $Y^*$ is independent of $Y_1, \cdots, Y_n$. Here we have more uncertainties in our prediction: $\boldsymbol\beta$ and $\varepsilon^*$.
 
-We predict $\hat{Y}$ by $\mathbf{x}^{*T}\hat{\boldsymbol\beta}$.
+A $100(1 - \alpha)\%$ \emph{prediction interval} for $Y^*$ is an interval $I(\mathbf{Y})$ such that $\P(Y^*\in I(\mathbf{Y})) = 1 - \alpha$, where the probability is over the joint distribution of $Y^*, Y_1, \cdots, Y_n$. So $I$ is a random function of the past data $\mathbf{Y}$ that outputs an interval.
 
-A $100(1 - \alpha)\%$ \emph{prediction interval} for $Y^*$ is an interval $I(\mathbf{Y})$ such that $\P(Y^*\in i(\mathbf{Y})) = 1 - \alpha$, where the probability is over the joint distribution of $Y^*, Y_1, \cdots, Y_n)$. So $I$ is a random function of the past data $\mathbf{Y}$ that outputs an interval.
-
-Observe that $\hat{Y}^* - Y^* = \mathbf{x}^{*T}(\hat{\boldsymbol\beta} - \boldsymbol\beta) - \varepsilon^*$. So
+First of all, as above, the predicted \emph{expected} response is $\hat{Y}^* = \mathbf{x}^{*T}\boldsymbol\beta$. This is an unbiased estimator since $\hat{Y}^* - Y^* = \mathbf{x}^{*T}(\hat{\boldsymbol\beta} - \boldsymbol\beta) - \varepsilon^*$, and hence
 \[
   \E[\hat{Y}^* - Y^*] = \mathbf{x}^{*T}(\boldsymbol\beta - \boldsymbol\beta) = 0,
 \]
-Hence $\hat{Y}^*$ is an unbiased estimator of $Y^*$.
-
 To find the variance, we use that fact that $\mathbf{x}^{*T}(\hat{\boldsymbol\beta} - \boldsymbol\beta)$ and $\varepsilon^*$ are independent, and the variance of the sum of independent variables is the sum of the variances. So
 \begin{align*}
   \var(\hat{Y}^* - Y^*) &= \var (\mathbf{x}^{*T}(\hat{\boldsymbol\beta})) + \var (\varepsilon^*)\\
@@ -2150,7 +2226,7 @@ We therefore find that
 \]
 So the interval with endpoints
 \[
-  \mathbf{x}^{*T}\hat{\boldsymbol\beta} \pm \tilde{\sigma}\sqrt{\tau^2 + 1}t_{n- - p}\left(\frac{\alpha}{2}\right)
+  \mathbf{x}^{*T}\hat{\boldsymbol\beta} \pm \tilde{\sigma}\sqrt{\tau^2 + 1}t_{n - p}\left(\frac{\alpha}{2}\right)
 \]
 is a $95\%$ prediction interval for $Y^*$. We don't call this a confidence interval - confidence intervals are about finding parameters of the distribution, while the \emph{prediction} interval is about our predictions.
 
@@ -2163,7 +2239,7 @@ is a $95\%$ prediction interval for $Y^*$. We don't call this a confidence inter
 \end{eg}
 
 \begin{eg}
-  Other example continued: Suppose we wish to estimate the expected resistivity of a new wafer in the first instrument. Here $\mathbf{x}^{*T} = (1, 0, \cdots, 0)$ (recall that $\mathbf{x}$ is an indicator vector to indicate which instrument is used).
+  Wafer example continued: Suppose we wish to estimate the expected resistivity of a new wafer in the first instrument. Here $\mathbf{x}^{*T} = (1, 0, \cdots, 0)$ (recall that $\mathbf{x}$ is an indicator vector to indicate which instrument is used).
 
   The estimated response at $\mathbf{x}^{*T}$ is
   \[
@@ -2173,7 +2249,7 @@ is a $95\%$ prediction interval for $Y^*$. We don't call this a confidence inter
   \[
     \tau^2 = \mathbf{x}^{*T}(X^TX)^{-1}\mathbf{x}^* = \frac{1}{5}.
   \]
-  SO a $95\%$ confidence interval for $\E[Y_{1*}]$ is
+  So a $95\%$ confidence interval for $\E[Y_1^*]$ is
   \[
     \mathbf{x}^{*T}\hat{\boldsymbol\mu}\pm \tilde{\sigma}\tau t_{n - p}\left(\frac{\alpha}{2}\right) = 124.3 \pm \frac{10.4}{\sqrt{5}}\times 2.09 = (114.6, 134.0).
   \]
@@ -2193,22 +2269,25 @@ is a $95\%$ prediction interval for $Y^*$. We don't call this a confidence inter
   \]
 \end{eg}
 \subsection{Hypothesis testing}
+\subsubsection{Hypothesis testing}
+In hypothesis testing, we want to know whether certain variables influence the result. If, say, the variable $x_1$ does not influence $Y$, then we must have $\beta_1 = 0$. So the goal is to test the hypothesis $H_0: \beta_1 = 0$ versus $H_1: \beta_1 \not= 0$. We will tackle a more general case, where $\boldsymbol\beta$ can be split into two vectors $\boldsymbol\beta_0$ and $\boldsymbol\beta_1$, and we test if $\boldsymbol\beta_1$ is zero.
+
 We start with an obscure lemma, which might seem pointless at first, but will prove itself useful very soon.
 \begin{lemma}
-  Suppose $\mathbf{Z} \sim N_n(\mathbf{0}, \sigma^2 I_n)$, and $A_1$ and $A_2$ are symmetric, idempotent $n\times n$ matrices with $A_1A_2 = 0$ (ie. they are orthogonal). Then $\mathbf{Z}^T A_1 \mathbf{Z}$ are independent.
+  Suppose $\mathbf{Z} \sim N_n(\mathbf{0}, \sigma^2 I_n)$, and $A_1$ and $A_2$ are symmetric, idempotent $n\times n$ matrices with $A_1A_2 = 0$ (ie. they are orthogonal). Then $\mathbf{Z}^T A_1 \mathbf{Z}$ and $\mathbf{Z}^TA_2 \mathbf{Z}$ are independent.
 \end{lemma}
 This is geometrically intuitive, because $A_1$ and $A_2$ being orthogonal means they are concerned about different parts of the vector $\mathbf{Z}$.
 
 \begin{proof}
-  Let $\mathbf{X}_i = A_I \mathbf{Z}$, $i = 1, 2$ and
+  Let $\mathbf{X}_i = A_i \mathbf{Z}$, $i = 1, 2$ and
   \[
     \mathbf{W} =
     \begin{pmatrix}
       \mathbf{W}_1\\
       \mathbf{W}_2
-    \end{pmatrix} = A\mathbf{Z},
+    \end{pmatrix} = \begin{pmatrix} A_1\\ A_2\end{pmatrix}\mathbf{Z}.
   \]
-  where $A = \begin{pmatrix}A_1\\A_2\end{pmatrix}$. Then
+  Then
   \[
     \mathbf{W}\sim N_{2n}\left(
     \begin{pmatrix}
@@ -2224,9 +2303,13 @@ This is geometrically intuitive, because $A_1$ and $A_2$ being orthogonal means 
 
   So $\mathbf{W}_1$ and $\mathbf{W}_2$ are independent, which implies
   \[
-    \mathbf{W}_1^T \mathbf{W}_1 = \mathbf{Z}^TA_1^TA_1 \mathbf{Z} = \mathbf{Z}^T A_1A_1 \mathbf{Z} = \mathbf{Z}^T A_1 \mathbf{Z},
+    \mathbf{W}_1^T \mathbf{W}_1 = \mathbf{Z}^TA_1^TA_1 \mathbf{Z} = \mathbf{Z}^T A_1A_1 \mathbf{Z} = \mathbf{Z}^T A_1 \mathbf{Z}
   \]
-  and so $\mathbf{W}_2^T\mathbf{W}_2 = \mathbf{Z}^TA_2 \mathbf{Z}$ are independent.
+  and
+  \[
+    \mathbf{W}_2^T \mathbf{W}_2 = \mathbf{Z}^TA_2^TA_2 \mathbf{Z} = \mathbf{Z}^T A_2A_2 \mathbf{Z} = \mathbf{Z}^T A_2 \mathbf{Z}
+  \]
+  are independent
 \end{proof}
 Now we go to hypothesis testing in general linear models:
 
@@ -2241,7 +2324,9 @@ Under $H_0$, the mle of $\boldsymbol\beta_0$ and $\sigma^2$ are
   \hat{\hat{\boldsymbol\beta}}_0 &= (X_0^TX_0)^{-1}X_0^T \mathbf{Y}\\
   \hat{\hat{\sigma}}^2 &= \frac{\mathrm{RSS}_0}{n} = \frac{1}{n} (\mathbf{Y} - X_0 \hat{\hat{\boldsymbol\beta}}_0)^T(\mathbf{Y} - X_0 \hat{\hat{\boldsymbol\beta_0}})
 \end{align*}
-and we have previously shown these are independent. (we use double hat for the estimators for the null hypothesis, and single hat for the estimators of the alternative hypothesis)
+and we have previously shown these are independent.
+
+Note that our poor estimators wear two hats instead of one. We adopt the convention that the estimators of the null hypothesis have two hats, while those of the alternative hypothesis have one.
 
 So the fitted values under $H_0$ are
 \[
@@ -2251,7 +2336,7 @@ where $P_0 = X_0(X_0^T X_0)^{-1}X_0^T$.
 
 The generalized likelihood ratio test of $H_0$ against $H_1$ is
 \begin{align*}
-  \Lambda_\mathbf{Y}(H_0, H_1) &= \frac{\left(\frac{1}{\sqrt{2\pi \hat{\sigma}^2}}\right)\exp\left(-\frac{1}{2\hat{\sigma}^2}(\mathbf{Y} - X\hat{\hat{\beta}})^T(\mathbf{Y} - X\hat{\hat{\beta}})\right)}{\left(\frac{1}{\sqrt{2\pi \hat{\hat{\sigma}}^2}}\right)\exp\left(-\frac{1}{2\hat{\hat{\sigma}}^2}(\mathbf{Y} - X\hat{\hat{\beta}})^T(\mathbf{Y} - X\hat{\hat{\beta}})\right)}\\
+  \Lambda_\mathbf{Y}(H_0, H_1) &= \frac{\left(\frac{1}{\sqrt{2\pi \hat{\sigma}^2}}\right)\exp\left(-\frac{1}{2\hat{\sigma}^2}(\mathbf{Y} - X\hat{\boldsymbol\beta})^T(\mathbf{Y} - X\hat{\boldsymbol\beta})\right)}{\left(\frac{1}{\sqrt{2\pi \hat{\hat{\sigma}}^2}}\right)\exp\left(-\frac{1}{2\hat{\hat{\sigma}}^2}(\mathbf{Y} - X\hat{\hat{\boldsymbol\beta}}_0)^T(\mathbf{Y} - X\hat{\hat{\boldsymbol\beta}}_0)\right)}\\
   &= \left(\frac{\hat{\hat{\sigma}}^2}{\hat{\sigma}^2}\right)^{n/2} \\
   &= \left(\frac{\text{RSS}_0}{\mathrm{RSS}}\right)^{n/2} \\
   &= \left(1 + \frac{\mathrm{RSS}_0 - \mathrm{RSS}}{\mathrm{RSS}}\right)^{n/2}.
@@ -2282,8 +2367,8 @@ Also,
 
 Finally,
 \begin{align*}
-  \mathbf{Y}^T(I_n - P)\mathbf{Y} &= (\mathbf{Y} - X_0 \boldsymbol\beta_0)(I_n - P)(\mathbf{Y} - X_0 \boldsymbol\beta_0)\\
-  \mathbf{Y}^T(P - P_0)\mathbf{Y} &= (\mathbf{Y} - X_0 \boldsymbol\beta_0)(P - P_0)(\mathbf{Y} - X_0 \boldsymbol\beta_0)
+  \mathbf{Y}^T(I_n - P)\mathbf{Y} &= (\mathbf{Y} - X_0 \boldsymbol\beta_0)^T(I_n - P)(\mathbf{Y} - X_0 \boldsymbol\beta_0)\\
+  \mathbf{Y}^T(P - P_0)\mathbf{Y} &= (\mathbf{Y} - X_0 \boldsymbol\beta_0)^T(P - P_0)(\mathbf{Y} - X_0 \boldsymbol\beta_0)
 \end{align*}
 since $(I_n - P)X_0 = (P - P_0)X_0 = 0$.
 
@@ -2296,23 +2381,23 @@ and these random variables are independent.
 
 So under $H_0$,
 \[
-  F = \frac{\mathbf{Y}^T(P - P_0)\mathbf{Y}/(p - p_0)}{\mathbf{Y}^T(I_n - P)\mathbf{Y}/(n - p)} = \frac{(\mathrm{RSS}_0 - \mathrm{RSS}/(p - p_0)}{\mathrm{RSS}/(n - p)} \sim F_{p - p_0, n - p},
+  F = \frac{\mathbf{Y}^T(P - P_0)\mathbf{Y}/(p - p_0)}{\mathbf{Y}^T(I_n - P)\mathbf{Y}/(n - p)} = \frac{(\mathrm{RSS}_0 - \mathrm{RSS})/(p - p_0)}{\mathrm{RSS}/(n - p)} \sim F_{p - p_0, n - p},
 \]
 Hence we reject $H_0$ if $F > F_{p - p_0, n - p}(\alpha)$.
 
 $\mathrm{RSS}_0 - \mathrm{RSS}$ is the reduction in the sum of squares due to fitting $\boldsymbol\beta_1$ in addition to $\boldsymbol\beta_0$.
-
-\noindent\begin{tabular}{ccccc}
-  \toprule
-  Source of var. & d.f. & sum of squares & mean squares & $F$ statistic\\
-  \midrule
-  Fitted model & $p - p_0$ & $\mathrm{RSS}_0 - \mathrm{RSS}$ & $\frac{\mathrm{RSS}_0 - \mathrm{RSS}}{p - p_0}$ & \multirow{2}{*}{$\frac{(\mathrm{RSS}_0 - \mathrm{RSS})/(p - p_0)}{\mathrm{RSS}/(n - p)}$}\\
-  Residual & $n - p$ & RSS & $\frac{\mathrm{RSS}}{n - p}$\\
-  \midrule
-  Total & $n - p_0$ & $\mathrm{RSS}_0$\\
-  \bottomrule
-\end{tabular}
-
+\begin{center}
+  \begin{tabular}{ccccc}
+    \toprule
+    Source of var. & d.f. & sum of squares & mean squares & $F$ statistic\\
+    \midrule
+    Fitted model & $p - p_0$ & $\mathrm{RSS}_0 - \mathrm{RSS}$ & $\frac{\mathrm{RSS}_0 - \mathrm{RSS}}{p - p_0}$ & \multirow{2}{*}{$\frac{(\mathrm{RSS}_0 - \mathrm{RSS})/(p - p_0)}{\mathrm{RSS}/(n - p)}$}\\
+    Residual & $n - p$ & RSS & $\frac{\mathrm{RSS}}{n - p}$\\
+    \midrule
+    Total & $n - p_0$ & $\mathrm{RSS}_0$\\
+    \bottomrule
+  \end{tabular}
+\end{center}
 The ratio $\frac{\mathrm{RSS}_0 - \mathrm{RSS}}{\mathrm{RSS}_0}$ is sometimes known as the \emph{proportion of variance explained} by $\boldsymbol\beta_1$, and denoted $R^2$.
 
 \subsubsection{Simple linear regression}
@@ -2334,30 +2419,32 @@ The fitted sum of squares is therefore
 \[
   \mathrm{RSS}_0 - \mathrm{RSS} = \sum_i \big((y_i - \bar y)^2 - (y_i - \bar y - \hat{b}(x_i - \bar x))^2\big) = \hat{b}^2 \sum (x_i - \bar x)^2 = \hat{b}^2 S_{xx}.
 \]
-\begin{tabular}{ccccc}
-  \toprule
-  Source of var. & d.f. & sum of squares & mean squares & $F$ statistic\\
-  \midrule
-  Fitted model & 1 & $\mathrm{RSS}_0 - \mathrm{RSS} = \hat{b}^2 S_{XX}$ & $\hat{b}^2 S_{xx}$ & \multirow{2}{*}{$F = \frac{\hat{b}^2 S_{xx}}{\tilde{\sigma}^2}$}\\
-  Residual & $n - 2$ & $\mathrm{RSS} = \sum_i (y_i- \hat y)^2$ &  $\tilde{\sigma}^2$.\\
-  \midrule
-  Total & $n - 1$ & $\mathrm{RSS}_0 = \sum_i (y_i - \bar y)^2$\\
-  \bottomrule
-\end{tabular}
-
-Note that the proposition of variance explained is $\hat{b}^2/S_{xx}/S_{yy} = \frac{S_{xy}^2}{S_{xx}S_{yy}} = r^2$, where $r$ is the Pearson's Product Moment Correlation coefficient
+\begin{center}
+  \begin{tabular}{ccccc}
+    \toprule
+    Source of var. & d.f. & sum of squares & mean squares & $F$ statistic\\
+    \midrule
+    Fitted model & 1 & $\mathrm{RSS}_0 - \mathrm{RSS} = \hat{b}^2 S_{XX}$ & $\hat{b}^2 S_{xx}$ & \multirow{2}{*}{$F = \frac{\hat{b}^2 S_{xx}}{\tilde{\sigma}^2}$}\\
+    Residual & $n - 2$ & $\mathrm{RSS} = \sum_i (y_i- \hat y)^2$ &  $\tilde{\sigma}^2$.\\
+    \midrule
+    Total & $n - 1$ & $\mathrm{RSS}_0 = \sum_i (y_i - \bar y)^2$\\
+    \bottomrule
+  \end{tabular}
+\end{center}
+Note that the proposition of variance explained is $\hat{b}^2S_{xx}/S_{yy} = \frac{S_{xy}^2}{S_{xx}S_{yy}} = r^2$, where $r$ is the Pearson's Product Moment Correlation coefficient
 \[
   r = \frac{S_{xy}}{S_{xx}S_{yy}}.
 \]
-We have previously seen that under $H_0$, $\frac{\hat{b}}{\mathrm{SE}(\hat{b})} \sim t_{n - 2}$, where $\mathrm{SE}(\hat{b}) = \tilde{\sigma}/\sqrt{S_{xx}}$. So
+We have previously seen that under $H_0$, $\frac{\hat{b}}{\mathrm{SE}(\hat{b})} \sim t_{n - 2}$, where $\mathrm{SE}(\hat{b}) = \tilde{\sigma}/\sqrt{S_{xx}}$. So we let
 \[
-  \frac{\hat{b}}{\mathrm{SE}(\hat{b})} = \frac{\hat{b}\sqrt{S_{xx}}}{\tilde{\sigma}} = t.
+  t = \frac{\hat{b}}{\mathrm{SE}(\hat{b})} = \frac{\hat{b}\sqrt{S_{xx}}}{\tilde{\sigma}}.
 \]
 Checking whether $|t| > t_{n - 2}\left(\frac{\alpha}{2}\right)$ is precisely the same as checking whether $t^2 = F > F_{1, n - 2}(\alpha)$, since a $F_{1, n - 2}$ variable is $t_{n - 2}^2$.
-Hence the same conclusion is reached, whether based on a $t$-distribution or the $F$ statistic derived form an analysis of variance table.
+
+Hence the same conclusion is reached, regardless of whether we use the $t$-distribution or the $F$ statistic derived form an analysis of variance table.
 
 \subsubsection{One way analysis of variance with equal numbers in each group}
-We assume $J$ measurements are taken in each of $I$ groups, and that
+Recall that in our wafer example, we made measurements in groups, and want to know if there is a difference between groups. In general, suppose $J$ measurements are taken in each of $I$ groups, and that
 \[
   Y_{ij} = \mu_i + \varepsilon_{ij},
 \]
@@ -2365,7 +2452,7 @@ where $\varepsilon_{ij}$ are independent $N(0, \sigma^2)$ random variables, and 
 
 Fitting this model gives
 \[
-  \mathrm{RSS} = \sum_{i = 1}^I\sum_{j = 1}^J (Y_{ij} - \hat{\mu}_i)^2 = \sum_{i = 1}^I\sum_{j = 1}^J (Y_{ij} - \bar Y_i)^2
+  \mathrm{RSS} = \sum_{i = 1}^I\sum_{j = 1}^J (Y_{ij} - \hat{\mu}_i)^2 = \sum_{i = 1}^I\sum_{j = 1}^J (Y_{ij} - \bar Y_{i.})^2
 \]
 on $n - I$ degrees of freedom.
 
@@ -2375,20 +2462,22 @@ Under $H_0$, the model is $Y_{ij} \sim N(\mu, \sigma^2)$, and so $\hat{\mu} = \b
 
 The observed $\mathrm{RSS}_0$ is therefore
 \[
-  \mathrm{RSS}_0 = \sum_{i,j} (y_{ij} - \bar y)^2.
+  \mathrm{RSS}_0 = \sum_{i,j} (y_{ij} - \bar y_{..})^2.
 \]
 The fitted sum of squares is therefore
 \[
-  \mathrm{RSS}_0 - \mathrm{RSS} = \sum_i \sum_j \big((y_{ij} - \bar y)^2 - (y_{ij} = \bar y_i)^2 \big) = J\sum_i (\bar y_i - \bar y)^2.
+  \mathrm{RSS}_0 - \mathrm{RSS} = \sum_i \sum_j \big((y_{ij} - \bar y_{..})^2 - (y_{ij} - \bar y_{i.})^2 \big) = J\sum_i (\bar y_{i.} - \bar y_{..})^2.
 \]
-\begin{tabular}{ccccc}
-  \toprule
-  Source of var. & d.f. & sum of squares & mean squares & $F$ statistic\\
-  \midrule
-  Fitted model & $I - 1$ & $J\sum_i (\bar y_i - \bar y)^2$ & $J\sum_i \frac{(\bar y_i - \bar y)^2}{I - 1}$ & \multirow{2}{*}{$J\sum_i \frac{(\bar y_i - \bar y)^2}{(I - 1)\tilde{\sigma}^2}$} \\
-  Residual & $n - I$ & $\sum_i \sum_j(y_{ij} - \bar y_i)^2$ & $\tilde{\sigma}^2$\\
-  \midrule
-  Total & n - 1 & $\sum_i \sum_j(y_{ij} - \bar y)^2$\\
-  \bottomrule
-\end{tabular}
+\begin{center}
+  \begin{tabular}{ccccc}
+    \toprule
+    Source of var. & d.f. & sum of squares & mean squares & $F$ statistic\\
+    \midrule
+    Fitted model & $I - 1$ & $J\sum_i (\bar y_i - \bar y_{..})^2$ & $J\sum_i \frac{(\bar y_{i.} - \bar y_{..})^2}{I - 1}$ & \multirow{2}{*}{$J\sum_i \frac{(\bar y_{i.} - \bar y_{..})^2}{(I - 1)\tilde{\sigma}^2}$} \\
+    Residual & $n - I$ & $\sum_i \sum_j(y_{ij} - \bar y_{i.})^2$ & $\tilde{\sigma}^2$\\
+    \midrule
+    Total & $n - 1$ & $\sum_i \sum_j(y_{ij} - \bar y_{..})^2$\\
+    \bottomrule
+  \end{tabular}
+\end{center}
 \end{document}
