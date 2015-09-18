@@ -43,7 +43,7 @@ We will use the observed $\mathbf{X} = \mathbf{x}$ to make inferences about the 
 \end{itemize}
 \section{Estimation}
 \subsection{Estimators}
-The goal of estimations is as follows: we are given iid's $X_1, \cdots, X_n$, and we know that their probability density/mass function is $f_X(x; \theta)$ for some unknown theta. We know $f_X$ but not $\theta$. For example, we might know that they follow a Poisson distribution, but we do not know what the mean is. The objective is to estimate the value of $\theta$.
+The goal of estimation is as follows: we are given iid's $X_1, \cdots, X_n$, and we know that their probability density/mass function is $f_X(x; \theta)$ for some unknown $\theta$. We know $f_X$ but not $\theta$. For example, we might know that they follow a Poisson distribution, but we do not know what the mean is. The objective is to estimate the value of $\theta$.
 
 \begin{defi}[Statistic]
   A \emph{statistic} is an estimate of $\theta$. It is a function $T$ of the data. If we write the data as $\mathbf{x} = (x_1, \cdots, x_n)$, then our estimate is written as $\hat{\theta} = T(\mathbf{x})$. $T(\mathbf{X})$ is an \emph{estimator} of $\theta$.
@@ -63,7 +63,7 @@ Note that we adopt the convention where capital $\mathbf{X}$ denotes a random va
   \]
   What is the sampling distribution of $T$? Recall from IA Probability that in general, if $X_i \sim N(\mu_i, \sigma_i^2)$, then $\sum X_i \sim N(\sum \mu_i, \sum \sigma_i^2)$, which is something we can prove by considering moment-generating functions.
 
-  So we have $T(\mathbf{X})\sim N(\mu, 1/n)$. Note that by the Central Limit Theorem, even if $X_i$ were not normal, we still have $T(\mathbf{X})\sim N(\mu, 1/n)$ for large values of $n$, but here we get the normal distribution even for small values of $n$.
+  So we have $T(\mathbf{X})\sim N(\mu, 1/n)$. Note that by the Central Limit Theorem, even if $X_i$ were not normal, we still have approximately $T(\mathbf{X})\sim N(\mu, 1/n)$ for large values of $n$, but here we get exactly the normal distribution even for small values of $n$.
 \end{eg}
 The estimator $\frac{1}{n}\sum X_i$ we had above is a rather sensible estimator. Of course, we can also have silly estimators such as $T(\mathbf{X}) = X_1$, or even $T(\mathbf{X}) = 0.32$ always.
 
@@ -105,6 +105,10 @@ For example, suppose $X\sim \binomial(n, \theta)$. The standard estimator is $T_
 \[
   \var_\theta(T_U) = \frac{\var_\theta(X)}{n^2} = \frac{\theta(1 - \theta)}{n}.
 \]
+Hence the mean squared error of the usual estimator is given by
+\[
+  \mse (T_U) = \var_\theta(T_U) + \bias^2(T_U) = \theta(1 - \theta)/n.
+\]
 Consider an alternative estimator
 \[
   T_B = \frac{X + 1}{n + 2} = w\frac{X}{n} + (1 - w)\frac{1}{2},
@@ -121,16 +125,12 @@ Hence the means squared error is
 \[
   \mse (T_B) = \var_\theta(T_B) + \bias^2(T_B) = w^2\frac{\theta(1 - \theta)}{n} + (1 - w)^2\left(\frac{1}{2} - \theta\right)^2.
 \]
-The mean squared error of the usual estimator is given by
-\[
-  \mse (T_U) = \var_\theta(T_U) + \bias^2(T_U) = \theta(1 - \theta)/n.
-\]
-We can plot the mean squared error for possible values of $\theta$. Here we plot the case where $n = 10$.
+We can plot the mean squared error of each estimator for possible values of $\theta$. Here we plot the case where $n = 10$.
 \begin{center}
   \begin{tikzpicture}[xscale=6,yscale=100]
-    \draw [dashed, domain=0:1] plot (\x, {\x * (1 - \x) / 10});
-    \node [above] at (0.5, 0.025) {unbiased estimator};
-    \draw [domain=0:1] plot (\x, {25 * \x * (1 - \x) / 360 + (1 - 5/6)*(1 - 5/6)*(0.5 - \x)*(0.5 - \x)}) node [right] {biased estimator};
+    \draw [mred, domain=0:1] plot (\x, {\x * (1 - \x) / 10});
+    \node [mred, above] at (0.5, 0.025) {unbiased estimator};
+    \draw [mblue, domain=0:1] plot (\x, {25 * \x * (1 - \x) / 360 + (1 - 5/6)*(1 - 5/6)*(0.5 - \x)*(0.5 - \x)}) node [right] {biased estimator};
     \draw [->] (0, 0) -- (1.1, 0) node [right] {$\theta$};
     \draw [->] (0, 0) -- (0, 0.035) node [above] {mse};
     \foreach \x in {0, 0.2, 0.4, 0.6, 0.8, 1.0} {
@@ -145,7 +145,7 @@ We see that this biased estimator has smaller MSE unless $\theta$ has extreme va
 
 We see that sometimes biased estimators could give better mean squared errors. In some cases, not only could unbiased estimators be worse - they could be completely nonsense.
 
-Suppose $X\sim \Poisson(\lambda)$, and for some reason, you want to estimate $\theta = [P(X = 0)]^2 = e^{-2\lambda}$. Then any unbiased estimator $T(X)$ must satisfy $\E_\theta(T(X)) = \theta$, or equivalently,
+Suppose $X\sim \Poisson(\lambda)$, and for some reason, we want to estimate $\theta = [P(X = 0)]^2 = e^{-2\lambda}$. Then any unbiased estimator $T(X)$ must satisfy $\E_\theta(T(X)) = \theta$, or equivalently,
 \[
   E_\lambda(T(X)) = e^{-\lambda}\sum_{x = 0}^\infty T(x) \frac{\lambda^x}{x!} = e^{-2\lambda}.
 \]
@@ -164,7 +164,7 @@ Often, we do experiments just to find out the value of $\theta$. For example, we
 
   Suppose we are now given that $T(\mathbf{X}) = t$. Then what is the distribution of $\mathbf{X}$? We have
   \[
-    f_{\mathbf{X}|T = t}(\mathbf{x}) = \frac{\P_\theta(\mathbf{X} = \mathbf{x}, T = t)}{\P_\theta (T = t)} = \frac{\P_\theta(\mathbf{X} = \mathbf{x})}{P_\theta(T = t)}.
+    f_{\mathbf{X}|T = t}(\mathbf{x}) = \frac{\P_\theta(\mathbf{X} = \mathbf{x}, T = t)}{\P_\theta (T = t)} = \frac{\P_\theta(\mathbf{X} = \mathbf{x})}{\P_\theta(T = t)}.
   \]
   Where the last equality comes because since if $\mathbf{X} = \mathbf{x}$, then $T$ must be equal to $t$. This is equal to
   \[
@@ -179,7 +179,7 @@ Often, we do experiments just to find out the value of $\theta$. For example, we
 
 There is a convenient theorem that allows us to find sufficient statistics.
 \begin{thm}[The factorization criterion]
-  $T$ is sufficient for $\theta$ iff
+  $T$ is sufficient for $\theta$ if and only if
   \[
     f_{\mathbf{X}}(\mathbf{x} |\theta) = g(T(\mathbf{x}), \theta)h(\mathbf{x})
   \]
@@ -250,7 +250,7 @@ Again, we have a handy theorem to find minimal statistics:
 
   Now let $\mathbf{x}\in \mathcal{X}^N$ and let $T(\mathbf{x}) = t$. So $T(\mathbf{x}) = T(\mathbf{x}_t)$. By the hypothesis, $\frac{f_\mathbf{X}(\mathbf{x}; \theta)}{f_\mathbf{X}(\mathbf{x}_t: \theta)}$ does not depend on $\theta$. Let this be $h(\mathbf{x})$. Let $g(t, \theta) = f_\mathbf{X}(\mathbf{x}_t, \theta)$. Then
   \[
-    f_\mathbf{X}(\mathbf{x}; \theta) = f_\mathbf{X}(\mathbf{x}_t; \theta) \frac{f_\mathbf{X}(\mathbf{x}; \theta)}{f_\mathbf{X}(\mathbf{x}_t: \theta)} = g(t, \theta) h(\mathbf{x}).
+    f_\mathbf{X}(\mathbf{x}; \theta) = f_\mathbf{X}(\mathbf{x}_t; \theta) \frac{f_\mathbf{X}(\mathbf{x}; \theta)}{f_\mathbf{X}(\mathbf{x}_t; \theta)} = g(t, \theta) h(\mathbf{x}).
   \]
   So $T$ is sufficient for $\theta$.
 
@@ -292,7 +292,7 @@ Using this theorem, given any estimator, we can find one that is a function of a
   \[
     \var(\tilde{\theta}) = \E[\var (\tilde{\theta}|T)] + \var [\E(\tilde{\theta}|T)] = \E[\var(\tilde{\theta}|T)] + \var(\hat{\theta}).
   \]
-  Hence $\var(\tilde{\theta}) \geq \var (\hat{\theta})$. So $\mse\tilde{\theta}) \geq \mse(\hat{\theta})$, with equality only if $\var(\tilde{\theta}|T) = 0$.
+  Hence $\var(\tilde{\theta}) \geq \var (\hat{\theta})$. So $\mse(\tilde{\theta}) \geq \mse(\hat{\theta})$, with equality only if $\var(\tilde{\theta}|T) = 0$.
 \end{proof}
 
 \begin{eg}
@@ -371,8 +371,8 @@ In practice, instead of maximizing the likelihood, it is often easier to maximiz
   We shall see later that $S_{XX}/s^2 = \frac{n\hat{\sigma}^2}{\sigma^2}\sim \chi_{n - 1}^2$, and so $\E(\hat{\sigma}^2) = \frac{(n - 1)\sigma^2}{n}$, ie. $\hat{\sigma}^2$ is biased.
 \end{eg}
 
-\begin{eg}
-  Let $X_1, \cdots X_n$ be iid $U(0, \theta)$. This is the ``German tank problem'': suppose the American army discovers some German tanks that are sequentially numbered, i.e. the first tank is numbered 1, the second is numbered 2, etc. Then if $\theta$ tanks are produced, then the probability distribution of the tank number is $U(0, \theta)$. Suppose we have discovered $n$ tanks whose numbers are $x_1, x_2, \cdots, x_n$, and we want to estimate $\theta$, the total number of tanks produced. We want to find the maximum likelihood estimator.
+\begin{eg}[German tank problem]
+   Suppose the American army discovers some German tanks that are sequentially numbered, i.e. the first tank is numbered 1, the second is numbered 2, etc. Then if $\theta$ tanks are produced, then the probability distribution of the tank number is $U(0, \theta)$. Suppose we have discovered $n$ tanks whose numbers are $x_1, x_2, \cdots, x_n$, and we want to estimate $\theta$, the total number of tanks produced. We want to find the maximum likelihood estimator.
 
   Then
   \[
@@ -380,7 +380,7 @@ In practice, instead of maximizing the likelihood, it is often easier to maximiz
   \]
   So for $\theta\geq \max _i$, $\like (\theta) = 1/\theta^n$ and is decreasing as $\theta$ increases, while for $\theta < \max x_i$, $\like (\theta) = 0$. Hence the value $\hat{\theta} = \max x_i$ maximizes the likelihood.
 
-  Is $\hat{\theta}$ unbiased? First we need to find the distribution of $\hat{\theta}$. For $0 \leq t \leq \theta$, the distribution function of $\hat{\theta}$ is
+  Is $\hat{\theta}$ unbiased? First we need to find the distribution of $\hat{\theta}$. For $0 \leq t \leq \theta$, the cumulative distribution function of $\hat{\theta}$ is
   \[
     F_{\hat{\theta}}(t) = P(\hat{\theta} \leq t) = \P(X_i \leq t \text{ for all }i) = (\P(X_i \leq t))^n = \left(\frac{t}{\theta}\right)^n,
   \]
@@ -418,7 +418,7 @@ Notice that it is the endpoints of the interval that are random quantities, whil
 
 We can interpret this in terms of repeat sampling. If we calculate $(A(\mathbf{x}), B(\mathbf{x}))$ for a large number of samples $\mathbf{x}$, then approximately $100\gamma\%$ of them will cover the true value of $\theta$.
 
-It is important to know that having observed some data $\mathbf{x}$ and calculated $95\%$ confidence interval, we \emph{cannot} say that $\theta$ has 95\% chance of being within the interval, since $\theta$ is a fixed value and either is or is not in the interval.
+It is important to know that having observed some data $\mathbf{x}$ and calculated $95\%$ confidence interval, we \emph{cannot} say that $\theta$ has 95\% chance of being within the interval. Apart from the standard objection that $\theta$ is a fixed value and either is or is not in the interval, and hence we cannot assign probabilities to this event, we will later construct an example where even though we have got a $50\%$ confidence interval, we are $100\%$ sure that $\theta$ lies in that interval.
 
 \begin{eg}
   Suppose $X_1, \cdots, X_n$ are iid $N(\theta, 1)$. Find a $95\%$ confidence interval for $\theta$.
@@ -431,7 +431,7 @@ It is important to know that having observed some data $\mathbf{x}$ and calculat
   \[
     \P\left[\bar X - \frac{z_2}{\sqrt{n}} < \theta < \bar X - \frac{z_1}{\sqrt{n}}\right] = 0.95.
   \]
-  so that
+  so we obtain the following $95\%$ confidence interval:
   \[
     \left(\bar X - \frac{z_2}{\sqrt{n}}, \bar X - \frac{z_1}{\sqrt{n}}\right).
   \]
@@ -509,7 +509,7 @@ Note that if $(A(\mathbf{x}), B(\mathbf{x}))$ is a $100\gamma\%$ confidence inte
   \]
   So $(\min(X_1, X_2), \max (X_1, X_2))$ is a 50\% confidence interval for $\theta$.
 
-  But suppose $|X_1 - X_2| \geq \frac{1}{2}$, e.g. $x_1 = 0.2, x_2 = 0.9$, then we \emph{know} that, in this particular case, $\theta$ \emph{must} lie in $(\min (X_1, X_2), \max(X_1, X_2))$, and we don't have just 50\% ``confidence''!
+  But suppose after the experiment, we obtain $|x_1 - x_2| \geq \frac{1}{2}$. For example, we might get $x_1 = 0.2, x_2 = 0.9$, then we \emph{know} that, in this particular case, $\theta$ \emph{must} lie in $(\min (X_1, X_2), \max(X_1, X_2))$, and we don't have just 50\% ``confidence''!
 
   This is why after we calculate a confidence interval, we should not say ``there is $100(1 - \alpha)\%$ chance that $\theta$ lies in here''. The confidence interval just says that ``if we keep making these intervals, $100(1 - \alpha)\%$ of them will contain $\theta$''. But if have calculated a \emph{particular} confidence interval, the probability that that \emph{particular} interval contains $\theta$ is \emph{not} $100(1 - \alpha)\%$.
 \end{eg}
@@ -517,7 +517,7 @@ Note that if $(A(\mathbf{x}), B(\mathbf{x}))$ is a $100\gamma\%$ confidence inte
 \subsection{Bayesian estimation}
 So far we have seen the \emph{frequentist} approach to a statistical inference, ie. inferential statements about $\theta$ are interpreted in terms of repeat sampling. For example, the confidence interval is what's the probability that the interval will contain $\theta$, not the probability that $\theta$ lies in the interval.
 
-In contrast, the Bayesian approach treats $\theta$ as a random variable taking values in $\Theta$. The investigator's information and beliefs about the possible values of $\theta$ before any observation of data, are summarised by a \emph{prior distribution} $\pi(\theta)$. When $\mathbf{X} = \mathbf{x}$ are observed, the extra information about $\theta$ is combined with the prior to obtain the \emph{posterior distribution} $\pi(\theta|\mathbf{x})$ for $\theta$ given $\mathbf{X} = \mathbf{x}$.
+In contrast, the Bayesian approach treats $\theta$ as a random variable taking values in $\Theta$. The investigator's information and beliefs about the possible values of $\theta$ before any observation of data are summarised by a \emph{prior distribution} $\pi(\theta)$. When $\mathbf{X} = \mathbf{x}$ are observed, the extra information about $\theta$ is combined with the prior to obtain the \emph{posterior distribution} $\pi(\theta|\mathbf{x})$ for $\theta$ given $\mathbf{X} = \mathbf{x}$.
 
 There has been a long-running argument between the two approaches. Recently, things have settled down, and Bayesian methods are seen to be appropriate in huge numbers of application where one seeks to assess a probability about a ``state of the world''. For example, spam filters will assess the probability that a specific email is a spam, even though from a frequentist's point of view, this is nonsense, because the email either is or is not a spam, and it makes no sense to assign a probability to the email's being a spam.
 
@@ -678,7 +678,7 @@ This occurs when each side is $1/2$. So $\hat{\theta}$ is the \emph{posterior me
   \[
     \pi(\lambda|\mathbf{x}) \propto e^{n\lambda} \lambda^{\sum x_i}e^{-\lambda} = \lambda^{\sum x_i}e^{-(n + 1)\lambda},\quad \lambda > 0,
   \]
-  which is $\gammaD\left(\sum x_i + 1, n + 1\right)$. Hence under quadratic loss,
+  which is $\gammaD\left(\sum x_i + 1, n + 1\right)$. Hence under quadratic loss, our estimator is
   \[
     \hat{\lambda} = \frac{\sum x_i + 1}{n + 1},
   \]

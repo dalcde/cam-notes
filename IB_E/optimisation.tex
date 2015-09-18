@@ -31,6 +31,8 @@ The Ford-Fulkerson algorithm and the max-flow min-cut theorems in the rational c
 
 \section{Introduction and preliminaries}
 \subsection{Constrained optimization}
+In optimization, the objective is to maximize or minimize some function. For example, if we are a factory, we want to minimize our cost of production. Often, our optimization is not unconstrained. Otherwise, the way to minimize costs is to produce nothing at all. Instead, there are some constraints we have to obey. The is known as \emph{constrained optimization}.
+
 \begin{defi}[Constrained optimization]
   The general problem is of \emph{constrained optimization} is
   \begin{center}
@@ -38,12 +40,11 @@ The Ford-Fulkerson algorithm and the max-flow min-cut theorems in the rational c
   \end{center}
   where $x\in \R^n$ is the \emph{vector of decision variables}, $f: \R^n \to \R$ is the \emph{objective function}, $h: \R^n \to \R^m$ and $b\in \R^m$ are the \emph{functional constraints}, and $X\subseteq \R^n$ is the \emph{regional constraint}.
 \end{defi}
-Note that we will have a lot of vectors here, but we do not bold them, since almost everything is going to be a vector.
+Note that everything above is a vector, but we do not bold our vectors. This is since almost everything we work with is going to be a vector, and there isn't much point in bolding them.
 
-This is the most general form of the problem. If we want to maximize $f$ instead of minimizing, we can minimize $-f$. If we want our constraints to be an inequality in the form $h(x) \geq b$, we can introduce a \emph{slack variable} $z$, make the functional constraint as $h(x) - z = b$, and add the regional constraint $z \geq 0$. So all is good, and this is in fact the most general form.
+This is indeed the most general form of the problem. If we want to maximize $f$ instead of minimize, we can minimize $-f$. If we want our constraints to be an inequality in the form $h(x) \geq b$, we can introduce a \emph{slack variable} $z$, make the functional constraint as $h(x) - z = b$, and add the regional constraint $z \geq 0$. So all is good, and this is in fact the most general form.
 
-\subsection{Linear programming}
-Linear programming is, surprisingly, the case where everything's linear. We can write our problem as:
+Linear programming is, surprisingly, the case where everything is linear. We can write our problem as:
 \begin{center}
   minimize $c^Tx$ subject to
   \begin{align*}
@@ -56,8 +57,7 @@ Linear programming is, surprisingly, the case where everything's linear. We can 
 \end{center}
 where we've explicitly written out the different forms the constraints can take.
 
-This is too clumsy. We claim (without proof) that these can be written into the following forms:
-
+This is too clumsy. Instead, we can perform some tricks and turn them into a nicer form:
 \begin{defi}[General and standard form]
   The \emph{general form} of a linear program is
   \begin{center}
@@ -69,6 +69,8 @@ This is too clumsy. We claim (without proof) that these can be written into the 
   \end{center}
 \end{defi}
 It takes some work to show that these are indeed the most general forms. The equivalence between the two forms can be done via slack variables, as described above. We still have to check some more cases. For example, this form says that $x \geq 0$, ie. all decision variables have to be positive. What if we want $x$ to be unconstrained, ie can take any value we like? We can split $x$ into to parts, $x = x^+ - x^-$, where each part has to be positive. Then $x$ can take any positive or negative value.
+
+Note that when I said ``nicer'', I don't mean that turning a problem into this form necessarily makes it easier to solve \emph{in practice}. However, it will be much easier to work with when developing general theory about linear programs.
 
 \begin{eg}
   We want to minimize $-(x_1 + x_2)$ subject to
@@ -126,7 +128,7 @@ However, this is obviously not a sufficient condition. Any such point can be a m
 \end{defi}
 
 \begin{defi}[Convex function]
-  A function $f: S\to \R$ is \emph{convex} if for all $x, y\in S$, $\delta\in [0, 1]$, then $\delta f(x) + (1 - \delta)f(y) \geq f(\delta x + (1 - \delta)y)$.
+  A function $f: S\to \R$ is \emph{convex} if $S$ is convex, and for all $x, y\in S$, $\delta\in [0, 1]$, we have $\delta f(x) + (1 - \delta)f(y) \geq f(\delta x + (1 - \delta)y)$.
   \begin{center}
     \begin{tikzpicture}
       \draw(-2, 4) -- (-2, 0) -- (2, 0) -- (2, 4);
@@ -164,9 +166,9 @@ We will not prove these.
 Note that this is helpful, since linear functions are convex (and concave). The problem is that our problems are constrained, not unconstrained. So we will have to convert constrained problems to unconstrained problems.
 
 \section{The method of Lagrange multipliers}
-The trick is to include the constraints into the objective function, so that things outside the constraint will not be thought to be minima.
+So how do we solve the problem of constrained maximization? The trick here is to include the constraints into the constraints into the objective function, so that things outside the constraint will not be thought to be minima.
 
-Suppose the problem is
+Suppose the original problem is
 \begin{center}
   minimize $f(x)$ subject to $h(x) = b$, $x\in X$.
 \end{center}
@@ -176,7 +178,7 @@ Call the constraint $(P)$.
   \[
     L(x, \lambda) = f(x) - \lambda^T(h(x) - b).
   \]
-  for $\lambda\in \R^m$.
+  for $\lambda\in \R^m$. $\lambda$ is known as the \emph{Lagrange multiplier}.
 \end{defi}
 Note that when the constraint is satisfied, $h(x) - b = 0$, and $L(x, \lambda) = f(x)$.
 
@@ -208,7 +210,21 @@ This looks like a pretty powerful result, but it turns out that it is quite easy
     &= f(x^*).
   \end{align*}
 \end{proof}
+How can we interpret this result? To find these values of $\lambda^*$ and $x^*$, we have to solve
+\begin{align*}
+  \nabla L &= 0\\
+  h(x) &= b.
+\end{align*}
+Alternatively, we can write this as
+\begin{align*}
+  \nabla f &= \lambda \nabla h\\
+  h(x) &= b.
+\end{align*}
+What does this mean? For better visualization, we take the special case where $f$ and $h$ are a functions $\R^2 \to \R$. Usually, if we want to minimize $f$ without restriction, then for small changes in $x$, there should be no (first-order) change in $f$, ie. $\d f = \nabla f\cdot \d x = 0$. This has to be true for all possible directions of $x$.
 
+However, if we are constrained by $h(x) = b$, this corresponds to forcing $x$ to lie along this particular  path. Hence the restriction $\d f = 0$ only has to hold when $x$ lies along the path. Since we need $\nabla f\cdot \d x = 0$, this means that $\nabla f$ has to be perpendicular to $\d x$. Alternatively, $\nabla f$ has to be parallel to the normal to the path. Since the normal to the path is given by $\nabla h$, we obtain the requirement $\nabla f = \lambda \nabla h$.
+
+This is how we should interpret the condition $\nabla f = \lambda \nabla h$. Instead of requiring that $\nabla f = 0$ as in usual minimization problems, we only require $\nabla f$ to point at directions perpendicular to the allowed space.
 
 \begin{eg}
   Minimize $x_1 + x_2 - 2x_3$ subject to
@@ -222,7 +238,7 @@ This looks like a pretty powerful result, but it turns out that it is quite easy
     &= ((1 - \lambda_1)x_1 - 2\lambda_2 x_1^2) + ((-1 - \lambda_1)x_2 - \lambda_2 x_2^2) \\
     &+ (-2 - \lambda_1)x_3 + 5\lambda_1 + 4\lambda_2
   \end{align*}
-  We want to pick a $\lambda^*$ and $x^*$ such that $L(x^*, \lambda^*)$ is minimal. Then for our $\lambda^*$, $L(x, \lambda^*)$  must have a finite minimum!
+  We want to pick a $\lambda^*$ and $x^*$ such that $L(x^*, \lambda^*)$ is minimal. Then in particular, for our $\lambda^*$, $L(x, \lambda^*)$ must have a finite minimum.
 
   We note that $(-2 - \lambda_1)x_3$ does not have a finite minimum unless $\lambda_1 = -2$, since $x_3$ can take any value. Also, the terms in $x_1$ and $x_2$ do not have a finite minimum unless $\lambda_2 < 0$.
 
@@ -316,7 +332,7 @@ This makes our life easier since our search space is smaller.
 \end{eg}
 
 \subsection{Shadow prices}
-We can understand Lagrange multipliers intuitively via the following theorem:
+We have previously described how we can understand the requirement $\nabla f = \lambda \nabla h$. But what does the multiplier $\lambda$ represent?
 \begin{thm}[]
   Consider the problem
   \begin{center}
@@ -430,8 +446,9 @@ We use the fancy term ``hyperplane'' to denote planes in higher dimensions (in a
 \end{defi}
 
 \begin{thm}[]
-  $(P)$ satisfies strong duality iff there exists a supporting hyperplane at $b$.
+  $(P)$ satisfies strong duality iff $\phi(c) = \inf\limits_{x \in X(c)}f(x)$ has a supporting hyperplane at $b$.
 \end{thm}
+Note that here we fix a $b$, and let $\phi$ be a function of $c$.
 
 \begin{proof}
   $(\Leftarrow)$ Suppose there is a supporting hyperplane. Then since the plane passes through $\phi(b)$, it must be of the form
@@ -468,12 +485,15 @@ We use the fancy term ``hyperplane'' to denote planes in higher dimensions (in a
   So $\phi(b) + \lambda^T(c - b) \leq \phi(c)$. So this defines a supporting hyperplane.
 \end{proof}
 
+We are having some progress now. To show that Lagrange multipliers work, we need to show that $(P)$ satisfies strong duality. To show that $(P)$ satisfies strong duality, we need to show that it has a supporting hyperplane at $b$. How can we show that there is a supporting hyperplane? A sufficient condition is convexity.
+
 \begin{thm}[Supporting hyperplane theorem]
   Suppose that $\phi: \R^m \to \R$ is convex and $b\in\R^m$ lies in the interior of the set of points where $\phi$ is finite. Then there exists a supporting hyperplane to $\phi$ at $b$.
 \end{thm}
+Proof follows rather straightforwardly from the definition of convexity, and is omitted.
 
-We're having some progress, but this is still not helpful, since we don't know what $\phi$ is! So now we have a sufficient condition for Lagrange multipliers to work:
-\subsection{A sufficient condition for convexity of \texorpdfstring{$\phi$}{phi}}
+This is some even better progress. However, the definition of $\phi$ is rather convoluted. How can we show that it is convex? We have the following helpful theorem:
+
 \begin{thm}
   Let
   \[
@@ -514,7 +534,8 @@ So
 \end{thm}
 
 \section{Solutions of linear programs}
-We first illustrate the general idea with the case of a 2D linear program
+\subsection{Linear programs}
+We'll come up with an algorithm to solve linear program efficiently. We first illustrate the general idea with the case of a 2D linear program. Consider the problem
 \begin{center}
   maximize $x_1 + x_2$ subject to
   \begin{align*}
@@ -553,7 +574,11 @@ Even if we have cases where $c$ is orthogonal to one of the lines, eg
 \end{center}
 An optimal point might be $A$. However, if we know that $A$ is an optimal point, we can slide it across the $x_1 + x_2 = 3.5$ line until it meets one of the corners. Hence we know that one of the corners must be an optimal point.
 
+This already allows us to solve linear programs, since we can just try all corners and see which has the smallest value. However, this can be made more efficient, especially when we have a large number of dimensions and hence corners.
+
 \subsection{Basic solutions}
+Here we will assume that the rows of $A$ are linearly independent, and any set of $m$ columns are linearly independent. Otherwise, we can just throw away the redundant rows or columns.
+
 In general, if both the constraints and the objective functions are linear, then the optimal point always lies on a ``corner'', or an \emph{extreme point}.
 
 \begin{defi}[Extreme point]
@@ -566,19 +591,23 @@ In general, if both the constraints and the objective functions are linear, then
 
 Consider again the linear program in standard form, ie.
 \begin{center}
-  \emph{maximize} $c^T x$ subject to $Ax = b, x \geq 0$, where $A \in \R^{m\times n}$ and $b\in \R^m$.
+  maximize $c^T x$ subject to $Ax = b, x \geq 0$, where $A \in \R^{m\times n}$ and $b\in \R^m$.
 \end{center}
+Note that now we are talking about maximization instead of minimization.
 
 \begin{defi}[Basic solution and basis]
   A solution $x\in \R^n$ is \emph{basic} if it has at most $m$ non-zero entries (out of $n$), ie. if there exists a set $B\subseteq \{1, \cdots, n\}$ with $|B| = m$ such that $x_i = 0$ if $i\not\in B$. In this case, $B$ is called the \emph{basis}, and $x_i$ are the \emph{basic variables} if $i\in B$.
 \end{defi}
+We will later see (via an example) that basic solutions correspond to solutions at the ``corners'' of the solution space.
 
 \begin{defi}[Non-degenerate solutions]
   A basic solution is \emph{non-degenerate} if it has exactly $m$ non-zero entries.
 \end{defi}
 
+Note that by ``solution'', we do not mean a solution to the whole maximization problem. Instead we are referring to a solution to the constraint $Ax = b$. Being a solution does \emph{not} require that $x \geq 0$. Those that satisfy this regional constraint are known as \emph{feasible}.
+
 \begin{defi}[Basic feasible solution]
-  A basic solution $x$ is \emph{feasible} if it satisfies $x \geq 0$ (being a solution only requires $Ax = b$).
+  A basic solution $x$ is \emph{feasible} if it satisfies $x \geq 0$.
 \end{defi}
 
 \begin{eg}
@@ -627,17 +656,16 @@ Consider again the linear program in standard form, ie.
   \end{center}
 \end{eg}
 
-\subsection{Extreme points and optimal solutions}
-Now we prove that the optimal solutions are exactly the basic feasible solutions.
-
-Here we assume that the rows of $A$ are linearly independent, and any set of $m$ columns are linearly independent. Otherwise, just throw away the redundant rows or columns.
-
+In previous example, we saw that the extreme points are exactly the basic feasible solutions. This is true in general.
 \begin{thm}[]
   A vector $x$ is a basic feasible solution of $Ax = b$ if and only if it is an extreme point of the set $X(b) = \{x': Ax' = b, x' \geq 0\}$.
 \end{thm}
-This is the generalization of the statement in 2D, and we are not going to prove this. What we will prove is the following:
+We will not prove this.
 
-\begin{thm}[]
+\subsection{Extreme points and optimal solutions}
+Recall that we previously showed in our 2D example that the optimal solution lies on an extreme point, ie. is a basic feasible solution. This is also true in general.
+
+\begin{thm}
   If $(P)$ is feasible and bounded, then there exists an optimal solution that is a basic feasible solution.
 \end{thm}
 
@@ -648,7 +676,7 @@ This is the generalization of the statement in 2D, and we are not going to prove
   \[
     x = \delta y + (1 - \delta) z.
   \]
-  We will show there exists an optimal solution strictly fewer than $r$ non-zero entries. Then the claim follows by induction.
+  We will show there exists an optimal solution strictly fewer than $r$ non-zero entries. Then the result follows by induction.
 
   By optimality of $x$, we have $c^T x \geq c^T y$ and $c^T x \geq c^T z$.
 
@@ -658,7 +686,7 @@ This is the generalization of the statement in 2D, and we are not going to prove
 
   So the non-zero entries of $y$ and $z$ is a subset of the non-zero entries of $x$. So $y$ and $z$ have at most $r$ non-zero entries, which must occur in rows where $x$ is also non-zero.
 
-  If $y$ or $z$ has strictly fewer than $r$ non-zero entries, then we are done. Otherwise, for any $\hat{\delta}$ (not necessarily in $(0, 1)$),let
+  If $y$ or $z$ has strictly fewer than $r$ non-zero entries, then we are done. Otherwise, for any $\hat{\delta}$ (not necessarily in $(0, 1)$), let
   \[
     x_{\hat{\delta}} = \hat{\delta} y + (1 - \hat{\delta}) z = z + \hat{\delta}(y - z).
   \]
@@ -668,7 +696,7 @@ This is the generalization of the statement in 2D, and we are not going to prove
 \end{proof}
 Intuitively, this is what we do when we ``slide along the line'' if $c$ is orthogonal to one of the boundary lines.
 
-The latter result in fact holds more generally for the maximum of a convex function $f$ over a compact convex set $X$ (ie. closed and bounded).
+This result in fact holds more generally for the maximum of a convex function $f$ over a compact (ie. closed and bounded) convex set $X$.
 
 In that case, we can write any point $x\in X$ as a convex combination
 \[
@@ -694,7 +722,7 @@ The Lagrangian is
 \]
 Since $x, z$ can be arbitrarily positive, this has a finite minimum if and only if
 \[
-  c^T - \lambda^TA \geq 0, \lambda^T \geq 0.
+  c^T - \lambda^TA \geq 0,\quad \lambda^T \geq 0.
 \]
 Call the feasible set $Y$. Then for fixed $\lambda\in Y$, the minimum of $L(x, z, \lambda)$ is attained when $(c^T - \lambda^T A)x$ and $\lambda^T z = 0$ by complementary slackness. So
 \[
@@ -702,7 +730,7 @@ Call the feasible set $Y$. Then for fixed $\lambda\in Y$, the minimum of $L(x, z
 \]
 The dual is thus
 \begin{center}
-  maximize $\lambda^T b$ subject to $A^T\lambda \leq c, \lambda \geq 0$
+  maximize $\lambda^T b$ subject to $A^T\lambda \leq c$, $\lambda \geq 0$
 \end{center}
 
 \begin{thm}[]
@@ -712,7 +740,7 @@ The dual is thus
 \begin{proof}
   It suffices to show this for the linear program in general form. We have shown above that the dual problem is
   \begin{center}
-    minimize $-b^T\lambda$ subject to $-A^T \lambda \geq -c, \lambda \geq 0$.
+    minimize $-b^T\lambda$ subject to $-A^T \lambda \geq -c$, $\lambda \geq 0$.
   \end{center}
   This problem has the same form as the primal, with $-b$ taking the role of $c$, $-c$ taking the role of $b$, $-A^T$ taking the role of $A$. So doing it again, we get back to the original problem.
 \end{proof}
@@ -809,10 +837,10 @@ The dual is thus
   \begin{align*}
     c^Tx &= \lambda^T b\\
     &= \inf_{x'\in X} (c^T x' - \lambda^T(Ax' - b))\\
-    &\leq c^T - \lambda^T (Ax - b)\\
-    &\leq c^T x
+    &\leq c^T x - \lambda^T (Ax - b)\\
+    &\leq c^T x.
   \end{align*}
-  since $Ax \geq b$ and $\lambda\geq 0$.
+  The last line is since $Ax \geq b$ and $\lambda\geq 0$.
 
   The first and last term are the same. So the inequalities hold with equality. Therefore
   \[
@@ -841,6 +869,8 @@ The dual is thus
   Hence by weak duality, $x$ and $\lambda$ are optimal.
 \end{proof}
 \subsection{Simplex method}
+The simplex method is an algorithm that makes use of the result we just had. To find the optimal solution to a linear program, we start with a basic feasible solution of the primal, and then modify the variables step by step until the dual is also feasible.
+
 We start with an example, showing what we do, then explain the logic behind, then do a more proper example.
 
 \begin{eg}
@@ -951,7 +981,7 @@ Hence our objective is to pick a basis that makes $c_N^T - c_B^T A_B^{-1}A_N \le
 
 We can increase the value of the objective function by increasing $(x_N)_i$. As we increase $(x_N)_i$, we have to satisfy the functional constraints. So the value of other variables will change as well. We can keep increasing $(x_N)_i$ until another variable hits $0$, say $(x_B)_j$. Then we will have to stop.
 
-However, if it so happens that we can increase $(x_N)_i$ indefinitely without other things hitting $0$, our problem is unbounded.
+(However, if it so happens that we can increase $(x_N)_i$ indefinitely without other things hitting $0$, our problem is unbounded)
 
 The effect of this is that we have switched basis by removing $(x_B)_j$ and adding $(x_N)_i$. We can continue from here. If $(c_N^T - c_B^T A_B^{-1}A_N)$ is negative, we are done. Otherwise, we continue the above procedure.
 
@@ -1061,7 +1091,7 @@ This method is illustrated by example.
       \bottomrule
     \end{tabular}
   \end{center}
-  Our pivot column is $x_1$, and our pivot row is the second row. We divide it by $1 $ and add/subtract it from other rows.
+  Our pivot column is $x_1$, and our pivot row is the second row. We divide it by $1$ and add/subtract it from other rows.
   \begin{center}
     \begin{tabular}{cccccccc}
       \toprule
@@ -1076,7 +1106,7 @@ This method is illustrated by example.
       \bottomrule
     \end{tabular}
   \end{center}
-  There are two possible pivot columns. We pick $z_2$ and the first row as the pivot row.
+  There are two possible pivot columns. We pick $z_2$ and use the first row as the pivot row.
   \begin{center}
     \begin{tabular}{cccccccc}
       \toprule
@@ -1133,6 +1163,38 @@ Here we have a short digression to game theory. We mostly focus on games with tw
   A two-player game, or \emph{bimatrix game}, is given by two matrices $P, Q\in \R^{m\times n}$. Player 1, or the \emph{row player}, chooses a row $i\in \{1, \cdots, m\}$, while player 2, the \emph{column player}, chooses a column $j\in \{1, \cdots, n\}$. These are selected without knowledge of the other player's decisions. The two players then get payoffs $P_{ij}$ and $Q_{ij}$ respectively.
 \end{defi}
 
+\begin{eg}
+  A game of rock-paper-scissors can have payoff matrices
+  \[
+    P_{ij} =
+    \begin{pmatrix}
+      0 & -1 & 1\\
+      1 & 0 & -1\\
+      -1 & 1 & 0
+    \end{pmatrix},\quad
+    Q_{ij} =
+    \begin{pmatrix}
+      0 & 1 & -1\\
+      -1 & 0 & 1\\
+      1 & -1 & 0
+    \end{pmatrix}.
+  \]
+  Here a victory gives you a payoff of $1$, a loss gives a payoff of $-1$, and a draw gives a payoff of $1$. Also the first row/column corresponds to playing rock, second corresponds to paper and third corresponds to scissors.
+
+  Usually, this is not the best way to display the payoff matrices. First of all, we need two write out two matrices, and there isn't an easy way to indicate what row corresponds to what decision. Instead, we usually write this as a table.
+  \begin{center}
+    \begin{tabular}{cccc}
+      \toprule
+      & R & P & S\\
+      \midrule
+      R & $(0, 0)$ & $(-1, 1)$ & $(1, -1)$\\
+      P & $(1, -1)$ & $(0, 0)$ & $(-1, 1)$\\
+      S & $(-1, 1)$ & $(1, -1)$ & $(0, 0)$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  By convention, the first item in the tuple $(-1, 1)$ indicates the payoff of the row player, and the second item indicates the payoff of the column player.
+\end{eg}
 \begin{defi}[Strategy]
   Players are allowed to play randomly. The set of \emph{strategies} the row player can have is
   \[
@@ -1168,8 +1230,6 @@ Here we have a short digression to game theory. We mostly focus on games with tw
       \bottomrule
     \end{tabular}
   \end{center}
-  For example, if the row player chooses $S$ and the column player chooses $T$, then the payoff of the row player is $0$ and the payoff of the column player is $3$.
-
   Note that higher payoff is desired, so a longer serving time corresponds to a lower payoff. Also, payoffs are interpreted relatively, so replacing $(0, 3)$ with $(0, 100)$ (and $(3, 0)$ with $(100, 0)$) in the payoff table would make no difference.
 
   Here we see that regardless of what the other person does, it is always strictly better to testify than not (unless you want to be nice). We say $T$ is a \emph{dominant strategy}, and $(1, 1)$ is \emph{Pareto dominated} by $(2, 2)$.
@@ -1193,7 +1253,7 @@ Here we have a short digression to game theory. We mostly focus on games with tw
   \[
     \max_{x\in X}\min_{y\in Y} p(x, y) = \max_{x\in X}\min_{j\in \{1, \ldots, n\}} \sum_{i = 1}^m x_i p_{ij}.
   \]
-  This is the strategy the row player can employ that minimizes the possible loss. This is called the maximin strategy.
+  Such an $x$ is the strategy the row player can employ that minimizes the worst possible loss. This is called the maximin strategy.
 
   We can formulate this as a linear program:
   \begin{center}
@@ -1222,12 +1282,18 @@ Here we have a short digression to game theory. We mostly focus on games with tw
 \begin{thm}[Nash, 1961]
   Every bimatrix game has an equilibrium.
 \end{thm}
+We are not proving this since it is too hard.
 
 \subsection{The minimax theorem}
+There is a special type of game known as a \emph{zero sum game}.
 \begin{defi}[Zero-sum game]
   A bimatrix game is a \emph{zero-sum game}, or matrix game, if $q_{ij} = -p_{ij}$ for all $i, j$, ie. the total payoff is always 0.
 \end{defi}
 To specify a matrix game, we only need one matrix, not two, since the matrix of the other player is simply the negative of the matrix of the first.
+
+\begin{eg}
+  The rock-paper-scissors games as specified in the beginning example is a zero-sum game.
+\end{eg}
 
 \begin{thm}[von Neumann, 1928]
   If $P\in \R^{m\times n}$. Then
@@ -1240,7 +1306,7 @@ To specify a matrix game, we only need one matrix, not two, since the matrix of 
   \]
   The left hand side is the worst payoff the row player can get if he employs the minimax strategy. The right hand side is the worst payoff the column player can get if he uses his minimax strategy.
 
-  The theorem says that if both players employ the minimax strategy, then this is an equilibrium.
+  The theorem then says that if both players employ the minimax strategy, then this is an equilibrium.
 \end{thm}
 
 \begin{proof}
@@ -1289,7 +1355,7 @@ Proof is in the second example sheet.
 
 \section{Network problems}
 \subsection{Definitions}
-We will need some definitions from graph theory.
+We are going to look into several problems that involve graphs. Unsurprisingly, we will need some definitions from graph theory.
 \begin{defi}[Directed graph/network]
   A \emph{directed graph} or \emph{network} is a pair $G = (V, E)$, where $V$ is the set of vertices and $E\subseteq V\times V$ is the set of edges. If $(u, v)\in E$, we say there is an edge from $u$ to $v$.
 \end{defi}
@@ -1352,16 +1418,18 @@ However, using this huge matrix to solve this problem by the simplex method is n
 
 Note that for the system to make sense, we must have
 \[
-  \sum_{i\in V}b_i = 0.
+  \sum_{i\in V}b_i = 0,
 \]
-To simplify the problem, we can convert it into an equivalent \emph{circulation problem}, where $b_i = 0$ for all $i$. We do this by adding an additional vertex where we send all the extra $b_i$ to. (eg if a vertex has $b_i = -1$, then it takes in more stuff than it gives out, so we can mandate it to send out one extra unit to the additional vertex, and then $b_i = 0$).
+ie. the total supply is equal to the total consumption.
 
-An \emph{uncapacitated problem} is a case where $\underline{m}_{ij} = 0$ and $\overline{m}_{ij} = \infty$ for all $(i, j) \in E$. An uncapacitated problem is either unbounded or bounded. If it is bounded, then it is equivalent to a problem with finite capacities, since we can add a bound greater than what the optimal solution wants.
+To simplify the problem, we can convert it into an equivalent \emph{circulation problem}, where $b_i = 0$ for all $i$. We do this by adding an additional vertex where we send all the extra $b_i$ to. For example, if a vertex has $b_i = -1$, then it takes in more stuff than it gives out. So we can mandate it to send out one extra unit to the additional vertex. Then $b_i = 0$.
+
+An \emph{uncapacitated problem} is the case where $\underline{m}_{ij} = 0$ and $\overline{m}_{ij} = \infty$ for all $(i, j) \in E$. An uncapacitated problem is either unbounded or bounded. If it is bounded, then it is equivalent to a problem with finite capacities, since we can add a bound greater than what the optimal solution wants.
 
 We are going to show that this can be reduced to a simpler problem:
 
 \subsection{The transportation problem}
-The transportation problem is a special case of the minimum-flow problem, where the graph is a \emph{bipartite graph}, ie. we can split the vertices into two halves $A, B$, where all edges flow from a vertex in $A$ to a vertex in $B$. We call the vertices of $A$ the \emph{suppliers} and the vertices of $B$ the \emph{consumers}.
+The transportation problem is a special case of the minimum-flow problem, where the graph is a \emph{bipartite graph}. In other words, we can split the vertices into two halves $A, B$, where all edges flow from a vertex in $A$ to a vertex in $B$. We call the vertices of $A$ the \emph{suppliers} and the vertices of $B$ the \emph{consumers}.
 
 In this case, we can write the problem as
 \begin{center}
@@ -1380,14 +1448,14 @@ This $s_i$ is the supply of each supplier, and $d_i$ is the demand of each suppl
 
 Finally, we have $c\in \R^{n\times m}$ representing the cost of transferal.
 
-We now claim that every (bounded) minimum cost-flow problem can be reduced to the transportation problem.
+We now show that every (bounded) minimum cost-flow problem can be reduced to the transportation problem.
 
 \begin{thm}[]
   Every minimum cost-flow problem with finite capacities or non-negative costs has an equivalent transportation problem.
 \end{thm}
 
 \begin{proof}
-  Consider a minimum-cost flow problem on network $(V, E)$. It is wlog to assume that $\underline{m}_{ij} = 0$ for all $(i, j) \in E$. Otherwise, $\underline{m}_{ij}$ to $0$, $\overline{m}_{ij}$ to $\overline{m}_{ij} - \underline{m}_{ij}$, $b_i$ to $b_i - \underline{m}_{ij}$, $b_j$ to $b_j + \underline{m}_{ij}$, $x_{ij}$ to $x_{ij} - \underline{m}_{ij}$. Intuitively, we just secretly ship the minimum amount without letting the network know.
+  Consider a minimum-cost flow problem on network $(V, E)$. It is wlog to assume that $\underline{m}_{ij} = 0$ for all $(i, j) \in E$. Otherwise, set $\underline{m}_{ij}$ to $0$, $\overline{m}_{ij}$ to $\overline{m}_{ij} - \underline{m}_{ij}$, $b_i$ to $b_i - \underline{m}_{ij}$, $b_j$ to $b_j + \underline{m}_{ij}$, $x_{ij}$ to $x_{ij} - \underline{m}_{ij}$. Intuitively, we just secretly ship the minimum amount without letting the network know.
 
   Moreover, we can assume that all capacities are finite: if some edge has infinite capacity but non-negative cost, then setting the capacity to a large enough number, for example $\sum_{i \in V}|b_i|$ does not affect the optimal solutions. This is since cost is non-negative, and the optimal solution will not want shipping loops. So we will have at most $\sum |b_i|$ shipments.
 
@@ -1414,17 +1482,17 @@ We now claim that every (bounded) minimum cost-flow problem can be reduced to th
 
   For any flow $x$ in the original network, the corresponding flow on $(ij, j)$ is $x_{ij}$ and the flow on $(ij, i)$ is $\overline{m}_{ij} - x_{ij}$.  The total flow into $i$ is then
   \[
-   \sum_{k: (i, j)\in E}(\overline{m}_{ik} - x_{ij}) + \sum_{k: (k, i)\in E}x_{ki}
+   \sum_{k: (i, k)\in E}(\overline{m}_{ik} - x_{ik}) + \sum_{k: (k, i)\in E}x_{ki}
   \]
   This satisfies the constraints of the new network if and only if
   \[
-   \sum_{k: (i, j)\in E}(\overline{m}_{ik} - x_{ij}) + \sum_{k: (k, i)\in E}x_{ki} = \sum_{k: (i, k)\in E}\overline{m}_{ik} - b_i,
+   jsum_{k: (i, k)\in E}(\overline{m}_{ik} - x_{ik}) + \sum_{k: (k, i)\in E}x_{ki} = \sum_{k: (i, k)\in E}\overline{m}_{ik} - b_i,
   \]
   which is true if and only if
   \[
     b_i + \sum_{k:(k, i)\in E}x_{ki} - \sum_{k: (i, k)\in E}x_{ik} = 0,
   \]
-  which is exactly the constraint for the node $i$ in the original minimal-cost flow problem.
+  which is exactly the constraint for the node $i$ in the original minimal-cost flow problem. So done.
 \end{proof}
 To solve the transportation problem, it is convenient to have two sets of Lagrange multipliers, one for the supplier constraints and one for the consumer constraint. Then the Lagrangian of the transportation problem can be written as
 \[
@@ -1436,7 +1504,7 @@ This is equivalent to
 \[
   L(x, \lambda, \mu) = \sum_{i = 1}^n \sum_{j = 1}^n (c_{ij} - \lambda_i + \mu_j)x_{ij} + \sum_{i = 1}^n \lambda_i s_i - \sum_{j = 1}^m \mu_j d_j.
 \]
-Since is $x \geq 0$, the Lagrangian has a finite minimum iff $c_{ij} - \lambda_i + \mu_j \geq 0$ for all $i, j$. So this is our dual feasibility condition.
+Since $x \geq 0$, the Lagrangian has a finite minimum iff $c_{ij} - \lambda_i + \mu_j \geq 0$ for all $i, j$. So this is our dual feasibility condition.
 
 At an optimum, complementary slackness entails that
 \[
@@ -1577,7 +1645,7 @@ We have a row for each supplier and a column for each consumer.
       \draw [->] (s2) -- (d3) node [pos=0.5, above] {\tiny 7};
       \draw [->] (s3) -- (d3) node [pos=0.5, above] {\tiny 1};
       \draw [->] (s3) -- (d4) node [pos=0.5, above] {\tiny 8};
-      \draw [dashed, ->] (s2) -- (d1) node [pos=0.3, above] {\tiny $\delta$};
+      \draw [mred, dashed, ->] (s2) -- (d1) node [pos=0.3, above] {\tiny $\delta$};
     \end{tikzpicture}
   \end{center}
   The maximum value of $\delta$ we can take is $3$. So we end up with
@@ -1663,10 +1731,11 @@ We can write this is problem as
     0 \leq x_{ij}\leq C_{ij}\quad \text{ for each }(i, j)\in E.
   \]
 \end{center}
-However, we don't have to turn it into a minimum-cost flow problem. There are easier ways to solve the problem, using the \emph{max-flow min-cut theorem}.
+Here $\delta$ is the total flow from $1$ to $n$.
 
-\subsubsection{The max-flow min-cut theorem}
+While we can apply our results from the minimum-cost flow problem, we don't have to do so. There are easier ways to solve the problem, using the \emph{max-flow min-cut theorem}.
 
+First we need to define a cut.
 \begin{defi}[Cut]
   Suppose $G = (V, E)$ with capacities $C_{ij}$ for $(i, j)\in E$. A \emph{cut} of $G$ is a partition of $V$ into two sets.
 
@@ -1674,7 +1743,7 @@ However, we don't have to turn it into a minimum-cost flow problem. There are ea
   \[
     C(S) = \sum_{(i, j)\in (S\times (V\setminus S))\cap E}C_{ij},
   \]
-  ie. the total capacity of the edges ``cut apart'' by the cut.
+  All this clumsy notation says is that we add up the capacities of all edges from $S$ to $V\setminus S$.
 \end{defi}
 
 Assume $x$ is a feasible flow vector that sends $\delta$ units from $1$ to $n$. For $X, Y\subseteq V$, we define
@@ -1683,11 +1752,11 @@ Assume $x$ is a feasible flow vector that sends $\delta$ units from $1$ to $n$. 
 \]
 ie. the overall amount of flow from $X$ to $Y$.
 
-Then for any cut $S\subseteq V$ with $1\in S, n\in V\setminus S$, we claim that
+For any solution $x_{ij}$ and cut $S\subseteq V$ with $1\in S, n\in V\setminus S$, the total flow from $1$ to $n$ can be written as
 \[
   \delta = \sum_{i\in S}\left(\sum_{j: (i, j)\in E}x_{ij} - \sum_{j: (j, i)\in E}x_{ji}\right).
 \]
-This is true since by flow conservation, for any $i \not= 1$, $\sum_{j: (i, j) \in E}x_{ij} - \sum_{j: (j, i)\in E} = 0$, and for $i = 1$, it is $\delta$. So the sum is $\delta$. Hence
+This is true since by flow conservation, for any $i \not= 1$, $\sum\limits_{j: (i, j) \in E}x_{ij} - \sum\limits_{j: (j, i)\in E}x_{ji} = 0$, and for $i = 1$, it is $\delta$. So the sum is $\delta$. Hence
 \begin{align*}
   \delta &= f_x(S, V) - f_x(V, S)\\
   &= f_x(S, S) + f_x(S, V\setminus S) - f_x(V\setminus S, S) - f_x(S, S)\\
@@ -1695,7 +1764,7 @@ This is true since by flow conservation, for any $i \not= 1$, $\sum_{j: (i, j) \
   &\leq f_x(S, V\setminus S)\\
   &\leq C(S)
 \end{align*}
-This says that the flow through the cut is less than the capacity through the cut, which is obviously true.
+This says that the flow through the cut is less than the capacity of the cut, which is obviously true. The less obvious result is that this bound is tight, ie. there is always a cut $S$ such that $\delta = C(S)$.
 
 \begin{thm}[Max-flow min-cut theorem]
   Let $\delta$ be an optimal solution. Then
@@ -1729,15 +1798,16 @@ This says that the flow through the cut is less than the capacity through the cu
   \]
 \end{proof}
 
-\subsubsection{Ford-Fulkerson algorithm}
-The algorithm is simple:
+The max-flow min-cut theorem does not tell us \emph{how} to find an optimal path. Instead, it provides a quick way to confirm that our path is optimal.
+
+It turns out that it isn't difficult to find an optimal solution. We simply keep adding flow along augmenting paths until we cannot do so. This is known as the \emph{Ford-Fulkerson algorithm}.
+
 \begin{enumerate}
   \item Start from a feasible flow $x$, eg. $x = \mathbf{0}$.
   \item If there is no augmenting path for $x$ form $1$ to $n$, then $x$ is optimal.
-  \item Find an augmenting path for $x$ from $1$ to $n$, and send a maximum amount of flow along it. Go to 2.
+  \item Find an augmenting path for $x$ from $1$ to $n$, and send a maximum amount of flow along it.
+  \item \texttt{GOTO} (ii).
 \end{enumerate}
-
-The max-flow min-cut theorem plays a role in step (ii). We can immediately prove that it is maximal by finding an appropriate cut.
 
 \begin{eg}
   Consider the diagram
