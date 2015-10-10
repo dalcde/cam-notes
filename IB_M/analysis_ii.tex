@@ -36,4 +36,149 @@ Definition and examples. *Metrics used in Geometry*. Limits, continuity, balls, 
 The contraction mapping theorem. Applications including the inverse function theorem (proof of continuity of inverse function, statement of differentiability). Picard's solution of differential equations.\hspace*{\fill} [4]}
 
 \tableofcontents
+
+\section{Uniform convergence}
+Here we are concerned with sequences of functions. In general, let $E$ be any set, and $f_n: E\to \R$ for $n = 1, 2, \cdots$. Suppose for all $x\in E$, the sequence $(f_n(x))$ of real numbers converges (to some element in the real line).
+
+We can define $f: E \to \R$ by $f(x) = \lim\limits_{n \to \infty} f_n(x)$. We say that $f_n$ converges \emph{pointwise} to $f$.
+
+\begin{defi}[Pointwise convergence]
+  The sequence $f_n$ converges \emph{pointwise} to $f$ if
+  \[
+    f(x) = \lim_{n\to \infty} f(x)
+  \]
+  for all $x$.
+\end{defi}
+
+Ideally, We want to deduce properties of $f$ from properties of $f_n$. For example, it would be great that continuity of all $f_n$ implies continuity of $f$, and similarly for integrability and values of derivatives and integrals. However, it turns out we cannot. The notion of pointwise convergence is too weak. We will look at many examples where $f$ fails to preserve the properties of $f_n$.
+
+\begin{eg}
+  Let $f_n: [-1, 1] \to \R$ be defined by $f_n(x) = x^{1/(2n + 1)}$. These are all continuous, but the limit function is
+  \[
+    f_n(x) \to f(x) =
+    \begin{cases}
+      1 & 0 < x \leq 1\\
+      0 & x = 1\\
+      -1 & -1 \leq x < 0
+    \end{cases},
+  \]
+  which is not continuous.
+\end{eg}
+
+\begin{eg}
+  Let $f_n: [0, 1] \to \R$ be the piecewise linear function formed by joining $(0, 0), (\frac{1}{n}, n), (\frac{2}{n}, 0)$ and $(1, 0)$.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (0, 0) -- (4, 0) node [right] {$x$};
+      \draw [->] (0, 0) -- (0, 3) node [above] {$y$};
+      \draw [thick, mred] (0, 0) -- (0.7, 2) -- (1.4, 0) -- (4, 0);
+      \node [anchor = north east] {$0$};
+      \node at (1.4, 0) [below] {$\frac{2}{n}$};
+      \draw [dashed] (0.7, 0) node [below] {$\frac{1}{n}$} -- (0.7, 2) -- (0, 2) node [left] {$n$};
+    \end{tikzpicture}
+  \end{center}
+  The pointwise limit of this function is $f_n(x) \to f(x) = 0$. However, we have
+  \[
+    \int_0^a f_n(x)\;\d x = 1\text{ for all }n;\quad \int_0^1 f(x) \;\d x = 0.
+  \]
+  So the limit of the integral is not the integral of the limit.
+\end{eg}
+
+\begin{eg}
+  Let $f_n: [0, 1] \to \R$ be defined as
+  \[
+    f_n (x) =
+    \begin{cases}
+      1 & n!x \in \Z\\
+      0 & \text{otherwise}
+    \end{cases}
+  \]
+  Since $f_n$ has finitely many discontinuities, it is Riemann integrable. However, the limit is
+  \[
+    f_n(x) \to f(x) =
+    \begin{cases}
+      1 & x\in \Q\\
+      0 & x\not\in \Q
+    \end{cases}
+  \]
+  which is not integrable. So integrability of a function is not preserved by pointwise limits.
+\end{eg}
+This suggests that we need a stronger notion of convergence. Of course, we don't want this notion to be too strong. For example, we could define $f_n \to f$ to mean ``$f_n = f$ for all sufficiently large $n$'', then any property common to $f_n$ is obviously inherited by the limit. However, this is clearly silly since only the most trivial sequences would converge.
+
+Hence we want to find a middle ground between the two cases - a notion of convergence that is sufficiently strong to preserve most interesting properties, without being too trivial. This is uniform convergence.
+
+\begin{defi}[Uniform convergence.]
+  A sequence of functions $f_n: E\to \R$ converges \emph{uniformly} to $f$ if
+  \[
+    (\forall \varepsilon)(\exists N)(\forall x)(\forall n > N)\; |f_n(x) - f(x)| < \varepsilon.
+  \]
+  Alternatively, we can say
+  \[
+    (\forall \varepsilon)(\exists N)(\forall n > N)\; \sup_{x\in E} |f_n(x) - f(x)| < \varepsilon.
+  \]
+\end{defi}
+We can compare this with the definition of pointwise convergence:
+\[
+  (\forall \varepsilon)(\forall x)(\exists N)(\forall n > N)\;  |f_n(x) - f(x)| < \varepsilon.
+\]
+The only difference is in where there $(\forall x)$ sits, and this is what makes all the difference. Uniform convergence requires that there is an $N$ that works for \emph{every} $x$, while pointwise convergence just requires that for each $x$, we can find an $N$ that works.
+
+It should now be clear from definition that if $f_n \to f$ uniformly, then $f_n \to f$ pointwise. We will show that the converse is false:
+\begin{eg}
+  Again consider our first example, where $f_n: [-1, 1] \to \R$ is defined by $f_n(x) = x^{1/(2n + 1)}$. If the uniform limit existed, then it must be given by
+  \[
+    f_n(x) \to f(x) =
+    \begin{cases}
+      1 & 0 < x \leq 1\\
+      0 & x = 1\\
+      -1 & -1 \leq x < 0
+    \end{cases},
+  \]
+  since uniform convergence implies pointwise convergence.
+
+  We will show that we don't have uniform convergence. Pick $\varepsilon = \frac{1}{4}$. Then for each $n$, $x = 2^{-(2n + 1)}$ will have $f_n(x) = \frac{1}{2}$, $f(x) = 1$. So there is some $x$ such that $|f_n(x) - f(x)| > \varepsilon$. So $f_n \not\to f$ uniformly.
+\end{eg}
+
+\begin{eg}
+  Let $f_n: \R \to \R$ be defined by $f_n (x) = \frac{x}{n}$. Then $f_n(x) \to f(x) = 0$ pointwise. However, this convergence is not uniform in $\R$ since $|f_n(x) - f(x)| = \frac{|x|}{n}$, and this can be arbitrarily large for any $n$.
+
+  However, if we restrict $f_n$ to a bounded domain, then the convergence is uniform. Let the domain be $[-a, a]$ for some positive, finite $a$. Then
+  \[
+    \sup |f_n(x) - f(x)| = \frac{|x|}{n} \leq \frac{a}{n}.
+  \]
+  So given $\varepsilon$, pick $N$ such that $N > \frac{a}{\varepsilon}$, and we are done.
+\end{eg}
+
+Recall that for sequences of normal numbers, we have normal convergence and Cauchy convergence, which we proved to be the same. Then clearly pointwise convergence and pointwise Cauchy convergence of functions are equivalent. We will now look into the case of uniform convergence.
+
+\begin{defi}[Uniformly Cauchy sequence]
+  A sequence $f_n: E\to \R$ of functions is \emph{uniformly Cauchy} if
+  \[
+    (\forall \varepsilon > 0)(\exists N)(\forall m,n > N)\;\sup_{x\in E}|f_n(x) - f_m(x)| < \varepsilon.
+  \]
+\end{defi}
+
+Our first theorem will be that uniform Cauchy convergence and uniform convergence are equivalent.
+
+\begin{thm}[]
+  Let $f_n: E\to \R$ be a sequence of functions. Then $(f_n)$ converges uniformly if and only if $(f_n)$ is uniformly Cauchy.
+\end{thm}
+
+\begin{proof}
+  First suppose that $f_n \to f$ uniformly. Given $\varepsilon$, we know that there is some $N$ such that
+  \[
+    (\forall n > N)\; \sup_{x\in E} |f_n(x) - f(x)| < \frac{\varepsilon}{2}.
+  \]
+  Then if $n, m > N$, $x\in E$ we have
+  \[
+    |f_n(x) - f_m(x)| \leq |f_n(x) - f(x)| + |f_m(x) - f(x)| < \varepsilon.
+  \]
+  So done.
+
+  Now suppose $(f_n)$ is uniformly Cauchy. Then $(f_n(x))$ is Cauchy for all $x$. So it converges. Let
+  \[
+    f(x) = \lim_{n\to \infty}f_n(x).
+  \]
+  We want to show that $f_n \to f$ uniformly. Given $\varepsilon > 0$, choose $N$ such that whenever $n, m > N$, $x\in E$, we have $|f_n(x) - f_m(x)| < \frac{\varepsilon}{2}$. Letting $m\to \infty$, $f_m(x) \to f(x)$. So we have $|f_n(x) - f(x)| \leq \frac{\varepsilon}{2} < \varepsilon$. So done.
+\end{proof}
 \end{document}

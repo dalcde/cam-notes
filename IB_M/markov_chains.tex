@@ -25,4 +25,86 @@ Definition and basic properties, the transition matrix. Calculation of $n$-step 
 \noindent Time reversal, detailed balance, reversibility, random walk on a graph.\hspace*{\fill} [1]}
 
 \tableofcontents
+\setcounter{section}{-1}
+\section{Introduction}
+So far, in IA Probability, we have always dealt with one random variable, or numerous independent variables, and we were able to handle them. However, in real life, things often \emph{are} dependent, and things become much more difficult. There are many ways in which variables can be dependent. Their dependence can be very complicated, or very simple. We don't really know what to do with them.
+
+This is similar to our study of functions. We can develop theories about continuous functions, increasing functions, or differentiable functions, but if we are just given a random function without assuming anything about it, there really isn't much we can do.
+
+Hence, in this course, we are just going to study a particular kind of dependent variables. In fact, in IA Probability, we did encounter some of these. For example, we dealt with random walks, in which the next position depends on the previous position. This gives us some dependent random variables, but they are dependent in a very simple way.
+
+In reality, a random walk is too simple of a model to describe the world. We need something more general, and these are known as \emph{Markov chains}. These are random distributions that satisfy the \emph{Markov assumption}. This assumption, intuitively, says that the future depends only upon the current state, and not how we got to the current state.
+
+\section{The Markov property}
+\begin{defi}[Markov chain]
+  Let $\mathbf{X} = (X_0, X_1, \cdots)$ be a sequence of random variables taking values in some set $S$, the \emph{state space}. We assume that $S$ is countable (which could be finite). $\mathbf{X}$ has the \emph{Markov property} if
+  \[
+    \P(X_{n + 1} = i_{n + 1} | X_0 = i_0, \cdots, X_n = i_n) = \P(X_{n + 1} = i_{n + 1} | X_n = i_n)
+  \]
+  for all $n\geq 0, i_0,\cdots, i_{n + 1}\in S$.
+
+  If $\mathbf{X}$ has the Markov property, we call it a \emph{Markov chain}.
+
+  We say that a Markov chain $\mathbf{X}$ is \emph{homogeneous} if the conditional probabilities $\P(X_{n + 1} = j | X_n = i)$ do not depend on $n$.
+\end{defi}
+All our chains $\mathbf{X}$ will be Markov and homogeneous unless otherwise specified.
+
+\begin{eg}\leavevmode
+  \begin{enumerate}
+    \item A random walk is a Markov chain.
+    \item The branching process is a Markov chain.
+  \end{enumerate}
+\end{eg}
+
+In general, to fully specify a (homogeneous) Markov chain, we will need two items:
+\begin{enumerate}
+  \item The initial distribution $\lambda_i = \P(X_0 = i)$. We can write this as a vector $\lambda = (\lambda_i: i \in S)$.
+  \item The transition probabilities $p_{ij} = \P(X_{n + 1} = j | X_n = i)$. We can write this as a matrix $P = (p_{ij})_{i, j\in S}$.
+\end{enumerate}
+
+There are some preliminary properties we know about these items. They are what decide whether a pair $(\lambda, P)$ actually specify a Markov chain.
+\begin{prop}\leavevmode
+  \begin{enumerate}
+    \item $\lambda$ is a \emph{distribution}, ie. $\lambda_i \geq 0, \sum_i \lambda_i = 1$.
+    \item $P$ is a \emph{stochastic matrix}, ie. $p_{ij} \geq 0$ and $\sum_j p_{ij} = 1$ for all $i$.
+  \end{enumerate}
+\end{prop}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item Obvious since $\lambda$ is a probability distribution.
+    \item $p_{ij} \geq 0$ since $p_{ij}$ is a probability. We also have
+      \[
+        \sum_j p_{ij} = \sum_j \P(X_{1} = j | X_0 = i) = 1
+      \]
+      since $\P(X_1 = \cdot | X_0 = i)$ is a probability distribution function.
+  \end{enumerate}
+\end{proof}
+Note that we only require the row sum to be $1$, and the column sum need not be.
+
+We will prove another seemingly obvious fact.
+\begin{thm}
+  Let $\lambda$ be a distribution (on $S$) and $P$ a stochastic matrix. The sequence $\mathbf{X} = (X_0, X_1, \cdots)$ is a Markov chain with initial distribution $\lambda$ and transition matrix $P$ iff
+  \[
+    \P(X_0 = i, X_1 = i_1, \cdots, X_n = i_n) = \lambda_{i_0}p_{i_0 i_1}p_{i_1i_2}\cdots p_{i_{n - 1}i_n}\tag{*}
+  \]
+  for all $n, i_0, \cdots, i_n$
+\end{thm}
+\begin{proof}
+  Let $A_k$ be the event $X_k = i_k$. Then we can write $(*)$ as
+  \[
+    \P(A_0\cap A_1\cap\cdots \cap A_n) = \lambda_{i_0}p_{i_0 i_1}p_{i_1i_2}\cdots p_{i_{n - 1}i_n}. \tag{*}
+  \]
+  We first assume that $\mathbf{X}$ is a Markov chain. We prove $(*)$ by induction on $n$.
+
+  When $n = 0$, $(*)$ says $\P(A_0) = \lambda_{i_0}$. This is true by definition of $\lambda$.
+
+  Assume that it is true for all $n < N$. Then
+  \begin{align*}
+    \P(A_0 \cap A_1 \cap \cdots \cap A_N) &= \P(A_0,\cdots, A_{N - 1})\P(A_0, \cdots., A_n | A_0, \cdots, A_{N - 1})\\
+    &= \lambda_{i_0} p_{i_0 i_1}\cdots p_{i_{N - 2}i_{N - 1}} \P(A_{N} | A_0,\cdots, A_{N - 1})\\
+    &= \lambda_{i_0} p_{i_0 i_1}\cdots p_{i_{N - 2}i_{N - 1}} \P(A_{N} | A_{N - 1})\\
+    &= \lambda_{i_0}p_{i_0 i_1}p_{i_1i_2}\cdots p_{i_{N - 1}i_N}.
+  \end{align*}
+\end{proof}
 \end{document}
