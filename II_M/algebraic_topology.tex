@@ -39,13 +39,13 @@ The homology groups of $S^n$, applications including Brouwer's fixed-point theor
 
 \setcounter{section}{-1}
 \section{Introduction}
-In topology, a typical problem is that we have two spaces $X$ and $Y$, and we want to know if $X\simeq Y$, ie. if $X$ and $Y$ are homeomorphic. If they are homeomorphic, we can easily show this by writing down a homeomorphism. But what if they are not? How can we prove that two spaces are not homeomorphic?
+In topology, a typical problem is that we have two spaces $X$ and $Y$, and we want to know if $X\cong Y$, ie. if $X$ and $Y$ are homeomorphic. If they are homeomorphic, we can easily show this by writing down a homeomorphism. But what if they are not? How can we prove that two spaces are not homeomorphic?
 
 For example, are $\R^m$ and $\R^n$ homeomorphic (for $m\not= n$)? Intuitively, they should not be, since they have different dimensions, and in fact they are. But how can we actually prove this?
 
 The idea of algebraic topology is to translate these non-existence problems in topology to non-existence problems in algebra. It turns out we are much better at algebra than topology. It is \emph{much} easier to show that two groups are not isomorphic.
 
-While the statement that $\R^m \not\simeq \R^n$ for $n \not= m$ is intuitively obvious, algebraic topology can be used to prove some less obvious results.
+While the statement that $\R^m \not\cong \R^n$ for $n \not= m$ is intuitively obvious, algebraic topology can be used to prove some less obvious results.
 
 Let $D^n$ be the $n$ dimensional unit disk, and $S^{n - 1}$ be the $n-1$ dimensional unit sphere. We will be able to show that there is no continuous map $F: D^n \to S^{n - 1}$ such that the composition
 \[
@@ -112,7 +112,6 @@ To build cell complexes, we are not just glueing maps, but spaces.
       \draw [dashed] (2, -0.3) -- (-0.05, -0.23);
     \end{tikzpicture}
   \end{center}
-  % insert diagram.
 \end{defi}
 
 \begin{defi}[Cell complex]
@@ -190,7 +189,7 @@ This will be our first trick to translate topological spaces into groups.
 
 \setcounter{subsection}{-1}
 \subsection{Motivation}
-Recall that we wanted to prove that $\R^n \not\simeq \R^m$ for $n\not= m$. Let's first do the simple case, where $m = 1, n = 2$. We want to show that $\R\not\simeq \R^2$.
+Recall that we wanted to prove that $\R^n \not\cong \R^m$ for $n\not= m$. Let's first do the simple case, where $m = 1, n = 2$. We want to show that $\R\not\cong \R^2$.
 
 This is not hard. We know that $\R$ is a line, while $\R^2$ is a plane. Let's try to remove a point from each of them.  If we remove a point from $\R$, the space stops being path connected. However, removing a point does not have this effect on $\R^2$. Since being path connected is a topological property, we have now showed that $\R$ and $\R^2$ are not homeomorphic.
 
@@ -213,4 +212,421 @@ Consider a circle containing the origin in $\R^2 \setminus \{0\}$. If the origin
   \end{tikzpicture}
 \end{center}
 The strategy now is to exploit the fact that $\R^2 \setminus \{0\}$ has circles which cannot be deformed to points.
+
+\subsection{Homotopy}
+We have just talked about the notion of ``deforming'' circles to a point. We can think of a circle in $X$ as a map $S^1 \to X$, and we want to ``deform'' this map to a point. This process of deformation is known as \emph{homotopy}. Here we are going to use the interval $[0, 1]\subseteq \R $ a lot, and we will just call it $I$.
+\begin{notation}
+  \[
+    I = [0, 1]\subseteq \R.
+  \]
+\end{notation}
+
+\begin{defi}[Homotopy]
+  Let $f, g: X\to Y$ be maps. A \emph{homotopy} from $f$ to $g$ is a map
+  \[
+    H: X\times I \to Y
+  \]
+  such that
+  \[
+    H(x, 0) = f(x),\quad H(x, 1) = g(x).
+  \]
+  We think of the interval $I$ as time. For each time $t$, $H(\cdot, t)$ defines a map $X\to Y$. So we want to start from $f$, move with time, and eventually reach $g$.
+
+  If such an $H$ exists, we say $f$ is \emph{homotopic} to $g$, and write $f\simeq g$. If we want to make it explicit that the homotopy is $H$, we write $f \simeq_H g$.
+\end{defi}
+As mentioned at the beginning, by calling $H$ a map, we are requiring it to be continuous.
+
+Sometimes, we don't want a general homotopy. We might want to make sure that when we are deforming from a path $f$ to $g$, the end points of the path don't move. In general, we have
+\begin{defi}[Homotopy $\rel$ A]
+  $f$ is \emph{homotopic to} $g$ \emph{rel} $A$, written $f\simeq g\rel A$, if for all $a \in A\subseteq X$, we have
+  \[
+    H(a, t) = f(a) = g(a).
+  \]
+\end{defi}
+This notion will find itself useful later, but we don't have to pay too much attention to this yet.
+
+Our notation suggests that homotopy is an equivalence relation. Indeed, we have
+\begin{prop}
+  For spaces $X, Y$, and $A\subseteq X$, the ``homotopic $\rel A$'' relation is an equivalence relation. In particular, when $A = \emptyset$, homotopy is an equivalence relation.
+\end{prop}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item Reflexivity: $f \simeq f$ since $H(x, t) = f(x)$ is a homotopy.
+    \item Symmetry: is $H(x, t)$ is a homotopy from $f$ to $g$, then $H(x, 1 - t)$ is a homotopy from $g$ to $h$.
+    \item Transitivity: Suppose $f, g, h: X\to Y$ and $f\simeq_H g\rel A$, $g\simeq_{H'} h \rel A$. We want to show that $f\simeq h \rel A$. The idea is to ``glue'' the two maps together.
+
+      We know how to continuously deform $f$ to $g$, and from $g$ to $h$. So we just do these one after another.
+      We define $H'': X\times I \to Y$ by
+      \[
+        H(x, t) =
+        \begin{cases}
+          H(x, 2t) & 0 \leq t \leq \frac{1}{2}\\
+          H'(x, 2t - 1) & \frac{1}{2} \leq t \leq 1
+        \end{cases}
+      \]
+      This is well-defined since $H(x, 1) = g(x) = H'(x, 0)$. This is also continuous by the gluing lemma. It is easy to check that $H''$ is a homotopy $\rel A$.
+  \end{enumerate}
+\end{proof}
+
+We now have a notion of equivalence of maps - two maps are equivalent if they are homotopic. We can extend the notion of homotopy to spaces as well.
+
+Recall that when we defined homeomorphism, we required that there is some $f, g$ such that $f\circ g = \id$, $g\circ f = \id$. Here, we replace equality by homotopy.
+\begin{defi}[Homotopy equivalence]
+  A map $f: X\to Y$ is a \emph{homotopy equivalence} if there exists a $g: Y\to X$ such that $f\circ g \simeq \id_Y$ and $g\circ f \simeq \id_X$. We call $g$ a \emph{homotopy inverse} for $f$.
+
+  If a homotopy equivalence $f: X\to Y$ exists, we say that $X$ and $Y$ are homotopy equivalent and write $X\simeq Y$.
+\end{defi}
+We are soon going to prove that this is indeed an equivalence relation on spaces, but we first look at some examples of homotopy equivalent spaces. Clearly, homeomorphic spaces are homotopy equivalent. However, we will see that we can do much more ``violent'' things to a space and still be homotopy equivalent.
+\begin{eg}
+  Let $X = S^1$, $Y = \R^2 \setminus \{0\}$. We have a natural inclusion map $i: X\hookrightarrow Y$. To obtain a map $Y \to X$, we can project each point onto the circle.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (-2, 0) -- (2, 0);
+      \draw (0, -2) -- (0, 2);
+
+      \draw [fill=white] circle [radius=0.075];
+      \draw circle [radius=1.5];
+
+      \node [circ] at (1.06, 1.06) {};
+      \node [circ] at (2, 2) {};
+      \node at (1.06, 1.06) [right] {$r(y)$};
+      \node at (2, 2) [right] {$y$};
+      \draw [dashed] (0.053, 0.053) -- (2, 2);
+    \end{tikzpicture}
+  \end{center}
+  In particular, we define $r: Y\to X$ by
+  \[
+    r(y) = \frac{y}{\|y\|}.
+  \]
+  We immediately have $r\circ i = \id_X$. We will now see that $i\circ r \simeq \id_Y$. The composition $i\circ r$ first projects each object into $S^1$, and then includes it back into $\R^2 \setminus \{0\}$. So this is just the projection map. We can define a homotopy $H: Y\times I \to Y$ by
+  \[
+    H(y, t) = \frac{y}{t + (1 - t)\|y\|}.
+  \]
+  This is continuous, and $H(\cdot, 0) = i\circ r$, $H(\cdot, 1) = \id_Y$.
+\end{eg}
+As we have said, homotopy equivalence can do really ``violent'' things to a space. We started with a 2-dimensional $\R^2\setminus \{0\}$ space, and squashed it into a one-dimensional sphere.
+
+Hence we see that homotopy doesn't \emph{care} about dimensions. This seems to be a rather fundamental thing in geometry, and we are discarding it. So what is left? What does homotopy preserve?
+
+While $S^1$ and $\R^2 \setminus \{0\}$ seem rather different, they have something in common - they both have a ``hole''. We will later see that this is what homotopy preserves.
+
+\begin{eg}
+  Let $Y = \R^n$, $X = \{0\} = *$. Let $X\hookrightarrow Y$ be the inclusion map, and $r: Y\to X$ be the unique map that sends everything to $\{0\}$. Again, we have $r\circ i = \id_X$. We can also obtain a homotopy from $i \circ r$ to $\id_Y$ by
+  \[
+    H(y, t) = ty.
+  \]
+\end{eg}
+Again, from the point of view of homotopy theory, $\R^n$ is just the same as a point! You might think that this is something crazy to do - we have just given up a lot of structure of topological spaces. However, this turns out to be a really useful notion.
+
+In general things homotopic to a single point are known as \emph{contractible spaces}.
+\begin{notation}
+  $*$ denotes the one-point space $\{0\}$.
+\end{notation}
+
+\begin{defi}[Contractible space]
+  If $X\simeq *$, then $X$ is \emph{contractible}.
+\end{defi}
+
+We now show that homotopy of spaces is an equivalence relation. To do this, we first need a lemma.
+\begin{lemma}
+  Consider the spaces and arrows
+  \[
+    \begin{tikzcd}
+      X \ar[r, bend left, "f_0"] \ar[r, bend right, "f_1"'] & Y \ar[r, bend left, "g_0"] \ar[r, bend right, "g_1"'] & Z
+    \end{tikzcd}
+  \]
+  If $f_0\simeq_H f_1$ and $g_0\simeq_{H'} g_1$, then $g_0\circ f_0 \simeq g_1 \circ f_1$.
+\end{lemma}
+
+\begin{proof}
+  We will show that $g_0 \circ f_0 \simeq g_0 \circ f_1 \simeq g_1 \circ f_1$. Then we are done since homotopy between maps is an equivalence relation. So we need to write down two homotopies.
+
+  \begin{enumerate}
+    \item Consider the following composition:
+      \[
+        \begin{tikzcd}
+          X\times I \ar[r, "H"] & Y \ar[r, "g_0"] & Z
+        \end{tikzcd}
+      \]
+      It is easy to check that this is the first homotopy we need to show $g_0\circ f_0 = g_0 \circ f_1$.
+    \item The following composition is a homotopy from $g_0 \circ f_1$ to $g_1 \circ f_1$:
+      \[
+        \begin{tikzcd}
+          X\times I \ar[r, "f_1\times \id_I"] & Y\times I \ar[r, "H'"] & Z
+        \end{tikzcd}
+      \]
+  \end{enumerate}
+\end{proof}
+
+\begin{prop}
+  Homotopy on spaces is a equivalence relation.
+\end{prop}
+
+\begin{proof}(sketch)
+  Symmetry and reflexivity are trivial, and applying the previous lemma several times can show transitivity.
+\end{proof}
+
+\begin{defi}[Retraction]
+  Let $A\subseteq X$ be a subspace. A \emph{retraction} $r: X\to A$ is a map such that $r\circ i = \id_A$, where $i: A\hookrightarrow X$ is the inclusion.
+\end{defi}
+This map sends everything in $X$ to $A$ without mmoving things in $A$. Roughly speaking, if such a retraction exists, then $A$ is no more complicated than $X$.
+
+\begin{defi}{Deformation retraction}
+  The retraction $r$ is a \emph{deformation retraction} if $i\circ r \simeq \id_X$. Some authors requires that this homotopy is a homotopy rel $A$.
+\end{defi}
+Roughly, this says that $A$ is as complicated as $X$.
+
+\begin{eg}
+Take $X$ any space, and $A = \{x\}\subseteq X$. Then the constant map $r: X\to A$ is a retraction. If $X$ is contractible, then this is a deformation retract.
+\end{eg}
+
+\subsection{Paths}
+\begin{defi}[Path]
+  A \emph{path} in a space $X$ is a map $\gamma: I\to X$. If $\gamma(0) = x_0$ and $\gamma(1) = x_1$, we say $\gamma$ is a path from $x_0$ to $x_1$, and write $\gamma: x_0 \rightsquigarrow x_1$.
+
+  If $\gamma(0) = \gamma(1)$, then $\gamma$ is called a \emph{loop} (based at $x_0$).
+  \begin{center}
+    \begin{tikzpicture}
+      \draw plot [smooth cycle] coordinates {(-1.2, -0.7) (0, -0.7) (0.7, -1) (1.3, -0.9) (1.4, 0.6) (0.3, 0.9) (-1.7, 0.8)};
+
+      \node [circ] at (-1, 0.2) {};
+      \node [above] at (-1, 0.2) {$x_0$};
+      \node [circ] at (0.8, 0.1) {};
+      \node [above] at (0.8, 0.1) {$x_1$};
+      \draw plot [smooth] coordinates {(-1, 0.2) (-0.3, 0) (0.1, 0.3) (0.8, 0.1)};
+    \end{tikzpicture}
+  \end{center}
+\end{defi}
+Note that this map does not have to be injective. It can be self intersecting or do all sorts of weird stuff.
+
+Recall that the basic idea of algebraic topology is to assign to each space $X$ an (algebraic) object, which is (hopefully) easier to deal with. In homotopy theory, we do so using the idea of paths.
+
+To do so, we need to be able to perform operations on paths.
+\begin{defi}[Concatenation of paths]
+  If we have two paths $\gamma_1$ from $x_0$ to $x_1$; and $\gamma_2$ from $x_1$ to $x_2$, we define the \emph{concatenation to be}
+  \[
+    (\gamma_1\cdot \gamma_2)(t) =
+    \begin{cases}
+      \gamma(2t) & 0 \leq t \leq \frac{1}{2}\\
+      \gamma(2t - 1) & \frac{1}{2} \leq t \leq 1.
+    \end{cases}
+  \]
+  This is continuous by the gluing lemma.
+\end{defi}
+\begin{center}
+  \begin{tikzpicture}
+    \draw plot [smooth cycle] coordinates {(-2.4, -0.7) (0, -0.7) (1.4, -1) (2.6, -0.9) (2.8, 0.6) (0.6, 1.9) (-3.4, 0.8)};
+
+    \node [circ] at (-2, 0.2) {};
+    \node [above] at (-2, 0.2) {$x_0$};
+    \node [circ] at (-0.2, 0.1) {};
+    \node [above] at (-0.2, 0.1) {$x_1$};
+    \node [circ] at (2, 0.5) {};
+    \node [above] at (2, 0.5) {$x_2$};
+    \draw plot [smooth] coordinates {(-2, 0.2) (-1.3, 0) (-0.9, 0.3) (-0.2, 0.1) (1, 0.6) (2, 0.5)};
+  \end{tikzpicture}
+\end{center}
+\begin{defi}[Inverse of path]
+  The \emph{inverse} of path $\gamma: I \to X$ is defined by
+  \[
+    \gamma^{-1}(t) = \gamma(1 - t).
+  \]
+  This is exactly the same path but going in the opposite direction.
+\end{defi}
+
+What else do we need? We need an identity.
+\begin{defi}[Constant path]
+  The \emph{constant path} at a point $x\in X$ is given by $c_x(t) = x$.
+\end{defi}
+
+We haven't actually got a good algebraic system. We have $\gamma$ and $\gamma^{-1}$, but when we compose them, we get a path from $x_1$ to $x_2$ and back, and not the identity. Also, we are not able to combine arbitrary paths in a space.
+
+Before we make these into proper algebraic operations, we will talk bout something slightly different.
+
+\begin{defi}[Path components]
+  We can define a relation on $X$: $x_1 \sim x_2$ if there exists path from $x_1$ to $x_2$. By the concatenation, inverse and constant paths, $\sim$ is an equivalence relation. The equivalence classes $[x]$ are called \emph{path components}. We denote the quotient $X/{\sim}$ by $\pi_0(X)$.
+\end{defi}
+\begin{center}
+  \begin{tikzpicture}[scale=0.5]
+    \draw [fill=mblue, opacity=0.5] circle [radius = 1];
+    \draw (3, 2.5) [fill=mblue, opacity=0.5] circle [radius = 1.3];
+    \draw (6, 1) [fill=mblue, opacity=0.5] circle [radius = 1.2];
+  \end{tikzpicture}
+\end{center}
+In the above space, we have three path components.
+
+This isn't really a very useful definition, since most spaces we care about are path-connected, ie. only have one path component. However, this is a first step at associating \emph{something} to spaces. We can view this as a ``toy model'' for the more useful definitions we will later have.
+
+One important property of this $\pi_0$ is that not only does it associate a set to each topological space, but also associates a function between the corresponding sets to each continuous map.
+\begin{prop}
+  For any map $f: X\to Y$, there is a well-defined function
+  \[
+    \pi_0(f): \pi_0(X) \to \pi_0(Y),
+  \]
+  defined by
+  \[
+    \pi_0(f)([x]) = [f(x)].
+  \]
+  Furthermore,
+  \begin{enumerate}
+    \item If $f\sim g$, then $\pi_0(f) = \pi_0(g)$.
+    \item For any maps $\begin{tikzcd} A \ar[r, "h"] & B\ar[r, "k"] & C\end{tikzcd}$, we have $\pi_0(k\circ h) = \pi_0(k)\circ \pi_0 (h)$.
+    \item $\pi_0(\id_X) = \id_{\pi_0(x)}$
+  \end{enumerate}
+\end{prop}
+Proof is left as an easy exercise.
+
+\begin{cor}
+  If $f: X\to Y$ is a homotopy equivalence, then $\pi_0(f)$ is a bijection.
+\end{cor}
+
+\begin{eg}
+  The two point space $X = \{-1, 1\}$ is not contractible. Because $|\pi_0(X)|$, but $|\pi_0(*)| = 1$.
+\end{eg}
+This is a rather silly example, since we can easily prove it directly. However, this is an example to show how we can use these machinery to prove topological results.
+
+Now let's return to our operations on paths, and try to make them algebraic.
+
+\begin{defi}[Homotopy of paths]
+  Paths $\gamma, \gamma': I\to X$ are \emph{homotopic as paths} if they are homotopic rel $\{0, 1\}\subseteq I$, ie. the end points are fixed. We write $\gamma\simeq \gamma'$.
+\end{defi}
+\begin{center}
+  \begin{tikzpicture}
+    \draw plot [smooth cycle] coordinates {(-1.2, -0.7) (0, -0.7) (0.7, -1) (1.3, -0.9) (1.4, 0.6) (0.3, 1.2) (-1.7, 0.8)};
+
+    \node [circ] at (-1, 0.2) {};
+    \node [left] at (-1, 0.2) {$x_0$};
+    \node [circ] at (0.8, 0.1) {};
+    \node [right] at (0.8, 0.1) {$x_1$};
+    \draw [semithick, mred] plot [smooth] coordinates {(-1, 0.2) (-0.5, 0.6) (0.1, 0.8) (0.8, 0.1)};
+    \draw [semithick, mred!50!mblue] plot [smooth] coordinates {(-1, 0.2) (-0.3, 0) (0.1, 0.3) (0.8, 0.1)};
+    \draw [semithick, mblue] plot [smooth] coordinates {(-1, 0.2) (-0.3, -0.5) (0.4, -0.5) (0.8, 0.1)};
+  \end{tikzpicture}
+\end{center}
+Note that we would necessarily want to fix the two end points. Otherwise, if we allow end points to move, we can shrink any path into a constant path, and our definition of homotopy would be rather silly.
+
+This homotopy works well with our previous operations on paths.
+\begin{prop}
+  Let $\gamma_1, \gamma_2: I \to X$ be paths, $\gamma_1(1) = \gamma_2(0)$. Then if $\gamma_1\simeq \gamma_1'$ and $\gamma_2 \simeq \gamma_2'$, then $\gamma_1 \cdot \gamma_2 \simeq \gamma_1' \cdot \gamma_2'$.
+\end{prop}
+\begin{center}
+  \begin{tikzpicture}
+    \draw plot [smooth cycle] coordinates {(-2.4, -0.7) (0, -0.7) (1.4, -1) (2.6, -0.9) (2.8, 0.6) (0.6, 1.9) (-3.4, 0.8)};
+
+    \node [circ] at (-2, 0.2) {};
+    \node [anchor = south east] at (-2, 0.2) {$x_0$};
+    \node [circ] at (-0.2, 0.1) {};
+    \node [above] at (-0.2, 0.1) {$x_1$};
+    \node [circ] at (2, 0.5) {};
+    \node [above] at (2, 0.5) {$x_2$};
+    \draw [semithick, mred] (-2, 0.2) parabola bend (-1.1, -0.3) (-0.2, 0.1);
+    \draw [semithick, mred] (-0.2, 0.1) parabola bend (1, -0.5) (2, 0.5);
+
+    \draw [semithick, mblue] (-2, 0.2) parabola bend (-1.3, 0.7) (-0.2, 0.1);
+    \draw [semithick, mblue] (-0.2, 0.1) parabola bend (1.3, 0.7) (2, 0.5);
+
+    \node [mred, below] at (-1.1, -0.3) {$\gamma_1$};
+    \node [mred, below] at (1, -0.5) {$\gamma_2$};
+
+    \node [mblue, above] at (-1.3, 0.7) {$\gamma_1'$};
+    \node [mblue, above] at (1, 0.7) {$\gamma_2'$};
+  \end{tikzpicture}
+\end{center}
+
+\begin{proof}
+  Suppose that $\gamma_1 \simeq_{H_1}\gamma_1'$ and $\gamma_2\simeq_{H_2}\gamma_2'$. Then we have the diagram
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (0, 0) rectangle (2, 2);
+      \draw (2, 0) rectangle (4, 2);
+      \node at (1, 0) [below] {$\gamma_1$};
+      \node at (3, 0) [below] {$\gamma_2$};
+      \node at (1, 2) [above] {$\gamma_1'$};
+      \node at (3, 2) [above] {$\gamma_2'$};
+      \node at (0, 1) [left] {$x_0$};
+      \node at (2, 1) [left] {$x_1$};
+      \node at (4, 1) [right] {$x_2$};
+
+      \node at (1, 1) {\large $H_1$};
+      \node at (3, 1) {\large $H_2$};
+    \end{tikzpicture}
+  \end{center}
+  We can thus construct a homotopy by
+  \[
+    H(s, t) =
+    \begin{cases}
+      H_1(s, 2t) & 0 \leq t \leq \frac{1}{2}\\
+      H_2(s, 2t - 1) & \frac{1}{2} \leq t \leq 1
+    \end{cases}.
+  \]
+\end{proof}
+
+To solve all our previous problems about operations on paths not behaving well, we can look at paths \emph{up to homotopy}.
+\begin{prop}
+  Let $\gamma_0: x_0 \leadsto x_1, \gamma_1: x_1 \leadsto x_2, \gamma_2: x_2 \leadsto x_3$ be paths. Then
+  \begin{enumerate}
+    \item $(\gamma_0 \cdot \gamma_1)\cdot \gamma_2 \simeq \gamma_0 \cdot (\gamma_1\cdot \gamma_2)$
+    \item $\gamma_0 \cdot c_{x_1}\simeq \gamma_0 \simeq c_{x_0}\cdot \gamma_0$.
+    \item $\gamma_0 \cdot \gamma_0^{-1}\simeq c_{x_0}$ and $\gamma_0^{-1}\cdot \gamma_0 \simeq c_{x_1}$.
+  \end{enumerate}
+\end{prop}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item Consider the following diagram:
+      \begin{center}
+        \begin{tikzpicture}[scale=0.75]
+          \draw rectangle (4, 4);
+
+          \node at (0, 2) [left] {$x_0$};
+          \node at (4, 2) [right] {$x_3$};
+
+          \node [circ] at (1, 0) {};
+          \node [circ] at (2, 0) {};
+          \node [circ] at (2, 4) {};
+          \node [circ] at (3, 4) {};
+
+          \node [below] at (0.5, 0) {$\gamma_0$};
+          \node [below] at (1.5, 0) {$\gamma_1$};
+          \node [below] at (3, 0) {$\gamma_2$};
+
+          \node [above] at (1, 4) {$\gamma_0$};
+          \node [above] at (2.5, 4) {$\gamma_1$};
+          \node [above] at (3.5, 4) {$\gamma_2$};
+
+          \draw (1, 0) -- (2, 4) node [pos=0.5, left] {$x_1$};
+          \draw (2, 0) -- (3, 4) node [pos=0.5, left] {$x_2$};
+        \end{tikzpicture}
+      \end{center}
+    \item Consider the following diagram:
+      \begin{center}
+        \begin{tikzpicture}[scale=0.75]
+          \draw rectangle (4, 4);
+          \node [circ] at (2, 0) {};
+          \node at (1, 0) [below] {$\gamma_0$};
+          \node at (3, 0) [below] {$c_{x_1}$};
+          \node at (2, 4) [above] {$\gamma_0$};
+          \node at (0, 2) [left] {$x_0$};
+          \node at (4, 2) [right] {$x_1$};
+
+          \draw (2, 0) -- (4, 4) node [pos=0.5, left] {$x_1$};
+        \end{tikzpicture}
+      \end{center}
+    \item Consider the following diagram:
+      \begin{center}
+        \begin{tikzpicture}[scale=0.75]
+          \draw rectangle (4, 4);
+          \node [circ] at (2, 0) {};
+          \node at (1, 0) [below] {$\gamma_0$};
+          \node at (3, 0) [below] {$\gamma_0^{-1}$};
+          \node at (2, 4) [above] {$c_{x_0}$};
+          \node at (0, 2) [left] {$x_0$};
+          \node at (4, 2) [right] {$x_0$};
+
+          \draw (0, 4) -- (2, 0) -- (4, 4);
+        \end{tikzpicture}
+      \end{center}
+  \end{enumerate}
+\end{proof}
 \end{document}

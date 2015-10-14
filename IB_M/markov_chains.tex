@@ -106,5 +106,150 @@ We will prove another seemingly obvious fact.
     &= \lambda_{i_0} p_{i_0 i_1}\cdots p_{i_{N - 2}i_{N - 1}} \P(A_{N} | A_{N - 1})\\
     &= \lambda_{i_0}p_{i_0 i_1}p_{i_1i_2}\cdots p_{i_{N - 1}i_N}.
   \end{align*}
+  So it is true for $N$ as well. Hence we are done by induction.
+
+  Conversely, suppose that ($*$) holds. Then for $n = 0$, we have $\P(X_0 = i_0) = \lambda_{i_0}$. Otherwise
+  \begin{align*}
+    \P(X_n = i_n| X_0 = i_0, \cdots, X_{n - 1} = i_{n - 1}) &= \P(A_n | A_0 \cap \cdots\cap A_{n - 1})\\
+    &= \frac{\P(A_0\cap \cdots \cap A_n)}{\P(A_0\cap \cdots \cap A_{n - 1}}\\
+    &= p_{i_{n - 1}i_n}
+  \end{align*}
+  which is independent of $i_0, \cdots, i_{n - 2}$. So this is Markov.
 \end{proof}
+
+Often, we do not use the Markov property directly. Instead, we use the following:
+\begin{thm}[Extended Markov property]
+  Let $\mathbf{X}$ be a Markov chain. For $n \geq 0$, any $H$ given in terms of the past $\{X_i: i < n\}$, and any $F$ given in terms of the future $\{X_i: i > n\}$, we have
+  \[
+    \P(F| X_n = i, H) = \P(F| X_n = i).
+  \]
+\end{thm}
+To prove this, we need to stitch together many instances of the Markov property. Actual proof is omitted.
+
+\section{Transition probability}
+Recall that we specify the Markov chain by the \emph{one-step} transition probability,
+\[
+  p_{ij} = \P(X_{n + 1} = k: X_n = i).
+\]
+However, we don't always want to take 1 step. We might want to take 2 steps, 3 steps, or, in general, $n$ steps. We define
+\begin{defi}[$n$-step transition probability]
+  The $n$-step transition probability from $i$ to $j$ is
+  \[
+    p_{ij}(n) = \P(X_n = j| X_0 = i).
+  \]
+\end{defi}
+How do we compute these probabilities? We can consider the following question: what is $p_{ij}(m + n)$? We can think of this as a two-step process. We first go form $i$ to some unknown point $k$ after $m$ steps, and then travel from $k$ to $j$ after $n$ more steps. To find the probability to get from $i$ to $j$, we consider all possible routes from $i$ to $j$, and sum up all the probability of the paths. We have
+\begin{align*}
+  p_{ij}(m + n) &= \P(X_{m + n}| X_0 = i)\\
+  &= \sum_k \P(X_{m + n} = j| X_m = k, X_0 = i)\P(X_m = k| X_0 = i)\\
+  &= \sum_k \P(X_{m + n} = j| X_m = k)\P(X_m = k: X_0 = i)\\
+  &= \sum_k p_{ik}(m)p_{kj}(n)
+\end{align*}
+\begin{thm}[Chapman-Kolmogorov equation]
+  \[
+    p_{ij}(m + n) = \sum_{k\in S} p_{ik}(m) p_{kj}(n).
+  \]
+\end{thm}
+This formula is suspiciously familiar. It is just matrix multiplication!
+
+\begin{notation}
+  Write $P(m) = (p_{ij}(m))_{i, j\in S}$.
+\end{notation}
+Then we have
+\[
+  P(m + n) = P(m)P(n)
+\]
+In particular, we have
+\[
+  P(n) = P(1)P(n - 1) = \cdots = P(1)^n = P^n.
+\]
+This allows us to easily compute the $n$-step transition probability by matrix multiplication.
+
+\begin{eg}
+  Let $S = \{1, 2\}$, with
+  \[
+    P =
+    \begin{pmatrix}
+      1 - \alpha & \alpha\\
+      \beta & 1 - \beta
+    \end{pmatrix}
+  \]
+  We assume $0 < \alpha, \beta < 1$. We want to find the $n$-step transition probability.
+
+  We can achieve this via diagonalization. We can write $P$ as
+  \[
+    P = U^{-1}
+    \begin{pmatrix}
+      \kappa_1 & 0\\
+      0 & \kappa_2
+    \end{pmatrix}U,
+  \]
+  where the $\kappa_i$ are eigenvalues of $P$, and $U$ is composed of the eigenvectors.
+
+  To find the eigenvalues, we calculate
+  \[
+    \det (P - \lambda I) = (1 - \alpha - \lambda)(1 - \beta - \lambda) - \alpha\beta = 0.
+  \]
+  We solve this to obtain
+  \[
+    \kappa_1 = 1,\quad \kappa_2 = 1 - \alpha - \beta.
+  \]
+  Usually, the next thing to do would be to find the eigenvectors to obtain $U$. However, here we can cheat a bit and not do that. Using the diagonalization of $P$, we have
+  \[
+    P^n = U^{-1}
+    \begin{pmatrix}
+      \kappa_1^n & 0\\
+      0 & \kappa_2^n
+    \end{pmatrix}U.
+  \]
+  We can now attempt to compute $p_{12}$. We know that it must be of the form
+  \[
+    p_{12} = A\kappa_1^n + B\kappa_2^n = A + B(1 - \alpha - \beta)^n
+  \]
+  where $A$ and $B$ are constants coming from $U$ and $U^{-1}$. However, we know well that
+  \[
+    p_{12}(0) = 0,\quad p_{12}(1) = \alpha.
+  \]
+  So we obtain
+  \begin{align*}
+    A + B &= 0\\
+    A + B(a - \alpha - \beta) &= \alpha.
+  \end{align*}
+  This is something we can solve, and obtain
+  \[
+    p_{12}(n) = \frac{\alpha}{\alpha + \beta}(1 - (1 - \alpha - \beta)^n) = 1 - p_{11}(n).
+  \]
+  How about $p_{21}$ and $p_{22}$? Well we don't need additional work. We can obtain these simply by interchanging $\alpha$ and $\beta$. So we obtain
+  \[
+    P^n = \frac{1}{\alpha + \beta}
+    \begin{pmatrix}
+      \beta + \alpha(1 - \alpha - \beta)^n & \alpha - \alpha(1 - \alpha - \beta)^n\\
+      \alpha + \beta(1 - \beta - \alpha)^n & \beta - \beta(1 - \beta - \alpha)^n
+    \end{pmatrix}
+  \]
+  What happens as $n\to \infty$? We can take the limit and obtain
+  \[
+    P^n \to \frac{1}{\alpha + \beta}
+    \begin{pmatrix}
+      \beta & \alpha\\
+      \beta & \alpha
+    \end{pmatrix}
+  \]
+  We see that the two rows are the same. This means that as time goes on, where we end up does not depend on where we started.
+
+  Alternatively, we can solve this by a difference equation. We have
+  \[
+    p_{11}(n + 1) = p_{11}(n)(1 - \alpha) + p_{12}(n)\beta = p_{11}(n)(1 - \alpha) + (1 - p_{11}(n))\beta.
+  \]
+  We can solve this as we have done in IA differential equations.
+\end{eg}
+As in the Chapman-Kolmogorov equation, many statements about Markov chains can be concisely stated in the language of linear algebra.
+
+In general, let $X_0$ have distribution $\lambda$. What is the distribution of $X_1$? We have
+\[
+  \P(X_i = j) = \sum_i \P(X_1 = j| X_0 = i)\P(X_0 = i) = \sum_i \lambda_i p_{ij}.
+\]
+Hence this has a distribution $\lambda P$, where $\lambda$ is treated as a row vector. Similarly, $X^n$ has the distribution $\lambda P^n$.
+
+In fact, historically, Markov chains was initially developed as a branch of linear algebra. However, nowadays, we often look at it as a branch of probability theory instead, and this is what we will do in this course. So don't be scared if you hate linear algebra.
 \end{document}

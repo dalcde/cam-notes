@@ -73,12 +73,12 @@ It is often convenient to express our concepts and items in terms of vector spac
   We can also multiply vectors by a scalars $\lambda\in \C$, which satisfies
   \begin{enumerate}
     \item $\lambda(\mu \mathbf{v}) = (\lambda \mu) \mathbf{v}$ \hfill (associativity)
-    \item $\lambda(\mathbf{u} + \mathbf{v}) = \lambda \mathbf{u} + \lambda \mathbf{v}$ \hfill (distributive in $V$)
-    \item $(\lambda + \mu)\mathbf{u} = \lambda \mathbf{u} + \lambda \mathbf{v}$ \hfill (distributive in $\C$)
+    \item $\lambda(\mathbf{u} + \mathbf{v}) = \lambda \mathbf{u} + \lambda \mathbf{v}$ \hfill (distributivity in $V$)
+    \item $(\lambda + \mu)\mathbf{u} = \lambda \mathbf{u} + \lambda \mathbf{v}$ \hfill (distributivity in $\C$)
     \item $1\mathbf{v} = \mathbf{v}$ \hfill (identity)
   \end{enumerate}
 \end{defi}
-It is often useful to give a vector space an extra structure known as an inner product.
+Often, we wouldn't have \emph{just} a vector space. We usually give them some additional structure, such as the inner product.
 \begin{defi}[Inner product]
   An \emph{inner product} on $V$ is a map $(\cdot, \cdot): V\times V \to \C$ that satisfies
   \begin{enumerate}
@@ -121,7 +121,7 @@ Suppose we have $f, g: \Omega \to \C$. Then we can define the sum $f + g$ by $(f
 
 This also makes intuitive sense. We can simply view a functions as a list of numbers, where we list out the values of $f$ at each point. The list could be infinite, but a list nonetheless.
 
-Often, we don't want to look at the set of \emph{all} functions. That would be too huge and uninteresting. A natural class of functions to consider would be the set of solutions to some particular differential solution. However, this doesn't always work. For this class to actually be a vector space, the sum of two solutions (and the scalar multiple of a solution) must also be a solution. This is exactly the requirement that the differential equation is linear. Hence, the set of solutions to a linear differential equation would form a vector space. Linearity pops up again.
+Most of the time, we don't want to look at the set of \emph{all} functions. That would be too huge and uninteresting. A natural class of functions to consider would be the set of solutions to some particular differential solution. However, this doesn't always work. For this class to actually be a vector space, the sum of two solutions (and the scalar multiple of a solution) must also be a solution. This is exactly the requirement that the differential equation is linear. Hence, the set of solutions to a linear differential equation would form a vector space. Linearity pops up again.
 
 Now what about the inner product? A natural definition is
 \[
@@ -171,5 +171,283 @@ where
 \[
   \hat{f}_n = \frac{1}{2\pi} (e^{in\theta}, f) = \frac{1}{2\pi}\int_{-\pi}^\pi e^{-in\theta} f(\theta)\;\d \theta.
 \]
-However, this is an infinite sum, and there is no guarantee that it converges. Indeed, it sometimes does not.
+Note that if $f: S^1 \to \R$ is a real function, then it follows that
+\[
+  (\hat{f}_n)^* = \left(\frac{1}{2\pi}\int_{-\pi}^\pi e^{-in\theta}f(\theta)\;\d \theta\right)^* = \frac{1}{2\pi}\int_{-\pi}^{\pi}e^{in\theta}f(\theta)\;\d \theta = \hat{f}_{-n}.
+\]
+So we can replace our Fourier series by
+\[
+  f(\theta) = \hat{f}_0 + \sum_{n = 1}^\infty\left(\hat{f}_n e^{in\theta} + \hat{f}_{-n}e^{-in\theta}\right) = \hat{f}_0 + \sum_{n = 1}^\infty \left(\hat{f}_n e^{in\theta} + \hat{f}_n^* e^{-in\theta}\right).
+\]
+Setting $\hat{f}_n = \frac{a_n + ib_n}{2}$, we have
+\[
+  f(\theta) = \hat{f}_0 + \sum_{n = 1}^\infty (a_n \cos n\theta + b_n \sin n\theta).
+\]
+Here the coefficients are
+\[
+  a_n = \frac{1}{\pi}\int_{-\pi}^\pi \cos n\theta f(\theta) \;\d \theta,\quad b_n = \frac{1}{\pi}\int_{-\pi}^\pi \sin n\theta f(\theta) \;\d \theta.
+\]
+Hence we can also expand this in terms of $\sin$ and $\cos$ as well.
+
+So when given a real function, which expansion should we use? It depends. If our function is odd (or even), it would be useful to pick the sine/cosine expansion, since the cosine (or sine) terms will simply disappear. On the other hand, if we want to stick our function into a differential equation, exponential functions are usually more helpful.
+
+Now why do we care about periodic functions? Apart from the fact that genuine periodic functions exist, we can also use them to model functions on a compact domain. For example, if we have a function defined on $[0, 1]$, we can pretend it is a function on $\R$ by making infinitely many copies of the function to the intervals $[1, 2]$, $[2, 3]$ etc.
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-0.3, 0) -- (2.3, 0) node [right] {$x$};
+    \draw [mred, thick] plot [smooth] coordinates {(0, 0.5) (0.7, -0.3) (1.6, 1) (2, 0.5)};
+
+    \draw [->] (2.8, 0.5) -- (3.8, 0.5);
+    \draw [->] (4.1, 0) -- (10.9, 0) node [right] {$x$};
+    \foreach \x in {4.5, 6.5, 8.5} {
+      \draw [mred, thick] plot [smooth] coordinates {(\x, 0.5) (\x + 0.7, -0.3) (\x + 1.6, 1) (\x + 2, 0.5)};
+    }
+  \end{tikzpicture}
+\end{center}
+\subsection{Convergence of Fourier series}
+When Fourier first proposed the idea of a Fourier series, people didn't really believe in him. How can we be sure that the infinite series actually converges? It turns out that in many cases, they don't.
+
+To investigate the convergence of the series, we define the \emph{partial Fourier sum} as
+\[
+  S_n f = \sum_{m = -n}^n \hat{f}_m e^{im\theta}.
+\]
+The question we want to answer is whether $S_n f$ ``converges'' to $f$. Here we have to be careful with what we mean by convergence. As we (might) have seen in Analysis, there are many ways of defining convergence of functions. If we have a ``norm'' on the space of functions, we can define convergence to mean $\lim\limits_{n\to \infty}\|S_n f - f\| = 0$. Our ``norm'' can be defined as
+\[
+  \|S_n f - f\| = \frac{1}{2\pi}\int_{-\pi}^\pi \|S_n f(\theta) - f(\theta)\|^2 \;\d \theta.
+\]
+However, this doesn't really work if $S_n f$ and $f$ can be arbitrary functions, as in this does not necessarily have to be a norm. Indeed, if $\lim\limits_{n \to \infty}S_n f$ differs from $f$ on finitely or countably many points, the integral will still be zero. In particular, $\lim S_n f$ and $f$ can differ at all rational points, but this definition will say that $S_n f$ converges to $f$.
+
+Hence another possible definition of convergence is to require
+\[
+  \lim_{n \to \infty}S_n f(\theta) - f(\theta) = 0
+\]
+for all $\theta$. This is known as \emph{pointwise convergence}. However, this is often too weak a notion. We can ask for more, and require that the \emph{rate} of convergent is independent of $\theta$. This is known as uniform convergence, and is defined by
+\[
+  \lim_{n \to \infty}\sup_{\theta} |S_n f(\theta) - f(\theta)| = 0.
+\]
+Of course, with different definitions of convergence, we can get different answers to whether it converges. Unfortunately, even if we manage to get our definition of convergence right, it is still difficult to come up with a criterion to decide if a function has a convergent Fourier Series. As of today, we still don't really understand how the convergence of Fourier series behaves.
+
+Instead of trying to come up with something general, (since this is an applied course), let's look at an example instead.
+
+\begin{eg}
+  Consider the sawtooth function $f(\theta) = \theta$.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (-3.2, 0) -- (3.2, 0);
+
+      \draw [thick, mblue] (-3, -1) -- (-1, 1);
+      \draw [dashed, mblue] (-1, 1) -- (-1, -1);
+      \draw [thick, mblue] (-1, -1) -- (1, 1);
+      \draw [dashed, mblue] (1, 1) -- (1, -1);
+      \draw [thick, mblue] (1, -1) -- (3, 1);
+
+      \node at (-3, 0) [below] {$-3\pi$};
+      \node at (-1, 0) [below] {$-\pi$};
+      \node at (1, 0) [below] {$\pi$};
+      \node at (3, 0) [below] {$3\pi$};
+    \end{tikzpicture}
+  \end{center}
+  Note that this function is discontinuous at odd multiples of $\pi$.
+
+  The Fourier coefficients (for $n \not= 0$) are
+  \[
+    \hat{f}_n = \frac{1}{2\pi}\int_{-\pi}^\pi e^{-in\theta}\theta\;\d \theta = \left[-\frac{1}{2\pi i n}e^{-in\theta}\theta\right]_{-\pi}^\pi + \frac{1}{2\pi i n}\int_{-\pi}^\pi e^{in\theta}\;\d \theta = \frac{(-1)^{n + 1}}{in}.
+  \]
+  We also have $\hat{f}_0 = 0$.
+
+  Hence we have
+  \[
+    \theta = \sum_{n \not= 0}\frac{(-1)^{n + 1}}{in}e^{in\theta}.
+  \]
+  It turns out that this series converges to the sawtooth for all $\theta \not= (2m + 1)\pi$, ie. everywhere that the sawtooth is continuous.
+
+  Let's look explicitly at the case where $\theta = \pi$. Each term of the partial Fourier series is zero. So we can say that the Fourier series converges to 0. This is the \emph{average} value of $\lim\limits_{\varepsilon \to 0} f(\pi \pm \varepsilon)$.
+
+  This is typical. At an isolated discontinuity, the Fourier series is the average of the limiting values of the original function. as we approach from either side.
+\end{eg}
+\subsection{Differentiability and Fourier series}
+Integration is a smoothening operator. If we take, say, the step function
+\[
+  \Theta(x) =
+  \begin{cases}
+    1 & x > 0\\
+    0 & x < 0
+  \end{cases}.
+\]
+Then the integral is given by
+\[
+  \int \Theta(x)\;\d x =
+  \begin{cases}
+    x & x > 0\\
+    0 & x < 0
+  \end{cases}.
+\]
+This is now a continuous function. If we integrate it again, we make the positive side look like a quadratic curve, and it is now differentiable.
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-2, 0) -- (2, 0) node [right] {$x$};
+    \draw [->] (0, -0.5) -- (0, 2.5) node [above] {$y$};
+    \draw [mblue, thick] (-2, 0) -- (0, 0);
+    \draw [mblue, thick] (0, 2) -- (2, 2);
+
+    \draw [->] (2.5, 1) -- (3.5, 1) node [above, pos=0.5] {$\int\d x$};
+
+    \draw [->] (4, 0) -- (8, 0) node [right] {$x$};
+    \draw [->] (6, -0.5) -- (6, 2.5) node [above] {$y$};
+    \draw [mred, thick] (4, 0) -- (6, 0);
+    \draw [mred, thick] (6, 0) -- (8, 2);
+  \end{tikzpicture}
+\end{center}
+On the other hand, when we differentiate a function, we generally make it worse. For example, when we differentiate the continuous function $\int \Theta (x)\;\d x$, we obtain the discontinuous function $\Theta(x)$. If we attempt to differentiate this again, we get the $\delta$-(non)-function.
+
+Hence, it is often helpful to characterize the ``smoothness'' of a function by how many times we can differentiate it. It turns out this is rather relevant to the behaviour of the Fourier series.
+
+Suppose that we have a function that is itself continuous and whose first $m - 1$ derivatives are also continuous, but $f^{(m)}$ has isolated discontinuities at $\{\theta_1, \theta_2, \theta_3, \cdots, \theta_r\}$.
+
+We can look at the $k$th Fourier coefficient:
+\begin{align*}
+  \hat{f}_k &= \frac{1}{2\pi}\int_{-\pi}^\pi e^{-k\theta}f(\theta) \;\d \theta\\
+  &= \left[-\frac{1}{2\pi i k}e^{-ik\theta}f(\theta)\right]^{\pi}_{-\pi} + \frac{1}{2\pi i k}\int_{-\pi}^\pi e^{-ik\theta}f'(\theta)\;\d \theta\\
+  \intertext{The first term vanishes since $f(\theta)$ is continuous and takes the same value at $\pi$ and $-\pi$. So we are left with}
+  &= \frac{1}{2\pi i k}\int_{-\pi}^\pi e^{-ik\theta}f'(\theta)\;\d \theta\\
+  &= \cdots\\
+  &= \frac{1}{(ik)^m}\frac{1}{2\pi} \int_{-\pi}^\pi e^{ik\theta} f^{(m)}(\theta)\;\d \theta.
+  \intertext{Now we have to be careful, since $f^{(m)}$ is no longer continuous. However provided that $f^{(m)}$ is everywhere finite, we can approximate this by removing small strips $(\theta_i - \varepsilon, \theta_i + \varepsilon)$ from our domain of integration, and take the limit $\varepsilon \to 0$. We can write this as}
+  &= \lim_{\varepsilon \to 0}\frac{1}{(ik)^m}\frac{1}{2\pi}\int_{-\pi}^{\theta_1 - \varepsilon} + \int_{\theta_1 + \varepsilon}^{\theta_2 - \varepsilon} + \cdots + \int_{\theta_r + \varepsilon}^{\pi} e^{ik\theta} f^{(m)}(\theta)\;\d \theta\\
+  &= \frac{1}{(ik)^{m + 1}} \frac{1}{2\pi}\left[\sum_{s = 1}^r (f^{(m)}(\theta_s^+) - f^{(m)}(\theta_s^-)) + \int_{(-\pi, \pi)\setminus \theta} e^{-ik\theta} f^{(m + 1)}(\theta) \;\d \theta\right].
+\end{align*}
+We now have to stop. So $\hat{f}_k$ decays like $\left(\frac{1}{k}\right)^{m + 1}$ if our function and its $(m - 1)$ derivatives are continuous. This means that if a function is more differentiable, then the coefficients decay more quickly.
+
+This makes sense. If we have a rather smooth function, then we would expect the first few Fourier terms (with low frequency) to account for most of the variation of $f$. Hence the coefficients decay really quickly.
+
+However, if the function is jiggly and bumps around all the time, we would expect to need some higher frequency to account for the minute variation. Hence the terms would not decay away that quickly. Hence if we can differentiate it more times, then in general the terms should decay quicker.
+
+\begin{thm}[Parseval's theorem]
+  \[
+    (f, f) = \int_{-\pi}^\pi |f(\theta)|^2 \;\d \theta = 2\pi \sum_{n\in \Z}|\hat{f}_n|^2
+  \]
+\end{thm}
+
+\begin{proof}
+  \begin{align*}
+    (f, f) &= \int_{-\pi}^\pi |f(\theta)|^2 \;\d \theta\\
+    &= \int_{-\pi}^{\pi} \left(\sum_{m \in \Z} \hat{f}_m^* e^{-im\theta}\right)\left(\sum_{n \in \Z} \hat{f}_n^* e^{-in\theta}\right)\;\d \theta\\
+    &= \sum_{m, n\in \Z}\hat{f}_m^* \hat{f}_n \int_{-\pi}^\pi e^{i(m - n)\theta}\;\d \theta\\
+    &= 2\pi \sum_{m, n\in \Z}\hat{f}_m^* \hat{f}_n \delta_{mn}\\
+    &= 2\pi \sum_{n\in \Z}|\hat{f}_n|^n
+  \end{align*}
+\end{proof}
+Note that this is not a fully rigorous proof, since we assumed not only that the Fourier series converges to the function, but also that we could commute the infinite sums. However, for the purposes of an applied course, this is sufficient.
+
+Last time, we computed that the sawtooth function $f(\theta) = \theta$ has Fourier coefficients
+\[
+  \hat{f}_0 = 0,\quad \hat{f}_n = \frac{i(-1)^{n}}{n}\text{ for }n\not= 0.
+\]
+But why do we care? It turns out this has some applications in number theory. You might have heard of the Riemann $\zeta$-function, defined by
+\[
+  \zeta(s) = \sum_{n = 1}^\infty \frac{1}{n^s}.
+\]
+We will show that this obeys the property that for any $m$, $\zeta(2m) = \pi^{2m}q$ for some $q\in \Q$. This may not be obvious at first sight. So let's apply Parseval's theorem for the sawtooth. By direct computation, we know that
+\[
+  (f, f) = \int_{-\pi}^\pi \theta^2 \;\d \theta = \frac{2\pi^3}{3}.
+\]
+However, by Parseval's theorem, we know that
+\[
+  (f, f) = 2\pi \sum_{n \in \Z}|\hat{f}_n|^2 = 4\pi \sum_{n = 1}^\infty \frac{1}{n^2}.
+\]
+Putting these together, we learn that
+\[
+  \sum_{n = 1}^\infty \frac{1}{n^2} = \zeta(2) = \frac{\pi^2}{6}.
+\]
+We have just done it for the case where $m = 1$. But if we integrate the sawtooth function repeatedly, then we can get the general result for all $m$.
+
+At this point, we might ask, why are we choosing these $e^{im\theta}$ as our basis? Surely there are a lot of different sets of basis we can use. For example, infinite dimensions, we can just arbitrary choose random vectors (that are not linearly dependent) to get a set of basis vectors. However, in practice, we don't pick them randomly. We often choose a basis that can reveal the symmetry of a system. For example, if we have a rotationally symmetric system, we would like to use polar coordinates. Similarly, if we have periodic functions, then $e^{im\theta}$ is often a good choice of basis.
+
+\section{Sturm-Liouville Theory}
+In finite dimensions, we often consider \emph{linear maps} $M: V\to W$. If $\{\mathbf{v}_i\}$ is a basis for $V$ and $\{\mathbf{w}\}$is a basis for $W$, then we can represent the map by a matrix with entries
+\[
+  M_{ai} = (\mathbf{w}_a, M\mathbf{v}_i).
+\]
+A map $M: V\to V$ is called \emph{self-adjoint} if $M^\dagger = M$ as matrices. However, it is not obvious how we can extend this notion to arbitrary maps between arbitrary vector spaces (with an inner product) when they cannot be represented by a matrix.
+
+Instead, we can define the \emph{adjoint} $B$ of a map $A: V\to V$ to be a map such that
+\[
+  (B\mathbf{u}, \mathbf{v}) = (\mathbf{u}, A\mathbf{v})
+\]
+for all vectors $\mathbf{u}, \mathbf{v}\in V$. A map is then self-adjoint if
+\[
+  (M\mathbf{u}, \mathbf{v}) = (\mathbf{u}, M\mathbf{v}).
+\]
+Self-adjoint matrices come with a natural basis. Recall that the \emph{eigenvalues} of a matrix are the roots of $\det(M - \lambda I) = 0$. The \emph{eigenvector} corresponding to an eigenvalue $\lambda$ is defined by $M\mathbf{v}_i = \lambda_i \mathbf{v}_i$.
+
+In general, eigenvalues can be any complex number. However, self-adjoint maps have \emph{real} eigenvalues. Suppose
+\[
+  M\mathbf{v}_i = \lambda_i \mathbf{v}_i.
+\]
+Then we have
+\[
+  \lambda_i (\mathbf{v}_i, \mathbf{v}_i) = (\mathbf{v}_i, M\mathbf{v}_i) = (M\mathbf{v}_i, \mathbf{v}_i) = \lambda_i^* (\mathbf{v}_i, \mathbf{v}_i).
+\]
+So $\lambda_i = \lambda_i^*$.
+
+Furthermore, eigenvectors with distinct eigenvalues are orthogonal with respect to the inner product. Suppose that
+\[
+  M \mathbf{v}_i = \lambda_i \mathbf{v}_i,\quad M \mathbf{v}_j = \lambda_j \mathbf{v}_j.
+\]
+Then
+\[
+  \lambda_i (\mathbf{v}_j, \mathbf{v}_i) = (\mathbf{v}_j, M\mathbf{v}_i) = (M\mathbf{v}_j, \mathbf{v}_i) = \lambda_j(\mathbf{v}_j, \mathbf{v}_i).
+\]
+Since $\lambda_i \not= \lambda_j$, we must have $(\mathbf{v}_j, \mathbf{v}_i) = 0$.
+
+Knowing eigenvalues and eigenvalues gives a neat way so solve linear equations of the form
+\[
+  M \mathbf{u} = \mathbf{f}.
+\]
+Here we are given $M$ and $\mathbf{f}$, and want to find $\mathbf{u}$. Of course, the answer is $\mathbf{u} = M^{-1}f$. However, if we expand in terms of eigenvectors, we obtain
+\[
+  M\mathbf{u} = M\sum u_i \mathbf{v}_i = \sum u_i \lambda_i \mathbf{v}_i.
+\]
+Hence we have
+\[
+  \sum u_i \lambda_i \mathbf{v}_i = \sum f_i \mathbf{v}_i.
+\]
+Taking the inner product with $\mathbf{v}_j$, we know that
+\[
+  u_j = \frac{f_j}{\lambda_j}.
+\]
+So far, these are all things from IA Vectors and Matrices. Sturm-Liouville theory is the infinite-dimensional analogue.
+
+In our vector space of differentiable functions, our ``matrices'' would be linear differential operators $\mathcal{L}$. For example, we could have
+\[
+  \mathcal{L} = A_p(x) \frac{\d^p}{\d x^p} + A_{p - 1}(x) \frac{\d^{p - 1}}{\d x^{p - 1}} + \cdots + A_1(x)\frac{\d}{\d x} + A_0(x).
+\]
+It is an easy check that this is in fact linear.
+
+We say $\mathcal{L}$ has order $p$ if the highest derivative that appears is $\frac{\d^p}{\d x^p}$.
+
+In most applications, we will be interested in the case $p = 2$. When will our $\mathcal{L}$ be self-adjoint?
+
+In the $p = 2$ case, we have
+\begin{align*}
+  \mathcal{L} y &= P \frac{\d^2 y}{\d x^2} + R \frac{\d y}{\d x} - Q y \\
+  &= P\left[\frac{\d^2 y}{\d x^2} + \frac{R}{P}\frac{\d y}{\d x} - \frac{Q}{P}y\right] \\
+  &= P\left[e^{-\int \frac{R}{P}\;\d x}\frac{\d}{\d x}\left(e^{\int \frac{R}{P}\;\d x}\frac{\d y}{\d x}\right)- \frac{Q}{P}y\right]\\
+  \intertext{Let $p = \exp\left(\int \frac{R}{P}\;\d x\right)$. Then we can write this as}
+  &= P p^{-1}\left[\frac{\d}{\d x}\left(p\frac{\d y}{\d x}\right) - \frac{Q}{P}p y\right].
+\end{align*}
+We further define $q = \frac{Q}{P}p$. We also drop a factor of $Pp^{-1}$. Then we are left with
+\[
+  \mathcal{L} = \frac{\d}{\d x}\left(p(x)\frac{\d}{\d x}\right) - q(x).
+\]
+This is the \emph{Sturm-Liouville form} of the operator. Now let's compute $(f, \mathcal{L}g)$. We integrate by parts numerous times to obtain
+\begin{align*}
+  (f, \mathcal{L}g) &= \int_a^b f^*\left(\frac{\d}{\d x}\left(p \frac{\d g}{\d x}\right) - qg\right)\;\d x \\
+  &= [f^* pg']_a^b - \int_a^b \left(\frac{\d f^*}{\d x}p\frac{\d g}{\d x} + f^* qg\right)\;\d x\\
+  &= [f^*pg' - f'^*pg]_a^b + \int_a^b \left(\frac{\d}{\d x}\left(p\frac{\d f^*}{\d x}\right) - qf^*\right)g\;\d x\\
+  &= [(f^*g' - f'^*g)p]_a^b + (\mathcal{L}f, g),
+\end{align*}
+assuming that $p, q$ are real.
+
+So 2nd order linear differential operators are self-adjoint with respect to this norm if $p, q\in \R$ and the boundary terms vanish.
 \end{document}

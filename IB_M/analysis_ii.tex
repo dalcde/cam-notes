@@ -107,7 +107,7 @@ This suggests that we need a stronger notion of convergence. Of course, we don't
 
 Hence we want to find a middle ground between the two cases - a notion of convergence that is sufficiently strong to preserve most interesting properties, without being too trivial. This is uniform convergence.
 
-\begin{defi}[Uniform convergence.]
+\begin{defi}[Uniform convergence]
   A sequence of functions $f_n: E\to \R$ converges \emph{uniformly} to $f$ if
   \[
     (\forall \varepsilon)(\exists N)(\forall x)(\forall n > N)\; |f_n(x) - f(x)| < \varepsilon.
@@ -181,4 +181,271 @@ Our first theorem will be that uniform Cauchy convergence and uniform convergenc
   \]
   We want to show that $f_n \to f$ uniformly. Given $\varepsilon > 0$, choose $N$ such that whenever $n, m > N$, $x\in E$, we have $|f_n(x) - f_m(x)| < \frac{\varepsilon}{2}$. Letting $m\to \infty$, $f_m(x) \to f(x)$. So we have $|f_n(x) - f(x)| \leq \frac{\varepsilon}{2} < \varepsilon$. So done.
 \end{proof}
+
+The important theorem here is that continuity is conserved by uniform convergence.
+\begin{thm}[Uniform convergence and continuity]
+  Let $f_n, f: E\to \R$, where $E\subseteq \R$. If $f_n \to f$ uniformly and $f_n$ are all continuous at some point $x\in E$ for all $n$, then $f$ is also continuous at $x$.
+
+  In particular, if $f_n$ are continuous everywhere, then $f$ is continuous everywhere.
+\end{thm}
+This can be concisely phrased as ``the uniform limit of continuous functions is continuous''.
+
+\begin{proof}
+  Let $\varepsilon > 0$. Choose $N$ such that for all $n \geq N$, we have
+  \[
+    \sup_{y\in E}|f_n(y) - f(y)| < \varepsilon.
+  \]
+  Since $f_N$ is continuous at $x$, there is some $\delta$ such that
+  \[
+    |x - y| < \delta \Rightarrow |f_N(x) - f_N(y)| < \varepsilon.
+  \]
+  Then for each $y$ such that $|x - y| < \delta$, we have
+  \[
+    |f(x) - f(y)| \leq |f(x) - f_N(x)| + |f_N(x) - f_N(y)| + |f_N(y) - f(y)| < 3\varepsilon.
+  \]
+\end{proof}
+
+\begin{thm}[Uniform convergnece and integrals]
+  Let $f_n, f: [a, b]\to \R$ be Riemann integrable, with $f_n \to f$ uniformly. Then
+  \[
+    \int_a^b f_n(t)\;\d t \to \int_a^b f(t)\;\d t.
+  \]
+\end{thm}
+
+\begin{proof}
+  We have
+  \begin{align*}
+    \left|\int_a^b f_n(t) \;\d t - \int_a^b f(t)\;\d t\right| &= \left|\int_a^b f_n(t) - f(t))\;\d t\right|\\
+    &\leq \int_a^b |f_n(t) - f(t)|\;\d t\\
+    &\leq \sup_{t\in [a, b]}|f_n(t) - f(t)| (b - a)\\
+    &\to 0\text{ as }n\to \infty
+  \end{align*}
+\end{proof}
+This is really the easy part. What we would also want to prove is that if $f_n$ is integrable, $f_n \to f$ uniformly, then $f$ is integrable. We will come to this later on.
+
+So far so good. However, the relationship between uniform convergence and differentiability, things are more subtle. The uniform limit of differential functions need not be differentiable. Even if it were, the limit of the derivative is not necessarily the same as the derivative of the limit, even if we just want pointwise convergence of the derivative.
+
+\begin{eg}
+  Let $f_n = |x|^{1 + 1/n}$, where $x \in [-1, 1]$. Then $f_n \to f$ uniformly (exercise).
+
+  Each $f_n$ is differentiable - this is obvious at $x \not= 0$, and at $x = 0$, the derivative is
+  \[
+    f_n'(0) = \lim_{x \to 0}\frac{f_n (x) - f_n(0)}{x} = \lim_{x \to 0} \sgn(x) |x|^{1/n} = 0
+  \]
+  However, the limit $f$ is not differentiable at $x = 0$.
+\end{eg}
+
+\begin{eg}
+  Let
+  \[
+    f_n(x) = \frac{\sin nx}{\sqrt{n}}
+  \]
+  for all $x\in \R$. Then
+  \[
+    \sup_{x\in \R}|f_n (x)| \leq \frac{1}{\sqrt{n}} \to 0.
+  \]
+  So $f_n \to f = 0$ uniformly in $\R$. However, the derivative is
+  \[
+    f_n'(x) = \sqrt{n} \cos nx,
+  \]
+  which does not converge to $0$, eg. at $x = 0$.
+\end{eg}
+
+Hence, for differentiability to play nice, we need a condition even stronger than uniform convergence.
+\begin{thm}
+  Let $f_n: [a, b]\to \R$ be a sequence of functions differentiable on $[a, b]$ (at the end points $a$, $b$, this means that the one-sided derivatives exist). Suppose the following holds:
+  \begin{enumerate}
+    \item For some $c\in [a, b]$, $f_n(c)$ converges.
+    \item The sequence of derivatives $(f_n')$ converges uniformly on $[a, b]$.
+  \end{enumerate}
+  Then $(f_n)$ converges uniformly on $[a, b]$, and if $f = \lim f_n$, then $f$ is differentiable with derivative $f'(x) = \lim f_n'(x)$.
+\end{thm}
+Note that we do \emph{not} assume that $f_n'$ are continuous or even Riemann integrable. If they are, then the proof is much easier!
+
+\begin{proof}
+  If we are given a specific sequence of functions and are asked to prove that they converge uniformly, we usually take the pointwise limit and show that the convergence is uniform. However, given a general function, this is usually not helpful. Instead, we can use the Cauchy criterion by showing that the sequence is uniformly Cauchy.
+
+  We want to find an $N$ such that $n, m> N$ implies $\sup|f_n - f_m| < \varepsilon$. We want to relate this to the derivatives. We might want to use the fundamental theorem of algebra for this. However, we don't know that the derivative is integrable! So instead, we go for the mean value theorem.
+
+  Fix $x\in [a, b]$. We apply the mean value theorem to $f_n - f_m$ to get
+  \[
+    (f_n - f_m)(x) - (f_n - f_m)(c) = (x - c)(f'_n - f'_m)(t)
+  \]
+  for some $t\in (x, c)$.
+
+  Taking the supremum and rearranging terms, we obtain
+  \[
+    \sup_{x\in [a, b]}|f_n(x) - f(x)| \leq |f_n(c) - f_m(c)| + (b - a)\sup_{t\in [a, b]}|f_n'(t) - f_m'(t)|.
+  \]
+  So given any $\varepsilon$, since $f_n'$ and $f_n(c)$ converge and are hence Cauchy, there is some $N$ such that for any $n, m \geq N$,
+  \[
+    \sup_{t \in [a, b]} |f_n'(t) - f_m'(t)| < \varepsilon, \quad |f_n(c) - f_m(c)| < \varepsilon.
+  \]
+  Hence we obtain
+  \[
+    n, m \geq N \Rightarrow  \sup_{x\in [a, b]}|f_n(x) - f_m(x)| < (1 + b - a) \varepsilon.
+  \]
+  So by the Cauchy criterion, we know that $f_n$ converges uniformly. Let $f = \lim f_n$.
+
+  Now we have to check differentiability. Let $f_n' \to h$. For any fixed $y\in [a, b]$, define
+  \[
+    g_n(x) =
+    \begin{cases}
+      \frac{f_n(x) - f_n(y)}{x - y} & x \not= y\\
+      f_n'(y) & x = y
+    \end{cases}
+  \]
+  Then by definition, $f_n$ is differentiable at $y$ iff $g_n$ is continuous at $y$. Also, define
+  \[
+    g(x) =
+    \begin{cases}
+      \frac{f(x) - f(y)}{x - y} & x \not= y\\
+      h'(y) & x = y
+    \end{cases}
+  \]
+  Then $f$ is differentiable with derivative $h$ at $y$ iff $g$ is continuous at $y$. However, we know that $g_x \to g$ pointwise on $[a, b]$, and we know that $g_x$ are all continuous. To conclude that $g$ is continuous, we have to show that the convergence is uniform. To show that $g_x$ congerges uniformly, we rely on the Cauchy criterion and the mean value theorem.
+
+  For $x \not = y$, we know that
+  \[
+    g_n(x) - g_m(x) = \frac{(f_n - f_m)(x) - (f_n - f_m)(y)}{x - y} = (f'_n - f'_m)(t)
+  \]
+  for some $t \in [x, y]$.
+
+  Let $\varepsilon > 0$. Since $f'$ converges uniformly, there is some $N$ such that for all $x\not= y$, $n, m > N$, we have
+  \[
+    |g_n(x), g_m(x)| \leq \sup |(f'_n - f'_m)(t)| < \varepsilon.
+  \]
+  For $x = y$, this is still true since $|g_n(y) - g_m(y)| = |f_n'(y) - f_m'(y)|$ by definition. So
+  \[
+    n, m\geq N \Rightarrow \sup_{[a, b]}|g_n - g_m| < \varepsilon,
+  \]
+  ie. $g_n$ converges uniformly. Hence the limit function $g$ is continuous, in particular at $x = y$. So $f$ is differentiable at $y$ and $f'(y) = h(y) = \lim f_n'(y)$.
+\end{proof}
+
+If we assume additionally that $f_n'$ are continuous, then there is an easy proof of this theorem. By the fundamental theorem of calculus, we have
+\[
+  f_n(x) = f_n(c) + \int_c^x f_n'(t)\;\d t.\tag{*}
+\]
+Then we get that
+\begin{align*}
+  \sup_{[a, b]}|f_n(x) - f_m(x)| &\leq |f_n(c) - f_m(c)| + \sup_{x\in [a, b]}\left|\int_c^x (f_n'(t) - f_m'(t))\;\d t\right|\\
+  &\leq |f_n(c) - f_m(c)| + (b - a)\sup_{t\in [a, b]}|f_n'(t) - f_m'(t)|\\
+  &< \varepsilon
+\end{align*}
+for sufficienlty large $n, m> N$.
+
+So by the Cauchy criterion, $f_n \to f$ uniformly for some function $f: [a, b] \to \R$.
+
+Since the $f_n'$ are continuous, $h = \lim\limits_{n\to \infty} f_n'$ is continuous and hence integrable. Taking the limit of $(*)$, we get
+\[
+  f(x) = f(c) + \int_c^x h(t)\;\d t.
+\]
+Then the fundamental theorem of calculus says that $f$ is differentiable and $f'(x) = h(x) = \lim f_n'(x)$. So done.
+
+Finally, we have a small proposition that can come handy.
+\begin{prop}\leavevmode
+  \begin{enumerate}
+    \item Let $f_n, g_n: E\to \R$, be sequences, and $f_n \to f$, $g_n \to g$ uniformly on $E$. Then for any $a, b\in \R$, $af_n + bg_n \to af + bg$ uniformly.
+    \item Let $f_n \to f$ uniformly, and let $g: E\to \R$ is bounded. then $gf_n: E\to \R$ converges uniformly to $gf$.
+  \end{enumerate}
+\end{prop}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item Easy exercise.
+    \item Say $|g(x)| < M$ for all $x\in E$. Then
+    \[
+      |(gf_n)(x) - (gf)(x)| \leq M |f_n(x) - f(x)|.
+    \]
+    So
+    \[
+      \sup_E |gf_n - gf| \leq M \sup_E |f_n - f| \to 0.
+    \]
+  \end{enumerate}
+\end{proof}
+Note that (ii) is false without assuming boundedness. An easy example is to take $f_n = \frac{1}{n}$, $x\in \R$, and $g(x) = x$. Then $x_n \to 0$ uniformly, but $(gf_n)(x) = \frac{x}{n}$ does not converge.
+
+\section{Series of functions}
+\subsection{Convergence of series}
+Recall that in Analysis I, we studied the convergence of a series of numbers. Here we will look at a series of \emph{functions}.
+\begin{defi}[Convergence of series]
+  Let $g_n; E \to \R$ be a sequence of functions. Then we say the series $\sum_{n = 1}^\infty g_n$ converges at a point $x \in E$ if the sequence of partial sums
+  \[
+    f_n = \sum_{j = 1}^ng_j
+  \]
+  converges at $x$. The series converges uniformly if $f_n$ converges uniformly.
+\end{defi}
+
+\begin{defi}[Absolute convergence]
+  $\sum g_n$ converges \emph{absolutely} at a point $x\in E$ if $\sum |g_n|$ converges at $x$.
+
+  $\sum g_n$ converges \emph{absolutely uniformly} if $\sum |g_n|$ converges uniformly.
+\end{defi}
+
+\begin{prop}
+  Let $g_n: E\to \R$. If $\sum g_n$ converges absolutely uniformly, then $\sum g_n$ converges uniformly.
+\end{prop}
+
+\begin{proof}
+  Again, we don't have a candidate for the limit. So we use the Cauchy criterion.
+
+  Let $f_n = \sum\limits_{j = 1}^n g_j$ and $h_n(x) = \sum\limits_{j = 1}^n |g_j|$ be the partial sums. Then for $n > m$, we have
+  \[
+    |f_n(x) - f_m(x)| = \left|\sum_{j = m + 1}^n g_j(x)\right| \leq \sum_{j = m + 1}^n |g_j(x)| = |h_n(x) - h_m(x)|.
+  \]
+  By hypothesis, we have
+  \[
+    \sup_{x\in E}|h_n(x) - h_m(x)| \to 0\text{ as }n, m\to \infty.
+  \]
+  So we get
+  \[
+    \sup_{x\in E}|f_n(x) - f_m(x)| \to 0\text{ as }n, m\to \infty.
+  \]
+  So the result follows from the Cauchy criteria.
+\end{proof}
+It is important to remember that uniform convergence plus absolute pointwise convergence does not imply absolute uniform convergence.
+
+\begin{eg}
+  Consider the series
+  \[
+    \sum_{n = 1}^\infty \frac{(-1)^n}{n}x^n.
+  \]
+  This converges absolutely for every $x\in [0, 1)$ since it is bounded by the geometric series. In fact, it converges \emph{uniformly} on $[0, 1)$ (see example sheet). However, this does \emph{not} converge absolutely uniformly on $[0, 1)$.
+
+  We can consider the difference in partial sums
+  \[
+    \sum_{j = m}^n \left|\frac{(-1)^j}{j}x^j\right| = \sum_{j = m}^n \frac{1}{j}|x|^j \geq \left(\frac{1}{m} + \frac{1}{m + 1} + \cdots + \frac{1}{n}\right)|x|^n.
+  \]
+  For each $N$, we can make this difference large enough by picking a really large $n$, and then making $x$ close enough to $1$. So the supremum is unbounded.
+\end{eg}
+
+\begin{thm}[Weierstrass M-test]
+  Let $g_n: E \to \R$ be a sequence of functions. Suppose there is some sequence $M_n$ such that for all $n$, we have
+  \[
+    \sup_{x\in E}|g_n (x)| \leq M_n.
+  \]
+  If $\sum M_n$ converges, then $\sum g_n$ converges absolutely uniformly.
+\end{thm}
+
+\begin{proof}
+  Let $f_n = \sum\limits_{j = 1}^n |g_j|$ be the partial sums. Then for $n > m$, we have
+  \[
+    |f_n(x) - f_m(x)| = \sum_{j = m + 1}^n |g_j(x)| \leq \sum_{j = m + 1}^n M_j.
+  \]
+  Taking supremum, we have
+  \[
+    \sup|f_n(x) - f_m(x)| \leq  \sum_{j = m + 1}^n M_j \to 0\text{ as }n, m\to \infty.
+  \]
+  So done by the Cauchy criterion.
+\end{proof}
+\subsection{Power series}
+\begin{thm}[]
+  Let $\sum\limits_{n = 0}^\infty c_n (x - a)^n$ be a real power series. Then there exists a unique number $R\in [0, +\infty]$ (called the radius of convergence) such that
+  \begin{enumerate}
+    \item If $|x - a| < R$, then $\sum c_n (x - a)^n$ converges absolutely
+    \item If $|x - a| > R$, then $\sum c_n (x - a)^n$ diverges.
+    \item If $R > 0$ and $0 < r < R$, then $\sum c_n (x - a)^n$ converges uniformly on $[a - r, a + r]$. 
+  \end{enumerate}
+\end{thm}
+Note that the first two statements are things we already know from IA Analysis I.
 \end{document}
