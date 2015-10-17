@@ -5,6 +5,7 @@
 \def\nyear {2015}
 \def\nlecturer {G. R. Grimmett}
 \def\ncourse {Markov Chains}
+\def\nlectures {TT.10}
 \def\nnotready {}
 
 \input{header}
@@ -252,4 +253,140 @@ In general, let $X_0$ have distribution $\lambda$. What is the distribution of $
 Hence this has a distribution $\lambda P$, where $\lambda$ is treated as a row vector. Similarly, $X^n$ has the distribution $\lambda P^n$.
 
 In fact, historically, Markov chains was initially developed as a branch of linear algebra. However, nowadays, we often look at it as a branch of probability theory instead, and this is what we will do in this course. So don't be scared if you hate linear algebra.
+
+\subsection{Class structure}
+\begin{defi}[Leading to and communicate]
+  Suppose we have two states $i, j\in S$. We write $i \to j$ ($i$ \emph{leads to} $j$) if there is some $n \geq 0$ such that $p_{ij}(n) > 0$, ie. it is possible for us to get from $i$ to $j$ (in multiple steps). Note that we allow $n = 0$.
+
+  We write $i \leftrightarrow j$ if $i \to j$ and $j \to i$. If $i \leftrightarrow j$, we say $i$ and $j$ ``communicate''
+\end{defi}
+
+\begin{prop}
+  $\leftrightarrow$ is an equivalence relation.
+\end{prop}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item Reflexive: we have $i \leftrightarrow i$ since $p_{ii}(0) = 1$.
+    \item Symmetric: trivial by definition.
+    \item Transitive: suppose $i \to j$ and $j \to k$. Since $i \to j$, there is some $m > 0$ such that $p_{ij}(m) > 0$. Since $j \to k$, there is some $n$ such that $p_{jk}(n) > 0$. Then $p_{ik}(m + n) = \sum_{r} p_{ir}(m)p_{r k}(n) \geq p_{ij}(m)p_{jk}(n) > 0$. So $i \to k$.
+
+      Similarly, if $j \to i$ and $k \to j$, then $k \to i$. So $i \leftrightarrow j$ and $j \leftrightarrow k$ implies that $i \leftrightarrow k$.
+  \end{enumerate}
+\end{proof}
+So we have an equivalence relation, and we know what to do with equivalence relations. We form equivalence classes!
+\begin{defi}[Communicating classes]
+  The equivalence classes of $\leftrightarrow$ are \emph{communicating classes}.
+\end{defi}
+We have to be careful with these communicating classes. They are not completely isolated. Within a communicating class $A$, of course we can move between any two vertices. However, it is possible that we can escape from a class $A$ to a class $B$. It is just that after going to $B$, we cannot go back to class $A$. From $B$, we might be able to get to another space $C$. We can jump around all the time, but (if there are finitely many communicating classes) eventually we have to stop when we have visited every class. Then we are bound to stay in that class.
+
+Since we are eventually going to be stuck in that class anyway, often, we can just consider this final communicating class and ignore the others. So wlog we can assume that the chain only has one communicating class.
+
+\begin{defi}[Irreducible chain]
+  A Markov chain is \emph{irreducible} if there is a unique communication class.
+\end{defi}
+
+\begin{defi}[Closed]
+  A subset $C\subseteq S$ is \emph{closed} if $p_{ij} = 0$ for all $i \in C, j\not\in C$.
+\end{defi}
+
+\begin{prop}
+  A subset $C$ is closed iff ``$i\in C, i\to j$ implies $j \in C$''.
+\end{prop}
+
+\begin{proof}
+  Assume $C$ is closed. Let $i \in C, i \to j$. Since $i \to j$, there is some $m$ such that $p_{ij}(m) > 0$. Expanding the Chapman-Kolmogorov equation, we have
+  \[
+    p_{ij}(m) = \sum_{i_1, \cdots, i_{m - 1}} p_{i, i_1}p_{i_1, i_2}, \cdots, p_{i_{m - 1},j} > 0.
+  \]
+  So there is some route $i, i_1, \cdots, i_{m - 1}, j$ such that $p_{i, i_1}, p_{i_1, i_2}, \cdots, p_{i_{m - 1}, j} > 0$. Since $p_{i, i_1} > 0$, we have $i_1\in C$. Since $p_{i_1,i_2} > 0$, we have $i_2\in C$. By induction, we get that $j \in C$.
+
+  To prove the other direction, assume that ``$i\in C, i \to j$ implies $j\in C$''. So for any $i\in C, j\not\in C$, then $i\not\to j$. So in particular $p_{ij} = 0$.
+\end{proof}
+
+\begin{eg}
+  Consider $S = \{1, \cdots, 6\}$ with transition matrix
+  \[
+    P =
+    \begin{pmatrix}
+      \frac{1}{2} & \frac{1}{2} & 0 & 0 & 0 & 0\\
+      0 & 0 & 1 & 0 & 0 & 0\\
+      \frac{1}{3} & 0 & 0 & \frac{1}{3} & \frac{1}{3} & 0\\
+      0 & 0 & 0 & \frac{1}{2} & \frac{1}{2} & 0\\
+      0 & 0 & 0 & 0 & 0 & 1\\
+      0 & 0 & 0 & 0 & 1 & 0\\
+    \end{pmatrix}
+  \]
+  \begin{center}
+    \begin{tikzpicture}
+      \node [mstate] (1) at (0, 0) {$1$};
+      \node [mstate] (2) at (1, 1.4) {$2$};
+      \node [mstate] (3) at (2, 0) {$3$};
+      \node [mstate] (4) at (3, -1.4) {$4$};
+      \node [mstate] (5) at (4, 0) {$5$};
+      \node [mstate] (6) at (6, 0) {$6$};
+      \draw (1) edge [loop left, ->] (1);
+      \draw (1) edge [->] (2);
+      \draw (2) edge [->] (3);
+      \draw (3) edge [->] (1);
+      \draw (3) edge [->] (4);
+      \draw (3) edge [->] (5);
+      \draw (4) edge [->] (5);
+      \draw (4) edge [loop below, ->] (4);
+      \draw (5) edge [bend left, ->] (6);
+      \draw (6) edge [bend left, ->] (5);
+    \end{tikzpicture}
+  \end{center}
+  We see that the communicating classes are $\{1, 2, 3\}$, $\{4\}$, $\{5, 6\}$, where $\{5, 6\}$ is closed.
+\end{eg}
+
+\section{Recurrence or transience}
+We adopt the following notation:
+\[
+  \P_i(A) = \P(A| X_0 = i),
+\]
+and
+\[
+  \E_i(Z) = \E(Z| X_0 = i).
+\]
+Suppose we start from $i$, and randomly wander around. Eventually, we may or may not get to $j$. If we do, there is a time at which we first reach $j$. We call this the \emph{first passage time}, written
+\[
+  T_j = \min\{n \geq 1: X_n = j\}.
+\]
+Note that we require $n \geq 1$. Otherwise $T_i$ would always be $0$.
+
+The \emph{first passage probability} is
+\[
+  f_{ij}(n) = \P_i(T_j = n).
+\]
+\begin{defi}[Recurrent state]
+  A state $i\in S$ is \emph{recurrent} (or \emph{persistent}) if
+  \[
+    \P_i (T_i < \infty) = 1,
+  \]
+  ie. we will eventually get back to the space. Otherwise, we call the state \emph{transient}.
+\end{defi}
+Note that transient does \emph{not} mean we don't get back. It's just that we are not sure that we will get back. We can (but will not) show that if a state is recurrent, then the probability that we return to $i$ infinitely many times is also $1$.
+
+Note that when we discuss about recurrent and transient states, we are often concerned with an infinite state space. In the infinite state space, a state is transient because we are likely to wander to a place far far away and not get back. However, in a finite state space, transience happens only if we are stuck somewhere, ie. we are not in an irreducible state space. This is not too interesting.
+
+Our current objective is to show the following:
+\begin{thm}
+  $i$ is recurrent iff $\sum_n p_{ii}(n) = \infty$.
+\end{thm}
+The technique to prove this would be to use generating functions. We need to first decide what sequence to work with. For any fixed $i, j$, consider the sequence $p_{ij}(n)$ as a sequence in $n$. Then we define
+\[
+  P_{ij}(s) = \sum_{n = 0}^\infty p_{ij}(n) s^n.
+\]
+We also define
+\[
+  F_{ij}(S) = \sum_{n = 0}^\infty f_{ij}(n) s^n,
+\]
+where $f_{ij}$ is our first-pass probability. For the sake of clarity, we make it explicit that $p_{ij}(0) = \delta_{ij}$, and $f_{ij}(0) = 0$. One helpful theorem is
+\begin{thm}[]
+  \[
+    p_{ij}(s) = \delta_{ij} + F_{ij}(s)P_{ij}(s),
+  \]
+  for $-1 < s \leq 1$.
+\end{thm}
 \end{document}

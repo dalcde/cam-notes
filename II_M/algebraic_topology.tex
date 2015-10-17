@@ -5,6 +5,7 @@
 \def\nyear {2015}
 \def\nlecturer {H. Wilton}
 \def\ncourse {Algebraic Topology}
+\def\nlectures {MWF.9}
 \def\nnotready {}
 
 \input{header}
@@ -414,6 +415,7 @@ To do so, we need to be able to perform operations on paths.
   \]
   This is continuous by the gluing lemma.
 \end{defi}
+Note that we concatenate left to right, but function composition goes from right to left.
 \begin{center}
   \begin{tikzpicture}
     \draw plot [smooth cycle] coordinates {(-2.4, -0.7) (0, -0.7) (1.4, -1) (2.6, -0.9) (2.8, 0.6) (0.6, 1.9) (-3.4, 0.8)};
@@ -629,4 +631,166 @@ To solve all our previous problems about operations on paths not behaving well, 
       \end{center}
   \end{enumerate}
 \end{proof}
+\subsection{The fundamental group}
+The idea is to take spaces and turn them into groups. We want to try to do this using paths. We've seen that if we want to do this, we should work directly with paths, but paths up to homotopy. According to our proposition, this operation satisfies associativity, inverses and identity. The last issue we have to resolve is that we can't actually put two paths together unless they have the same start and end points.
+
+The idea is to fix one of the points $x_0$ in our space, and only think about loops that start and end at $x_0$. So we can always join two paths together.
+
+This tells us that we aren't going to just think about spaces, but spaces \emph{with basepoints}. We've now got everything we need.
+
+\begin{defi}[Fundamental group]
+  Let $X$ be a space and $x_0 \in X$. The \emph{fundamental group} of $X$ (based at $x_0$), denoted $\pi_1(X, x_0)$, is the set of homotopy classes of loops in $X$ based at $x_0$ (ie. $\gamma(0) = \gamma(1) = x_0$). The group operations are defined as follows:
+
+  We define an operation by $[\gamma_0][\gamma_1] = [\gamma_0\cdot \gamma_1]$; inverses by $[\gamma]^{-1} = [\gamma^{-1}]$; and the identity as the constant path $e = [c_{x_0}]$.
+\end{defi}
+Often, when we write the homotopy classes of paths $[\gamma]$, we just get lazy and write $\gamma$.
+
+\begin{thm}[]
+  The fundamental group is a group.
+\end{thm}
+
+\begin{proof}
+  Immediate from our previous lemmas.
+\end{proof}
+
+Often, in mathematics, after defining a term, we give lots of examples of it. Unfortunately, it is rather difficult to prove that a space has a non-trivial fundamental group, until we have developed some relevant machinery. Hence we will have to wait for a while before we have some concrete examples. Instead, we will look at some properties of the fundamental group first.
+
+\begin{defi}[Based space]
+  A \emph{based space} is a pair $(X, x_0)$ of a space $X$ and a point $x_0\in X$, the \emph{basepoint}. A \emph{map of based spaces}
+  \[
+    f: (X, x_0) \to (Y, y_0)
+  \]
+  is a continuous map $f: X\to Y$ such that $f(x_0) = y_0$. A \emph{based homotopy} is a homotopy rel $\{x_0\}$.
+\end{defi}
+
+Recall that for $\pi_0$, for every map $f: X\to Y$, we can associate a function $\pi_0(f): \pi_0(X) \to \pi_0(Y)$. We can do the same for $\pi_1$.
+\begin{prop}
+  To a based map
+  \[
+    f: (X, x_0) \to (Y, y_0),
+  \]
+  there is an associated function
+  \[
+    f_* = \pi_1(f): \pi_1(X, x_0) \to \pi_1(Y, y_0),
+  \]
+  defined by $[\gamma] \mapsto [f\circ \gamma]$. Moreover, it satisfies
+  \begin{enumerate}
+    \item $\pi_1(f)$ is a homomorphism of groups.
+    \item If $f \simeq f'$, then $\pi_1(f) = \pi_1(f')$.
+    \item For any maps $\begin{tikzcd} (A, a) \ar[r, "h"] & (B, b) \ar[r, "k"] & (C, c) \end{tikzcd}$, we have $\pi_1(k\circ h) = \pi_1(k)\circ \pi_1 (h)$.
+    \item $\pi_1(\id_X) = \id_{\pi_1(X, x_0)}$
+  \end{enumerate}
+\end{prop}
+
+\begin{proof}
+  Exercise.
+\end{proof}
+In category-theoretic language, we say that $\pi_1$ is a \emph{functor}.
+
+So far so good. However, to define the fundamental group, we had to make a compromise and pick a basepoint. But we just care about the space. We don't want a basepoint! Hence, we should look carefully what happens when we change the basepoint, and see if we can live without it.
+
+The first observation is that $\pi_1(X, x_0)$ only ``sees'' the path component of $x_0$, since all loops based at $x_0$ can only live inside the path component of $x_0$. Hence, the first importance of picking a basepoint is picking a path component.
+
+For all practical purposes, we just assume that $X$ is path connected, since if we weren't, the fundamental group just describes a particular path component of the original space.
+
+Now we want to compare fundamental groups with different basepoints. Suppose we have two basepoints $x_0$ and $x_1$. Suppose we have a loop $\gamma$ at $x_0$. How can we turn this into a loop based at $x_1$? This is easy. We first pick a path $u: x_0 \leadsto x_1$. Then we can produce a new loop at $x_1$ by going along $u^{-1}$ to $x_0$, take the path $\gamma$, and then return to $x_0$ by $u$, ie. consider $u\cdot \gamma\cdot u^{-1}$.
+\begin{center}
+  \begin{tikzpicture}
+    \draw plot [smooth cycle] coordinates {(-2.4, -0.7) (0, -0.7) (1.4, -1) (2.6, -0.9) (2.8, 0.6) (0.6, 1.9) (-3.4, 0.8)};
+
+    \node [circ] at (-2, 0.2) {};
+    \node [anchor = south west] at (-2, 0.2) {$x_0$};
+    \node [circ] at (1.5, 0.1) {};
+    \node [above] at (1.5, 0.1) {$x_1$};
+
+    \draw [->-=0.5] (-2.4, 0.2) circle [radius = 0.4];
+    \draw [->-=0.5] (-2, 0.2) parabola bend (-0.25, 0) (1.5, 0.1) node [pos=0.5, below] {$u$};
+    \draw [mred, ->-=0.3, ->-=0.7] (1.5, 0.1) -- (1.5, 0.2) parabola bend (-0.25, 0.1) (-2, 0.3) arc (14:346:0.4123) parabola bend (-0.25, -0.1) (1.5, 0) -- (1.5, 0.1);
+  \end{tikzpicture}
+\end{center}
+
+\begin{prop}
+  A path $u: x_0 \leadsto x_1$ induces a group \emph{isomorphism}
+  \[
+    u_\#: \pi_1(X, x_0) \to \pi_1(X, x_1)
+  \]
+  by
+  \[
+    [\gamma_0] \mapsto [u^{-1}\cdot \gamma \cdot u].
+  \]
+  This satisfies
+  \begin{enumerate}
+    \item If $u\simeq u'$, then $u_\# = u'_\#$.
+    \item $(c_{x_0})_\# = \id_{\pi_1(X, x_0)}$
+    \item If $v: x_1 \leadsto x_2$. Then $(u\cdot v)_\# = v_\# \circ u_\#$.
+    \item If $f: X\to Y$ with $f(x_0) = y_0$, $f(x_1) = y_1$, then
+      \[
+        (f\circ u)_\# \circ f_* = f_* \circ u_\#: \pi_1(X, x_0) \to \pi_1(Y, y_1).
+      \]
+      A nicer way of writing this is
+      \[
+        \begin{tikzcd}[row sep=large]
+          \pi_1(X, x_0) \ar[r, "f_*"] \ar[d, "u_\#"] & \pi_1(Y, y_0)\ar [d, "(f\circ u)_\#"]\\
+          \pi_1(X, x_1) \ar[r, "f_*"] & \pi_1(Y, y_1)
+        \end{tikzcd}
+      \]
+      The property says that the composition is the same no matter which way we go from $\pi_1(X, x_0)$ to $\pi_1(Y, y_1)$. We say that the square is a \emph{commutative diagram}. These diagrams will appear all of the time in this course.
+    \item If $x_1 = x_0$, then $u_\#$ is an automorphism of $\pi_1(X, x_0)$ given by conjugation by $u$.
+  \end{enumerate}
+\end{prop}
+It is important (yet difficult) the get the order of concatenation and composition right. Path concatenation is from left to right, while function composition is from right to left.
+
+\begin{proof}
+  Yet another exercise. Note that $(u^{-1})_\# = (u_\#)^{-1}$, which is why we have an isomorphism.
+\end{proof}
+The main takeaway is that if $x_0$ and $x_1$ are in the same path component, then 
+\[
+  \pi_1(X, x_0) \cong \pi_1(X, x_1).
+\]
+So the basepoint isn't really too important. However, we have to be careful. While the two groups are isomorphic, the actual isomorphism depends on \emph{which} path $u: x_0 \leadsto x_1$ we pick. So there is no natural isomorphism between the two groups. In particular, we cannot say ``let $\alpha \in \pi_1(X, x_0)$. Now let $\alpha'$ be the corresponding element in $\pi_1(X, x_1)$''.
+
+We can also see if $(X, x_0)$ and $(Y, y_0)$ are based homotopy equivalent, then $\pi_1(X, x_0)\cong \pi_1(Y, y_0)$. Indeed, if they are homotopy equivalent, then there is some $f: X \to Y$, $g: Y \to X$ such that $f\circ g = \id_Y$, $g\circ f = \id_X$. So $f_*\circ g_* = \id_{\pi_1(Y, y_0)}$ and $g_*\circ f_* = \id_{\pi_1(X, x_0)}$, and $f_*$ and $g_*$ are the isomorphisms we need.
+
+However, can we do this with non-based homotopies? Suppose we have a space $X$, and a space $Y$, and functions $f, g: X \to Y$, with a homotopy $H: X\times I \to Y$ from $f$ to $g$. Since we don't insist that this fixes $x_0$, we could have $f(x_0) \not= g(x_0)$. What can we do?
+
+First of all, we can find a path from $f(x_0)$ to $g(x_0)$. To produce this, we can use the homotopy. We let $u: f(x_0) \leadsto g(x_0)$ with $u = H(x_0, \cdot)$. Now we have things like $f_*, g_*$ and $u_\#$. Fortunately, these do fit together well.
+\begin{center}
+  \begin{tikzpicture}
+    \draw plot [smooth cycle] coordinates {(-3.7, -1.2) (-3.7, 0) (-4, 0.7) (-3.9, 1.3) (-2.4, 1.4) (-1.8, 0.3) (-2.2, -1.7)};
+    \draw plot [smooth cycle] coordinates {(1.3, -1.2) (1.3, 0) (0.7, 0.7) (0.6, 1.3) (2.6, 1.4) (3, 0.3) (2.8, -1.7)};
+
+    \node [circ] at (-3, 0) {};
+    \node [below] at (-3, 0) {$x_0$};
+    \node [above] at (-3, 1.6) {$X$};
+
+    \node [above] at (1.8, 1.6) {$Y$};
+
+    \node [circ] at (1.8, 0.8) {};
+    \node [below] at (1.8, 0.8) {$f(x_0)$};
+
+    \node [circ] at (2, -0.8) {};
+    \node [below] at (2, -0.8) {$g(x_0)$};
+
+    \draw [->] (-1.6, 1) parabola bend (-0.7, 1.3) (0.2, 1.2);
+    \node [above] at (-0.7, 1.3) {$f$};
+
+    \draw [->] (-1.6, -1) parabola bend (-0.3, -1.3) (1, -1.1);
+    \node [below] at (-0.3, -1.3) {$g$};
+  \end{tikzpicture}
+\end{center}
+
+\begin{lemma}
+  The following diagram commutes:
+  \[
+    \begin{tikzcd}
+      & \pi_1(Y, f(x_0)) \ar[dd, "u_\#"]\\
+      \pi_1(X, x_0) \ar[ru, "f_*"] \ar [rd, "g_*"']& \\
+      & \pi_1(Y, g(x_0))
+    \end{tikzcd}
+  \]
+  In algebra, we say
+  \[
+    g_* = u_\# \circ f_*.
+  \]
+\end{lemma}
 \end{document}

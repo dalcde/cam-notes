@@ -5,6 +5,7 @@
 \def\nyear {2015}
 \def\nlecturer {N. Wickramasekera}
 \def\ncourse {Analysis II}
+\def\nlectures {MWF.12}
 \def\nnotready {}
 
 \input{header}
@@ -438,14 +439,98 @@ It is important to remember that uniform convergence plus absolute pointwise con
   \]
   So done by the Cauchy criterion.
 \end{proof}
+
 \subsection{Power series}
 \begin{thm}[]
   Let $\sum\limits_{n = 0}^\infty c_n (x - a)^n$ be a real power series. Then there exists a unique number $R\in [0, +\infty]$ (called the radius of convergence) such that
   \begin{enumerate}
-    \item If $|x - a| < R$, then $\sum c_n (x - a)^n$ converges absolutely
+    \item If $|x - a| < R$, then $\sum c_n (x - a)^n$ converges absolutely.
     \item If $|x - a| > R$, then $\sum c_n (x - a)^n$ diverges.
-    \item If $R > 0$ and $0 < r < R$, then $\sum c_n (x - a)^n$ converges uniformly on $[a - r, a + r]$. 
+    \item If $R > 0$ and $0 < r < R$, then $\sum c_n (x - a)^n$ converges absolutely uniformly on $[a - r, a + r]$. We say that the sum converges locally absolutely uniformly inside circle of convergence, ie. for every point $y\in (a - R, a + R)$, there is some open interval around $y$ on which the sum converges absolutely uniformly.
+  \end{enumerate}
+  These results hold for complex power series as well, but for concreteness we will just do it for real series.
+\end{thm}
+Note that the first two statements are things we already know from IA Analysis I, and we are not going to prove them.
+\begin{proof}
+  See Analysis I for (i) and (ii).
+
+  For (iii), note that from (i), taking $x = a - r$, we know that $\sum |c_n| r^n$ is convergent. But we know that if $x\in [a - r, a + r]$, then
+  \[
+    |c_n (x - a)^n| \leq |c_n| r^n.
+  \]
+  So the result follows from the Weierstrass M-test by taking $M_n = |c_n| r^n$. 
+\end{proof}
+Note that uniform convergence need not hold on the entire interval of convergence.
+\begin{eg}
+  Consider $\sum x^n$. This converges for $x\in (-1, 1)$, but uniform convergence fails on $(-1, 1)$ since the tail
+  \[
+    \sum_{j = m}^n x^j = x^n \sum_{j = 0}^{n - m} x^j \geq \frac{x^m}{1 - x}.
+  \]
+  This is not uniformly small since we can make this large by picking $x$ close to $1$.
+\end{eg}
+
+\begin{thm}[Termwise differentiation of power series]
+  Suppose $\sum c_n (x - n)^n$ is a real power series with radius of convergence $R > 0$. Then
+  \begin{enumerate}
+    \item The ``derived series''
+      \[
+        \sum_{n = 1}^\infty n c_n (x - a)^{n - 1}
+      \]
+      has radius of convergence $R$.
+    \item The function defined by $f(x) = \sum c_n (x - a)^n$, $x\in (a - R, a + R)$ is differentiable with derivative $f'(x) = \sum n c_n (x - a)^{n - 1}$ within the (open) circle of convergence.
   \end{enumerate}
 \end{thm}
-Note that the first two statements are things we already know from IA Analysis I.
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item Let $R_1$ be the radius of convergence of the derived series. Since
+      \[
+        |c_n(x - a)^n| = |c_n||x - a|^{n - 1}|x - a| \leq |n c_n (x - a)^{n - 1}| |x - a|.
+      \]
+      Hence if the derived series $\sum n c_n(x - a)^{n - 1}$ converges absolutely for some $x$, then so does $\sum c_n (x - a)^n$. So $R_1 \leq R$.
+
+      Suppose that the inequality is strict, ie. $R_1 < R$, then there are $r_1, r$ such that $R_1 < r_1 < r < R$, where $\sum n|c_n| r_1^{n - 1}$ diverges while $\sum |c_n| r^n$ diverges. But this cannot be true since $n|c_n| r_1^{n - 1} \leq |c_n| r^n$ for sufficiently large $n$.
+
+    \item Let $f_n(x) = \sum\limits_{j = 0}^n c_j (x - a)^j$. Then $f_n '(x) = \sum\limits_{j = 1}^n j c_j (x - a)^{j - 1}$. We want to use the result that the derivative of limit is limit of derivative. This requires that $f_n$ converges at a point, and that $f_n'$ converges uniformly. The first is obviously true, and we know that $f_n'$ converges uniformly on $[a - r, a + r]$ for any $r < R$. So for each $x_0$, there is some interval containing $x_0$ on which $f_n'$ is convergent. So on this interval, we know that
+      \[
+        f(x) = \lim_{n \to \infty}f_n (x)
+      \]
+      is differentiable with
+      \[
+        f'(x) = \lim_{n \to \infty}f_n'(x) = \sum_{j = 1}^\infty jc_j (x - a)^j.
+      \]
+      In particular,
+      \[
+        f'(x_0) =  \sum_{j = 1}^\infty jc_j (x_0 - a)^j.
+      \]
+      Since this is true for all $x_0$, the result follows.
+  \end{enumerate}
+\end{proof}
+
+\section{Uniform continuity and integration}
+\subsection{Uniform continuity}
+Recall that we had a rather weak notion of convergence, known as pointwise convergence, and then promoted it to \emph{uniform convergence}. The process of this promotion is to replace the condition ``for each $x$, we can find an $\varepsilon$'' to ``we can find an $\varepsilon$ that works for each $x$''. We are going to do the same for continuity to obtain uniform continuity.
+
+\begin{defi}[Uniform continuity]
+  Let $E \subseteq \R$ and $f: E\to \R$. We say that $f$ is \emph{uniformly continuous} on $E$ if
+  \[
+    (\forall \varepsilon)(\exists \delta > 0)(\forall x)(\forall y)\; |x - y| < \delta \Rightarrow |f(x) - f(y)| < \varepsilon.
+  \]
+\end{defi}
+Compare this to the definition of continuity:
+\[
+  (\forall \varepsilon)(\forall x)(\exists \delta > 0)(\forall y)\; |x - y| < \delta \Rightarrow |f(x) - f(y)| < \varepsilon.
+\]
+Again, we have shifted the $(\forall x)$ out of the $(\exists \delta)$ quantifier. The difference is that in regular continuity, $\delta$ can depend on our choice of $x$, but in uniform continuity, it only depends on $y$. Again, clearly a uniformly continuous function is continuous.
+
+A very important theorem is
+\begin{thm}[]
+  Any continuous function on a closed, bounded interval is uniformly continuous.
+\end{thm}
+
+\begin{proof}
+  We are going to prove by contradiction. Suppose $f: [a, b] \to \R$ not uniformly continuous. Since $f$ is not uniformly continuous, there is some $\varepsilon > 0$ such that for all $\delta = \frac{1}{n}$, there is some $x_n, y_n$ such that $|x_n - y_n| < \frac{1}{n}$ but $|f(x_n) - f(y_n)| > \varepsilon$.
+
+  Since we are on a closed, bounded interval, by Bolazno-Weierstrass, $(x_n)$ has a convergent subsequence $(x_{n_i}) \to x$. Then we also have $y_{n_i}\to x$. So by continuity, we must have $f(x_{n_i}) \to f(x)$ and $f(y_{n_i}) \to f(x)$. But $|f(x_{n_i}) - f(y_{n_i})| > \varepsilon$ for all $n_i$. This is a contradiction.
+\end{proof}
 \end{document}
