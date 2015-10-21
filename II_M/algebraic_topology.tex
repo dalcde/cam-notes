@@ -793,4 +793,208 @@ First of all, we can find a path from $f(x_0)$ to $g(x_0)$. To produce this, we 
     g_* = u_\# \circ f_*.
   \]
 \end{lemma}
+
+\begin{proof}
+  Given a loop $\gamma: I\to X$ based at $x_0$.
+
+  We need to check that
+  \[
+    g_*([\gamma]) = u_\#\circ f_*([\gamma]).
+  \]
+  In other words, we want to show that
+  \[
+    g\circ \gamma \simeq u^{-1}\cdot (f\circ \gamma)\cdot u.
+  \]
+  To prove this result, we want to build a homotopy.
+
+  Consider the composition:
+  \[
+    F:
+    \begin{tikzcd}
+      I\times I \ar[r, "\gamma\times \id_I"] & X\times I \ar[r, "H"] & Y.
+    \end{tikzcd}
+  \]
+  Our plan is to exhibit two homotopic paths $\ell^+$ and $\ell^-$ in $I\times I$ such that
+  \[
+    F\circ \ell^+ = g \circ \gamma,\quad F\circ \ell^- = u^{-1}\cdot (f\circ \gamma) \cdot u.
+  \]
+  This is in general a good strategy - $X$ is a complicated and horrible space we don't understand. So to construct a homotopy, we make ourselves work in a much nicer space $I\times I$.
+
+  Our $\ell^+$ and $\ell^-$ are defined in a rather simple way.
+  \begin{center}
+    \begin{tikzpicture}[scale=0.75]
+      \node at (2, 5) {$I\times I$};
+      \draw [mgreen, ->-=0.5] (0, 4) -- (0, 0);
+      \draw [mgreen, ->-=0.5] (0, 0) -- (4, 0) node [pos=0.5, below] {$\ell^-$};
+      \draw [mgreen, ->-=0.5] (4, 0) -- (4, 4);
+
+      \draw [mred, ->-=0.5] (0, 4) -- (4, 4) node [pos=0.5, above] {$\ell^+$};
+
+      \draw [->] (4.5, 2) -- (6.5, 2) node [pos=0.5, above] {$F$};
+      \begin{scope}[shift={(7, 0)}]
+      \node at (2, 5) {$Y$};
+        \draw [->-=0.5] (0, 4) -- (0, 0) node [pos=0.5, right] {$u^{-1}$};
+        \draw [->-=0.5] (0, 0) -- (4, 0) node [pos=0.5, below] {$f$};
+        \draw [->-=0.5] (4, 0) -- (4, 4) node [pos=0.5, right] {$u$};
+
+        \draw [->-=0.5] (0, 4) -- (4, 4) node [pos=0.5, above] {$g$};
+      \end{scope}
+
+    \end{tikzpicture}
+  \end{center}
+  More precisely, $\ell^+$ is the path $s\mapsto (s, 1)$, and $\ell^-$ is the concatenation of the paths $s\mapsto (0, 1- s)$, $s \mapsto (s, 0)$ and $s\mapsto (1, s)$.
+
+  Note that $\ell^+$ and $\ell^-$ are homotopic as paths. If this is not obvious, we can manually check the homotopy
+  \[
+    L(s, t) = t\ell^+(s) + (1 - t)\ell^- (s).
+  \]
+  This works because $I\times I$ is convex. Hence $F\circ \ell^+\simeq_{F\circ L} F\circ \ell^-$ as paths.
+
+  Now we check that the compositions $F\circ \ell^{\pm}$ are indeed what we want. We have
+  \[
+    F\circ \ell^+ (s) = H(\gamma(s), 1) = g\circ \gamma.
+  \]
+  Similarly, we can show that
+  \[
+    F\circ \ell^-(s) = u^{-1}\cdot (f\circ \gamma)\cdot u.
+  \]
+\end{proof}
+It is worth looking at this proof hard and truly understand what is going on, since this is a really good example of how we can construct interesting homotopies.
+
+With this lemma, we can show that fundamental groups really respect homotopies.
+
+\begin{thm}
+  If $f: X\to Y$ is a homotopy equivalence, and $x_0 \in X$, then the induced map
+  \[
+    f_*: \pi_1(X, x_0) \to \pi_1(Y, f(x_0).
+  \]
+  is an isomorphism.
+\end{thm}
+While this seems rather obvious, it is actually non-trivial if we want to do it from scratch. While we are given a homotopy equivalence, we are given no guarantee that the homotopy respects our basepoints. So this proof involves some real work.
+
+\begin{proof}
+  Let $g: Y\to X$ be a homotopy inverse. So $f\circ g\simeq_H \id_Y$ and $g\circ f\simeq_H' \id_X$.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw plot [smooth cycle] coordinates {(-3.7, -1.2) (-3.7, 0) (-4, 0.7) (-3.9, 1.3) (-2.4, 1.4) (-1.8, 0.3) (-2.2, -1.7)};
+      \draw plot [smooth cycle] coordinates {(1.3, -1.2) (1.3, 0) (0.7, 0.7) (0.6, 1.3) (2.6, 1.4) (3, 0.3) (2.8, -1.7)};
+
+      \node [circ] at (-3, 0.7) {};
+      \node [above] at (-3, 0.7) {$x_0$};
+      \node [above] at (-3, 1.6) {$X$};
+
+      \node [above] at (1.8, 1.6) {$Y$};
+
+      \node [circ] at (1.8, 0.8) {};
+      \node [below] at (1.8, 0.8) {$f(x_0)$};
+
+      \node [circ] at (-3, -0.8) {};
+      \node [below] at (-3, -0.8) {$g\circ f(x_0)$};
+
+      \draw [decoration={snake}, decorate] (-3, 0.7) -- (-3, -0.8) node [right, pos=0.5] {$u'$};
+
+      \draw [->] (-1.6, 1) parabola bend (-0.7, 1.3) (0.2, 1.2);
+      \node [above] at (-0.7, 1.3) {$f$};
+
+      \draw [->] (1, -1.1) parabola bend (-0.3, -1.3) (-1.6, -1);
+      \node [below] at (-0.3, -1.3) {$g$};
+    \end{tikzpicture}
+  \end{center}
+  We have no guarantee that $g\circ f(x_0) = x_0$, but we know that our homotopy $H'$ gives us $u' = H'(x_0, \cdot): x_0 \leadsto g\circ f(x_0)$.
+
+  Applying our previous lemma with $\id_X$ for ``$f$'' and $g \circ f$ for ``$g$'', we get
+  \[
+    u'_\# \circ (\id_X)_* = (g\circ f)_*
+  \]
+  Using the properties of the $_*$ operation, we get that
+  \[
+    g_*\circ f_* = u'_\#.
+  \]
+  However, we know that $u'_\#$ is an isomorphism. So $f_*$ is injective and $g_*$ is surjective.
+
+  Doing it the other way round with $f\circ g$ instead of $g\circ f$, we know that $g_*$ is injective and $f_*$ is surjective. So both of them are isomorphisms.
+\end{proof}
+With this theorem, we can finally be sure that the fundamental group is a property of the space, without regards to the basepoint (assuming path connectedness), and is preserved by arbitrary homotopies.
+
+We now use the fundamental group to define several simple notions.
+\begin{defi}[Simply connected space]
+  A space $X$ is \emph{simply connected} if it is path connected \emph{and} $\pi_1(X, x_0) \cong 1$ for some (any) choice of $x_0 \in X$.
+\end{defi}
+
+\begin{eg}
+  Clearly, a point $*$ is simply connected since there is only one path on $*$ (the constant path). Hence, any contractible space is simply connected since it is homotopic to $*$. For example, $\R^n$ is simply connected for all spaces.
+\end{eg}
+
+There is a useful characterization of simply connected spaces:
+\begin{lemma}
+  A space $X$ is simply connected if and only if for any $x_0, x_1\in X$, there exists a unique homotopy class of paths $x_0 \leadsto x_1$.
+\end{lemma}
+
+Proof is, again, an exercise.
+
+\section{Covering spaces}
+We can ask ourselves a question - what are groups? We can write down a definition in terms of operations and axioms, but this is not what groups \emph{are}. Groups were created to represent \emph{symmetries} of objects. In particular, a group should be \emph{acting} on something. If not, something wrong is probably going on.
+
+We have created the fundamental group. So what do they act on? Can we find something on which these fundamental groups act on?
+
+An answer to this would also be helpful in more practical terms. So far we have not exhibited a non-trivial fundamental group. This would be easy if we can make the group act on something - if the group acts non-trivially on our thing, then clearly the group cannot be trivial.
+
+These things we act on are \emph{covering spaces}.
+
+\subsection{Covering space}
+Intuitively, a \emph{covering space} of $X$ is a pair $(\tilde{X}, p: \tilde{X} \to X)$, such that if we take any $x_0 \in X$, there is some neighbourhood $U$ of $x$ such that the pre-image of the neighbourhood is ``many copies'' of $U$.
+\begin{center}
+  \begin{tikzpicture}
+    \draw plot [smooth cycle] coordinates {(-1.2, -0.7) (0, -0.7) (0.7, -1) (1.3, -0.9) (1.4, 0.4) (0.3, 1) (-1.7, 0.6)};
+
+    \draw [fill=mblue] ellipse (0.6 and 0.3);
+    \node at (0.6, 0.3) [anchor = south east] {$U$};
+
+    \draw [densely dashed] (0, 1.5) -- (0, 0);
+    \foreach \y in {1.5, 2, 2.5, 3} {
+      \node [circ] at (0, \y) {};
+      \pgfmathsetmacro\c{100 - \y * 20};
+      \draw [densely dashed] (0, \y) -- (0, \y - 0.5);
+      \draw [fill=mblue!\c!mred] (0, \y) ellipse (0.6 and 0.3);
+      \node [circ] at (0, \y) {};
+    }
+    \node at (-1.5, 2.5) {\Large $\tilde{X}$};
+    \node at (-2.4, 0) {\Large $\tilde{X}$};
+    \node [circ] at (0, 0) {};
+    \node [left] at (0, 0) {$x_0$};
+
+    \draw [->] (2.3, 3) -- (2.3, 0.7) node [right, pos=0.5] {$p$};
+  \end{tikzpicture}
+\end{center}
+
+\begin{defi}[Covering space]
+  A \emph{covering space} of $X$ is a pair $(\tilde{X}, p: \tilde{X} \to X)$, such that each $x\in X$ has a neighbourhood $U$ which is \emph{evenly covered}.
+\end{defi}
+Whether we require $p$ to be surjective is a matter of taste. However, it will not matter if $X$ is path-connected, which is the case we really care about.
+
+\begin{defi}[Evenly covered]
+  $U$ is \emph{evenly covered} by $p$ if
+  \[
+    p^{-1}(U) \cong \coprod_{\alpha \in \Lambda}V_\alpha, % change to reverse pi
+  \]
+  where $p|_{V_\alpha}: V_\alpha \to U$ is a homeomorphism, and each of the $V_\alpha$ is open.
+
+  (the big reverse product sign is the disjoint union)
+\end{defi}
+
+\begin{eg}
+  $\R \to S^1$ by $t \mapsto 2^{2\pi i t}$ is a covering space.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [decorate, decoration={aspect=0.3, coil, amplitude=0.6cm}] (0, 1) -- (0, 3.65);
+
+      \draw ellipse (0.6 and 0.3);
+
+      \node at (-1, 0) {$S^1$};
+      \node at (-1, 2.3) {$\R$};
+
+      \draw [->] (1.4, 3) -- (1.4, 0.7) node [pos=0.5, right] {$p$};
+    \end{tikzpicture}
+  \end{center}
+\end{eg}
 \end{document}
