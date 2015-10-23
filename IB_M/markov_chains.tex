@@ -87,14 +87,14 @@ We will prove another seemingly obvious fact.
 \begin{thm}
   Let $\lambda$ be a distribution (on $S$) and $P$ a stochastic matrix. The sequence $\mathbf{X} = (X_0, X_1, \cdots)$ is a Markov chain with initial distribution $\lambda$ and transition matrix $P$ iff
   \[
-    \P(X_0 = i, X_1 = i_1, \cdots, X_n = i_n) = \lambda_{i_0}p_{i_0 i_1}p_{i_1i_2}\cdots p_{i_{n - 1}i_n}\tag{*}
+    \P(X_0 = i, X_1 = i_1, \cdots, X_n = i_n) = \lambda_{i_0}p_{i_0 i_1}p_{i_1i_2}\cdots p_{i_{n - 1}i_n}\tag{$*$}
   \]
   for all $n, i_0, \cdots, i_n$
 \end{thm}
 \begin{proof}
   Let $A_k$ be the event $X_k = i_k$. Then we can write $(*)$ as
   \[
-    \P(A_0\cap A_1\cap\cdots \cap A_n) = \lambda_{i_0}p_{i_0 i_1}p_{i_1i_2}\cdots p_{i_{n - 1}i_n}. \tag{*}
+    \P(A_0\cap A_1\cap\cdots \cap A_n) = \lambda_{i_0}p_{i_0 i_1}p_{i_1i_2}\cdots p_{i_{n - 1}i_n}. \tag{$*$}
   \]
   We first assume that $\mathbf{X}$ is a Markov chain. We prove $(*)$ by induction on $n$.
 
@@ -382,11 +382,156 @@ We also define
 \[
   F_{ij}(S) = \sum_{n = 0}^\infty f_{ij}(n) s^n,
 \]
-where $f_{ij}$ is our first-pass probability. For the sake of clarity, we make it explicit that $p_{ij}(0) = \delta_{ij}$, and $f_{ij}(0) = 0$. One helpful theorem is
+where $f_{ij}$ is our first-pass probability. For the sake of clarity, we make it explicit that $p_{ij}(0) = \delta_{ij}$, and $f_{ij}(0) = 0$.
+
+Our proof would be heavily based on the result below:
 \begin{thm}[]
   \[
-    p_{ij}(s) = \delta_{ij} + F_{ij}(s)P_{ij}(s),
+    P_{ij}(s) = \delta_{ij} + F_{ij}(s)P_{jj}(s),
   \]
   for $-1 < s \leq 1$.
+\end{thm}
+
+\begin{proof}
+  Using the law of total probability
+  \begin{align*}
+    p_{ij}(n) &= \sum_{m = 1}^n \P_i(X_n = j| T_j = m) \P_i(T_j = m) \\
+    \intertext{Using the Markov property, we can write this as}
+    &= \sum_{m = 1}^n \P(X_n = j| X_m = j) \P_i(T_j = m)\\
+    &= \sum_{m = 1}^n p_{jj}(n - m) f_{ij}(m).
+  \end{align*}
+  We can multiply through by $s^n$ and sum over all $n$ to obtain
+  \[
+    \sum_{n = 1}^\infty p_{ij}(n) S^n = \sum_{n = 1}^\infty \sum_{m = 1}^n p_{jj}(n - m)s^{n - m} f_{ij}(m)s^m.
+  \]
+  The left hand side is \emph{almost} the generating function $P_{ij}(s)$, except that we are missing an $n = 0$ term, which is $p_{ij}(0) = \delta_{ij}$. The right hand side is the ``convolution'' of the power series $P_{jj}(s)$ and $F_{ij}(s)$, which we can write as the product $P_{jj}(s) F_{ij}(s)$. So
+  \[
+    P_{ij}(s) - \delta_{ij} = P_{ij}(s) F_{ij}(s).
+  \]
+\end{proof}
+
+Before we actually prove our theorem, we need one helpful result from Analysis that allows us to deal with power series nicely.
+\begin{lemma}[Abel's lemma]
+  Let $u_1, u_2, \cdots$ be real numbers such that $U(s) = \sum_{n} u_n s^n$ converges for $0 < s < 1$. Then
+  \[
+    \lim_{s\to 1^-} U(s) = \sum_n u_n.
+  \]
+\end{lemma}
+Proof is an exercise for Analysis.
+
+We now prove the theorem we initially wanted to show
+\begin{thm}
+  $i$ is recurrent iff $\sum_n p_{ii}(n) = \infty$.
+\end{thm}
+
+\begin{proof}
+  Using $j = i$ in the above formula, for $0 < s < 1$, we have
+  \[
+    P_{ii}(s) = \frac{1}{1 - F_{ii} (s)}.
+  \]
+  Here we need to be careful that we are not dividing by $0$. Thiw would be a problem if $F_{ii}(s) = 1$. By definition, we have
+  \[
+    F_{ii}(s) = \sum_{n = 1}^\infty f_{ii}(n) s^n.
+  \]
+  Also, by definition of $f_{ii}$, we have
+  \[
+    F_{ii}(1) = \sum_n f_{ij}(n) = \P(\text{ever returning to }1) \leq 1.
+  \]
+  So for $|s| < 1$, $F_{ii}(s) < 1$. So we are not dividing by zero. Now we use our original equation
+  \[
+    P_{ii}(s) = \frac{1}{1 - F_{ii} (s)},
+  \]
+  and take the limit as $s \to 1$. By Abel's lemma, we know that the left hand side is
+  \[
+    \lim_{s \to 1}P_{ii}(s) = P_{ii}(1) = \sum_n p_{ii}(n).
+  \]
+  The other side is
+  \[
+    \lim_{s \to 1}\frac{1}{1 - F_{ii}(s)} = \frac{1}{1 - \sum f_{ii}(n)}.
+  \]
+  Hence we have
+  \[
+    \sum_n p_{ii}(n) = \frac{1}{1 - \sum f_{ii}(n)}.
+  \]
+  Since $\sum f_{ii}(n)$ is the probability of ever returning, the probability of ever returning is 1 if and only if $\sum_n p_{ii}(n) = \infty$.
+\end{proof}
+
+Using this result, we can check if a state is recurrent. However, a Markov chain has many states, and it would be tedious to check if every state is recurring. Thus we have the following helpful result.
+\begin{thm}[]
+  Let $C$ be a communicating class. Then
+  \begin{enumerate}
+    \item Either every state in $C$ is recurrent, or every state is transient.
+    \item If $C$ contains a recurrent state, then $C$ is closed.
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item Let $i \leftrightarrow j$ and $i \not =j$. Then by definition of communicating, there is some $m$ such that $p_{ij}(m) = \alpha > 0$, and some $n$ such that $p_{ji}(n) = \beta > 0$. So for each $k$, we have
+      \[
+        p_{ii}(m + k + n) \geq p_{ij}(m) p_{jj}(k) p_{ji}(n) = \alpha\beta p_{jj}(k).
+      \]
+      So if $\sum_k p_{jj}(k) = \infty$, then $\sum_r p_{ii}(r) = \infty$. So $j$ recurrent implies $i$ recurrent. Similarly, $i$ recurrent implies $j$ recurrent.
+    \item If $C$ is not closed, then there is a non-zero probability that we leave the class and never get back. So the states are not recurrent.
+  \end{enumerate}
+\end{proof}
+
+Note that there is a profound difference between a finite state space and an infinite state space. A finite state space can be represented by a finite matrix, and we are all very familiar with a finite matrices. We can use everything we know about finite matrices from IA Vectors and Matrices. However, infinite matrices are weirder.
+
+For example, any finite transition matrix $P$ has an eigenvalue of $1$. This is since the row sums of a transition matrix is always $1$. So if we multiply $P$ by $\mathbf{e} = (1, 1, \cdots, 1)$, then we get $\mathbf{e}$ again. However, this is not true for infinite matrices, since we usually don't usually allow arbitrary infinite vectors. We usually restrict our focus to vectors $\mathbf{x}$ such that $\sum x_i^2$ is finite. In this case the vector $\mathbf{e}$ is not allowed, and the transition matrix need not have eigenvalue $1$.
+
+Another thing about a finite state space is that probability ``cannot escape''. We can think of a Markov chain as a flow of probabilities around the state space, with the probability distribution moving around in every step. If we have a finite state space, all the probability must be contained within your finite state space. However, if we have an infinite state space, then probabilities can just drift away to infinity.
+
+In particular, we have the following result:
+\begin{thm}[]
+  In a finite state space,
+  \begin{enumerate}
+    \item There exists at least one recurrent state.
+    \item If the chain is irreducible, every state is recurrent.
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}
+  Recall that
+  \[
+    P_{ij}(s) = \delta_{ij} + P_{jj}(s) F_{ij}(s).
+  \]
+  If $j$ is transient, then $\sum_n p_{jj}(n) = P_{jj}(1) < \infty$. Hence $P_{ij}(1) < \infty$. By Abel's lemma, $P_{ij}(1)$ is given by
+  \[
+    P_{ij}(1) = \sum_n p_{ij}(n).
+  \]
+  Since this is finite,  we must have $p_{ij}\to 0$.
+
+  Since we know that
+  \[
+    \sum_{j\in S}p_{ij}(n) = 1,
+  \]
+  If every state is transient, then for all $j$, $\sum p_{ij}(n) \to 0$ as $n\to \infty$. This is a contradiction.
+\end{proof}
+
+\begin{thm}[P\'olya's theorem]
+  Consider $\Z^d = \{(x_1, x_2, \cdots, x_d): x_i \in \Z\}$. This generates a graph with $x\sim y$ if $|x - y| = 1$, where $|\cdot |$ is the Euclidean norm.
+  \begin{center}
+    \begin{tikzpicture}[scale=0.75]
+      \node at (-4, 0) {$d = 0$};
+      \draw (-2.5, 0) -- (2.5, 0);
+      \foreach \x in {-2,-1,...,2} {
+        \node [circ] at (\x, 0) {};
+      }
+      \begin{scope}[shift={(0, -3.5)}]
+        \node at (-4, 2) {$d = 1$};
+        \foreach \x in {-2, -1,...,2} {
+          \foreach \y in {-2,-1,...,2} {
+            \node [circ] at (\x, \y) {};
+          }
+        }
+        \foreach \x in {-2, -1,...,2} {
+          \draw (\x, -2.5) -- (\x, 2.5);
+          \draw (-2.5, \x) -- (2.5, \x);
+        }
+      \end{scope}
+    \end{tikzpicture}
+  \end{center}
+  Consider a random walk in $\Z^d$. At each step, it moves to a neighbour, each chosen with equal probability. Then this is recurrent if $d = 1$ or $2$.
 \end{thm}
 \end{document}

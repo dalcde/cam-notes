@@ -762,7 +762,7 @@ We can do this forever, but if this process never stops, even after infinite tim
 
 \subsubsection*{Back to vector spaces}
 The Hahn-Banach theorem is just our previous proposition without the constraint that $W$ has co-dimension 1.
-\begin{thm}[Hahn-Banach theorem]
+\begin{thm}[Hahn-Banach theorem*]
   Let $V$ be a real normed vector space, and $W\subseteq V$ a subset. Assume we have the following two items:
   \begin{itemize}
     \item $p: V \to \R$ (not necessarily linear), which is positive homogeneous and subadditive;
@@ -880,6 +880,11 @@ Recall that given $T\in \mathcal{B}(V, W)$, we defined $T^*\in \mathcal{B}(W^*, 
 \]
 for $\mathbf{v}\in V, f\in W^*$.
 
+Recall that we have previously shown that
+\[
+  \|T^*\|_{\mathcal{B}(W^*, V^*)} \leq \|T\|_{\mathcal{B}(V, W)}.
+\]
+We will now show that in fact equality holds.
 \begin{prop}
   \[
     \|T^*\|_{\mathcal{B}(W^*, V^*)} = \|T\|_{\mathcal{B}(V, W)}.
@@ -909,5 +914,169 @@ for $\mathbf{v}\in V, f\in W^*$.
     &\geq \|T\|_{\mathcal{B}(V, W)} - \varepsilon,
   \end{align*}
   where we used the fact that $\|f_{T\mathbf{v}}\|_{W^*}$ and $\|\mathbf{v}\|_V$ are both $1$. Since $\varepsilon$ is arbitrary, we are done.
+\end{proof}
+
+\section{Baire category theorem}
+\subsection{The Baire category theorem}
+When we first write the Baire category theorem down, it might seem a bit pointless. However, it turns out to be a really useful result. To specify the theorem, we will need some terminology.
+
+\begin{defi}[Nowhere dense set]
+  Let $X$ be a topological space. A subset $E\subseteq X$ is \emph{nowhere dense} if $\bar{E}$ has empty interior.
+\end{defi}
+Usually, we will pick $E$ to be closed so that the definition just says that $E$ has an empty interior.
+
+\begin{defi}[First/second category, meagre and residual]
+  Let $X$ be a topological space. We say that $Z\subseteq X$ is of \emph{first category} or \emph{meagre} if it is a countable union of nowhere dense set.
+
+  A subset is of \emph{second category} or \emph{non-meagre} if it is not of first category.
+
+  A subset is \emph{residual} if $X\setminus Z$ is meagre.
+\end{defi}
+
+\begin{thm}[Baire category theorem]
+  Let $X$ be a complete metric space. Then $X$ is of second category.
+\end{thm}
+This, by definition, means that it is not a countable union of nowhere dense set. This is equivalent to saying that if we can write
+\[
+  X = \bigcup_{n = 1}^\infty C_n,
+\]
+where each $C_n$ are closed, then $C_n$ has a non-empty interior for some $n$.
+
+Alternatively, we can say that if $U_n$ is a countable collection of open dense sets, then $\bigcap_{n = 1}^\infty U_n \not= \emptyset$ (for if $U_n$ is open dense, then $X\setminus X_n$ is closed with empty interior).
+
+\begin{proof}
+  We will prove that the intersection of a countable collection of open dense sets is non-empty. Let $U_n$ be a countable collection of open dense set.
+
+  The key to proving this is completeness, since that is the only information we have. The idea is to construct a sequence, show that it is Cauchy, and prove that the limit is in the intersection.
+
+  Construct a sequence $x_n \in X$ and $\varepsilon_n > 0$ as follows: let $x_1, \varepsilon_1$ be defined such that $\overline{B(x_1, \varepsilon_1)} \subseteq U_1$. This exists $U_1$ is open and dense. By density, there is some $x_1 \in U_1$, and $\varepsilon_1$ exists by openness.
+
+  We define the $x_n$ iteratively. Suppose we already have $x_n$ and $\varepsilon_n$. Define $x_{n + 1}, \varepsilon_{n + 1}$ such that $\overline{B(x_{n + 1}, \varepsilon_{n + 1})} \subseteq \overline{B(x_n, c_n)}\cap U_{n + 1}$. Again, this is possible because $U_{n + 1}$ is open and dense. Moreover, we choose our $\varepsilon_{n + 1}$ such that $\varepsilon_{n + 1} < \frac{1}{n}$ so that $\varepsilon_n \to 0$.
+
+  Since $\varepsilon_n \to 0$, we know that $x_n$ is a Cauchy sequence. By completeness of $X$, we can find an $x\in X$ such that $x_n \to x$. Since $x$ is the limit of $x_n$, we know that $x\in \overline{B(x_n, \varepsilon_n)}$ for all $n$. In particular, $x\in U_n$ for all $n$. So done.
+\end{proof}
+
+\subsection{Some applications}
+We are going to have a few applications of the Baire category theorem.
+
+\begin{prop}
+  $\R \setminus \Q \not= \emptyset$, ie. there is an irrational number.
+\end{prop}
+Of course, we can also prove this directly by, say, showing that $\sqrt{2}$ is irrational, or that noting that $\R$ is uncountable. However, we can also use the Baire category theorem.
+
+\begin{proof}
+  Recall that we defined $\R$ to be the completion of $\Q$. So we just have to show that $\Q$ is not complete.
+
+  First, note that $\Q$ is countable. Also, for all $q \in \Q$, $\{q\}$ is closed and has empty interior. Hence
+  \[
+    \Q = \bigcup_{q \in \Q}\{q\}
+  \]
+  is the countable union of nowhere dense sets. So it is not complete by the Baire category theorem.
+\end{proof}
+
+We will show that there are normed vector spaces which are not Banach spaces.
+\begin{prop}
+  Let $\hat{\ell}_1$ be a normed vector space defined by the vector space
+  \[
+    V = \{(x_1, x_2, \cdots): x_i \in \R, \exists I \in \N \text{ such that } i > I \Rightarrow x_i = 0\},
+  \]
+  with componentwise addition and scalar multiplication. This is the space of all sequences that are eventually zero.
+
+  We define the norm by
+  \[
+    \|x\|_{\hat{\ell}_1} = \sum_{i = 1}^\infty |x_i|.
+  \]
+  Then $\hat{\ell}_1$ is not a Banach space.
+\end{prop}
+Note that $\hat{\ell}_1$ is not standard notation.
+
+\begin{proof}
+  Let
+  \[
+    E_n = \{x\in \hat{\ell}_1: x_i = 0, \forall i \geq n\}.
+  \]
+  By definition,
+  \[
+    \hat{\ell}_1 = \bigcup_{n = 1}^\infty E_n.
+  \]
+  We now show that $E_n$ is nowhere dense. We first show that $E_n$ is closed. If $x_j \to x$ in $\hat{\ell}_1$ with $x_j \in E_n$, then since $x_j$ is $0$ from the $n$th component onwards, $x$ is also $0$ from the $n$th component onwards. So we must have $x \in E_n$. So $E_n$ is closed.
+
+  We now show that $E_n$ has empty interior. We need to show that for all $x\in E_n$ and $\varepsilon >  0$, there is some $y \in \hat{\ell}_1$ such that $\|y - x\| < \varepsilon$ but $y\not\in E_n$. This is also easy. Given $x = (x_1, \cdots, x_{n - 1}, 0, 0, \cdots)$, we consider
+  \[
+    y = (x_1, \cdots, x_{n - 1}, \varepsilon/2, 0, 0,\cdots).
+  \]
+  Then $\|y - x\|_{\hat{\ell}_1} < \varepsilon$ but $y \not\in E_n$. Hence by the Baire category theorem, $\hat{\ell}_1$ is not complete.
+\end{proof}
+
+\begin{prop}
+  There exists an $f\in C([0, 1])$ which is nowhere differentiable.
+\end{prop}
+
+\begin{proof}(sketch)
+  We want to show that the set of all continuous functions which are differentiable at at least one point is contained in a meagre subset of $C([0, 1])$. Then this set cannot be all of $C([0, 1])$ since $C([0, 1])$ is complete.
+
+  Let $E_{m, n}$ be the set of all $f \in C([0, 1])$ such that
+  \[
+    (\exists x)(\forall y)\; 0 < |y - x| < \frac{1}{m} \Rightarrow  |f(y) - f(x)| < n|y - x|.
+  \]
+  (where the quantifiers range over $[0, 1]$).
+
+  We now have to prove that
+  \[
+    \{f \in C([0, 1]): f\text{ is differentiable somewhere}\} \subseteq \bigcup_{n, m = 1}^\infty E_{m, n},
+  \]
+  and each $E_{m, n}$ is closed and has empty interior. This is left as an exercise for the reader. The hard part would be to show that $E_{m, n}$ has empty interior, but the others should be easy.
+\end{proof}
+
+\begin{thm}[Banach-Steinhaus theorem/uniform boundedness principle]
+  Let $V$ be a Banach space and $W$ be a normed vector space. Suppose $T_\alpha$ is a collection of bounded linear maps $T_\alpha: V\to W$ such that for each fixed $\mathbf{v} \in V$,
+  \[
+    \sup_\alpha \|T_\alpha (\mathbf{v})\|_W < \infty.
+  \]
+  Then
+  \[
+    \sup_\alpha \|T_\alpha\|_{\mathcal{B}(V, W)} < \infty.
+  \]
+\end{thm}
+The last statement is equivalent to saying
+\[
+  \sup_\alpha \sup_{\|\mathbf{v}\| < 1} \|T_\alpha(\mathbf{v})\|_W < \infty.
+\]
+
+\begin{proof}
+  Let
+  \[
+    E_n = \{\mathbf{v} \in V: \sup_\alpha \|T_\alpha(\mathbf{v})\|_W \leq n\}.
+  \]
+  Then by our conditions,
+  \[
+    V = \bigcup_{n = 1}^\infty E_n.
+  \]
+  We can write each $E_n$ as
+  \[
+    E_n = \bigcap_\alpha \{\mathbf{v} \in V: \|T_\alpha (\mathbf{v})\|_W \leq n\}.
+  \]
+  Since $T_\alpha$ is bounded and hence continuous, so $\{\mathbf{v} \in V: \|T_\alpha (\mathbf{v})\|_W\leq n\}$ is the continuous preimage of a closed set, and is hence closed. So $E_n$, being the intersection of closed sets, is closed.
+
+  By the Baire category theorem, there is some $n$ such that $E_n$ has non-empty interior. In particular, $(\exists n) (\exists \varepsilon > 0)(\exists \mathbf{v}_0 \in V)$  such that for all $\mathbf{v}\in B(\mathbf{v}_0, \varepsilon)$, we have
+  \[
+    \sup_{\alpha} \|T_\alpha(\mathbf{v})\|_W \leq n.
+  \]
+  Now consider arbitrary $\|\mathbf{v}'\|_V \leq 1$. Then
+  \[
+    \mathbf{v}_0 + \frac{\varepsilon}{2} \mathbf{v}' \in B(\mathbf{v}_0, \varepsilon).
+  \]
+  So
+  \[
+    \sup_\alpha \left\|T_\alpha\left(\mathbf{v}_0 + \frac{\varepsilon \mathbf{v}'}{2}\right)\right\|_W \leq n.
+  \]
+  Therefore
+  \[
+    \sup_\alpha \|T_\alpha \mathbf{v}'\|_W \leq  \frac{2}{\varepsilon} \left(n + \sup_\alpha \|T_\alpha \mathbf{v}_0\|\right).
+  \]
+  Note that the right hand side is independent of $\mathbf{v}'$. So
+  \[
+    \sup_{\|\mathbf{v}'\| \leq 1}\sup_\alpha \|T_\alpha \mathbf{v}'\|_W \leq \infty.
+  \]
 \end{proof}
 \end{document}
