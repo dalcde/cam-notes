@@ -775,5 +775,110 @@ Since there is time left in the lecture, we'll write down a really remarkable re
   \]
   These are known as \emph{Bernstein polynomials}.
 \end{thm}
-Proof is, err\ldots on the example sheet?
+Of course, there are many different sequences of polynomials converging uniformly to $f$. Apart from the silly examples like adding $\frac{1}{n}$ to each $p_n$, there can also be vastly different ways of constructing such polynomial sequences.
+
+\begin{proof}
+  For convenience, let
+  \[
+    p_{n, k}(x) = \binom{n}{k}x^k (1 - x)^{n - k}.
+  \]
+  First we need a few facts about these functions. Firstly, $p_{n, k}(x) \geq 0$ for all $x\in [0, 1]$. Also, by the binomial theorem,
+  \[
+    \sum_{k = 0}^n \binom{n}{k}x^k y^{n - k} = (x + y)^n.
+  \]
+  So we get
+  \[
+    \sum_{k = 0}^n p_{n, k}(x) = 1.
+  \]
+  Differentiating the binomial theorem with respect to $x$ and putting $y = 1 - x$ gives
+  \[
+    \sum_{k = 0}^n \binom{n}{k}k x^{k - 1}(1 - x)^{n - k} = n.
+  \]
+  We multiply by $x$ to obtain
+  \[
+    \sum_{k = 0}^n \binom{n}{k}k x^k(1 - x)^{n - k} = nx.
+  \]
+  In other words,
+  \[
+    \sum_{k = 0}^n kp_{n, k}(x) = nx.
+  \]
+  Differentiating once more gives
+  \[
+    \sum_{k = 0}^n k(k - 1)p_{n, k}(x) = n(n - 1)x^2.
+  \]
+  Adding these two results gives
+  \[
+    \sum_{k = 0}^n k^2 p_{n, k}(x) = n^2 x^2 + nx(1 - x).
+  \]
+  We will write our results in a rather weird way:
+  \[
+    \sum_{k = 0}^n (nx - k)^2 p_{n, k}(x) = n^2 x^2 - 2nx \cdot nx + n^2 x^2 + nx(1 - x) = nx(1 - x).\tag{$*$}
+  \]
+  This is what we really need.
+
+  Now given $\varepsilon$, since $f$ is continuous, $f$ is uniformly continuous. So pick $\delta$ such that $|f(x) - f(y)| < \varepsilon$ whenever $|x - y| < \delta$.
+
+  Since $\sum p_{n, k}(x) = 1$, $f(x) = \sum p_{n, k}(x) f(x)$. Now for each \emph{fixed} $x$, we can write
+  \begin{align*}
+    |p_n(x) - f(x)| &= \left|\sum_{k = 0}^n \left(f\left(\frac{k}{n}\right) - f(x)\right) p_{n, k}(x)\right|\\
+    &\leq \sum_{k = 0}^n \left|f\left(\frac{k}{n}\right) - f(x)\right| p_{n, k}(x)\\
+    &= \sum_{k: |x - k/n| < \delta}\left(\left|f\left(\frac{k}{n}\right) - f(x)\right| p_{n, k}(x)\right) \\
+    &\quad\quad\quad+ \sum_{k: |x - k/n| \geq \delta}\left(\left|f\left(\frac{k}{n}\right) - f(x)\right| p_{n, k}(x)\right)\\
+    &\leq \varepsilon \sum_{k = 0}^n p_{n, k}(x) + 2\sup_{[0, 1]} |f| \sum_{k: |x - k/n| > \delta} p_{n, k}(x)\\
+    &\leq \varepsilon + 2\sup_{[0, 1]} |f|\cdot \frac{1}{\delta^2}\sum_{k: |x - k/n| > \delta} \left(x - \frac{k}{n}\right)^2 p_{n, k}(x)\\
+    &\leq \varepsilon + 2\sup_{[0, 1]} |f|\cdot \frac{1}{\delta^2}\sum_{k = 0}^n \left(x - \frac{k}{n}\right)^2 p_{n, k}(x)\\
+    &= \varepsilon + \frac{2\sup|f|}{\delta^2 n^2} nx(1 - x)\\
+    &\leq \varepsilon + \frac{2\sup|f|}{\delta^2 n}\\
+  \end{align*}
+  Hence given any $\varepsilon$ and $\delta$, we can pick $n$ sufficiently large that that $|p_n(x) - f(x)| < 2\varepsilon$. This is picked independently of $x$. So done.
+\end{proof}
+
+We might be interested in the question - when is a function Riemann integrable? A possible answer is if it satisfies the Riemann integrability criterion, but this is not really helpful. We know that a function is integrable if it is continuous. But it need not be. It could be discontinuous at finitely many points and still be integrable. If it has countably many discontinuities, then we still can integrate it. How many points of discontinuiity can we accommodate if we want to keep integrability?
+
+To answer this questions, we have Lebesgue's thoerem. To state this theorem, we need the following definition:
+\begin{defi}[Lebesgue measure zero*]
+  A subset $A\subseteq \R$ is said to have \emph{(Lebesgue) measure zero} if for any $\varepsilon > 0$, there exists a countable (possibly finite) collection of open intervals $I_j$ such that
+  \[
+    A \subseteq \bigcup_{j = 1}^\infty I_J,
+  \]
+  and
+  \[
+    \sum_{j = 1}^\infty | I_j| < \varepsilon.
+  \]
+  here $|I_j|$ is defined as the length of the interval, not the cardinality (obviously).
+\end{defi}
+This is a way to characterize ``small'' sets, and in general a rather good way. This will be studied in depth in the IID Probability and Measure course.
+
+\begin{eg}\leavevmode
+  \begin{itemize}
+    \item The empty set has measure zero.
+    \item Any finite set has measure zero.
+    \item Any countable set has measure zero. If $A = \{a_0, a_1, \cdots, \}$, take
+      \[
+        I_j = \left(a_j - \frac{\varepsilon}{2^{j + 1}}, a_j + \frac{\varepsilon}{2^{j + 1}}\right).
+      \]
+      Then $A$ is contained in the union and the sum of lengths is $\varepsilon$.
+    \item A countable union of sets of measure zero has measure zero, using a similar proof strategy as above.
+    \item Any (non-trivial) interval does not have measure zero.
+    \item The Cantor set, despite being uncountable, has measure zero. The Cantor set is constructed as follows: start with $C_0 = [0, 1]$. Remove the middle third $\left(\frac{1}{3}, \frac{2}{3}\right)$ to obtain $C_1 = \left[0, \frac{1}{3}\right] \cup \left[\frac{2}{3}, 1\right]$. Removing the middle third of each segment to obtain
+      \[
+        C_2 = \left[0, \frac{1}{9}\right] \cup \left[\frac{2}{9}, \frac{3}{9}\right] \cup \left[\frac{6}{9}, \frac{7}{9}\right]\cup \left[\frac{8}{9}, 1\right].
+      \]
+      Continue iteratively by removing the middle thirds of each part. Define
+      \[
+        C = \bigcap_{n = 0}^\infty C_n,
+      \]
+      which is the Cantor set. Since each $C_n$ consists of $2^n$ disjoint closed intervals of length $1/3^n$, the total length of the segments of $C_n$ is $\left(\frac{2}{3}\right)^n \to 0$. So we can cover $C$ by arbitrarily small union of intervals. Hence the Cantor set has measure zero.
+
+      It is slightly trickier to show that $C$ is uncountable, and to save time, we are not doing it now.
+  \end{itemize}
+\end{eg}
+Using this definition, we can have the following theorem:
+\begin{thm}[Lebesgue's theorem on the Riemann integral*]
+  Let $f: [a, b] \to \R$ be a bounded function, and let $\mathcal{D}_f$ be the set of points of discontinuities of $f$. Then $f$ is Riemann integrable \emph{if and only if} $\mathcal{D}_f$ has measure zero.
+\end{thm}
+Using this result, a lot of our theorems follow easily of these. Apart from the easy ones like the sum and product of integrable functions is integrable, we can also easily show that the composition of a continuous function with an integrable function is integrable, since composing with a continuous function will not introduce more discontinuities.
+
+Similarly, we can show that the uniform limit of integrable functions is integrable, since the points of discontinuities of the uniform limit is at most the (countable) union of all discontinuities of the functions in the sequence.
+
 \end{document}
