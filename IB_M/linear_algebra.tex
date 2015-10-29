@@ -140,9 +140,9 @@ If we have two subspaces $U$ and $V$, there are several things we can do with th
 \end{proof}
 
 \begin{defi}[Quotient spaces*]
-  Suppose that $V$ is a vector space, and $U\subseteq V$ is a subspace. Then the quotient group $V/U$ can be made into a vector space called the \emph{quotient space}, where scalar multiplication is given by $(\lambda, v + U) = (\lambda v) + U$.
+  Suppose that $V$ is a vector space, and $U\subseteq V$ is a subspace. Then the quotient group $V/U$ can be made into a vector space called the \emph{quotient space}, where scalar multiplication is given by $(\lambda, \mathbf{v} + U) = (\lambda \mathbf{v}) + U$.
 
-  This is well defined since if $v + U = w + U\in V/U$, then $v - w \in U$. Hence for $\lambda \in \F$, we have $\lambda v - \lambda w \in U$. So $\lambda v + U = \lambda w + U$.
+  This is well defined since if $\mathbf{v} + U = \mathbf{w} + U\in V/U$, then $\mathbf{v} - \mathbf{w} \in U$. Hence for $\lambda \in \F$, we have $\lambda \mathbf{v} - \lambda \mathbf{w} \in U$. So $\lambda \mathbf{v} + U = \lambda \mathbf{w} + U$.
 \end{defi}
 \subsection{Linear independence, bases and the Steinitz exchange lemma}
 
@@ -658,7 +658,7 @@ However, we will not just prove that they are isomorphic. We will show that they
 \end{prop}
 
 \begin{proof}
-  We first make sure this is indeed a function - if $\alpha$ is an isomorphism, then from our previous proposition, we know that it sends a basis to a basis. So $(\alpha(\mathbf{e}_1), \cdots, \alpha(\mathbf{e}_n))$ is indeed a basis for $V$.
+  We first make sure this is indeed a function --- if $\alpha$ is an isomorphism, then from our previous proposition, we know that it sends a basis to a basis. So $(\alpha(\mathbf{e}_1), \cdots, \alpha(\mathbf{e}_n))$ is indeed a basis for $V$.
 
   We now have to prove surjectivity and injectivity.
 
@@ -1163,4 +1163,342 @@ We are going to start with $A$, and then apply these operations to get it into t
   Now $B$ is smaller than $A$. So by induction on the size of $A$, we can reduce $B$ to a matrix of the required form, so done.
 \end{proof}
 It is an exercise to show that the row and column operations do not change the row rank or column rank. So deduce that they are equal.
+
+\section{Duality}
+Duality is a principle we will find throughout mathematics. For example, in IB Optimisation, we considered the dual problems of linear programs. Here we will look for the dual of vector spaces. In general, we try to look at our question in a ``mirror'' and hope that the mirror problem is easier to solve than the original mirror.
+
+\subsection{Dual space}
+To specify a subspace of $\F^n$, we can write down linear equations that its elements satisfy. For example, if we have the subspace $U = \bra \begin{pmatrix} 1\\2\\1 \end{pmatrix}\ket\subseteq \F^3$, we can specify this by saying $\begin{pmatrix}x_1\\ x_2\\ x_3\end{pmatrix} \in U$ if and only if
+\begin{align*}
+  x_1 - x_3 &= 0\\
+  2x_1 - x_2 &= 0.
+\end{align*}
+However, characterizing a space in terms of equations involves picking some particular equations out of the many possibilities. In general, we do not like making arbitrary choices. Hence the solution is to consider \emph{all} possible such equations. We will show that these form a subspace in some space.
+
+We can interpret these equations in terms of linear maps $\F^n \to \F$. For example $x_1 = x_3 = 0$ if and only if $\begin{pmatrix}x_1\\x_2\\x_3\end{pmatrix} \in \ker \theta$, where $\theta: \F^3 \to \F$ is defined by $\begin{pmatrix}x_1\\x_2\\x_3\end{pmatrix} \mapsto x_1 - x_3$.
+
+This works well with the vector space operations. If $\theta_1, \theta_2: \F^n \to \F$ vanish on some subspace of $\F^n$, and $\lambda, \mu\in \F$, then $\lambda \theta_1 + \mu \theta_2$ also vanishes on the subspace. So the set of all maps $\F^n \to \F$ that vanishes on $U$ forms a vector space.
+
+To formalize this notion, we introduce dual spaces.
+
+\begin{defi}[Dual space]
+  Let $V$ be a vector space over $\F$. The \emph{dual} of $V$ is defined as
+  \[
+    V^* = \mathcal{L}(V, \F) = \{\theta: V \to \F: \theta\text{ linear}\}.
+  \]
+  Elements of $V^*$ are called \emph{linear functionals} or \emph{linear forms}.
+\end{defi}
+By convention, we use Roman letters for elements in $V$, and Greek letters for elements in $V^*$.
+
+\begin{eg}\leavevmode
+  \begin{itemize}
+    \item If $V = \R^3$ and $\theta: V\to \R$ that sends $\begin{pmatrix}x_1\\x_2\\x_3\end{pmatrix} \mapsto x_1 - x_3$, then $\theta \in V^*$.
+    \item Let $V = \F^X$. Then for any fixed $x$, $\theta: V\to \F$ defined by $f \mapsto f(x)$ is in $V^*$.
+    \item Let $C([0, 1], \R)$. Then $f \mapsto \int_0^1 f(t)\;\d t \in V^*$.
+    \item The trace $\tr: M_n(\F)\to \F$ defined by $A\mapsto \sum_{i = 1}^n A_{ii}$ is in $M_n(\F)^*$.
+  \end{itemize}
+\end{eg}
+
+It turns out it is rather easy to specify how the dual space looks like, at least in the case where $V$ is finite dimensional.
+\begin{lemma}
+  If $V$ is a finite-dimensional vector space over $f$ with basis $(\mathbf{e}_1, \cdots, \mathbf{e}_n)$, then there is a basis $(\varepsilon_1, \cdots, \varepsilon_n)$  for $V^*$ (called the \emph{dual basis} to $(\mathbf{e}_1, \cdots, \mathbf{e}_n)$) such that
+  \[
+    \varepsilon_i(\mathbf{e}_j) = \delta_{ij}.
+  \]
+\end{lemma}
+
+\begin{proof}
+  Since linear maps are characterized by their values on a basis, there exists unique choices for $\varepsilon_1, \cdots, \varepsilon_n \in V^*$. Now we show that $(\varepsilon_1, \cdots, \varepsilon_n)$ is a basis.
+
+  Suppose $\theta \in V^*$. We show that we can write it uniquely as a combination of $\varepsilon_1, \cdots, \varepsilon_n$. We have $\theta = \sum_{i = 1}^n \lambda_i \varepsilon_i$ if and only if $\theta(\mathbf{e}_j) = \sum_{i = 1}^n \varepsilon_i(\mathbf{e}_j)$ if and only if $\lambda_j = \theta(\mathbf{e}_j)$. So we have uniqueness and existence.
+\end{proof}
+
+\begin{cor}
+  If $V$ is finite dimensional, then $\dim V = \dim V^*$.
+\end{cor}
+When $V$ is not finite dimensional, this need not be true. However, we know that the dimension of $V^*$ is at least as big as that of $V$, since the above gives a set of $\dim V$ many independent vectors in $V^*$.
+
+It helps to come up with a more concrete example of how dual spaces look like. Consider the vector space $\F^n$, where we treat each element as a column vector (with respect to the standard basis). Then we can regard elements of $V^*$ as just row vectors $(a_1, \cdots, a_n) = \sum_{j = 1}^n a_j\varepsilon_j$ with respect to the dual basis. We have
+\[
+  \left(\sum a_j \varepsilon_j\right)\left(\sum_{x_i}\mathbf{e}_i\right) = \sum_{i, j} a_j x_i \delta_{ij} = \sum_{i = 1}^n a_i x_i =
+  \begin{pmatrix}
+    a_1 & \cdots & a_n
+  \end{pmatrix}
+  \begin{pmatrix}
+    x_1\\\vdots\\x_n
+  \end{pmatrix}.
+\]
+This is exactly what we want.
+
+Now what happens when we change basis? How will the dual basis change?
+\begin{prop}
+  Let $V$ be a finite-dimensional vector space over $\F$ with bases $(\mathbf{e}_1, \cdots, \mathbf{e}_n)$ and $(\mathbf{f}_1, \cdots, \mathbf{f}_n)$, and that $P$ is the change of basis matrix so that
+  \[
+    \mathbf{f}_i = \sum_{k = 1}^n P_{ki}\mathbf{e}_k.
+  \]
+  Let $(\varepsilon_1, \cdots, \varepsilon_n)$ and $(\eta_1, \cdots, \eta_n)$ be the corresponding dual bases so that
+  \[
+    \varepsilon_i (\mathbf{e}_j) = \delta_{ij} = \eta_i (\mathbf{f}_j).
+  \]
+  Then the change of basis matrix from $(\varepsilon_1, \cdots, \varepsilon_n)$ to $(\eta_1, \cdots, \eta_n)$ is $(P^{-1})^T$, ie.
+  \[
+    \varepsilon_i = \sum_{\ell = 1}^n P_{\ell i}^T \eta_\ell.
+  \]
+\end{prop}
+
+\begin{proof}
+  For convenience, write $Q = P^{-1}$ so that
+  \[
+    \mathbf{e}_j = \sum_{k = 1}^n Q_{kj}\mathbf{f}_k.
+  \]
+  So we can compute
+  \begin{align*}
+    \left(\sum_{\ell = 1}^\infty P_{i\ell}\eta_\ell\right)(\mathbf{e}_j) &= \left(\sum_{\ell = 1}^\infty P_{i\ell}\eta_\ell\right)\left(\sum_{k = 1}^n Q_{kj}\mathbf{f}_k\right)\\
+    &= \sum_{k, \ell} P_{i\ell}\delta_{\ell k} Q_{kj}\\
+    &= \sum_{k, \ell} P_{i\ell} Q_{\ell j}\\
+    &= [PQ]_{ij}\\
+    &= \delta_{ij}.
+  \end{align*}
+  So $\varepsilon_i = \sum_{\ell = 1}^n P_{\ell i}^T \eta_\ell$.
+\end{proof}
+
+Now we'll return to our original motivation, and think how we can define subspaces of $V^*$ in terms of subspaces of $V$, and vice versa.
+
+\begin{defi}[Annihilator]
+  Let $U\subseteq V$. Then the \emph{annihilator} of $U$ is
+  \[
+    U^0 = \{\theta\in V^* : \theta(\mathbf{u}) = 0, \forall \mathbf{u}\in U\}.
+  \]
+  If $W \subseteq V^*$, then the \emph{annihilator} of $V$ is
+  \[
+    W^0 = \{\mathbf{v}\in V: \theta(\mathbf{v}) = 0,\forall \theta \in W\}.
+  \]
+\end{defi}
+One might object that $W^0$ should be a subset of $V^{**}$ and not $V$. We will later show that there is a canonical isomorphism between $V^{**}$ and $V$, and this will all make sense.
+
+\begin{eg}
+  Consider $\R^3$ with standard basis $\mathbf{e}_1, \mathbf{e}_2, \mathbf{e}_3$; $(R^3)^*$ with dual basis $(\varepsilon_1, \varepsilon_2, \varepsilon_3)$. If $U = \bra \mathbf{e}_1 + 2\mathbf{e}_2 + \mathbf{e}_3\ket$ and $W = \bra \varepsilon_1 - \varepsilon_3, 2\varepsilon_1 - \varepsilon_2\ket $, then $U^0 = W$ and $W^0 = U$.
+\end{eg}
+We see that the dimension of $U$ and $U^0$ add up to three, which is the dimension of $\R^3$. This is typical.
+
+\begin{prop}
+  Let $V$ be a vector space over $\F$ and $U$ a subspace. Then
+  \[
+    \dim U + \dim U^0 = \dim V.
+  \]
+\end{prop}
+We are going to prove this in many ways.
+\begin{proof}
+  Let $(\mathbf{e}_1, \cdots, \mathbf{e}_k)$ be a basis for $U$ and extend to $(\mathbf{e}_1, \cdots, \mathbf{e}_n)$ a basis for $V$. Consider the dual basis for $V^*$, say $(\varepsilon_1, \cdots, \varepsilon_n)$. Then we will show that
+  \[
+    U^0 = \bra \varepsilon_{k + 1}, \cdots,  \varepsilon_{n}\ket.
+  \]
+  So $\dim U^0 = n - k$ as required. This is easy to prove --- if $j > k$, then $\varepsilon_j(\mathbf{e}_i) = 0$ for all $ i \leq k$. So $\varepsilon_{k + 1}, \cdots, \varepsilon_n \in U^0$. On the other hand, suppose $\theta \in U^0$. Then we can write
+  \[
+    \theta = \sum_{j = 1}^n \lambda_j \varepsilon_j.
+  \]
+  But then $0 = \theta (\mathbf{e}_i) = \lambda_i$ for $i \leq k$. So done.
+\end{proof}
+
+\begin{proof}
+  Consider the restriction map $V^* \to U^*$, given by $\theta \mapsto \theta|_U$. This is obviously linear. Since every linear map $U \to \F$ can be extended to $V\to \F$, this is a surjection. Moreover, the kernel is $U^0$. So by rank-nullity theorem,
+  \[
+    \dim V^* = \dim U^0 + \dim U^*.
+  \]
+  Since $\dim V^* = \dim V$ and $\dim U^* = \dim U$, we're done.
+\end{proof}
+
+\begin{proof}
+  We can show that $U^0 \simeq (V/U)^*$, and then deduce the result. Details are left as an exercise.
+\end{proof}
+
+\subsection{Dual maps}
+Since linear algebra is the study of vector spaces and linear maps between them, after dualizing vector spaces, we should be able to dualize linear maps as well. If we have a map $\alpha: V \to W$, then after dualizing, the map will go \emph{the other direction}, ie. $\alpha^*: W^* \to V^*$. This is a characteristic common to most dualization processes in mathematics.
+
+\begin{defi}[Dual map]
+  Let $V, W$ be vector spaces over $\F$ and $\alpha: V\to W \in \mathcal{L}(V, W)$. The \emph{dual map} to $\alpha$, written $\alpha^*: W^* \to V^*$ is given by $\theta \mapsto \theta \circ \alpha$. Since the composite of linear maps is linear, $\alpha^*(\theta) \in V^*$. So this is a genuine map.
+\end{defi}
+
+\begin{prop}
+  Let $\alpha \in \mathcal{L}(V, w)$ be a linear map. Then $\alpha^* \in \mathcal{L}(W^*, V^*)$ is a linear map.
+\end{prop}
+
+\begin{proof}
+  Let $\lambda, \mu \in \F$ and $\theta_1, \theta_2 \in W^*$. We want to show
+  \[
+    \alpha^*(\lambda \theta_1 + \mu \theta_2) = \lambda \alpha^*(\theta_1) + \mu \alpha^*(\theta_2).
+  \]
+  To show this, we show that for every $\mathbf{v} \in V$, the left and right give the same result. We have
+  \begin{align*}
+    \alpha^*(\lambda \theta_1 + \mu \theta_2)(\mathbf{v}) &= (\lambda \theta_1 + \mu \theta_2)(\alpha \mathbf{v}) \\
+    &= \lambda \theta_1 (\alpha (\mathbf{v})) + \mu \theta_2 (\alpha(\mathbf{v})) \\
+    &= (\lambda \alpha^*(\theta_1)+ \mu \alpha^*(\theta_2))(\mathbf{v}).
+  \end{align*}
+  So $\alpha^* \in \mathcal{L}(W^*, V^*)$.
+\end{proof}
+
+What happens to the matrices when we take the dual map? The answer is that we get the transpose.
+\begin{prop}
+  Let $V, W$ be finite-dimensional vector spaces over $\F$ and $\alpha: V\to W$ be a linear map. Let $(\mathbf{e}_1, \cdots, \mathbf{e}_n)$ be a basis for $V$ and $(\mathbf{f}_1, \cdots, \mathbf{f}_m)$ be a basis for $W$; $(\varepsilon_1, \cdots, \varepsilon_n)$ and $(\eta_1, \cdots, \eta_m)$ the corresponding dual bases.
+
+  Suppose $\alpha$ is represented by $A$ with respect to $(\mathbf{e}_i)$ and $(\mathbf{f}_i)$ for $V$ and $W$. Then $\alpha^*$ is represented by $A^T$ with respect to the corresponding dual bases.
+\end{prop}
+
+\begin{proof}
+  We are given that
+  \[
+    \alpha (\mathbf{e}_i) = \sum_{k = 1}^m A_{ki}\mathbf{f}_k.
+  \]
+  We must compute $\alpha^*(\eta_i)$. To do so, we evaluate it at $\mathbf{e}_j$. We have
+  \[
+    \alpha^*(\eta_i)(\mathbf{e}_j) = \eta_i(\alpha(\mathbf{e}_j)) = \eta_i\left(\sum_{k = 1}^m A_{kj}\mathbf{f}_k\right) = \sum_{k = 1}^m A_{kj} \delta_{ik} = A_{ij}.
+  \]
+  We can also write this as
+  \[
+    \alpha^*(\eta_i)(\mathbf{e}_j) = \sum_{k = 1}^n A_{ik} \varepsilon_k (\mathbf{e}_j).
+  \]
+  Since this is true for all $j$, we have
+  \[
+    \alpha^*(\eta_i) \sum_{k = 1}^n A_{ik}\varepsilon_k = \sum_{k = 1}^n A_{ki}^T \varepsilon_k.
+  \]
+  So done.
+\end{proof}
+
+Note that if $\alpha: U\to V$ and $\beta: V\to W$, $\theta \in W^*$, then
+\[
+  (\beta\alpha)^*(\theta) = \theta\beta\alpha = \alpha^*(\theta\beta) = \alpha^*(\beta^*(\theta)).
+\]
+So we have $(\beta\alpha)^* = \alpha^*\beta^*$. This is obviously true for the finite-dimensional case, since that's how transposes of matrices work.
+
+Similarly, if $\alpha, \beta: U \to V$, then $(\lambda\alpha + \mu\beta)^* = \lambda\alpha^* + \mu\beta^*$.
+
+What happens when we change basis? If $B = Q^{-1}AP$ for some invertible $P$ and $Q$, then
+\[
+  B^T = (Q^{-1}AP)^T = P^TA^T(Q^{-1})^{-1} = ((P^{-1})^T)^{-1} A^T (Q^{-1})^T,
+\]
+as expected.
+
+As we said, we can use dualization to translate problems about a vector space to its dual. The following lemma gives us some good tools to do so:
+\begin{lemma}
+  Let $\alpha \in \mathcal{L}(V, W)$ with $V, W$ finite dimensional vector spaces over $\F$. Then
+  \begin{enumerate}
+    \item $\ker \alpha^* = (\im \alpha)^0$.
+    \item $r(\alpha) = r(\alpha^*)$ (which is another proof that row rank is equal to column rank).
+    \item $\im \alpha^* = (\ker \alpha)^0$.
+  \end{enumerate}
+\end{lemma}
+At first sight, (i) and (iii) look quite similar. However, (i) is almost trivial to prove, but (iii) is rather hard.
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item If $\theta \in W^*$, then
+      \begin{align*}
+        \theta \in \ker \alpha^* &\Leftrightarrow \alpha^*(\theta) = 0 \\
+        &\Leftrightarrow (\forall \mathbf{v}\in V)\; \theta \alpha(\mathbf{v}) = 0 \\
+        &\Leftrightarrow (\forall \mathbf{w}\in \im \alpha)\; \theta(\mathbf{w}) = 0\\
+        &\Leftrightarrow \theta \in (\im \alpha)^0
+      \end{align*}
+    \item As $\im \alpha \leq W$, we've seen that
+      \[
+        \dim \im \alpha + \dim (\im \alpha)^0 = \dim W.
+      \]
+      Using (i), we see
+      \[
+        n(\alpha^*) = \dim (\im \alpha)^0.
+      \]
+      So
+      \[
+        r(\alpha) + n(\alpha^*) = \dim W = \dim W^*.
+      \]
+      By the rank-nullity theorem, we have $r(\alpha) = r(\alpha^*)$.
+    \item The proof in (i) doesn't quite work here. We can only show that one includes the other. To draw the conclusion, we will show that the two spaces have the dimensions, and hence must be equal.
+
+      Let $\theta \in \im \alpha^*$. Then $\theta = \phi \alpha$ for some $\phi \in W^*$. If $\mathbf{v}\in \ker\alpha$, then
+      \[
+        \theta(\mathbf{v}) = \phi(\alpha(\mathbf{v})) = \phi(\mathbf{0}) = \mathbf{0}.
+      \]
+      So $\im \alpha^* \subseteq (\ker\alpha)^0$.
+
+      But we know
+      \[
+        \dim (\ker \alpha)^0 + \dim \ker \alpha = \dim V,
+      \]
+      So we have
+      \[
+        \dim (\ker \alpha)^0 = \dim V - n(\alpha) = r(\alpha) = r(\alpha^*) = \dim \im \alpha^*.
+      \]
+      Hence we must have $\im \alpha^* = (\ker \alpha)^0$.
+  \end{enumerate}
+\end{proof}
+
+Not only do we want to get from $V$ to $V^*$, we want to get back from $V^*$ to $V$. We can take the dual of $V^*$ to get a $V^{**}$. We know that $V^{**}$ is isomorphic to $V$, since they have the same dimension. However, there are many possible such isomorphisms. It turns out there is a ``canonical'' or ``natural'' isomorphism between the two.
+
+\begin{lemma}
+  Let $V$ be a vector space over $\F$. Then there is a canonical linear map $\ev: V\to (V^*)^*$ given by
+  \[
+    \ev (\mathbf{v})(\theta) = \theta(\mathbf{v}).
+  \]
+  We call this the \emph{evaluation} map.
+\end{lemma}
+We call this ``canonical'' since this does not require picking a particular basis of the vector spaces. It is in some sense a ``natural'' map.
+
+\begin{proof}
+  We first show that $\ev(\mathbf{v}) \in V^{**}$ for all $\mathbf{v}\in V$, ie. $\ev (\mathbf{v})$ is linear for any $\mathbf{v}$. For any $\lambda, \mu\in \F$, $\theta_1, \theta_2 \in V^*$, then for $\mathbf{v} \in V$, we have
+  \begin{align*}
+    \ev(\mathbf{v})(\lambda\theta_1 + \mu\theta_2) &= (\lambda\theta_1 + \mu\theta_2)(\mathbf{v}) \\
+    &= \lambda\theta_1(\mathbf{v}) + \mu\theta_2(\mathbf{v}) \\
+    &= \lambda\ev(\mathbf{v})(\theta_1) + \mu \ev(\mathbf{v})(\theta_2).
+  \end{align*}
+  So done. Now we show that $\ev$ itself is linear. Let $\lambda, \mu\in \F$, $\mathbf{v}_1, \mathbf{v}_2 \in V$. We want to show
+  \[
+    \ev(\lambda\mathbf{v}_1 + \mu \mathbf{v}_2) = \lambda \ev (\mathbf{v}_1) + \mu \ev(\mathbf{v}_2).
+  \]
+  To show these are equal, pick $\theta \in V^*$. Then
+  \begin{align*}
+    \ev(\lambda \mathbf{v}_1 + \mu \mathbf{v}_2)(\theta) &= \theta(\lambda\mathbf{v}_1 + \mu \mathbf{v}_2) \\
+    &= \lambda\theta(\mathbf{v}_1) + \mu \theta(\mathbf{v}_2) \\
+    &= \lambda \ev(\mathbf{v}_1)(\theta) + \mu \ev(\mathbf{v}_2)(\theta) \\
+    &= (\lambda \ev(\mathbf{v}_1) + \mu \ev(\mathbf{v}_2))(\theta).
+  \end{align*}
+  So done.
+\end{proof}
+In the special case where $V$ is finite-dimensional, this is an isomorphism.
+\begin{lemma}
+  If $V$ is finite-dimensional, then $\ev: V \to V^{**}$ is an isomorphism.
+\end{lemma}
+This is very false for infinite dimensional spaces. In fact, this is true \emph{only} for finite-dimensional vector spaces (assuming the axiom of choice), and some (weird) people use this as the definition of finite-dimensional vector spaces.
+
+\begin{proof}
+  We first show it is injective. Suppose $\ev(\mathbf{v}) = \mathbf{0}$ for some $\mathbf{v}\in V$. Then $\theta (\mathbf{v}) = \ev (\mathbf{v})(\theta) = 0$ for all $\theta \in V^*$. So $\dim \bra \mathbf{v}\ket^0 = \dim V^* = \dim V$. So $\dim \bra \mathbf{v} \ket = 0$. So $\mathbf{v} = 0$. So $\ev$ is injective. Since $V$ and $V^{**}$ have the same dimension, this is also surjective. So done.
+\end{proof}
+From now on, we will just pretend that $V$ and $V^{**}$ are the same thing, at least when $V$ is finite dimensional.
+
+Note that this lemma does not just say that $V$ is isomorphic to $V^{**}$ (we already know that since they have the same dimension). This says there is a completely canonical way to choose the isomorphism.
+
+In general, if $V$ has a basis, then $\ev$ is injective, but not surjective. So we can think of $V$ as a subspace of $V^{**}$ in a canonical way.
+
+\begin{lemma}
+  Let $V, W$ be finite-dimensional vector spaces over $\F$ after identifying ($V$ and $V^{**}$) and ($W$ and $W^{**}$) by the evaluation map. Then we have
+  \begin{enumerate}
+    \item If $U\leq V$, then $U^{00} = U$.
+    \item If $\alpha\in \mathcal{L}(V, W)$, then $\alpha^{**} = \alpha$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item Let $\mathbf{u} \in U$. Then $\mathbf{u}(\theta) = \theta(\mathbf{u}) = 0$ for all $\theta \in U^0$. So $\mathbf{u}$ annihilates everything in $U^0$. So $\mathbf{u} \in U^{00}$. So $U \subseteq U^{00}$. We also know that
+      \[
+        \dim U = \dim V  - \dim U^0 = \dim V - (\dim V - \dim U^{00}) = \dim U^{00}.
+      \]
+      So we must have $U = U^{00}$.
+    \item Let $(\mathbf{e}_1, \cdots, \mathbf{e}_n)$ be a basis for $V$ and $(\mathbf{f}_1, \cdots, \mathbf{f}_m)$ be a basis for $W$, and let $(\varepsilon_1, \cdots, \varepsilon_n)$ and $(\eta_1, \cdots, \eta_n)$ be the corresponding dual basis. We know that
+      \[
+        \mathbf{e}_i(\varepsilon_j) = \delta_{ij} = \varepsilon_j(\mathbf{e}_i),\quad \mathbf{f}_i(\eta_j) = \delta_{ij} = \eta_j(\mathbf{f}_i).
+      \]
+      So $(\mathbf{e}_1, \cdots, \mathbf{e}_n)$ is dual to $(\varepsilon_1, \cdots, \varepsilon_n)$, and similarly for $\mathbf{f}$ and $\eta$.
+
+      If $\alpha$ is represented by $A$, then $\alpha^*$ is represented by $A^T$. So $\alpha^{**}$ is represented by $(A^T)^T = A$. So done.
+  \end{enumerate}
+\end{proof}
 \end{document}

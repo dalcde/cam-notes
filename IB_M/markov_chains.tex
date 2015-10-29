@@ -532,6 +532,274 @@ In particular, we have the following result:
       \end{scope}
     \end{tikzpicture}
   \end{center}
-  Consider a random walk in $\Z^d$. At each step, it moves to a neighbour, each chosen with equal probability. Then this is recurrent if $d = 1$ or $2$.
+  Consider a random walk in $\Z^d$. At each step, it moves to a neighbour, each chosen with equal probability, ie.
+   \[
+    \P(X_{n + 1} = j| X_n = i) =
+    \begin{cases}
+      \frac{1}{2d} & |j - i| = 1\\
+      0 & \text{otherwise}
+    \end{cases}
+  \]
+  This is an irreducible chain, since it is possible to get from one point to any other point. So the points are either all recurrent or all transient.
+
+  The theorem says this is recurrent iff $d = 1$ or $2$.
 \end{thm}
+Intuitively, this makes sense since if we have more dimensions, then it is easier to get lost.
+
+\begin{proof}
+  We will start with the case $d = 1$. We want to show that $\sum p_{0, 0}(n) = \infty$. Then we know the origin is recurrent. However, we can simplify this a bit. It is impossible to get back to the origin in an odd number of steps. So we can instead write $\sum p_{0, 0}(2n)$. However, we can write down this expression immediately. To return to the origin after $2n$ steps, we need to have made $n$ steps to the left, and $n$ steps to the right, in any order. So we have
+  \[
+    p_{0, 0}(2n) = \P(n\text{ steps left}, n\text{ steps right}) = \binom{2n}{n} \left(\frac{1}{2}\right)^{2n}.
+  \]
+  To show if this converges, it is not helpful to work with these binomial coefficients and factorials. So we use Stirling's formula $n! \simeq \sqrt{2\pi n}\left(\frac{n}{e}\right)^n$. If we plug this in, we get
+  \[
+    p_{0, 0}(2n) \sim \frac{1}{\sqrt{\pi n}}.
+  \]
+  This tends to $0$, but really slowly, and even more slowly than the harmonic series. So we have $\sum p_{0, 0}(2n) = \infty$.
+
+  In the $d = 2$ case, suppose after $2n$ steps, I have taken $r$ steps right, $\ell$ steps left, $u$ steps up and $d$ steps down. We must have $r + \ell + u + d = 2n$, and we need $r = \ell, u = d$ to return the origin. So we let $r = \ell = m, u = d = n - m$. So we get
+  \begin{align*}
+    p_{0, 0}(2n) &= \left(\frac{1}{4}\right)^{2n} \sum_{m = 0}^n \binom{2n}{m, m, n - m, n - m} \\
+    &= \left(\frac{1}{4}\right)^{2n} \sum_{m = 0}^n \frac{(2n)!}{(m!)^2 ((n - m)!)^2} \\
+    &= \left(\frac{1}{4}\right)^{2n} \binom{2n}{n}\sum_m \left(\frac{n!}{m!(n - m)!}\right)^2\\
+    &= \left(\frac{1}{4}\right)^{2n} \binom{2n}{n}\sum_m \left(\binom{n}{m}\binom{n}{n - m}\right)^2\\
+    \intertext{We now use a well-known identity (proved in IA Numbers and Sets) to obtain}
+    &= \left(\frac{1}{4}\right)^{2n} \binom{2n}{n} \binom{2n}{n}\\
+    &= \left[\binom{2n}{n} \left(\frac{1}{2}\right)^{2n}\right]^2\\
+    &\sim \frac{1}{\pi n}.
+  \end{align*}
+  So the sum diverges. So this is recurrent. Note that the two-dimensional probability turns out to be the square of the one-dimensional probability. Is this a coincidence? Or is there a reason why? Does this extend to higher dimensions? We would be able to explain why this happens, but it unfortunately does not extend straightforwardly to higher dimensions.
+
+  In the $d = 3$ case, we have
+  \[
+    p_{0, 0}(2n) = \left(\frac{1}{6}\right)^{2n}\sum_{i + j + k = n}\frac{(2n)!}{(i!j!k!)^2}.
+  \]
+  This time, there is no neat combinatorial formula. Since we want to show this is summable, we can try to bound this from above. We have
+  \begin{align*}
+    p_{0, 0}(2m) &= \left(\frac{1}{6}\right)^{2n} \binom{2n}{n} \sum \left(\frac{n!}{i!j!k!}\right)^2\\
+    &= \left(\frac{1}{2}\right)^{2n} \binom{2n}{n} \sum \left(\frac{n!}{3^n i!j!k!}\right)^2\\
+    \intertext{Why do we write it like this? We are going to use the identity $\displaystyle \sum_{i + j + k = n} \frac{n!}{3^n i!j!k!} = 1$. Where does this come from? Suppose we have three urns, and throw $n$ balls into it. Then the probability of getting $i$ balls in the first, $j$ in the second and $k$ in the third is exactly $\frac{n!}{3^n i!j!k!}$. Summing over all possible combinations of $i$, $j$ and $k$ gives the total probability of getting in any configuration, which is $1$. So we can bound this by}
+    &\leq \left(\frac{1}{2}\right)^{2n}\binom{2n}{n} \max\left(\frac{n!}{3^n i!j!k!}\right)\sum \frac{n!}{3^n i!j!k!}\\
+    &= \left(\frac{1}{2}\right)^{2n}\binom{2n}{n} \max\left(\frac{n!}{3^n i!j!k!}\right)
+    \intertext{To find the maximum, we can replace the factorial by the gamma function and use Lagrange multiplier. However, we would just argue that the maximum can be achieved when $i$, $j$ and $k$ are as close to each other as possible. So we get}
+    &\leq \left(\frac{1}{2}\right)^{2n}\binom{2n}{n} \frac{n!}{3^n}\left(\frac{1}{\lfloor n/3\rfloor!}\right)^3\\
+    &\leq Cn^{-3/2}
+  \end{align*}
+  for some constant $C$ using Stirling's formula. So $\sum p_{0,0}(2n) < \infty$ and the chain is transient. We can prove similarly for higher dimensions.
+\end{proof}
+
+Let's get back to why the two dimensional probability is the square of the one-dimensional probability. This square might remind us of independence. However, it is obviously not true that horizontal movement and vertical movement are independent --- if we go sideways in one step, then we cannot move vertically. So we need something more sophisticated.
+
+We write $X_n = (A_n, B_n)$. What we do is that we try to rotate our space. We are going to record our coordinates in a pair of axis that is rotated by $45^\circ$.
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-2, 0) -- (4, 0) node [right] {$A$};
+    \draw [->] (0, -3) -- (0, 3) node [above] {$B$};
+
+    \node [circ] at (3, 2) {};
+    \node [right] at (3, 2) {$(A_n, B_n)$};
+
+    \draw [mred, ->] (-1, -1) -- (3, 3) node [anchor = south west] {$V$};
+    \draw [mred, ->] (-1, 1) -- (3, -3) node [anchor = north west] {$U$};
+
+    \draw [mred, dashed] (3, 2) -- (0.5, -0.5) node [anchor = north east] {$U_n/\sqrt{2}$};
+    \draw [mred, dashed] (3, 2) -- (2.5, 2.5) node [anchor = south east] {$V_n/\sqrt{2}$};
+  \end{tikzpicture}
+\end{center}
+We can define the new coordinates as
+\begin{align*}
+  U_n &= A_n - B_n\\
+  V_n &= A_n + B_n
+\end{align*}
+In each step, either $A_n$ or $B_n$ change by one step. So $U_n$ and $V_n$ \emph{both} change by $1$. Moreover, they are independent. So we have
+\begin{align*}
+  p_{0, 0}(2n) &= \P(A_n = B_n = 0)\\
+  &= \P(U_n = V_n = 0)\\
+  &= \P(U_n = 0)\P (V_n = 0)\\
+  &= \left[\binom{2n}{n}\left(\frac{1}{2}\right)^{2n}\right]^2.
+\end{align*}
+\subsection{Hitting probabilities}
+In general, we might have a Markov chain, and there are some states we want to reach, or don't want to reach. For example, we might be in a casino, and we want to win, say, a million, and don't want to go bankrupt. So we want to study how likely and when we will reach these states.
+
+In general, let $A \subseteq S$.
+\begin{defi}[Hitting time]
+  The \emph{hitting time} of $A \subseteq S$ is the random variable $H^A = \min\{n \geq 0: X_n \in A\}$. In particular, if we start in $A$, then $H^A = 0$. We also have
+  \[
+    h_i^A = \P_i(H^A < \infty) = \P_i(\text{ever reach }A).
+  \]
+\end{defi}
+
+We are going to have an important result about the hitting time:
+\begin{thm}
+  The vector $(h_i^A: i \in S)$ satisfies
+  \[
+    h_i^A =
+    \begin{cases}
+      1 & i \in A\\
+      \sum_{j \in S}p_{ij}h_j^A & i \not \in A
+    \end{cases},
+  \]
+  and is \emph{minimal} in that for any non-negative solution $(x_i: i \in S)$ to these equations, we have $h_i^a \leq x_i$ for all $i$.
+\end{thm}
+The first part is easy to show using the definition, but it takes some more work to show that the real $h_i^A$ is minimal. The proof, however, is almost the same as that for random walks in IA Probability.
+
+\begin{proof}
+  By definition, $h_i^A = 1$ if $i \in A$. Then we have
+  \[
+    h_i^A = \P_i(H^A < \infty) = \sum_{j\in S} \P_i(H^A < \infty | X_1 = j)p_{ij} = \sum_{j\in S}h_{j}^A p_{ij}.
+  \]
+  So $h_i^A$ is a solution.
+
+  To show that $h_i^A$ is the minimal solution, suppose $x = (x_i: i \in S)$ is a non-negative solution, ie.
+  \[
+    x_i^A =
+    \begin{cases}
+      1 & i \in A\\
+      \sum_{j \in S}p_{ij}x_j^A & i \not \in A
+    \end{cases},
+  \]
+  If $i \in A$, we have $h_i^A = x_i = 1$. Otherwise, we can write
+  \begin{align*}
+    x_i &= \sum_j p_{ij}x_j \\
+    &= \sum_{j \in A}p_{ij}x_j + \sum_{j \not\in A}p_{ij}x_j \\
+    &= \sum_{j \in A}p_{ij} + \sum_{j \not\in A}p_{ij}x_j \\
+    &\geq \sum_{j \in A}p_{ij}\\
+    &= \P_i(H^A = 1).
+  \end{align*}
+  By iterating this process, we can write
+  \begin{align*}
+    x_i &= \sum_{j \in A} p_{ij} + \sum_{j \not\in A} p_{ij}\left(\sum_k p_{ik} x_k\right) \\
+    &= \sum_{j \in A} p_{ij} + \sum_{j \not\in A} p_{ij}\left(\sum_{k\in A} p_{ik} x_k + \sum_{k \not\in A} p_{ik}x_k\right)\\
+    &\geq \P_i (H^A = 1) + \sum_{j \not \in A, k \in A}p_{ij}p_{jk}\\
+    &= \P_i(H^A = 1) + \P_i(H^A = 2)\\
+    &= \P_i (H^A \leq 2).
+  \end{align*}
+  By induction, we obtain
+  \[
+    x_i \geq \P_i(H^A \leq n)
+  \]
+  for all $n$. Taking the limit as $n \to \infty$, we get
+  \[
+    x_n \geq \P_i(H^A \leq \infty) = h_i^A.
+  \]
+\end{proof}
+The next question we want to ask is how long it will take for us to hit $A$. We want to find $\E_i(H^A) = k_i^A$. Note that we have to be careful --- if there is a chance that we never hit $A$, then it is $H^A$ could be infinite, and $\E_i(H^A) = \infty$. This occurs if $h_i^A < 1$. So often we are only interested in the case where $h_i^A < 1$.
+
+Nevertheless, we have the following result:
+\begin{thm}[]
+  $(k_i^A: i \in S)$ is the minimal non-negative solution to
+  \[
+    k_i^A =
+    \begin{cases}
+      0 & i \in A\\
+      1 + \sum_j p_{ik}k_j^A & i \not\in A.
+    \end{cases}
+  \]
+\end{thm}
+Note that we have this ``$1 +$'' since when we move from $i$ to $j$, one step has already passed.
+
+The proof is almost the same as the proof we had above.
+\begin{proof}
+  The proof that $(k_i^A)$ satisfies the equations is the same as before.
+
+  Now let $(y_i : i\in S)$ be a non-negative solution. We show that $y_i \geq k_i^A$.
+
+  If $i \in A$, we get $y_i = k_i^A = 0$. Otherwise, suppose $i\not\in A$. Then we have
+  \begin{align*}
+    y_i &= 1 + \sum_j p_{ij}y_j\\
+    &= 1 + \sum_{j \in A}p_{ij}y_j + \sum_{j\not\in A}p_{ij}y_j\\
+    &= 1 + \sum_{j\not\in A}p_{ij}y_j\\
+    &= 1 + \sum_{j \not\in A}p_{ij}\left(1 + \sum_{k\not\in A} p_{jk}y_k\right)\\
+    &\geq 1 + \sum_{j \not\in A} p_{ij}\\
+    &= \P_i(H^A \geq 1) + \P_i(H^A \geq 2).
+  \end{align*}
+  By induction, we know that
+  \[
+    y_i \geq \P_i (H^A \geq 1) + \cdots + \P_i(H^A \geq n)
+  \]
+  for all $n$. Let $ n\to \infty$. Then we get
+  \[
+    y_i \geq \sum_{m \geq 1}\P_i(H^A \geq m) = \sum_{m \geq 1} m\P_i(H^a = m)= k_i^A.
+  \]
+\end{proof}
+
+\begin{eg}[Gambler's ruin]
+  This time, we will consider a random walk on $\N$. In each step, we either move to the right with probability $p$, or to the left with probability $q = 1 - p$. What is the probability of every hitting $0$ from a given initial point? In other words, we want to find $h_i = h_i^{\{0\}}$.
+
+  We know $h_i$ is the minimal solution to
+  \[
+    h_i =
+    \begin{cases}
+      1 & i = 0\\
+      qh_{i - 1} + ph_{i + 1} & i \not= 0.
+    \end{cases}
+  \]
+  What are the solutions to these equations? We can view this as a difference equation
+  \[
+    ph_{i + 1} - h_i + qh_{i - 1} = 0,\quad i \geq 1.
+  \]
+  with the boundary condition that $h_0 = 1$. We all know how to solve difference equations, so let's just jump to the solution.
+
+  If $p \not= q$, ie. $p \not= \frac{1}{2}$, then the solution has the form
+  \[
+    h_i = A + B\left(\frac{q}{p}\right)^i
+  \]
+  for $i \geq 0$. If $p < q$, then for large $i$, $\left(\frac{q}{p}\right)^i$ is very large and blows up. However, since $h_i$ is a probability, it can never blow up. So we must have $B = 0$. So $h_i$ is constant. Since $h_0 = 1$, we have $h_i = 1$ for all $i$. So we always get to $0$.
+
+  If $p > q$, since $h_0 = 1$, we have $A + B = 1$. So
+  \[
+    h_i = \left(\frac{q}{p}\right)^i + A\left(1 - \left(\frac{q}{p}\right)^i\right).
+  \]
+  This is in fact a solution for all $A$. So we want to find the smallest solution.
+
+  As $i \to\infty$, we get $h_i \to A$. Since $h_i \geq 0$, we know that $A \geq 0$. Subject to this constraint, the minimum is attained when $A = 0$ (since $(q/p)^i$ and $(1 - (q/p)^i)$ are both positive).
+
+  There is another way to solve this. We can give ourselves a ceiling, ie. we also stop when we hit $k > 0$, ie. $h_k = 1$. We now have two boundary conditions and can find a unique solution. Then we take the limit as $k \to \infty$. This is the approach taken in IA Probability.
+
+  Here if $p = q$, then by the same arguments, we get $h_i = 1$ for all $i$.
+\end{eg}
+
+\begin{eg}[Birth-death chain]
+  Let $(p_i: i \geq 1)$ such that $p_i \in (0, 1)$. We let $q_i = 1 - p_i$. We let $\N$ be our state space and define the transition probabilities to be
+  \[
+    p_{i, i + 1} = p_i,\quad p_{i, i - 1} = q_i.
+  \]
+  This is a more general case of the random walk --- in the random walk we have a constant $p_i$ sequence.
+
+  This is a general model for population growth, for the change in population depends on what the current population is. Here each ``step'' does not correspond to some unit time, since births and deaths occur rather randomly. Instead, we just make a ``step'' whenever some birth or death occurs, regardless of what time they occur.
+
+  Here, if we have no people left, then it is impossible for us to reproduce and get more population. So we have
+  \[
+    p_{0, 0} = 1.
+  \]
+  We say $0$ is \emph{absorbing} in that $\{0\}$ is closed. We let $h_i = h_i^{\{0\}}$. We know that
+  \[
+    h_0 = 1,\quad p_i h_{i + 1} - h_i + q_i h_{i - 1} = 0,\quad i \geq 1.
+  \]
+  This is no longer a difference equation, since the coefficients depends on the index $i$. To solve this, we rewrite this as
+  \[
+    p_i h_{i + 1} - h_i + q_i h_{i - 1} = p_i h_{i + 1} - (p_i + q_i) h_i + q_i h_{i - 1}.
+  \]
+  We let $u_i = h_{i - 1} - h_i$. Then our equation becomes
+  \[
+    u_{i + 1} = \frac{q_i}{p_i} u_i.
+  \]
+  We can iterate this to become
+  \[
+    u_{i + 1} = \left(\frac{q_i}{p_i}\right)\left(\frac{q_{i - 1}}{p_{i - 1}}\right) \cdots \left(\frac{q_1}{p_1}\right) u_1.
+  \]
+  We let
+  \[
+    \gamma_i = \frac{q_1q_2\cdots q_i}{p_1p_2\cdots p_i}.
+  \]
+  Then we get $u_{i + 1} = \gamma_i u_1$. Now we want to retrieve our $h_i$. We can do this by summing the equation $u_i = h_{i - 1} - h_i$. So we get
+  \[
+    h_0 - h_i = u_1 + u_2 + \cdots + u_i.
+  \]
+  So
+  \[
+    h_1 = h_0 - u_1(\gamma_0 + \gamma_1 + \cdots + \gamma_{i - 1}),
+  \]
+  where $\gamma_0 = 1$. Here we have a parameter $u_1$, and we need to find out what this is.
+\end{eg}
 \end{document}
