@@ -1473,22 +1473,148 @@ This is obviously a rather silly way to write our function out. However, this is
 
   We now define $f$ by
   \[
-  f(x) = \inf\left\{q \in (0, 1] \text{ dyadic rational}: x \in U_q\right\},
+    f(x) = \inf\left\{q \in (0, 1] \text{ dyadic rational}: x \in U_q\right\},
   \]
   with the understanding that $\inf \emptyset = 1$. We now check the properties desired.
   \begin{itemize}
     \item By definition, we have $0 \leq f(x) \leq 1$.
     \item If $x \in C_0$, then $x \in U_q$ for all $q$. So $f(x) = 0$.
     \item If $x \in C_1$, then $x \not\in U_q$ for all $q$. So $f(x) = 1$.
-    \item To show $f$ is continuous, it suffices to check that $\{x: f(x) \> \alpha\}$ and $\{x: f(x) < \alpha\}$ for all $\alpha \in \R$, as this shows that the pre-images of all open intervals in $\R$ are open. We can in fact show that
+    \item To show $f$ is continuous, it suffices to check that $\{x: f(x) > \alpha\}$ and $\{x: f(x) < \alpha\}$ for all $\alpha \in \R$, as this shows that the pre-images of all open intervals in $\R$ are open. We know that
+      \begin{align*}
+        f(x) < \alpha &\Leftrightarrow \inf\{q \in (0, 1)\text{ dyadic rational}: x \in U_q\} < \alpha \\
+        &\Leftrightarrow (\exists q)\; q < \alpha \text{ and }x \in U_q\\
+        &\Leftrightarrow x \in \bigcup_{q < \alpha} U_q.
+      \end{align*}
+      Hence we have
       \[
-        \{x: f(x) < \alpha\} = \bigcup_{q < \alpha} U_q,
+        \{x: f(x) < \alpha\} = \bigcup_{q < \alpha} U_q.
       \]
-      which is open, and similarly we have
-      \[
-        \{x: f(x) > \alpha\} = \bigcup_{q > \alpha} X \setminus C_q.
-      \]
-      So done.
+      which is open, since each $U_q$ is open for all $q$. Similarly we know that
+      \begin{align*}
+        f(x) > \alpha &\Leftrightarrow \inf\{q: x \in U_q\} > \alpha\\
+        &\Leftrightarrow (\exists q > \alpha)\; x \not\in C_q\\
+        & x \in \bigcup_{q > \alpha} X \setminus C_q.
+      \end{align*}
+      Since this is a union of complement of closed sets, this is open.
   \end{itemize}
 \end{proof}
+With this, we can already say that there are many continuous functions. We can just pick some values on some $C_0, C_1$, and then get a continuous function out of it. However, we can make a stronger statement.
+
+\begin{thm}[Tietze-Urysohn extension theorem]
+  Let $X$ be a normal topological space, and $C\subseteq X$ be a closed subset. Suppose $f: C \to \R$ is a continuous function. Then there exists an extension $\tilde{f}: X \to \R$ which is continuous and satisfies $\tilde{f}|_C = f$ and $\|\tilde{f}\|_{C(X)} \leq \|f\|_{C(C)}$.
+\end{thm}
+This is in some sense similar to the Hahn-Banach theorem, which states that we can extend linear maps to larger spaces.
+
+Note that this implies the Urysohn's lemma, since if $C_0$ and $C_1$ are closed, then $C_0\cup C_1$ is closed.
+
+\begin{proof}
+  The idea is to repeatedly use Urysohn's lemma to get better and better approximations. We can assume wlog that $0\leq f(x) \leq 1$ for all $x \in C$. Otherwise, we just translate and rescale our function. Moreover, we can assume that the $\sup\limits_{x \in C} f(x) = 1$. It suffices to find $\tilde{f}: X \to \R$ with $\tilde{f}|_C = f$ with $0 \leq \tilde{f}(x) \leq 1$ for all $x \in X$.
+
+  We define the sequences of continuous functions $f_i: C \to \R$ and $g_i: X \to \R$ for $i \in \N$. We want to think of the sum $\sum_{i = 0}^n g_i$ to be the approximations, and $f_{n + 1}$ the error on $C$.
+
+  Let $f_0 = f$. This is the error we have when we approximate with the zero function.
+
+  We first define $g_0$ on a subset of $X$ by
+  \[
+    g_0(x) =
+    \begin{cases}
+      0 & x \in f_0^{-1}\left(\left[0, \frac{1}{3}\right]\right)\\
+      \frac{1}{3} & x \in f_0^{-1}\left(\left[\frac{2}{3}, 1\right]\right)
+    \end{cases}.
+  \]
+  We can then extend this to the whole of $X$ with $0 \leq g_0(x) \leq \frac{1}{3}$ for all $x$ by Urysohn's lemma.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (0, 0) -- (4.5, 0);
+      \draw (0, 0) -- (0, 3.5);
+      \node at (0, 1) [left] {$\frac{1}{3}$};
+      \node at (0, 2) [left] {$\frac{2}{3}$};
+      \node at (0, 3) [left] {$1$};
+      \foreach \y in {1, 2, 3} {
+        \draw [dashed] (0, \y) -- (4.5, \y);
+      }
+
+      \draw plot [smooth] coordinates {(1, 1.4) (1.3, 2.3) (1.8, 0.5) (2.3, 1.3)};
+      \draw (3, 0.6) parabola (4, 1.6);
+
+      \draw [very thick, morange] (1.14, 1) -- (1.4, 1);
+      \draw [very thick, morange] (1.63, 0) -- (2.17,0);
+      \draw [very thick, morange] (3, 0) -- (3.6325, 0);
+
+      \draw (1.05, 0.1) -- +(-0.05, 0) -- +(-0.05, -0.2) -- +(0, -0.2);
+      \draw (2.25, 0.1) -- +(0.05, 0) -- +(0.05, -0.2) -- +(0, -0.2);
+
+      \draw (3.05, 0.1) -- +(-0.05, 0) -- +(-0.05, -0.2) -- +(0, -0.2);
+      \draw (3.95, 0.1) -- +(0.05, 0) -- +(0.05, -0.2) -- +(0, -0.2);
+
+      \draw [mblue] plot [smooth] coordinates {(0, 0.5) (0.5, 0.3) (0.8, 0.7) (1, 0.6) (1.14, 1)};
+      \draw [mblue] plot [smooth] coordinates {(1.4, 1) (1.48, 0.5) (1.53, 0.53) (1.63, 0)};
+
+      \draw [mblue] plot [smooth] coordinates {(2.16, 0) (2.4, 0.5) (2.6, 0.3) (3, 0)};
+      \draw [mblue] plot [smooth] coordinates {(3.6325, 0) (3.8, 0.3) (4, 0.8)};
+      \node [mblue] at (4, 0.8) [right] {$g_0(x)$};
+      \node at (4, 1.6) [right] {$f(x)$};
+    \end{tikzpicture}
+  \end{center}
+  We define
+  \[
+    f_1 = f_0 - g_0|_C.
+  \]
+  By construction, we know that $0 \leq f_1 \leq \frac{2}{3}$. This is our first approximation. Note that we have now lowered our maximum error from $1$ to $\frac{2}{3}$. We now repeat this.
+
+  Given $f_i: C \to \R$ with $0 \leq f_i \leq \left(\frac{2}{3}\right)^i$, we define $g_i$ by requiring
+  \[
+    g_i(x) =
+    \begin{cases}
+      0 & x \in f_i^{-1}\left(\left[0, \frac{1}{3}\left(\frac{2}{3}\right)^i\right]\right)\\
+      \frac{1}{3}\left(\frac{2}{3}\right)^i & x \in f_i^{-1}\left(\left[\left(\frac{2}{3}\right)^{i + 1}, \left(\frac{2}{3}\right)^i\right]\right)\\
+    \end{cases},
+  \]
+  and then extending to the whole of $X$ with $0 \leq g_i \leq \frac{1}{3}\left(\frac{2}{3}\right)^i$ and $g_i$ continuous. Again, this exists by Urysohn's lemma. We then define $f_{i + 1} = f_i - g_i|_C$.
+
+  We then have
+  \[
+    \sum_{i = 0}^n g_i = (f_0 - f_1) + (f_1 - f_2) + \cdots + (f_n - f_{n + 1}) = f - f_{n + 1}.
+  \]
+  We also know that
+  \[
+    0 \leq f_{i + 1} \leq \left(\frac{2}{3}\right)^{i + 1}.
+  \]
+  We conclude by letting
+  \[
+    \tilde{f} = \sum_{i = 0}^\infty g_i.
+  \]
+  This exists because we have the bounds
+  \[
+    0 \leq g_i \leq \frac{1}{3}\left(\frac{2}{3}\right)^i,
+  \]
+  and hence $\sum_{i = 0}^n g_i$ is Cauchy. So the limit exists and is continuous by the completeness of $C(X)$.
+
+  Now we check that
+  \[
+    \sum_{i = 0}^n g_i|_C - f = -f_{n + 1}.
+  \]
+  Since we know that $\|f_{n + 1}\|_{_C(C)} \to 0$. Therefore, we know that
+  \[
+    \left.\sum_{i = 0}^\infty g_i\right|_C = \tilde{f}|_C = f.
+  \]
+  Finally, we check the bounds. We need to show that $0 \leq \tilde{f}(x) \leq 1$. This is true since $g_i \geq 0$ for all $i$, and also
+  \[
+    |\tilde{f}(x)| \leq \sum_{i = 0}^\infty g_i(x) \leq \sum_{i = 0}^n \frac{1}{3}\left(\frac{2}{3}\right)^i = 1.
+  \]
+  So done.
+\end{proof}
+We can already show what was stated last time --- if $K$ is compact Hausdorff, $\{p_1, \cdots, p_n\}\subseteq K$ a finite set of points, and $\{y_1, \cdots, y_n\} \subseteq \R$, then there exists $f: K \to \R$ continuous such that $f(p_i) = y_i$. This is since compact Hausdorff spaces are normal, and singleton points are closed sets in Hausdorff spaces. In fact, we can prove this directly with the Urysohn's lemma, by, say, requesting functions $f_i$ such that $f_i(p_i) = y_i$, $f_i(p_j) = 0$ for $i \not= j$. Then we just sum all $f_i$.
+
+Note that normality is necessary for Urysohn's lemma. Since the Urysohn's lemma is a special case of the Tietze-Urysohn extension theorem, normality is also necessary for the Tietze-Urysohn extension theorem. In fact, the lemma is \emph{equivalent} to normality. Let $C_0, C_1$ be disjoint closed sets of $X$. If there is some $f: X \to \R$ such that $f|_{C_0} = 0$, $f|_{C_1} = 1$, then $U_0 = f^{-1}\left(\left(-\infty, \frac{1}{3}\right)\right)$ and $U_1 = f^{-1}\left(\left(\frac{2}{3}, \infty\right)\right)$ are open disjoint sets such that $C_0 \subseteq U_0, C_1 \subseteq U_1$.
+
+Closedness of $C_0$ and $C_1$ is also necessary in Urysohn's lemma. For example, we cannot extend $f: [0, \frac{1}{2}) \cup (\frac{1}{2}, 1]$ to $[0, 1]$ continuously, with $f$ defined as
+\[
+  f(x) =
+  \begin{cases}
+    0 & x < \frac{1}{2}\\
+    1 & x > \frac{1}{2}
+  \end{cases}.
+\]
 \end{document}
