@@ -1674,11 +1674,112 @@ The energy also allows us to prove a uniqueness theorem. First we show that ener
 \begin{eg}
   Consider $\Omega = \{(x, y) \in \R^2, x^2 + y^2 \leq 1\}$, and let $\phi(r, \theta, t)$ solve
   \[
-    \frac{1}{c^2}\frac{\partial^2 \phi}{\partial t^2} = \frac{1}{r} \left(r \frac{\partial \phi}{\partial r}\right) + \frac{1}{r^2}\frac{\partial^2\phi}{\partial \theta^2}.
+    \frac{1}{c^2}\frac{\partial^2 \phi}{\partial t^2} = \nabla^2 \phi = \frac{1}{r} \left(r \frac{\partial \phi}{\partial r}\right) + \frac{1}{r^2}\frac{\partial^2\phi}{\partial \theta^2},
   \]
+  with the boundary condition $\phi|_{\partial \Omega} = 0$. We can imagine this as a drum, where the membrane can freely oscillate with the boundary fixed. % should not be sheet
+
   Separating variables with $\phi(r, \theta, t) = T(t) R(r) \Theta(\theta)$, we get
   \[
-    T'' = -c^2 \lambda T,\quad \Theta'' = -\mu \Theta,\quad r(R')' + (r^2\lambda - \mu)R = 0.
+    T'' = - c^2 \lambda T,\quad \Theta'' = -\mu \Theta,\quad r(R')' + (r^2\lambda - \mu)R = 0.
   \]
+  Then as before, $T$ and $\Theta$ are both sine and cosine waves. Since we are in polars coordinates, we need $\phi(t, r, \theta + 2\pi) = \phi(t, r, \theta)$. So we must have $\mu = m^2$ for some $m \in \N$. Then the radial equation becomes
+  \[
+    r(rR')' + (r^2 \lambda - m^2) R = 0,
+  \]
+  which is Bessel's equation of order $m$. So we have
+  \[
+    R(r) = a_m J_m(\sqrt{\lambda} r) + b_m Y_m(\sqrt{\lambda} r).
+  \]
+  Since we want regularity at $r = 0$, we need $b_m = 0$ for all $m$. To satisfy the boundary condition $\phi|_{\partial \Omega} = 0$, we must choose $\sqrt{\lambda} = k_{mi}$, where $k_{mi}$is the $i$th root of $J_m$.
+
+  Hence the general solution is
+  \begin{align*}
+    \phi(t, r, \theta) &= \sum_{i = 0}^\infty [A_{0i}\sin (k_{0i} ct) + B_{0i}\cos(k_{0i}ct)] J_0 (k_{0i}r)\\\
+    &\quad\quad +\sum_{m = 1}^\infty\sum_{i = 0}^\infty [A_{mi}\cos (m \theta) + B_{mi}\sin (m\theta)]\sin k_{mi}ct J_m (k_{mi} r)\\
+    &\quad\quad +\sum_{m = 1}^\infty\sum_{i = 0}^\infty [C_{mi}\cos (m \theta) + D_{mi}\sin (m\theta)]\cos k_{mi}ct J_m (k_{mi} r)
+  \end{align*}
+  For example, suppose we have the initial conditions $\phi(0, r, \theta) = 0$, $\partial_t \phi(0, r, \theta) = g(r)$. So we start with a flat surface and suddenly hit it with some force. By symmetry, we must have $A_{mi}, B_{mi}, C_{mi}, D_{mi} = 0$ for $m \not= 0$. If this does not seem obvious, we can perform some integrals with the orthogonality relations to prove this.
+
+  At $t = 0$, we need $\phi = 0$. So we must have $B_{0i} = 0$. So we are left with
+  \[
+    \phi = \sum_{i = 0}^\infty A_{0i} \sin (k_{0i} ct) J_0(k_{0j}r).
+  \]
+  We can differentiate this, multiply with $J_0(k_{0j} r) r$ to obtain
+  \[
+    \int_0^1 \sum_{i = 0}^\infty k_{0i}c A_{0i}J_0(k_{0i}r) J_0(k_{0j} r)r\;\d r = \int_0^1 g(r) J_0(k_{0j}r)r \;\d r.
+  \]
+  Using the orthogonality relations for $J_0$ from the Example sheet, we get
+  \[
+    A_{0i} = \frac{2}{ck_{0i}} \frac{1}{[J_0'(k_{0i})]^2} \int_0^1 g(r)J_0(k_{0j} r) r\;\d r.
+  \]
+  Note that the frequencies come from the roots of the Bessel's function, and are not evenly spaced. This is different from, say, string instruments, where the frequencies are evenly spaced. So drums sound differently from strings.
 \end{eg}
+
+So far, we have used separation of variables to solve our differential equations. This is quite good, as it worked in our examples, but there are a few issues with it. Of course, we have the problem of whether it converges or not, but there is a more fundamental problem.
+
+To perform separation of variables, we need to pick a good coordinate system, such that the boundary conditions come in a nice form. We were able to perform separation of variables because we can find some coordinates that fit our boundary conditions well. However, in real life, most things are not nice. Our domain might have a weird shape, and we cannot easily find good coordinates for it.
+
+Hence, instead of solving things directly, we want to ask some more general questions about them. In particular, Kac asked the question ``can you hear the shape of a drum?'' --- suppose we know all the frequencies of the modes of oscillation on some domain $\Omega$. Can we know what $\Omega$ is like?
+
+The answer is no. Fortunately, we get an affirmative answer if we restrict ourselves a bit. If we require $\Omega$ to be convex, and has a real analytic boundary, then yes! In fact, we have the following result: let $N(\lambda_0)$ be the number of eigenvalues less than $\lambda_0$. Then we can show that
+\[
+  4\pi^2 \lim_{\lambda_0 \to \infty} \frac{N(\lambda_0)}{\lambda_0} = \mathrm{Area}(\Omega).
+\]
+
+\section{Distributions}
+When performing separation of variables, we also have the problem of convergence as well. To perform separation of variables, we first find some particular solutions of the form, say, $X(x)Y(y)Z(z)$. We know that these solve, say, the wave equation. However, what we do next is take an \emph{infinite} sum of these functions. First of all, how can we be sure that this converges at all? Even if it did, how do we know that the sum satisfies the differential equation? As we have seen in Fourier series, an infinite sum of continuous functions can be discontinuous. If it is not even continuous, how can we say it is a solution of a differential equation?
+
+Hence, at first people were rather skeptical of this method. They thought that while these methods worked, they only work on a small, restricted domain of problems. However, later people realized that this method is indeed rather general, as long as we allow some more ``generalized'' functions that are not functions in the usual sense. These are known as distributions.
+
+To define a distribution, we first pick a class of ``nice'' test functions, where ``nice'' means we can do whatever we want to them (eg. differentiate, integrate etc.) A main example is the set of infinitely smooth functions with compact support on some set $K\subseteq \Omega$, written $C^{\infty}_{\mathrm{cpt}}(\Omega)$ or $D(\Omega)$. For example, we can have the bump function defined by
+\[
+  \phi(x) =
+  \begin{cases}
+    e^{-1/(1- x^2)} & |x| < 1\\
+    0 & \text{otherwise}.
+  \end{cases}
+\]
+\begin{center}
+  \begin{tikzpicture}[scale=1.5]
+    \draw [->] (-2, 0) -- (2, 0) node [right] {$x$};
+    \draw [->] (0, -0.5) -- (0, 1);
+
+    \draw [semithick, domain=-0.999:0.999, mblue] plot (\x, {exp (-1 / (1 - \x * \x))});
+    \draw [semithick, mblue] (-1.5, 0) -- (-1, 0);
+    \draw [semithick, mblue] (1, 0) -- (1.5, 0);
+  \end{tikzpicture}
+\end{center}
+We now define a distribution $T$ to be a linear map $T:D(\Omega) \to \R$. For those who are doing IB Linear Algebra, this is the dual space of the space of (``nice'') real-valued functions. For $\phi \in D(\Omega)$, we often write its image under $T$ as $T[\phi]$.
+
+\begin{eg}
+  The simplest example is just an ordinary function that is integrable over any compact region. Then we define the distribution $T_f$ as
+  \[
+    T_f[\phi] = \int_\Omega f(x) \phi(x) \;\d x.
+  \]
+  Note that this is a linear map since integration is linear (and multiplication is commutative and distributes over addition). Hence every function ``is'' a distribution.
+\end{eg}
+Of course, this would not be interesting if we only had ordinary functions. The most important example of a distribution (that is not an ordinary function) is the Dirac delta ``function''.
+\begin{defi}[Dirac-delta]
+  The \emph{Dirac-delta} is a distribution defined by
+  \[
+    \delta[\phi] = \phi(0).
+  \]
+\end{defi}
+By analogy with the first case, we often abuse notation and write
+\[
+  \delta[\phi] = \int_\Omega \delta(x) \phi(x) \;\d x,
+\]
+and pretend $\delta(x)$ is an actual function. Of course, it is not really a function, ie. it is not a map $\Omega \to \R$. If it were, then we must have $\delta(x) = 0$ whenever $x \not = 0$, since $\delta[\phi] = \phi(0)$ only depends on what happens at $0$. But then this integral will just give $0$ if $\delta(0) \in \R$. Some people like to think of this as a function that is zero anywhere and ``infinitely large'' everywhere else. Formally, though, we have to think of it as a distribution.
+
+Although distributions can be arbitrarily singular, we can nonetheless define \emph{all} their derivatives, defined by
+\[
+  T'[\phi] = -T[\phi'].
+\]
+This is motivated by the case of the regular function, where we get, after integrating by parts,
+\[
+  \int_\Omega f'(x) \phi(x)\;\d x = -\int_\Omega f(x)\phi'(x) \;\d x,
+\]
+with no boundary terms since we have a compact support. Since $\phi$ is infinitely differentiable, we can take arbitrary derivatives of distributions.
+
+So even though distributions can be crazy and singular, everything can be differentiated. This is good.
 \end{document}

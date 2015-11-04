@@ -1898,4 +1898,174 @@ So we know that $\det A$ is the volume rescaling factor of an arbitrary parallel
   Since $d$ is non-zero, we must have $\det AB = \det A \det B$.
 \end{proof}
 
+\begin{cor}
+  If $A \in \Mat_n(\F)$ is invertible, then $\det A \not= 0$. In fact, when $A$ is invertible, then $\det (A^{-1}) = (\det A)^{-1}$.
+\end{cor}
+
+\begin{proof}
+  We have
+  \[
+    1 = \det I = \det(AA^{-1}) = \det A\det A^{-1}.
+  \]
+  So done.
+\end{proof}
+
+\begin{defi}[Singular matrices]
+  A matrix $A$ is \emph{singular} if $\det A = 0$. Otherwise, it is \emph{non-singular}.
+\end{defi}
+
+\begin{thm}[]
+  Let $A \in \Mat_n(\F)$. Then the following are equivalent:
+  \begin{enumerate}
+    \item $A$ is invertible.
+    \item $\det A \not= 0$.
+    \item $r(A) = n$.
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}
+  We have proved that (i) $\Rightarrow$ (ii) above, and the rank-nullity theorem implies (iii) $\Rightarrow$ (i). We will prove (ii) $\Rightarrow$ (ii). In fact we will show the contrapositive. Suppose $r(A) < n$. By rank-nullity theorem, $n(A) > 0$. So there is some $\mathbf{x} = \begin{pmatrix}\lambda_1\\\vdots\\\lambda_n\end{pmatrix}$ such that $A\mathbf{x} = \mathbf{0}$. Suppose $\lambda_k \not= 0$. We define $B$ as follows:
+  \[
+    B =
+    \begin{pmatrix}
+      1 & & & \lambda_1\\
+      & \ddots & & \vdots\\
+      & & 1 & \lambda_{k - 1}\\
+      & & & \lambda_k\\
+      & & & \lambda_{k + 1} & 1\\
+      & & & \vdots & & \ddots\\
+      & & & \lambda_n & & & 1
+    \end{pmatrix}
+  \]
+  So $AB$ has the $k$th column identically zero. So $\det(AB) = 0$. So it is sufficient to prove that $\det (B) \not= 0$. But $\det B = \lambda_k \not= 0$. So done.
+\end{proof}
+
+We are now going to come up with an alternative formula for the derivative (which is probably the one you are familiar with). To do so, we introduce the following notation:
+\begin{notation}
+  Write $\hat{A}_{ij}$ for the matrix obtained from $A$ by deleting the $i$th row and $j$th column.
+\end{notation}
+
+\begin{lemma}
+  Let $A \in \Mat_n(\F)$. Then
+  \begin{enumerate}
+    \item We can expand $\det A$ along the $j$th column by
+      \[
+        \det A = \sum_{i = 1}^n (-1)^{i + j} A_{ij} \det \hat{A}_{ij}.
+      \]
+    \item We can expand $\det A$ along the $i$th row by
+      \[
+        \det A = \sum_{j = 1}^n (-1)^{i + j} A_{ij} \det \hat{A}_{ij}.
+      \]
+  \end{enumerate}
+\end{lemma}
+We could prove this directly from the definition, but that is messy and scary, so let's use volume forms instead.
+
+\begin{proof}
+  Since $\det A = \det A^T$, (i) and (ii) are equivalent. So it suffices to prove just one of them. We have
+  \[
+    \det A = d(A^{(1)}, \cdots, A^{(n)}),
+  \]
+  where $d$ is the volume form induced by the determinant. Then we can write as
+  \begin{align*}
+    \det A &= d\left(A^{(1)}, \cdots, \sum_{j = 1}^n A_{ij} \mathbf{e}_i, \cdots, A^{(n)}\right)\\
+    &= \sum_{i = 1}^n A_{ij} d(A^{(1)}, \cdots, \mathbf{e}_{ij}, \cdots, A^{(n)})
+  \end{align*}
+  The right is the determinant of a matrix with the $j$th column replaced with $\mathbf{e}_1$. We can move our columns around so that our matrix becomes
+  \[
+    B =
+    \begin{pmatrix}
+      \hat{A}_{ij} & 0\\
+      \mathrm{stuff} & 1
+    \end{pmatrix}
+  \]
+  We get that $\det B = \det \hat{A}^{ij}$, since the only permutations that give a non-zero sum are those that send $n$ to $n$. In the row and column swapping, we have made $n - j$ column transpositions and $n - i$ row transpositions. So we have
+  \begin{align*}
+    \det A &= \sum_{i = 1}^n A_{ij} (-1)^{n - j} (-1)^{n - i}\det B\\
+    &= \sum_{i = 1}^n A_{ij} (-1)^{i + j} \det \hat{A}_{ij}.
+  \end{align*}
+\end{proof}
+This is not only useful for computing determinants, but also computing inverses.
+
+\begin{defi}[Adjugate matrix]
+  Let $A \in \Mat_n(\F)$. The \emph{adjugate matrix} of $A$, written $\adj A$, is the $n\times n$ matrix such that $(\adj A)_{ij} = (-1)^{i + j} \det\hat{A}_{ji}$.
+\end{defi}
+
+The relevance is the following result:
+\begin{thm}[]
+  If $A \in \Mat_n(\F)$, then $A(\adj A) = (\det A) I_n = (\adj A)A$. In particular, if $\det A \not= 0$, then
+  \[
+    A^{-1} = \frac{1}{\det A}\adj A.
+  \]
+\end{thm}
+Note that this is not an efficient way to compute the inverse.
+
+\begin{proof}
+  We compute
+  \[
+    [(\adj A)A]_{jk} = \sum_{i = 1}^n (\adj A)_{ji} A_{ik} = \sum_{i = 1}^n (-1)^{i + 1} \det\hat{A}_{ij} A_{ik}.\tag{$*$}
+  \]
+  So if $j = k$, then $[(\adj A)A]_{jk} = \det A$ by the lemma.
+
+  Otherwise, if $j = k$, consider the matrix obtained from $A$ by replacing the $j$th column by the $k$th column. Then the right hand side of $(*)$ is just $\det B$ by the lemma. But we know that if two columns are the same, the determinant is zero. So the right hand side of $(*)$ is zero. So
+  \[
+    [(\adj A)A]_{jk} = \det A \delta_{jk}
+  \]
+  The calculation for $[A\adj A] = (\det A) I_n$ can be done in a similar manner, or by considering $(A\adj A)^T = (\adj A)^T A^T = (\adj (A^T)) A^T = (\det A) I_n$.
+\end{proof}
+Note that the coefficients of $(\adj A)$ are just given by polynomials in the entries of $A$, and so is the determinant. So if $A$ is invertible, then its inverse is given a rational function (ie. ratio of two polynomials) in the entries of $A$.
+
+This is very useful theoretically, but not computationally, since the polynomials are very large. There are better ways computationally, such as Gaussian elimination.
+
+We'll end with a useful tricks to compute the determinant.
+\begin{lemma}
+  Let $A, B$ be square matrices. Then for any $C$, we have
+  \begin{align*}
+    \det
+    \begin{pmatrix}
+      A & C\\
+      0 & B
+    \end{pmatrix}
+    = (\det A) (\det B).
+  \end{align*}
+\end{lemma}
+
+\begin{proof}
+  Suppose $A\in \Mat_k(\F)$, and $B\in \Mat_{\ell}(\F)$, so $C \in \Mat_{l, \ell}(\F)$. let
+  \[
+    X =
+    \begin{pmatrix}
+      A & C\\
+      0 & B
+    \end{pmatrix}.
+  \]
+  Then by definition, we have
+  \[
+    \det X = \sum_{\sigma \in S_{k + \ell}}\varepsilon(\sigma) \prod_{i = 1}^{k + \ell} X_{i\sigma(i)}.
+  \]
+  If $j \leq k$ and $i > k$, then $X_{ij} = 0$. We only want to sum over permutations $\sigma$ such that $\sigma(i) > k$ if $i > k$. So we are permuting the last $j$ things among themselves, and hence the first $k$ things among themselves. So we can decompose this into $\sigma = \sigma_1 \sigma_2$, where $\sigma_1$ is a permutation of $\{1, \cdots, k\}$ and fixes the remaining things, while $\sigma_2$ fixes $\{1, \cdots, k\}$, and permutes the remaining. Then
+  \begin{align*}
+    \det X &= \sum_{\sigma = \sigma_1\sigma_2}\varepsilon(\sigma_1\sigma_2) \prod_{i = 1}^k X_{i\sigma_1(i)} \prod_{j = 1}^\ell X_{k + j\; \sigma(k + j)}\\
+    &= \left(\sum_{\sigma_1 \in S_k} \varepsilon(\sigma_1) \prod_{i = 1}^k A_{i\sigma_1(i)}\right)\left(\sum_{\sigma_2 \in S_\ell} \varepsilon(\sigma_2) \prod_{j = 1}^k B_{j\sigma_2(j)}\right)\\
+    &= (\det A)(\det B)
+  \end{align*}
+\end{proof}
+
+\begin{cor}
+  \[
+    \det
+    \begin{pmatrix}
+      A_1 & & & \mathrm{stuff}\\
+      & A_2\\
+      & & \ddots\\
+      0 & & & A_n
+    \end{pmatrix} = \prod_{i = 1}^n \det A_i
+  \]
+\end{cor}
+
+\section{Endomorphisms}
+Endomorphisms are linear maps from a vector space $V$ to itself. One might wonder --- why would we want to study these linear maps in particular, when we can just work with arbitrary linear maps from any space to any other space?
+
+When we work with arbitrary linear maps, we are free to choose any basis for the domain, and any basis for the co-domain, since it doesn't make sense to require they have the ``same'' basis. Then we proved that by choosing the right bases, we can put matrices into a nice form with only $1$'s in the diagonal.
+
+However, when working with endomorphisms, we can require ourselves to use the same basis for the domain and co-domain, and there is much more we can say.
 \end{document}
