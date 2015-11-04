@@ -798,10 +798,108 @@ The proof is almost the same as the proof we had above.
   \[
     h_0 - h_i = u_1 + u_2 + \cdots + u_i.
   \]
-  So
+  Using the fact that $h_0 = 1$, we get
   \[
-    h_i = h_0 - u_1(\gamma_0 + \gamma_1 + \cdots + \gamma_{i - 1}),
+    h_i = 1 - u_1(\gamma_0 + \gamma_1 + \cdots + \gamma_{i - 1}),
   \]
-  where $\gamma_0 = 1$. Here we have a parameter $u_1$, and we need to find out what this is.
+  where $\gamma_0 = 1$. Here we have a parameter $u_1$, and we need to find out what this is. Our theorem tells us the value of $u_1$ minimizes $h_i$. This all depends on the value of
+  \[
+    S = \sum_{i = 0}^\infty \gamma_i.
+  \]
+  By the law of excluded middle, $S$ either diverges or converges. If $S = \infty$, then we must have $u_1 = 0$. Otherwise, $h_i$ blows up for large $i$, but we know that $0 \leq h_i \leq 1$. If $S$ is finite, then $u_1$ can be non-zero. We know that the $\gamma_i$ are all positive. So to minimize $h_i$, we need to maximize $u_1$. We cannot make $u_1$ arbitrarily large, since this will make $h_i$ negative. Taking the limit as $i \to\infty$, we know that the maximum value of $u_1$ satisfies
+  \[
+    0 = 1 - u_1 S.
+  \]
+  In other words, $u_1 = 1/S$. Then we have
+  \[
+    h_i = \frac{\sum_{k = i}^\infty \gamma_k}{\sum_{k = 0}^\infty \gamma_k}.
+  \]
+\end{eg}
+
+\subsection{Stopping times and strong Markov property}
+We are going to state the \emph{strong} Markov property and see applications of it. Before this, we should know what the \emph{weak} Markov property is. We have, in fact, already seen the weak Markov property. It's just that we called it the ``Markov property' instead.
+
+In probability, we often have ``strong'' and ``weak'' versions of things. For example, we have the strong and weak law of large numbers. In general, the difference is that the weak versions are expressed in terms of probabilities, while the strong versions are expressed in terms of random variables. Initially, when people first started developing probability theory, they just talked about probability distributions like the Poisson distribution or the normal distribution. However, later it turned out it is often nicer to talk about random variables instead. After messing with random variables, we can just take expectations or evaluate probabilities to get the corresponding statement about probability distributions. Hence usually the ``strong'' versions imply the ``weak'' version, but not the other way round.
+
+In this case, recall that we defined the Markov property in terms of the probabilities at some fixed time. We have some fixed time $t$, and we want to know the probabilities of events after $t$ in terms of what happened before $t$. In the strong Markov property, we will allow $t$ to be a random variable, and say something slightly more involved. However, we will not allow $T$ to be any random variable, but just some nice ones.
+
+\begin{defi}[Stopping time]
+  Let $X$ be a Markov chain. A random variable $T$ (which is a function $\Omega \to \N\cup \{\infty\}$) is a \emph{stopping time} for the chain $X = (X_n)$ if for $n \geq 0$, the event $\{T = n\}$ is given in terms of $X_0, \cdots, X_1, X_n$.
+\end{defi}
+For example, suppose we are in a casino and gambling. We let $X_n$ be the amount of money we have at time $n$. Then we can set our stopping time as ``the time when we have $\$10$ left''. This is a stopping time, in the sense that we can use this as a guide to when to stop --- it is certainly possible to set yourself a guide that you should leave the casino when you have $\$10$ left. However, it does not make sense to say ``I will leave if the next game will make me bankrupt'', since there is no way to tell if the next game will make you bankrupt (it certainly will not if you win the game!). Hence this is not a stopping time.
+
+\begin{eg}
+  The hitting time $H^A$ is a stopping time. This is since $\{H^A = n\} = \{X_i \not\in A\text{ for }i < n\}  \cap \{X_n \in A\}$. We also know that $H^A + 1$ is a stopping time since it only depends in $X_i$ for $i \leq n - 1$. However, $H^A - 1$ is not a stopping time since it depends on $X_{n + 1}$.
+\end{eg}
+
+We can now state the strong Markov property, which is expressed in a rather complicated manner but can be useful at times.
+\begin{thm}[Strong Markov property]
+  Let $X$ be a Markov change with transition matrix $P$, and let $T$ be a stopping time for $X$. Given $T < \infty$ and $X_T = i$, the chain $(X_{T + k}: k \geq 0)$ is a Markov chain with transition matrix $P$ with initial distribution $X_{T + 0} = i$, and this Markov chain is independent of $X_0, \cdots, X_T$.
+\end{thm}
+Proof is omitted.
+
+\begin{eg}[Gambler's ruin]
+  Again, this is the Markov chain taking values on the non-negative integers, moving to the right with probability $p$ and left with probability $q = 1 - p$. $0$ is an absorbing state, since we cannot escape zero.
+
+  Instead of computing the probability of hitting zero, we want to find the time it takes to get to $0$, ie.
+  \[
+    H = \inf\{n \geq 0: X_n = 0\}.
+  \]
+  Note that the infimum of the empty set is $+\infty$, ie. if we never hit zero, we say it takes infinite time. What is the distribution of $H$? We define the generating function
+  \[
+    G_i(s) = \E_i(s^H) = \sum_{n = 0}^\infty s^n \P_i(H = n),\quad |s| < 1.
+  \]
+  Note that we need the requirement that $|s| < 1$, since it is possible that $H$ is infinite, and we would not want to think whether the sum converges when $s = 1$. However, we know that it does for $|s| < 1$.
+
+  We have
+  \[
+    G_1(s) = \E_1(s^H) = p\E_1(s^H|X_1 = 2) + q\E(s^H|X_1 = 0).
+  \]
+  How can we simplify this? The second term is easy, since if $X_1 = 0$, then we must have $H = 1$. So $\E_1(s^H|X_1 = 0) = s$. The second term is more tricky. We are now at $2$. To get to $0$, we need to pass through $1$. So the time needed to get to $0$ is the time to get from $2$ to $1$ (say $H'$), plus the time to get from $1$ to $0$ (say $H''$). We know that $H'$ and $H''$ have the same distribution as $H$, and by the strong Markov property, they are independent. So
+  \[
+    G_1 = p\E_1(s^{H' + H'' + 1}) + qs = psG_1^2 + qs.
+  \]
+  Solving this, we get two solutions
+  \[
+    G_1 (s) = \frac{1 \pm \sqrt{1 - 4pqs^2}}{2ps}.\tag{$*$}
+  \]
+  We have to be careful here. This result says that for each value of $s$, $G_1(s)$ is \emph{either} $\frac{1 + \sqrt{1 - 4pqs^2}}{2ps}$ \emph{or} $\frac{1 - \sqrt{1 - 4pqs^2}}{2ps}$. It does \emph{not} say that there is some consistent choice of $+$ or $-$ that works for everything.
+
+  However, we know that if we suddenly change the sign, then $G_1(s)$ will be discontinuous at that point, but $G_1$, being a power series, has to be continuous. So the solution must be either $+$ for all $s$, or $-$ for all $s$.
+
+  To determine the sign, we can look at what happens when $s = 0$. We see that the numerator becomes $1 \pm 1$, while the denominator is $0$. We know that $G$ converges at $s = 0$. Hence the numerator must be $0$. So we must pick $-$, ie.
+  \[
+    G_1 (s) = \frac{1 - \sqrt{1 - 4pqs^2}}{2ps}.
+  \]
+  We can find $\P_1(H = k)$ by expanding the Taylor series.
+
+  What is the probability of ever hitting $0$? This is
+  \[
+    \P_1(H < \infty) = \sum_{n = 1}^\infty \P(H = n) = \lim_{s\to 1} G_1(s) = \frac{1 - \sqrt{1 - 4pq}}{2p}.
+  \]
+  We can rewrite this using the fact that $q = 1 - p$. So $1 - 4pq = 1 - 4p(1 - p) = (1 - 2p)^2 = |q - p|^2$. So we can write
+  \[
+    \P_1(H < \infty) = \frac{1 - |p - q|}{2p} =
+    \begin{cases}
+      1 & p \leq q\\
+      \frac{q}{p} & p > q
+    \end{cases}
+  \]
+  Using this, we can also find $\mu = \E_1(H)$. Firstly, if $p > q$, then it is possible that $H = \infty$. So $\mu = \infty$. If $p \leq q$, we can find $\mu$ by differentiating $G_1(s)$ and evaluating at $s = 1$. Doing this directly would result it horrible and messy algebra, which we want to avoid. Instead, we can differentiate $(*)$ and obtain
+  \[
+    G_1' = pG_1^2 + ps 2 G_1G_1' + q.
+  \]
+  We can rewrite this as
+  \[
+    G_1'(s) = \frac{pG(s)^2 + q}{1 - 2ps G(s)}.
+  \]
+  By Abel's lemma, we have
+  \[
+    \mu = \lim_{s \to 1}G'(s) =
+    \begin{cases}
+      \infty & p = \frac{1}{2}\\
+      \frac{1}{p - q} & p < \frac{1}{2}.
+    \end{cases}
+  \]
 \end{eg}
 \end{document}
