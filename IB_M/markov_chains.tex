@@ -902,4 +902,107 @@ Proof is omitted.
     \end{cases}
   \]
 \end{eg}
+\section{Classification of states}
+So far, we have classified chains in say, irreducible and reducible chains. We have also seen that states can be recurrent or transience. By definition, a state is recurrent if the probability of returning to it is infinite. However, we can further classify recurrent states. Even if a state is recurrent, it is possible that the expected time of returning is infinite. So it is likely that we return to the original state only after a very long time. On the other hand, it might be that are very likely to return quickly, and the expected time of returning is finite. It turns out this distinction can affect the long-term behaviour of the chain.
+
+First we have the following proposition, which tells us that if a state is recurrent, then we are expected to return to it infinitely many times.
+\begin{thm}
+  Suppose $X_0 = i$. Let $V_i = |\{n \geq 1: X_n = i\}|$. Let $f_{ii} = \P_i(T_i < \infty)$. Then
+  \[
+    \P_i (V_i = r) = f_{ii}^r (1 - f_{ii}),
+  \]
+  since we have to return $r$ times, each with probability $f_{ii}$, and then never return.
+
+  Hence, if $f_{ii} = 1$, then $\P_i(V_i = r) = 0$ for all $r$. So $\P_i(V_i = \infty) = 1$. Otherwise, $\P_i(V_i = r)$ is a genuine geometric distribution, and we get $\P_i(V_i < \infty) = 1$.
+\end{thm}
+
+\begin{proof}
+  Exercise, using the strong Markov property.
+\end{proof}
+
+\begin{defi}[Mean recurrence time]
+  Let $T_i$ be the returning time to a state $i$. Then the \emph{mean recurrence time} of $i$ is
+  \[
+    \mu_i = \E_i(T_i) =
+    \begin{cases}
+      \infty & i\text{ transient}\\
+      \sum_{n = 1}^\infty n f_{ii}(n) & i\text{ recurrent}
+    \end{cases}
+  \]
+\end{defi}
+
+\begin{defi}[Null and positive state]
+  If $i$ is recurrent, we call $i$ a \emph{null state} if $\mu_i = \infty$. Otherwise $i$ is \emph{non-null} or \emph{positive}.
+\end{defi}
+
+\begin{defi}[Period]
+  The \emph{period} of a state $i$ is $d_i = \gcd\{n \geq 1: p_{ii}(n)> 0\}$.
+
+  A state is \emph{aperiodic} if $d_i = 1$.
+\end{defi}
+For example, the period of $0$ in a simple random walk is $2$, since we can only return after an even number of steps.
+
+\begin{defi}[Ergodic]
+  A state $i$ is \emph{ergodic} if it is aperiodic and positive recurrent.
+\end{defi}
+These are the nice states.
+
+Recall that recurrence is a class property --- if two states are in the same communicating class, then they are either both recurrent, or both transient. Is this true for the properties above as well? The answer is yes.
+
+\begin{thm}[]
+  If $i \leftrightarrow j$ are communicating, then
+  \begin{enumerate}
+    \item $d_i = d_j$.
+    \item $i$ is recurrent iff $j$ is recurrent.
+    \item $i$ is positive recurrent iff $j$ is positive recurrent.
+    \item $i$ is ergodic iff $j$ is ergodic.
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item Assume $i \leftrightarrow j$. Then there are $m, n \geq 1$ with $p_{ij}(m), p_{ji}(n) > 0$. By the Chapman-Kolmogorov inequality, we know that
+      \[
+        p_{ii}(m + r + n) \geq p_{ij}(m)p_{jj}(r)p_{ji}(n) \geq \alpha p_{jj}(r),
+      \]
+      where $\alpha = p_{ij}(m) p_{ji}(n) > 0$. Now let $D_j = \{r \geq 1: p_{jj}(r) > 0\}$. Then by definition, $d_j = \gcd D_j$.
+      
+      We have just shown that if $r \in D_j$, then we have $m + r + n \in D_i$. We also know that $n + m \in D_i$, since $p_{ii}(n + m) \geq p_{ij}(n)p_{ji}(m) > 0$. Then for any $r \in D_j$, we know that $d_i | m + r + n$, and also $d_i | m + n$. So $d_i | r$. Hence $\gcd D_i | \gcd D_j$. By symmetry, $\gcd D_i = \gcd D_j$.
+    \item Proved before.
+    \item This is deferred to a later time.
+    \item Follows directly from (i), (ii) and (iii) by definition.
+  \end{enumerate}
+\end{proof}
+
+We also have the following proposition we will use later one:
+\begin{prop}
+  If the chain is irreducible and $j \in S$ is recurrent, then
+  \[
+    \P(X_n = j\text{ for some }n \geq 1) = 1,
+  \]
+  regardless of the distribution of $X_0$.
+\end{prop}
+Note that this is not just the definition of recurrence, since recurrence says that if we start at $i$, then we will return to $i$. Here we are saying wherever we start, we will eventually visit $i$.
+
+\begin{proof}
+  Let
+  \[
+    f_{ij} = \P_i(X_n = j\text{ for some }n \geq 1).
+  \]
+  Since $j \to i$, there exists a \emph{least} integer $m \geq 1$ with $p_{ji}(m) > 0$. Since $m$ is least, we know that
+  \[
+    p_{ji}(m) = \P_j(X_m = i, X_r \not= j\text{ for }r < m).
+  \]
+  This is since we cannot visit $j$ in the path, or else we can truncate our path and get a shorter path from $j$ to $i$. Then
+  \[
+    p_{ji}(m)(1 - f_{ij}) \leq 1 - f_{jj}.
+  \]
+  This is since the left hand side is the probability that we first go from $j$ to $i$ in $m$ steps, and then never going from $i$ to $j$ again; while the right is the just probability of never returning to $j$ starting from $j$; and we know that it is easier to just not get back to $j$ than to go to $i$ in exactly $m$ steps and never returning to $j$. Hence if $f_{jj} = 1$, then $f_{ij} = 1$.
+
+  Now let $\lambda_k = \P(X_j = k)$ be our initial distribution. Then
+  \[
+    \P(X_n = j\text{ for some }n \geq 1) = \sum_i \lambda_j \P_j (X_n =j\text{ for some }n \geq 1) = 1.
+  \]
+\end{proof}
+
 \end{document}
