@@ -1727,6 +1727,7 @@ The answer is no. Fortunately, we get an affirmative answer if we restrict ourse
 \]
 
 \section{Distributions}
+\subsection{Distributions}
 When performing separation of variables, we also have the problem of convergence as well. To perform separation of variables, we first find some particular solutions of the form, say, $X(x)Y(y)Z(z)$. We know that these solve, say, the wave equation. However, what we do next is take an \emph{infinite} sum of these functions. First of all, how can we be sure that this converges at all? Even if it did, how do we know that the sum satisfies the differential equation? As we have seen in Fourier series, an infinite sum of continuous functions can be discontinuous. If it is not even continuous, how can we say it is a solution of a differential equation?
 
 Hence, at first people were rather skeptical of this method. They thought that while these methods worked, they only work on a small, restricted domain of problems. However, later people realized that this method is indeed rather general, as long as we allow some more ``generalized'' functions that are not functions in the usual sense. These are known as distributions.
@@ -1782,4 +1783,126 @@ This is motivated by the case of the regular function, where we get, after integ
 with no boundary terms since we have a compact support. Since $\phi$ is infinitely differentiable, we can take arbitrary derivatives of distributions.
 
 So even though distributions can be crazy and singular, everything can be differentiated. This is good.
+
+Generalized functions can occur as limits of sequences of normal functions. For example, the family of functions
+\[
+  G_n(x) = \frac{n}{\sqrt{\pi}} \exp(-n^2 x^2)
+\]
+are smooth for any finite $n$, and $G_n[\phi] \to \delta[\phi]$ for any $\phi$.
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-3, 0) -- (3.25, 0) node [right] {$t$};
+    \draw [->, use as bounding box] (0, 0) -- (0, 4) node [above] {$D$};
+
+    \draw [semithick, mblue, domain=-3:3, samples = 100] plot (\x, { 1.6 * exp( - \x * \x)});
+    \draw [semithick, morange, domain=-3:3, samples = 100] plot (\x, { 3.2 * exp( - 4 * \x * \x)});
+  \end{tikzpicture}
+\end{center}
+It thus makes sense to define
+\[
+  \delta'(\phi) = -\delta[\phi'] = -\phi'(0),
+\]
+as this is the limit of the sequence
+\[
+  \lim_{n \to \infty}\int_\Omega G'_n(x) \phi(x)\;\d x.
+\]
+It is often convenient to think of $\delta(x)$ as $\lim\limits_{n \to \infty} G_n(x)$, and $\delta'(x) = \lim\limits_{n \to \infty} G'_n(x)$ etc, despite the fact that these limits do not exist as functions.
+
+We can look at some properties of $\delta(x)$:
+\begin{itemize}
+  \item Translation:
+    \[
+      \int_{-\infty}^\infty \delta(x - a) \phi(x)\;\d x = \int_{-\infty}^\infty \delta(y) \phi(y + a)\;\d x.
+    \]
+  \item Scaling:
+    \[
+      \int_{-\infty}^\infty \delta(cx) \phi(x)\;\d x = \int_{-\infty}^\infty \delta(y) \phi\left(\frac{y}{c}\right) \frac{\d y}{|c|} = \frac{1}{|c|}\phi(0).
+    \]
+  \item These are both special cases of the following: suppose $f(x)$ is a continuously differentiable function with isolated simple zeros at $x_i$. Then near any of its zeros $x_i$, we have $f(x) \approx (x - x_i) \left.\frac{\partial f}{\partial x}\right|_{x_i}$. Then
+    \begin{align*}
+      \int_{-\infty}^\infty \delta(f(x)) \phi(x)\;\d x &= \sum_{i = 1}^n \int_{-\infty}^\infty \delta\left((x - x_i)\left.\frac{\partial f}{\partial x}\right|_{x_i}\right) \phi(x)\;\d x \\
+      &= \sum_{i = 1}^n \frac{1}{|f'(x_i)|} \phi(x_i).
+    \end{align*}
+\end{itemize}
+We can also expand the $\delta$-function in a basis of eigenfunctions. Suppose we live in the interval $[-L, L]$, and write a Fourier expansion
+\[
+  \delta(x) = \sum_{n \in \Z}\hat{\delta}_n e^{in\pi x/L}
+\]
+with
+\[
+  \hat{\delta}_n = \frac{1}{2L} \int_{-L}^L e^{in\pi x/L}\delta(x)\;\d x = \frac{1}{2L}
+\]
+So we have
+\[
+  \delta(x) = \frac{1}{2L} \sum_{n \in \Z} e^{in\pi x/L}.
+\]
+This \emph{does} make sense as a distribution. We let
+\[
+  S_N \delta(x) = \frac{1}{2L} \sum_{n = -N}^N e^{in \pi x/L}.
+\]
+Then
+\begin{align*}
+  \lim_{N \to \infty} \int_{-L}^L S_N \delta(x) \phi(x)\;\d x &= \lim_{N \to \infty} \frac{1}{2L}\int_{L}^L \sum_{n = -N}^N e^{in\pi x/L}\phi(x) \;\d x\\
+  &= \lim_{N \to \infty} \sum_{n = -N}^N \left[\frac{1}{2L}\int_{-L}^L e^{in\pi x/L} \phi(x) \;\d x\right]\\
+  &= \lim_{N\to \infty} \sum_{n = -N}^N \hat{\phi}_{-n}\\
+  &= \lim_{N \to \infty}\sum_{n = -N}^N \hat{\phi}_n e^{in\pi 0/L}\\
+  &= \phi(0),
+\end{align*}
+since the Fourier series of the smooth function $\phi(x)$ \emph{does} converge for all $x \in [-L, L]$.
+
+We can equally well expand $\delta(x)$ in terms of any other set of orthonormal eigenfunctions. Let $\{y_n(x)\}$ be a complete set of eigenfunctions on $[a, b]$ that are orthogonal with respect to a weight function $w(x)$. Then we can write
+\[
+  \delta (x - \xi) = \sum_{n} c_n y_n(x),
+\]
+with
+\[
+  c_n = \int_a^b y_n^*(x) \delta(x - \xi) w(x)\;\d x = y_n^*(\xi) w(\xi).
+\]
+So
+\[
+  \delta(x - \xi) = w(\xi) \sum_n y_n^* (\xi) y_n(x) = w(x) \sum_n y_n^*(\xi) y_n(x),
+\]
+using the fact that
+\[
+  \delta(x - \xi) = \frac{w(\xi)}{w(x)} \delta(x - \xi).
+\]
+\subsection{Green's functions}
+One of the main uses of the $\delta$ function is the Green's function. Suppose we wish to solve the 2nd order ordinary differential equation $\mathcal{L}y = f$, where $f(x)$ is a bounded forcing term, and $\mathcal{L}$ is a bounded differential operator, say
+\[
+  \mathcal{L} = \alpha(x) \frac{\partial^2}{\partial x^2} + \beta(x) \frac{\partial}{\partial x} + \gamma(x).
+\]
+As a first step, we try to find the Green's function for $\mathcal{L}$, which we shall write as $G(x, \xi)$, which obeys
+\[
+  \mathcal{L} G(x, \xi) = \delta(x - \xi).
+\]
+Given $G(x, \xi)$, we can then define
+\[
+  y(x) = \int_{a}^b G(x, \xi) f(\xi) \;\d \xi.
+\]
+Then we have
+\[
+  \mathcal{L}y = \int_a^b \mathcal{L} G(x, \xi) f(\xi)\;\d \xi = \int_a^b \delta(x - \xi) f(\xi) \;d\xi = f(x).
+\]
+We can formally say $y = \mathcal{L}^{-1} f$, and the Green's function shows that $\mathcal{L}^{-1}$ means an integral.
+
+Hence if we can solve for Green's function, then we have solved the differential equation, at least in terms of an integral.
+
+To find the Green's function $G(x, \xi)$ obeying the boundary conditions $G(a, \xi) = G(b, \xi) = 0$, first note that $\mathcal{L} G = 0$ for all $x \in [a, \xi) \cup (\xi, b]$, ie. everywhere except $\xi$ itself. Thus we must be able to expand it in a basis of solutions in these two regions.
+
+Suppose $\{y_1(x), y_2(x)\}$ are a basis of solutions to $\mathcal{L}G = 0$ everywhere on $[a, b]$, with boundary conditions $y_1(a) = 0, y_2(b) = 0$. Then we must have
+\[
+  G(x, \xi) =
+  \begin{cases}
+    A(\xi) y_1(x) & a \leq x < \xi\\
+    B(\xi) y_2(x) & \xi < x \leq b
+  \end{cases}
+\]
+So we have a whole family of solutions. To fix the coefficients, we must decide how to join these solutions together over $x = \xi$.
+
+If $G(x, \xi)$ were discontinuous at $x = \xi$, then $\partial_x G|_{x = \xi}$ would involve a $\delta$ function, while $\partial^2_x G|_{x = \xi}$ would involve the derivative of the $\delta$ function. This is not good, since nothing in $\mathcal{L}G = \delta(x - \xi)$ would balance a $\delta'$. So $G(x, \xi)$ must be everywhere continuous.
+
+Now integrate over a small region $(\xi - \varepsilon, \xi + \varepsilon)$ surrounding $\xi$. Then we have
+\[
+  \int_{\xi - \varepsilon}^{\xi + \varepsilon} \left[\alpha(x) \frac{\d^2 G}{\d x^2} + \beta(x) \frac{\d G}{\d x} + \gamma(x) G\right]\;\d x = \int_{\xi - \varepsilon}^{\xi + \varepsilon} \delta(x - \xi)\;\d x = 1.
+\]
 \end{document}
