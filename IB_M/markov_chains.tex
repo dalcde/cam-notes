@@ -1004,5 +1004,132 @@ Note that this is not just the definition of recurrence, since recurrence says t
     \P(X_n = j\text{ for some }n \geq 1) = \sum_i \lambda_j \P_j (X_n =j\text{ for some }n \geq 1) = 1.
   \]
 \end{proof}
+\subsection{Invariant distributions}
+We want to look at what happens in the long run. When we are dealing with real sequences $x_n$, we have a precise definition of what it means for $x_n \to x$. How can we define the convergence of a sequence of random variables $X_n$? These are not proper numbers, so we cannot just apply our usual definitions.
+
+It turns out that the right way to think about convergence is to look at the probability mass function. For each $k \in S$, we ask if $\P(X_n = k)$ converges to anything.
+
+In most cases, $\P(X_n = k)$ converges. Hence, this is not an interesting question to ask. What we would \emph{really} want to know is whether the limit is a probability mass function. It is, for example, possible that $\P(X_n = k) \to 0$ for all $k$, and the result is not a distribution.
+
+Usually, when we want to prove that something converges, we first figure out what the limit should be, and then attempt to prove that convergence does indeed occur. In this case, recall that if we have a starting state $\lambda$, then the distribution of the $n$th step is given by $\lambda P^n$. We have the following trivial identity:
+\[
+  \lambda P^{n + 1} = (\lambda P^n) P.
+\]
+If the distribution converges, then we have $\lambda  P^n \to \pi$ for some $\pi$, and also $\lambda P^{n + 1} \to \pi$. Hence the limit $\pi$ satisfies
+\[
+  \pi P = \pi.
+\]
+We call these \emph{invariant distributions}.
+
+\begin{defi}[Invariant distriubtion]
+  Let $X_j$ be a Markov chain with transition probabilities $P$. The distribution $\pi = (\pi_k: k \in S)$ is an \emph{invariant distribution} if
+  \begin{enumerate}
+    \item $\pi_k \geq 0$, $\sum_k \pi_k = 1$.
+    \item $\pi = \pi P$.
+  \end{enumerate}
+  The first condition just ensures that this is a genuine distribution.
+
+  An invariant distribution is also known as an invariant measure, equilibrium distribution or steady-state distribution.
+\end{defi}
+
+\begin{thm}
+  Consider an irreducible Markov chain. Then
+  \begin{enumerate}
+    \item There exists an invariant distribution if and only if some state is positive recurrent.
+    \item If there is an invariant distribution $\pi$, then every state is positive recurrent, and
+      \[
+        \pi_i = \frac{1}{\mu_i}
+      \]
+      for $i \in S$, where $\mu_i$ is the mean recurrence time of $i$. In particular, $\pi$ is unique.
+  \end{enumerate}
+\end{thm}
+Note how we worded the first statement. Recall that we once stated that if one state is positive recurrent, then all states are positive recurrent, and then said we would defer the proof for later on. This is where we actually prove it. In (i), we show that if some state is positive recurrent, then it has an invariant distribution. Then (ii) tells us if there is an invariant distribution, then \emph{all} states are positive recurrent. Hence one state being positive recurrent implies all states being positive recurrent.
+
+Now where did the formula for $\pi$ come from? We can first think what $\pi_i$ should be. By definition, we should know that for large $m$, $\P(X_m = i) \sim \pi_i$. This means that if we go on to really late in time, we would expect to visit the state $i$ $\pi_i$ of the time. On the other hand, the mean recurrence time tells us that we are expected to (re)-visit $i$ every $mu_i$ steps. So it makes sense that $\pi_i = 1/\mu_i$.
+
+To put this on a more solid ground, we would like to look at some time intervals. For example, we might ask how many times we will hit $i$ in 100 steps. This is not a good thing to do, because we are not given where we are starting, and this probability can depend a lot on where the starting point is.
+
+It turns out the natural thing to do is not to use a fixed time interval, but use a \emph{random} time interval. In particular, we fix a state $k$, and look at the time interval between two consecutive visits of $k$.
+
+We start by letting $X_0 = k$. Let $W_i$ denote the number of visits to $i$ before the next visit to $k$. Formally, we have
+\[
+  W_i = \sum_{m = 1}^\infty 1(X_m = i, T_k \geq m),
+\]
+where $T_k$ is the recurrence time of $m$ and $1$ is the indicator function. In particular, $i = 1$ for $i = k$ (if $T_k$ is finite). We can also write this as
+\[
+  W_i = \sum_{m = 1}^{T_k} 1(X_m = i).
+\]
+This is a random variable. So we can look at its expectation. We define
+\[
+  \rho_i = \E_k(W_i).
+\]
+We will show that this $\rho$ is \emph{almost} our $\pi_i$, up to a constant.
+\begin{prop}
+  For an irreducible recurrent chain and $k \in S$, $\rho = (\rho_i: i \in S)$ defined as above by
+  \[
+    \rho_i = \E_k(W_i),\quad W_i = \sum_{m = 1}^\infty 1(X_m = i, T_k \geq m),
+  \]
+  we have
+  \begin{enumerate}
+    \item $\rho_k = 1$
+    \item $\sum_i \rho_i = \mu_k$
+    \item $\rho = \rho P$
+    \item $0 < \rho_i < \infty$ for all $i \in S$.
+  \end{enumerate}
+\end{prop}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item This follows from definition of $\rho_i$, since for $m < T_k$, $X_m \not= k$.
+    \item Note that $\sum_i W_i = T_k$, since in each step we hit exactly one thing. We have
+      \begin{align*}
+        \sum_i \rho_i &= \sum_i \E_k(W_i)\\
+        &= \E_k\left(\sum_i W_i\right)\\
+        &= \E_k(T_k) \\
+        &= \mu_k
+      \end{align*}
+      Note that we secretly swapped the sum and expectation, which is in general bad because both are potentially infinite sums. However, there is a theorem that tells us this is okay whenever the summands are non-negative, but we will not prove this.
+    \item We have
+      \begin{align*}
+        \rho_j &= \E_k(W_j)\\
+        &= \E_k\left(\sum_{m \geq 1}1(X_m = j, T_k \geq m)\right) \\
+        &= \sum_{m\geq 1}\P_k(X_m = j, T_k \geq m)\\
+        &= \sum_{m \geq 1}\sum_{i \in S} \P_k(X_m = j | X_{m - 1} = i, T_k \geq m) \P_k(X_{m - 1} = i, T_k \geq m)\\
+        \intertext{We now use the Markov property. Note that $T_k \geq m$ means $X_1, \cdots, X_{m - 1} \not= k$. The Markov property thus tells us the condition $T_k \geq m$ is useless. So we are left with}
+        &= \sum_{m \geq 1}\sum_{i \in S} \P_k(X_m = j | X_{m - 1} = i) \P_k(X_{m - 1} = i, T_k \geq m)\\
+        &= \sum_{m \geq 1}\sum_{i \in S} p_{ij} \P_k(X_{m - 1} = i, T_k \geq m)\\
+        &= \sum_{i \in S} p_{ij} \sum_{m \geq 1} \P_k(X_{m - 1} = i, T_k \geq m)
+      \end{align*}
+      The last term looks really $\rho_i$, but the indices are slightly off. We shall have faith in ourselves, and show that this is indeed equal to $\rho_i$.
+
+      First we let $r = m - 1$, and get
+      \[
+        \sum_{m \geq 0} \P_k (X_{m - 1} = i, T_k \geq m) = \sum_{r = 0}^\infty \P_k(X_r = i, T_k \geq r + 1).
+      \]
+      Of course this does not fix the problem. We will look at the different possible cases. First, if $i = k$, then the $r = 0$ term is $1$ since $T_k \geq 1$ is always true by definition and $X_0 = k$, also by construction. On the other hand, the other terms are all zero since it is impossible for the return time to be greater or equal to $r + 1$ if we are at $k$ at time $r$. So the sum is $1$, which is $\rho_k$.
+
+      In the case where $i \not= k$, first note that when $r = 0$ we know that $X_0 = k \not= i$. So the term is zero. For $r \geq 1$, we know that if $X_r = i$ and $T_k \geq r$, then we must also have $T_k \geq r + 1$, since it is impossible for the return time to $k$ to be exactly $r$ if we are not at $k$ at time $r$. So $\P_k(X_r = i , T_k \geq r + 1) = \P_k(X_r = i, T_k \geq r)$. So indeed we have
+      \[
+        \sum_{m \geq 0} \P_k (X_{m - 1} = i, T_k \geq m) = \rho_i.
+      \]
+      Hence we get
+      \[
+        \rho_j = \sum_{i \in S} p_{ij} \rho_i.
+      \]
+      So done.
+
+    \item To show that $0 < \rho_i < \infty$, first fix our $i$, and note that $\rho_k = 1$. We know that $\rho = \rho P = \rho P^n$ for $n \geq 1$. So by expanding the matrix sum, know that for any $m, n$,
+      \begin{align*}
+        \rho_i &\geq \rho_k p_{k, i}(n)\\
+        \rho_k &\geq \rho_i p_{i, k}(m)
+      \end{align*}
+      By irreducibility, we now choose $m, n$ such that $p_{i, k}(m), p_{k, i}(n) > 0$. So we have
+      \[
+        \rho_k p_{k, i}(n) \leq \rho_i \leq \frac{\rho_k}{p_{i, k}(m)}
+      \]
+      Since $\rho_k = 1$, the result follows.
+
+  \end{enumerate}
+\end{proof}
 
 \end{document}
