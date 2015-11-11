@@ -2092,4 +2092,145 @@ since we know that when $\tau > t$, the Green's function $G(t, \tau) = 0$. Thus 
     y(t) = \int_0^t \sin (t - \tau) f(\tau) \;\d \tau.
   \]
 \end{eg}
+
+\section{Fourier transforms}
+So far, we have considered writing a function $f: S^1 \to \C$ (or a periodic function) as a Fourier sum
+\[
+  f(\theta) = \sum_{n \in \Z} \hat{f}_n e^{in\theta},\quad \hat{f}_n = \int_{-\pi}^\pi e^{-in\theta}f(\theta)\;\d \theta.
+\]
+What if we don't have a periodic function, but just an arbitrary $f:\R \to \C$? Can we still do Fourier analysis? Yes!
+
+To start with, instead of $\hat{f}_n = \int_{-\pi}^\pi e^{-in\theta }f(\theta)\;\d \theta$, we define the Fourier transform as follows:
+\begin{defi}[Fourier transfor]
+  The \emph{Fourier transform} of an (absolutely integrable) function $f: \R \to \C$ is defined as
+  \[
+    \tilde{f}(k) = \int_{-\infty}^\infty e^{-ikx}f(x)\;\d x
+  \]
+  for \emph{all} $k \in \R$. We will also write $\tilde{f}(k) = \mathcal{F}[f(x)]$.
+\end{defi}
+Note that for any $k$, we have
+\[
+  |\tilde{f}(k)| = \left|\int_{-\infty}^\infty e^{-ikx}f(x)\;\d x\right| \leq \int_{-\infty}^\infty |e^{-ikx} f(x)|\;\d x = \int_{-\infty}^\infty  |f(x)|\;\d x.
+\]
+Since we have assumed that our function is absolutely integrable, this definition makes sense.
+
+We can look at a few basic properties of the Fourier transform.
+\begin{enumerate}
+  \item Linearity: if $f, g: \R \to \C$ are absolutely integrable and $c_1, c_2$ are constants, then
+    \[
+      \mathcal{F}[c_1 f(x) + c_2 g(x)] = c_1 \mathcal{F}[f(x)] + c_2 \mathcal{F}[g(x)].
+    \]
+    This follows directly from the linearity of the integral.
+  \item Translation:
+    \begin{align*}
+      \mathcal{F}[f(x - a)] &= \int_{\R}e^{ikx} f(x - a)\;\d x \\
+      \intertext{Let $y = x - a$. Then we have}
+      &= \int_{\R} e^{ik(y + a)}f (y) \;\d y \\
+      &= e^{-ika} \int_{\R} e^{-iky}f(y)\;\d y \\
+      &= e^{-ika}\mathcal{F}[f(x)],
+    \end{align*}
+    So a translation in $x$-space becomes a re-phasing in $k$-space.
+  \item Re-phasing:
+    \begin{align*}
+      \mathcal{F}[e^{-i\ell x}f(x)] &= \int_{-\infty}^\infty e^{-ikx} e^{-i\ell x} f(x)\;\d x\\
+      &= \int_{-\infty}^\infty e^{-i(k + \ell)x} f(x)\;\d x\\
+      &= \tilde{f}(k + \ell),
+    \end{align*}
+    where $\ell \in \R$ and $\tilde{f}(x) = \mathcal{F}[f(x)]$.
+  \item Scaling:
+    \begin{align*}
+      \mathcal{F}[f(cx)] &= \int_{-\infty}^\infty e^{-ikx}f(cx)\;\d x\\
+      &= \int_{-\infty}^\infty e^{-iky/c} f(y) \frac{\d y}{|c|}\\
+      &= \frac{1}{|c|} \tilde{f}\left(\frac{k}{c}\right).
+    \end{align*}
+    Note that we have to take the absolute value of $c$, since if we replace $x$ by $y/c$ and $c$ is negative, then we will flip the bounds of the integral. The extra minus sign then turns $c$ into $-c = |c|$.
+  \item Convolutions: for functions $f, g: \R \to \C$, we define the \emph{convolution} as
+    \[
+      f * g (x) = \int_{-\infty}^\infty f(x - y) g(y)\;\d y.
+    \]
+    We then have
+    \begin{align*}
+      \mathcal{F}[f * g(x)] &= \int_{-\infty}^\infty e^{-ikx} \left[\int_{-\infty}^{\infty} f(x - y)g(y) \;\d y\right] \;\d x\\
+      &= \int_{\R^2} e^{ik(x - y)} f(x - y) e^{-iky}g(y) \;\d y \;\d x\\
+      &= \int_{\R} e^{-iku} f(u) \;\d u \int_{\R} e^{-iky} g(y)\;\d y\\
+      &= \mathcal{F}[f] \mathcal{F}[g],
+    \end{align*}
+    where $u = x - y$. So the Fourier transform of a convolution is the product of individual Fourier transforms.
+  \item The most useful property of the Fourier transform is that it ``turns differentiation into multiplication''. Integrating by parts, we have
+    \begin{align*}
+      \mathcal{F}[f'(x)] &= \int_{-\infty}^\infty e^{-ikx} \frac{\d f}{\d x}\;\d x\\
+      &= \int_{-\infty}^\infty - \frac{\d}{\d x} (e^{-ikx}) f(x)\;\d x\\
+      \intertext{Note that we don't have any boundary terms since for the function to be absolutely integrable, it has to decay to zero as we go to infinity. So we have}
+      &= ik \int_{-\infty}^\infty e^{-ikx} f(x)\;\d x\\
+      &= ik \mathcal{F}[f(x)]
+    \end{align*}
+    Conversely,
+    \[
+      \mathcal{F}[xf(x)] = \int_{-\infty}^\infty e^{-ikx} xf(x)\;\d x = - \frac{\d}{\d k}\int_{-\infty}^{\infty} e^{-ikx} f(x)\;\d x = i\tilde{f}'(k).
+    \]
+\end{enumerate}
+This are useful results, since if we have a complicated function to find the Fourier transform of, we can use these to break it apart into smaller pieces and hopefully make our lives easier.
+
+Suppose we have a differential equation
+\[
+  \mathcal{L}(\partial) y = f,
+\]
+where
+\[
+  \mathcal{L}(\partial) = \sum_{r = 0}^p c_r \frac{\d^r}{\d x^r}
+\]
+is a differential operator of $p$th order with constant coefficients.
+
+Taking the Fourier transform of both sides of the equation, we find
+\[
+  \mathcal{F}[\mathcal{L}(\partial)y] = \mathcal{F}[f(x)] = \tilde{f}(k).
+\]
+The interesting part is the left hand side, since the Fourier transform turns differentiation into multiplication. The left hand side becomes
+\[
+  c_0 \tilde{y}(k) + c_1 ik\tilde{y}(k) + c_2 (ik)^2 \tilde{y}(k) + \cdots + c_p (ik)^p \tilde{y}(k) = \mathcal{L}(ik) \tilde{y}(k).
+\]
+Here $\mathcal{L}(ik)$ is a polynomial in $ik$. Thus taking the Fourier transform has changed our ordinary differential equation into the algebraic equation
+\[
+  \mathcal{L}(ik) \tilde{y}(k) = \tilde{f}(k).
+\]
+Since $\mathcal{L}(ik)$ is just multiplication by a polynomial, we can immediately get
+\[
+  \tilde{y}(k) = \frac{\tilde{f}(k)}{\mathcal{L}(ik)}.
+\]
+\begin{eg}
+  For $\phi: \R^n \to \C$, suppose we have the equation
+  \[
+    \nabla^2 \phi - m^2 \phi = \rho(x),
+  \]
+  with
+  \[
+    \nabla^2 = \sum_{i = 1}^n \frac{\d^2}{\d x_i^2}
+  \]
+  is the Laplacian on $\R^n$.
+
+  We define the $n$ dimensional Fourier transform by
+  \[
+    \tilde{\phi} (\mathbf{k}) = \int_{\R^n} e^{-i\mathbf{k}\cdot \mathbf{x}} f(\mathbf{x})\;\d \mathbf{x} = \mathcal{F}[\phi(x)]
+  \]
+  where now $\mathbf{k} \in \R^n$ is an $n$-dimensional vector. So we get
+  \[
+    \mathcal{F}[\nabla^2 \phi - m^2 \phi] = \mathcal{F}[\rho] = \tilde{\rho}(\mathbf{k}).
+  \]
+  The first term is
+  \begin{align*}
+    \int_{\R^n} e^{-i\mathbf{k}\cdot \mathbf{x}} \nabla\cdot \nabla \phi \;\d ^n x &= -\int_{\R^n} \nabla (e^{-i\mathbf{k}\cdot \mathbf{x}}) \cdot \nabla \phi \;\d^n x\\
+    &= \int_{\R^n} \nabla^2 (e^{-i\mathbf{k}\cdot \mathbf{x}}) \phi \;\d^n x\\
+    &= -\mathbf{k}\cdot \mathbf{k} \int_{\R^n} e^{-i\mathbf{k}\cdot \mathbf{x}} \phi(\mathbf{x})\;\d^n x\\
+    &= -\mathbf{k}\cdot \mathbf{k} \tilde{\phi} (\mathbf{k}).
+  \end{align*}
+  So our equation becomes
+  \[
+    -\mathbf{k}\cdot \mathbf{k} \tilde{\phi}(\mathbf{k}) - m^2 \tilde{\phi}(\mathbf{k}) = \tilde{\rho}(\mathbf{k}).
+  \]
+  So we get
+  \[
+    \tilde{\phi}(\mathbf{k}) = -\frac{\tilde{\rho}(\mathbf{k})}{|\mathbf{k}|^2 + m^2}.
+  \]
+\end{eg}
+So differential equations are trivial in $k$ space. The problem is, of course, that we want our solution in $x$ space, not $k$ space. So we need to find a way to restore our function back to $x$ space.
 \end{document}
