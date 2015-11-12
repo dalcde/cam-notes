@@ -1132,4 +1132,157 @@ We will show that this $\rho$ is \emph{almost} our $\pi_i$, up to a constant.
   \end{enumerate}
 \end{proof}
 
+Now we can prove our initial theorem.
+\begin{thm}
+  Consider an irreducible Markov chain. Then
+  \begin{enumerate}
+    \item There exists an invariant distribution if and only if some state is positive recurrent.
+    \item If there is an invariant distribution $\pi$, then every state is positive recurrent, and
+      \[
+        \pi_i = \frac{1}{\mu_i}
+      \]
+      for $i \in S$, where $\mu_i$ is the mean recurrence time of $i$. In particular, $\pi$ is unique.
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item Let $k$ be a positive recurrent state. Then
+      \[
+        \pi_i = \frac{\rho_i}{\mu_k}
+      \]
+      satisfies $\pi_i \geq 0$ with $\sum_i \pi_i = 1$, and is an invariant distribution.
+    \item Let $\pi$ be an invariant distribution. So for all $n$, we have
+      \[
+        \pi = \pi P^n.
+      \]
+      Hence for all $i, j \in S$, $n \in \N$, we have
+      \[
+        \pi_i \geq \pi_j p_{j,i}(n).\tag{$*$}
+      \]
+      Since $\sum \pi_1 = 1$, there is some $k$ such that $\pi_k > 0$.
+
+      By $(*)$ with $j = k$, we know that
+      \[
+        \pi_i \geq \pi_k p_{k,i}(n) > 0
+      \]
+      for some $n$, by irreducibility. So $\pi_i > 0$ for all $i$.
+
+      Now we show that all states are positive recurrent. So we need to rule out the cases of transience and null recurrence.
+
+      So assume all states are transient. So $p_{ji}(n) \to 0$ for all $i, j\in S$, $n \in \N$. However, we know that
+      \[
+        \pi_i = \sum_j \pi_j p_{j, i}(n).
+      \]
+      If our state space is finite, then since $p_{j, i}(n) \to 0$, the sum tends to $0$, and we reach a contradiction, since $\pi_i$ is non-zero. If we have a countably infinite set, we have to be more careful. We have a huge state space $S$, and we don't know how to work with it. So we approximate it by a finite $F$, and split $S$ into $F$ and $S\setminus F$. So we get
+      \begin{align*}
+        0 &\leq \sum_j \pi_j p_{j, i}(n)\\
+        &= \sum_{j \in F} \pi_j p_{j, i}(n) + \sum_{j \not\in F} \pi_j p_{j, i}(n) \\
+        &\leq \sum_{j \in F}p_{j, i}(n) + \sum_{j \in F}\pi_j\\
+        &\to \sum_{j \not\in F}\pi_j
+      \end{align*}
+      as we take the limit $n \to \infty$. We now want to take the limit as $F \to S$.  We know that $\sum_{j \in S} \pi_i = 1$. So as we remove more and more things from $S$, $\sum_{j \not\in S} \pi_i \to 0$. So $\sum p_j p_{j, i}(n) \to 0$. So we get the desired contradiction. Hence we know that all states are recurrent.
+
+      To rule out the case of null recurrence, recall that in the previous discussion, we said that we ``should'' have $\pi_i \mu_i =1 $. So we attempt to prove this. Then this would imply that $\mu_i$ is finite since $\pi_i > 0$.
+
+      By definition $\mu_i = \E_i(T_i)$, and we have the general formula
+      \[
+        \E(N) = \sum_n \P(N \geq n).
+      \]
+      So we get
+      \[
+        \pi_i \mu_i = \sum_{n = 1}^\infty \pi_i\P_i (T_i \geq n).
+      \]
+      Note that $\P_i$ is a probability conditional on starting at $i$. So to work with the expression $\pi_i \P_i (T_i \geq n)$, it is helpful to let $\pi_i$ be the probability of starting at $i$. So suppose $X_0$ has distribution $\pi$. Then
+      \[
+        \pi_i \mu_i = \sum_{n = 1}^\infty \P(T_i \geq n, X_0 = i).
+      \]
+      Let's work out what the terms are. What is the first term? It is
+      \[
+        \P(T_i \geq 1, X_0 = i) = \P(X_0 = i) = \pi_i,
+      \]
+      since we know that we always have $T_i \geq 1$ by definition.
+
+      For other $n \geq 2$, we want to compute $\P(T_i \geq n, X_0 = i)$. This is the probability of starting at $i$, and then not return to $i$ in the next $n - 1$ steps. So we have
+      \[
+        \P(T_i \geq n, X_0 = i) = \P(X_0 = i, X_m \not= i\text{ for } 1 \leq m \leq n - 1)
+      \]
+      Note that all the expressions on the right look rather similar, except that the first term is $=i$ while the others are $\not= i$. We can make them look more similar by writing
+      \begin{align*}
+        \P(T_i \geq n, X_0 = i) &= \P(X_m \not= i\text{ for } 1\leq m \leq n - 1) \\
+        &\quad\quad- \P(X_m \not= i\text{ for } 0\leq m \leq n - 1)
+      \end{align*}
+      What can we do now? The trick here is to use invariance. Since we started with an invariant distribution, we always live in an invariant distribution. Looking at the time interval $1 \leq m \leq n -1$ is the same as looking at $0 \leq m \leq n -2$. In other words, the sequence $(X_0, \cdots, X_{n - 2}$ has the same distribution as $(X_1, \cdots, X_{n - 1})$. So we can write the expression as
+      \[
+        \P(T_i \geq n, X_0 = i) = a_{n - 2} - a_{n - 1},
+      \]
+      where
+      \[
+        a_r = \P(X_m \not= i \text{ for }0 \leq i \leq r).
+      \]
+      Now we are summing differences, and when we sum differences everything cancels term by term. Then we have
+      \[
+        \pi_i \mu_i = \pi_i + (a_0 - a_1) + (a_1 - a_2) + \cdots
+      \]
+      Note that we cannot do the cancellation directly, since this is an infinite sum, and infinity behaves weirdly. We have to look at a finite truncation, do the cancellation, and take the limit. So we have
+      \begin{align*}
+        \pi_i \mu_i &= \lim_{N \to \infty} [\pi_i + (a_0 - a_1) + (a_1 - a_2) + \cdots + (a_{N - 2} - a_{N - 1})]\\
+        &= \lim_{N\to \infty} [\pi_i + a_0 - a_{N - 1}]\\
+        &= \pi_i + a_0 + \lim_{N \to \infty} a_N.
+      \end{align*}
+      What is each term? $\pi_i$ is the probability that $X_0 = i$, and $a_0$ is the probability that $X_0 \not= i$. So we know that $\pi_i + a_0 = 1$. What about $\lim a_N$? We know that
+      \[
+        \lim_{N\to \infty} a_N = \P(X_m \not= i \text{ for all }m).
+      \]
+      Since the state is recurrent, the probability of never visiting $i$ is $0$. So we get
+      \[
+        \pi_i \mu_i = 1.
+      \]
+      Since $\pi_i > 0$, we get $\mu_i = \frac{1}{\pi_i} < \infty$ for all $i$. Hence we have positive recurrence. We have also proved the formula we wanted.
+  \end{enumerate}
+\end{proof}
+\subsection{Convergence to equilibrium}
+So far, we have discussed that if a chain converged, then it must converge to an invariant distribution. We then proved that the chain has a (unique) invariant distribution if and only if it is positive recurrent.
+
+Now, we want to understand when convergence actually occurs.
+\begin{thm}[]
+  Consider a Markov chain that is irreducible, positive recurrent and aperiodic. Then
+  \[
+    p_{i,j}(n) \to \pi_j
+  \]
+  as $n \to \infty$, where $\pi$ is the unique invariant distribution.
+\end{thm}
+We will prove this by ``coupling''. The idea is that here we have two sets of probabilities, and we want to prove some relations between them. The first step is to move our attention to random variables, by considering random variables that give rise to these probability distribution. In other words, we look at the Markov chains themselves instead of the probabilities. In general, random variables are nicer to work with, since they are functions, not discrete, random numbers.
+
+However, we have a problem since we get two random variables, but they are completely unrelated. In particular, as functions, their domains are different, and we just cannot compare them directly. This is bad. Any person can solve this problem using the obvious way, by taking the product of the two domains, but this is still not helpful, since the two random variables are still not correlated to each other. So we will need to do some ``coupling'' to correlate the two random variables together.
+
+\begin{proof}
+  Since we have two probability distributions, we would like to work with two Markov chains.
+
+  We copy our Markov chain into a pair $Z = (X, Y)$ of \emph{two} independent chains, with $X = (X_n)$ and $Y = (Y_n)$ each having the state space $S$ and transition matrix $P$.
+
+  We can let $Z = (Z_n)$, where $Z_n = (X_n, Y_n)$ is a Markov chain on state space $S^2$. This has transition probabilities
+  \[
+    p_{ij, k\ell} = p_{ik} p_{j\ell}
+  \]
+  by independence of the chains. We would like to apply theorems to $Z$, so we need to make sure it has nice properties. First, we want to check that $Z$ is irreducible. We have
+  \[
+    p_{ij, k\ell}(n) = p_{i,k} (n) p_{j,\ell}(n).
+  \]
+  We want this to be strictly positive for some $n$. We know that there is $m$ such that $p_{i,k}(m) > 0$, and some $r$ such that $p_{j,\ell}(r) > 0$. However, what we need is an $n$ that makes them \emph{simultaneously} positive. We can indeed find such an $n$, based on the assumption that we have aperiodic chains and waffling something about number theory.
+
+  Now we want to show positive recurrence. We know that $X$, and hence $Y$ is positive recurrent. By our previous theorem, there is a unique invariant distribution $\pi$ for $P$. It is then easy to check that $Z$ has invariant distribution
+  \[
+    \nu = (\nu_{ij}: ij \in S^2)
+  \]
+  given by
+  \[
+    \nu_{ij} = \pi_i \pi_j.
+  \]
+  This works because $X$ and $Y$ are independent. So $Z$ is also positive recurrent.
+
+  Now we have to couple the two chains together.
+
+  We fix some state $s \in S$. Let $T$ be the earliest time at which $X_n = Y_n = s$. Because of recurrence, we can always find such at $T$. After this state $s$, they behave under the exact same distribution.
+\end{proof}
 \end{document}
