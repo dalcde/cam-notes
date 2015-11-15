@@ -2094,6 +2094,7 @@ since we know that when $\tau > t$, the Green's function $G(t, \tau) = 0$. Thus 
 \end{eg}
 
 \section{Fourier transforms}
+\subsection{The Fourier transform}
 So far, we have considered writing a function $f: S^1 \to \C$ (or a periodic function) as a Fourier sum
 \[
   f(\theta) = \sum_{n \in \Z} \hat{f}_n e^{in\theta},\quad \hat{f}_n = \int_{-\pi}^\pi e^{-in\theta}f(\theta)\;\d \theta.
@@ -2101,7 +2102,7 @@ So far, we have considered writing a function $f: S^1 \to \C$ (or a periodic fun
 What if we don't have a periodic function, but just an arbitrary $f:\R \to \C$? Can we still do Fourier analysis? Yes!
 
 To start with, instead of $\hat{f}_n = \int_{-\pi}^\pi e^{-in\theta }f(\theta)\;\d \theta$, we define the Fourier transform as follows:
-\begin{defi}[Fourier transfor]
+\begin{defi}[Fourier transform]
   The \emph{Fourier transform} of an (absolutely integrable) function $f: \R \to \C$ is defined as
   \[
     \tilde{f}(k) = \int_{-\infty}^\infty e^{-ikx}f(x)\;\d x
@@ -2233,4 +2234,171 @@ Since $\mathcal{L}(ik)$ is just multiplication by a polynomial, we can immediate
   \]
 \end{eg}
 So differential equations are trivial in $k$ space. The problem is, of course, that we want our solution in $x$ space, not $k$ space. So we need to find a way to restore our function back to $x$ space.
+
+\subsection{The Fourier inversion theorem}
+We need to be able to express our original function $f(x)$ in terms of its Fourier transform $\tilde{f}(k)$. Recall that in the periodic case where $f(x) = f(x + L)$, we have
+\[
+  f(x) = \sum_{n \in \Z}\hat{f}_n e^{2inx\pi /L}.
+\]
+We can try to obtain a similar expression for a non-periodic function $f: \R \to \C$ by taking the limit $L \to \infty$. Recall that our coefficients are defined by
+\[
+  \hat{f}_n = \frac{1}{L} \int_{-L/2}^{L/2} e^{-2 in\pi x/L} f(x)\;\d x.
+\]
+Now define
+\[
+  \Delta k = \frac{2\pi }{L}.
+\]
+So we have
+\[
+  f(x) = \sum_{n \in \Z} e^{inx \Delta k} \frac{\Delta k}{2 \pi}\int_{-L/2}^{L/2} e^{-inx \Delta k} f(u) \;\d u
+\]
+As we take the limit $L \to \infty$, we can approximate
+\[
+  \int_{-L/2}^{L/2} e^{-ixn\Delta k} f(x) \;\d x = \int_{-\infty}^\infty e^{-ix (n \Delta k)} f(x)\;\d x = \tilde{f}(n \Delta k).
+\]
+Then for a non-periodic function, we have
+\[
+  f(x) = \lim_{\Delta k \to \infty} \sum_{n \in \Z} \frac{\Delta k}{2\pi} e^{in \Delta k x} \tilde{f} (n \Delta k) = \frac{1}{2\pi} \int_{-\infty}^\infty e^{ik x} \tilde{f}(k) \;\d k.
+\]
+So
+\[
+  f(x) = \mathcal{F}^{-1}[f(k)] = \frac{1}{2\pi} \int_{-\infty}^\infty e^{ik x} \tilde{f}(k) \;\d k.
+\]
+This is a really dodgy argument. We first took the limit as $L \to \infty$ to turn the integral from $\int_{-L}^L$ to $\int_{-\infty}^\infty$. \emph{Then} we take the limit as $\Delta k \to 0$. However, we can't really do this, since $\Delta k$ is defined to be $2\pi /L$, and both limits have to be taken at the same time. So we should really just take this as a heuristic argument for why this works, instead of a formal proof.
+
+Nevertheless, note that the inverse Fourier transform looks very similar to the Fourier transform itself. The only differences are a factor of $\frac{1}{2\pi}$, and the sign of the exponent. We can get rid of the first difference by evenly distributing the factor among the Fourier transform and inverse Fourier transform. For example, we can instead define
+\[
+  \mathcal{F}(x) = \frac{1}{\sqrt{2\pi}} \int_{-\infty}^\infty e^{-ikx} f(x)\;\d x.
+\]
+Then $\mathcal{F}^{-1}$ looks just like $\mathcal{F}$ apart from having the wrong sign.
+
+However, we will stick to our original definition so that we don't have to deal with messy square roots. Hence we have the duality
+\[
+  \mathcal{F}[f(x)] = \mathcal{F}^{-1}[f(-x)] (2\pi).
+\]
+This is useful because it means we can use our knowledge of Fourier transforms to compute inverse Fourier transform.
+
+Note that this does not occur in the case of the Fourier \emph{series}. In the Fourier series, we obtain the coefficients by evaluating an integral, and restore the original function by taking a discrete sum. These operations are not symmetric.
+
+\begin{eg}
+  Recall that we defined the convolution as
+  \[
+    f * g(x) = \int_{-\infty}^\infty f(x - y) g(y)\;\d y.
+  \]
+  We then computed
+  \[
+    \mathcal{F}[f * g(x)] = \tilde{f}(k) \tilde{f}(g).
+  \]
+  It follows by definition of the inverse that
+  \[
+    \mathcal{F}^{-1}[\tilde{f}(k) \tilde{g}(k)] = f * g(x).
+  \]
+  Therefore, we know that
+  \[
+    \mathcal{F}[f(x) g(x)] = 2\pi \int_{-\infty}^\infty  \tilde{f}(k - \ell) \tilde{g}(\ell)\;\d \ell = 2\pi \tilde{f} * \tilde{g} (k).
+  \]
+\end{eg}
+
+\begin{eg}
+  Last time we saw that if $\nabla^2 \phi - m^2 \phi = \rho(x)$, then
+  \[
+    \tilde{\phi}(\mathbf{k}) = -\frac{\tilde{\rho}(\mathbf{k})}{|\mathbf{k}|^2 + m^2}.
+  \]
+  Hence we can retrieve our $\phi$ as
+  \[
+    \phi(\mathbf{x}) = \mathcal{F}^{-1}[\tilde{\phi}(k)] = -\frac{1}{(2\pi)^n} \int_{\R^n} e^{i\mathbf{k}\cdot \mathbf{x}} \frac{\tilde{\rho}(\mathbf{k})}{|\mathbf{k}|^2 + m^2}\;\d^n x.
+  \]
+  Note that we have $(2\pi)^n$ instead of $2\pi$ since we get a factor of $2\pi$ for each dimension (and the negative sign was just brought down from the original expression).
+
+  Since we are taking the inverse Fourier transform of a product, we know that the result is just a convolution of $\mathcal{F}^{-1}[\tilde{\rho}(k)] = \rho(x)$ and $\mathcal{F}^{-1}\left(\frac{1}{|\mathbf{k}|^2 + m^2}\right)$.
+
+  Recall that when we worked with Green's function, if we have a forcing term, then the final solution is the convolution of our Green's function with the forcing term. Here we get a similar expression in higher dimensions.
+\end{eg}
+
+\subsection{Parseval's theorem for Fourier transforms}
+\begin{thm}[Parseval's theorem (again)]
+  Suppose $f, g: \R \to \C$ are sufficiently well-behaved that $\tilde{f}$ and $\tilde{g}$ exist and we indeed have $\mathcal{F}^{-1}[\tilde{f}] = f, \mathcal{F}^{-1}[\tilde{g}] = g$. Then
+  \[
+    (f, g) = \int_\R f^*(x) g(x)\;\d x = \frac{1}{2\pi}(\tilde{f}, \tilde{g}).
+  \]
+  In particular, if $f = g$, then
+  \[
+    \|f\|^2 = \frac{1}{2\pi} \|\tilde{f}\|^2.
+  \]
+\end{thm}
+So taking the Fourier transform preserves the $L^2$ norm (up to a constant factor of $\frac{1}{2 \pi}$).
+\begin{proof}
+  \begin{align*}
+    (f, g) &= \int_\R f^*(x) g(x)\;\d x\\
+    &= \int_{-\infty}^\infty f^*(x) \left[\frac{1}{2\pi}\int_{-\infty}^\infty e^{ikx} \tilde{g}(x) \;\d k\right]\;\d x\\
+    &= \frac{1}{2\pi} \int_{-\infty}^\infty \left[\int_{-\infty}^\infty f^*(x) e^{ikx} \;\d x\right] \tilde{g}(k)\;\d k\\
+    &= \frac{1}{2\pi} \int_{-\infty}^\infty \left[\int_{-\infty}^\infty f(x) e^{-ikx} \;\d x\right]^* \tilde{g}(k)\;\d k\\
+    &= \frac{1}{2\pi} \int_{-\infty}^\infty \tilde{f}^*(k) \tilde{g}(k) \;\d k\\
+    &= \frac{1}{2\pi}(\tilde{f}, \tilde{g}).
+  \end{align*}
+\end{proof}
+\subsection{A word of warning}
+Suppose $f(x)$ is defined by
+\[
+  f(x) =
+  \begin{cases}
+    1 & |x| < 1\\
+    0 & |x| \geq 1.
+  \end{cases}
+\]
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-3, 0) -- (3, 0) node [right] {$x$};
+    \draw [->] (0, -0.5) -- (0, 2) node [above] {$y$};
+
+    \draw [mred, semithick] (-2.5, 0) -- (-1, 0) -- (-1, 1) -- (1, 1) -- (1, 0) -- (2.5, 0);
+  \end{tikzpicture}
+\end{center}
+This function looks rather innocent. Sure it has discontinuities at $\pm 1$, but these are not too absurd, and we are just integrating. This is certainly absolutely integrable. We can easily compute the Fourier transform as
+\[
+  \tilde{f}(k) = \int_{-\infty}^\infty e^{-ikx}f(x) = \int_{-1}^1 e^{-ikx} \;\d x = \frac{2\sin k}{k}.
+\]
+Is our original function equal to the integral $\mathcal{F}^{-1}[\tilde{f}(l)]$? We have
+\[
+  \mathcal{F}^{-1}\left[\frac{2 \sin k}{k}\right] = \frac{1}{\pi} \int_{-\infty}^\infty e^{ikx} \frac{\sin k}{k} \;\d k.
+\]
+This is hard to do. So let's first see if this function is absolutely integrable. We have
+\begin{align*}
+  \int_{-\infty}^\infty \left|e^{ikx} \frac{\sin k}{k}\right|\;\d x &= \int_{-\infty}^\infty \left|\frac{\sin k}{k}\right|\;\d k\\
+  &= 2 \int_0^\infty \left|\frac{\sin k}{k}\right|\;\d k\\
+  &\geq 2 \sum_{n = 0}^N \int_{(n + 1/4) \pi}^{(n + 3/4)\pi} \left|\frac{\sin k}{k}\right|\;\d k.
+\end{align*}
+% can insert diagram
+The idea here is instead of looking at the integral over the whole real line, we just pick out segments of it. In these small segments, we know that $|\sin k| \geq \frac{1}{\sqrt{2}}$. So we can bound this by
+\begin{align*}
+  \int_{-\infty}^\infty \left|e^{ikx} \frac{\sin k}{k}\right|\;\d x &\geq 2 \sum_{n = 0}^N \frac{1}{\sqrt{2}} \int_{(n + 1/4) \pi}^{(n + 3/4)\pi} \frac{\d k}{k}\\
+  &\geq \sqrt{2} \sum_{n = 0}^N \int_{(n + 1/4) \pi}^{(n + 3/4)\pi} \frac{\d k}{(n + 1)\pi}\\
+  &= \frac{\sqrt{2}}{2} \sum_{n = 0}^N \frac{1}{n + 1},
+\end{align*}
+and this diverges as $N \to \infty$. So we don't have absolute integrability. So we have to be careful when we are doing these things. Well, in theory. We actually won't. We'll just ignore this issue.
+
+\subsection{Fourier transformation of distributions}
+We have
+\[
+  \mathcal{F}[\delta(x)] = \int_{-\infty}^\infty  e^{ikx} \delta (x)\;\d x = 1.
+\]
+Hence we have
+\[
+  \mathcal{F}^{-1}[1] = \frac{1}{2\pi} \int_{-\infty}^\infty e^{ikx}\;\d k = \delta (x).
+\]
+Of course, it is extremely hard to make sense of this integral. It quite obviously diverges as a normal integral, but we can just have faith and believe this makes sense as long as we are talking about distributions.
+
+Similarly, from our rules of translations, we get
+\[
+  \mathcal{F}[\delta(x - a)] = e^{ika}
+\]
+and
+\[
+  \mathcal{F}[e^{i\ell x}] = 2\pi \delta(k - \ell),
+\]
+Hence we get
+\[
+  \mathcal{F}[\cos (\ell x)] = \mathcal{F}\left[\frac{1}{2}( e^{i\ell x} + e^{-i\ell x})\right] = \frac{1}{2} \mathcal{F}[e^{i\ell x}] + \frac{1}{2} \mathcal{F}[e^{-\ell x}] = \pi [\delta (k - \ell) + \delta(k + \ell)].
+\]
+We see that highly localized functions in $x$-space have very spread-out behaviour in $k$-space, and vice versa.
 \end{document}

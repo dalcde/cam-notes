@@ -2212,7 +2212,7 @@ If $A \in \Mat_n(\F)$, we can define $\chi_A(t) = \det (tI - A)$.
   \[
     \prod_{r \not= j}(\lambda_j - \lambda_r) \mathbf{x}_j = \prod_{r \not= j} (\lambda_j- \lambda_r)\mathbf{y}_j.
   \]
-  Since we know that $\prod_{r \not= j} (\lambda_r - \lambda_j \not= 0$, we must have $\mathbf{x}_i = \mathbf{y}_i$ for all $i$.
+  Since we know that $\prod_{r \not= j} (\lambda_r - \lambda_j) \not= 0$, we must have $\mathbf{x}_i = \mathbf{y}_i$ for all $i$.
 
   So each expression for $\sum \mathbf{x}_i$ is unique.
 \end{proof}
@@ -2500,7 +2500,16 @@ Recall that $\chi_\alpha(t) = \det (t\iota - \alpha)$ for $\alpha \in \End(V)$. 
 \begin{thm}[Cayley-Hamilton theorem]
   Let $V$ be a finite-dimensional vector space and $\alpha \in \End(V)$. Then $\chi_\alpha(\alpha) = 0$, ie. $M_\alpha(t) | \chi_\alpha(t)$. In particular, $\deg M_\alpha \leq n$.
 \end{thm}
-We will not prove this yet, but just talk about it first. It is tempting to prove this by substituting $t = \alpha$ into $\det(t\iota - \alpha)$ and get $\det (\alpha - \alpha) = 0$, but this is meaningless. It doesn't make sense.
+We will not prove this yet, but just talk about it first. It is tempting to prove this by substituting $t = \alpha$ into $\det(t\iota - \alpha)$ and get $\det (\alpha - \alpha) = 0$, but this is meaningless, since what the statement $\chi_\alpha(t) = \det (t\iota - \alpha)$ tells us to do is to expand
+\[
+  \begin{pmatrix}
+    t - a_{11} & a_{12} & \cdots & a_{1n}\\
+    a_{21} & t - a_{22} & \cdots & a_{2n}\\
+    \vdots & \vdots & \ddots & \vdots\\
+    a_{n1} & a_{n2} & \cdots & t - a_{nn}
+  \end{pmatrix}
+\]
+to obtain a polynomial, and we clearly cannot substitute $t = A$ in this expression. However, we can later show that we can use this idea to prove it, but just be a bit more careful.
 
 Note also that if $\rho(t) \in \F[t]$ and
 \[
@@ -2594,4 +2603,267 @@ We have a similar lemma telling us when matrices are triangulable.
   \]
   with respect to $(\mathbf{u}_1, \cdots, \mathbf{u}_r, \mathbf{v}_{r + 1}, \mathbf{v}_n)$, which is upper triangular.
 \end{proof}
+
+\begin{eg}
+  Consider the real rotation matrix
+  \[
+    \begin{pmatrix}
+      \cos \theta & \sin \theta\\
+      -\sin \theta & \cos \theta
+    \end{pmatrix}.
+  \]
+  This is \emph{not} similar to a real upper triangular matrix (if $\theta$ is not an integer multiple of $\pi$). This is since the eigenvalues are $e^{\pm i\theta}$ and are not real. On the other hand, as a complex matrix, it is triangulable, and in fact diagonalizable since the eigenvalues are distinct.
+\end{eg}
+For this reason, in the rest of the section, we are mostly going to work in $\C$. We can now prove the Cayley-Hamilton theorem.
+
+\begin{thm}[Cayley-Hamilton theorem]
+  Let $V$ be a finite-dimensional vector space and $\alpha \in \End(V)$. Then $\chi_\alpha(\alpha) = 0$, ie. $M_\alpha(t) | \chi_\alpha(t)$. In particular, $\deg M_\alpha \leq n$.
+\end{thm}
+
+\begin{proof}
+  In this proof, we will work over $\C$. By the lemma, we can choose a basis $\{\mathbf{e}_1, \cdots, \mathbf{e}_n\}$ is represented by an upper triangular matrix.
+  \[
+    A =
+    \begin{pmatrix}
+      \lambda_1 & * & \cdots & *\\
+      0 & \lambda_2 & \cdots & *\\
+      \vdots & \vdots & \ddots & \vdots\\
+      0 & 0 & \cdots & \lambda_n
+    \end{pmatrix}.
+  \]
+  We must prove that
+  \[
+    \chi_\alpha(\alpha) = \chi_A(\alpha) = \prod_{i = 1}^n (\alpha - \lambda_i \iota) = 0.
+  \]
+  Write $V_j = \bra \mathbf{e}_1, \cdots, \mathbf{e}_j\ket$. So we have the inclusions
+  \[
+    V_0 = 0 \subseteq V_1 \subseteq \cdots \subseteq V_{n - 1} \subseteq V_n = V.
+  \]
+  We also know that $\dim V_j = j$. This increasing sequence is known as a \emph{flag}.
+
+  Now note that since $A$ is upper-triangular, we get
+  \[
+    \alpha(\mathbf{e}_i) = \sum_{k = 1}^i A_{ki} \mathbf{e}_k \in V_i.
+  \]
+  So $\alpha (V_j)\subseteq V_j$ for all $j = 0, \cdots, n$.
+
+  Moreover, we have
+  \[
+    (\alpha - \lambda_j\iota)(\mathbf{e}_j) = \sum_{k = 1}^{j - 1} A_{kj}\mathbf{e}_k \subseteq V_{j - 1}
+  \]
+  for all $j = 1, \cdots, n$. So every time we apply one of these things, we get to a smaller space. Hence by induction on $n - j$, we have
+  \[
+    \prod_{i = j}^n (\alpha - \lambda_i \iota) (V_n) \subseteq V_{j - 1}.
+  \]
+  In particular, when $j = 1$, we get
+  \[
+    \prod_{i = 1}^n (\alpha - \lambda_i \iota) (V) \subseteq V_0 = 0.
+  \]
+  So $\chi_\alpha(\alpha) = 0$ as required.
+
+  Note that if our field $\F$ is not $\C$ but just a subfield of $\C$, say $\R$, we can just pretend it is a complex matrix, do the same proof.
+\end{proof}
+
+\begin{proof}
+  We'll now prove the theorem again, which is somewhat a formalization of the ``nonsense proof'' where we just substitute $t = \alpha$ into $\det (\alpha - t\iota)$.
+
+  Let $\alpha$ be represented by $A$, and $B = tI - A$. Then
+  \[
+    B\adj B = \det B I_n = \chi_\alpha(t) I_n.
+  \]
+  But we know that $\adj B$ is a matrix with entries in $\F[t]$ of degree at most $n - 1$. So we can write
+  \[
+    \adj B = B_{n - 1}t^{n - 1} + B_{n - 2}t^{n - 2} + \cdots + B_0,
+  \]
+  with $B_i \in \Mat_n (\F)$. We can also write
+  \[
+    \chi_\alpha(t) = t^n + a_{n - 1}t^{n - 1} + \cdots + a_0.
+  \]
+  Then we get the result
+  \[
+    (tI_n - A) (B_{n - 1}t^{n - 1} + B_{n - 2} t^{n - 2} + \cdots + B_0) = t^n + a_{n - 1} t^{n - 1} + \cdots + a_0.
+  \]
+  We would like to just throw in $t = A$, and get the desired result, but in all these derivations, $t$ is assumed to be a real number, and, $tI_n - A$ is the matrix
+  \[
+    \begin{pmatrix}
+      t - a_{11} & a_{12} & \cdots & a_{1n}\\
+      a_{21} & t - a_{22} & \cdots & a_{2n}\\
+      \vdots & \vdots & \ddots & \vdots\\
+      a_{n1} & a_{n2} & \cdots & t - a_{nn}
+    \end{pmatrix}
+  \]
+  It doesn't make sense to put our $A$ in there.
+
+  However, what we \emph{can} do is to note that since this is true for all values of $t$, the coefficients on both sides must be equal. Equating coefficients in $t^k$, we have
+  \begin{align*}
+    -A B_0 &= a_0\\
+    B_0 - AB_1 &= a_1\\
+    &\vdots\\
+    B_{n - 2} - AB_{n - 1} &= a_{n - 1}\\
+    AB_{n - 1}  - 0 &= 1
+  \end{align*}
+  We now multiply each row a suitable power of $A$ to obtain
+  \begin{align*}
+    -A B_0 &= a_0 I_n\\
+    A B_0 - A^2B_1 &= a_1 A\\
+    &\;\;\vdots\\
+    A^{n - 1}B_{n - 2} - A^n B_{n - 1} &= a_{n - 1} A^{n - 1}\\
+    A^{n}B_{n - 1}  - 0 &= A^n.
+  \end{align*}
+  Summing this up then gives $\chi_\alpha(A) = 0$.
+\end{proof}
+
+\begin{lemma}
+  Let $\alpha \in \End(V), \lambda \in \F$. Then the following are equivalent:
+  \begin{enumerate}
+    \item $\lambda$ is an eigenvalue of $\alpha$.
+    \item $\lambda$ is a root of $\chi_\alpha(t)$.
+    \item $\lambda$ is a root of $M_\alpha(t)$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}\leavevmode
+  \begin{itemize}
+    \item (i) $\Leftrightarrow$ (ii): $\lambda$ is an eigenvalue of $\alpha$ if and only if $(\alpha - \lambda \iota)(\mathbf{v}) = 0$ has a non-trivial root, iff $\det(\alpha - \lambda \iota) = 0$.
+    \item (iii) $\Rightarrow$ (ii): This follows from Cayley-Hamilton theorem since $M_\alpha | \chi_\alpha$.
+    \item (i) $\Rightarrow$ (iii): Let $\lambda$ be an eigenvalue, and $\mathbf{v}$ be a corresponding eigenvector. Then by definition of $M_\alpha$, we have
+      \[
+        M_\alpha(\alpha)(\mathbf{v}) = 0(\mathbf{v}) = 0.
+      \]
+      We also know that
+      \[
+        M_\alpha(\alpha)(\mathbf{v}) = M_\alpha(\lambda)\mathbf{v}.
+      \]
+      Since $\mathbf{v}$ is non-zero, we must have $M_\alpha(\lambda) =0$.
+
+    \item (iii) $\Rightarrow$ (i): This is not necessary since it follows from the above, but we could as well do it explicitly. Suppose $\lambda$ is a root of $M_\alpha(t)$. Then $M_\alpha(t) = (t - \lambda) g(t)$ for some $g \in \F[t]$. But $\deg g < \deg M_\alpha$. Hence by minimality of $M_\alpha$, we must have $g(\alpha) \not= 0$. So there is some $\mathbf{v}\in V$ such that $g(\alpha)(\mathbf{v}) \not=0$. Then
+      \[
+        (\alpha - \lambda\iota)g(\alpha)(\mathbf{v}) = m_\alpha(\alpha)\mathbf{v} = 0.
+      \]
+      So we must have $\alpha (g(\alpha)(\mathbf{v})) = \lambda g(\alpha)(\mathbf{v})$. So $g(\alpha)(\mathbf{v}) \in E_\alpha(\lambda) \setminus \{0\}$. So (i) holds.
+  \end{itemize}
+\end{proof}
+
+\begin{eg}
+  What is the minimal polynomial of
+  \[
+    A =
+    \begin{pmatrix}
+      1 & 0 & -2\\
+      0 & 1 & 1\\
+      0 & 0 & 2
+    \end{pmatrix}?
+  \]
+  We can compute $\chi_A(t) = (t - 1)^2 (t - 2)$. So we know that the minimal polynomial is one of $(t - 1)^2(t - 2)$ and $(t - 1)(t - 2)$.
+
+  By direct and boring computations, we can find $(A - I)(A - 2I) = 0$. So we know that $M_A(t) = (t - 1)(t - 2)$. So $A$ is diagonalizable.
+\end{eg}
+\subsection{Multiplicities of eigenvalues and Jordan normal form}
+We will want to put our matrices in their ``Jordan normal forms'', which is a unique form for each equivalence class of similar matrices. The following will determine which Jordan normal form a matrix can have.
+\begin{defi}[Algebraic and geometry multiplicity]
+  Let $\alpha \in \End (V)$ and $\lambda$ an eigenvalue of $\alpha$. Then
+  \begin{enumerate}
+    \item The \emph{algebraic multiplicity} of $\lambda$, written $a_\lambda$, is the multiplicity of $\lambda$ as a root of $\chi_\alpha(t)$.
+    \item The \emph{geometric multiplicity} of $\lambda$, written $g_\lambda$, is the dimension of the corresponding eigenspace, $\dim E_\alpha(\lambda)$.
+    \item $c_\lambda$ is the multiplicity of $\lambda$ as a root of the minimal polynomial $m_\alpha(t)$.
+  \end{enumerate}
+\end{defi}
+
+We will look at some extreme examples:
+\begin{eg}\leavevmode
+  \begin{itemize}
+    \item Let
+      \[
+        A =
+        \begin{pmatrix}
+          \lambda & 1 & \cdots & 0\\
+          0 & \lambda & \ddots & \vdots\\
+          \vdots & \vdots & \ddots & 1\\
+          0 & 0 & \cdots & \lambda
+        \end{pmatrix}.
+      \]
+      Then by direct computation, we can show that $a_\lambda = n = c_\lambda$ and $g_\lambda = 1$.
+    \item Consider $A = \lambda I$. Then $a_\lambda = g_\lambda = n$, $c_\lambda = 1$.
+  \end{itemize}
+\end{eg}
+
+\begin{lemma}
+  If $\lambda$ is an eigenvalue of $\alpha$, then
+  \begin{enumerate}
+    \item $1 \leq g_\lambda \leq a_\lambda$
+    \item $1 \leq c_\lambda \leq a_\lambda$.
+  \end{enumerate}
+\end{lemma}
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item The first inequality is easy. If $\lambda$ is an eigenvalue, then $E(\lambda) = 0$. So $g_\lambda = \dim E(\lambda) \geq 1$. To prove the other eigenvalue, if $\mathbf{v}_1, \cdots, \mathbf{v}_g$ is a basis for $E(\lambda)$, then we can extend it to a basis for $V$, and then $\alpha$ is represented by
+      \[
+        \begin{pmatrix}
+          \lambda I_g & *\\
+          0 & B
+        \end{pmatrix}
+      \]
+      So $\chi_\alpha(t) = (t - \lambda)^g \chi_B(t)$. So $a_\lambda > g = g_\lambda$.
+    \item This is straightforward since $M_\alpha(\lambda) = 0$ implies $1 \leq c_\lambda$, and since $M_\alpha(t) | \chi_\alpha(t)$, we know that $c_\lambda \leq \alpha_\lambda$.
+  \end{enumerate}
+\end{proof}
+
+\begin{lemma}
+  Suppose $\F = \C$ and $\alpha \in \End(V)$. Then the following are equivalent:
+  \begin{enumerate}
+    \item $\alpha$ is diagonalizable.
+    \item $g_\lambda = a_\lambda$ for all eigenvalues of $\alpha$.
+    \item $c_\lambda = 1$ for all $\lambda$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}\leavevmode
+  \begin{itemize}
+    \item (i) $\Leftrightarrow$ (ii): $\alpha$ is diagonalizable iff $\dim V = \sum \dim E_\alpha (\lambda_i)$. But this is equivalent to
+      \[
+       \dim V = \sum g_{\lambda_i} \leq \sum a_{\lambda_i} = \deg \chi_\alpha = \dim V.
+     \]
+     So we must have $\sum g_{\lambda_i} = \sum a_{\lambda_i}$. Since each $g_{\lambda_i}$ is at most $a_{\lambda_i}$, they must be individually equal.
+
+   \item (i) $\Leftrightarrow$ (iii): $\alpha$ is diagonalizable if and only if $M_\alpha(t)$ is a product of distinct linear factors if and only if $c_\lambda = 1$ for all eigenvalues $\lambda$.
+  \end{itemize}
+\end{proof}
+
+\begin{defi}[Jordan normal form]
+  We say $A \in \Mat_N(\C)$ is in \emph{Jordan normal form} if it is a block diagonal of the form
+  \[
+    \begin{pmatrix}
+      J_{n_1}(\lambda_1) & & & & 0\\
+      & & J_{n_2}(\lambda_2)\\
+      & & & \ddots\\\
+      0 & & & &J_{n_k} (\lambda_k)
+    \end{pmatrix}
+  \]
+  where $k \geq 1$, $n_1, \cdots, n_k \in \N$ such that $n = \sum n_i$, $\lambda_1, \cdots, \lambda_k$ not necessarily distinct, and
+  \[
+    J_m (\lambda) =
+    \begin{pmatrix}
+      \lambda & 1 & \cdots & 0\\
+      0 & \lambda & \ddots & \vdots\\
+      \vdots & \vdots & \ddots & 1\\
+      0 & 0 & \cdots & \lambda
+    \end{pmatrix}.
+  \]
+  Note that $J_m(\lambda) = \lambda I_m + J_m(0)$.
+\end{defi}
+For example, it might look something like
+\[\arraycolsep=1.4pt
+  \begin{pmatrix}
+    \lambda_1 & 1\\
+    & \lambda_1 & 1\\
+    & & \lambda_1 & 0\\
+    & & & \lambda_2 & 0\\
+    & & & & \lambda_3 & 1\\
+    & & & & & \lambda_3 & 0\\
+    & & & & & & \ddots & \ddots\\
+    & & & & & & & \lambda_n & 1\\
+    & & & & & & & & \lambda_n
+  \end{pmatrix}
+\]
+with all other entries zero.
 \end{document}

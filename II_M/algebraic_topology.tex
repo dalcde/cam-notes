@@ -78,8 +78,8 @@ We will start with some preliminary definitions and conventions.
   In this course, the word \emph{map} will always refer to continuous maps. We are doing topology, and never care about non-continuous functions.
 \end{defi}
 
-We are going to build a lot of continuous maps in algebraic topology. To do so, we will often need to glue maps together. The \emph{glueing lemma} tells us that this works.
-\begin{lemma}[Glueing lemma]
+We are going to build a lot of continuous maps in algebraic topology. To do so, we will often need to glue maps together. The \emph{gluing lemma} tells us that this works.
+\begin{lemma}[Gluing lemma]
   If $f: X\to Y$ is a function of topological spaces, $X = C\cup K$, $C$ and $K$ are both closed, then $f$ is continuous if and only if the restrictions $f|_C$ and $f|_K$are continuous.
 \end{lemma}
 The proof is easy from the definition of continuous maps.
@@ -87,7 +87,7 @@ The proof is easy from the definition of continuous maps.
 \subsection{Cell complexes}
 In general, we can construct some really horrible topological spaces. Even if we require them to be compact, Hausdorff etc, we can often still produce really ugly topological spaces. In algebraic topology, we will often restrict our attention to some nice topological spaces, known as \emph{cell complexes}.
 
-To build cell complexes, we are not just glueing maps, but spaces.
+To build cell complexes, we are not just gluing maps, but spaces.
 
 \begin{defi}[Cell attachment]
   For a space $X$, and a map $f: S^{n - 1}\to X$, the space obtained by \emph{attaching an $n$-cell} to $X$ along $f$ is
@@ -2688,6 +2688,7 @@ The key motivation of this is that simplices are determined by their vertices. W
 
   The boundary of $\sigma$ is usually denoted by $\partial \sigma$, while the interior is denoted by $\mathring{\sigma}$, and we write $\tau \leq \sigma$ when $\tau$ is a face of $\sigma$.
 \end{defi}
+In particular, the interior of a vertex is the vertex itself.
 
 \begin{eg}
   The \emph{standard $n$-simplex} is spanned by the basis vectors $\{\mathbf{e}_1, \cdots, \mathbf{e}_n\}$ in $\R^{n + 1}$. For example, when $n = 2$, we get the following:
@@ -2841,6 +2842,7 @@ The next thing we should talk about is maps between simplicial complexes.
 \begin{defi}[Simplicial map]
   A \emph{simplicial map} $f: K \to L$ is a function $f: V_K \to V_L$ such that if $\bra a_0, \cdots, a_n\ket$ is a simplex in $K$, then $\{f(a_0), \cdots, f(a_n)\}$ span a simplex of $L$.
 \end{defi}
+The nice thing about simplicial maps is that we only have to specify where the vertices go, and there are only finitely many vertices. So we can completely specify a simplicial map by writing down a finite amount of definition.
 
 \begin{eg}
   Suppose we have the standard $2$-simplex $K$ as follows:
@@ -2883,4 +2885,157 @@ The next thing we should talk about is maps between simplicial complexes.
     \end{tikzpicture}
   \end{center}
 \end{eg}
+
+The following lemma is obvious, but we will need it later on.
+\begin{lemma}
+  If $K$ is a simplicial complex, then every point $x \in |K|$ lines in the interior of a \emph{unique} simplex.
+\end{lemma}
+Note that here the word interior is interior in the sense of the complement of the boundary, not interior in the topological sense (or else in $\R^n$, all $k$-cells for $k < n$ have empty interior).
+
+As we said, simplicial maps are nice, but they are not exactly what we want. We want to have maps between \emph{spaces}.
+\begin{lemma}
+  A simplicial map $f: K \to L$ induces a continuous map $|f|: |K|\to |L|$, and furthermore, we have
+  \[
+    |f\circ g| = |f|\circ |g|.
+  \]
+\end{lemma}
+There is an obvious way to define this map. We know how to map vertices, and then just extend everything linearly.
+\begin{proof}
+  For a simplex $\sigma = \bra a_0,\cdots, a_n\ket$, we define
+  \[
+    |f|\left(\sum_{i = 0}^n t_i a_i\right) = \sum_{i = 0}^n t_i f(a_i).
+  \]
+  The result is in $L$ because $\{f(a_i)\}$ spans a simplex. This is well-defined because each point is in the interior of exactly one simplex. This is clearly continuous on $\sigma$, and is hence continuous on $|K|$ by the gluing lemma. This is easily seen to satisfy the final property.
+\end{proof}
+
+\subsection{Simplicial approximation}
+This is all very well, but we are really interested in \emph{continuous maps}. So given a continuous map $f$, we would like to find a related simplicial map $g$.
+
+\begin{defi}[Open star and link]
+  Let $x \in |K|$. The \emph{open star} of $x$ is the union of all the interiors of the simplices that contain $x$, ie.
+  \[
+    \St_K(x) = \bigcup_{x \in \sigma \in K} \mathring{\sigma}.
+  \]
+  The \emph{link} of $x$ is the union of all those simplices that do not contain $x$, but are faces of a simplex that do contain $x$.
+\end{defi}
+
+\begin{defi}[Simplicial approximation]
+  Let $f: |K| \to |L|$ be a continuous map between the polyhedra. A simplicial map $g: K \to L$ is a \emph{simplicial approximation} to $f$ if for all $v \in V_k$,
+  \[
+    f(\St_K(v)) \subseteq \St_L(g(v)).\tag{$*$}
+  \]
+\end{defi}
+
+The following lemma tells us why this is a good definition:
+\begin{lemma}
+  If an arbitrary set-function $g: V_k \to V_L$ satisfies $(*)$, then $g$ is a simplicial map, and $|g| \simeq f$. (Furthermore, if $f$ is already simplicial on some subcomplex $M\subseteq K$, then we get $g|_M = f|_M$, and the homotopy can be made $\rel M$).
+\end{lemma}
+
+\begin{proof}
+  First we want to check $g$ is really a simplicial map if it satisfies $(*)$. Let $\sigma = \bra a_0,\cdots, a_n\ket$ span a simplex in $K$. We want to show that $\{g(a_0), \cdots, g(a_n)\}$ spans a simplex in $L$.
+
+  Pick arbitrary $x \in \mathring{\sigma}$. Since $\sigma$ contains each $a_i$, we know that $x \in \St_K(a_i)$ for all $i$. Hence we know that
+  \[
+    f(x) \in \bigcap_{i = 0}^n f(\St_K(a_i)) \subseteq \bigcap_{i = 0}^n \St_L(g(a_i)).
+  \]
+  Hence we know that there is one simplex, say, $\tau$ that contains all $g(a_i)$ whose interior contains $f(x)$. Since $g(a_i)$ are all vertices in $L$, each $g(a_i)$ must be a vertex of $\tau$. So they span a face of $\tau$, as required.
+
+  We now want to prove that $|g| \simeq f$. We let $H: |K| \times I \to |L| \subseteq \R^m$ be defined by
+  \[
+    (x, t) \mapsto t |g|(x) + (1 - t)f(x).
+  \]
+  This is clearly continuous. So we need to check that $\im H \subseteq |L|$. But we have know that both $|g|(x)$ and $f(x)$ live in $\tau$ and $\tau$ is convex. It thus follow that $H(x \times I) \subseteq \tau \subseteq |L|$.
+
+  % prove remaining parts?
+\end{proof}
+What's the best thing we might hope for at this point? It would be great if every map is homotopic to a simplicial map. Is this possible? Let's take a nice example. Let's consider the following $K$:
+\begin{center}
+  \begin{tikzpicture}
+    \draw (0, 0) -- (2, 0) -- (1, 1.732) -- cycle;
+    \node [circ] at (0, 0) {};
+    \node [circ] at (2, 0) {};
+    \node [circ] at (1, 1.732) {};
+  \end{tikzpicture}
+\end{center}
+How many homotopy classes of continuous maps are there $K \to K$? Countably many, one for each winding number. However, there can only be at most $3^3 = 27$ simplicial maps. The problem is that we don't have enough vertices to realize all those interesting maps. The idea is to refine our simplicial complexes. Suppose we have the following simplex:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [fill=mblue, fill opacity=0.5] (0, 0) -- (2, 0) -- (1, 1.732) -- cycle;
+    \node [circ] at (0, 0) {};
+    \node [circ] at (2, 0) {};
+    \node [circ] at (1, 1.732) {};
+  \end{tikzpicture}
+\end{center}
+What we do is to add a point in the center of each simplex, and join them up:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [fill=mblue, fill opacity=0.5] (0, 0) -- (2, 0) -- (1, 1.732) -- cycle;
+    \node [circ] at (0, 0) {};
+    \node [circ] at (2, 0) {};
+    \node [circ] at (1, 1.732) {};
+    \node [circ] at (1, 0) {};
+    \node [circ] at (0.5, 0.866) {};
+    \node [circ] at (1.5, 0.866) {};
+    \node [circ] at (1, 0.5773) {};
+    \draw (0, 0) -- (1, 0.5773) -- (2, 0);
+    \draw (1, 0) -- (1, 1.732);
+    \draw (0.5, 0.866) -- (1, 0.5773) -- (1.5, 0.866);
+  \end{tikzpicture}
+\end{center}
+This is known as the barycentric subdivision.
+\begin{defi}[Barycenter]
+  The \emph{barycenter} of $\sigma = \bra a_0, \cdots, a_n\ket$ is
+  \[
+    \hat{\sigma} = \sum_{i = 0}^n \frac{1}{n + 1} a_i.
+  \]
+\end{defi}
+
+\begin{defi}[Barycentric subdivision]
+  The \emph{(first) barycentric subdivision} $K'$ of $K$ is the simplicial complex:
+  \[
+    K' = \{\bra \hat{\sigma}_0, \cdots, \hat{\sigma}_n\ket: \sigma_i \in K\text{ and }\sigma_0 < \sigma_1 < \cdots \sigma_n\}.
+  \]
+  If you stare at this long enough, you will realize this is exactly what we have drawn above
+
+  The $r$th barycentric subdivision $K^{(r)}$ is defined inductively as the barycentric subdivision of the $r - 1$th barycentric subdivision, ie.
+  \[
+    K^{(r)} = (K^{(r - 1)})'.
+  \]
+\end{defi}
+
+\begin{prop}
+  $|K| = |K|'$ and $K'$ really is a simplicial complex.
+\end{prop}
+
+\begin{proof}
+  Too boring to be included in lectures.
+\end{proof}
+
+We now have a slight problem. Even though $|K'|$ and $|K|$ are equal, the identity map from $|K'|$ to $|K|$ is not a simplicial map.
+
+To solve this problem, we can choose any function $K \to V_K$ by $\sigma \mapsto v_\sigma$ with $v_\sigma \in \sigma$, ie. a function that sends any simplex to any of its vertices. Then we can define $g: K' \to K$ by sending $\hat{\sigma} \mapsto v_\sigma$. Then this is a simplicial map, and indeed a simplicial approximation to the identity map $|K'| \to |K|$.
+
+The key theorem is that as long as we are willing to perform barycentric subdivisions, then
+
+\begin{thm}[Simplicial approximation theorem]
+  Le $K$ and $L$ be simplicial complexes, and $f: |K| \to |L|$ a continuous map. Then there exists an $r$ and a simplicial map $g: K^{(r)} \to L$ such that $g$ is a simplicial approximation of $f$. (Furthermore, if $f$ is already simplicial on $M\subseteq K$, then we can choose $g$ such that $|g||_M = f|_M$).
+\end{thm}
+
+The first thing we have to figure out is how far we are going to subdivide. To do this, we want to quantify how ``fine'' our subdivisions are.
+\begin{defi}[Mesh]
+  Let $K$ be a simplicial complex. The \emph{mesh} of $K$ is
+  \[
+    \mu(K) = \max\{\|v_0 - v_1\| : \bra v_0, v_1\ket \in K\}.
+  \]
+\end{defi}
+
+We have the following lemma that tells us how large our mesh is:
+\begin{lemma}
+  Let $\dim K \leq n$, then
+  \[
+    \mu(K^{(r)}) = \left(\frac{n}{n + 1}\right)^r \mu(K).
+  \]
+\end{lemma}
+The key point is that as $r \to \infty$, the mesh goes to zero. So indeed we can make our barycentric subdivisions finer and finer. The proof is purely technical and omitted.
+
 \end{document}
