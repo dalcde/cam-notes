@@ -2945,8 +2945,6 @@ The following lemma tells us why this is a good definition:
     (x, t) \mapsto t |g|(x) + (1 - t)f(x).
   \]
   This is clearly continuous. So we need to check that $\im H \subseteq |L|$. But we have know that both $|g|(x)$ and $f(x)$ live in $\tau$ and $\tau$ is convex. It thus follow that $H(x \times I) \subseteq \tau \subseteq |L|$.
-
-  % prove remaining parts?
 \end{proof}
 What's the best thing we might hope for at this point? It would be great if every map is homotopic to a simplicial map. Is this possible? Let's take a nice example. Let's consider the following $K$:
 \begin{center}
@@ -3035,7 +3033,202 @@ We have the following lemma that tells us how large our mesh is:
   \[
     \mu(K^{(r)}) = \left(\frac{n}{n + 1}\right)^r \mu(K).
   \]
-\end{lemma}
+\end{lemma} % insert proof
 The key point is that as $r \to \infty$, the mesh goes to zero. So indeed we can make our barycentric subdivisions finer and finer. The proof is purely technical and omitted.
 
+Now we can prove the simplicial approximation theorem.
+
+\begin{proof}(of simplicial approximation theorem)
+  Suppose we are given the map $f: |K| \to |L|$. We have a natural cover of $|L|$, namely the open stars of all vertices. We can use $f$ to pull these back to $|K|$ to obtain a cover of $|K|$:
+  \[
+    \{f^{-1}(\St_L(w)) : w \in V_L\}.
+  \]
+  The idea is to barycentrically subdivide our $K$ such that each open star of $K$ is contained in one of these things.
+
+  By the Lebesgue number lemma, there exists some $\delta$, the \emph{Lebesgue number} of the cover, such that for each $x \in |K|$, $B_\delta(x)$ is contained in \emph{some} element of the cover. By the previous lemma, there is an $r$ such that $\mu(K^{(r)}) < \delta$. % insert Lebesgue number lemma somewhere.
+
+  Now since the mesh $\mu(K^{(r)})$ is the smallest distance between any two vertices, the radius of every open star $\St_K(x)$ is at most $\mu(K^{(r)})$. Hence it follows that $\St_K(x) \subseteq B_\delta(x)$ for all vertices $x \in V_{K^{(r)}}$. Therefore, for all $x \in V_{K^{(r)}}$, there is some $w \in L$ such that
+  \[
+    \St_K(x) \subseteq B_\delta(x) \subseteq f^{-1}(\St_L(w)).
+  \]
+  Therefore defining $g(x) = w$, we get
+  \[
+    f(\St_{K^{(r)}}(x)) \subseteq \St_L(g(x)).
+  \]
+  So $g$ is a simplicial approximation of $f$.
+\end{proof}
+
+\section{Simplicial homology}
+\subsection{Simplicial homology}
+For now, we will forget about simplicial approximations and related fluff, but just note that it is fine to assume everything can be considered to be simplicial. Instead, we are going to use this framework to move on and define some new invariants of simplicial complexes $K$, known as $H_n(K)$. These are analogous to $\pi_0, \pi_1, \cdots$, but only use linear algebra in the definitions, and is thus much simpler. The drawback, however, is that the definitions are slightly less intuitive at first sight.
+
+Recall that we defined an $n$-simplex as the collection of $n + 1$ vertices that span a simplex. As a simplex, when we permute the vertices, we still get the same simplex. What we one to do is to remember the orientation of the simplex. In particular, we want think of the simplices $(a, b)$ and $(b, a)$ as different:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->-=0.58] (0, 0) node [left] {$a$} node [circ] {} -- (2, 0) node [right] {$b$} node [circ] {};
+    \draw [->-=0.58] (6, 0) node [right] {$b$} node [circ] {} -- (4, 0) node [left] {$a$} node [circ] {};
+  \end{tikzpicture}
+\end{center}
+Hence we define \emph{oriented simplices}.
+
+\begin{defi}[Oriented $n$-simplex]
+  An \emph{oriented $n$-simplex} in a simplicial complex $K$ is an $n + 1$-tuple $(a_0, \cdots, a_n)$ of vertices $a_i \in V_k$ such that $\bra a_0, \cdots, a_n\ket \in K$, where we think of two $n + 1$ tuples $(a_0, \cdots, a_n)$ and $(a_{\pi(0)}, \cdots, a_{\pi(n)})$ as the same \emph{oriented} simplex if $\pi \in S^n$ is an \emph{even} permutation.
+
+  We often denote an oriented simplex as $\sigma$, and then $\bar{\sigma}$ denotes the same simplex with the opposite orientation.
+\end{defi}
+
+\begin{eg}
+  As oriented $2$-simplices, $(v_0, v_1, v_2)$ and $(v_1, v_2, v_0)$ are equal, but they are different from $(v_2, v_1, v_0)$. We can imagine the two different orientations of the simplices as follows:
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [fill=mblue, fill opacity=0.5] (0, 0) -- (2, 0) -- (1, 1.732) -- cycle;
+      \node [circ] at (0, 0) {};
+      \node [left] at (0, 0) {$v_0$};
+      \node [circ] at (2, 0) {};
+      \node [right] at (2, 0) {$v_2$};
+      \node [circ] at (1, 1.732) {};
+      \node [above] at (1, 1.732) {$v_1$};
+      \draw [semithick, -latex'] (1, 0.3773) arc (270:0:0.2);
+
+      \begin{scope}[shift={(4, 0)}]
+        \draw [fill=mblue, fill opacity=0.5] (0, 0) -- (2, 0) -- (1, 1.732) -- cycle;
+        \node [circ] at (0, 0) {};
+        \node [left] at (0, 0) {$v_0$};
+        \node [circ] at (2, 0) {};
+        \node [right] at (2, 0) {$v_1$};
+        \node [circ] at (1, 1.732) {};
+        \node [above] at (1, 1.732) {$v_2$};
+        \draw [semithick, latex'-] (1, 0.3773) arc (270:0:0.2);
+      \end{scope}
+    \end{tikzpicture}
+  \end{center}
+\end{eg}
+One and two dimensions are the dimensions where we can easily visualize the orientation. This is substantially harder in higher dimensions, and often we just work with the definition instead.
+
+\begin{defi}[Chain group $C_n(K)$]
+  Let $K$ be a simplicial complex. For each $n \geq 0$, we define $C_n(K)$ as follows:
+
+  Let $\{\sigma_1, \cdots, \sigma_\ell\}$ be the set of $n$ simplices of $k$. For each $i$, choose an orientation on $\sigma_i$. That is, choose an order for the vertices (up to an even permutation). This choice is not important, but we need to make it. Now when we say $\sigma_i$, we mean the oriented simplex with this particular orientation.
+
+  Now let $C_n(K)$ be the free abelian group with basis $\{\sigma_1, \cdots, \sigma_\ell\}$, ie. $C_n(K) \cong \Z^\ell$. So an element in $C_n(L)$ might look like
+  \[
+    \sigma_3 - 7 \sigma_1 + 52 \sigma_{64} - 28 \sigma_{1000000}.
+  \]
+  So it is just a formal sum of simplices.
+
+  For convenience, we define $C_{\ell}(K) = 0$ for $\ell > 0$. This will save us from making exceptions for $n = 0$ cases later.
+\end{defi}
+For each oriented simplex, we identify $-\sigma_i$ with $\bar{\sigma}_i$, at least when $n \geq 1$.
+
+In this definition, we have to choose a particular orientation for each of our simplices. If you don't like making arbitrary choices, we could instead define $C_n(K)$ as some quotient, but it is slightly more complicated.
+
+\begin{eg}
+  We can think of elements in the chain group $C_1(X)$ as ``paths'' in $X$. For example, we might have the following simplex:
+  \begin{center}
+    \begin{tikzpicture}
+      \node [mred, circ] at (0, 0) {};
+      \node [mred, left] at (0, 0) {$v_0$};
+      \node [mred, above] at (1, 1.732) {$v_1$};
+      \node [mred, below] at (2, 0) {$v_2$};
+      \node [mred, circ] at (2, 0) {};
+      \node [mred, circ] at (1, 1.732) {};
+      \node [mred, circ] at (3, 1.732) {};
+      \node [mred, circ] at (4, 0.6) {};
+      \node [mred, circ] at (5, 1.6) {};
+      \node [mred, circ] at (6, 0.6) {};
+      \node [mred, circ] at (5, -0.4) {};
+
+      \draw [->-=0.58] (0, 0) -- (1, 1.732) node [pos=0.5, left] {$\sigma_1$};
+      \draw [->-=0.58] (1, 1.732) -- (2, 0) node [pos=0.5, right] {$\sigma_2$};
+      \draw [->-=0.58] (2, 0) -- (0, 0) node [pos=0.5, below] {$\sigma_3$};
+
+      \draw [->-=0.58] (1, 1.732) -- (3, 1.732);
+      \draw [->-=0.58] (2, 0) -- (3, 1.732);
+      \draw [->-=0.58] (4, 0.6) -- (3, 1.732) node [pos=0.5, right] {$\sigma_6$};
+      \draw [->-=0.58] (4, 0.6) -- (5, 1.6);
+      \draw [->-=0.58] (5, 1.6) -- (6, 0.6);
+      \draw [->-=0.58] (6, 0.6) -- (5, -0.4);
+      \draw [->-=0.58] (5, -0.4) -- (4, 0.6);
+    \end{tikzpicture}
+  \end{center}
+  Then the path $v_0 \leadsto v_1 \leadsto v_2 \leadsto v_0 \leadsto v_1$ around the left triangle is represented by the member
+  \[
+    \sigma_1 - \sigma_2 + \sigma_3 + \sigma_1 = 2\sigma_1 - \sigma_2 + \sigma_3.
+  \]
+  Of course, with this setup, we can do more random things, like adding $57$ copies of $\sigma_6$ to it, and this is also allowed. So we could think of these as disjoint union of paths instead.
+\end{eg}
+
+When defining fundamental groups, we had homotopies that allows us to ``move around''. Somehow, we would like to say two of these paths are ``equivalent'' under certain conditions. To do so, we need to define the \emph{boundary homomorphisms}.
+
+\begin{defi}[Boundary homomorphisms]
+  We define \emph{boundary homomorphisms}
+  \[
+    d_n: C_n(K) \to C_{n - 1}(K)
+  \]
+  by
+  \[
+    (a_0, \cdots, a_n) \mapsto \sum_{i = 0}^n (-1)^i (a_0, \cdots, \hat{a}_i, \cdots, a_n),
+  \]
+  where $(a_0, \cdots, \hat{a}_i, \cdots, a_n) = (a_0, \cdots, a_{i - 1}, a_{i + 1}, a_n)$ is the simplex with $a_i$ removed.
+\end{defi}
+This means we remove each vertex in turn and add them up. This is clear if we draw some pictures in low dimensions:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->-=0.58] (0, 0) node [left] {$v_0$} -- (2, 0) node [right] {$v_1$};
+
+    \draw [->] (3, 0) -- (4.5, 0);
+    \draw (3, 0.1) -- +(0, -0.2);
+
+    \node [circ] at (5.5, 0) {};
+    \node [above] at (5.5, 0) {$-v_0$};
+    \node [circ] at (7.5, 0) {};
+    \node [above] at (7.5, 0) {$v_1$};
+  \end{tikzpicture}
+\end{center}
+If we take a triangle, we get
+\begin{center}
+  \begin{tikzpicture}
+    \draw [fill=mblue, fill opacity=0.5] (0, 0) -- (2, 0) -- (1, 1.732) -- cycle;
+    \node [circ] at (0, 0) {};
+    \node [left] at (0, 0) {$v_0$};
+    \node [circ] at (2, 0) {};
+    \node [right] at (2, 0) {$v_2$};
+    \node [circ] at (1, 1.732) {};
+    \node [above] at (1, 1.732) {$v_1$};
+    \draw [semithick, -latex'] (1, 0.3773) arc (270:0:0.2);
+
+    \draw [->] (3, 0.866) -- (4.5, 0.866);
+    \draw (3, 0.966) -- +(0, -0.2);
+
+    \begin{scope}[shift={(5.5, 0)}]
+      \draw [->-=0.58] (0, 0) -- (1, 1.732);
+      \draw [->-=0.58] (1, 1.732) -- (2, 0);
+      \draw [->-=0.58] (2, 0) -- (0, 0);
+      \node [circ] at (0, 0) {};
+      \node [left] at (0, 0) {$v_0$};
+      \node [circ] at (2, 0) {};
+      \node [right] at (2, 0) {$v_2$};
+      \node [circ] at (1, 1.732) {};
+      \node [above] at (1, 1.732) {$v_1$};
+    \end{scope}
+  \end{tikzpicture}
+\end{center}
+
+An important property of the boundary map is that the boundary of a boundary is empty:
+\begin{lemma}
+  $d_{n - 1}\circ d_n = 0$.
+\end{lemma}
+In other words, $\im d_{n + 1} \subseteq \ker d_n$.
+
+\begin{proof}
+  This just involves expanding the definition and working through the mess. % exercise
+\end{proof}
+
+With this in mind, we will define the homology groups as follows:
+\begin{defi}[Simplicial homology group $H_n(K)$]
+  The \emph{$n$th simplicial homology group} $H_n(K)$ is defined as
+  \[
+    H_n(K) = \frac{\ker d_n}{\im d_{n + 1}}.
+  \]
+\end{defi}
 \end{document}
