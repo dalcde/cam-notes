@@ -1250,18 +1250,18 @@ Now, we want to understand when convergence actually occurs.
 \begin{thm}[]
   Consider a Markov chain that is irreducible, positive recurrent and aperiodic. Then
   \[
-    p_{i,j}(n) \to \pi_j
+    p_{i,k}(n) \to \pi_k
   \]
   as $n \to \infty$, where $\pi$ is the unique invariant distribution.
 \end{thm}
-We will prove this by ``coupling''. The idea is that here we have two sets of probabilities, and we want to prove some relations between them. The first step is to move our attention to random variables, by considering random variables that give rise to these probability distribution. In other words, we look at the Markov chains themselves instead of the probabilities. In general, random variables are nicer to work with, since they are functions, not discrete, random numbers.
+We will prove this by ``coupling''. The idea of coupling is that here we have two sets of probabilities, and we want to prove some relations between them. The first step is to move our attention to random variables, by considering random variables that give rise to these probability distribution. In other words, we look at the Markov chains themselves instead of the probabilities. In general, random variables are nicer to work with, since they are functions, not discrete, random numbers.
 
 However, we have a problem since we get two random variables, but they are completely unrelated. In particular, as functions, their domains are different, and we just cannot compare them directly. This is bad. Any person can solve this problem using the obvious way, by taking the product of the two domains, but this is still not helpful, since the two random variables are still not correlated to each other. So we will need to do some ``coupling'' to correlate the two random variables together.
 
-\begin{proof}
-  Since we have two probability distributions, we would like to work with two Markov chains.
+\begin{proof}(non-examinable)
+  The idea of the proof is to show that for any $i, j, k \in S$, we have $p_{i, k}(n) \to p_{j, k}(n)$ as $n \to \infty$. Then we can argue that no matter where we start, we will tend to the same distribution, and hence any distribution tends to the same distribution as $\pi$, since $\pi$ doesn't change.
 
-  We copy our Markov chain into a pair $Z = (X, Y)$ of \emph{two} independent chains, with $X = (X_n)$ and $Y = (Y_n)$ each having the state space $S$ and transition matrix $P$.
+  As mentioned, instead of working with probability distributions, we will work with the chains themselves. In particular, we have \emph{two} Markov chains, and we imagine one starts at $i$ and the other starts at $j$. To do so, we define the pair $Z = (X, Y)$ of \emph{two} independent chains, with $X = (X_n)$ and $Y = (Y_n)$ each having the state space $S$ and transition matrix $P$.
 
   We can let $Z = (Z_n)$, where $Z_n = (X_n, Y_n)$ is a Markov chain on state space $S^2$. This has transition probabilities
   \[
@@ -1283,8 +1283,132 @@ However, we have a problem since we get two random variables, but they are compl
   \]
   This works because $X$ and $Y$ are independent. So $Z$ is also positive recurrent.
 
-  Now we have to couple the two chains together.
+  So $Z$ is nice.
 
-  We fix some state $s \in S$. Let $T$ be the earliest time at which $X_n = Y_n = s$. Because of recurrence, we can always find such at $T$. After this state $s$, they behave under the exact same distribution.
+  The next step is to couple the two chains together. The idea is to fix some state $s \in S$, and let $T$ be the earliest time at which $X_n = Y_n = s$. Because of recurrence, we can always find such at $T$. After this time $T$, they behave under the exact same distribution.
+
+  We define
+  \[
+    T = \inf\{n: Z_n = (X_n, Y_n) = (s, s)\}.
+  \]
+  We have
+  \begin{align*}
+    p_{i, k}(n) &= \P_i(X_n = k)\\
+    &= \P_{ij}(X_n = k)\\
+    &= \P_{ij} (X_n = k, T \leq n) + \P_{ij} (X_n = k, T > n)\\
+    \intertext{Note that if $T \leq n$, then at time $T$, $X_T = Y_T$. Thus the evolution of $X$ and $Y$ after time $T$ is equal. So this is equal to}
+    &= \P_{ij}(Y-n = k, T \leq n) + \P_{ij} (X_n = k, T > n)\\
+    &\leq \P_{ij}(Y_n = k) + \P_{ij}(T > n)\\
+    &= p_{j,k}(n) + \P_{ij}(T > n).
+  \end{align*}
+  Hence we know that
+  \[
+    |p_{i, k}(n) - p_{j, k}(n)| \leq \P_{ij} (T > n).
+  \]
+  As $n \to \infty$, we know that $\P_{ij}(T > n) \to 0$ since $Z$ is recurrent. So
+  \[
+    |p_{i, k}(n) - p_{j, k}(n)| \to 0
+  \]
+  With this result, we can prove what we want. First, by the invariance of $\pi$, we have
+  \[
+    \pi = \pi P^n
+  \]
+  for all $n$. So we can write
+  \[
+    \pi_k = \sum_j \pi_j p_{j, k}(n).
+  \]
+  Hence we have
+  \[
+    |\pi_k - p_{i, k}(n)| = \left|\sum_j \pi_j (p_{j, k}(n) - p_{i, k}(n))\right| \leq \sum_j \pi_j |p_{j, k}(n) - p_{i, k}|.
+  \]
+  We know that each individual $|p_{j, k}(n) - p_{i, k}(n)|$ tends to zero. So by bounded convergence, we know
+  \[
+    \pi_k - p_{i, k}(n) \to 0.
+  \]
+  So done.
+\end{proof}
+What happens when we have a \emph{null} recurrent case? We would still be able to prove the result about $p_{i, k}(n) \to p_{j, k}(n)$, since $T$ is finite by recurrence. However, we do not have a $\pi$ to make the last step.
+
+Recall that we motivated our definition of $\pi_i$ as the proportion of time we spend in state $i$. Can we prove that this is indeed the case?
+
+More concretely, we let
+\[
+  V_i(n) = |\{m \leq n: X_m = i\}|.
+\]
+We thus want to know what happens to $V_i(n)/n$ as $n \to \infty$. We think this should tend to $\pi_i$.
+
+Note that technically, this is not a well-formed questions, since we don't exactly know how convergence of random variables should be defined. Nevertheless, we can give an informal proof of this result.
+
+The idea is to look at the average time between successive visits. We assume $X_0 = i$. We let $T_m$ be the time of $m$th return to $i$. In particular, $T_0 = 0$. We define $U_m = T_m - T_{m - 1}$. All of these are iid by the strong Markov property, and has mean $\mu_i$ by definition of $\mu_i$.
+
+Hence, by the law of large numbers,
+\[
+  \frac{1}{m} T_m = \frac{1}{m} \sum_{r = 1}^m U_r \sim \E [U_1] = \mu_i. \tag{$*$}
+\]
+We now want to know look at $V_i$. If we stare at them hard enough, we see that $V_i(n) \leq k$ if and only if $T_k \leq n$. We can write an equivalent statement by letting $k$ be a real number. We denote $\lceil x\rceil$ as the least integer greater than $x$. Then we have
+\[
+  V_i(n) \leq x \Leftrightarrow T_{\lceil x\rceil} \leq n.
+\]
+Putting a funny value of $x$ in, we get
+\[
+  \frac{V_i(n)}{n} \geq \frac{A}{\mu_i} \Leftrightarrow \frac{1}{n} T_{\lceil An/\mu_i\rceil} \leq 1.
+\]
+However, using $(*)$, we know that
+\[
+  \frac{T_{An/\mu_i}}{An/\mu_i} \to \mu_i.
+\]
+Multiply both sides by $A/\mu_i$ to get
+\[
+  \frac{A}{\mu_i} \frac{T_{An/\mu_i}}{An/\mu_i} = \frac{T_{An/\mu_i}}{n} \to \frac{A \mu_i}{\mu_i} = A.
+\]
+So if $A < 1$, the event $\frac{1}{n}T_{An/\mu_i} \leq 1$ occurs with almost probability $1$. Otherwise, it happens with probability $0$. So in some sense,
+\[
+  \frac{V_i(n)}{n} \to \frac{1}{\mu_i} = \pi_i.
+\]
+\section{Time reversal}
+Physicists have a hard time dealing with time reversal. They cannot find a decent explanation for why we can move in all directions in space, but can only move forward in time. Some physicists mumble something about entropy and pretend they understand the problem of time reversal, but they don't. However, in the world of Markov chain, time reversal is something we understand well.
+
+Suppose we have a Markov chain $X = (X_0, \cdots, X_N)$. We define a new Markov chain by $Y_k = X_{N - k}$. Then $Y = (X_N, X_{N - 1}, \cdots, X_0)$. When is this a Markov chain? It turns out this is the case if $X_0$ has the invariant distribution.
+
+\begin{thm}[]
+  Let $X$ be positive recurrent, irreducible with invariant distribution $\pi$. Suppose that $X_0$ has distribution $\pi$. Then $Y$ defined by
+  \[
+    Y_{k} = X_{N - k}
+  \]
+  is a Markov chain with transition matrix $\hat{P} = (\hat{p}_{i, j}: i, j \in S)$, where
+  \[
+    \hat{p}_{i, j} = \left(\frac{\pi_j}{\pi_i}\right) p_{j, i}.
+  \]
+  Also $\pi$ is invariant for $\hat{P}$.
+\end{thm}
+Most of the results here should not be surprising, apart from the fact that $Y$ is Markov. Since $Y$ is just $X$ reversed, the transition matrix of $Y$ is just the transpose of the transition matrix of $X$, with some factors to get the normalization right. Also, it is not surprising that $\pi$ is invariant for $\hat{P}$, since each $X_i$, and hence $Y_i$ has distribution $\pi$ by assumption.
+
+\begin{proof}
+  First we show that $\hat{p}$ is a stochastic matrix. We clearly have $\hat{p}_{i,j} \geq 0$. We also have that for each $i$, we have
+  \[
+    \sum_j \hat{p}_{i, j} = \frac{1}{\pi_i} \sum_j \pi_j p_{j, i} = \frac{1}{\pi_i} \pi_i = 1,
+  \]
+  using the fact that $\pi = \pi P$.
+
+  We now show $\pi$ is invariant for $\hat{P}$: We have
+  \[
+    \sum_i \pi_i \hat{p}_{i, j} = \sum_i \pi_j p_{j, i} = \pi_j
+  \]
+  since $P$ is a stochastic matrix and $\sum_i p_{ji} = 1$.
+
+  Note that our formula for $\hat{p}_{i,j}$ gives
+  \[
+    \pi_i \hat{p}_{i, j} = p_{j, i} \pi_j.
+  \]
+  Now we have to show that $Y$ is a Markov chain. We have
+  \begin{align*}
+    \P(Y_0 = i_0, \cdots, Y_k = i_k) &= \P(X_{N - k} = i_N, X_{N - k + 1} = i_{k - 1}, \cdots, X_N = i_0)\\
+    &= \pi_{i_k} p_{i_k, i_{k - 1}} p_{i_{k - 1}, p_{k - 2}} \cdots p_{i_1, i_0}\\
+    &= (\pi_{i_k} p_{i_k, i_{k - 1}}) p_{i_{k - 1}, p_{k - 2}} \cdots p_{i_1, i_0}\\
+    &= \hat{p}_{i_{k - 1} i_k} (\pi_{i_{k - 1}} p_{i_{k - 1}, p_{k - 2}}) \cdots p_{i_1, i_0}\\
+    &= \cdots\\
+    &= \pi_{i_0} \hat{p}_{i_0, i} \hat{p}_{i_1, i_2} \cdots \hat{p}_{i_{k - 1}, i_k}.
+  \end{align*}
+  So $Y$ is a Markov chain.
 \end{proof}
 \end{document}
