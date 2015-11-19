@@ -2528,4 +2528,142 @@ Therefore we get
   y(x) = \frac{1}{2A} \int_{-\infty}^\infty e^{-A|x - u|} f(u)\;\d u.
 \]
 So far, we have done Fourier analysis over some abelian groups. For example, we've done it over $S^1$, which is an abelian group under multiplication, and $\R$, which is an abelian group under addition. We will next look at Fourier analysis over another abelian group, $\Z_m$, known as the discrete Fourier transform.
+
+\subsection{The discrete Fourier transform}
+Recall that the Fourier transform is defined as
+\[
+  \tilde{f}(k) = \int_\R e^{-ikx} f(X)\;\d x.
+\]
+To find the Fourier transform, we have to know how to perform the integral. If we cannot do the integral, then we cannot do the Fourier transform. However, it is usually difficult to perform integrals for even slightly more complicated functions.
+
+A more serious problem is that we usually don't even have a closed form of the function $f$ for us to perform the integral. In real life, $f$ might be some radio signal, and we are just given some data of what value $f$ takes at different points.. There is no hope that we can do the integral exactly.
+
+Hence, we first give ourselves a simplifying assumption. We suppose that $f$ is mostly concentrated in some finite region $[-R, S]$. More precisely, $|f(x)|\ll 1$ for $x \not\in [-R, S]$ for some $R, S > 0$. Then we can approximate our integral as
+\[
+  \tilde{f}(k) = \int_{-R}^S e^{-ikx} f(x)\;\d x.
+\]
+Afterwards, we perform the integral numerically. Suppose we ``sample'' $f(x)$ at
+\[
+  x = x_j = -R + j\frac{R + S}{N}
+\]
+for $N$ a large integer and $j = 0, 1, \cdots, N - 1$. Then
+\[
+  \tilde{f}(k) \approx \frac{R + S}{N} \sum_{j = 0}^{N - 1} f(x_j) e^{-ik x_j}.
+\]
+This is just the Riemann sum.
+
+Similarly, our computer can only store the result $\tilde{f}(k)$ for some finite list of $k$. Let's choose these to be at
+\[
+  k = k_m = \frac{2\pi m}{R + S}.
+\]
+Then after some cancellation,
+\begin{align*}
+  \tilde{f}(k_m) &\approx \frac{R + S}{N} e^{\frac{2\pi i m R}{R + S}} \sum_{j = 0}^{N - 1} f(x_j) e^{\frac{2\pi i}{N} jm}\\
+  &= (R + S) e^{\frac{2\pi i m R}{R + S}} \left[\frac{1}{N} \sum_{j = 0}^{N - 1} f(x_j) \omega^{-jm}\right],
+\end{align*}
+where
+\[
+  \omega = e^{\frac{2\pi i}{N}}
+\]
+is an $N$th root of unity. We call the thing in the brackets
+\[
+  F(m) = \frac{1}{N} \sum_{j = 0}^{N - 1} f(x_j) \omega^{-jm}.
+\]
+Of course, we've thrown away lots of information about our original function $f(x)$, since we made approximations all over the place. For example, we have already lost all knowledge of structures varying more rapidly than our sampling interval $\frac{R + S}{N}$. Also, $F(m + N) = F(m)$, since $\omega^N = 1$. So we have ``forced'' some periodicity into our function $F$, while $\tilde{f}(k)$ itself was not necessarily periodic.
+
+For the usual Fourier transform, we were able to re-construct our original function from the $\tilde{f}(k)$, but here we clearly cannot. However, if we know the $F(m)$ for all $m = 0, 1, \cdots, N - 1$, then we \emph{can} reconstruct the exact values of $f(x_j)$ for all $j$ by just solving linear equations. To make this more precise, we want to put what we're doing into the linear algebra framework we've been using. Let $G = \{1, \omega, \omega^2, \cdots, \omega^{N - 1}\}$. For our purposes below, we can just treat this as a discrete set, and $\omega^i$ are just meaningless symbols that happen to visually look like the powers of our $N$th roots of unity.
+
+Consider a function $g: G \to \C$ defined by
+\[
+  g(\omega^j) = f(x_j).
+\]
+This is actually nothing but just a new notation for $f(x_j)$. Then using this new notation, we have
+\[
+  F(m) = \frac{1}{N} \sum_{j = 0}^{N - 1} \omega^{-jm} g(\omega^j).
+\]
+Consider the space of \emph{all} functions $g: G \to \C$ is a finite-dimensional vector space, isomorphic to $\C^N$. This has an inner product
+\[
+  (f, g) = \frac{1}{N} \sum_{j = 0}^{N - 1} f^*(\omega^j) g(\omega^j).
+\]
+This inner product obeys
+\begin{align*}
+  (g, f) &= (f, g)^*\\
+  (f, c_1 g_1 + c_2 g_2) &= c_1 (f, g_1) + c_2 (f, g_2)\\
+  (f, f) &\geq 0\text{ with equality iff }f(\omega_j) = 0
+\end{align*}
+Now let $e_n: G \to \C$ be the function
+\[
+  e_m(\omega^j) = \omega^{jm}.
+\]
+Then the set of functions $\{e_m\}$ for $m = 0, \cdots, N - 1$ is an orthonormal basis with respect to our inner product. To show this, we can compute
+\begin{align*}
+  (e_m, e_m) &= \frac{1}{N} \sum_{j = 0}^{N - 1} e_m^*(\omega^j) e_m(\omega^j)\\
+  &= \frac{1}{N} \sum_{j = 0}^{N - 1} \omega^{-jm} \omega^{jm}\\
+  &= \frac{1}{N} \sum_{j = 0}^{N - 1} 1\\
+  &= 1.
+\end{align*}
+For $n \not =m$, we have
+\begin{align*}
+  (e_n, e_m) &= \frac{1}{N} \sum_{j = 0}^{N - 1} e_n^* (\omega^j) e^m(\omega^j)\\
+  &= \frac{1}{N} \sum_{j = 0}^{N - 1} \omega^{j(m - n)}\\
+  &= \frac{1}{N} \frac{1 - \omega^{(m - n)N}}{1 - \omega^{m - n}}.
+\end{align*}
+Since $m - n$ is an integer and $\omega$ is an $N$th root of unity, we know that $\omega^{(m - n)N} = 1$. So the numerator is $0$. However, since $n \not= m$, $m - n\not=0$. So the denominator is non-zero. So we get $0$. Hence
+\[
+  (e_n, e_m) = 0 .
+\]
+We can now rewrite our $F(m)$ as
+\[
+  F(m) = \frac{1}{N}\sum_{j = 0}^{N - 1}\omega^{-jm} f(x_j) = \frac{1}{N}\sum_{j = 0}^{N - 1} e_m^* (\omega^j) g(\omega^j) = (e_j, g).
+\]
+Hence we can expand our $g$ as
+\[
+  g = \sum_{m = 0}^{N - 1} (e_m, g) e_m = \sum_{m = 0}^{N - 1} F(m) e_m.
+\]
+Writing $f$ instead of $g$, we recover the formula
+\[
+  f(x_j) = g(\omega^j) = \sum_{m = 0}^{N - 1} F(m) e_m(\omega^j).
+\]
+If we forget about our $f$s and just look at the $g$, what we have effectively done is take the Fourier transform of functions taking values on $G = \{1, \omega, \cdots, \omega^{N - 1}\}\cong \Z_N$.
+
+This is exactly analogous to what we did for the Fourier transform, except that everything is now discrete, and we don't have to worry about convergence since these are finite sums.
+
+\subsection{The fast Fourier transform*}
+What we've said so far is we've defined
+\[
+  F(m) = \frac{1}{N} \sum_{j = 0}^{N - 1} \omega^{-mj}g(\omega^j).
+\]
+To compute this directly, even given the values of $\omega^{-mj}$ for all $j, m$, this takes $N - 1$ additions and $N + 1$ multiplications. This is $2N$ operations for a \emph{single} value of $m$. To know $F(m)$ for all $m$, this takes $2N^2$ operations.
+
+This is a problem. Historically, during the cold war, especially after the Cuban missile crisis, people were in fear that the world will one day go into a huge nuclear war, and something had to be done to prevent this. Thus the countries decided to come up with a treaty to ensure people don't perform nuclear testings anymore.
+
+However, the obvious problem is that we can't easily check if other countries are doing nuclear tests. Nuclear tests are easy to spot if the test is done above ground, since there will be a huge explosion. However, if it is done underground, it is much harder to test.
+
+They then came up with the idea to put some seismometers all around the world, and record vibrations in the ground. To distinguish normal crust movements from nuclear tests, they wanted to take the Fourier transform and analyze the frequencies of the vibrations. However, they had a \emph{large} amount of data, and the value of $N$ is on the order of magnitude of a few million. So $2N^2$ will be a huge number that the computers at that time were not able to handle. So they need to find a trick to perform Fourier transforms quickly.
+
+Now suppose $N = 2M$. We can write
+\begin{align*}
+  F(m) &= \frac{1}{2M} \sum_{j = 0}^{2M - 1} \omega^{-jm} g(\omega^j) \\
+  &= \frac{1}{2}\left[\frac{1}{M}\sum_{k = 0}^{M - 1} \omega^{-2km} g(\omega^{2k}) + \omega^{-(2k + 1)m} g(\omega^{2k + 1})\right].
+\end{align*}
+We now let $\eta$ be an $M$th root of unity, and define
+\[
+  G(\eta^k) = g(\omega^{2k}),\quad H(\eta^k) = g(\omega^{2k + 1}).
+\]
+We then have
+\begin{align*}
+  F(m) &= \frac{1}{2} \left[\frac{1}{M} \sum_{k = 0}^{M - 1} \eta^{-km} G(\eta^k) + \frac{\omega^{-m}}{M} \sum_{k = 0}^{M - 1} \eta^{-km} H(\eta^k)\right]\\
+  &= \frac{1}{2}[\tilde{G}(m) + \omega^{-m} \tilde{H}(m)].
+\end{align*}
+Suppose we are given the values of $\tilde{G}(m)$ and $\tilde{H}(m)$ and $\omega^{-m}$ for all $m = \{0, \cdots, N - 1\}$. Then we can compute $F(m)$ using $3$ operations per value of $m$. So this takes $3 \times N = 6M$ operations for all $M$.
+
+We can compute $\omega^{-m}$ for all $m$ using at most $2N$ operations, and suppose it takes $P_M$ operations to compute $\tilde{G}(m)$ for all $m$. Then the number of operations needed to compute $F(m)$ is
+\[
+  P_{2M} = 2 P_M + 6M + 2M.
+\]
+Now let $N = 2^n$. Then by iterating this, we can find
+\[
+  P_N \leq 4N \log_2 N \ll N^2.
+\]
+So by breaking the Fourier transform apart, we are able to greatly reduce the number of operations needed to compute the Fourier transform. This is used nowadays everywhere for everything.
 \end{document}

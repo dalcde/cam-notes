@@ -2065,4 +2065,120 @@ Note that the definition of continuity says something like (iii), but with open 
 \begin{proof}
   Follows directly from the equivalence of (i) and (iii) in the theorem above.
 \end{proof}
+
+\subsection{The contraction mapping theorem}
+\begin{defi}[Contraction mapping]
+  Let $(X, d)$ be metric space. A mapping $f: X \to X$ is a \emph{contraction} if there exists some $\lambda$ with $0 \leq \lambda < 1$ such that
+  \[
+    d(f(x), f(y)) \leq \lambda d(x, y).
+  \]
+\end{defi}
+Note that a contraction mapping is by definition Lipschitz and hence (uniformly) continuous.
+
+\begin{thm}[Contraction mapping theorem]
+  Let $X$ be a (non-empty) complete metric space, and if $f: X \to X$ is a contraction, then $f$ has a \emph{unique} fixed point, ie. there is a unique $x$ such that $f(x) = x$.
+
+  Moreover, if $f: X\to X$ is a function such that $f^{(m)}: X\to X$ (ie. $f$ composed with itself $m$ times) is a contraction for some $m$, then $f$ has a unique fixed point.
+\end{thm}
+We can see finding fixed points as the process of solving equations. One important application we will have is to use this to solve \emph{differential} equations.
+
+Note that the theorem is false if we drop the completeness assumption. For example, $f: (0, 1) \to (0, 1)$ defined by $\frac{x}{2}$ is clearly a contraction with no fixed point. The theorem is also false if we drop the assumption $\lambda < 1$. In fact, it is not enough to assume $d(f(x), f(y)) < d(x, y)$ for all $x, y$. A counterexample is to be found on example sheet 3.
+
+\begin{proof}
+  We first focus on the case where $f$ itself is a contraction.
+
+  Uniqueness is straightforward. By assumption, there is some $0 \leq \lambda < 1$ such that
+  \[
+     d(f(x), f(y)) \leq \lambda d(x, y)
+  \]
+  for all $x, y \in X$. If $x$ and $y$ are both fixed points, then this says
+  \[
+    d(x, y) = d(f(x), f(y)) \leq \lambda d(x, y).
+  \]
+  This is possible only if $d(x, y) = 0$, ie. $x = y$.
+
+  To prove existence, the idea is to pick a point $x_0$ and keep applying $f$. Let $x_0 \in X$. We define the sequence $(x_n)$ inductively by
+  \[
+    x_{n + 1} = f(x_n).
+  \]
+  We first show that this is Cauchy. For any $n \geq 1$, we can compute
+  \[
+    d(x_{n + 1}, x_n) = d(f(x_n), f(x_{n - 1})) \leq \lambda d(x_n, x_{n - 1}) \leq \lambda^n d(x_1, x_0).
+  \]
+  Since this is true for any $n$, for $m > n$, we have
+  \begin{align*}
+    d(x_m, x_n) &\leq d(x_m, x_{m - 1}) + d(x_{m - 1}, x_{m - 2}) + \cdots + d(x_{n + 1}, x_n) \\
+    &= \sum_{j = n}^{m - 1} d(x_{j + 1}, x_j)\\
+    &= \sum_{j = n}^{m - 1} \lambda^j d(x_1, x_0)\\
+    &\leq d(x_1, x_0) \sum_{j = n}^\infty x^j\\
+    &= \frac{\lambda^n}{1 - \lambda} d(x_1, x_0).
+  \end{align*}
+  Note that we have again used the property that $\lambda < 1$.
+
+  This implies $d(x_m, x_n) \to 0$ as $m, n \to \infty$. So this sequence is Cauchy. By the completeness of $X$, there exists some $x \in X$ such that $x_n \to x$. Since $f$ is a contraction, it is continuous. So $f(x_n) \to f(x)$. However, by definition $f(x_n) = x_{n + 1}$. So taking the limit on both sides, we get $f(x) = x$. So $x$ is a fixed point.
+
+  Now suppose that $f^{(m)}$ is a contraction for some $m$. Hence by the first part, there is a unique $x \in X$ such that $f^{(m)}(x) = x$. But then
+  \[
+    f^{(m)}(f(x)) = f^{(m + 1)}(x) = f(f^{(m)}(x)) = f(x).
+  \]
+  So $f(x)$ is also a fixed point of $f^{(n)}(x)$. By uniqueness of fixed points, we must have $f(x) = x$. Since any fixed point of $f$ is clearly a fixed point of $f^{(n)}$ as well, it follows that $x$ is the unique fixed point of $f$.
+\end{proof}
+
+We are now going to use this to obtain the Picard-Lindel\"of existence theorem for ordinary differential equations. The objective is as follows. Suppose we are given a function
+\[
+  \mathbf{F} = (F_1, F_2, \cdots, F_n): \R\times \R^n \to \R^n.
+\]
+We interpret the $\R$ as time and the $\R^n$ as time.
+
+Given $t_0 \in \R$ and $\mathbf{x}_0 \in \R^n$, we want to know when can we find a solution to the ODE
+\[
+  \frac{\d \mathbf{f}}{\d t} = \mathbf{F}(t, \mathbf{f}(t))
+\]
+subject to $f(t_0) = \mathbf{x}_0$. We would like this solution to be valid (at least) for all $t$ in some interval $I$ containing $t_0$?
+
+More explicitly, we want to understand when will there be some $\varepsilon > 0$ and a differentiable function $\mathbf{f} = (f_1, \cdots, f_n): (t_0 - \varepsilon, t_0 + \varepsilon) \to \R^n$ (ie. $f_j: (t_0 - \varepsilon, t_0 + \varepsilon): \to \R$ is differentiable for all $j$) satisfying
+\[
+  \frac{\d f_j}{\d t} = F_j(t, f_1(t), \cdots, f_n(t))
+\]
+such that $f_j(t_0) = x_0^{(j)}$ for all $j = 1, \ldots, n$ and $t \in (t_0 - \varepsilon, t_0 + \varepsilon)$.
+
+We can imagine this scenario as a particle moving in $\R^n$, passing through $\mathbf{x}_0$ at time $t_0$. We then ask if there is a trajectory $\mathbf{f}(t)$ such that the velocity of the particle at any time $t$ is given by $\mathbf{F}(t, \mathbf{f}(t))$.
+
+This is a complicated system, since it is a coupled system of many variables. Explicit solutions are usually impossible, but we in certain cases, we can prove the existence of a solution. Of course, solutions need not exist for arbitrary $F$. For example, there will be no solution if $F$ is everywhere discontinuous, since any derivative is continuous in a dense set of points. The Picard-Lindel\"of existence theorem gives us sufficient conditions for a unique solution to exists.
+
+We will need the following notation
+\begin{notation}
+  For $\mathbf{x}_0 \in \R^n$, $R > 0$, we let
+  \[
+    \overline{B_R(\mathbf{x}_0)} = \{\mathbf{x} \in \R^n: \|\mathbf{x} - \mathbf{x}_0\|_2 \leq R\}.
+  \]
+\end{notation}
+Then the theorem says
+\begin{thm}[Picard-Lindel\"of existence theorem]
+  Let $\mathbf{x}_0 \in \R^n$, $R > 0$, $a < b$, $t_0 \in [a, b]$. Let $\mathbf{F}: [a, b] \times \overline{B_R(\mathbf{x}_0)} \to \R^n$ be a continuous function satisfying
+  \[
+    \|\mathbf{F}(t, \mathbf{x}) - \mathbf{F}(t, \mathbf{y})\|_2 \leq K\|\mathbf{x} - \mathbf{y}\|_2
+  \]
+  for some fixed $K > 0$ and all $t \in [a, b], \mathbf{x} \in \overline{B_R(\mathbf{x}_0)}$. In other words, $F(t, \ph): \R^n \to \R^n$ is Lipschitz on $\overline{B_R(\mathbf{x}_0})$ with the same Lipschitz constant for every $t$. Then
+  \begin{enumerate}
+    \item There exists an $\varepsilon > 0$ and a unique differentiable function $f: [t_0 - \varepsilon, t_0 + \varepsilon] \cap [a, b] \to \R^n$ such that
+      \[
+        \frac{\d \mathbf{f}}{\d t} = \mathbf{F}(t, \mathbf{f}(t))
+      \]
+      and $\mathbf{f}(t_0) = \mathbf{x}_0$.
+    \item If
+      \[
+        \sup_{[a, b] \times \overline{B_R(\mathbf{x}_0)}} \|\mathbf{F}\|_2 \leq \frac{R}{b - a},
+      \]
+      then there exists a unique differential function $f: [a, b] \to \R$ that satisfies the differential equation and boundary conditions above.
+  \end{enumerate}
+\end{thm}
+
+Note that even $n = 1$ is an important, special, non-trivial case. Even in this case, explicit solutions may be very difficult to find, if not impossible. For example,
+\[
+  \frac{\d f}{\d t} = f^2 + \sin f + e^f
+\]
+would be almost impossible to solve. However, the theorem tells us there will be a solution, at least locally.
+
+We are going to use the contraction mapping theorem to prove this. In general, this is a very useful idea. It is in fact possible to use other fixed point theorems to show the existence of solutions to partial differential equations. This is \emph{much} more difficult, but has many far-reaching important applications to theoretical physics and geometry, say. For these, see Part III courses.
 \end{document}
