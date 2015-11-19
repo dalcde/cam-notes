@@ -5,7 +5,6 @@
 \def\nyear {2015}
 \def\nlecturer {G. R. Grimmett}
 \def\ncourse {Markov Chains}
-\def\nlectures {TT.10}
 \def\nnotready {}
 
 \input{header}
@@ -1411,4 +1410,211 @@ Most of the results here should not be surprising, apart from the fact that $Y$ 
   \end{align*}
   So $Y$ is a Markov chain.
 \end{proof}
+
+\begin{defi}[Reversible chain]
+  An irreducible Markov chain $X = (X_0, \cdots, X_N)$ in its invariant distribution $\pi$ is \emph{reversible} if its reversal has the same transition probabilities as does $X$, ie
+  \[
+    \pi_i p_{i, j} = \pi_j p_{j, i}
+  \]
+  for all $i, j \in S$.
+
+  This equation is known as the \emph{detailed balance equation}. In general, if $\lambda$ is a distribution that satisfies
+  \[
+    \lambda_i p_{i, j} = \lambda_j p_{j, i},
+  \]
+  we say $(P, \lambda)$ is in \emph{detailed balance}.
+\end{defi}
+Note that most chains are \emph{not} reversible, just like most functions are not continuous. However, if we know reversibility, then we have one powerful piece of information. The nice thing about this is that it is very easy to check if the above holds --- we just have to compute $\pi$, and check the equation directly.
+
+In fact, there is an even easier check. We don't have to start with finding $\pi$, but just some $\lambda$ that is in detailed balance.
+
+\begin{prop}
+  Let $P$ be the transition matrix of an irreducible Markov chain $X$. Suppose $(P, \lambda)$ is in detailed balance. Then $\lambda$ is the \emph{unique} invariant distribution and the chain is reversible (when $X_0$ has distribution $\lambda$).
+\end{prop}
+
+This is a much better criterion. To find $\pi$, we need to solve
+\[
+  \pi_i = \sum_j \pi_j p_{j, i},
+\]
+and this has a big scary sum on the right. However, to find the $\lambda$, we just need to solve
+\[
+  \lambda_i p_{i, j} = \lambda_j p_{j, i},
+\]
+and there is no sum involved. So this is indeed a helpful result.
+
+\begin{proof}
+  It suffices to show that $\lambda$ is invariant. Then it is automatically unique and the chain is by definition reversible. This is easy to check. We have
+  \[
+    \sum_j \lambda_j p_{j, i} = \sum_j \lambda_i p_{i, j} = \lambda_i \sum_j p_{i, j} = \lambda_i.
+  \]
+  So $\lambda$ is invariant.
+\end{proof}
+This gives a really quick route to compute invariant distributions.
+
+\begin{eg}[Birth-death chain with immigration]
+  Recall our birth-death chain, where at each state $i > 0$, we move to $i + 1$ with probability $p_i$ and to $i - 1$ with probability $q_i = 1 - p_i$. When we are at $0$, we are dead and no longer change.
+
+  We wouldn't be able to apply our previous result to this scenario, since $0$ is an absorbing equation, and this chain is obviously not irreducible, let alone positive recurrent. Hence we make a slight modification to our scenario --- if we have population $0$, we allow ourselves to have a probability $p_0$ of having an immigrant and get to $1$, or probability $q_0 = 1 - p_0$ that we stay at $0$.
+
+  This is sort of a ``physical'' process, so it would not be surprising if this is reversible. So we can try to find a solution to the detailed balance equation. If it works, we would have solved it quickly. If not, we have just wasted a minute or two. We need to solve
+  \[
+    \lambda_i p_{i, j} = \lambda_j p_{j, i}.
+  \]
+  Note that this is automatically satisfied if $j$ and $i$ differ by at least $2$, since both sides are zero. So we only look at the case where $j = i + 1$ (the case $j = i - 1$ is the same thing with the slides flipped). So the only equation we have to satisfy is
+  \[
+    \lambda_i p_i = \lambda_{i + 1}q_{i + 1}
+  \]
+  for all $i$. This is just a recursive formula for $\lambda_i$, and we can solve to get
+  \[
+    \lambda_i = \frac{p_{i - 1}}{q_i} \lambda_{i - 1} = \cdots = \left(\frac{p_{i - 1}}{q_i} \frac{p_{i - 2}}{q_{i - 1}} \cdots \frac{p_0}{q_1}\right)\lambda_0.
+  \]
+  We can call the term in the brackets
+  \[
+    \rho_i = \left(\frac{p_{i - 1}}{q_i} \frac{p_{i - 2}}{q_{i - 1}} \cdots \frac{p_0}{q_1}\right).
+  \]
+  For $\lambda_i$ to be a distribution, we need
+  \[
+    1 = \sum_i \lambda_i = \lambda_0 \sum_i \rho_i.
+  \]
+  Thus if
+  \[
+    \sum \rho_i < \infty,
+  \]
+  then we can pick
+  \[
+    \lambda_0 = \frac{1}{\sum \rho_i}
+  \]
+  and $\lambda$ is a distribution. Hence this is the unique invariant distribution.
+
+  If it diverges, the method fails, and we need to use our more traditional methods to check recurrence and transience.
+\end{eg}
+
+\begin{eg}[Random walk on a finite graph]
+  A graph is a collection of points with edges between them. For example, the following is a graph:
+  \begin{center}
+    \begin{tikzpicture}
+      \node [circ] at (0, 0) {};
+      \node [circ] at (2, 0) {};
+      \node [circ] at (1, -1.5) {};
+      \node [circ] at (-1, -0.5) {};
+      \draw (0, 0) -- (2, 0) -- (1, -1.5) -- (0, 0);
+
+      \draw (1, -1.5) -- (-1, -0.5);
+
+      \draw (0, 0) -- (-1, -0.5);
+      \draw (-3, -0.5) -- (-1, -0.5) -- (-2, -1.6) -- cycle;
+      \node [circ] at (-3, -0.5) {};
+      \node [circ] at (-1, -0.5) {};
+      \node [circ] at (-2, -1.6) {};
+
+      \draw (-1.5, -0.2) node [circ] {} -- (-1.2, 1) node [circ] {};
+    \end{tikzpicture}
+  \end{center}
+  More precisely, a graph is a pair $G = (V, E)$, where $E$ contains distinct unordered pairs of distinct vertices $(u, v)$, drawn as edges from $u$ to $v$.
+
+  Note that the restriction of distinct pairs and distinct vertices are there to prevent loops and parallel edges, and the fact that the pairs are unordered means our edges don't have orientations.
+
+  A graph $G$ is connected if for all $u, v \in V$, there exists a path along the edges from $u$ to $v$.
+
+  Let $G = (V, E)$ be a connected graph with $|V| \leq \infty$. Let $X = (X_n)$ be a random walk on $G$. Here we live on the vertices, and on each step, we move to one an adjacent vertex. More precisely, if $X_n = x$, then $X_{n + 1}$ is chosen uniformly at random from the set of neighbours of $x$, ie. the set $\{y \in V: (x, y) \in E\}$, independently of the past. This is a Markov chain.
+
+  For example, our previous simple symmetric random walks on $\Z$ or $\Z^d$ are random walks on graphs (despite the graphs not being finite). Our transition probabilities are
+  \[
+    p_{i, j} =
+    \begin{cases}
+      0 & j\text{ is a neighbour of }i\\
+      \frac{1}{d_i} & j\text{ is a neighbour of }i
+    \end{cases}.
+  \]
+  where $d_i$ is the number of neighbours of $i$, commonly known as the \emph{degree} of $i$.
+
+  By connectivity, the Markov chain is irreducible. Since it is finite, it is recurrent, and in fact positive recurrent.
+
+  This process is a rather ``physical'' process, and we would expect it to be reversible. So let's try to solve the detailed balance equation
+  \[
+    \lambda_i p_{i, j} = \lambda_j p_{j, i}.
+  \]
+  If $j$ is not a neighbour of $i$, then both sides are zero, and it is trivially balanced. Otherwise, the equation becomes
+  \[
+    \lambda_i \frac{1}{d_i} = \lambda_j \frac{1}{d_j}.
+  \]
+  The solution is \emph{obvious}. Take $\lambda_i = d_i$. In fact we can multiply by any constant $c$, and $\lambda_i = c d_i$ for any $c$. So we pick our $c$ such that this is a distribution, ie.
+  \[
+    1 = \sum_i \lambda_i = c \sum_i d_i.
+  \]
+  We now note that since each edge adds $1$ to the degrees of each vertex on the two ends, $\sum d_i$ is just twice the number of edges. So
+  \[
+    1 = 2c |E|.
+  \]
+  Hence we get
+  \[
+    c = \frac{1}{2|E|}.
+  \]
+  Hence, our invariant distribution is
+  \[
+    \lambda_i = \frac{d_i}{2|E|}.
+  \]
+  Let's look at a specific scenario.
+
+  Suppose we have a knight on the chessboard. In each step, the allowed moves are:
+  \begin{itemize}
+    \item Move two steps horizontally, then one step vertically;
+    \item Move two steps vertically, then one step horizontall.
+  \end{itemize}
+  For example, if the knight is in the center of the board (red dot), then the possible moves are indicated with blue crosses:
+  \begin{center}
+    \begin{tikzpicture}[scale=0.5]
+      \foreach \x in {0,1,...,8} {
+        \draw (0, \x) -- (8, \x);
+        \draw (\x, 0) -- (\x, 8);
+      }
+      \node [mred, circ] at (3.5, 4.5) {};
+
+      \node [mblue] at (5.5, 5.5) {$\times$};
+      \node [mblue] at (5.5, 3.5) {$\times$};
+      \node [mblue] at (1.5, 5.5) {$\times$};
+      \node [mblue] at (1.5, 3.5) {$\times$};
+      \node [mblue] at (4.5, 6.5) {$\times$};
+      \node [mblue] at (4.5, 2.5) {$\times$};
+      \node [mblue] at (2.5, 6.5) {$\times$};
+      \node [mblue] at (2.5, 2.5) {$\times$};
+    \end{tikzpicture}
+  \end{center}
+  At each epoch of time, our erratic night follows a legal move chosen uniformly from the set available. Hence we have a Markov chain derived from the chessboard. What is his invariant distribution. We can compute the number of possible moves from each position:
+  \begin{center}
+    \begin{tikzpicture}[scale=0.5]
+      \foreach \x in {0,1,...,8} {
+        \draw (0, \x) -- (8, \x);
+        \draw (\x, 0) -- (\x, 8);
+      }
+      \node at (7.5, 7.5) {$2$};
+      \node at (7.5, 6.5) {$3$};
+      \node at (6.5, 7.5) {$3$};
+      \node at (6.5, 6.5) {$4$};
+
+      \node at (7.5, 5.5) {$4$};
+      \node at (7.5, 4.5) {$4$};
+      \node at (5.5, 7.5) {$4$};
+      \node at (4.5, 7.5) {$4$};
+
+      \node at (6.5, 5.5) {$6$};
+      \node at (6.5, 4.5) {$6$};
+      \node at (4.5, 6.5) {$6$};
+      \node at (5.5, 6.5) {$6$};
+
+      \node at (4.5, 4.5) {$8$};
+      \node at (4.5, 5.5) {$8$};
+      \node at (5.5, 4.5) {$8$};
+      \node at (5.5, 5.5) {$8$};
+    \end{tikzpicture}
+  \end{center}
+  The sum of degrees is
+  \[
+    \sum_i d_i = 336.
+  \]
+  So the invariant distribution at, say, the corner is
+  \[
+    \pi_{\mathrm{corner}} = \frac{2}{336}.
+  \]
+\end{eg}
 \end{document}
