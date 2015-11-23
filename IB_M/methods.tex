@@ -2666,4 +2666,392 @@ Now let $N = 2^n$. Then by iterating this, we can find
   P_N \leq 4N \log_2 N \ll N^2.
 \]
 So by breaking the Fourier transform apart, we are able to greatly reduce the number of operations needed to compute the Fourier transform. This is used nowadays everywhere for everything.
+\section{More partial differential equations}
+\subsection{Characteristics}
+Recall that to find a unique solution of Laplace's equation $\nabla^2 \phi = 0$ on a bounded domain $\Omega \subseteq \R^n$, we imposed the Dirichlet boundary condition $\phi|_{\partial \Omega} = F$ or the Neumann boundary condition $\mathbf{n}\cdot \nabla \phi|_{\partial \Omega} = g$.
+
+For the heat equation $\frac{\partial \phi}{\partial t} = \kappa \nabla^2 \phi$ on $\Omega \times [0, \infty)$, we asked for $\partial |_{\partial \Omega \times [0, \infty)} = f$ and also $\phi|_{\Omega \times \{0\}} = g$.
+
+For the wave equation $\frac{\partial^2 \phi}{\partial t^2} = c^2 \nabla^2 \phi$ on $\Omega \times [0, \infty)$, we imposed $\phi|_{\partial \Omega \times [0, \infty)} = f$, $\phi|_{\Omega \times \{0\}} = g$ and also $\partial_t \phi|_{\Omega \times \{0\}} = h$.
+
+All the boundary and initial conditions restrict the value of $\phi$ on some co-dimension 1 surface, ie. a surface whose dimension is one less than the domain. This is known as \emph{Cauchy data} for our partial differential equation.
+
+\begin{defi}[Well-posed problem]
+  A partial differential equation problem is said to be well-posed if its Cauchy data means
+  \begin{enumerate}
+    \item A solution exists;
+    \item The solution is unique;
+    \item A ``small change'' in the Cauchy data leads to a ``small change'' in the solution.
+  \end{enumerate}
+\end{defi}
+To understand the last condition, we need to make it clear what we mean by ``small change''. To do this properly, we need to impose some topology on our space of functions, which is some technicalities we will not go into. Instead, we can look at a simple example.
+
+Suppose we have the heat equation $\partial_t \phi = \kappa \nabla^2 \phi$. We know that whatever starting condition we have, the solution quickly smooths out with time. Any spikiness of the initial conditions get exponentially suppressed. Hence this is a well-posed problem --- changing the initial condition slightly will result in a similar solution.
+
+However, if we take the heat equation but run it backwards in time, we get a non-well-posed problem. If we provide a tiny, small change in the ``ending condition'', as we go back in time, this perturbation grows \emph{exponentially}, and the result could vary wildly.
+
+Another example is as follows: consider the Laplace's equation $\nabla^2 \phi$ on the upper half plane $(x, y) \in \R \times \R^{\geq 0}$ subject to the boundary conditions
+\[
+  \phi(x, 0) = 0,\quad \partial_y \phi(x, 0) = g(x).
+\]
+If we take $g(x) = 0$, then $\phi(x, y) = 0$ is the unique solution, obviously.
+
+However, if we take $g(x) = \frac{\sin Ax}{A}$, then we get the unique solution
+\[
+  \phi(x, y) = \frac{\sin (Ax) \sinh (Ay)}{A^2}.
+\]
+So far so good. However, now consider the limit as $A \to \infty$. Then
+\[
+  g(x) = \frac{\sin (Ax)}{A} \to 0.
+\]
+for all $x \in \R$. However, at the special point $\phi\left(\frac{\pi}{2A}, y\right)$, we get
+\[
+  \phi\left(\frac{\pi}{2A}, y\right) = \frac{\sinh (Ay)}{A^2} \to A^{-2} e^{Ay},
+\]
+which is unbounded. So as we take the limit as our boundary conditions $g(x) \to 0$, we get an unbounded solution.
+
+How can we make sure this doesn't happen? We're first going to look at first order equations.
+
+\subsubsection*{Curves in the plane}
+Suppose we have a curve on the plane $\mathbf{x}: \R \to \R^2$ given by $s\mapsto (x(s), y(s))$.
+
+\begin{defi}[Tangent vector]
+  The tangent vector to a smooth curve $C$ given by $\mathbf{x}: \R \to \R^2$ with $\mathbf{x}(s) = (x(s), y(s))$ is
+  \[
+    \left(\frac{\d x}{\d s}, \frac{\d y}{\d s}\right)
+  \]
+\end{defi}
+
+If we have some quantity $\phi: \R^2 \to \R$, then its value along the curve $C$ is just $\phi(x(s), y(s))$.
+
+A vector field $\mathbf{V}(x, y): \R^2 \to \R^2$ defines a family of curves. To imagine this, suppose we are living in a river. The vector field tells us the how the water flows at each point. We can then obtain a curve by starting a point and flow along with the water. More precisely,
+\begin{defi}[Integral curve]
+  Let $\mathbf{V}(x, y): \R^2 \to \R^2$ be a vector field. The \emph{integral curves} associated to $\mathbf{V}$ are curves whose tangent $\left(\frac{\d x}{\d s}, \frac{\d y}{\d s}\right)$ is just $\mathbf{V}(x, y)$.
+\end{defi}
+For sufficiently regular vector fields, we can fill the space with different curves. We will parametrize which curve we are on by the parameter $t$. More precisely, we have a curve $B = (x(t), y(t))$ that is \emph{transverse} (ie. nowhere parallel) to our family of curves, and we can label the members of our family by the value of $t$ at which they intersect $B$.
+\begin{center}
+  \begin{tikzpicture}
+    \draw rectangle (3, 3);
+
+    \draw plot [smooth] coordinates {(0, 1) (0.7, 1.3) (0.9, 1.2) (1.6, 1.5) (2.3, 1) (3, 0.9)};
+    \draw plot [smooth] coordinates {(0, 1.3) (0.7, 1.6) (0.9, 1.6) (1.6, 1.8) (2.3, 1.2) (3, 1.2)};
+    \draw plot [smooth] coordinates {(0, 1.7) (0.9, 1.9) (1.6, 2.2) (2.3, 1.7) (3, 1.8)};
+    \draw plot [smooth] coordinates {(0, 0.8) (0.7, 1.1) (0.9, 0.9) (1.6, 1.3) (2.3, 0.8) (3, 0.6)};
+
+    \node [right] at (3, 1.8) {$C_4$};
+    \node [right] at (3, 1.2) {$C_3$};
+    \node [right] at (3, 0.9) {$C_2$};
+    \node [right] at (3, 0.6) {$C_1$};
+
+    \draw [mred] plot [smooth] coordinates {(1, 0) (1.3, 1.4) (1.2, 1.9) (1.4, 3)};
+
+    \node [mred, right] at (1.3, 2.4) {$B(t)$};
+  \end{tikzpicture}
+\end{center}
+We can thus label our family of curves by $(x(s, t), y(s, t))$. If the Jacobian
+\[
+  J = \frac{\partial x}{\partial s} \frac{\partial y}{\partial t} - \frac{\partial x}{\partial t} \frac{\partial y}{\partial s} \not= 0,
+\]
+then we can invert this to find $(s, t)$ as a function of $(x, y)$, ie. at any point, we know which curve we are on, and how far along the curve we are.
+
+This means we now have a new coordinate system $(s, t)$ for our points in $\R^2$. It turns out by picking the right vector field $\mathbf{V}$, we can make differential equations easier to solve in this new coordinate system.
+
+\subsubsection*{The method of characteristics}
+Suppose $\phi: \R^2 \to \R$ obeys
+\[
+  a(x, y) \frac{\partial \phi}{\partial x} + b(x, y) \frac{\partial \phi}{\partial y} = 0.
+\]
+We can define our vector field as
+\[
+  \mathbf{V}(x, y) =
+  \begin{pmatrix}
+    a(x, y)\\
+    b(x, y)
+  \end{pmatrix}.
+\]
+Then we can write the differential equation as
+\[
+  \mathbf{V}\cdot \nabla \phi = 0.
+\]
+Along any particular integral curve of $\mathbf{V}$, we have
+\[
+  \frac{\partial \phi}{\partial s} = \frac{\d x(s)}{\d s} \frac{\partial \phi}{\partial x} + \frac{\d y(s)}{\d s} \frac{\partial \phi}{\partial y} = \mathbf{V}\cdot \nabla \phi,
+\]
+where the integral curves of $V$ are determined by
+\[
+  \left.\frac{\partial x}{\partial s}\right|_t = a(x, y),\quad \left.\frac{\partial y}{\partial s}\right|_t = b(x, y).
+\]
+This is known as the characteristic equation.
+
+Hence our partial differential equation just becomes the equation
+\[
+  \left.\frac{\partial \phi}{\partial s}\right|_t = 0.
+\]
+To get ourselves a well-posed problem, we have to specify our boundary data along a transverse curve $B$. We pick our transverse curve as $s = 0$, and we suppose we are given the initial data
+\[
+  \phi(0, t) = h(t).
+\]
+Since $\phi$ does not vary with $s$, our solution automatically is
+\[
+  \phi(s, t) = h(t).
+\]
+Then, $\phi(x, y)$ is given by inverting the characteristic equations to find $t(x, y)$.
+
+We do a few examples to make this clear.
+
+\begin{eg}[Trivial]
+  Suppose $\phi$ obeys
+  \[
+    \left.\frac{\partial \phi}{\partial x}\right|_y = 0.
+  \]
+  We are given the boundary condition
+  \[
+    \phi(0, y) = f(y).
+  \]
+  The solution is obvious, since the differential equation tells us the function is just a function of $y$, and then the solution is obviously $\phi(x, y) = h(y)$. However, we can try to use the method of characteristics to practice our skills. Our vector field is given by
+  \[
+    \mathbf{V} =
+    \begin{pmatrix}
+      1\\0
+    \end{pmatrix}
+    =
+    \begin{pmatrix}
+      \frac{\d x}{\d s}\\
+      \frac{\d y}{\d s}
+    \end{pmatrix}.
+  \]
+  Hence, we get
+  \[
+    \frac{\d x}{\d s} = 1,\quad \frac{\d y}{\d s} = 0.
+  \]
+  So we have
+  \[
+    x = s + c,\quad y = d.
+  \]
+  Our initial curve is given by $y = t, x = 0$. Since we want this to be the curve $s = 0$, we find our integral curves to be
+  \[
+    x = s,\quad y = t.
+  \]
+  Now for each fixed $t$, we have to solve
+  \[
+    \left.\frac{\partial \phi}{\partial s}\right|_t = 0,\quad \phi(s, t) = h(t) = f(t).
+  \]
+  So we know that
+  \[
+    \phi(x, y) = f(y).
+  \]
+\end{eg}
+
+\begin{eg}
+  Consider the equation
+  \[
+    e^x \frac{\partial \phi}{\partial x} + \frac{\partial \phi}{\partial y} = 0.
+  \]
+  with the boundary condition
+  \[
+    \phi(x, 0) = \cosh x.
+  \]
+  We find that the vector field is
+  \[
+    \mathbf{V} =
+    \begin{pmatrix}
+      e^x\\
+      1
+    \end{pmatrix}
+  \]
+  This gives
+  \[
+    \frac{\d x}{\d s} = e^x,\quad \frac{\d y}{\d s} = 1.
+  \]
+  Thus we have
+  \[
+    e^{-x} = -s + c,\quad y = s + d.
+  \]
+  We pick our curve as $x = t, y = 0$. So our relation becomes
+  \[
+    e^{-x} = -s + e^{-t}, y = s.
+  \]
+  We thus have
+  \[
+    \left.\frac{\partial \phi}{\partial s}\right|_t = 0,\quad \phi(s, t) = \phi(0, t) = \cosh(t) = \cosh[-\ln (y + e^{-x})]
+  \]
+  So done.
+\end{eg}
+
+\begin{eg}
+  Let $\phi: \R^2 \to \R$ solve the inhomogeneous partial differential equation
+  \[
+    \partial_x \phi + 2 \partial_y \phi = y e^x
+  \]
+  with $\phi(x, x) = \sin x$.
+
+  We can still use the method of characteristics. We have
+  \[
+    \mathbf{u} =
+    \begin{pmatrix}
+      1\\2
+    \end{pmatrix}.
+  \]
+  So the characteristic curves obey
+  \[
+    \frac{\d x}{\d s} = 1, \quad \frac{\d y}{\d s} = 2.
+  \]
+  This gives
+  \[
+    x = s + t, y = 2s + t
+  \]
+  so that $x = y = t$ at $s = 0$. We can invert this to obtain the relations
+  \[
+    s = y - x, \quad t = 2x - y.
+  \]
+  The partial differential equation now becomes
+  \[
+    \left.\frac{\d \phi}{\d s}\right|_t = \mathbf{u}\cdot \nabla \phi = y e^x = (2s + t)e^{s + t}
+  \]
+  Note that this is just an ordinary differential equation in $s$ because $t$ is held constant. We have the boundary conditions
+  \[
+    \phi(s = 0, t) = \sin t.
+  \]
+  So we get
+  \[
+    \phi(x(s, t), y(s, t)) = (2 - t)e^t(1 - e^s) + \sin t + 2s e^{s + t}.
+  \]
+  Putting it in temrs of $x$ and $y$, we have
+  \[
+    \phi(x, y) = (2 - 2x + y) e^{2x - y} + \sin (2x - y) + (y - 2) e^x. % check!
+  \]
+\end{eg}
+We see that our Cauchy data $\phi(x, x) = \sin x$ should be specified on a curve $B$ that intersects each characteristic curve exactly once.
+
+If we tried to use a characteristic curve $B$ that intersects the characteristics multiple times, if we want a solution \emph{at all}, we cannot specify data freely along $B$. its values at the points of intersection have to compatible with the partial differential equation.
+
+For example, if we have a homogeneous equation, we saw the solution will be constant along the same characteristic. Hence if our Cauchy data requires the solution to take different values on the same characteristic, we will have no solution.
+
+Moreover, even if it is compactible, if $B$ does not intersect all characteristics, we will not get a unique solution. So the solution is not fixed along such characteristics.
+
+On the other hand, if $B$ intersects each characteristic curve transversely, the problem is well-posed. So there exists a unique solution, at least in the neighbourhood of $B$. Notice that data is never transferred between characteristic curves.
+
+\subsection{Characteristics for 2nd order partial differential equations}
+Whether the method of characteristics works for a 2nd order partial differential equation, or even higher order ones, depends on the ``type'' of the differential equation.
+
+To classify these differential equations, we need to define
+
+\begin{defi}[Symbol and principal part]
+  Let $\mathcal{L}$ be the general $2$nd order differential operator on $\R^n$. We can write it as
+  \[
+    \mathcal{L} = \sum_{i, j = 1}^n a^{ij}(x) \frac{\partial^2}{\partial x^i \partial x^j} + \sum_{i = 1}^n b^i(x) \frac{\partial}{\partial x^i} + c(X),
+  \]
+  where $a^{ij}(x), b^i(x), c(x) \in \R$ and $a^{ij} = a^{ji}$ (wlog).
+
+  We define the \emph{symbol} $\sigma(\mathbf{k}, x)$ of $\mathcal{L}$ to be
+  \[
+    \sigma(\mathbf{k}, x) = \sum_{i, j = 1}^n a^{ij} (x) k_i k_j + \sum_{i = 1}^n b^i(x) k_i + c(x).
+  \]
+  So we just replace the derivatives by the variable $k$.
+
+  The \emph{principal part} of the symbol is the leading term
+  \[
+    \sigma^p(\mathbf{k}, x) = \sum_{i, j = 1}^n a^{ij} (x) k_i k_j.
+  \]
+\end{defi}
+
+\begin{eg}
+  If $\mathcal{L} = \nabla^2$, then
+  \[
+    \sigma(\mathbf{k}, x) = \sigma^p(\mathbf{k}, x) = \sum_{i = 1}^n (k_i)^2.
+  \]
+  If $\mathcal{L}$ is the heat operator (where we think of the last coordinate $x^n$ as the time, and others as space), then the operator is given by
+  \[
+    \mathcal{L} = \frac{\partial}{\partial x^n} - \sum_{i = 1}^{n - 1}\frac{\partial^2}{\partial x^{i2}}.
+  \]
+  The symbol is then
+  \[
+    \sigma(\mathbf{k}, x) = k_n - \sum_{i = 1}^{n - 1} (k_i)^2,
+  \]
+  and the principal part is
+  \[
+    \sigma^p (\mathbf{k}, x) = -\sum_{i = 1}^{n - 1}(k_i)^2.
+  \]
+\end{eg}
+Note that the symbol is closely related to the Fourier transform of the differential operator, since both turn differentiation into multiplication. Indeed, they are equal if the coefficients are constant. However, we define this symbol for arbitrary differential operators with non-constant coefficients.
+
+In general, for each $x$, we can write
+\[
+  \sigma^p (\mathbf{k}, x) = \mathbf{k}^T A\mathbf{k},
+\]
+where $A(x)$ has elements $a^{ij}(x)$. Recall that a real symmetric matrix (such as $A$) has all real eigenvalues. So we define the following:
+
+\begin{defi}[Elliptic, hyperbolic, ultra-hyperbolic and parabolic differential operators]
+  We say a differential operator $\mathcal{L}$ is \emph{elliptic} if all eigenvalues have the same sign.
+
+  We say it is \emph{hyperbolic} if all but one eigenvalues have the same sign.
+
+  We say it is \emph{ultra-hyperbolic} if there are more than one eigenvalues of each sign.
+
+  We say it is \emph{parabolic} if $A$ is degenerate, ie. has a zero eigenvalue.
+\end{defi}
+These names are supposed to remind us of conic sections, and indeed if we think of $\mathbf{k}^T A\mathbf{k}$ as an equation in $\mathbf{k}$, then we get a conic section.
+
+Note that the type of $\mathcal{L}$ depends on the values of $a^{ij}(x)$, which in turn depends on the value of $x$. Hence it is possible that $\mathcal{L}$ has different types at different regions of space.
+
+\begin{eg}
+  Let
+  \[
+    \mathcal{L} = a(x, y) \frac{\partial^2}{\partial x^2} + 2b(x, y) \frac{\partial^2}{\partial x \partial y} + c(x, y) \frac{\partial^2}{\partial y^2} + d(x, y) \frac{\partial}{\partial x} + e(x, y) \frac{\partial}{\partial y} + f(x, y).
+  \]
+  Then the principal part of the symbol is
+  \[
+    \rho^p(\mathbf{k}, x) =
+    \begin{pmatrix}
+      k_x & k_y
+    \end{pmatrix}
+    \begin{pmatrix}
+      a(x, y) & b(x, y)\\
+      b(x, y) & c(x, y)
+    \end{pmatrix}
+    \begin{pmatrix}
+      k_x \\ k_y
+    \end{pmatrix}
+  \]
+  Then $\mathcal{L}$ is elliptic if $b^2 - ac < 0$; hyperbolic if $b^2 - ac > 0$; and parabolic if $b^2 - ac = 0$.
+
+  Note that since we only have two dimensions and hence only two dimensions, we cannot possibly have an ultra-hyperbolic equation.
+\end{eg}
+
+\subsubsection*{Characteristic surfaces}
+\begin{defi}[Characteristic surface]
+  Given a differential operator $\mathcal{L}$, let
+  \[
+    f(x^1, x^2, \cdots, x^n) = 0
+  \]
+  define a surface $C \subseteq \R^n$. We say $C$ is \emph{characteristic} if
+  \[
+    \sum_{i, j = 1}^n a^{ij}(x) \frac{\partial f}{\partial x^i} \frac{\partial f}{\partial x^j} = (\nabla f)^T A (\nabla f) = 0.
+  \]
+\end{defi}
+For an elliptic operator, all the eigenvalues of $A$ have the same sign. So there are no non-trivial real solutions to this equation $(\nabla f)^T A (\nabla f)$. Consequently, elliptic operators have no real characteristics. So the method of characteristics would not be of any use when studying, say, Laplace's equation, at least if we want to stay in the realm of real numbers.
+
+If $\mathcal{L}$ is hyperbolic, we assume all but one eigenvalues are positive, we let $-\lambda$ be the unique negative eigenvalue. We let $\mathbf{n}$ be the corresponding unit eigenvector, where we normalize it such that $\mathbf{n}^T A\mathbf{n} = -\lambda$. For any $\nabla f$, we can always decompose it as
+\[
+  \nabla f = \mathbf{n} (\mathbf{n} \cdot \nabla f) + [\nabla f - \mathbf{n}\cdot (\mathbf{n}\cdot \nabla f)].
+\]
+This is a relation that is trivially true, since we just add and subtract the same thing. Note, however, that the first term points along $\mathbf{n}$, while the latter term is orthogonal to $\mathbf{n}$. To save some writing, we adopt the notation
+\[
+  \nabla_\perp f = \nabla f - \mathbf{n}(\mathbf{n} \cdot \nabla \mathbf{f}).
+\]
+So we have
+\[
+  \nabla f = \mathbf{n}(\mathbf{n}\cdot \nabla f) + \nabla f.
+\]
+We say $f$ is characteristic if
+\begin{align*}
+  0 &= (\nabla f)^T A(\nabla f) \\
+  &= [\mathbf{n}(\mathbf{n}\cdot \nabla f) + \nabla_\perp f]^T A[\mathbf{n}(\mathbf{n}\cdot \nabla f) + \nabla_\perp f]\\
+  &= -\lambda (\mathbf{n}\cdot \nabla f)^2 + (\nabla_\perp f)^T A(\nabla_\perp f).
+\end{align*}
+Consequently, for this to be a characteristic, we need
+\[
+  \mathbf{n}\cdot \nabla f = \pm \sqrt{\frac{(\nabla_\perp f)^T A(\nabla_\perp f)}{\lambda}}.
+\]
+So there are two choices for $\mathbf{n}\cdot \nabla f$, given any $\nabla_\perp f$. So hyperbolic equations have two characteristic surfaces through any point. % why?
 \end{document}

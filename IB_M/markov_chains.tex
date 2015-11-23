@@ -5,7 +5,6 @@
 \def\nyear {2015}
 \def\nlecturer {G. R. Grimmett}
 \def\ncourse {Markov Chains}
-\def\nnotready {}
 
 \input{header}
 
@@ -27,27 +26,33 @@ Definition and basic properties, the transition matrix. Calculation of $n$-step 
 \tableofcontents
 \setcounter{section}{-1}
 \section{Introduction}
-So far, in IA Probability, we have always dealt with one random variable, or numerous independent variables, and we were able to handle them. However, in real life, things often \emph{are} dependent, and things become much more difficult. There are many ways in which variables can be dependent. Their dependence can be very complicated, or very simple. We don't really know what to do with them.
+So far, in IA Probability, we have always dealt with one random variable, or numerous independent variables, and we were able to handle them. However, in real life, things often \emph{are} dependent, and things become much more difficult.
+
+In general, there are many ways in which variables can be dependent. Their dependence can be very complicated, or very simple. If we are just told two variables are dependent, we have no idea what we can do with them.
 
 This is similar to our study of functions. We can develop theories about continuous functions, increasing functions, or differentiable functions, but if we are just given a random function without assuming anything about it, there really isn't much we can do.
 
-Hence, in this course, we are just going to study a particular kind of dependent variables. In fact, in IA Probability, we did encounter some of these. For example, we dealt with random walks, in which the next position depends on the previous position. This gives us some dependent random variables, but they are dependent in a very simple way.
+Hence, in this course, we are just going to study a particular kind of dependent variables, known as \emph{Markov chains}. In fact, in IA Probability, we have already encountered some of these. One prominent example is the random walk, in which the next position depends on the previous position. This gives us some dependent random variables, but they are dependent in a very simple way.
 
-In reality, a random walk is too simple of a model to describe the world. We need something more general, and these are known as \emph{Markov chains}. These are random distributions that satisfy the \emph{Markov assumption}. This assumption, intuitively, says that the future depends only upon the current state, and not how we got to the current state.
+In reality, a random walk is too simple of a model to describe the world. We need something more general, and these are Markov chains. These, by definition, are random distributions that satisfy the \emph{Markov assumption}. This assumption, intuitively, says that the future depends only upon the current state, and not how we got to the current state. It turns out that just given this assumption, we can prove a lot about these chains.
 
-\section{The Markov property}
+\section{Markov chains}
+\subsection{The Markov property}
+We start with the definition of a Markov chain.
 \begin{defi}[Markov chain]
-  Let $\mathbf{X} = (X_0, X_1, \cdots)$ be a sequence of random variables taking values in some set $S$, the \emph{state space}. We assume that $S$ is countable (which could be finite). $\mathbf{X}$ has the \emph{Markov property} if
+  Let $X = (X_0, X_1, \cdots)$ be a sequence of random variables taking values in some set $S$, the \emph{state space}. We assume that $S$ is countable (which could be finite).
+
+  We say $X$ has the \emph{Markov property} if for all $n\geq 0, i_0,\cdots, i_{n + 1}\in S$, we have
   \[
-    \P(X_{n + 1} = i_{n + 1} | X_0 = i_0, \cdots, X_n = i_n) = \P(X_{n + 1} = i_{n + 1} | X_n = i_n)
+    \P(X_{n + 1} = i_{n + 1} \mid X_0 = i_0, \cdots, X_n = i_n) = \P(X_{n + 1} = i_{n + 1} \mid X_n = i_n).
   \]
-  for all $n\geq 0, i_0,\cdots, i_{n + 1}\in S$.
+  If $X$ has the Markov property, we call it a \emph{Markov chain}.
 
-  If $\mathbf{X}$ has the Markov property, we call it a \emph{Markov chain}.
-
-  We say that a Markov chain $\mathbf{X}$ is \emph{homogeneous} if the conditional probabilities $\P(X_{n + 1} = j | X_n = i)$ do not depend on $n$.
+  We say that a Markov chain $X$ is \emph{homogeneous} if the conditional probabilities $\P(X_{n + 1} = j \mid X_n = i)$ do not depend on $n$.
 \end{defi}
-All our chains $\mathbf{X}$ will be Markov and homogeneous unless otherwise specified.
+All our chains $X$ will be Markov and homogeneous unless otherwise specified.
+
+Since the state space $S$ is countable, we usually label the states by integers $i \in \N$.
 
 \begin{eg}\leavevmode
   \begin{enumerate}
@@ -59,102 +64,103 @@ All our chains $\mathbf{X}$ will be Markov and homogeneous unless otherwise spec
 In general, to fully specify a (homogeneous) Markov chain, we will need two items:
 \begin{enumerate}
   \item The initial distribution $\lambda_i = \P(X_0 = i)$. We can write this as a vector $\lambda = (\lambda_i: i \in S)$.
-  \item The transition probabilities $p_{ij} = \P(X_{n + 1} = j | X_n = i)$. We can write this as a matrix $P = (p_{ij})_{i, j\in S}$.
+  \item The transition probabilities $p_{i, j} = \P(X_{n + 1} = j \mid X_n = i)$. We can write this as a matrix $P = (p_{i, j})_{i, j\in S}$.
 \end{enumerate}
 
-There are some preliminary properties we know about these items. They are what decide whether a pair $(\lambda, P)$ actually specify a Markov chain.
+We will start by proving a few properties of $\lambda$ and $P$. These let us know whether an arbitrary pair of vector and matrix $(\lambda, P)$ actually specifies a Markov chain.
 \begin{prop}\leavevmode
   \begin{enumerate}
     \item $\lambda$ is a \emph{distribution}, ie. $\lambda_i \geq 0, \sum_i \lambda_i = 1$.
-    \item $P$ is a \emph{stochastic matrix}, ie. $p_{ij} \geq 0$ and $\sum_j p_{ij} = 1$ for all $i$.
+    \item $P$ is a \emph{stochastic matrix}, ie. $p_{i, j} \geq 0$ and $\sum_j p_{i, j} = 1$ for all $i$.
   \end{enumerate}
 \end{prop}
 
 \begin{proof}\leavevmode
   \begin{enumerate}
     \item Obvious since $\lambda$ is a probability distribution.
-    \item $p_{ij} \geq 0$ since $p_{ij}$ is a probability. We also have
+    \item $p_{i, j} \geq 0$ since $p_{ij}$ is a probability. We also have
       \[
-        \sum_j p_{ij} = \sum_j \P(X_{1} = j | X_0 = i) = 1
+        \sum_j p_{i,j} = \sum_j \P(X_{1} = j \mid X_0 = i) = 1
       \]
-      since $\P(X_1 = \ph | X_0 = i)$ is a probability distribution function.
+      since $\P(X_1 = \ph \mid X_0 = i)$ is a probability distribution function.
   \end{enumerate}
 \end{proof}
 Note that we only require the row sum to be $1$, and the column sum need not be.
 
 We will prove another seemingly obvious fact.
 \begin{thm}
-  Let $\lambda$ be a distribution (on $S$) and $P$ a stochastic matrix. The sequence $\mathbf{X} = (X_0, X_1, \cdots)$ is a Markov chain with initial distribution $\lambda$ and transition matrix $P$ iff
+  Let $\lambda$ be a distribution (on $S$) and $P$ a stochastic matrix. The sequence $X = (X_0, X_1, \cdots)$ is a Markov chain with initial distribution $\lambda$ and transition matrix $P$ iff
   \[
-    \P(X_0 = i, X_1 = i_1, \cdots, X_n = i_n) = \lambda_{i_0}p_{i_0 i_1}p_{i_1i_2}\cdots p_{i_{n - 1}i_n}\tag{$*$}
+    \P(X_0 = i, X_1 = i_1, \cdots, X_n = i_n) = \lambda_{i_0}p_{i_0, i_1}p_{i_1, i_2}\cdots p_{i_{n - 1}, i_n}\tag{$*$}
   \]
   for all $n, i_0, \cdots, i_n$
 \end{thm}
 \begin{proof}
   Let $A_k$ be the event $X_k = i_k$. Then we can write $(*)$ as
   \[
-    \P(A_0\cap A_1\cap\cdots \cap A_n) = \lambda_{i_0}p_{i_0 i_1}p_{i_1i_2}\cdots p_{i_{n - 1}i_n}. \tag{$*$}
+    \P(A_0\cap A_1\cap\cdots \cap A_n) = \lambda_{i_0}p_{i_0, i_1}p_{i_1, i_2}\cdots p_{i_{n - 1}, i_n}. \tag{$*$}
   \]
-  We first assume that $\mathbf{X}$ is a Markov chain. We prove $(*)$ by induction on $n$.
+  We first assume that $X$ is a Markov chain. We prove $(*)$ by induction on $n$.
 
   When $n = 0$, $(*)$ says $\P(A_0) = \lambda_{i_0}$. This is true by definition of $\lambda$.
 
   Assume that it is true for all $n < N$. Then
   \begin{align*}
-    \P(A_0 \cap A_1 \cap \cdots \cap A_N) &= \P(A_0,\cdots, A_{N - 1})\P(A_0, \cdots, A_n | A_0, \cdots, A_{N - 1})\\
-    &= \lambda_{i_0} p_{i_0 i_1}\cdots p_{i_{N - 2}i_{N - 1}} \P(A_{N} | A_0,\cdots, A_{N - 1})\\
-    &= \lambda_{i_0} p_{i_0 i_1}\cdots p_{i_{N - 2}i_{N - 1}} \P(A_{N} | A_{N - 1})\\
-    &= \lambda_{i_0}p_{i_0 i_1}p_{i_1i_2}\cdots p_{i_{N - 1}i_N}.
+    \P(A_0 \cap A_1 \cap \cdots \cap A_N) &= \P(A_0,\cdots, A_{N - 1})\P(A_0, \cdots, A_n \mid A_0, \cdots, A_{N - 1})\\
+    &= \lambda_{i_0} p_{i_0, i_1}\cdots p_{i_{N - 2}, i_{N - 1}} \P(A_{N} \mid A_0,\cdots, A_{N - 1})\\
+    &= \lambda_{i_0} p_{i_0, i_1}\cdots p_{i_{N - 2}, i_{N - 1}} \P(A_{N} \mid A_{N - 1})\\
+    &= \lambda_{i_0} p_{i_0, i_1}\cdots p_{i_{N - 2}, i_{N - 1}} p_{i_{N - 1}, i_N}.
   \end{align*}
   So it is true for $N$ as well. Hence we are done by induction.
 
-  Conversely, suppose that ($*$) holds. Then for $n = 0$, we have $\P(X_0 = i_0) = \lambda_{i_0}$. Otherwise
+  Conversely, suppose that ($*$) holds. Then for $n = 0$, we have $\P(X_0 = i_0) = \lambda_{i_0}$. Otherwise,
   \begin{align*}
-    \P(X_n = i_n| X_0 = i_0, \cdots, X_{n - 1} = i_{n - 1}) &= \P(A_n | A_0 \cap \cdots\cap A_{n - 1})\\
+    \P(X_n = i_n\mid X_0 = i_0, \cdots, X_{n - 1} = i_{n - 1}) &= \P(A_n \mid A_0 \cap \cdots\cap A_{n - 1})\\
     &= \frac{\P(A_0\cap \cdots \cap A_n)}{\P(A_0\cap \cdots \cap A_{n - 1}}\\
-    &= p_{i_{n - 1}i_n}
+    &= p_{i_{n - 1}, i_n},
   \end{align*}
   which is independent of $i_0, \cdots, i_{n - 2}$. So this is Markov.
 \end{proof}
 
 Often, we do not use the Markov property directly. Instead, we use the following:
 \begin{thm}[Extended Markov property]
-  Let $\mathbf{X}$ be a Markov chain. For $n \geq 0$, any $H$ given in terms of the past $\{X_i: i < n\}$, and any $F$ given in terms of the future $\{X_i: i > n\}$, we have
+  Let $X$ be a Markov chain. For $n \geq 0$, any $H$ given in terms of the past $\{X_i: i < n\}$, and any $F$ given in terms of the future $\{X_i: i > n\}$, we have
   \[
-    \P(F| X_n = i, H) = \P(F| X_n = i).
+    \P(F\mid X_n = i, H) = \P(F\mid X_n = i).
   \]
 \end{thm}
 To prove this, we need to stitch together many instances of the Markov property. Actual proof is omitted.
 
-\section{Transition probability}
 \subsection{Transition probability}
-Recall that we specify the Markov chain by the \emph{one-step} transition probability,
+Recall that we can specify the dynamics of a Markov chain by the \emph{one-step} transition probability,
 \[
-  p_{ij} = \P(X_{n + 1} = k| X_n = i).
+  p_{i, j} = \P(X_{n + 1} = k\mid X_n = i).
 \]
-However, we don't always want to take 1 step. We might want to take 2 steps, 3 steps, or, in general, $n$ steps. We define
+However, we don't always want to take 1 step. We might want to take 2 steps, 3 steps, or, in general, $n$ steps. Hence, we define
 \begin{defi}[$n$-step transition probability]
   The $n$-step transition probability from $i$ to $j$ is
   \[
-    p_{ij}(n) = \P(X_n = j| X_0 = i).
+    p_{i, j}(n) = \P(X_n = j\mid X_0 = i).
   \]
 \end{defi}
-How do we compute these probabilities? We can consider the following question: what is $p_{ij}(m + n)$? We can think of this as a two-step process. We first go form $i$ to some unknown point $k$ after $m$ steps, and then travel from $k$ to $j$ after $n$ more steps. To find the probability to get from $i$ to $j$, we consider all possible routes from $i$ to $j$, and sum up all the probability of the paths. We have
+How do we compute these probabilities? The idea is to break this down into smaller parts. We want to express $p_{i, j}(m + n)$ in terms of $n$-step and $m$-step transition probabilities. Then we can iteratively break down an arbitrary $p_{i, j}(n)$ into expressions involving the one-step transition probabilities only.
+
+To compute $p_{i, j}(m + n)$, we can think of this as a two-step process. We first go from $i$ to some unknown point $k$ in $m$ steps, and then travel from $k$ to $j$ in $n$ more steps. To find the probability to get from $i$ to $j$, we consider all possible routes from $i$ to $j$, and sum up all the probability of the paths. We have
 \begin{align*}
-  p_{ij}(m + n) &= \P(X_{m + n}| X_0 = i)\\
-  &= \sum_k \P(X_{m + n} = j| X_m = k, X_0 = i)\P(X_m = k| X_0 = i)\\
-  &= \sum_k \P(X_{m + n} = j| X_m = k)\P(X_m = k: X_0 = i)\\
-  &= \sum_k p_{ik}(m)p_{kj}(n)
+  p_{ij}(m + n) &= \P(X_{m + n}\mid X_0 = i)\\
+  &= \sum_k \P(X_{m + n} = j\mid X_m = k, X_0 = i)\P(X_m = k\mid X_0 = i)\\
+  &= \sum_k \P(X_{m + n} = j\mid X_m = k)\P(X_m = k \mid X_0 = i)\\
+  &= \sum_k p_{i, k}(m)p_{k, j}(n)
 \end{align*}
 \begin{thm}[Chapman-Kolmogorov equation]
   \[
-    p_{ij}(m + n) = \sum_{k\in S} p_{ik}(m) p_{kj}(n).
+    p_{i, j}(m + n) = \sum_{k\in S} p_{i, k}(m) p_{k, j}(n).
   \]
 \end{thm}
 This formula is suspiciously familiar. It is just matrix multiplication!
 
 \begin{notation}
-  Write $P(m) = (p_{ij}(m))_{i, j\in S}$.
+  Write $P(m) = (p_{i, j}(m))_{i, j\in S}$.
 \end{notation}
 Then we have
 \[
@@ -203,13 +209,13 @@ This allows us to easily compute the $n$-step transition probability by matrix m
       0 & \kappa_2^n
     \end{pmatrix}U.
   \]
-  We can now attempt to compute $p_{12}$. We know that it must be of the form
+  We can now attempt to compute $p_{1, 2}$. We know that it must be of the form
   \[
-    p_{12} = A\kappa_1^n + B\kappa_2^n = A + B(1 - \alpha - \beta)^n
+    p_{1, 2} = A\kappa_1^n + B\kappa_2^n = A + B(1 - \alpha - \beta)^n
   \]
   where $A$ and $B$ are constants coming from $U$ and $U^{-1}$. However, we know well that
   \[
-    p_{12}(0) = 0,\quad p_{12}(1) = \alpha.
+    p_{1, 2}(0) = 0,\quad p_{12}(1) = \alpha.
   \]
   So we obtain
   \begin{align*}
@@ -218,9 +224,9 @@ This allows us to easily compute the $n$-step transition probability by matrix m
   \end{align*}
   This is something we can solve, and obtain
   \[
-    p_{12}(n) = \frac{\alpha}{\alpha + \beta}(1 - (1 - \alpha - \beta)^n) = 1 - p_{11}(n).
+    p_{1, 2}(n) = \frac{\alpha}{\alpha + \beta}(1 - (1 - \alpha - \beta)^n) = 1 - p_{1, 1}(n).
   \]
-  How about $p_{21}$ and $p_{22}$? Well we don't need additional work. We can obtain these simply by interchanging $\alpha$ and $\beta$. So we obtain
+  How about $p_{2, 1}$ and $p_{2, 2}$? Well we don't need additional work. We can obtain these simply by interchanging $\alpha$ and $\beta$. So we obtain
   \[
     P^n = \frac{1}{\alpha + \beta}
     \begin{pmatrix}
@@ -236,30 +242,37 @@ This allows us to easily compute the $n$-step transition probability by matrix m
       \beta & \alpha
     \end{pmatrix}
   \]
-  We see that the two rows are the same. This means that as time goes on, where we end up does not depend on where we started.
+  We see that the two rows are the same. This means that as time goes on, where we end up does not depend on where we started. We will later (near the end of the course) see that this is generally true for most Markov chains.
 
-  Alternatively, we can solve this by a difference equation. We have
+  Alternatively, we can solve this by a difference equation. The recurrence relation is given by
   \[
-    p_{11}(n + 1) = p_{11}(n)(1 - \alpha) + p_{12}(n)\beta = p_{11}(n)(1 - \alpha) + (1 - p_{11}(n))\beta.
+    p_{1, 1}(n + 1) = p_{1, 1}(n)(1 - \alpha) + p_{1, 2}(n)\beta.
   \]
-  We can solve this as we have done in IA differential equations.
+  Writing in terms of $p_{11}$ only, we have
+  \[
+    p_{1, 1}(n + 1) = p_{1, 1}(n)(1 - \alpha) + (1 - p_{1, 1}(n))\beta.
+  \]
+  We can solve this as we have done in IA Differential Equations.
 \end{eg}
-As in the Chapman-Kolmogorov equation, many statements about Markov chains can be concisely stated in the language of linear algebra.
+We saw that the Chapman-Kolmogorov equation can be concisely stated as a rule about matrix multiplication. In general, many statements about Markov chains can be formulated in the language of linear algebra naturally.
 
-In general, let $X_0$ have distribution $\lambda$. What is the distribution of $X_1$? We have
+For example, let $X_0$ have distribution $\lambda$. What is the distribution of $X_1$? By definition, it is
 \[
-  \P(X_i = j) = \sum_i \P(X_1 = j| X_0 = i)\P(X_0 = i) = \sum_i \lambda_i p_{ij}.
+  \P(X_i = j) = \sum_i \P(X_1 = j\mid X_0 = i)\P(X_0 = i) = \sum_i \lambda_i p_{i, j}.
 \]
-Hence this has a distribution $\lambda P$, where $\lambda$ is treated as a row vector. Similarly, $X^n$ has the distribution $\lambda P^n$.
+Hence this has a distribution $\lambda P$, where $\lambda$ is treated as a row vector. Similarly, $X_n$ has the distribution $\lambda P^n$.
 
-In fact, historically, Markov chains was initially developed as a branch of linear algebra. However, nowadays, we often look at it as a branch of probability theory instead, and this is what we will do in this course. So don't be scared if you hate linear algebra.
+In fact, historically, Markov chains was initially developed as a branch of linear algebra, and a lot of the proofs were just linear algebra manipulations. However, nowadays, we often look at it as a branch of probability theory instead, and this is what we will do in this course. So don't be scared if you hate linear algebra.
 
-\subsection{Class structure}
+\section{Classification of chains and states}
 \subsection{Communicating classes}
-\begin{defi}[Leading to and communicate]
-  Suppose we have two states $i, j\in S$. We write $i \to j$ ($i$ \emph{leads to} $j$) if there is some $n \geq 0$ such that $p_{ij}(n) > 0$, ie. it is possible for us to get from $i$ to $j$ (in multiple steps). Note that we allow $n = 0$.
+Suppose we have a Markov chain $X$ over some state space $S$. While we would usually expect the different states in $S$ to be mutually interacting, it is possible that we have a state $i \in S$ that can never be reached, or we might get stuck in some state $j \in S$ and can never leave. These are usually less interesting. Hence we would like to rule out these scenarios, and focus on what we call \emph{irreducible chains}, where we can freely move between different states.
 
-  We write $i \leftrightarrow j$ if $i \to j$ and $j \to i$. If $i \leftrightarrow j$, we say $i$ and $j$ ``communicate''
+We start with an some elementary definitions.
+\begin{defi}[Leading to and communicate]
+  Suppose we have two states $i, j\in S$. We write $i \to j$ ($i$ \emph{leads to} $j$) if there is some $n \geq 0$ such that $p_{i, j}(n) > 0$, ie. it is possible for us to get from $i$ to $j$ (in multiple steps). Note that we allow $n = 0$. So we always have $i \to i$.
+
+  We write $i \leftrightarrow j$ if $i \to j$ and $j \to i$. If $i \leftrightarrow j$, we say $i$ and $j$ \emph{communicate}.
 \end{defi}
 
 \begin{prop}
@@ -268,9 +281,9 @@ In fact, historically, Markov chains was initially developed as a branch of line
 
 \begin{proof}\leavevmode
   \begin{enumerate}
-    \item Reflexive: we have $i \leftrightarrow i$ since $p_{ii}(0) = 1$.
+    \item Reflexive: we have $i \leftrightarrow i$ since $p_{i, i}(0) = 1$.
     \item Symmetric: trivial by definition.
-    \item Transitive: suppose $i \to j$ and $j \to k$. Since $i \to j$, there is some $m > 0$ such that $p_{ij}(m) > 0$. Since $j \to k$, there is some $n$ such that $p_{jk}(n) > 0$. Then $p_{ik}(m + n) = \sum_{r} p_{ir}(m)p_{r k}(n) \geq p_{ij}(m)p_{jk}(n) > 0$. So $i \to k$.
+    \item Transitive: suppose $i \to j$ and $j \to k$. Since $i \to j$, there is some $m > 0$ such that $p_{i, j}(m) > 0$. Since $j \to k$, there is some $n$ such that $p_{j, k}(n) > 0$. Then $p_{i, k}(m + n) = \sum_{r} p_{i, r}(m)p_{r k}(n) \geq p_{i, j}(m)p_{j, k}(n) > 0$. So $i \to k$.
 
       Similarly, if $j \to i$ and $k \to j$, then $k \to i$. So $i \leftrightarrow j$ and $j \leftrightarrow k$ implies that $i \leftrightarrow k$.
   \end{enumerate}
@@ -279,16 +292,18 @@ So we have an equivalence relation, and we know what to do with equivalence rela
 \begin{defi}[Communicating classes]
   The equivalence classes of $\leftrightarrow$ are \emph{communicating classes}.
 \end{defi}
-We have to be careful with these communicating classes. They are not completely isolated. Within a communicating class $A$, of course we can move between any two vertices. However, it is possible that we can escape from a class $A$ to a class $B$. It is just that after going to $B$, we cannot go back to class $A$. From $B$, we might be able to get to another space $C$. We can jump around all the time, but (if there are finitely many communicating classes) eventually we have to stop when we have visited every class. Then we are bound to stay in that class.
+We have to be careful with these communicating classes. Different communicating classes are not completely isolated. Within a communicating class $A$, of course we can move between any two vertices. However, it is also possible that we can escape from a class $A$ to a different class $B$. It is just that after going to $B$, we cannot return to class $A$. From $B$, we might be able to get to another space $C$. We can jump around all the time, but (if there are finitely many communicating classes) eventually we have to stop when we have visited every class. Then we are bound to stay in that class.
 
 Since we are eventually going to be stuck in that class anyway, often, we can just consider this final communicating class and ignore the others. So wlog we can assume that the chain only has one communicating class.
 
 \begin{defi}[Irreducible chain]
   A Markov chain is \emph{irreducible} if there is a unique communication class.
 \end{defi}
+From now on, we will mostly care about irreducible chains only.
 
+More generally, we call a subset \emph{closed} if we cannot escape from it.
 \begin{defi}[Closed]
-  A subset $C\subseteq S$ is \emph{closed} if $p_{ij} = 0$ for all $i \in C, j\not\in C$.
+  A subset $C\subseteq S$ is \emph{closed} if $p_{i, j} = 0$ for all $i \in C, j\not\in C$.
 \end{defi}
 
 \begin{prop}
@@ -296,17 +311,17 @@ Since we are eventually going to be stuck in that class anyway, often, we can ju
 \end{prop}
 
 \begin{proof}
-  Assume $C$ is closed. Let $i \in C, i \to j$. Since $i \to j$, there is some $m$ such that $p_{ij}(m) > 0$. Expanding the Chapman-Kolmogorov equation, we have
+  Assume $C$ is closed. Let $i \in C, i \to j$. Since $i \to j$, there is some $m$ such that $p_{i, j}(m) > 0$. Expanding the Chapman-Kolmogorov equation, we have
   \[
-    p_{ij}(m) = \sum_{i_1, \cdots, i_{m - 1}} p_{i, i_1}p_{i_1, i_2}, \cdots, p_{i_{m - 1},j} > 0.
+    p_{i, j}(m) = \sum_{i_1, \cdots, i_{m - 1}} p_{i, i_1}p_{i_1, i_2}, \cdots, p_{i_{m - 1},j} > 0.
   \]
   So there is some route $i, i_1, \cdots, i_{m - 1}, j$ such that $p_{i, i_1}, p_{i_1, i_2}, \cdots, p_{i_{m - 1}, j} > 0$. Since $p_{i, i_1} > 0$, we have $i_1\in C$. Since $p_{i_1,i_2} > 0$, we have $i_2\in C$. By induction, we get that $j \in C$.
 
-  To prove the other direction, assume that ``$i\in C, i \to j$ implies $j\in C$''. So for any $i\in C, j\not\in C$, then $i\not\to j$. So in particular $p_{ij} = 0$.
+  To prove the other direction, assume that ``$i\in C, i \to j$ implies $j\in C$''. So for any $i\in C, j\not\in C$, then $i\not\to j$. So in particular $p_{i, j} = 0$.
 \end{proof}
 
 \begin{eg}
-  Consider $S = \{1, \cdots, 6\}$ with transition matrix
+  Consider $S = \{1, 2, 3, 4, 5, 6\}$ with transition matrix
   \[
     P =
     \begin{pmatrix}
@@ -341,55 +356,64 @@ Since we are eventually going to be stuck in that class anyway, often, we can ju
   We see that the communicating classes are $\{1, 2, 3\}$, $\{4\}$, $\{5, 6\}$, where $\{5, 6\}$ is closed.
 \end{eg}
 
-\section{Recurrence or transience}
 \subsection{Recurrence or transience}
-We adopt the following notation:
-\[
-  \P_i(A) = \P(A| X_0 = i),
-\]
-and
-\[
-  \E_i(Z) = \E(Z| X_0 = i).
-\]
-Suppose we start from $i$, and randomly wander around. Eventually, we may or may not get to $j$. If we do, there is a time at which we first reach $j$. We call this the \emph{first passage time}, written
-\[
-  T_j = \min\{n \geq 1: X_n = j\}.
-\]
-Note that we require $n \geq 1$. Otherwise $T_i$ would always be $0$.
+The major focus of this chapter is recurrence and transience. This was something that came up when we discussed random walks in IA Probability --- given a random walk, say starting at $0$, what is the probability that we will return to $0$ later on? Recurrence and transience is a qualitative way of answering this question. As we mentioned, we will mostly focus on irreducible chains. So by definition there is always a non-zero probability of returning to $0$. Hence the question we want to ask is whether we are going to return to $0$ with certainty, ie. with probability $1$. If we are bound to return, then we say the state is recurrent. Otherwise, we say it is transient.
 
-The \emph{first passage probability} is
-\[
-  f_{ij}(n) = \P_i(T_j = n).
-\]
+It should be clear that this notion is usually interesting only for an infinite state space. If we have an infinite state space, we might get transience because we are very likely to drift away to a place far, far away and never return. However, in a finite state space, this can't happen. Transience can occur only if we get stuck in a place and can't leave, ie. we are not in an irreducible state space. These are not interesting.
+
+\begin{notation}
+  For convenience, we will introduce some notations. We write
+  \[
+    \P_i(A) = \P(A\mid X_0 = i),
+  \]
+  and
+  \[
+    \E_i(Z) = \E(Z\mid X_0 = i).
+  \]
+\end{notation}
+
+Suppose we start from $i$, and randomly wander around. Eventually, we may or may not get to $j$. If we do, there is a time at which we first reach $j$. We call this the \emph{first passage time}.
+
+\begin{defi}[First passage time and probability]
+  The \emph{first passage time} of $j \in S$ starting from $i$ is
+  \[
+    T_j = \min\{n \geq 1: X_n = j\}.
+  \]
+  Note that we require $n \geq 1$. Otherwise $T_i$ would always be $0$.
+
+  The \emph{first passage probability} is
+  \[
+    f_{ij}(n) = \P_i(T_j = n).
+  \]
+\end{defi}
+
 \begin{defi}[Recurrent state]
   A state $i\in S$ is \emph{recurrent} (or \emph{persistent}) if
   \[
     \P_i (T_i < \infty) = 1,
   \]
-  ie. we will eventually get back to the space. Otherwise, we call the state \emph{transient}.
+  ie. we will eventually get back to the state. Otherwise, we call the state \emph{transient}.
 \end{defi}
-Note that transient does \emph{not} mean we don't get back. It's just that we are not sure that we will get back. We can (but will not) show that if a state is recurrent, then the probability that we return to $i$ infinitely many times is also $1$.
+Note that transient does \emph{not} mean we don't get back. It's just that we are not sure that we will get back. We can show that if a state is recurrent, then the probability that we return to $i$ infinitely many times is also $1$.
 
-Note that when we discuss about recurrent and transient states, we are often concerned with an infinite state space. In the infinite state space, a state is transient because we are likely to wander to a place far far away and not get back. However, in a finite state space, transience happens only if we are stuck somewhere, ie. we are not in an irreducible state space. This is not too interesting.
-
-Our current objective is to show the following:
+Our current objective is to show the following characterization of recurrence.
 \begin{thm}
-  $i$ is recurrent iff $\sum_n p_{ii}(n) = \infty$.
+  $i$ is recurrent iff $\sum_n p_{i, i}(n) = \infty$.
 \end{thm}
 The technique to prove this would be to use generating functions. We need to first decide what sequence to work with. For any fixed $i, j$, consider the sequence $p_{ij}(n)$ as a sequence in $n$. Then we define
 \[
-  P_{ij}(s) = \sum_{n = 0}^\infty p_{ij}(n) s^n.
+  P_{i, j}(s) = \sum_{n = 0}^\infty p_{i, j}(n) s^n.
 \]
 We also define
 \[
-  F_{ij}(S) = \sum_{n = 0}^\infty f_{ij}(n) s^n,
+  F_{i, j}(S) = \sum_{n = 0}^\infty f_{i, j}(n) s^n,
 \]
-where $f_{ij}$ is our first-pass probability. For the sake of clarity, we make it explicit that $p_{ij}(0) = \delta_{ij}$, and $f_{ij}(0) = 0$.
+where $f_{i, j}$ is our first passage probability. For the sake of clarity, we make it explicit that $p_{i, j}(0) = \delta_{i, j}$, and $f_{i, j}(0) = 0$.
 
 Our proof would be heavily based on the result below:
-\begin{thm}[]
+\begin{thm}
   \[
-    P_{ij}(s) = \delta_{ij} + F_{ij}(s)P_{jj}(s),
+    P_{i, j}(s) = \delta_{i, j} + F_{i, j}(s)P_{j, j}(s),
   \]
   for $-1 < s \leq 1$.
 \end{thm}
@@ -397,18 +421,18 @@ Our proof would be heavily based on the result below:
 \begin{proof}
   Using the law of total probability
   \begin{align*}
-    p_{ij}(n) &= \sum_{m = 1}^n \P_i(X_n = j| T_j = m) \P_i(T_j = m) \\
+    p_{i, j}(n) &= \sum_{m = 1}^n \P_i(X_n = j\mid T_j = m) \P_i(T_j = m) \\
     \intertext{Using the Markov property, we can write this as}
-    &= \sum_{m = 1}^n \P(X_n = j| X_m = j) \P_i(T_j = m)\\
-    &= \sum_{m = 1}^n p_{jj}(n - m) f_{ij}(m).
+    &= \sum_{m = 1}^n \P(X_n = j\mid X_m = j) \P_i(T_j = m)\\
+    &= \sum_{m = 1}^n p_{j, j}(n - m) f_{i, j}(m).
   \end{align*}
   We can multiply through by $s^n$ and sum over all $n$ to obtain
   \[
-    \sum_{n = 1}^\infty p_{ij}(n) S^n = \sum_{n = 1}^\infty \sum_{m = 1}^n p_{jj}(n - m)s^{n - m} f_{ij}(m)s^m.
+    \sum_{n = 1}^\infty p_{i, j}(n) s^n = \sum_{n = 1}^\infty \sum_{m = 1}^n p_{j, j}(n - m)s^{n - m} f_{i, j}(m)s^m.
   \]
-  The left hand side is \emph{almost} the generating function $P_{ij}(s)$, except that we are missing an $n = 0$ term, which is $p_{ij}(0) = \delta_{ij}$. The right hand side is the ``convolution'' of the power series $P_{jj}(s)$ and $F_{ij}(s)$, which we can write as the product $P_{jj}(s) F_{ij}(s)$. So
+  The left hand side is \emph{almost} the generating function $P_{i, j}(s)$, except that we are missing an $n = 0$ term, which is $p_{i, j}(0) = \delta_{i, j}$. The right hand side is the ``convolution'' of the power series $P_{j, j}(s)$ and $F_{i, j}(s)$, which we can write as the product $P_{j, j}(s) F_{i, j}(s)$. So
   \[
-    P_{ij}(s) - \delta_{ij} = P_{ij}(s) F_{ij}(s).
+    P_{i, j}(s) - \delta_{i, j} = P_{i, j}(s) F_{i, j}(s).
   \]
 \end{proof}
 
@@ -419,7 +443,7 @@ Before we actually prove our theorem, we need one helpful result from Analysis t
     \lim_{s\to 1^-} U(s) = \sum_n u_n.
   \]
 \end{lemma}
-Proof is an exercise for Analysis.
+Proof is an exercise for Analysis, which happens to be on the first example sheet of Analysis II.
 
 We now prove the theorem we initially wanted to show
 \begin{thm}
@@ -429,37 +453,37 @@ We now prove the theorem we initially wanted to show
 \begin{proof}
   Using $j = i$ in the above formula, for $0 < s < 1$, we have
   \[
-    P_{ii}(s) = \frac{1}{1 - F_{ii} (s)}.
+    P_{i, i}(s) = \frac{1}{1 - F_{i, i} (s)}.
   \]
-  Here we need to be careful that we are not dividing by $0$. Thiw would be a problem if $F_{ii}(s) = 1$. By definition, we have
+  Here we need to be careful that we are not dividing by $0$. This would be a problem if $F_{ii}(s) = 1$. By definition, we have
   \[
-    F_{ii}(s) = \sum_{n = 1}^\infty f_{ii}(n) s^n.
+    F_{i, i}(s) = \sum_{n = 1}^\infty f_{i, i}(n) s^n.
   \]
   Also, by definition of $f_{ii}$, we have
   \[
-    F_{ii}(1) = \sum_n f_{ij}(n) = \P(\text{ever returning to }1) \leq 1.
+    F_{i, i}(1) = \sum_n f_{i, i}(n) = \P(\text{ever returning to }i) \leq 1.
   \]
-  So for $|s| < 1$, $F_{ii}(s) < 1$. So we are not dividing by zero. Now we use our original equation
+  So for $|s| < 1$, $F_{i, i}(s) < 1$. So we are not dividing by zero. Now we use our original equation
   \[
-    P_{ii}(s) = \frac{1}{1 - F_{ii} (s)},
+    P_{i, i}(s) = \frac{1}{1 - F_{i, i} (s)},
   \]
   and take the limit as $s \to 1$. By Abel's lemma, we know that the left hand side is
   \[
-    \lim_{s \to 1}P_{ii}(s) = P_{ii}(1) = \sum_n p_{ii}(n).
+    \lim_{s \to 1}P_{i, i}(s) = P_{i, i}(1) = \sum_n p_{i, i}(n).
   \]
   The other side is
   \[
-    \lim_{s \to 1}\frac{1}{1 - F_{ii}(s)} = \frac{1}{1 - \sum f_{ii}(n)}.
+    \lim_{s \to 1}\frac{1}{1 - F_{i, i}(s)} = \frac{1}{1 - \sum f_{i, i}(n)}.
   \]
   Hence we have
   \[
-    \sum_n p_{ii}(n) = \frac{1}{1 - \sum f_{ii}(n)}.
+    \sum_n p_{i, i}(n) = \frac{1}{1 - \sum f_{i, i}(n)}.
   \]
-  Since $\sum f_{ii}(n)$ is the probability of ever returning, the probability of ever returning is 1 if and only if $\sum_n p_{ii}(n) = \infty$.
+  Since $\sum f_{i, i}(n)$ is the probability of ever returning, the probability of ever returning is 1 if and only if $\sum_n p_{i, i}(n) = \infty$.
 \end{proof}
 
-Using this result, we can check if a state is recurrent. However, a Markov chain has many states, and it would be tedious to check if every state is recurring. Thus we have the following helpful result.
-\begin{thm}[]
+Using this result, we can check if a state is recurrent. However, a Markov chain has many states, and it would be tedious to check every state individually. Thus we have the following helpful result.
+\begin{thm}
   Let $C$ be a communicating class. Then
   \begin{enumerate}
     \item Either every state in $C$ is recurrent, or every state is transient.
@@ -469,23 +493,23 @@ Using this result, we can check if a state is recurrent. However, a Markov chain
 
 \begin{proof}\leavevmode
   \begin{enumerate}
-    \item Let $i \leftrightarrow j$ and $i \not =j$. Then by definition of communicating, there is some $m$ such that $p_{ij}(m) = \alpha > 0$, and some $n$ such that $p_{ji}(n) = \beta > 0$. So for each $k$, we have
+    \item Let $i \leftrightarrow j$ and $i \not =j$. Then by definition of communicating, there is some $m$ such that $p_{i, j}(m) = \alpha > 0$, and some $n$ such that $p_{j, i}(n) = \beta > 0$. So for each $k$, we have
       \[
-        p_{ii}(m + k + n) \geq p_{ij}(m) p_{jj}(k) p_{ji}(n) = \alpha\beta p_{jj}(k).
+        p_{i, i}(m + k + n) \geq p_{i, j}(m) p_{j, j}(k) p_{j, i}(n) = \alpha\beta p_{j, j}(k).
       \]
-      So if $\sum_k p_{jj}(k) = \infty$, then $\sum_r p_{ii}(r) = \infty$. So $j$ recurrent implies $i$ recurrent. Similarly, $i$ recurrent implies $j$ recurrent.
+      So if $\sum_k p_{j, j}(k) = \infty$, then $\sum_r p_{i, i}(r) = \infty$. So $j$ recurrent implies $i$ recurrent. Similarly, $i$ recurrent implies $j$ recurrent.
     \item If $C$ is not closed, then there is a non-zero probability that we leave the class and never get back. So the states are not recurrent.
   \end{enumerate}
 \end{proof}
 
 Note that there is a profound difference between a finite state space and an infinite state space. A finite state space can be represented by a finite matrix, and we are all very familiar with a finite matrices. We can use everything we know about finite matrices from IA Vectors and Matrices. However, infinite matrices are weirder.
 
-For example, any finite transition matrix $P$ has an eigenvalue of $1$. This is since the row sums of a transition matrix is always $1$. So if we multiply $P$ by $\mathbf{e} = (1, 1, \cdots, 1)$, then we get $\mathbf{e}$ again. However, this is not true for infinite matrices, since we usually don't usually allow arbitrary infinite vectors. We usually restrict our focus to vectors $\mathbf{x}$ such that $\sum x_i^2$ is finite. In this case the vector $\mathbf{e}$ is not allowed, and the transition matrix need not have eigenvalue $1$.
+For example, any finite transition matrix $P$ has an eigenvalue of $1$. This is since the row sums of a transition matrix is always $1$. So if we multiply $P$ by $\mathbf{e} = (1, 1, \cdots, 1)$, then we get $\mathbf{e}$ again. However, this is not true for infinite matrices, since we usually don't usually allow arbitrary infinite vectors. To avoid getting infinitely large numbers when multiplying vectors and matrices, we usually restrict our focus to vectors $\mathbf{x}$ such that $\sum x_i^2$ is finite. In this case the vector $\mathbf{e}$ is not allowed, and the transition matrix need not have eigenvalue $1$.
 
-Another thing about a finite state space is that probability ``cannot escape''. We can think of a Markov chain as a flow of probabilities around the state space, with the probability distribution moving around in every step. If we have a finite state space, all the probability must be contained within your finite state space. However, if we have an infinite state space, then probabilities can just drift away to infinity.
+Another thing about a finite state space is that probability ``cannot escape''. Each step of a Markov chain gives a probability distribution on the state space, and we can imagine the progression of the chain as a flow of probabilities around the state space. If we have a finite state space, then all the probability flow must be contained within our finite state space. However, if we have an infinite state space, then probabilities can just drift away to infinity.
 
-In particular, we have the following result:
-\begin{thm}[]
+More concretely, we get the following result about finite state spaces.
+\begin{thm}
   In a finite state space,
   \begin{enumerate}
     \item There exists at least one recurrent state.
@@ -494,25 +518,27 @@ In particular, we have the following result:
 \end{thm}
 
 \begin{proof}
+  (ii) follows immediately from (i) since if a chain is irreducible, either all states are transient or all states are recurrent. So we just have to prove (i).
+
   Recall that
   \[
-    P_{ij}(s) = \delta_{ij} + P_{jj}(s) F_{ij}(s).
+    P_{i, j}(s) = \delta_{i, j} + P_{j, j}(s) F_{i, j}(s).
   \]
-  If $j$ is transient, then $\sum_n p_{jj}(n) = P_{jj}(1) < \infty$. Hence $P_{ij}(1) < \infty$. By Abel's lemma, $P_{ij}(1)$ is given by
+  If $j$ is transient, then $\sum_n p_{j, j}(n) = P_{j, j}(1) < \infty$. Also, $F_{i, j}(1)$ is the probability of ever reaching $j$ from $i$, and is hence finite as well. So we have $P_{i, j}(1) < \infty$. By Abel's lemma, $P_{i, j}(1)$ is given by
   \[
-    P_{ij}(1) = \sum_n p_{ij}(n).
+    P_{i, j}(1) = \sum_n p_{i, j}(n).
   \]
-  Since this is finite, we must have $p_{ij}\to 0$.
+  Since this is finite, we must have $p_{i, j}(n)\to 0$.
 
   Since we know that
   \[
-    \sum_{j\in S}p_{ij}(n) = 1,
+    \sum_{j\in S}p_{i, j}(n) = 1,
   \]
-  If every state is transient, then for all $j$, $\sum p_{ij}(n) \to 0$ as $n\to \infty$. This is a contradiction.
+  If every state is transient, then for all $j$, $\sum p_{i, j}(n) \to 0$ as $n\to \infty$. This is a contradiction. So we must have a recurrent state.
 \end{proof}
 
 \begin{thm}[P\'olya's theorem]
-  Consider $\Z^d = \{(x_1, x_2, \cdots, x_d): x_i \in \Z\}$. This generates a graph with $x\sim y$ if $|x - y| = 1$, where $|\ph |$ is the Euclidean norm.
+  Consider $\Z^d = \{(x_1, x_2, \cdots, x_d): x_i \in \Z\}$. This generates a graph with $x$ adjacent to $y$ if $|x - y| = 1$, where $|\ph |$ is the Euclidean norm.
   \begin{center}
     \begin{tikzpicture}[scale=0.75]
       \node at (-4, 0) {$d = 0$};
@@ -536,7 +562,7 @@ In particular, we have the following result:
   \end{center}
   Consider a random walk in $\Z^d$. At each step, it moves to a neighbour, each chosen with equal probability, ie.
    \[
-    \P(X_{n + 1} = j| X_n = i) =
+    \P(X_{n + 1} = j\mid X_n = i) =
     \begin{cases}
       \frac{1}{2d} & |j - i| = 1\\
       0 & \text{otherwise}
@@ -546,10 +572,10 @@ In particular, we have the following result:
 
   The theorem says this is recurrent iff $d = 1$ or $2$.
 \end{thm}
-Intuitively, this makes sense since if we have more dimensions, then it is easier to get lost.
+Intuitively, this makes sense that we get recurrence only for low dimensions, since if we have more dimensions, then it is easier to get lost.
 
 \begin{proof}
-  We will start with the case $d = 1$. We want to show that $\sum p_{0, 0}(n) = \infty$. Then we know the origin is recurrent. However, we can simplify this a bit. It is impossible to get back to the origin in an odd number of steps. So we can instead write $\sum p_{0, 0}(2n)$. However, we can write down this expression immediately. To return to the origin after $2n$ steps, we need to have made $n$ steps to the left, and $n$ steps to the right, in any order. So we have
+  We will start with the case $d = 1$. We want to show that $\sum p_{0, 0}(n) = \infty$. Then we know the origin is recurrent. However, we can simplify this a bit. It is impossible to get back to the origin in an odd number of steps. So we can instead consider $\sum p_{0, 0}(2n)$. However, we can write down this expression immediately. To return to the origin after $2n$ steps, we need to have made $n$ steps to the left, and $n$ steps to the right, in any order. So we have
   \[
     p_{0, 0}(2n) = \P(n\text{ steps left}, n\text{ steps right}) = \binom{2n}{n} \left(\frac{1}{2}\right)^{2n}.
   \]
@@ -563,14 +589,14 @@ Intuitively, this makes sense since if we have more dimensions, then it is easie
   \begin{align*}
     p_{0, 0}(2n) &= \left(\frac{1}{4}\right)^{2n} \sum_{m = 0}^n \binom{2n}{m, m, n - m, n - m} \\
     &= \left(\frac{1}{4}\right)^{2n} \sum_{m = 0}^n \frac{(2n)!}{(m!)^2 ((n - m)!)^2} \\
-    &= \left(\frac{1}{4}\right)^{2n} \binom{2n}{n}\sum_m \left(\frac{n!}{m!(n - m)!}\right)^2\\
-    &= \left(\frac{1}{4}\right)^{2n} \binom{2n}{n}\sum_m \left(\binom{n}{m}\binom{n}{n - m}\right)^2\\
+    &= \left(\frac{1}{4}\right)^{2n} \binom{2n}{n}\sum_{m = 0}^n \left(\frac{n!}{m!(n - m)!}\right)^2\\
+    &= \left(\frac{1}{4}\right)^{2n} \binom{2n}{n}\sum_{m = 0}^n \binom{n}{m}\binom{n}{n - m}\\
     \intertext{We now use a well-known identity (proved in IA Numbers and Sets) to obtain}
     &= \left(\frac{1}{4}\right)^{2n} \binom{2n}{n} \binom{2n}{n}\\
     &= \left[\binom{2n}{n} \left(\frac{1}{2}\right)^{2n}\right]^2\\
     &\sim \frac{1}{\pi n}.
   \end{align*}
-  So the sum diverges. So this is recurrent. Note that the two-dimensional probability turns out to be the square of the one-dimensional probability. Is this a coincidence? Or is there a reason why? Does this extend to higher dimensions? We would be able to explain why this happens, but it unfortunately does not extend straightforwardly to higher dimensions.
+  So the sum diverges. So this is recurrent. Note that the two-dimensional probability turns out to be the square of the one-dimensional probability. This is not a coincidence, and we will explain this after the proof. However, this does not extend to higher dimensions.
 
   In the $d = 3$ case, we have
   \[
@@ -583,7 +609,7 @@ Intuitively, this makes sense since if we have more dimensions, then it is easie
     \intertext{Why do we write it like this? We are going to use the identity $\displaystyle \sum_{i + j + k = n} \frac{n!}{3^n i!j!k!} = 1$. Where does this come from? Suppose we have three urns, and throw $n$ balls into it. Then the probability of getting $i$ balls in the first, $j$ in the second and $k$ in the third is exactly $\frac{n!}{3^n i!j!k!}$. Summing over all possible combinations of $i$, $j$ and $k$ gives the total probability of getting in any configuration, which is $1$. So we can bound this by}
     &\leq \left(\frac{1}{2}\right)^{2n}\binom{2n}{n} \max\left(\frac{n!}{3^n i!j!k!}\right)\sum \frac{n!}{3^n i!j!k!}\\
     &= \left(\frac{1}{2}\right)^{2n}\binom{2n}{n} \max\left(\frac{n!}{3^n i!j!k!}\right)
-    \intertext{To find the maximum, we can replace the factorial by the gamma function and use Lagrange multiplier. However, we would just argue that the maximum can be achieved when $i$, $j$ and $k$ are as close to each other as possible. So we get}
+    \intertext{To find the maximum, we can replace the factorial by the gamma function and use Lagrange multipliers. However, we would just argue that the maximum can be achieved when $i$, $j$ and $k$ are as close to each other as possible. So we get}
     &\leq \left(\frac{1}{2}\right)^{2n}\binom{2n}{n} \frac{n!}{3^n}\left(\frac{1}{\lfloor n/3\rfloor!}\right)^3\\
     &\leq Cn^{-3/2}
   \end{align*}
@@ -621,9 +647,10 @@ In each step, either $A_n$ or $B_n$ change by one step. So $U_n$ and $V_n$ \emph
   &= \left[\binom{2n}{n}\left(\frac{1}{2}\right)^{2n}\right]^2.
 \end{align*}
 \subsection{Hitting probabilities}
-In general, we might have a Markov chain, and there are some states we want to reach, or don't want to reach. For example, we might be in a casino, and we want to win, say, a million, and don't want to go bankrupt. So we want to study how likely and when we will reach these states.
+Recurrence and transience tells us if we are going to return to the original state with (almost) certainty. Often, we would like to know something more qualitative. What is the actual probability of returning to the state $i$? If we return, what is the expected duration of returning?
 
-In general, let $A \subseteq S$.
+We can formulate this in a more general setting. Let $S$ be our state space, and let $A \subseteq S$. We want to know how likely and how long it takes for us to reach $A$. For example, if we are in a casino, we want to win, say, a million, and don't want to go bankrupt. So we would like to know the probability of reaching $A = \{1\text{ million}\}$ and $A = \{0\}$.
+
 \begin{defi}[Hitting time]
   The \emph{hitting time} of $A \subseteq S$ is the random variable $H^A = \min\{n \geq 0: X_n \in A\}$. In particular, if we start in $A$, then $H^A = 0$. We also have
   \[
@@ -631,48 +658,48 @@ In general, let $A \subseteq S$.
   \]
 \end{defi}
 
-We are going to have an important result about the hitting time:
+To determine hitting times, we mostly rely on the following result:
 \begin{thm}
   The vector $(h_i^A: i \in S)$ satisfies
   \[
     h_i^A =
     \begin{cases}
       1 & i \in A\\
-      \sum_{j \in S}p_{ij}h_j^A & i \not \in A
+      \sum_{j \in S}p_{i, j}h_j^A & i \not \in A
     \end{cases},
   \]
   and is \emph{minimal} in that for any non-negative solution $(x_i: i \in S)$ to these equations, we have $h_i^a \leq x_i$ for all $i$.
 \end{thm}
-The first part is easy to show using the definition, but it takes some more work to show that the real $h_i^A$ is minimal. The proof, however, is almost the same as that for random walks in IA Probability.
+It is easy to show that $h_i^A$ satisfies the formula given, but it takes some more work to show that $h_i^A$ is the minimal. Recall, however, that we have proved a similar result for random walks in IA probability, and the proof is more-or-less the same.
 
 \begin{proof}
-  By definition, $h_i^A = 1$ if $i \in A$. Then we have
+  By definition, $h_i^A = 1$ if $i \in A$. Otherwise, we have
   \[
-    h_i^A = \P_i(H^A < \infty) = \sum_{j\in S} \P_i(H^A < \infty | X_1 = j)p_{ij} = \sum_{j\in S}h_{j}^A p_{ij}.
+    h_i^A = \P_i(H^A < \infty) = \sum_{j\in S} \P_i(H^A < \infty \mid X_1 = j)p_{i, j} = \sum_{j\in S}h_{j}^A p_{i, j}.
   \]
-  So $h_i^A$ is a solution.
+  So $h_i^A$ is indeed a solution to the equations.
 
   To show that $h_i^A$ is the minimal solution, suppose $x = (x_i: i \in S)$ is a non-negative solution, ie.
   \[
     x_i^A =
     \begin{cases}
       1 & i \in A\\
-      \sum_{j \in S}p_{ij}x_j^A & i \not \in A
+      \sum_{j \in S}p_{i, j}x_j^A & i \not \in A
     \end{cases},
   \]
   If $i \in A$, we have $h_i^A = x_i = 1$. Otherwise, we can write
   \begin{align*}
-    x_i &= \sum_j p_{ij}x_j \\
-    &= \sum_{j \in A}p_{ij}x_j + \sum_{j \not\in A}p_{ij}x_j \\
-    &= \sum_{j \in A}p_{ij} + \sum_{j \not\in A}p_{ij}x_j \\
-    &\geq \sum_{j \in A}p_{ij}\\
+    x_i &= \sum_j p_{i, j}x_j \\
+    &= \sum_{j \in A}p_{i, j}x_j + \sum_{j \not\in A}p_{i, j}x_j \\
+    &= \sum_{j \in A}p_{i, j} + \sum_{j \not\in A}p_{i, j}x_j \\
+    &\geq \sum_{j \in A}p_{i, j}\\
     &= \P_i(H^A = 1).
   \end{align*}
   By iterating this process, we can write
   \begin{align*}
-    x_i &= \sum_{j \in A} p_{ij} + \sum_{j \not\in A} p_{ij}\left(\sum_k p_{ik} x_k\right) \\
-    &= \sum_{j \in A} p_{ij} + \sum_{j \not\in A} p_{ij}\left(\sum_{k\in A} p_{ik} x_k + \sum_{k \not\in A} p_{ik}x_k\right)\\
-    &\geq \P_i (H^A = 1) + \sum_{j \not \in A, k \in A}p_{ij}p_{jk}\\
+    x_i &= \sum_{j \in A} p_{i, j} + \sum_{j \not\in A} p_{i, j}\left(\sum_k p_{i, k} x_k\right) \\
+    &= \sum_{j \in A} p_{i, j} + \sum_{j \not\in A} p_{i, j}\left(\sum_{k\in A} p_{i, k} x_k + \sum_{k \not\in A} p_{i, k}x_k\right)\\
+    &\geq \P_i (H^A = 1) + \sum_{j \not \in A, k \in A}p_{i, j}p_{j, k}\\
     &= \P_i(H^A = 1) + \P_i(H^A = 2)\\
     &= \P_i (H^A \leq 2).
   \end{align*}
@@ -684,17 +711,18 @@ The first part is easy to show using the definition, but it takes some more work
   \[
     x_n \geq \P_i(H^A \leq \infty) = h_i^A.
   \]
+  So $h_i^A$ is minimal.
 \end{proof}
 The next question we want to ask is how long it will take for us to hit $A$. We want to find $\E_i(H^A) = k_i^A$. Note that we have to be careful --- if there is a chance that we never hit $A$, then it is $H^A$ could be infinite, and $\E_i(H^A) = \infty$. This occurs if $h_i^A < 1$. So often we are only interested in the case where $h_i^A < 1$.
 
-Nevertheless, we have the following result:
-\begin{thm}[]
+We get a similar result characterizing the expected hitting time.
+\begin{thm}
   $(k_i^A: i \in S)$ is the minimal non-negative solution to
   \[
     k_i^A =
     \begin{cases}
       0 & i \in A\\
-      1 + \sum_j p_{ik}k_j^A & i \not\in A.
+      1 + \sum_j p_{i, k}k_j^A & i \not\in A.
     \end{cases}
   \]
 \end{thm}
@@ -708,18 +736,18 @@ The proof is almost the same as the proof we had above.
 
   If $i \in A$, we get $y_i = k_i^A = 0$. Otherwise, suppose $i\not\in A$. Then we have
   \begin{align*}
-    y_i &= 1 + \sum_j p_{ij}y_j\\
-    &= 1 + \sum_{j \in A}p_{ij}y_j + \sum_{j\not\in A}p_{ij}y_j\\
-    &= 1 + \sum_{j\not\in A}p_{ij}y_j\\
-    &= 1 + \sum_{j \not\in A}p_{ij}\left(1 + \sum_{k\not\in A} p_{jk}y_k\right)\\
-    &\geq 1 + \sum_{j \not\in A} p_{ij}\\
+    y_i &= 1 + \sum_j p_{i, j}y_j\\
+    &= 1 + \sum_{j \in A}p_{i, j}y_j + \sum_{j\not\in A}p_{i, j}y_j\\
+    &= 1 + \sum_{j\not\in A}p_{i, j}y_j\\
+    &= 1 + \sum_{j \not\in A}p_{i, j}\left(1 + \sum_{k\not\in A} p_{j, k}y_k\right)\\
+    &\geq 1 + \sum_{j \not\in A} p_{i, j}\\
     &= \P_i(H^A \geq 1) + \P_i(H^A \geq 2).
   \end{align*}
   By induction, we know that
   \[
     y_i \geq \P_i (H^A \geq 1) + \cdots + \P_i(H^A \geq n)
   \]
-  for all $n$. Let $ n\to \infty$. Then we get
+  for all $n$. Let $n\to \infty$. Then we get
   \[
     y_i \geq \sum_{m \geq 1}\P_i(H^A \geq m) = \sum_{m \geq 1} m\P_i(H^a = m)= k_i^A.
   \]
@@ -754,21 +782,23 @@ The proof is almost the same as the proof we had above.
   \]
   This is in fact a solution for all $A$. So we want to find the smallest solution.
 
-  As $i \to\infty$, we get $h_i \to A$. Since $h_i \geq 0$, we know that $A \geq 0$. Subject to this constraint, the minimum is attained when $A = 0$ (since $(q/p)^i$ and $(1 - (q/p)^i)$ are both positive).
-
+  As $i \to\infty$, we get $h_i \to A$. Since $h_i \geq 0$, we know that $A \geq 0$. Subject to this constraint, the minimum is attained when $A = 0$ (since $(q/p)^i$ and $(1 - (q/p)^i)$ are both positive). So we have
+  \[
+    h_i = \left(\frac{q}{p}\right)^i.
+  \]
   There is another way to solve this. We can give ourselves a ceiling, ie. we also stop when we hit $k > 0$, ie. $h_k = 1$. We now have two boundary conditions and can find a unique solution. Then we take the limit as $k \to \infty$. This is the approach taken in IA Probability.
 
   Here if $p = q$, then by the same arguments, we get $h_i = 1$ for all $i$.
 \end{eg}
 
 \begin{eg}[Birth-death chain]
-  Let $(p_i: i \geq 1)$ such that $p_i \in (0, 1)$. We let $q_i = 1 - p_i$. We let $\N$ be our state space and define the transition probabilities to be
+  Let $(p_i: i \geq 1)$ be an arbitrary sequence such that $p_i \in (0, 1)$. We let $q_i = 1 - p_i$. We let $\N$ be our state space and define the transition probabilities to be
   \[
     p_{i, i + 1} = p_i,\quad p_{i, i - 1} = q_i.
   \]
   This is a more general case of the random walk --- in the random walk we have a constant $p_i$ sequence.
 
-  This is a general model for population growth, for the change in population depends on what the current population is. Here each ``step'' does not correspond to some unit time, since births and deaths occur rather randomly. Instead, we just make a ``step'' whenever some birth or death occurs, regardless of what time they occur.
+  This is a general model for population growth, where the change in population depends on what the current population is. Here each ``step'' does not correspond to some unit time, since births and deaths occur rather randomly. Instead, we just make a ``step'' whenever some birth or death occurs, regardless of what time they occur.
 
   Here, if we have no people left, then it is impossible for us to reproduce and get more population. So we have
   \[
@@ -778,11 +808,12 @@ The proof is almost the same as the proof we had above.
   \[
     h_0 = 1,\quad p_i h_{i + 1} - h_i + q_i h_{i - 1} = 0,\quad i \geq 1.
   \]
-  This is no longer a difference equation, since the coefficients depends on the index $i$. To solve this, we rewrite this as
-  \[
-    p_i h_{i + 1} - h_i + q_i h_{i - 1} = p_i h_{i + 1} - (p_i + q_i) h_i + q_i h_{i - 1}.
-  \]
-  We let $u_i = h_{i - 1} - h_i$. Then our equation becomes
+  This is no longer a difference equation, since the coefficients depends on the index $i$. To solve this, we need magic. We rewrite this as
+  \begin{align*}
+    p_i h_{i + 1} - h_i + q_i h_{i - 1} &= p_i h_{i + 1} - (p_i + q_i) h_i + q_i h_{i - 1} \\
+    &= p_i (h_{i + 1} - h_i) - q_i(h_i - h_{i - 1}).
+  \end{align*}
+  We let $u_i = h_{i - 1} - h_i$ (picking $h_i - h_{i - 1}$ might seem more natural, but this definition makes $u_i$ positive). Then our equation becomes
   \[
     u_{i + 1} = \frac{q_i}{p_i} u_i.
   \]
@@ -794,37 +825,39 @@ The proof is almost the same as the proof we had above.
   \[
     \gamma_i = \frac{q_1q_2\cdots q_i}{p_1p_2\cdots p_i}.
   \]
-  Then we get $u_{i + 1} = \gamma_i u_1$. Now we want to retrieve our $h_i$. We can do this by summing the equation $u_i = h_{i - 1} - h_i$. So we get
+  Then we get $u_{i + 1} = \gamma_i u_1$. For convenience, we let $\gamma_0 = 1$. Now we want to retrieve our $h_i$. We can do this by summing the equation $u_i = h_{i - 1} - h_i$. So we get
   \[
     h_0 - h_i = u_1 + u_2 + \cdots + u_i.
   \]
   Using the fact that $h_0 = 1$, we get
   \[
-    h_i = 1 - u_1(\gamma_0 + \gamma_1 + \cdots + \gamma_{i - 1}),
+    h_i = 1 - u_1(\gamma_0 + \gamma_1 + \cdots + \gamma_{i - 1}).
   \]
-  where $\gamma_0 = 1$. Here we have a parameter $u_1$, and we need to find out what this is. Our theorem tells us the value of $u_1$ minimizes $h_i$. This all depends on the value of
+  Here we have a parameter $u_1$, and we need to find out what this is. Our theorem tells us the value of $u_1$ minimizes $h_i$. This all depends on the value of
   \[
     S = \sum_{i = 0}^\infty \gamma_i.
   \]
-  By the law of excluded middle, $S$ either diverges or converges. If $S = \infty$, then we must have $u_1 = 0$. Otherwise, $h_i$ blows up for large $i$, but we know that $0 \leq h_i \leq 1$. If $S$ is finite, then $u_1$ can be non-zero. We know that the $\gamma_i$ are all positive. So to minimize $h_i$, we need to maximize $u_1$. We cannot make $u_1$ arbitrarily large, since this will make $h_i$ negative. Taking the limit as $i \to\infty$, we know that the maximum value of $u_1$ satisfies
+  By the law of excluded middle, $S$ either diverges or converges. If $S = \infty$, then we must have $u_1 = 0$. Otherwise, $h_i$ blows up for large $i$, but we know that $0 \leq h_i \leq 1$. If $S$ is finite, then $u_1$ can be non-zero. We know that the $\gamma_i$ are all positive. So to minimize $h_i$, we need to maximize $u_1$. We cannot make $u_1$ arbitrarily large, since this will make $h_i$ negative. To find the maximum possible value of $u_1$, we take the limit as $i \to\infty$. Then we know that the maximum value of $u_1$ satisfies
   \[
     0 = 1 - u_1 S.
   \]
-  In other words, $u_1 = 1/S$. Then we have
+  In other words, $u_1 = 1/S$. So we have
   \[
     h_i = \frac{\sum_{k = i}^\infty \gamma_k}{\sum_{k = 0}^\infty \gamma_k}.
   \]
 \end{eg}
 
-\subsection{Stopping times and strong Markov property}
+\subsection{The strong Markov property and applications}
 We are going to state the \emph{strong} Markov property and see applications of it. Before this, we should know what the \emph{weak} Markov property is. We have, in fact, already seen the weak Markov property. It's just that we called it the ``Markov property' instead.
 
-In probability, we often have ``strong'' and ``weak'' versions of things. For example, we have the strong and weak law of large numbers. In general, the difference is that the weak versions are expressed in terms of probabilities, while the strong versions are expressed in terms of random variables. Initially, when people first started developing probability theory, they just talked about probability distributions like the Poisson distribution or the normal distribution. However, later it turned out it is often nicer to talk about random variables instead. After messing with random variables, we can just take expectations or evaluate probabilities to get the corresponding statement about probability distributions. Hence usually the ``strong'' versions imply the ``weak'' version, but not the other way round.
+In probability, we often have ``strong'' and ``weak'' versions of things. For example, we have the strong and weak law of large numbers. The difference is that the weak versions are expressed in terms of probabilities, while the strong versions are expressed in terms of random variables.
+
+Initially, when people first started developing probability theory, they just talked about probability distributions like the Poisson distribution or the normal distribution. However, later it turned out it is often nicer to talk about random variables instead. After messing with random variables, we can just take expectations or evaluate probabilities to get the corresponding statement about probability distributions. Hence usually the ``strong'' versions imply the ``weak'' version, but not the other way round.
 
 In this case, recall that we defined the Markov property in terms of the probabilities at some fixed time. We have some fixed time $t$, and we want to know the probabilities of events after $t$ in terms of what happened before $t$. In the strong Markov property, we will allow $t$ to be a random variable, and say something slightly more involved. However, we will not allow $T$ to be any random variable, but just some nice ones.
 
 \begin{defi}[Stopping time]
-  Let $X$ be a Markov chain. A random variable $T$ (which is a function $\Omega \to \N\cup \{\infty\}$) is a \emph{stopping time} for the chain $X = (X_n)$ if for $n \geq 0$, the event $\{T = n\}$ is given in terms of $X_0, \cdots, X_1, X_n$.
+  Let $X$ be a Markov chain. A random variable $T$ (which is a function $\Omega \to \N\cup \{\infty\}$) is a \emph{stopping time} for the chain $X = (X_n)$ if for $n \geq 0$, the event $\{T = n\}$ is given in terms of $X_0, \cdots, X_n$.
 \end{defi}
 For example, suppose we are in a casino and gambling. We let $X_n$ be the amount of money we have at time $n$. Then we can set our stopping time as ``the time when we have $\$10$ left''. This is a stopping time, in the sense that we can use this as a guide to when to stop --- it is certainly possible to set yourself a guide that you should leave the casino when you have $\$10$ left. However, it does not make sense to say ``I will leave if the next game will make me bankrupt'', since there is no way to tell if the next game will make you bankrupt (it certainly will not if you win the game!). Hence this is not a stopping time.
 
@@ -834,12 +867,12 @@ For example, suppose we are in a casino and gambling. We let $X_n$ be the amount
 
 We can now state the strong Markov property, which is expressed in a rather complicated manner but can be useful at times.
 \begin{thm}[Strong Markov property]
-  Let $X$ be a Markov change with transition matrix $P$, and let $T$ be a stopping time for $X$. Given $T < \infty$ and $X_T = i$, the chain $(X_{T + k}: k \geq 0)$ is a Markov chain with transition matrix $P$ with initial distribution $X_{T + 0} = i$, and this Markov chain is independent of $X_0, \cdots, X_T$.
+  Let $X$ be a Markov chain with transition matrix $P$, and let $T$ be a stopping time for $X$. Given $T < \infty$ and $X_T = i$, the chain $(X_{T + k}: k \geq 0)$ is a Markov chain with transition matrix $P$ with initial distribution $X_{T + 0} = i$, and this Markov chain is independent of $X_0, \cdots, X_T$.
 \end{thm}
 Proof is omitted.
 
 \begin{eg}[Gambler's ruin]
-  Again, this is the Markov chain taking values on the non-negative integers, moving to the right with probability $p$ and left with probability $q = 1 - p$. $0$ is an absorbing state, since we cannot escape zero.
+  Again, this is the Markov chain taking values on the non-negative integers, moving to the right with probability $p$ and left with probability $q = 1 - p$. $0$ is an absorbing state, since we have no money left to bet if we are broke.
 
   Instead of computing the probability of hitting zero, we want to find the time it takes to get to $0$, ie.
   \[
@@ -853,15 +886,15 @@ Proof is omitted.
 
   We have
   \[
-    G_1(s) = \E_1(s^H) = p\E_1(s^H|X_1 = 2) + q\E_1(s^H|X_1 = 0).
+    G_1(s) = \E_1(s^H) = p\E_1(s^H\mid X_1 = 2) + q\E_1(s^H\mid X_1 = 0).
   \]
-  How can we simplify this? The second term is easy, since if $X_1 = 0$, then we must have $H = 1$. So $\E_1(s^H|X_1 = 0) = s$. The second term is more tricky. We are now at $2$. To get to $0$, we need to pass through $1$. So the time needed to get to $0$ is the time to get from $2$ to $1$ (say $H'$), plus the time to get from $1$ to $0$ (say $H''$). We know that $H'$ and $H''$ have the same distribution as $H$, and by the strong Markov property, they are independent. So
+  How can we simplify this? The second term is easy, since if $X_1 = 0$, then we must have $H = 1$. So $\E_1(s^H\mid X_1 = 0) = s$. The second term is more tricky. We are now at $2$. To get to $0$, we need to pass through $1$. So the time needed to get to $0$ is the time to get from $2$ to $1$ (say $H'$), plus the time to get from $1$ to $0$ (say $H''$). We know that $H'$ and $H''$ have the same distribution as $H$, and by the strong Markov property, they are independent. So
   \[
-    G_1 = p\E_1(s^{H' + H'' + 1}) + qs = psG_1^2 + qs.
+    G_1 = p\E_1(s^{H' + H'' + 1}) + qs = psG_1^2 + qs.\tag{$*$}
   \]
   Solving this, we get two solutions
   \[
-    G_1 (s) = \frac{1 \pm \sqrt{1 - 4pqs^2}}{2ps}.\tag{$*$}
+    G_1 (s) = \frac{1 \pm \sqrt{1 - 4pqs^2}}{2ps}.
   \]
   We have to be careful here. This result says that for each value of $s$, $G_1(s)$ is \emph{either} $\frac{1 + \sqrt{1 - 4pqs^2}}{2ps}$ \emph{or} $\frac{1 - \sqrt{1 - 4pqs^2}}{2ps}$. It does \emph{not} say that there is some consistent choice of $+$ or $-$ that works for everything.
 
@@ -883,7 +916,7 @@ Proof is omitted.
     \begin{cases}
       1 & p \leq q\\
       \frac{q}{p} & p > q
-    \end{cases}
+    \end{cases}.
   \]
   Using this, we can also find $\mu = \E_1(H)$. Firstly, if $p > q$, then it is possible that $H = \infty$. So $\mu = \infty$. If $p \leq q$, we can find $\mu$ by differentiating $G_1(s)$ and evaluating at $s = 1$. Doing this directly would result it horrible and messy algebra, which we want to avoid. Instead, we can differentiate $(*)$ and obtain
   \[
@@ -898,23 +931,23 @@ Proof is omitted.
     \mu = \lim_{s \to 1}G'(s) =
     \begin{cases}
       \infty & p = \frac{1}{2}\\
-      \frac{1}{p - q} & p < \frac{1}{2}.
-    \end{cases}
+      \frac{1}{p - q} & p < \frac{1}{2}
+    \end{cases}.
   \]
 \end{eg}
-\section{Classification of states}
-\subsection{Classification of states}
-So far, we have classified chains in say, irreducible and reducible chains. We have also seen that states can be recurrent or transience. By definition, a state is recurrent if the probability of returning to it is infinite. However, we can further classify recurrent states. Even if a state is recurrent, it is possible that the expected time of returning is infinite. So it is likely that we return to the original state only after a very long time. On the other hand, it might be that are very likely to return quickly, and the expected time of returning is finite. It turns out this distinction can affect the long-term behaviour of the chain.
+
+\subsection{Further classification of states}
+So far, we have classified chains in say, irreducible and reducible chains. We have also seen that states can be recurrent or transience. By definition, a state is recurrent if the probability of returning to it is infinite. However, we can further classify recurrent states. Even if a state is recurrent, it is possible that the expected time of returning is infinite. So while we will eventually return to the original state, this is likely to take a long, long time. The opposite behaviour is also possible --- the original state might be very attracting, and we are likely to return quickly. It turns out this distinction can affect the long-term behaviour of the chain.
 
 First we have the following proposition, which tells us that if a state is recurrent, then we are expected to return to it infinitely many times.
 \begin{thm}
-  Suppose $X_0 = i$. Let $V_i = |\{n \geq 1: X_n = i\}|$. Let $f_{ii} = \P_i(T_i < \infty)$. Then
+  Suppose $X_0 = i$. Let $V_i = |\{n \geq 1: X_n = i\}|$. Let $f_{i, i} = \P_i(T_i < \infty)$. Then
   \[
-    \P_i (V_i = r) = f_{ii}^r (1 - f_{ii}),
+    \P_i (V_i = r) = f_{i, i}^r (1 - f_{i, i}),
   \]
-  since we have to return $r$ times, each with probability $f_{ii}$, and then never return.
+  since we have to return $r$ times, each with probability $f_{i, i}$, and then never return.
 
-  Hence, if $f_{ii} = 1$, then $\P_i(V_i = r) = 0$ for all $r$. So $\P_i(V_i = \infty) = 1$. Otherwise, $\P_i(V_i = r)$ is a genuine geometric distribution, and we get $\P_i(V_i < \infty) = 1$.
+  Hence, if $f_{i, i} = 1$, then $\P_i(V_i = r) = 0$ for all $r$. So $\P_i(V_i = \infty) = 1$. Otherwise, $\P_i(V_i = r)$ is a genuine geometric distribution, and we get $\P_i(V_i < \infty) = 1$.
 \end{thm}
 
 \begin{proof}
@@ -927,7 +960,7 @@ First we have the following proposition, which tells us that if a state is recur
     \mu_i = \E_i(T_i) =
     \begin{cases}
       \infty & i\text{ transient}\\
-      \sum_{n = 1}^\infty n f_{ii}(n) & i\text{ recurrent}
+      \sum_{n = 1}^\infty n f_{i, i}(n) & i\text{ recurrent}
     \end{cases}
   \]
 \end{defi}
@@ -936,21 +969,23 @@ First we have the following proposition, which tells us that if a state is recur
   If $i$ is recurrent, we call $i$ a \emph{null state} if $\mu_i = \infty$. Otherwise $i$ is \emph{non-null} or \emph{positive}.
 \end{defi}
 
+This is mostly all we care about. However, there is still one more technical consideration. Recall that in the random walk starting from the origin, we can only return to the origin after an even number of steps. This causes problems for a lot of our future results. For example, we will later look at the ``convergence'' of Markov chains. If we are very likely to return to $0$ after an even number of steps, but is impossible for an odd number of steps, we don't get convergence. Hence we would like to prevent this from happening.
+
 \begin{defi}[Period]
-  The \emph{period} of a state $i$ is $d_i = \gcd\{n \geq 1: p_{ii}(n)> 0\}$.
+  The \emph{period} of a state $i$ is $d_i = \gcd\{n \geq 1: p_{i, i}(n)> 0\}$.
 
   A state is \emph{aperiodic} if $d_i = 1$.
 \end{defi}
-For example, the period of $0$ in a simple random walk is $2$, since we can only return after an even number of steps.
+In general, we like aperiodic states. This is not a very severe restriction. For example, in the random walk, we can get rid of periodicity by saying there is a very small chance of staying at the same spot in each step. We can make this chance is so small that we can ignore its existence for most practical purposes, but will help us get rid of the technical problem of periodicity.
 
-\begin{defi}[Ergodic]
+\begin{defi}[Ergodic state]
   A state $i$ is \emph{ergodic} if it is aperiodic and positive recurrent.
 \end{defi}
-These are the nice states.
+These are the really nice states.
 
 Recall that recurrence is a class property --- if two states are in the same communicating class, then they are either both recurrent, or both transient. Is this true for the properties above as well? The answer is yes.
 
-\begin{thm}[]
+\begin{thm}
   If $i \leftrightarrow j$ are communicating, then
   \begin{enumerate}
     \item $d_i = d_j$.
@@ -962,13 +997,13 @@ Recall that recurrence is a class property --- if two states are in the same com
 
 \begin{proof}\leavevmode
   \begin{enumerate}
-    \item Assume $i \leftrightarrow j$. Then there are $m, n \geq 1$ with $p_{ij}(m), p_{ji}(n) > 0$. By the Chapman-Kolmogorov inequality, we know that
+    \item Assume $i \leftrightarrow j$. Then there are $m, n \geq 1$ with $p_{i, j}(m), p_{j, i}(n) > 0$. By the Chapman-Kolmogorov equation, we know that
       \[
-        p_{ii}(m + r + n) \geq p_{ij}(m)p_{jj}(r)p_{ji}(n) \geq \alpha p_{jj}(r),
+        p_{i, i}(m + r + n) \geq p_{i, j}(m)p_{j, j}(r)p_{j, i}(n) \geq \alpha p_{j, j}(r),
       \]
-      where $\alpha = p_{ij}(m) p_{ji}(n) > 0$. Now let $D_j = \{r \geq 1: p_{jj}(r) > 0\}$. Then by definition, $d_j = \gcd D_j$.
+      where $\alpha = p_{i, j}(m) p_{j, i}(n) > 0$. Now let $D_j = \{r \geq 1: p_{j, j}(r) > 0\}$. Then by definition, $d_j = \gcd D_j$.
 
-      We have just shown that if $r \in D_j$, then we have $m + r + n \in D_i$. We also know that $n + m \in D_i$, since $p_{ii}(n + m) \geq p_{ij}(n)p_{ji}(m) > 0$. Then for any $r \in D_j$, we know that $d_i | m + r + n$, and also $d_i | m + n$. So $d_i | r$. Hence $\gcd D_i | \gcd D_j$. By symmetry, $\gcd D_i = \gcd D_j$.
+      We have just shown that if $r \in D_j$, then we have $m + r + n \in D_i$. We also know that $n + m \in D_i$, since $p_{i, i}(n + m) \geq p_{i, j}(n)p_{ji}(m) > 0$. Hence for any $r \in D_j$, we know that $d_i \mid m + r + n$, and also $d_i \mid m + n$. So $d_i \mid r$. Hence $\gcd D_i \mid \gcd D_j$. By symmetry, $\gcd D_j \mid \gcd D_i$ as well. So $\gcd D_i = \gcd D_j$.
     \item Proved before.
     \item This is deferred to a later time.
     \item Follows directly from (i), (ii) and (iii) by definition.
@@ -988,31 +1023,39 @@ Note that this is not just the definition of recurrence, since recurrence says t
 \begin{proof}
   Let
   \[
-    f_{ij} = \P_i(X_n = j\text{ for some }n \geq 1).
+    f_{i, j} = \P_i(X_n = j\text{ for some }n \geq 1).
   \]
-  Since $j \to i$, there exists a \emph{least} integer $m \geq 1$ with $p_{ji}(m) > 0$. Since $m$ is least, we know that
+  Since $j \to i$, there exists a \emph{least} integer $m \geq 1$ with $p_{j, i}(m) > 0$. Since $m$ is least, we know that
   \[
-    p_{ji}(m) = \P_j(X_m = i, X_r \not= j\text{ for }r < m).
+    p_{j, i}(m) = \P_j(X_m = i, X_r \not= j\text{ for }r < m).
   \]
   This is since we cannot visit $j$ in the path, or else we can truncate our path and get a shorter path from $j$ to $i$. Then
   \[
-    p_{ji}(m)(1 - f_{ij}) \leq 1 - f_{jj}.
+    p_{j, i}(m)(1 - f_{i, j}) \leq 1 - f_{j, j}.
   \]
-  This is since the left hand side is the probability that we first go from $j$ to $i$ in $m$ steps, and then never going from $i$ to $j$ again; while the right is the just probability of never returning to $j$ starting from $j$; and we know that it is easier to just not get back to $j$ than to go to $i$ in exactly $m$ steps and never returning to $j$. Hence if $f_{jj} = 1$, then $f_{ij} = 1$.
+  This is since the left hand side is the probability that we first go from $j$ to $i$ in $m$ steps, and then never going from $i$ to $j$ again; while the right is the just probability of never returning to $j$ starting from $j$; and we know that it is easier to just not get back to $j$ than to go to $i$ in exactly $m$ steps and never returning to $j$. Hence if $f_{j, j} = 1$, then $f_{i, j} = 1$.
 
   Now let $\lambda_k = \P(X_j = k)$ be our initial distribution. Then
   \[
     \P(X_n = j\text{ for some }n \geq 1) = \sum_i \lambda_j \P_j (X_n =j\text{ for some }n \geq 1) = 1.
   \]
 \end{proof}
+
+\section{Long-run behaviour}
 \subsection{Invariant distributions}
-We want to look at what happens in the long run. When we are dealing with real sequences $x_n$, we have a precise definition of what it means for $x_n \to x$. How can we define the convergence of a sequence of random variables $X_n$? These are not proper numbers, so we cannot just apply our usual definitions.
+We want to look at what happens in the long run. Recall that at the very beginning of the course, we calculated the transition probabilities of the two-state Markov chain, and saw that in the long run, as $n \to \infty$, the probability distribution of the $X_n$ will ``converge'' to some particular distribution. Moreover, this limit does not depend on where we started. We'd like to see if this is true for all Markov chains.
 
-It turns out that the right way to think about convergence is to look at the probability mass function. For each $k \in S$, we ask if $\P(X_n = k)$ converges to anything.
+First of all, we want to make it clear what we mean by the chain ``converging'' to something. When we are dealing with real sequences $x_n$, we have a precise definition of what it means for $x_n \to x$. How can we define the convergence of a sequence of random variables $X_n$? These are not proper numbers, so we cannot just apply our usual definitions.
 
-In most cases, $\P(X_n = k)$ converges. Hence, this is not an interesting question to ask. What we would \emph{really} want to know is whether the limit is a probability mass function. It is, for example, possible that $\P(X_n = k) \to 0$ for all $k$, and the result is not a distribution.
+For the purposes of our investigation of Markov chains here, it turns out that the right way to think about convergence is to look at the probability mass function. For each $k \in S$, we ask if $\P(X_n = k)$ converges to anything.
 
-Usually, when we want to prove that something converges, we first figure out what the limit should be, and then attempt to prove that convergence does indeed occur. In this case, recall that if we have a starting state $\lambda$, then the distribution of the $n$th step is given by $\lambda P^n$. We have the following trivial identity:
+In most cases, $\P(X_n = k)$ converges to \emph{something}. Hence, this is not an interesting question to ask. What we would \emph{really} want to know is whether the limit is a probability mass function. It is, for example, possible that $\P(X_n = k) \to 0$ for all $k$, and the result is not a distribution.
+
+From Analysis, we know there are, in general, two ways to prove something converges --- we either ``guess'' a limit and then prove it does indeed converge to that limit, or we prove the sequence is Cauchy. It would be rather silly to prove that these probabilities form a Cauchy sequence, so we will attempt to guess the limit. The limit will be known as an \emph{invariant distribution}, for reasons that will become obvious shortly.
+
+The main focus of this section is to study the existence and properties of invariant distributions, and we will provide sufficient conditions for convergence to occur in the next.
+
+Recall that if we have a starting state $\lambda$, then the distribution of the $n$th step is given by $\lambda P^n$. We have the following trivial identity:
 \[
   \lambda P^{n + 1} = (\lambda P^n) P.
 \]
@@ -1046,9 +1089,9 @@ We call these \emph{invariant distributions}.
 \end{thm}
 Note how we worded the first statement. Recall that we once stated that if one state is positive recurrent, then all states are positive recurrent, and then said we would defer the proof for later on. This is where we actually prove it. In (i), we show that if some state is positive recurrent, then it has an invariant distribution. Then (ii) tells us if there is an invariant distribution, then \emph{all} states are positive recurrent. Hence one state being positive recurrent implies all states being positive recurrent.
 
-Now where did the formula for $\pi$ come from? We can first think what $\pi_i$ should be. By definition, we should know that for large $m$, $\P(X_m = i) \sim \pi_i$. This means that if we go on to really late in time, we would expect to visit the state $i$ $\pi_i$ of the time. On the other hand, the mean recurrence time tells us that we are expected to (re)-visit $i$ every $mu_i$ steps. So it makes sense that $\pi_i = 1/\mu_i$.
+Now where did the formula for $\pi$ come from? We can first think what $\pi_i$ should be. By definition, we should know that for large $m$, $\P(X_m = i) \sim \pi_i$. This means that if we go on to really late in time, we would expect to visit the state $i$ $\pi_i$ of the time. On the other hand, the mean recurrence time tells us that we are expected to (re)-visit $i$ every $\mu_i$ steps. So it makes sense that $\pi_i = 1/\mu_i$.
 
-To put this on a more solid ground, we would like to look at some time intervals. For example, we might ask how many times we will hit $i$ in 100 steps. This is not a good thing to do, because we are not given where we are starting, and this probability can depend a lot on where the starting point is.
+To put this on a more solid ground and actually prove it, we would like to look at some time intervals. For example, we might ask how many times we will hit $i$ in 100 steps. This is not a good thing to do, because we are not given where we are starting, and this probability can depend a lot on where the starting point is.
 
 It turns out the natural thing to do is not to use a fixed time interval, but use a \emph{random} time interval. In particular, we fix a state $k$, and look at the time interval between two consecutive visits of $k$.
 
@@ -1087,19 +1130,19 @@ We will show that this $\rho$ is \emph{almost} our $\pi_i$, up to a constant.
         \sum_i \rho_i &= \sum_i \E_k(W_i)\\
         &= \E_k\left(\sum_i W_i\right)\\
         &= \E_k(T_k) \\
-        &= \mu_k
+        &= \mu_k.
       \end{align*}
-      Note that we secretly swapped the sum and expectation, which is in general bad because both are potentially infinite sums. However, there is a theorem that tells us this is okay whenever the summands are non-negative, but we will not prove this.
+      Note that we secretly swapped the sum and expectation, which is in general bad because both are potentially infinite sums. However, there is a theorem (bounded convergence) that tells us this is okay whenever the summands are non-negative, which is left as an Analysis exercise.
     \item We have
       \begin{align*}
         \rho_j &= \E_k(W_j)\\
         &= \E_k\left(\sum_{m \geq 1}1(X_m = j, T_k \geq m)\right) \\
         &= \sum_{m\geq 1}\P_k(X_m = j, T_k \geq m)\\
-        &= \sum_{m \geq 1}\sum_{i \in S} \P_k(X_m = j | X_{m - 1} = i, T_k \geq m) \P_k(X_{m - 1} = i, T_k \geq m)\\
+        &= \sum_{m \geq 1}\sum_{i \in S} \P_k(X_m = j \mid X_{m - 1} = i, T_k \geq m) \P_k(X_{m - 1} = i, T_k \geq m)\\
         \intertext{We now use the Markov property. Note that $T_k \geq m$ means $X_1, \cdots, X_{m - 1} \not= k$. The Markov property thus tells us the condition $T_k \geq m$ is useless. So we are left with}
-        &= \sum_{m \geq 1}\sum_{i \in S} \P_k(X_m = j | X_{m - 1} = i) \P_k(X_{m - 1} = i, T_k \geq m)\\
-        &= \sum_{m \geq 1}\sum_{i \in S} p_{ij} \P_k(X_{m - 1} = i, T_k \geq m)\\
-        &= \sum_{i \in S} p_{ij} \sum_{m \geq 1} \P_k(X_{m - 1} = i, T_k \geq m)
+        &= \sum_{m \geq 1}\sum_{i \in S} \P_k(X_m = j \mid X_{m - 1} = i) \P_k(X_{m - 1} = i, T_k \geq m)\\
+        &= \sum_{m \geq 1}\sum_{i \in S} p_{i, j} \P_k(X_{m - 1} = i, T_k \geq m)\\
+        &= \sum_{i \in S} p_{i, j} \sum_{m \geq 1} \P_k(X_{m - 1} = i, T_k \geq m)
       \end{align*}
       The last term looks really $\rho_i$, but the indices are slightly off. We shall have faith in ourselves, and show that this is indeed equal to $\rho_i$.
 
@@ -1119,7 +1162,7 @@ We will show that this $\rho$ is \emph{almost} our $\pi_i$, up to a constant.
       \]
       So done.
 
-    \item To show that $0 < \rho_i < \infty$, first fix our $i$, and note that $\rho_k = 1$. We know that $\rho = \rho P = \rho P^n$ for $n \geq 1$. So by expanding the matrix sum, know that for any $m, n$,
+    \item To show that $0 < \rho_i < \infty$, first fix our $i$, and note that $\rho_k = 1$. We know that $\rho = \rho P = \rho P^n$ for $n \geq 1$. So by expanding the matrix sum, we know that for any $m, n$,
       \begin{align*}
         \rho_i &\geq \rho_k p_{k, i}(n)\\
         \rho_k &\geq \rho_i p_{i, k}(m)
@@ -1153,7 +1196,7 @@ Now we can prove our initial theorem.
         \pi_i = \frac{\rho_i}{\mu_k}
       \]
       satisfies $\pi_i \geq 0$ with $\sum_i \pi_i = 1$, and is an invariant distribution.
-    \item Let $\pi$ be an invariant distribution. So for all $n$, we have
+    \item Let $\pi$ be an invariant distribution. We first show that all entries are non-zero. For all $n$, we have
       \[
         \pi = \pi P^n.
       \]
@@ -1171,7 +1214,7 @@ Now we can prove our initial theorem.
 
       Now we show that all states are positive recurrent. So we need to rule out the cases of transience and null recurrence.
 
-      So assume all states are transient. So $p_{ji}(n) \to 0$ for all $i, j\in S$, $n \in \N$. However, we know that
+      So assume all states are transient. So $p_{j, i}(n) \to 0$ for all $i, j\in S$, $n \in \N$. However, we know that
       \[
         \pi_i = \sum_j \pi_j p_{j, i}(n).
       \]
@@ -1179,10 +1222,10 @@ Now we can prove our initial theorem.
       \begin{align*}
         0 &\leq \sum_j \pi_j p_{j, i}(n)\\
         &= \sum_{j \in F} \pi_j p_{j, i}(n) + \sum_{j \not\in F} \pi_j p_{j, i}(n) \\
-        &\leq \sum_{j \in F}p_{j, i}(n) + \sum_{j \in F}\pi_j\\
+        &\leq \sum_{j \in F}p_{j, i}(n) + \sum_{j \not\in F}\pi_j\\
         &\to \sum_{j \not\in F}\pi_j
       \end{align*}
-      as we take the limit $n \to \infty$. We now want to take the limit as $F \to S$. We know that $\sum_{j \in S} \pi_i = 1$. So as we remove more and more things from $S$, $\sum_{j \not\in S} \pi_i \to 0$. So $\sum p_j p_{j, i}(n) \to 0$. So we get the desired contradiction. Hence we know that all states are recurrent.
+      as we take the limit $n \to \infty$. We now want to take the limit as $F \to S$. We know that $\sum_{j \in S} \pi_i = 1$. So as we put more and more things into $F$, $\sum_{j \not\in F} \pi_i \to 0$. So $\sum \pi_j p_{j, i}(n) \to 0$. So we get the desired contradiction. Hence we know that all states are recurrent.
 
       To rule out the case of null recurrence, recall that in the previous discussion, we said that we ``should'' have $\pi_i \mu_i =1 $. So we attempt to prove this. Then this would imply that $\mu_i$ is finite since $\pi_i > 0$.
 
@@ -1213,7 +1256,7 @@ Now we can prove our initial theorem.
         \P(T_i \geq n, X_0 = i) &= \P(X_m \not= i\text{ for } 1\leq m \leq n - 1) \\
         &\quad\quad- \P(X_m \not= i\text{ for } 0\leq m \leq n - 1)
       \end{align*}
-      What can we do now? The trick here is to use invariance. Since we started with an invariant distribution, we always live in an invariant distribution. Looking at the time interval $1 \leq m \leq n -1$ is the same as looking at $0 \leq m \leq n -2$. In other words, the sequence $(X_0, \cdots, X_{n - 2}$ has the same distribution as $(X_1, \cdots, X_{n - 1})$. So we can write the expression as
+      What can we do now? The trick here is to use invariance. Since we started with an invariant distribution, we always live in an invariant distribution. Looking at the time interval $1 \leq m \leq n -1$ is the same as looking at $0 \leq m \leq n -2)$. In other words, the sequence $(X_0, \cdots, X_{n - 2})$ has the same distribution as $(X_1, \cdots, X_{n - 1})$. So we can write the expression as
       \[
         \P(T_i \geq n, X_0 = i) = a_{n - 2} - a_{n - 1},
       \]
@@ -1246,16 +1289,16 @@ Now we can prove our initial theorem.
 So far, we have discussed that if a chain converged, then it must converge to an invariant distribution. We then proved that the chain has a (unique) invariant distribution if and only if it is positive recurrent.
 
 Now, we want to understand when convergence actually occurs.
-\begin{thm}[]
+\begin{thm}
   Consider a Markov chain that is irreducible, positive recurrent and aperiodic. Then
   \[
     p_{i,k}(n) \to \pi_k
   \]
   as $n \to \infty$, where $\pi$ is the unique invariant distribution.
 \end{thm}
-We will prove this by ``coupling''. The idea of coupling is that here we have two sets of probabilities, and we want to prove some relations between them. The first step is to move our attention to random variables, by considering random variables that give rise to these probability distribution. In other words, we look at the Markov chains themselves instead of the probabilities. In general, random variables are nicer to work with, since they are functions, not discrete, random numbers.
+We will prove this by ``coupling''. The idea of coupling is that here we have two sets of probabilities, and we want to prove some relations between them. The first step is to move our attention to random variables, by considering random variables that give rise to these probability distribution. In other words, we look at the Markov chains themselves instead of the probabilities. In general, random variables are nicer to work with, since they are functions, not discrete, unrelated numbers.
 
-However, we have a problem since we get two random variables, but they are completely unrelated. In particular, as functions, their domains are different, and we just cannot compare them directly. This is bad. Any person can solve this problem using the obvious way, by taking the product of the two domains, but this is still not helpful, since the two random variables are still not correlated to each other. So we will need to do some ``coupling'' to correlate the two random variables together.
+However, we have a problem since we get two random variables, but they are completely unrelated. This is bad. So we will need to do some ``coupling'' to correlate the two random variables together.
 
 \begin{proof}(non-examinable)
   The idea of the proof is to show that for any $i, j, k \in S$, we have $p_{i, k}(n) \to p_{j, k}(n)$ as $n \to \infty$. Then we can argue that no matter where we start, we will tend to the same distribution, and hence any distribution tends to the same distribution as $\pi$, since $\pi$ doesn't change.
@@ -1264,7 +1307,7 @@ However, we have a problem since we get two random variables, but they are compl
 
   We can let $Z = (Z_n)$, where $Z_n = (X_n, Y_n)$ is a Markov chain on state space $S^2$. This has transition probabilities
   \[
-    p_{ij, k\ell} = p_{ik} p_{j\ell}
+    p_{ij, k\ell} = p_{i, k} p_{j, \ell}
   \]
   by independence of the chains. We would like to apply theorems to $Z$, so we need to make sure it has nice properties. First, we want to check that $Z$ is irreducible. We have
   \[
@@ -1278,13 +1321,13 @@ However, we have a problem since we get two random variables, but they are compl
   \]
   given by
   \[
-    \nu_{ij} = \pi_i \pi_j.
+    \nu_{i, j} = \pi_i \pi_j.
   \]
   This works because $X$ and $Y$ are independent. So $Z$ is also positive recurrent.
 
   So $Z$ is nice.
 
-  The next step is to couple the two chains together. The idea is to fix some state $s \in S$, and let $T$ be the earliest time at which $X_n = Y_n = s$. Because of recurrence, we can always find such at $T$. After this time $T$, they behave under the exact same distribution.
+  The next step is to couple the two chains together. The idea is to fix some state $s \in S$, and let $T$ be the earliest time at which $X_n = Y_n = s$. Because of recurrence, we can always find such at $T$. After this time $T$, $X$ and $Y$ behave under the exact same distribution.
 
   We define
   \[
@@ -1296,7 +1339,7 @@ However, we have a problem since we get two random variables, but they are compl
     &= \P_{ij}(X_n = k)\\
     &= \P_{ij} (X_n = k, T \leq n) + \P_{ij} (X_n = k, T > n)\\
     \intertext{Note that if $T \leq n$, then at time $T$, $X_T = Y_T$. Thus the evolution of $X$ and $Y$ after time $T$ is equal. So this is equal to}
-    &= \P_{ij}(Y-n = k, T \leq n) + \P_{ij} (X_n = k, T > n)\\
+    &= \P_{ij}(Y_n = k, T \leq n) + \P_{ij} (X_n = k, T > n)\\
     &\leq \P_{ij}(Y_n = k) + \P_{ij}(T > n)\\
     &= p_{j,k}(n) + \P_{ij}(T > n).
   \end{align*}
@@ -1344,7 +1387,7 @@ Hence, by the law of large numbers,
 \[
   \frac{1}{m} T_m = \frac{1}{m} \sum_{r = 1}^m U_r \sim \E [U_1] = \mu_i. \tag{$*$}
 \]
-We now want to know look at $V_i$. If we stare at them hard enough, we see that $V_i(n) \leq k$ if and only if $T_k \leq n$. We can write an equivalent statement by letting $k$ be a real number. We denote $\lceil x\rceil$ as the least integer greater than $x$. Then we have
+We now want to look at $V_i$. If we stare at them hard enough, we see that $V_i(n) \leq k$ if and only if $T_k \leq n$. We can write an equivalent statement by letting $k$ be a real number. We denote $\lceil x\rceil$ as the least integer greater than $x$. Then we have
 \[
   V_i(n) \leq x \Leftrightarrow T_{\lceil x\rceil} \leq n.
 \]
@@ -1369,7 +1412,7 @@ Physicists have a hard time dealing with time reversal. They cannot find a decen
 
 Suppose we have a Markov chain $X = (X_0, \cdots, X_N)$. We define a new Markov chain by $Y_k = X_{N - k}$. Then $Y = (X_N, X_{N - 1}, \cdots, X_0)$. When is this a Markov chain? It turns out this is the case if $X_0$ has the invariant distribution.
 
-\begin{thm}[]
+\begin{thm}
   Let $X$ be positive recurrent, irreducible with invariant distribution $\pi$. Suppose that $X_0$ has distribution $\pi$. Then $Y$ defined by
   \[
     Y_{k} = X_{N - k}
@@ -1411,6 +1454,8 @@ Most of the results here should not be surprising, apart from the fact that $Y$ 
   So $Y$ is a Markov chain.
 \end{proof}
 
+Just because the reverse of a chain is a Markov chain does not mean it is ``reversible''. In physics, we say a process is reversible only if the dynamics of moving forwards in time is the same as the dynamics of moving backwards in time. Hence we have the following definition.
+
 \begin{defi}[Reversible chain]
   An irreducible Markov chain $X = (X_0, \cdots, X_N)$ in its invariant distribution $\pi$ is \emph{reversible} if its reversal has the same transition probabilities as does $X$, ie
   \[
@@ -1426,7 +1471,7 @@ Most of the results here should not be surprising, apart from the fact that $Y$ 
 \end{defi}
 Note that most chains are \emph{not} reversible, just like most functions are not continuous. However, if we know reversibility, then we have one powerful piece of information. The nice thing about this is that it is very easy to check if the above holds --- we just have to compute $\pi$, and check the equation directly.
 
-In fact, there is an even easier check. We don't have to start with finding $\pi$, but just some $\lambda$ that is in detailed balance.
+In fact, there is an even easier check. We don't have to start by finding $\pi$, but just some $\lambda$ that is in detailed balance.
 
 \begin{prop}
   Let $P$ be the transition matrix of an irreducible Markov chain $X$. Suppose $(P, \lambda)$ is in detailed balance. Then $\lambda$ is the \emph{unique} invariant distribution and the chain is reversible (when $X_0$ has distribution $\lambda$).
@@ -1524,13 +1569,13 @@ This gives a really quick route to compute invariant distributions.
     \begin{cases}
       0 & j\text{ is a neighbour of }i\\
       \frac{1}{d_i} & j\text{ is a neighbour of }i
-    \end{cases}.
+    \end{cases},
   \]
   where $d_i$ is the number of neighbours of $i$, commonly known as the \emph{degree} of $i$.
 
   By connectivity, the Markov chain is irreducible. Since it is finite, it is recurrent, and in fact positive recurrent.
 
-  This process is a rather ``physical'' process, and we would expect it to be reversible. So let's try to solve the detailed balance equation
+  This process is a rather ``physical'' process, and again we would expect it to be reversible. So let's try to solve the detailed balance equation
   \[
     \lambda_i p_{i, j} = \lambda_j p_{j, i}.
   \]
@@ -1542,7 +1587,7 @@ This gives a really quick route to compute invariant distributions.
   \[
     1 = \sum_i \lambda_i = c \sum_i d_i.
   \]
-  We now note that since each edge adds $1$ to the degrees of each vertex on the two ends, $\sum d_i$ is just twice the number of edges. So
+  We now note that since each edge adds $1$ to the degrees of each vertex on the two ends, $\sum d_i$ is just twice the number of edges. So the equation gives
   \[
     1 = 2c |E|.
   \]
@@ -1559,7 +1604,7 @@ This gives a really quick route to compute invariant distributions.
   Suppose we have a knight on the chessboard. In each step, the allowed moves are:
   \begin{itemize}
     \item Move two steps horizontally, then one step vertically;
-    \item Move two steps vertically, then one step horizontall.
+    \item Move two steps vertically, then one step horizontally.
   \end{itemize}
   For example, if the knight is in the center of the board (red dot), then the possible moves are indicated with blue crosses:
   \begin{center}
@@ -1580,7 +1625,7 @@ This gives a really quick route to compute invariant distributions.
       \node [mblue] at (2.5, 2.5) {$\times$};
     \end{tikzpicture}
   \end{center}
-  At each epoch of time, our erratic night follows a legal move chosen uniformly from the set available. Hence we have a Markov chain derived from the chessboard. What is his invariant distribution. We can compute the number of possible moves from each position:
+  At each epoch of time, our erratic knight follows a legal move chosen uniformly from the set of possible moves. Hence we have a Markov chain derived from the chessboard. What is his invariant distribution. We can compute the number of possible moves from each position:
   \begin{center}
     \begin{tikzpicture}[scale=0.5]
       \foreach \x in {0,1,...,8} {
