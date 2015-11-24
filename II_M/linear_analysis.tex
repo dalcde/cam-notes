@@ -34,7 +34,7 @@
 Linear analysis is the study of (infinite dimensional) vector spaces with extra structure (eg. a norm or inner product) that allows us to do analysis. We will be interested also in linear operators on spaces of functions.
 
 \section{Normed vector spaces}
-In IB Linear Analysis, we have studied vector spaces in quite a lot of detail. However, just knowing that something is a vector space usually isn't too helpful. Often, we would want the vector space to have some additional structure. The first structure we will study is a \emph{norm}.
+In IB Linear Analysis, we have studied vector spaces in quite a lot of detail. However, just knowing something is a vector space usually isn't too helpful. Often, we would want the vector space to have some additional structure. The first structure we will study is a \emph{norm}.
 
 \begin{defi}[Normed vector space]
   A \emph{normed vector space} is a pair $(V, \|\ph \|)$, where $V$ is a vector space over a field $\F$ and $\|\ph \|$ is a function $\|\ph \|: V \mapsto \R$, known as the \emph{norm}, satisfying
@@ -828,7 +828,7 @@ We'll have some quick corollaries of these theorems.
 \end{proof}
 
 \begin{cor}
-  Let $V$ be a real normed vector space. Then $\mathbf{v} = \mathbf{0}$ if and only if $f(\mathbf{v}) = 0$ for all $\mathbf{v}\in V^*$.
+  Let $V$ be a real normed vector space. Then $\mathbf{v} = \mathbf{0}$ if and only if $f(\mathbf{v}) = 0$ for all $f\in V^*$.
 \end{cor}
 
 \begin{cor}
@@ -2867,7 +2867,7 @@ Obviously, $\sigma_p(T) \subseteq \sigma(T)$, but they are in general not equal.
 \end{defi}
 Again, we have
 \[
-  \sigma_p \subseteq \sigma_{ap}.
+  \sigma_p(T) \subseteq \sigma_{ap}(T) \subseteq \sigma(T).
 \]
 
 \begin{thm}
@@ -2934,6 +2934,7 @@ We can now return to prove our original theorem.
     \{\lambda \in \C: |\lambda| \leq \|T\|_{\mathcal{B}(X)}\}.
   \]
 \end{thm}
+Note that it is not hard to prove that it is closed and a subset of $\{\lambda \in \C: |\lambda| \leq \|T\|_{\mathcal{B}(X)}\}$. The hard part is to prove it is non-empty.
 
 \begin{proof}
   We first prove the closedness of the spectrum. It suffices to prove that the resolvent set $\rho(T) = \C \setminus \sigma(T)$ is open, by the definition of closedness.
@@ -2981,13 +2982,153 @@ We can now return to prove our original theorem.
   \[
     \sup_{\lambda \in \C} \|R (\lambda)\|_{\mathcal{B}(X)} < \infty.
   \]
-  It suffices to prove this for $\lambda$ large. In that case, we have
+  It suffices to prove this for $\lambda$ large. Note that we have
   \[
-    \|(\lambda I - T)^{-1}\|_{\mathcal{B}(X)} \leq \|\lambda^{-1}(I - \lambda^{-1}T)^{-1}\|_{\mathcal{B}(X)} \to 0
+    (T - \lambda I)^{-1} = \lambda^{-1}(\lambda^{-1} T - I)^{-1} = -\lambda^{-1} \sum_{i = 0}^\infty \lambda^{-i} T^i.
   \]
-  as $|\lambda| \to \infty$. So it is bounded.
+  Hence we get
+  \begin{align*}
+    \|(\lambda I - T)^{-1}\|_{\mathcal{B}(X)} &\leq |\lambda|^{-1}\sum_{i = 0}^\infty |\lambda|^{-1} \|T^i\|_{\mathcal{B}(X)}\\
+    &\leq |\lambda|^{-1} \sum_{i = 0}^\infty |\lambda^{-i}| \|T\|^i_{\mathcal{B}(X)}\\
+    &\leq \frac{1}{|\lambda| - \|T\|_{\mathcal{B}(X)}},
+  \end{align*}
+  which tends to $0$ as $|\lambda| \to \infty$. So it is bounded.
 
   By ``Liouville's theorem'', $R(\lambda)$ is constant, which is clearly a contradiction since $R(\lambda) \not= R(\mu)$ for $\lambda \not= \mu$.
 \end{proof}
-Of course, to do this properly, we need a version of Liouville's theorem for Banach-space valued functions as opposed to complex-valued functions. We will do that next time.
+Of course, to do this properly, we need a version of Liouville's theorem for Banach-space valued functions as opposed to complex-valued functions. So let's prove this.
+
+\begin{prop}[Liouville's theorem for Banach space-valued analytic function]
+  Let $X$ be a Banach space, and $F: \C \to X$ be entire (in the sense that $F$ is given by an absolutely convergent power series in some neighbourhood of any point) and norm bounded, ie.
+  \[
+    \sup_{z \in \C} \|F(z)\|_X < \infty.
+  \]
+  Then $F$ is constant.
+\end{prop}
+This is a generalization of Liouville's theorem to the case where the target of the map is a Banach space. To prove this, we reduce this to the case of complex-valued functions. To do so, we compose this $F$ to a map $X \to \C$.
+
+\begin{proof}
+  Let $f \in X^*$. Then we show $f \circ F: \C \to \C$ is bounded and entired. To see it is bounded, just note that $f$ is a bounded linear map. So
+  \[
+    \sup_{z \in \C} |f\circ F(z)| \leq \sup_{ z \in \C} \|f\|_{X^*} \|F(z)\|_X < \infty.
+  \]
+  Analyticity can be shown in a similar fashion, exploiting the fact that $f^*$ is linear.
+
+  Hence Liouville's theorem implies $f \circ F$ is constant, ie. $(f \circ F)(z) = (f\circ F)(0)$. In particular, this implies $f(F(z) - F(0)) = 0$. Moreover, this is true for all $f \in X^*$. Hence by (corollary of) Hahn-Banach theorem, we know $F(z) - F(0) = 0$ for all $z \in \C$. Therefore $F$ is constant.
+\end{proof}
+We have thus completed our proof that $\sigma(T)$ is non-empty, closed and a subset of $\{\lambda \in \C: |\lambda| \leq \|T\|_{\mathcal{B}(X)}\}$. However, we want to know more. Apart from the spectrum itself, we also had the point spectrum $\sigma_p(T)$ and the approximate point spectrum $\sigma_{ap}(T)$, and we had the inclusions
+\[
+  \sigma_p(T) \subseteq \sigma_{ap}(T) \subseteq \sigma(T).
+\]
+We know that the largest set $\sigma(T)$ is non-empty, but we want the smaller ones to be non-empty as well. We have the following theorem:
+\begin{thm}
+  We have
+  \[
+    \sigma_{ap}(T) \supseteq \partial \sigma(T),
+  \]
+  where $\partial \sigma(T)$ is the boundary of $\sigma(T)$ in the topology of $\C$. In particular, $\sigma_{op}(T) \not= \emptyset$.
+\end{thm}
+On the other hand, it is possible for $\sigma_p(T)$ to be empty (in infinite dimensional cases).
+
+\begin{proof}
+  Let $\lambda \in \partial \sigma(T)$. Hence there exists a sequence $\{\lambda_n\}_{n = 1}^\infty \subseteq \rho(T) = \C\setminus \sigma(T)$ such that $\lambda_n \to \lambda$. We will show $R(\lambda_n) = (T - \lambda_n I)^{-1}$ satisfies
+  \[
+    \|R(\lambda_n)\|_{\mathcal{B}(X)} \to \infty.
+  \]
+  Why is this so? Recall from last time if $S_1$ is invertible, and
+  \[
+    \|S_1^{-1}\|_{\mathcal{B}(X)} \|S_1 - S_2\|_{\mathcal{B}(X)} \leq 1, \tag{$*$}
+  \]
+  then $S_2$ is invertible. We define
+  \[
+    d_n = \inf\{ |\mu - \lambda_n|: \mu \in \sigma(T)\}.
+  \]
+  Of course, $d_n \to 0$ by definition. Hence it suffices to show
+  \[
+    \|R(\lambda_n)\|_{\mathcal{B}(X)} \geq \frac{1}{d_n} \to \infty;
+  \]
+  This is true because since $\sigma(T)$ is compact, the infimum is achieved. So there exists some $\mu_n \in \sigma(T)$ such that $|\mu_n - \lambda_n| = d_n$. So if $\|R(\lambda_n)\|_{\mathcal{B}(X)} \leq \frac{1}{d_n}$, then since
+  \[
+    \|(T - \lambda_n I) - (T - \mu_n i)\|_{B(X)} = d_n,
+  \]
+  by $(*)$, we know $T - \mu_n I$ is invertible, contradicting the fact that $\mu_n \in \sigma(T)$.
+
+  As a consequence, we know there exists $\mathbf{y}_n \in X$ such that $\|\mathbf{y}_n\| \to 0$ while $\|R(\lambda_n)(\mathbf{y}_n)\|_X = 1$. Now let $\mathbf{x}_n = R(\lambda_n) (\mathbf{y}_n)$. Note that $\|\mathbf{x}_n\| = 1$, and
+  \begin{align*}
+    \|(T - \lambda I)\mathbf{x}_n \| &\leq \|(T - \lambda_n I) \mathbf{x}_n\|X + \|(\lambda - \lambda_n) I \mathbf{x}_n\|\\
+    &= \|(T - \lambda_n I) (T - \lambda_n I)^{-1} \mathbf{y}_n\|_X + \|(\lambda - \lambda_n) I \mathbf{x}_n\|\\
+    &= \|\mathbf{y}_n\|_X + |\lambda - \lambda_n|\\
+    &\to 0
+  \end{align*}
+  So $\lambda \in \sigma_{ap}(T)$.
+\end{proof}
+
+Having proven so many theorems, we now look at an specific example.
+
+\begin{eg}
+  Consider the shift operator $S: \ell_\infty \to \ell_\infty$ defined by
+  \[
+    (a_1, a_2, a_3, \cdots) \mapsto (0, a_1, a_2, \cdots).
+  \]
+  Then $S$ is a bounded linear operator with norm $\|S\|_{\mathcal{B}(\ell_\infty)} = 1$. The theorem then tells $\sigma(S)$ is a non-empty closed subset of $\{\lambda \in \C: \|\lambda\| \leq 1\}$.
+
+  First, we want to understand what the point spectrum is. In fact, it is empty. To show this, suppose
+  \[
+    S(a_1, a_2, a_3, \cdots) = \lambda (a_1, a_2, a_3, \cdots)
+  \]
+  for some $\lambda \in \C$. In other words,
+  \[
+    (0, a_1, a_2, \cdots) = \lambda (a_1, a_2, a_3, \cdots).
+  \]
+  First consider the possibility that $\lambda = 0$. This would imply that the left is zero. So $a_i = 0$ for all $i$.
+
+  If $\lambda \not= 0$, then for the first coordinate to match, we must have $a_1 = 0$. Then for the second coordinate to match, we also need $a_2 = 0$. By induction, we need all $a_i = 0$. So $\ker (S - \lambda I) = \{0\}$ for all $\lambda \in \C$.
+
+  To find the spectrum, we will in fact show that
+  \[
+    \sigma(S) = D = \{\lambda \in \C: |\lambda \leq 1\}.
+  \]
+  To prove this, we need to show that for any $\lambda \in D$, $S - \lambda I$ is not surjective. The $\lambda = 0$ case is obvious. For the other cases, we first have a look at what the image of $S - \lambda I$ looks like. We take
+  \[
+    (b_1, b_2, b_3, ...) \in \ell_\infty.
+  \]
+  Suppose for some $\lambda \in D$, there exists $(a_1, a_2, \cdots)$ such that we have
+  \[
+    (S - \lambda I) (a_1, a_2, \cdots) = (b_1, b_2, \cdots)
+  \]
+   In other words, we have
+  \[
+    (0, a_1, a_2, \cdots) - (\lambda a_1, \lambda a_2, \lambda a_3, \cdots) = (b_1, b_2, b_3, \cdots).
+  \]
+  So $-\lambda a_1 = b_1$. Hence we have
+  \[
+    a_1 = -\lambda^{-1} b_1.
+  \]
+  The next line then gives
+  \[
+    a_1 - \lambda a_2 = b_2.
+  \]
+  Hence
+  \[
+    a_2 = -\lambda^{-1}(b_2 - a_1) = -\lambda^{-1} (b_2 + \lambda^{-1} b_1).
+  \]
+  Inductively, we can show that
+  \[
+    a_n = \lambda^{-1}(b_n + \lambda^{-1} b_{n - 1} + \lambda^{-2}b_{n - 2} + \cdots + \lambda^{-n + 1}b_1).
+  \]
+  Now if $|\lambda| \leq 1$, we pick $b_n$ such that $|b_n| = 1$ and $\lambda^{-i}b_{n - i} = |\lambda|^{-i}$. Then we get $|a_n| \to \infty$. Such a sequence $(a_n) \not\in \ell_\infty$. So $(b_n) \not\in \im (S - \lambda I)$. Therefore for $|\lambda| \leq 1$, $S - \lambda I$ is not surjective.
+
+  Hence we have $\sigma(S) \supseteq D$. By the theorem, we also know $\sigma(S) \subseteq D$. So in fact $\sigma(S) = D$.
+
+  Finally, we show that
+  \[
+    \sigma_{ap}(S) = \partial D = \{\lambda \in \C: |\lambda| = 1\}.
+  \]
+  Our theorem tells us that $\partial D \subseteq \sigma_{ap}(S) \subseteq D$. To show that indeed $\partial D = \sigma_{ap}(S)$, note that if $|\lambda| < 1$, then for all $\mathbf{x} \in \ell_\infty$.
+  \[
+    \|(S - \lambda I)\mathbf{x}\|_{\ell_\infty} \geq \|S_\mathbf{x}\|_{\ell\infty} - |\lambda|\|\mathbf{x}\|_{\ell_\infty} = \|\mathbf{x}\|_{\ell_\infty} - |\lambda| \|\mathbf{x}\|_{\ell_\infty} = (1 - \lambda) \|\mathbf{x}\|_{\ell_\infty}.
+  \]
+  So if $|\lambda| < 1$, then there exists no sequenecs $\mathbf{x}_n$ with $\|\mathbf{x}_n\|_{\ell_\infty} = 1$ and $\|(S - \lambda I) \mathbf{x}_n \|_{\ell_\infty} \to 0$. So $\lambda$ is not in the approximate point spectrum.
+\end{eg}
+We see that these results are rather unpleasant and the spectrum behaves rather unlike the finite dimensional cases. Fortunately, we will later see that if we put some more restrictions on our operators, then we can get a much nicer result.
 \end{document}
