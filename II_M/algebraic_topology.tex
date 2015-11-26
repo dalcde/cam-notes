@@ -3787,7 +3787,7 @@ We are first going to apply this result to obtain the Mayer-Vietoris theorem.
       N \ar[r, hook, "\ell"] & K.
     \end{tikzcd}
   \]
-  Then there exists some natural homomorphism $\partial_*$ such that
+  Then there exists some natural homomorphism $\partial_*: H_n(K) \to H_{n - 1}(L)$ that gives the following long exact sequence:
   \[
     \begin{tikzcd}
       \cdots \ar[r, "\partial_*"] & H_n(L) \ar[r, "i_* + j_*"] & H_n(M) \oplus H_n(N) \ar[r, "k_* - \ell_*"] & H_n(K)\ar[out=0, in=180, looseness=2, overlay, lld, "\partial_*"']\\
@@ -3796,7 +3796,9 @@ We are first going to apply this result to obtain the Mayer-Vietoris theorem.
     \end{tikzcd}
   \]
 \end{thm}
-Here $A \oplus B$ is the direct sum of the two groups, which may also be known as the Cartesian product.
+Here $A \oplus B$ is the direct sum of the two (abelian) groups, which may also be known as the Cartesian product.
+
+Note that unlike the Seifert-van Kampen theorem, this does not require the intersection $L = M \cap N$ to be (path) connected. This is restriction was needed for Seifert-van Kampen since the fundamental group is unable to see things outside the path component of the basepoint, and hence it does not like non-path connected spaces well. Howeber, homology groups don't have these problems.
 
 \begin{proof}
   All we have to do is to produce is short exact sequence of complexes. We have
@@ -3808,5 +3810,171 @@ Here $A \oplus B$ is the direct sum of the two groups, which may also be known a
   Here $i_n + j_n: C_n(L) \to C_n(M) \oplus C_n(N)$ is the map $x \mapsto (x, x)$, while $k_n - \ell_n: C_n(M) \oplus C_n(N) \to C_n(K)$ is the map $(a, b) \mapsto a - b$ (after applying the appropriate inclusion maps).
 
   It is easy to see this is a short exact exact sequence of chain complexes. The image of $i_n + j_n$ is the set of all elements of the form $(x, x)$, and the kernel of $k_n - \ell_n$ is also these. It is also easy to see that $i_n + j_n$ is injective and $k_n - \ell_n$ is surjective.
+\end{proof}
+
+The Mayer-Vietoris theorem is a powerful theorem we will use, but the result by itself is often not useful, since we don't know what the map $\partial_*$ is. To understand this map, we need to know how to prove the previous theorem.
+\begin{thm}
+  If we have a short exact sequence of complexes
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & A_{\Cdot} \ar [r, "i_{\Cdot}"] & B_{\Cdot} \ar [r, "j_{\Cdot}"] & C_{\Cdot} \ar[r] & 0
+    \end{tikzcd}
+  \]
+  then a miracle happens to their homology groups. In particular, there is a long exact sequence (ie. an exact sequence that is not short)
+  \[
+    \begin{tikzcd}
+      \cdots \ar [r] & H_n(A) \ar[r, "i_*"] & H_n(B) \ar[r, "j_*"] & H_n(C) \ar[out=0, in=180, looseness=2, overlay, dll, "\partial_*"']\\
+      & H_{n - 1}(A) \ar[r, "i_*"] & H_{n - 1}(B) \ar[r, "j_*"] & H_{n - 1}(C) \ar [r] & \cdots
+    \end{tikzcd}
+  \]
+  where $i_*$ and $j_*$ are induced by $i_{\Cdot}$ and $j_{\Cdot}$, and $\partial_*$ is a map we will define in the proof.
+\end{thm}
+The method of proving this is sometimes known as ``diagram chasing'', where we just ``chase'' around commutative diagrams to find the elements we need.
+\begin{proof}
+  The proof of this is in general not hard. It just involves a lot of checking of the details, such as making sure the homomorphisms are well-defined, are actually homomorphisms, are exact at all the places etc. The only important and non-trivial part is just the construction of the map $\partial_*$. Other than this, we will not spend our time trying to pin down all the details.
+
+  First we look at the following commutative diagram:
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & A_n \ar[r, "i_n"] \ar[d, "d_n"] & B_n \ar[r, "j_n"] \ar[d, "d_n"] & C_n \ar[r] \ar[d, "d_n"] & 0\\
+      0 \ar[r] & A_{n - 1} \ar[r, "i_{n - 1}"] & B_{n - 1} \ar[r, "i_{n - 1}"] & C_{n - 1} \ar[r] & 0
+    \end{tikzcd}
+  \]
+  To construct $\partial_*: H_n(C) \to H_{n - 1}(A)$, let $[x] \in H_n(C)$ be a class represented by $x \in Z_n(C)$. We need to find a cycle $z \in A_{n - 1}$. By exactness, we know the map $j_n: B_n \to C_n$ is surjective. So there is a $y \in B_n$ such that $j_n(y) = x$. Since our target is $A_{n - 1}$, we want to move down to the next level. So consider $d_n(y) \in B_{n - 1}$. We would be done if $d_n(y)$ is in the image of $i_{n - 1}$. By exactness, this is equivalent saying $d_n(y)$ is in the kernel of $j_{n -1 }$. Since the diagram is commutative, we know
+  \[
+    j_{n - 1}\circ d_n(y) = d_n \circ j_n (y) = d_n(x) = 0,
+  \]
+  using the fact that $x$ is a cycle. So $d_n (y) \in \ker j_{n - 1} = \im i_{n - 1}$. Moreover, by exactness again, $i_{n - 1}$ is injective. So there is a unique $z \in A_{n - 1}$ such that $i_{n - 1}(z) = d_n(y)$. We have now produced our $z$.
+
+  We are not done. We have $\partial_* [x] = [z]$ as our candidate definition, but we need to check many things:
+  \begin{enumerate}
+    \item We need to make sure $\partial_*$ is indeed a homomorphism.
+    \item We need $d_{n - 1}(z) = 0$ so that $[z] \in H_{n - 1}(A)$;
+    \item We need to check $[z]$ is well-defined, ie. it does not depend on our choice of $y$ and $x$ for the homology class $[x]$.
+    \item We need to check the exactness of the resulting sequence.
+  \end{enumerate}
+  Let's just do the easiest ones. We check $d_{n - 1}(z) = 0$. To do so, we need to add an additional layer.
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & A_n \ar[r, "i_n"] \ar[d, "d_n"] & B_n \ar[r, "j_n"] \ar[d, "d_n"] & C_n \ar[r] \ar[d, "d_n"] & 0\\
+      0 \ar[r] & A_{n - 1} \ar[r, "i_{n - 1}"] \ar[d, "d_{n - 1}"] & B_n \ar[r, "j_{n - 1}"] \ar[d, "d_{n - 1}"] & C_n \ar[r] \ar[d, "d_{n - 1}"] & 0\\
+      0 \ar[r] & A_{n - 2} \ar[r, "i_{n - 2}"] & B_{n - 2} \ar[r, "i_{n - 2}"] & C_{n - 2} \ar[r] & 0
+    \end{tikzcd}
+  \]
+  We want to check that $d_{n - 1}(z) = 0$. We want to use the commutativity of the diagram. In particular, we know
+  \[
+    i_{n - 2} \circ d_{n - 1}(z) = d_{n - 1} \circ i_{n - 1} (z) = d_{n - 1} \circ d_n(y) = 0.
+  \]
+  By exactness at $A_{n - 2}$, we know $i_{n - 2}$ is injective. So we must have $d_{n - 1}(z) = 0$.
+
+  % complete proof, insert elements at diagram
+\end{proof}
+
+\subsection{Continuous maps and homotopy invariance}
+This is the most technical part of the homology section of the course. The goal is to see that the homology groups $H_*(K)$ depends only on the polyhedron, and not the simplicial structure on it. Moreover, we will show that they are \emph{homotopy invariants} of the space, and that homotopic maps $f \simeq : |K| \to |L|$ induce equal maps $H_*(K) \to H_*(L)$. Note that this is a lot to prove. At this point, we don't even know arbitrary continuous maps induce \emph{any} map on the homology. We only know simplicial maps do.
+
+\begin{defi}[Contiguous]
+  Simplicial maps $f, g: K \to L$ are \emph{contiguous} if for each $\sigma \in K$, the simplices $f(\sigma)$ and $g(\sigma)$ (ie. the simplices spanned by the image of the vertices of $\sigma$) are faces of some some simplex $\tau \in L$
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (0, 0) node [circ] {} -- (2, 0) node [pos=0.5, above] {$\sigma$} node [circ] {};
+
+      \fill [mblue, opacity=0.5] (4, 0) -- (6, 0) -- (5, 1.732) -- cycle;
+      \node at (5, 0.57733) {$\tau$};
+      \draw (4, 0) -- (6, 0) -- (5, 1.732) -- cycle;
+
+      \draw [mred, semithick] (4, 0) -- (6, 0);
+      \draw (1, -0.5) edge [bend right, mred, -latex'] (5, -0.3);
+      \node [mred] at (3, -1.3) {$g$};
+
+      \draw [morange, semithick] (4, 0) -- (5, 1.732);
+      \draw (1, 0.5) edge [bend left, morange, -latex'] (4.3, 0.866); % fix arrows
+      \node [morange] at (3, 1.7) {$f$};
+    \end{tikzpicture}
+  \end{center}
+\end{defi}
+Why do we want this definition? The significance is the following result:
+
+\begin{lemma}
+  If $f, g: K \to L$ are simplicial approximations to the same map $F$, then $f$ and $g$ are contiguous.
+\end{lemma}
+
+\begin{proof}
+  Let $\sigma \in K$, and pick some $s \in \mathring{\sigma}$. Then $F(s) \in \mathring{\tau}$ for some $\tau \in L$. Then the definition of simplicial approximation implies that for any simplicial approximation $f$ to $F$, $f(\sigma)$ spans a face of $\tau$.
+\end{proof}
+
+\begin{lemma}
+  If $f, g: K \to L$ are continguous simplicial maps, then
+  \[
+    f_* = g_* : H_n(K) \to H_n(L)
+  \]
+  for all $n$.
+\end{lemma}
+
+Geometrically, the homotopy is obvious. If $f(\sigma)$ and $g(\sigma)$ are both faces of $\tau$, then we just pick the homotopy as $\tau$. The algebraic definition is less inspiring, and it takes some staring to see it is indeed what we think it should be.
+\begin{proof}
+  We will write down a chain homotopy between $f$ and $g$:
+  \[
+    h_n((a_0, \cdots, a_n)) = \sum_{i = 0}^n (-1)^i [f(a_0), \cdots, f(a_i), g(a_i), \cdots, g(a_n)],
+  \]
+  where the square brackets means the corresponding oriented simplex if there are no repeats, $0$ otherwise.
+
+  We can now check by direct computation that this is indeed a chain homotopy.
+\end{proof}
+
+Now we know that if $f, g:K \to L$ are both simplicial approximations to the same $F$, then they induce equal maps on homology. However, we not yet know that continuous maps induce well-defined maps on homologies, since to produce simplicial approximations, we needed to perform barycentric subdivision, and we need to make sure this does not change the homology.
+\begin{center}
+  \begin{tikzpicture}
+    \draw [fill=mblue, fill opacity=0.5] (0, 0) -- (2, 0) -- (1, 1.732) -- cycle;
+    \node [circ] at (0, 0) {};
+    \node [circ] at (2, 0) {};
+    \node [circ] at (1, 1.732) {};
+    \node [below] at (1, 0) {$K$};
+
+    \draw [->] (2.5, 0.866) -- (4.5, 0.866);
+    \begin{scope}[shift={(5, 0)}]
+      \draw [fill=mblue, fill opacity=0.5] (0, 0) -- (2, 0) -- (1, 1.732) -- cycle;
+      \node [circ] at (0, 0) {};
+      \node [circ] at (2, 0) {};
+      \node [circ] at (1, 1.732) {};
+      \node [circ] at (1, 0) {};
+      \node [circ] at (0.5, 0.866) {};
+      \node [circ] at (1.5, 0.866) {};
+      \node [circ] at (1, 0.5773) {};
+      \draw (0, 0) -- (1, 0.5773) -- (2, 0);
+      \draw (1, 0) -- (1, 1.732);
+      \draw (0.5, 0.866) -- (1, 0.5773) -- (1.5, 0.866);
+      \node [below] at (1, 0) {$K'$};
+    \end{scope}
+  \end{tikzpicture}
+\end{center}
+Given a barycentric subdivision, we need to choose a simplicial approximation to the identity map $a: K' \to K$. It turns out this is easy to do, and we can do it almost arbitrarily.
+
+\begin{lemma}
+  Each vertex $\hat{\sigma} \in K'$ is a barycenter of some $\sigma \in K$. Then we choose $a(\hat{\sigma})$ to be a arbitrary vertex of $\sigma$. This defines a function $a: V_{K'} \to V_K$. This $a$ is a simplicial approximation to the identity. Moreover, \emph{every} simplicial approximation to the identity is of this form.
+\end{lemma}
+
+\begin{proof}
+  Omitted. % see notes.
+\end{proof}
+
+Next, we need to show this gives an isomorphism on the homologies.
+
+\begin{prop}
+  For $a: K' \to K$ a simplicial approximation to the identity, the induced map $a_*: H_n(K') \to H_n(K)$ is an isomorphism for all $n$.
+\end{prop}
+
+\begin{proof}
+  We first deal with $K$ being a simplex $\sigma$ and its faces. Now that $K$ is just a cone (with any vertex as the cone vertex), and $K'$ is also a cone (with the barycenter as the cone vertex). Therefore
+  \[
+    H_n(K) \cong H_{n}(K') \cong
+    \begin{cases}
+      \Z & n = 0\\
+      0 & n > 0
+    \end{cases}
+  \]
+  So only $n = 0$ is (a little) interesting, but it is easy to check that $a_*$ is an isomorphism.
+
+  To finish the proof, note that $K$ is built up by gluing up simplices, and $K'$ is built by gluing up subdivided simplices. So to understand their homology groups, we use the Mayer-Vietoris sequence.
 \end{proof}
 \end{document}
