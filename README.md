@@ -8,18 +8,25 @@ Currently, the notes for the following subjects are available.
 
 ## Part IA
 ### Michaelmas Term
+ - Differential Equations (2014, M. G. Worster)
  - Groups (2014, J. Goedecke)
  - Numbers and Sets (2014, A. G. Thomason)
- - Differential Equations (2014, M. G. Worster)
  - Vectors and Matrices (2014, N. Peake)
 
 ### Lent Term
  - Analysis I (2015, W. T. Gowers)
- - Probability (2015, R. R. Weber)
  - Dynamics and Relativity (2015, G. I. Ogilvie)
+ - Probability (2015, R. R. Weber)
  - Vector Calculus (2015, B. Allanach)
 
 ## Part IB
+### Michaelmas Term
+ - Analysis II (2015, N. Wickramasekera)
+ - Linear Algebra (2015, S. J. Wadsley)
+ - Markov Chains (2015, G. R. Grimmett)
+ - Methods (2015, D. B. Skinner)
+ - Quantum Mechanics (2015, J. M. Evans)
+
 ### Lent Term
  - Electromagnetism (2015, D. Tong)
  - Statistics (2015, D. Spiegelhalter)
@@ -30,5 +37,10 @@ Currently, the notes for the following subjects are available.
  - Variational Principles (2015, P. K. Townsend)
 
 ## Part II
+### Michaelmas Term
+ - Algebraic Topology (2015, H. Wilton)
+ - Galois Theory (2015, C. Birkar)
+ - Linear Analysis (2015, J. W. Luk)
+
 ### Lent Term
  - Logic and Set Theory (2015, I. B. Leader)
