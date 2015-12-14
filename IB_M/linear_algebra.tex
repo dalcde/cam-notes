@@ -6,7 +6,6 @@
 \def\nlecturer {S. J. Wadsley}
 \def\ncourse {Linear Algebra}
 \def\nofficial{https://www.dpmms.cam.ac.uk/~sjw47/LinearAlgebraM15.pdf}
-\def\nnotready {}
 
 \input{header}
 
@@ -36,10 +35,18 @@
 \tableofcontents
 \setcounter{section}{-1}
 \section{Introduction}
-Linear algebra is the study of vector spaces and linear maps between vector spaces. Unlike IA vector and matrices, most of the time, we will not assume that we already have a fixed coordinate system. In particular, we no longer treat vectors as a ``list of numbers''. Instead, we will provide an axiomatic treatment of vector spaces and the maps.
+In IA Vectors and Matrices, we have learnt about vectors (and matrices) in a rather applied way. A vector was just treated as a ``list of numbers'' representing a point in space. We used these to represent lines, conics, planes and many other geometrical notions. A matrix is treated as a ``physical operation'' on vectors that stretches and rotates them. For example, we studied the properties of rotations, reflections and shears of space. We also used matrices to express and solve systems of linear equations. We mostly took a practical approach in the course.
 
-\section{Definitions}
+In IB Linear Algebra, we are going to study vectors in an abstract setting. Instead of treating vectors as ``lists of numbers'', we view them as things we can add and scalar-multiply. We will write down axioms governing how these operations should behave, just like how we wrote down the axioms of group theory. Instead of studying matrices as an array of numbers, we instead look at linear maps between vector spaces abstractly.
+
+In the course, we will, of course, prove that this abstract treatment of linear algebra is just ``the same as'' our previous study of ``vectors as a list of numbers''. Indeed, in certain cases, results are much more easily proved by working with matrices (as an array of numbers) instead of abstract linear maps, and we don't shy away from doing so. However, most of the time, looking at these abstractly will provide a much better fundamental understanding of how things work.
+
+\section{Vector spaces}
 \subsection{Definitions and examples}
+\begin{notation}
+  We will use $\F$ to denote an arbitrary field, usually $\R$ or $\C$.
+\end{notation}
+
 Intuitively, a vector space $V$ over a field $\F$ (or an $\F$-vector space) is a space with two operations:
 \begin{itemize}
   \item We can add two vectors $\mathbf{v}_1, \mathbf{v}_2 \in V$ to obtain $\mathbf{v}_1 + \mathbf{v}_2 \in V$.
@@ -67,15 +74,12 @@ Of course, these two operations must satisfy certain axioms before we can call i
       \[
         C^{\infty}([a, b], \R) = \{f\in \R^{[a,b]}: f\text{ is infinitely differentiable}\}
       \]
-    \item The set of $m\times n$ matrices with coefficients in $\R$ is a vector space, using the obvious operations, is a vector space.
+    \item The set of $m\times n$ matrices with coefficients in $\R$ is a vector space, using componentwise addition and scalar multiplication, is a vector space.
   \end{enumerate}
 \end{eg}
 
-\begin{notation}
-  We will use $\F$ to denote an arbitrary field, usually $\R$ or $\C$.
-\end{notation}
+Of course, we cannot take a random set, define some random operations called addition and scalar multiplication, and call it a vector space. These operations have to behave sensibly.
 
-We will now properly define a vector space, listing the axioms they are required to satisfy.
 \begin{defi}[Vector space]
   An \emph{$\F$-vector space} is an (additive) abelian group $V$ together with a function $\F \times V \to V$, written $(\lambda, \mathbf{v}) \mapsto \lambda \mathbf{v}$, such that
   \begin{enumerate}
@@ -85,9 +89,9 @@ We will now properly define a vector space, listing the axioms they are required
     \item $1\mathbf{v} = \mathbf{v}$ for all $\mathbf{v}\in V$ \hfill (identity)
   \end{enumerate}
 
-  We always write $\mathbf{0}$ for the identity in $V$, and call this the identity. By abuse of notation, we also write $0$ for the trivial vector space $\{0\}$.
+  We always write $\mathbf{0}$ for the additive identity in $V$, and call this the identity. By abuse of notation, we also write $0$ for the trivial vector space $\{0\}$.
 \end{defi}
-In a general vector space, there is no notion of ``coordinates'', length, angle or distance.
+In a general vector space, there is no notion of ``coordinates'', length, angle or distance. For example, it would be difficult to assign these quantities to the vector space of real-valued continuous functions in $[a, b]$.
 
 From the axioms, there are a few results we can immediately prove.
 \begin{prop}
@@ -95,17 +99,19 @@ From the axioms, there are a few results we can immediately prove.
 \end{prop}
 Proof is left as an exercise.
 
-Similar to groups and subgroups, we can have a subspace of a vector space.
+In mathematics, whenever we define ``something'', we would like to define as ``sub-something''. In the case of vector spaces, this is a subspace.
 \begin{defi}[Subspace]
   If $V$ is an $\F$-vector space, then $U\subseteq V$ is an ($\F$-linear) \emph{subspace} if
   \begin{enumerate}
     \item $\mathbf{u}, \mathbf{v}\in U$ implies $\mathbf{u} + \mathbf{v} \in U$.
-    \item $\mathbf{u}\in U, \lambda \in \F$ implies $\lambda u\in U$.
+    \item $\mathbf{u}\in U, \lambda \in \F$ implies $\lambda \mathbf{u}\in U$.
     \item $\mathbf{0}\in U$.
   \end{enumerate}
-  These conditions can be expressed more concisely as ``$U$ is non-empty and if $\lambda, \mu\in \F, \mathbf{u}, \mathbf{v}\in U$, then $\lambda \mathbf{u} + \mu \mathbf{v}\in U$''. Alternatively, we can write the requirements as $U$ is also a vector space (inheriting the operations from $V$).
+  These conditions can be expressed more concisely as ``$U$ is non-empty and if $\lambda, \mu\in \F, \mathbf{u}, \mathbf{v}\in U$, then $\lambda \mathbf{u} + \mu \mathbf{v}\in U$''.
 
-  We sometimes write $U\leq V$ is $U$ is a subspace of $V$.
+  Alternatively, $U$ is a subspace of $V$ if it is itself a vector space, inheriting the operations from $V$.
+
+  We sometimes write $U\leq V$ if $U$ is a subspace of $V$.
 \end{defi}
 
 \begin{eg}\leavevmode
@@ -120,7 +126,7 @@ If we have two subspaces $U$ and $V$, there are several things we can do with th
 \begin{defi}[Sum of subspaces]
   Suppose $U, W$ are subspaces of an $\F$ vector space $V$. The \emph{sum} of $U$ and $V$ is
   \[
-    U + W = \{u + w: u\in U, w\in W\}.
+    U + W = \{\mathbf{u} + \mathbf{w}: \mathbf{u}\in U, \mathbf{w}\in W\}.
   \]
 \end{defi}
 
@@ -138,17 +144,25 @@ If we have two subspaces $U$ and $V$, there are several things we can do with th
   Both $U\cap W$ and $U + W$ contain $\mathbf{0}$, and are non-empty. So done.
 \end{proof}
 
+In addition to sub-somethings, we often have quotient-somethings as well. In general, quotient spaces are very useful, but unfortunately they are non-examinable in this course.
 \begin{defi}[Quotient spaces*]
-  Suppose that $V$ is a vector space, and $U\subseteq V$ is a subspace. Then the quotient group $V/U$ can be made into a vector space called the \emph{quotient space}, where scalar multiplication is given by $(\lambda, \mathbf{v} + U) = (\lambda \mathbf{v}) + U$.
+  Let $V$ be a vector space, and $U\subseteq V$ a subspace. Then the quotient group $V/U$ can be made into a vector space called the \emph{quotient space}, where scalar multiplication is given by $(\lambda, \mathbf{v} + U) = (\lambda \mathbf{v}) + U$.
 
   This is well defined since if $\mathbf{v} + U = \mathbf{w} + U\in V/U$, then $\mathbf{v} - \mathbf{w} \in U$. Hence for $\lambda \in \F$, we have $\lambda \mathbf{v} - \lambda \mathbf{w} \in U$. So $\lambda \mathbf{v} + U = \lambda \mathbf{w} + U$.
 \end{defi}
 \subsection{Linear independence, bases and the Steinitz exchange lemma}
+Recall that in $\R^n$, we had the ``standard basis'' made of vectors of the form $\mathbf{e}_i = (0, \cdots, 0, 1, 0, \cdots, 0)$, with $1$ in the $i$th component and $0$ otherwise. We call this a \emph{basis} because everything in $\R^n$ can be (uniquely) written as a sum of (scalar multiples of) these basis elements. In other words, the whole $\R^n$ is generated by taking sums and multiples of the basis elements.
+
+We would like to capture this idea in general vector spaces. The most important result in this section is to prove that for any vector space $V$, any two basis must contain the same number of elements. This means we can define the ``dimension'' of a vector space as the number of elements in the basis.
+
+While this result sounds rather trivial, it is a very important result. We will in fact prove a slightly stronger statement than what was stated above, and this ensures that the dimension of a vector space is well-behaved. For example, the subspace of a vector space has a smaller dimension than the larger space (at least when the dimensions are finite).
+
+This is not the case when we study modules in IB Groups, Rings and Modules, which are generalizations of vector spaces. Not all modules have basis, which makes it difficult to define the dimension. Even for those that have basis, the behaviour of the ``dimension'' is complicated when, say, we take submodules. The existence and well-behavedness of basis and dimension is what makes linear algebra different from modules.
 
 \begin{defi}[Span]
-  If $V$ is an $\F$-vector space and $S\subseteq V$, then the \emph{span} of $S$ is
+  Let $V$ be a vector space over $\F$ and $S\subseteq V$. The \emph{span} of $S$ is defined as
   \[
-    \bra S\ket = \left\{\sum_{i = 1}^n \lambda_i S_i : \lambda_i \in \F, S_i \in S, n \geq 0\right\}
+    \bra S\ket = \left\{\sum_{i = 1}^n \lambda_i \mathbf{s}_i : \lambda_i \in \F, \mathbf{s}_i \in S, n \geq 0\right\}
   \]
   This is the smallest subspace of $V$ containing $S$.
 
@@ -166,7 +180,7 @@ If we have two subspaces $U$ and $V$, there are several things we can do with th
         \right\}.
       \]
       Note that any subset of $S$ of order 2 has the same span as $S$.
-    \item Let $X$ be a set, $\delta x: X\to \F$ be the function
+    \item Let $X$ be a set, $x \in X$. Define the function $\delta x: X\to \F$ by
       \[
         \delta x(y) =
         \begin{cases}
@@ -183,13 +197,13 @@ If we have two subspaces $U$ and $V$, there are several things we can do with th
 \end{defi}
 
 \begin{defi}[Linear independence]
-  Let $V$ be a vector space over $\F$ and $S\subseteq V$. Then $S$ is \emph{linearly independent} (LI) if whenever
+  Let $V$ be a vector space over $\F$ and $S\subseteq V$. Then $S$ is \emph{linearly independent} if whenever
   \[
     \sum_{i = 1}^n \lambda_i \mathbf{s}_i = 0\text{ with } \lambda_i \in \F, \mathbf{s}_1, \mathbf{s}_2, \cdots, \mathbf{s}_n \in S\text{ distinct},
   \]
   we must have $\lambda_i = 0$ for all $i$.
 
-  If $S$ is not linearly independent, we say it is \emph{linearly dependent} (LD).
+  If $S$ is not linearly independent, we say it is \emph{linearly dependent}.
 \end{defi}
 
 \begin{defi}[Basis]
@@ -214,24 +228,25 @@ Note that no linearly independent set can contain $\mathbf{0}$, as $1\cdot \math
 
 There is an alternative way in which we can define linear independence.
 \begin{lemma}
-  $S\subseteq V$ is linearly dependent if and only if there are distinct $s_0, \cdots, s_n \in S$ and $\lambda_1, \cdots, \lambda_n\in \F$ such that
+  $S\subseteq V$ is linearly dependent if and only if there are distinct $\mathbf{s}_0, \cdots, \mathbf{s}_n \in S$ and $\lambda_1, \cdots, \lambda_n\in \F$ such that
   \[
-    \sum_{i = 1}^n \lambda_i s_i = s_0.
+    \sum_{i = 1}^n \lambda_i \mathbf{s}_i = \mathbf{s}_0.
   \]
 \end{lemma}
 
 \begin{proof}
-  If $S$ is linearly dependent, then there is some $\lambda_1, \cdots, \lambda_n \in \F$ all non-zero and $s_1,\cdots, s_n \in S$ such that $\sum \lambda_i s_i = 0$. Then
+  If $S$ is linearly dependent, then there is some $\lambda_1, \cdots, \lambda_n \in \F$ all non-zero and $\mathbf{s}_1,\cdots, \mathbf{s}_n \in S$ such that $\sum \lambda_i \mathbf{s}_i = 0$. Then
   \[
-    s_1 = \sum_{i = 2}^n -\frac{\lambda_i}{\lambda_1} s_i.
+    \mathbf{s}_1 = \sum_{i = 2}^n -\frac{\lambda_i}{\lambda_1} s_i.
   \]
-  Conversely, if $s_0 = \sum_{i = 1}^n \lambda_i s_i$, then
+  Conversely, if $\mathbf{s}_0 = \sum_{i = 1}^n \lambda_i \mathbf{s}_i$, then
   \[
-    (-1)s_0 + \sum_{i = 1}^n \lambda_i s_i = 0.
+    (-1)\mathbf{s}_0 + \sum_{i = 1}^n \lambda_i \mathbf{s}_i = 0.
   \]
+  So $S$ is linearly independent.
 \end{proof}
 
-We also have an alternative characterization of what it means to be a basis:
+This in turn gives an alternative characterization of what it means to be a basis:
 \begin{prop}
   If $S = \{\mathbf{e}_1, \cdots, \mathbf{e}_n\}$ is a subset of $V$ over $\F$, then it is a basis if and only if every $\mathbf{v}\in V$ can be written uniquely as a finite linear combination of elements in $S$, ie. as
   \[
@@ -267,19 +282,34 @@ We also have an alternative characterization of what it means to be a basis:
 
 Now we come to the key theorem:
 \begin{thm}[Steinitz exchange lemma]
-  Let $V$ be an $\F$-vector space, and $S = \{\mathbf{e}_1, \cdots, \mathbf{e}_n\}$ a finite linearly independent subset of $V$, and $T$ a spanning subset of $V$. Then there is some $T'\subseteq T$ of order $n$ such that $(T\setminus T') \cup S$ still spans $V$. In particular, $|T| \geq n$.
+  Let $V$ be an vector space over $\F$, and $S = \{\mathbf{e}_1, \cdots, \mathbf{e}_n\}$ a finite linearly independent subset of $V$, and $T$ a spanning subset of $V$. Then there is some $T'\subseteq T$ of order $n$ such that $(T\setminus T') \cup S$ still spans $V$. In particular, $|T| \geq n$.
 \end{thm}
-In some sense, the final remark is the most important part. It tells us that we cannot have a independent set larger than a spanning set.
+What does this actually say? This says if $T$ is spanning and $S$ is independent, there is a way of grabbing $|S|$ many elements away from $T$ and replace them with $S$, and the result will still be spanning.
+
+In some sense, the final remark is the most important part. It tells us that we cannot have a independent set larger than a spanning set, and most of our corollaries later will only use this remark.
 
 This is sometimes stated in the following alternative way for $|T| < \infty$.
 \begin{cor}
-  If $\{\mathbf{e}_1, \cdots, \mathbf{e}_n\}$ is a linearly independent subset of $V$ and $\{\mathbf{f}_1, \cdots, \mathbf{f}_m\}$ spans $V$, then there is a re-ordering of the $\{\mathbf{f}_i\}$ such that $\{\mathbf{e}_1,\cdots, \mathbf{e}_n, \mathbf{f}_{n + 1}, \cdots, \mathbf{f}_m\}$ spans $V$.
+  Let $\{\mathbf{e}_1, \cdots, \mathbf{e}_n\}$ be a linearly independent subset of $V$, and suppose $\{\mathbf{f}_1, \cdots, \mathbf{f}_m\}$ spans $V$. Then there is a re-ordering of the $\{\mathbf{f}_i\}$ such that $\{\mathbf{e}_1,\cdots, \mathbf{e}_n, \mathbf{f}_{n + 1}, \cdots, \mathbf{f}_m\}$ spans $V$.
 \end{cor}
 
-\begin{proof}
-  We are going to prove this by finding an element in $T$ and replacing it with $\mathbf{e}_i$, for each $i$, one by one.
+The proof is going to be slightly technical and notationally daunting. So it helps to give a brief overview of what we are going to do in words first. The idea is to do the replacement one by one. The first one is easy. Start with $\mathbf{e}_1$. Since $T$ is spanning, we can write
+\[
+  \mathbf{e}_1 = \sum \lambda_i \mathbf{t}_i
+\]
+for some $\mathbf{t}_i \in T, \lambda_i \in \F$ non-zero. We then replace with $\mathbf{t}_1$ with $\mathbf{e}_1$. The result is still spanning, since the above formula allows us to write $\mathbf{t}_1$ in terms of $\mathbf{e}_1$ and the other $\mathbf{t}_i$.
 
-  Suppose that we have found $T_r'\subseteq T$ of order $0 \leq r < n$ such that
+We continue inductively. For the $r$th element, we again write
+\[
+  \mathbf{e}_r = \sum \lambda_i \mathbf{t}_i.
+\]
+We would like to just pick a random $\mathbf{t}_i$ and replace it with $\mathbf{e}_r$. However, we cannot do this arbitrarily, since the lemma wants us to replace something \emph{in $T$} with with $\mathbf{e}_r$. After all that replacement procedure before, some of the $\mathbf{t}_i$ might have actually come from $S$.
+
+This is where the linear independence of $S$ kicks in. While some of the $\mathbf{t}_i$ might be from $S$, we cannot possibly have all \emph{all} of them being from $S$, or else this violates the linear independence of $S$. Hence there is something genuinely from $T$, and we can safely replace it with $\mathbf{e}_r$.
+
+We now write this argument properly and formally.
+\begin{proof}
+  Suppose that we have already found $T_r'\subseteq T$ of order $0 \leq r < n$ such that
   \[
     T_r = (T\setminus T_r') \cup \{\mathbf{e}_1, \cdots, \mathbf{e}_r\}
   \]
@@ -307,8 +337,8 @@ This is sometimes stated in the following alternative way for $|T| < \infty$.
 
   Hence we can inductively find $T_n$.
 \end{proof}
-Note that while we proved this for finite sets, if we assume the Axiom of Choice, we can prove the same for infinite sets of any cardinality by big scary things like Zorn's lemma and transfinite induction, but these are out of the scope of this course, and we needn't care.
 
+From this lemma, we can immediately deduce a lot of important corollaries.
 \begin{cor}
   Suppose $V$ is a vector space over $\F$ with a basis of order $n$. Then
   \begin{enumerate}
@@ -321,9 +351,11 @@ Note that while we proved this for finite sets, if we assume the Axiom of Choice
 \end{cor}
 
 \begin{proof}
-  let $S = \{\mathbf{e}_1, \cdots, \mathbf{e}_n\}$ be the basis for $V$.
+  Let $S = \{\mathbf{e}_1, \cdots, \mathbf{e}_n\}$ be the basis for $V$.
   \begin{enumerate}
-    \item Suppose $T$ is another basis. Since $S$ is independent and $T$ is spanning, $|T| \geq |S|$. Since $T$ is linearly independent, every finite subset of $T$ is independent. Also, $S$ is spanning. So every finite subset of $T$ has order at most $|S|$. So $|T| \leq |S|$. So $|T| = |S|$.
+    \item Suppose $T$ is another basis. Since $S$ is independent and $T$ is spanning, $|T| \geq |S|$.
+
+      The other direction is less trivial, since $T$ might be infinite, and Steinitz does not immediately apply. Instead, we argue as follows: since $T$ is linearly independent, every finite subset of $T$ is independent. Also, $S$ is spanning. So every finite subset of $T$ has order at most $|S|$. So $|T| \leq |S|$. So $|T| = |S|$.
 
     \item Suppose now that $T$ is a linearly independent subset of order $n$, but $\bra T\ket \not= V$. Then there is some $\mathbf{v} \in V\setminus \bra T\ket$. We now show that $T\cup \{\mathbf{v}\}$ is independent. Indeed, if
       \[
@@ -335,7 +367,7 @@ Note that while we proved this for finite sets, if we assume the Axiom of Choice
       \]
       Then $\lambda_0 \mathbf{v} \in \bra T\ket$. So $\lambda_0= 0$. As $T$ is linearly independent, we have $\lambda_0 = \cdots = \lambda_m = 0$. So $T\cup \{\mathbf{v}\}$ is a linearly independent subset of size $> n$. This is a contradiction since $S$ is a spanning set of size $n$.
 
-    \item Let $T$ be a spanning set of order $n$. if $T$ were linearly dependent, then there is some $\mathbf{t}_0, \cdots, \mathbf{t}_m \in T$ distinct and $\lambda_1, \cdots, \lambda_m \in \F$ such that
+    \item Let $T$ be a spanning set of order $n$. If $T$ were linearly dependent, then there is some $\mathbf{t}_0, \cdots, \mathbf{t}_m \in T$ distinct and $\lambda_1, \cdots, \lambda_m \in \F$ such that
       \[
         \mathbf{t}_0 = \sum \lambda_i \mathbf{t}_i.
       \]
@@ -346,9 +378,11 @@ Note that while we proved this for finite sets, if we assume the Axiom of Choice
     \item Suppose $T$ is a linearly independent set. Since $S$ spans, there is some $S' \subseteq S$ of order $|T|$ such that $(S\setminus S')\cup T$ spans $V$ by the Steinitz exchange lemma. So by (ii), $(S\setminus S')\cup T$ is a basis of $V$ containing $T$.
   \end{enumerate}
 \end{proof}
-Finally, we can define dimension.
+Note that the last part is where we actually use the full result of Steinitz.
+
+Finally, we can use this to define the dimension.
 \begin{defi}[Dimension]
-  If $V$ is a vector space $\F$ iwht finite basis $S$, then the \emph{dimension} of $V$, written
+  If $V$ is a vector space over $\F$ with finite basis $S$, then the \emph{dimension} of $V$, written
   \[
     \dim V = \dim_{\F}V = |S|.
   \]
@@ -381,7 +415,7 @@ The proof is not hard, as long as we manage to pick the right basis to do the pr
 We need a basis for all four of them, and we want to compare the basis. So we want to pick bases that are compatible.
 
 \begin{proof}
-  let $R = \{\mathbf{v}_1, \cdots, \mathbf{v}_r\}$ be a basis for $U\cap W$. This is a linearly independent subset of $U$. So we can extend it to be a basis of $U$ by
+  Let $R = \{\mathbf{v}_1, \cdots, \mathbf{v}_r\}$ be a basis for $U\cap W$. This is a linearly independent subset of $U$. So we can extend it to be a basis of $U$ by
   \[
     S = \{\mathbf{v}_1, \cdots, \mathbf{v}_r, \mathbf{u}_{r + 1}, \cdots, \mathbf{u}_s\}.
   \]
@@ -421,7 +455,7 @@ We can view this as a linear algebra version of Lagrange's theorem. Combined wit
 \begin{proof}
   Let $\{\mathbf{u}_1, \cdots, \mathbf{u}_m\}$ be a basis for $U$ and extend this to a basis $\{\mathbf{u}_1, \cdots, \mathbf{u}_m,\allowbreak \mathbf{v}_{m + 1}, \cdots, \mathbf{v}_n\}$ for $V$. We want to show that $\{\mathbf{v}_{m + 1} + U, \cdots, \mathbf{v}_n + U\}$ is a basis for $V/U$.
 
-  It is easy to see that this spans $V/U$. If $v + U \in V/U$, then we can write
+  It is easy to see that this spans $V/U$. If $\mathbf{v} + U \in V/U$, then we can write
   \[
     \mathbf{v} = \sum \lambda_i \mathbf{u}_i + \sum \mu_i \mathbf{v}_i.
   \]
@@ -457,25 +491,30 @@ We are going to define direct sums in many ways in order to confuse students.
 
   Equivalently, this requires that every $\mathbf{v}\in V$ can be written uniquely as $\mathbf{u} + \mathbf{w}$ with $\mathbf{u}\in U, \mathbf{w}\in W$. We say that $U$ and $W$ are \emph{complementary subspaces} of $V$.
 \end{defi}
+You will show in the example sheets that given any subspace $U \subseteq V$, $U$ must have a complementary subspace in $V$.
 
 \begin{eg}
   Let $V = \R^2$, and $U = \bra \begin{pmatrix}0\\1\end{pmatrix}\ket$. Then $\bra \begin{pmatrix}1\\1\end{pmatrix}\ket$ and $\bra \begin{pmatrix}1\\0\end{pmatrix}\ket$ are both complementary subspaces to $U$ in $V$.
 \end{eg}
 
 \begin{defi}[(External) direct sum]
-  If $U, W$ are vector spaces over $\F$, the \emph{(external) direct sum} is $U\oplus W = \{(\mathbf{u}, \mathbf{v}): \mathbf{u}\in U, \mathbf{w}\in W\}$, with addition and scalar multiplication componentwise:
+  If $U, W$ are vector spaces over $\F$, the \emph{(external) direct sum} is
+  \[
+    U\oplus W = \{(\mathbf{u}, \mathbf{w}): \mathbf{u}\in U, \mathbf{w}\in W\},
+  \]
+  with addition and scalar multiplication componentwise:
   \[
     (\mathbf{u}_1, \mathbf{w}_1) + (\mathbf{u}_2, \mathbf{w}_2) = (\mathbf{u}_1 + \mathbf{u}_2, \mathbf{w}_1 + \mathbf{w}_2),\quad \lambda (\mathbf{u}, \mathbf{w}) = (\lambda \mathbf{u}, \lambda \mathbf{w}).
   \]
 \end{defi}
 The difference between these two definitions is that the first is decomposing $V$ into smaller spaces, while the second is building a bigger space based on two spaces.
 
-Note, however, that the external direct sum $U\oplus W$ is the internal direct sum of $U$ and $W$ viewed as subspaces of $U\oplus W$, ie. as the internal direct sum of $\{(\mathbf{u}, \mathbf{0}): \mathbf{u}\in U\}$ and $\{(\mathbf{0}, \mathbf{v}): \mathbf{v}\in V\}$.
+Note, however, that the external direct sum $U\oplus W$ is the internal direct sum of $U$ and $W$ viewed as subspaces of $U\oplus W$, ie. as the internal direct sum of $\{(\mathbf{u}, \mathbf{0}): \mathbf{u}\in U\}$ and $\{(\mathbf{0}, \mathbf{v}): \mathbf{v}\in V\}$. So these two are indeed compatible notions, and this is why we give them the same name and notation.
 
 \begin{defi}[(Multiple) (internal) direct sum]
   If $U_1, \cdots, U_n\subseteq V$ are subspaces of $V$, then $V$ is the \emph{(internal) direct sum}
   \[
-    V = U_1 \oplus \cdots \oplus U_n = \bigoplus_{i = 1}^n U_i,
+    V = U_1 \oplus \cdots \oplus U_n = \bigoplus_{i = 1}^n U_i
   \]
   if every $\mathbf{v}\in V$ can be written uniquely as $\mathbf{v} = \sum \mathbf{u}_i$ with $\mathbf{u}_i \in U_i$.
 
@@ -494,6 +533,7 @@ For more details, see example sheet 1 Q. 10, where we prove in particular that $
 \end{defi}
 
 \section{Linear maps}
+In mathematics, apart from studying objects, we would like to study functions between objects as well. In particular, we would like to study functions that respect the structure of the objects. With vector spaces, the kinds of functions we are interested in are \emph{linear maps}.
 \subsection{Definitions and examples}
 \begin{defi}[Linear map]
   Let $U, V$ be vector spaces over $\F$. Then $\alpha: U\to V$ is a \emph{linear map} if
@@ -524,7 +564,7 @@ There are a few things we should take note of:
         &= \lambda \alpha(\mathbf{u})_i + \mu \alpha(\mathbf{v})_i.
       \end{align*}
       So $\alpha$ is linear.
-    \item Let $X$ be a set and $g\in \F^X$. Then we define $m_g: \F^x \to \F^x$ by $m_g(f)(x) = g(x) f(x)$. Then $m_g$ is linear. For example, $f(x) \mapsto 2x^2 f(x)$ is linear.
+    \item Let $X$ be a set and $g\in \F^X$. Then we define $m_g: \F^X \to \F^X$ by $m_g(f)(x) = g(x) f(x)$. Then $m_g$ is linear. For example, $f(x) \mapsto 2x^2 f(x)$ is linear.
     \item Integration $I: (C([a, b]), \R) \to (C([a, b]), \R)$ defined by $f\mapsto \int_a^x f(t) \;\d t$ is linear.
     \item Differentiation $D: (C^\infty ([a, b]), \R) \to (C^\infty ([a, b]), \R)$ by $ f\mapsto f'$ is linear.
     \item If $\alpha, \beta\in \mathcal{L}(U, V)$, then $\alpha + \beta$ defined by $(\alpha + \beta)(\mathbf{u}) = \alpha(\mathbf{u}) + \beta(\mathbf{u})$ is linear.
@@ -588,7 +628,7 @@ It is easy to show that these are subspaces of $V$ and $U$ respectively.
       \]
       for some $p, q\in C^{\infty}(\R, \R)$.
 
-      Then if $y(t) \in \im \beta$, then there is a solution (in $C^\infty (\R, \R)$) to
+      Then if $y(t) \in \im \beta$, then there is a solution (in $C^\infty (\R, \R)$) to the differential equation
       \[
         f''(t) + p(t) f'(t) + q(t) f(t) = y(t).
       \]
@@ -599,7 +639,7 @@ It is easy to show that these are subspaces of $V$ and $U$ respectively.
   \end{enumerate}
 \end{eg}
 
-If two vector spaces are isomorphic, then do they have to have the same dimension? If they have the same dimension, do they have to be isomorphic? We will answer these questions now.
+If two vector spaces are isomorphic, then it is not too surprising that they have the same dimension, since isomorphic spaces are ``the same''. Indeed this is what we are going to show.
 \begin{prop}
   Let $\alpha: U\to V$ be an $\F$-linear map. Then
   \begin{enumerate}
@@ -636,7 +676,7 @@ Here (iii) immediately shows that two isomorphic spaces have the same dimension.
 \begin{cor}
   If $U$ and $V$ are finite-dimensional vector spaces over $\F$ and $\alpha: U\to V$ is an isomorphism, then $\dim U = \dim V$.
 \end{cor}
-Note that we restrict it to finite-dimensional spaces since we've only shown that dimensions are well-defined for finite dimensional spaces. Otherwise, the proof works just finite for infinite dimensional spaces.
+Note that we restrict it to finite-dimensional spaces since we've only shown that dimensions are well-defined for finite dimensional spaces. Otherwise, the proof works just fine for infinite dimensional spaces.
 
 \begin{proof}
   Let $S$ be a basis for $U$. Then $\alpha(S)$ is a basis for $V$. Since $\alpha$ is injective, $|S| = |\alpha(S)|$. So done.
@@ -686,7 +726,10 @@ However, we will not just prove that they are isomorphic. We will show that they
 \end{proof}
 
 \subsection{Linear maps and matrices}
-We are going to look at the relationship between (abstract) linear maps and (concrete) matrices.
+Recall that our first example of linear maps is matrices acting on $\F^n$. We will show that in fact, \emph{all} linear maps come from matrices. Since we know that all vector spaces are isomorphic to $\F^n$, this means we can represent an arbitrary linear maps on vector spaces by matrices.
+
+This is a useful result, since it is sometimes easier to argue about matrices than linear maps.
+
 \begin{prop}
   Suppose $U, V$ are vector spaces over $\F$ and $S = \{\mathbf{e}_1, \cdots, \mathbf{e}_n\}$ is a basis for $U$. Then every function $f: S \to V$ extends uniquely to a linear map $U \to V$.
 \end{prop}
@@ -728,7 +771,7 @@ The slogan is ``to define a linear map, it suffices to define its values on a ba
 \end{cor}
 We can interpret this has follows: the $i$th column of $A$ tells us how to write $\alpha (\mathbf{e}_i)$ in terms of the $\mathbf{f}_j$.
 
-We can also draw a fancy diagram. Given bases $\mathbf{e}_1, \cdots, \mathbf{e}_m$, by our bijection, we get an isomorphism $s(\mathbf{e}_i): U\to \F^m$. Similarly, we get an isomorphism $s(\mathbf{f}_i): V\to \F^n$.
+We can also draw a fancy diagram to display this result. Given bases $\mathbf{e}_1, \cdots, \mathbf{e}_m$, by our bijection, we get an isomorphism $s(\mathbf{e}_i): U\to \F^m$. Similarly, we get an isomorphism $s(\mathbf{f}_i): V\to \F^n$.
 
 Since a matrix is a linear map $A: \F^m \to \F^n$, given a matrix $A$, we can produce a linear map $\alpha: U\to V$ via the following composition
 \[
@@ -743,16 +786,17 @@ We can put this into a square:
     U \ar[u, "s(\mathbf{e}_i)"] \ar[r, "\alpha"] & V \ar[u, "s(\mathbf{f}_i)"']
   \end{tikzcd}
 \]
+Then the corollary tells us that every $A$ gives rise to an $\alpha$, and every $\alpha$ corresponds to an $A$ that fit into this diagram.
 \begin{proof}
   If $\alpha$ is a linear map $U \to V$, then for each $1 \leq u \leq m$, we can write $\alpha(\mathbf{e}_i)$ uniquely as
   \[
     \alpha(\mathbf{e}_i) = \sum_{j = 1}^n a_{ji} \mathbf{f}_j
   \]
-  for some $a_{ji} \in \F$. The previous proposition tells us that every matrix $A$ arises in this way, and $\alpha$ is determined by $A$.
+  for some $a_{ji} \in \F$. This gives a matrix $A = (a_{ij})$. The previous proposition tells us that every matrix $A$ arises in this way, and $\alpha$ is determined by $A$.
 \end{proof}
 
-\begin{defi}[Matrix representing map]
-  We call the matrix corresponding to a linear map $\alpha\in \mathcal{L}(U, V)$ under the corollary the \emph{matrix representing} $\alpha$ with respect to $(\mathbf{e}_1, \cdots, \mathbf{e}_m)$ and $(\mathbf{f}_1, \cdots, \mathbf{f}_n)$.
+\begin{defi}[Matrix representation]
+  We call the matrix corresponding to a linear map $\alpha\in \mathcal{L}(U, V)$ under the corollary the \emph{matrix representing} $\alpha$ with respect to the bases $(\mathbf{e}_1, \cdots, \mathbf{e}_m)$ and $(\mathbf{f}_1, \cdots, \mathbf{f}_n)$.
 \end{defi}
 
 It is an exercise to show that the bijection $\Mat_{n, m}(\F) \to \mathcal{L}(U, V)$ is an isomorphism of the vector spaces and deduce that $\dim \mathcal{L}(U, V) = (\dim U)(\dim V)$.
@@ -780,9 +824,9 @@ It is an exercise to show that the bijection $\Mat_{n, m}(\F) \to \mathcal{L}(U,
 \end{proof}
 
 \subsection{The first isomorphism theorem and the rank-nullity theorem}
-We will start by stating the first isomorphism theorem, and deduce the rank-nullity theorem as an immediate consequence of it. The first isomorphism theorem is an exact analogy of that for groups.
+The main theorem of this section is the \emph{rank-nullity theorem}, which relates the dimensions of the kernel and image of a linear map. This is in fact an easy corollary of a stronger result, known as the \emph{first isomorphism theorem}, which directly relates the kernel and image themselves. This first isomorphism is an exact analogy of that for groups, and should not be unfamiliar. However, the theorem involves taking quotient spaces, which is non-examinable. Hence we will later provide another proof that does not involve quotients as well.
 
-\begin{thm}[First isomoprhism theorem]
+\begin{thm}[First isomoprhism theorem*]
   Let $\alpha: U\to V$ be a linear map. Then $\ker \alpha$ and $\im \alpha$ are subspaces of $U$ and $V$ respectively. Moreover, $\alpha$ induces an isomorphism
   \begin{align*}
     \bar{\alpha}: U/\ker \alpha &\to \im \alpha\\
@@ -802,11 +846,11 @@ Note that if we view a vector space as an abelian group, then this is exactly th
 
   Similarly, if $\alpha(\mathbf{u}_1), \alpha(\mathbf{u}_2) \in \im \alpha$, then $\lambda\alpha(\mathbf{u}_1) + \lambda_2 \alpha(\mathbf{u}_2) = \alpha(\lambda_1 \mathbf{u}_1 + \lambda_2 \mathbf{u}_2) \in \im \alpha$. So $\im \alpha$ is a subspace.
 
-  Now by the first isomorphism theorem of groups, $\bar{\alpha}$ is a well-defined isomorphism of groups. So it remains to observe
+  Now by the first isomorphism theorem of groups, $\bar{\alpha}$ is a well-defined isomorphism of groups. So it remains to show that $\bar{\alpha}$ is a linear map. Indeed, we have
   \[
     \bar{\alpha}(\lambda(\mathbf{u} + \ker \alpha)) = \alpha (\lambda \mathbf{u}) = \lambda \alpha(\mathbf{u}) = \lambda (\bar{\alpha}(\mathbf{u} + \ker \alpha)).
   \]
-  So $\bar {\alpha}$ is indeed a linear map.
+  So $\bar {\alpha}$ is a linear map.
 \end{proof}
 
 \begin{defi}[Rank and nullity]
@@ -821,7 +865,11 @@ Note that if we view a vector space as an abelian group, then this is exactly th
 \end{cor}
 
 \begin{proof}
-  By the first isomorphism theorem, we know that $U/\ker \alpha \cong \im \alpha$, we know that $\dim \im \alpha = \dim (U/\ker \alpha) = \dim U - \dim \ker \alpha$. So the result follows.
+  By the first isomorphism theorem, we know that $U/\ker \alpha \cong \im \alpha$. So we have
+  \[
+    \dim \im \alpha = \dim (U/\ker \alpha) = \dim U - \dim \ker \alpha.
+  \]
+  So the result follows.
 \end{proof}
 
 We can also prove this result without the first isomorphism theorem, and say a bit more in the mean time.
@@ -905,7 +953,7 @@ More generally, the rank-nullity theorem gives that $m$ linear equations in $n$ 
   \end{align*}
   where the $\oplus$ is the \emph{external} direct sum. Then $\im \alpha =U + W$ and
   \[
-    \ker \alpha = \{(\mathbf{u}, -\mathbf{u}): \mathbf{u}\in U\cap W\} \simeq \dim W.
+    \ker \alpha = \{(\mathbf{u}, -\mathbf{u}): \mathbf{u}\in U\cap W\} \cong \dim (U\cap W).
   \]
   Then we have
   \[
@@ -915,11 +963,11 @@ More generally, the rank-nullity theorem gives that $m$ linear equations in $n$ 
 \end{eg}
 
 \begin{cor}
-  Suppose $\alpha: U\to V$ is a linear map betwee vector spaces over $\F$ both of dimension $n < \infty$. Then the following are equivalent
+  Suppose $\alpha: U\to V$ is a linear map between vector spaces over $\F$ both of dimension $n < \infty$. Then the following are equivalent
   \begin{enumerate}
-    \item $\alpha$ is injective
-    \item $\alpha$ is surjective
-    \item $\alpha$ is an isomoprhism
+    \item $\alpha$ is injective;
+    \item $\alpha$ is surjective;
+    \item $\alpha$ is an isomorphism.
   \end{enumerate}
 \end{cor}
 
@@ -939,11 +987,11 @@ More generally, the rank-nullity theorem gives that $m$ linear equations in $n$ 
 \end{lemma}
 
 \begin{proof}
-  Let $\alpha, \beta, \gamma, \iota: \F^n \to \F^n$ be the linear maps represented by matrices $A, B, C, I_n$ rrespectively with respect to the standard basis.
+  Let $\alpha, \beta, \gamma, \iota: \F^n \to \F^n$ be the linear maps represented by matrices $A, B, C, I_n$ respectively with respect to the standard basis.
 
-  We note that (i) is equivalent to saying that there exists $\beta$ such that $\beta\alpha = \iota$. This is true iff $\alpha$ is injective, which is true iff $\alpha$ is an isomoprhism, which is true iff $\alpha$ has an inverse $\alpha^{-1}$.
+  We note that (i) is equivalent to saying that there exists $\beta$ such that $\beta\alpha = \iota$. This is true iff $\alpha$ is injective, which is true iff $\alpha$ is an isomorphism, which is true iff $\alpha$ has an inverse $\alpha^{-1}$.
 
-  Similarly, (ii) is equivalent ot saying that there exists $\gamma$ such that $\alpha\gamma = \iota$. This is truee iff $\alpha$ is injective, which is true iff $\alpha$ is isomoprhism, which is true iff $\alpha$ has an inverse $\alpha^{-1}$.
+  Similarly, (ii) is equivalent to saying that there exists $\gamma$ such that $\alpha\gamma = \iota$. This is true iff $\alpha$ is injective, which is true iff $\alpha$ is isomorphism, which is true iff $\alpha$ has an inverse $\alpha^{-1}$.
 
   So these are the same things, and we have $\beta = \alpha^{-1} = \gamma$.
 \end{proof}
@@ -1137,7 +1185,7 @@ Multiplying on the left instead of the right would result in the same operations
 We are going to start with $A$, and then apply these operations to get it into this form.
 
 \begin{proof}
-  We claim that there are elementary matrices $E_1^m, \cdots, E_a^m$ and $F_1^n, \cdots, F_b^n$ (these $E$ are not necessarily the shears, but but any elementary matrix) such that
+  We claim that there are elementary matrices $E_1^m, \cdots, E_a^m$ and $F_1^n, \cdots, F_b^n$ (these $E$ are not necessarily the shears, but any elementary matrix) such that
   \[
     E_1^m \cdots E_a^m AF_1^n \cdots F_b^n =
     \begin{pmatrix}
@@ -1161,10 +1209,12 @@ We are going to start with $A$, and then apply these operations to get it into t
   \]
   Now $B$ is smaller than $A$. So by induction on the size of $A$, we can reduce $B$ to a matrix of the required form, so done.
 \end{proof}
-It is an exercise to show that the row and column operations do not change the row rank or column rank. So deduce that they are equal.
+It is an exercise to show that the row and column operations do not change the row rank or column rank, and deduce that they are equal.
 
 \section{Duality}
 Duality is a principle we will find throughout mathematics. For example, in IB Optimisation, we considered the dual problems of linear programs. Here we will look for the dual of vector spaces. In general, we try to look at our question in a ``mirror'' and hope that the mirror problem is easier to solve than the original mirror.
+
+At first, the definition of the dual might see a bit arbitrary and weird. We will try to motivate it using what we will call \emph{annihilators}, but they are much more useful than just for these. Despite their usefulness, though, they can be confusing to work with at times, since the dual space of a vector space $V$ will be constructed by considering linear maps on $V$, and when we work with maps on dual spaces, things explode.
 
 \subsection{Dual space}
 To specify a subspace of $\F^n$, we can write down linear equations that its elements satisfy. For example, if we have the subspace $U = \bra \begin{pmatrix} 1\\2\\1 \end{pmatrix}\ket\subseteq \F^3$, we can specify this by saying $\begin{pmatrix}x_1\\ x_2\\ x_3\end{pmatrix} \in U$ if and only if
@@ -1193,7 +1243,7 @@ By convention, we use Roman letters for elements in $V$, and Greek letters for e
   \begin{itemize}
     \item If $V = \R^3$ and $\theta: V\to \R$ that sends $\begin{pmatrix}x_1\\x_2\\x_3\end{pmatrix} \mapsto x_1 - x_3$, then $\theta \in V^*$.
     \item Let $V = \F^X$. Then for any fixed $x$, $\theta: V\to \F$ defined by $f \mapsto f(x)$ is in $V^*$.
-    \item Let $C([0, 1], \R)$. Then $f \mapsto \int_0^1 f(t)\;\d t \in V^*$.
+    \item Let $V = C([0, 1], \R)$. Then $f \mapsto \int_0^1 f(t)\;\d t \in V^*$.
     \item The trace $\tr: M_n(\F)\to \F$ defined by $A\mapsto \sum_{i = 1}^n A_{ii}$ is in $M_n(\F)^*$.
   \end{itemize}
 \end{eg}
@@ -1209,13 +1259,13 @@ It turns out it is rather easy to specify how the dual space looks like, at leas
 \begin{proof}
   Since linear maps are characterized by their values on a basis, there exists unique choices for $\varepsilon_1, \cdots, \varepsilon_n \in V^*$. Now we show that $(\varepsilon_1, \cdots, \varepsilon_n)$ is a basis.
 
-  Suppose $\theta \in V^*$. We show that we can write it uniquely as a combination of $\varepsilon_1, \cdots, \varepsilon_n$. We have $\theta = \sum_{i = 1}^n \lambda_i \varepsilon_i$ if and only if $\theta(\mathbf{e}_j) = \sum_{i = 1}^n \varepsilon_i(\mathbf{e}_j)$ if and only if $\lambda_j = \theta(\mathbf{e}_j)$. So we have uniqueness and existence.
+  Suppose $\theta \in V^*$. We show that we can write it uniquely as a combination of $\varepsilon_1, \cdots, \varepsilon_n$. We have $\theta = \sum_{i = 1}^n \lambda_i \varepsilon_i$ if and only if $\theta(\mathbf{e}_j) = \sum_{i = 1}^n \varepsilon_i(\mathbf{e}_j)$ (for all $j$) if and only if $\lambda_j = \theta(\mathbf{e}_j)$. So we have uniqueness and existence.
 \end{proof}
 
 \begin{cor}
   If $V$ is finite dimensional, then $\dim V = \dim V^*$.
 \end{cor}
-When $V$ is not finite dimensional, this need not be true. However, we know that the dimension of $V^*$ is at least as big as that of $V$, since the above gives a set of $\dim V$ many independent vectors in $V^*$.
+When $V$ is not finite dimensional, this need not be true. However, we know that the dimension of $V^*$ is at least as big as that of $V$, since the above gives a set of $\dim V$ many independent vectors in $V^*$. In fact for any infinite dimensional vector space, $\dim V^*$ is strictly larger than $\dim V$, if we manage to define dimensions for infinite-dimensional vector spaces.
 
 It helps to come up with a more concrete example of how dual spaces look like. Consider the vector space $\F^n$, where we treat each element as a column vector (with respect to the standard basis). Then we can regard elements of $V^*$ as just row vectors $(a_1, \cdots, a_n) = \sum_{j = 1}^n a_j\varepsilon_j$ with respect to the dual basis. We have
 \[
@@ -1319,8 +1369,9 @@ Since linear algebra is the study of vector spaces and linear maps between them,
 \end{defi}
 
 \begin{prop}
-  Let $\alpha \in \mathcal{L}(V, w)$ be a linear map. Then $\alpha^* \in \mathcal{L}(W^*, V^*)$ is a linear map.
+  Let $\alpha \in \mathcal{L}(V, W)$ be a linear map. Then $\alpha^* \in \mathcal{L}(W^*, V^*)$ is a linear map.
 \end{prop}
+This is \emph{not} the same as what we remarked at the end of the definition of the dual map. What we remarked was that given any $\theta$, $\alpha^*(\theta)$ is a linear map. What we want to show here is that $\alpha^*$ itself as a map $W^* \to V^*$ is linear.
 
 \begin{proof}
   Let $\lambda, \mu \in \F$ and $\theta_1, \theta_2 \in W^*$. We want to show
@@ -1373,9 +1424,9 @@ Similarly, if $\alpha, \beta: U \to V$, then $(\lambda\alpha + \mu\beta)^* = \la
 
 What happens when we change basis? If $B = Q^{-1}AP$ for some invertible $P$ and $Q$, then
 \[
-  B^T = (Q^{-1}AP)^T = P^TA^T(Q^{-1})^{-1} = ((P^{-1})^T)^{-1} A^T (Q^{-1})^T,
+  B^T = (Q^{-1}AP)^T = P^TA^T(Q^{-1})^{-1} = ((P^{-1})^T)^{-1} A^T (Q^{-1})^T.
 \]
-as expected.
+So in the dual space, we conjugate by the dual of the change-of-basis matrices.
 
 As we said, we can use dualization to translate problems about a vector space to its dual. The following lemma gives us some good tools to do so:
 \begin{lemma}
@@ -1395,7 +1446,7 @@ At first sight, (i) and (iii) look quite similar. However, (i) is almost trivial
         \theta \in \ker \alpha^* &\Leftrightarrow \alpha^*(\theta) = 0 \\
         &\Leftrightarrow (\forall \mathbf{v}\in V)\; \theta \alpha(\mathbf{v}) = 0 \\
         &\Leftrightarrow (\forall \mathbf{w}\in \im \alpha)\; \theta(\mathbf{w}) = 0\\
-        &\Leftrightarrow \theta \in (\im \alpha)^0
+        &\Leftrightarrow \theta \in (\im \alpha)^0.
       \end{align*}
     \item As $\im \alpha \leq W$, we've seen that
       \[
@@ -1430,16 +1481,19 @@ At first sight, (i) and (iii) look quite similar. However, (i) is almost trivial
   \end{enumerate}
 \end{proof}
 
-Not only do we want to get from $V$ to $V^*$, we want to get back from $V^*$ to $V$. We can take the dual of $V^*$ to get a $V^{**}$. We know that $V^{**}$ is isomorphic to $V$, since they have the same dimension. However, there are many possible such isomorphisms. It turns out there is a ``canonical'' or ``natural'' isomorphism between the two.
+Not only do we want to get from $V$ to $V^*$, we want to get back from $V^*$ to $V$. We can take the dual of $V^*$ to get a $V^{**}$. We already know that $V^{**}$ is isomorphic to $V$, since $V^*$ is isomorphic to $V$ already. However, the isomorphism between $V^*$ and $V$ are not ``natural''. To define such an isomorphism, we needed to pick a basis for $V$ and consider a dual basis. If we picked a different basis, we would get a different isomorphism. There is no natural, canonical, uniquely-defined isomorphism between $V$ and $V^*$.
 
+However, this is not the case when we want to construct an isomorphism $V \to V^{**}$. The construction of this isomorphism is obvious once we think hard what $V^{**}$ actually means. Unwrapping the definition, we know $V^{**} = \mathcal{L}(V^*, \F)$. Our isomorphism has to produce something in $V^{**}$ given any $\mathbf{v} \in V$. This is equivalent to saying given any $\mathbf{v} \in V$ and a function $\theta \in V^*$, produce something in $\F$.
+
+This is easy, by definition $\theta \in V^*$ is just a linear map $V \to \F$. So given $\mathbf{v}$ and $\theta$, we just return $\mathbf{v}(\theta)$. We now just have to show that this is linear and is bijective.
 \begin{lemma}
-  Let $V$ be a vector space over $\F$. Then there is a canonical linear map $\ev: V\to (V^*)^*$ given by
+  Let $V$ be a vector space over $\F$. Then there is a linear map $\ev: V\to (V^*)^*$ given by
   \[
     \ev (\mathbf{v})(\theta) = \theta(\mathbf{v}).
   \]
   We call this the \emph{evaluation} map.
 \end{lemma}
-We call this ``canonical'' since this does not require picking a particular basis of the vector spaces. It is in some sense a ``natural'' map.
+We call this a ``canonical'' map since this does not require picking a particular basis of the vector spaces. It is in some sense a ``natural'' map.
 
 \begin{proof}
   We first show that $\ev(\mathbf{v}) \in V^{**}$ for all $\mathbf{v}\in V$, ie. $\ev (\mathbf{v})$ is linear for any $\mathbf{v}$. For any $\lambda, \mu\in \F$, $\theta_1, \theta_2 \in V^*$, then for $\mathbf{v} \in V$, we have
@@ -1474,7 +1528,7 @@ From now on, we will just pretend that $V$ and $V^{**}$ are the same thing, at l
 
 Note that this lemma does not just say that $V$ is isomorphic to $V^{**}$ (we already know that since they have the same dimension). This says there is a completely canonical way to choose the isomorphism.
 
-In general, if $V$ has a basis, then $\ev$ is injective, but not surjective. So we can think of $V$ as a subspace of $V^{**}$ in a canonical way.
+In general, if $V$ is infinite dimensional, then $\ev$ is injective, but not surjective. So we can think of $V$ as a subspace of $V^{**}$ in a canonical way.
 
 \begin{lemma}
   Let $V, W$ be finite-dimensional vector spaces over $\F$ after identifying ($V$ and $V^{**}$) and ($W$ and $W^{**}$) by the evaluation map. Then we have
@@ -1491,7 +1545,9 @@ In general, if $V$ has a basis, then $\ev$ is injective, but not surjective. So 
         \dim U = \dim V - \dim U^0 = \dim V - (\dim V - \dim U^{00}) = \dim U^{00}.
       \]
       So we must have $U = U^{00}$.
-    \item Let $(\mathbf{e}_1, \cdots, \mathbf{e}_n)$ be a basis for $V$ and $(\mathbf{f}_1, \cdots, \mathbf{f}_m)$ be a basis for $W$, and let $(\varepsilon_1, \cdots, \varepsilon_n)$ and $(\eta_1, \cdots, \eta_n)$ be the corresponding dual basis. We know that
+    \item The proof of this is basically --- the transpose of the transpose is the original matrix. The only work we have to do is to show that the dual of the dual basis is the original basis.
+
+      Let $(\mathbf{e}_1, \cdots, \mathbf{e}_n)$ be a basis for $V$ and $(\mathbf{f}_1, \cdots, \mathbf{f}_m)$ be a basis for $W$, and let $(\varepsilon_1, \cdots, \varepsilon_n)$ and $(\eta_1, \cdots, \eta_n)$ be the corresponding dual basis. We know that
       \[
         \mathbf{e}_i(\varepsilon_j) = \delta_{ij} = \varepsilon_j(\mathbf{e}_i),\quad \mathbf{f}_i(\eta_j) = \delta_{ij} = \eta_j(\mathbf{f}_i).
       \]
@@ -1514,7 +1570,7 @@ In general, if $V$ has a basis, then $\ev$ is injective, but not surjective. So 
     \item Suppose $\theta \in V^*$. Then
       \begin{align*}
         \theta \in (U_1 + U_2)^0 &\Leftrightarrow \theta (\mathbf{u}_1 + \mathbf{u}_2) = 0\text{ for all }\mathbf{u}_i \in U_i\\
-        &\Leftrightarrow \theta (\mathbf{u}) = 0\text{ for all }\mathbf{u} \in U\cup U_2\\
+        &\Leftrightarrow \theta (\mathbf{u}) = 0\text{ for all }\mathbf{u} \in U_1 \cup U_2\\
         &\Leftrightarrow \theta \in U_1^0 \cap U_2^0.
       \end{align*}
     \item We have
@@ -1526,6 +1582,9 @@ In general, if $V$ has a basis, then $\ev$ is injective, but not surjective. So 
 \end{proof}
 
 \section{Bilinear forms I}
+\label{sec:bilin1}
+So far, we have been looking at linear things only. This can get quite boring. For a change, we look at \emph{bi}linear maps instead. In this chapter, we will look at bilinear forms in general. It turns out there isn't much we can say about them, and hence this chapter is rather short. Later, in Chapter~\ref{sec:bilin2}, we will study some special kinds of bilinear forms which are more interesting.
+
 \begin{defi}[Bilinear form]
   Let $V, W$ be vector spaces over $\F$. Then a function $\phi: V\times W \to \F$ is a \emph{bilinear form} if it is linear in each variable, ie. for each $\mathbf{v} \in V$, $\phi(\mathbf{v}, \ph): W \to \F$ is linear; for each $\mathbf{w} \in W$, $\phi(\ph, \mathbf{w}): V\to \F$ is linear.
 \end{defi}
@@ -1588,7 +1647,7 @@ We have identified linear maps with matrices, and we have identified bilinear ma
   \[
     \mathbf{w}_i = \sum Q_{\ell j} \mathbf{f}_\ell\text{ for all }j = 1, \cdots, m.
   \]
-  Let $\psi: V\times W \to \F$ be a bilinear form represented by $A$ with respect to $(\mathbf{e}_1, \cdots, \mathbf{e}_n)$, and $(\mathbf{f}_1, \cdots, \mathbf{f}_m)$ by $B$ with respect to $(\mathbf{v}_1, \cdots, \mathbf{v}_n)$ and $\mathbf{w}_1, \cdots, \mathbf{w}_n)$. Then
+  Let $\psi: V\times W \to \F$ be a bilinear form represented by $A$ with respect to $(\mathbf{e}_1, \cdots, \mathbf{e}_n)$ and $(\mathbf{f}_1, \cdots, \mathbf{f}_m)$, and by $B$ with respect to the bases $(\mathbf{v}_1, \cdots, \mathbf{v}_n)$ and $(\mathbf{w}_1, \cdots, \mathbf{w}_m)$. Then
   \[
     B = P^T AQ.
   \]
@@ -1605,13 +1664,13 @@ The difference with the transformation laws of matrices is this time we are taki
     &= (P^T AQ)_{ij}.
   \end{align*}
 \end{proof}
-Note that while the transformation laws for bilinear forms and linear maps are different, we still get that two matrices are representing the same bilinear form with respect to different bases if and only if they are equivalent, since if $B = P^T AQ$, then $B = ((P^{-1})^T)^T AQ$.
+Note that while the transformation laws for bilinear forms and linear maps are different, we still get that two matrices are representing the same bilinear form with respect to different bases if and only if they are equivalent, since if $B = P^{-1} AQ$, then $B = ((P^{-1})^T)^T AQ$.
 
 If we are given a bilinear form $\psi: V\times W \to \F$, we immediately get two linear maps:
 \[
   \psi_L: V\to W^*,\quad \psi_R: W \to V^*,
 \]
-defined by $\psi_L(\mathbf{v})(\mathbf{w}) = \psi(\mathbf{v}, \mathbf{w}) = \psi_R(\mathbf{w})(\mathbf{v})$.
+defined by $\psi_L(\mathbf{v}) = \psi(\mathbf{v}, \ph)$ and $\psi_R(\mathbf{w}) = \psi(\ph, \mathbf{w})$.
 
 For example, if $\psi: V\times V^* \to \F$, is defined by $(\mathbf{v}, \theta) \mapsto \theta(\mathbf{v})$, then $\psi_L: V\to V^{**}$ is the evaluation map. On the other hand, $\psi_R: V^* \to V^*$ is the identity map.
 
@@ -1624,7 +1683,7 @@ For example, if $\psi: V\times V^* \to \F$, is defined by $(\mathbf{v}, \theta) 
 \begin{proof}
   We just have to compute
   \[
-    \psi_L(\mathbf{e}_i)(\mathbf{e}_j) = A_{ij} = \left(\sum A_{i\ell} \eta_\ell\right) (\mathbf{f}_j).
+    \psi_L(\mathbf{e}_i)(\mathbf{f}_j) = A_{ij} = \left(\sum A_{i\ell} \eta_\ell\right) (\mathbf{f}_j).
   \]
   So we get
   \[
@@ -1663,7 +1722,7 @@ If we have a non-trivial left (or right) kernel, then in some sense, some elemen
 \end{defi}
 
 \begin{defi}[Rank of bilinear form]
-  If $\psi: V\to W$ is a bilinear form $\F$ on a finite-dimensional vector space $V$, then the \emph{rank} of $V$ is the rank of any matrix reperesenting $\phi$. This is well-defined since $r(P^T AQ) = r(A)$ if $P$ and $Q$ are invertible.
+  If $\psi: V\to W$ is a bilinear form $\F$ on a finite-dimensional vector space $V$, then the \emph{rank} of $V$ is the rank of any matrix representing $\phi$. This is well-defined since $r(P^T AQ) = r(A)$ if $P$ and $Q$ are invertible.
 
   Alternatively, it is the rank of $\psi_L$ (or $\psi_R$).
 \end{defi}
@@ -1704,7 +1763,7 @@ Recall that $S_n$ is the group of permutations of $\{1, \cdots, n\}$, and there 
     \det A = \sum_{\sigma \in S_n} \varepsilon(\sigma) \prod_{i = 1}^n A_{i \sigma(i)}.
   \]
 \end{defi}
-This is a big scary definition, and we will see this is the same as the determinant we are used to.
+This is a big scary definition. Hence, we will spend the first half of the chapter trying to understand what this really means, and how it behaves. We will eventually prove a formula that is useful for computing the determinant, which is probably how you were first exposed to the determinant.
 
 \begin{eg}
   If $n = 2$, then $S_2 = \{\id, (1\; 2)\}$. So
@@ -1718,7 +1777,7 @@ This is a big scary definition, and we will see this is the same as the determin
   \end{align*}
 \end{eg}
 
-We will first prove a few easy and useful lemmas about the determinant, and then later see why it is defined this way.
+We will first prove a few easy and useful lemmas about the determinant.
 \begin{lemma}
   $\det A = \det A^T$.
 \end{lemma}
@@ -1784,7 +1843,7 @@ To motivate this definition, we need a notion of volume. How can we define \emph
 \end{defi}
 We should think of $d(\mathbf{v}_1, \cdots, \mathbf{v}_n)$ as the $n$-dimensional volume of the parallelopiped spanned by $\mathbf{v}_1, \cdots, \mathbf{v}_n$.
 
-We can view $A \in \Mat_n(\F)$ as an $n$-tuple in $\F^n$ by considering its columns $A = (A^{(1)}\; A^{(2)}\; \cdots \; A^{(n)})$, with $A^{(i)} \in \F^n$. Then we have
+We can view $A \in \Mat_n(\F)$ as $n$-many vectors in $\F^n$ by considering its columns $A = (A^{(1)}\; A^{(2)}\; \cdots \; A^{(n)})$, with $A^{(i)} \in \F^n$. Then we have
 \begin{lemma}
   $\det A$ is a volume form.
 \end{lemma}
@@ -1817,7 +1876,7 @@ We can view $A \in \Mat_n(\F)$ as an $n$-tuple in $\F^n$ by considering its colu
 We have shown that determinants are volume forms, but is this the only volume form? Well obviously not, since $2 \det A$ is also a valid volume form. However, in some sense, all volume forms are ``derived'' from the determinant. Before we show that, we need the following
 
 \begin{lemma}
-  Let $d$ be a volume form on $\F^n$. Swapping two entries changes the sign, ie.
+  Let $d$ be a volume form on $\F^n$. Then swapping two entries changes the sign, ie.
   \[
     d (\mathbf{v}_1, \cdots, \mathbf{v}_i, \cdots, \mathbf{v}_j,\cdots, \mathbf{v}_n) = -d(\mathbf{v}_1, \cdots, \mathbf{v}_j, \cdots, \mathbf{v}_i, \cdots, \mathbf{v}_n).
   \]
@@ -1859,15 +1918,15 @@ We have shown that determinants are volume forms, but is this the only volume fo
     d(A^{(1)}, \cdots, A^{(n)}) &= d\left(\sum_{i = 1}^n A_{i1} \mathbf{e}_i, A^{(2)}, \cdots, A^{(n)}\right)\\
     &= \sum_{i = 1}^n A_{i1} d(\mathbf{e}_1, A^{(2)}, \cdots, A^{(n)})\\
     &= \sum_{i, j = 1}A_{i1}A_{j2}d(\mathbf{e}_i, \mathbf{e}_j, A^{(3)}, \cdots, A^{(n)})\\
-    &= \sum_{i_1, \cdots, i_n} \prod_{j = 1}^n A_{i_j j}d(\mathbf{e}_{i_1}, \cdots, \mathbf{e}_{i_n})
+    &= \sum_{i_1, \cdots, i_n} d(\mathbf{e}_{i_1}, \cdots, \mathbf{e}_{i_n})\prod_{j = 1}^n A_{i_j j}.
   \end{align*}
   We know that lots of these are zero, since if $i_k = i_j$ for some $k, j$, then the term is zero. So we are just summing over distinct tuples, ie. when there is some $\sigma$ such that $i_j = \sigma(j)$. So we get
   \[
-    d(A^{(1)}, \cdots, A^{(n)}) = \sum_{\sigma \in S_n} \prod_{j = 1}^n A_{\sigma(j)j} d(\mathbf{e}_{\sigma(1)}, \cdots, \mathbf{e}_{\sigma(n)}).
+    d(A^{(1)}, \cdots, A^{(n)}) = \sum_{\sigma \in S_n} d(\mathbf{e}_{\sigma(1)}, \cdots, \mathbf{e}_{\sigma(n)})\prod_{j = 1}^n A_{\sigma(j)j}.
   \]
   However, by our corollary up there, this is just
   \[
-    d(A^{(1)}, \cdots, A^{(n)}) = \sum_{\sigma \in S_n} \prod_{j = 1}^n A_{\sigma(j)j} \varepsilon(\sigma) d(\mathbf{e}_1, \cdots, \mathbf{e}_n) = (\det A) d(\mathbf{e}_1, \cdots, \mathbf{e}_n).
+    d(A^{(1)}, \cdots, A^{(n)}) = \sum_{\sigma \in S_n} \varepsilon(\sigma) d(\mathbf{e}_1, \cdots, \mathbf{e}_n) \prod_{j = 1}^n A_{\sigma(j)j} = (\det A) d(\mathbf{e}_1, \cdots, \mathbf{e}_n).
   \]
   So done.
 \end{proof}
@@ -1912,6 +1971,7 @@ So we know that $\det A$ is the volume rescaling factor of an arbitrary parallel
 \begin{defi}[Singular matrices]
   A matrix $A$ is \emph{singular} if $\det A = 0$. Otherwise, it is \emph{non-singular}.
 \end{defi}
+We have just shown that if $\det A = 0$, then $A$ is not invertible. Is the converse true? If $\det A \not= 0$, then can we conclude that $A$ is invertible? The answer is yes. We are now going to prove it in an abstract and clean way. We will later prove this fact again by constructing an explicit formula for the inverse, which involves dividing by the determinant. So if the determinant is non-zero, then we know an inverse exists.
 
 \begin{thm}
   Let $A \in \Mat_n(\F)$. Then the following are equivalent:
@@ -1939,7 +1999,7 @@ So we know that $\det A$ is the volume rescaling factor of an arbitrary parallel
   So $AB$ has the $k$th column identically zero. So $\det(AB) = 0$. So it is sufficient to prove that $\det (B) \not= 0$. But $\det B = \lambda_k \not= 0$. So done.
 \end{proof}
 
-We are now going to come up with an alternative formula for the derivative (which is probably the one you are familiar with). To do so, we introduce the following notation:
+We are now going to come up with an alternative formula for the determinant (which is probably the one you are familiar with). To do so, we introduce the following notation:
 \begin{notation}
   Write $\hat{A}_{ij}$ for the matrix obtained from $A$ by deleting the $i$th row and $j$th column.
 \end{notation}
@@ -1967,9 +2027,9 @@ We could prove this directly from the definition, but that is messy and scary, s
   where $d$ is the volume form induced by the determinant. Then we can write as
   \begin{align*}
     \det A &= d\left(A^{(1)}, \cdots, \sum_{j = 1}^n A_{ij} \mathbf{e}_i, \cdots, A^{(n)}\right)\\
-    &= \sum_{i = 1}^n A_{ij} d(A^{(1)}, \cdots, \mathbf{e}_{ij}, \cdots, A^{(n)})
+    &= \sum_{i = 1}^n A_{ij} d(A^{(1)}, \cdots, \mathbf{e}_i, \cdots, A^{(n)})
   \end{align*}
-  The right is the determinant of a matrix with the $j$th column replaced with $\mathbf{e}_1$. We can move our columns around so that our matrix becomes
+  The volume form on the right is the determinant of a matrix with the $j$th column replaced with $\mathbf{e}_i$. We can move our columns around so that our matrix becomes
   \[
     B =
     \begin{pmatrix}
@@ -1996,7 +2056,7 @@ The relevance is the following result:
     A^{-1} = \frac{1}{\det A}\adj A.
   \]
 \end{thm}
-Note that this is not an efficient way to compute the inverse.
+Note that this is \emph{not} an efficient way to compute the inverse.
 
 \begin{proof}
   We compute
@@ -2011,7 +2071,7 @@ Note that this is not an efficient way to compute the inverse.
   \]
   The calculation for $[A\adj A] = (\det A) I_n$ can be done in a similar manner, or by considering $(A\adj A)^T = (\adj A)^T A^T = (\adj (A^T)) A^T = (\det A) I_n$.
 \end{proof}
-Note that the coefficients of $(\adj A)$ are just given by polynomials in the entries of $A$, and so is the determinant. So if $A$ is invertible, then its inverse is given a rational function (ie. ratio of two polynomials) in the entries of $A$.
+Note that the coefficients of $(\adj A)$ are just given by polynomials in the entries of $A$, and so is the determinant. So if $A$ is invertible, then its inverse is given by a rational function (ie. ratio of two polynomials) in the entries of $A$.
 
 This is very useful theoretically, but not computationally, since the polynomials are very large. There are better ways computationally, such as Gaussian elimination.
 
@@ -2029,7 +2089,7 @@ We'll end with a useful tricks to compute the determinant.
 \end{lemma}
 
 \begin{proof}
-  Suppose $A\in \Mat_k(\F)$, and $B\in \Mat_{\ell}(\F)$, so $C \in \Mat_{l, \ell}(\F)$. let
+  Suppose $A\in \Mat_k(\F)$, and $B\in \Mat_{\ell}(\F)$, so $C \in \Mat_{l, \ell}(\F)$. Let
   \[
     X =
     \begin{pmatrix}
@@ -2066,11 +2126,11 @@ Endomorphisms are linear maps from a vector space $V$ to itself. One might wonde
 
 When we work with arbitrary linear maps, we are free to choose any basis for the domain, and any basis for the co-domain, since it doesn't make sense to require they have the ``same'' basis. Then we proved that by choosing the right bases, we can put matrices into a nice form with only $1$'s in the diagonal.
 
-However, when working with endomorphisms, we can require ourselves to use the same basis for the domain and co-domain, and there is much more we can say.
+However, when working with endomorphisms, we can require ourselves to use the same basis for the domain and co-domain, and there is much more we can say. One major objective is to classify all matrices up to similarity, where two matrices are similar if they represent the same endomorphism under different bases.
 
 \subsection{Invariants}
 \begin{defi}
-  If $V$ is a (finite-dimensional) vector space over $\F$. An \emph{endomorphism} of $V$ is a linear map $\alpha: V \to V$. We write $\End(V)$ for the $\F$-vector space of all such linear maps, and $L$ for the identity map $V \to V$.
+  If $V$ is a (finite-dimensional) vector space over $\F$. An \emph{endomorphism} of $V$ is a linear map $\alpha: V \to V$. We write $\End(V)$ for the $\F$-vector space of all such linear maps, and $I$ for the identity map $V \to V$.
 \end{defi}
 When we think about matrices representing an endomorphism of $V$, we'll use the same basis for the domain and the range. We are going to study some properties of these endomorphisms that are not dependent on the basis we pick, known as \emph{invariants}.
 
@@ -2145,7 +2205,7 @@ This allows us to define the trace and determinant of an \emph{endomorphism}.
 \end{defi}
 The lemma tells us that the determinant and trace are well-defined. We can also define the determinant without reference to a basis, by defining more general volume forms and define the determinant as a scaling factor.
 
-The trace is slightly more tricky to define without basis, but in IB Analysis II, you will find that it is the directional derivative at the origin.
+The trace is slightly more tricky to define without basis, but in IB Analysis II example sheet 4, you will find that it is the directional derivative of the determinant at the origin.
 
 To talk about the characteristic polynomial, we need to know what eigenvalues are.
 \begin{defi}[Eigenvalue and eigenvector]
@@ -2158,13 +2218,14 @@ To talk about the characteristic polynomial, we need to know what eigenvalues ar
     E_\alpha(\lambda) = \ker (\lambda \iota - \alpha).
   \]
   where $\iota$ is the identity function.
-
+\end{defi}
+\begin{defi}[Characteristic polynomial]
   The \emph{characteristic polynomial} of $\alpha$ is defined by
   \[
     \chi_\alpha(t) = \det (t\iota - \alpha).
   \]
 \end{defi}
-Note that $\chi_\alpha(t)$ is a monic polynomial of degree $\dim V$.
+You might be used to the definition $\chi_\alpha(t) = \det(\alpha - t \iota)$ instead. These two definitions are obviously equivalent up to a factor of $-1$, but this definition has an advantage that $\chi_\alpha(t)$ is always monic, ie. the leading coefficient is $1$. However, when doing computations in reality, we often use $\det (\alpha - t\iota)$ instead, since it is easier to negate $t \iota$ than $\alpha$.
 
 We know that $\lambda$ is an eigenvalue of $\alpha$ iff $n(\alpha - \lambda \iota) > 0$ iff $r(\alpha - \lambda \iota) < \dim V$ iff $\chi_\alpha(\lambda) = \det(\lambda \iota - \alpha) = 0$. So the eigenvalues are precisely the roots of the characteristic polynomial.
 
@@ -2239,8 +2300,8 @@ These are in some sense the nice matrices we like to work with.
         \alpha(\mathbf{e}_i) = A_{ji} \mathbf{e}_j,
       \]
       where $A$ represents $\alpha$. Then $A$ is diagonal iff each $\mathbf{e}_i$ is an eigenvector. So done
-    \item (ii) $\Leftrightarrow$ (iii): It is clear that (ii) is true iff $\sum E_i = V$, but we know that $V$ must be a direct sum. So done.
-    \item (iii) $\Leftrightarrow$ (iv): This follows from example sheet Q10, which says that $V = \oplus_{i = 1}^k E_i$ iff the bases for $E_i$ are disjoint and their union is a basis of $V$.
+    \item (ii) $\Leftrightarrow$ (iii): It is clear that (ii) is true iff $\sum E_i = V$, but we know that this must be a direct sum. So done.
+    \item (iii) $\Leftrightarrow$ (iv): This follows from example sheet Q10, which says that $V = \bigoplus_{i = 1}^k E_i$ iff the bases for $E_i$ are disjoint and their union is a basis of $V$.
   \end{itemize}
 \end{proof}
 \subsection{The minimal polynomial}
@@ -2256,12 +2317,12 @@ Before we talk about minimal polynomials, we first talk about polynomials in gen
 
   We write $\F[t]$ for the set of polynomials over $\F$.
 \end{defi}
-Note that we don't identify $f$ with the corresponding function it represents. For example, if $\F = \Z/p\Z$, then $t^p$ and $t$ are different polynomials, even though they define the same function. Two polynomials are equal if and only if they have the same coefficients.
+Note that we don't identify a polynomial $f$ with the corresponding function it represents. For example, if $\F = \Z/p\Z$, then $t^p$ and $t$ are different polynomials, even though they define the same function (by Fermat's little theorem/Lagrange's theorem). Two polynomials are equal if and only if they have the same coefficients.
 
 However, we will later see that if $\F$ is $\R$ or $\C$, then polynomials are equal if and only if they represent the same function, and this distinction is not as important.
 
 \begin{defi}[Degree]
-  Let $f \in \F[t]$ as above. Then the \emph{degree} of $f$, written $\deg f$ is the largest $n$ such that $a_n \not= 0$. In particular, $\deg 0 = -\infty$.
+  Let $f \in \F[t]$. Then the \emph{degree} of $f$, written $\deg f$ is the largest $n$ such that $a_n \not= 0$. In particular, $\deg 0 = -\infty$.
 \end{defi}
 
 Notice that $\deg fg = \deg f + \deg g$ and $\deg f + g \leq \max\{\deg f, \deg g\}$.
@@ -2328,6 +2389,8 @@ More importantly, we have the following:
 \begin{thm}[The fundamental theorem of algebra]
   Every non-constant polynomial over $\C$ has a root in $\C$.
 \end{thm}
+We will not prove this.
+
 We say $\C$ is an \emph{algebraically closed field}.
 
 It thus follows that every polynomial over $\C$ of degree $n > 0$ has precisely $n$ roots, counted with multiplicity, since if we write $f(t) = g(t)\prod (t - \lambda_i)^{a_i}$ and $g$ has no roots, then $g$ is constant. So the number of roots is $\sum a_i = \deg f$, counted with multiplicity.
@@ -2401,7 +2464,7 @@ It also follows that every polynomial in $\R$ factors into linear polynomials an
   \]
   So
   \[
-    \alpha (\pi_j \mathbf{v}) = \lambda_j \mathbf{v}_j.
+    \alpha \mathbf{v}_j = \lambda_j \mathbf{v}_j.
   \]
   So done.
 \end{proof}
@@ -2495,7 +2558,7 @@ This is important in quantum mechanics. This means that if two operators do not 
 \subsection{The Cayley-Hamilton theorem}
 We will first state the theorem, and then prove it later.
 
-Recall that $\chi_\alpha(t) = \det (t\iota - \alpha)$ for $\alpha \in \End(V)$. Our main theorem of the section (as you might have guessed from the title), is
+Recall that $\chi_\alpha(t) = \det (t\iota - \alpha)$ for $\alpha \in \End(V)$. Our main theorem of the section (as you might have guessed from the title) is
 \begin{thm}[Cayley-Hamilton theorem]
   Let $V$ be a finite-dimensional vector space and $\alpha \in \End(V)$. Then $\chi_\alpha(\alpha) = 0$, ie. $M_\alpha(t) \mid \chi_\alpha(t)$. In particular, $\deg M_\alpha \leq n$.
 \end{thm}
@@ -2585,7 +2648,7 @@ We have a similar lemma telling us when matrices are triangulable.
   \]
   We know $\chi_\alpha(t) = (t - \lambda)^r \chi_B(t)$. So $\chi_B(t)$ is also a product of linear factors. We let $\beta: W\to W$ be the map defined by $B$ with respect to $\mathbf{w}_{r + 1}, \cdots, \mathbf{w}_n$.
 
-  (Note that in general, $\beta$ is not $\alpha|_W$ in general, since $\alpha$ does not necessarily map $W$ to $W$. However, we can say that $(\alpha - \beta) (\mathbf{w}) \in U$ for all $\mathbf{w}\in W$. This can be much more elegantly expressed in terms of quotient spaces, but unfortunately that is non officially part of the course)
+  (Note that in general, $\beta$ is not $\alpha|_W$ in general, since $\alpha$ does not necessarily map $W$ to $W$. However, we can say that $(\alpha - \beta) (\mathbf{w}) \in U$ for all $\mathbf{w}\in W$. This can be much more elegantly expressed in terms of quotient spaces, but unfortunately that is not officially part of the course)
 
   Since $\dim W < \dim V$, there is a basis $\mathbf{v}_{r + 1}, \cdots, \mathbf{v}_n$ for $W$ such that $\beta$ is represented by $C$, which is upper triangular.
 
@@ -2680,7 +2743,7 @@ For this reason, in the rest of the section, we are mostly going to work in $\C$
   \]
   Then we get the result
   \[
-    (tI_n - A) (B_{n - 1}t^{n - 1} + B_{n - 2} t^{n - 2} + \cdots + B_0) = t^n + a_{n - 1} t^{n - 1} + \cdots + a_0.
+    (tI_n - A) (B_{n - 1}t^{n - 1} + B_{n - 2} t^{n - 2} + \cdots + B_0) = (t^n + a_{n - 1} t^{n - 1} + \cdots + a_0)I_n.
   \]
   We would like to just throw in $t = A$, and get the desired result, but in all these derivations, $t$ is assumed to be a real number, and, $tI_n - A$ is the matrix
   \[
@@ -2695,11 +2758,11 @@ For this reason, in the rest of the section, we are mostly going to work in $\C$
 
   However, what we \emph{can} do is to note that since this is true for all values of $t$, the coefficients on both sides must be equal. Equating coefficients in $t^k$, we have
   \begin{align*}
-    -A B_0 &= a_0\\
-    B_0 - AB_1 &= a_1\\
+    -A B_0 &= a_0I_n\\
+    B_0 - AB_1 &= a_1I_n\\
     &\vdots\\
-    B_{n - 2} - AB_{n - 1} &= a_{n - 1}\\
-    AB_{n - 1} - 0 &= 1
+    B_{n - 2} - AB_{n - 1} &= a_{n - 1}I_n\\
+    AB_{n - 1} - 0 &= I_n
   \end{align*}
   We now multiply each row a suitable power of $A$ to obtain
   \begin{align*}
@@ -2711,6 +2774,7 @@ For this reason, in the rest of the section, we are mostly going to work in $\C$
   \end{align*}
   Summing this up then gives $\chi_\alpha(A) = 0$.
 \end{proof}
+This proof suggests that we \emph{really} ought to be able to just substitute in $t = \alpha$ and be done. In fact, we can do this, after we develop sufficient machinery. This will be done in the IB Groups, Rings and Modules course.
 
 \begin{lemma}
   Let $\alpha \in \End(V), \lambda \in \F$. Then the following are equivalent:
@@ -2758,7 +2822,7 @@ For this reason, in the rest of the section, we are mostly going to work in $\C$
   By direct and boring computations, we can find $(A - I)(A - 2I) = 0$. So we know that $M_A(t) = (t - 1)(t - 2)$. So $A$ is diagonalizable.
 \end{eg}
 \subsection{Multiplicities of eigenvalues and Jordan normal form}
-We will want to put our matrices in their ``Jordan normal forms'', which is a unique form for each equivalence class of similar matrices. The following will determine which Jordan normal form a matrix can have.
+We will want to put our matrices in their ``Jordan normal forms'', which is a unique form for each equivalence class of similar matrices. The following properties will help determine which Jordan normal form a matrix can have.
 \begin{defi}[Algebraic and geometry multiplicity]
   Let $\alpha \in \End (V)$ and $\lambda$ an eigenvalue of $\alpha$. Then
   \begin{enumerate}
@@ -2795,7 +2859,7 @@ We will look at some extreme examples:
 \end{lemma}
 \begin{proof}\leavevmode
   \begin{enumerate}
-    \item The first inequality is easy. If $\lambda$ is an eigenvalue, then $E(\lambda) = 0$. So $g_\lambda = \dim E(\lambda) \geq 1$. To prove the other eigenvalue, if $\mathbf{v}_1, \cdots, \mathbf{v}_g$ is a basis for $E(\lambda)$, then we can extend it to a basis for $V$, and then $\alpha$ is represented by
+    \item The first inequality is easy. If $\lambda$ is an eigenvalue, then $E(\lambda) \not= 0$. So $g_\lambda = \dim E(\lambda) \geq 1$. To prove the other inequality, if $\mathbf{v}_1, \cdots, \mathbf{v}_g$ is a basis for $E(\lambda)$, then we can extend it to a basis for $V$, and then $\alpha$ is represented by
       \[
         \begin{pmatrix}
           \lambda I_g & *\\
@@ -2906,7 +2970,7 @@ Note that the permutation thing is necessary, since if two matrices in Jordan no
       \bottomrule
     \end{tabular}
   \end{center}
-  Notice that $\chi_A$ and $M_A$ together determine the Jordan normal form of a $3\times 3$ of a $3\times 3$ complex matrix. We do indeed need $\chi_A$ in the second case, since if we are given $M_A = (t - \lambda_1)(t - \lambda_2)$, we know one of the roots is double, but not which one.
+  Notice that $\chi_A$ and $M_A$ together determine the Jordan normal form of a $3\times 3$ complex matrix. We do indeed need $\chi_A$ in the second case, since if we are given $M_A = (t - \lambda_1)(t - \lambda_2)$, we know one of the roots is double, but not which one.
 \end{eg}
 
 In general, though, even $\chi_A$ and $M_A$ together does not suffice.
@@ -2919,7 +2983,7 @@ We now want to understand the Jordan normal blocks better. Recall the definition
     0 & \lambda & \ddots & \vdots\\
     \vdots & \vdots & \ddots & 1\\
     0 & 0 & \cdots & \lambda
-  \end{pmatrix} = \lambda I_n = J_n(0).
+  \end{pmatrix} = \lambda I_n + J_n(0).
 \]
 If $(\mathbf{e}_1, \cdots, \mathbf{e}_n)$ is the standard basis for $\C^n$, we have
 \[
@@ -2930,7 +2994,7 @@ Thus we know
   J_n(0)^k(\mathbf{e}_i) =
   \begin{cases}
     0 & i \leq k\\
-    \mathbf{e}_{i - k} & k < \leq n
+    \mathbf{e}_{i - k} & k < i \leq n
   \end{cases}
 \]
 In other words, for $k < n$, we have
@@ -2948,7 +3012,7 @@ Hence we can summarize this as
 \]
 Note that if $A = J_n(\lambda)$, then $\chi_A(t) = M_A(t) = (t - \lambda)^n$. So $\lambda$ is the only eigenvalue of $A$. So $a_\lambda = c_\lambda = n$. We also know that $n(A - \lambda I) = n - r(A - \lambda I) = 1$. So $g_\lambda = 1$.
 
-To understand general Jordan normal forms, it is beneficial to quickly look at some properties of block diagonal matrices in general. If $A$ is the block diagonal matrix
+Recall that a general Jordan normal form is a block diagonal matrix of Jordan blocks. We have just studied individual Jordan blocks. Next, we want to look at some properties of block diagonal matrices in general. If $A$ is the block diagonal matrix
 \[
   A =
   \begin{pmatrix}
@@ -3009,27 +3073,30 @@ This is clearly independent of the choice of basis. Also, given this information
   \]
   We have previously computed
   \[
-    n((J_m(\lambda) - \lambda I_m)^r) = \min\{r, m\}.
+    n((J_m(\lambda) - \lambda I_m)^r) =
+    \begin{cases}
+      r & r \leq m\\
+      m & r > m
+    \end{cases}.
+  \]
+  Hence we know
+  \[
+    n((J_m(\lambda) - \lambda I_m)^r) - n((J_m(\lambda) - \lambda I_m)^{r - 1}) =
+    \begin{cases}
+      1 & r \leq m\\
+      0 & \text{otherwise}.
+    \end{cases}
   \]
   It is also easy to see that for $\mu \not= \lambda$,
   \[
     n((J_m(\mu) - \lambda I_m)^r) = n(J_m(\mu - \lambda)^r) = 0
   \]
   Adding up for each block, for $r \geq 1$, we have
-  \begin{align*}
-    n((\alpha - \lambda \iota)^r) - n((\alpha - \lambda \iota)^{r - 1}) &= n((A - \lambda I)^r) - n((A - \lambda I)^{r - 1})\\
-    &= \sum_{i = 1, \lambda_i = \lambda}^k \min\{r, n_i\} - \min\{r - 1, n_i\}
-  \end{align*}
-  Note that if $n_i \geq r$, then
   \[
-    \min \{r, n_i\} - \min\{r - 1, n_i\} = r - (r - 1) = 1,
+    n((\alpha - \lambda \iota)^r) - n((\alpha - \lambda \iota)^{r - 1}) =\text{ number of Jordan blocks }J_n(\lambda)\text{ with } n \geq r.
   \]
-  while if $n_i < r$, then
-  \[
-    \min\{r, n_i\} - \min\{r - 1\}n_i = n_i - n_i = 0.
-  \]
-  Hence it follows that this sum is exactly the number of Jordan blocks $J_{n_i}(\lambda_i)$ such that $\lambda_i = \lambda$ and $n_i \geq r$.
 \end{proof}
+We can interpret this result as follows: if $r \leq m$, when we take an additional power of $J_m(\lambda) - \lambda I_m$, we get from $\begin{pmatrix}0 & I_{m - r}\\ 0 & 0\end{pmatrix}$ to $\begin{pmatrix}0 & I_{m - r - 1}\\ 0 & 0\end{pmatrix}$. So we kill off one more column in the matrix, and the nullity increase by one. This happens until $(J_m(\lambda) - \lambda I_m)^r = 0$, in which case increasing the power no longer affects the matrix. So when we look at the difference in nullity, we are counting the number of blocks that are affected by the increase in power, which is the number of blocks of size at least $r$.
 
 We have now proved uniqueness, but existence is not yet clear. To show this, we will reduce it to the case where there is exactly one eigenvalue. This reduction is easy if the matrix is diagonalizable, because we can decompose the matrix into each eigenspace and then work in the corresponding eigenspace. In general, we need to work with ``generalized eigenspaces''.
 
@@ -3092,7 +3159,7 @@ Using this theorem, by restricting $\alpha$ to its generalized eigenspaces, we c
 \end{defi}
 Over $\C$, $\alpha$ is nilpotent if and only if the only eigenvalue of $\alpha$ is $0$. This is since $\alpha$ is nilpotent if the minimal polynomial is $t^r$ for some $r$.
 
-We've now reduced the problem of classifying complex endomorphisms to the classifying nilpotent endomorphsims. This is the point where we stop. For the remainder of the proof, see IB Groups, Rings and Modules. There is in fact an elementary proof of it, and we're not doing it not because it's hard, but because we don't have time.
+We've now reduced the problem of classifying complex endomorphisms to the classifying nilpotent endomorphisms. This is the point where we stop. For the remainder of the proof, see IB Groups, Rings and Modules. There is in fact an elementary proof of it, and we're not doing it not because it's hard, but because we don't have time.
 
 \begin{eg}
   Let
@@ -3168,7 +3235,7 @@ We've now reduced the problem of classifying complex endomorphisms to the classi
   \]
   There is an obvious choices $\mathbf{v}_3$, namely the eigenvector of eigenvalue $2$.
 
-  To find $\mathbf{v}_1$ and $\mathbf{v}_2$, the idea is to find some $\mathbf{v}_2$ such that $(A - I) \mathbf{v}_2 \not= \mathbf{0}$ but $(A - I)^2 \mathbf{v}_2 = 0$. Then we can let $\mathbf{v}_1 = (A - I) \mathbf{v}_1$.
+  To find $\mathbf{v}_1$ and $\mathbf{v}_2$, the idea is to find some $\mathbf{v}_2$ such that $(A - I) \mathbf{v}_2 \not= \mathbf{0}$ but $(A - I)^2 \mathbf{v}_2 = \mathbf{0}$. Then we can let $\mathbf{v}_1 = (A - I) \mathbf{v}_1$.
 
   We can compute the kernel of $(A - I)^2$. We have
   \[
@@ -3220,14 +3287,15 @@ We've now reduced the problem of classifying complex endomorphisms to the classi
       1 & 1 & 0\\
       0 & 1 & 0\\
       0 & 0 & 2
-    \end{pmatrix}
+    \end{pmatrix}.
   \]
 \end{eg}
 
 \section{Bilinear forms II}
-In the previous chapter on bilinear forms, we have looked at bilinear forms in general. Here, we want to look at bilinear forms on a single space, since often there is just one space we are interested in.
-\subsection{Symmetric bilinear forms and quadratic forms}
+\label{sec:bilin2}
+In Chapter~\ref{sec:bilin1}, we have looked at bilinear forms in general. Here, we want to look at bilinear forms on a single space, since often there is just one space we are interested in. We are also not looking into general bilinear forms on a single space, but just those that are symmetric.
 
+\subsection{Symmetric bilinear forms and quadratic forms}
 \begin{defi}[Symmetric bilinear form]
   Let $V$ is a vector space over $\F$. A bilinear form $\phi: V \times V \to \F$ is \emph{symmetric} if
   \[
@@ -3246,7 +3314,7 @@ In the previous chapter on bilinear forms, we have looked at bilinear forms in g
 This example is typical in the following sense:
 
 \begin{lemma}
-  Let $V$ be a finite-dimensional vector space over $\F$, and $\phi: V\times V \to \F$ is a symmetric bilinear form. Let $(\mathbf{e}_1, \cdots, \mathbf{e}_n)$ be a basis for $V$, and let $M$ be the matrix representing $\phi$ with respect to this basis, ie. $M_{ij} = \phi(\mathbf{e}_i, \mathbf{e}_j)$. Then $\phi$ is symmetric if and only if $MM$ is symmetric.
+  Let $V$ be a finite-dimensional vector space over $\F$, and $\phi: V\times V \to \F$ is a symmetric bilinear form. Let $(\mathbf{e}_1, \cdots, \mathbf{e}_n)$ be a basis for $V$, and let $M$ be the matrix representing $\phi$ with respect to this basis, ie. $M_{ij} = \phi(\mathbf{e}_i, \mathbf{e}_j)$. Then $\phi$ is symmetric if and only if $M$ is symmetric.
 \end{lemma}
 
 \begin{proof}
@@ -3292,6 +3360,8 @@ This motivates the following definition:
 It is easy to see that congruence is an equivalence relation. Two matrices are congruent if and only if represent the same bilinear form with respect to different bases.
 
 Thus, to classify (symmetric) bilinear forms is the same as classifying (symmetric) matrices up to congruence.
+
+Before we do the classification, we first look at quadratic forms, which are something derived from bilinear forms.
 
 \begin{defi}[Quadratic form]
   A \emph{function} $q: V \to \F$ is a \emph{quadratic form} if there exists some bilinear form $\phi$ such that
@@ -3344,7 +3414,7 @@ then we get a different $\phi$, but the same $q$. This is in fact true in genera
 
   To prove uniqueness, we want to find out the values of $\phi(\mathbf{v}, \mathbf{w})$ in terms of what $q$ tells us. Suppose $\phi$ is such a symmetric bilinear form. We compute
   \begin{align*}
-    \phi(\mathbf{v}, \mathbf{w}) &= \phi(\mathbf{v} + \mathbf{w}, \mathbf{v} + \mathbf{w}) \\
+    q(\mathbf{v} + \mathbf{w}) &= \phi(\mathbf{v} + \mathbf{w}, \mathbf{v} + \mathbf{w}) \\
     &= \phi(\mathbf{v}, \mathbf{v}) + \phi(\mathbf{v}, \mathbf{w}) + \phi(\mathbf{w}, \mathbf{v}) + \phi(\mathbf{w}, \mathbf{w})\\
     &= q(\mathbf{v}) + 2\phi(\mathbf{v}, \mathbf{w}) + q(\mathbf{w}).
   \end{align*}
@@ -3358,12 +3428,12 @@ then we get a different $\phi$, but the same $q$. This is in fact true in genera
 \begin{thm}
   Let $V$ be a finite-dimensional vector space over $\F$, and $\phi: V\times V \to \F$ a symmetric bilinear form. Then there exists a basis $(\mathbf{e}_1, \cdots, \mathbf{e}_n)$ for $V$ such that $\phi$ is represented by a diagonal matrix with respect to this basis.
 \end{thm}
-This tells us classifying symemtric bilinear forms is easier than classifying endomorphisms, since for endomorphisms, even over $\C$, we cannot always make it diagonal, but we can for bilinear forms over arbitrary fields.
+This tells us classifying symmetric bilinear forms is easier than classifying endomorphisms, since for endomorphisms, even over $\C$, we cannot always make it diagonal, but we can for bilinear forms over arbitrary fields.
 
 \begin{proof}
   We induct over $n = \dim V$. The cases $n = 0$ and $n = 1$ are trivial, since all matrices are diagonal.
 
-  Supppose we have proven the result for all spaces of dimension less than $n$. First consdier the case where $\phi(\mathbf{v}, \mathbf{v}) = 0$ for all $\mathbf{v} \in V$. We want to show that we must have $\phi = 0$. This follows from the polarization identity, since this $\phi$ induces the zero quadratic form, and we know that there is a unique bilinear form that induces the zero quadratic form. Since we know that the zero bilinear form also induces the zero quadratic form, we must have $\phi = 0$. Then $\phi$ will be represented by the zero matrix with repsect to any basis, which is trivially diagonal.
+  Suppose we have proven the result for all spaces of dimension less than $n$. First consider the case where $\phi(\mathbf{v}, \mathbf{v}) = 0$ for all $\mathbf{v} \in V$. We want to show that we must have $\phi = 0$. This follows from the polarization identity, since this $\phi$ induces the zero quadratic form, and we know that there is a unique bilinear form that induces the zero quadratic form. Since we know that the zero bilinear form also induces the zero quadratic form, we must have $\phi = 0$. Then $\phi$ will be represented by the zero matrix with respect to any basis, which is trivially diagonal.
 
   If not, pick $\mathbf{e}_1 \in V$ such that $\phi(\mathbf{e}_1, \mathbf{e}_1) = 0$. Let
   \[
@@ -3568,7 +3638,7 @@ Note that it follows that for the corresponding quadratic form $q$, we have
   q\left(\sum_{i = 1}^n a_i \mathbf{v}_i\right) = \sum_{i = 1}^r a_i^2.
 \]
 \begin{cor}
-  Every symmetric $A \in \Mat_n(\C)$ is congruent to a unqiue matrix of the form
+  Every symmetric $A \in \Mat_n(\C)$ is congruent to a unique matrix of the form
   \[
     \begin{pmatrix}
       I_r & 0\\
@@ -3591,7 +3661,7 @@ Now this theorem is a bit too strong, and we are going to fix that next lecture,
     q\left(\sum_{i = 1}^n a_i \mathbf{v}_i\right) = \sum_{i = 1}^p a_i^2 - \sum_{j = p + 1}^{p + q} a_j^2.
   \]
 \end{thm}
-Note that we have seen these things in special relativity, where the Minkowski inner prouct is given by the symmetric bilinear form represented by
+Note that we have seen these things in special relativity, where the Minkowski inner product is given by the symmetric bilinear form represented by
 \[
   \begin{pmatrix}
     -1 & 0 & 0 & 0 \\
@@ -3852,6 +3922,8 @@ The proof this time is slightly more involved.
 \end{proof}
 
 \section{Inner product spaces}
+Welcome to the last chapter, where we discuss inner products. Technically, an inner product is just a special case of a positive-definite symmetric bilinear or hermitian form. However, they are usually much more interesting and useful. Many familiar notions such as orthogonality only make sense when we have an inner product.
+
 In this chapter, we will adopt the convention that $\F$ always means either $\R$ or $\C$, since working with other fields doesn't make much sense here.
 
 \subsection{Definitions and basic properties}
@@ -3860,7 +3932,7 @@ In this chapter, we will adopt the convention that $\F$ always means either $\R$
 
   A vector space equipped with an inner product is an \emph{inner product space}.
 \end{defi}
-We will see that if we have an inner product, then we can define lengths and products in a sensible way.
+We will see that if we have an inner product, then we can define lengths and distances in a sensible way.
 
 \begin{eg}\leavevmode
   \begin{enumerate}
@@ -3875,7 +3947,7 @@ We will see that if we have an inner product, then we can define lengths and pro
       \[
         (f, g) = \int_0^1 \bar{f}(t) g(t)\;\d t.
       \]
-    \item More generally, for any $w: [0, 1] \to \R^+$ continuous, then we can define the inner product on $C([0, 1], \F)$ as
+    \item More generally, for any $w: [0, 1] \to \R^+$ continuous, we can define the inner product on $C([0, 1], \F)$ as
       \[
         (f, g) = \int_0^1 w(t) \bar{f}(t) g(t) \;\d t.
       \]
@@ -3937,10 +4009,10 @@ With this, we can prove the triangle inequality.
   So done.
 \end{proof}
 
-The next thing we do is to define an orthonormal set and an orthonormal basis.
+The next thing we do is to define orthogonality. This generalizes the notion of being ``perpendicular''.
 
 \begin{defi}[Orthogonal vectors]
-  Let $V$ be an inner product space. Then $\mathbf{v} \in \mathbf{w} \in V$ are \emph{orthogonal} if $(\mathbf{v}, \mathbf{w}) = 0$.
+  Let $V$ be an inner product space. Then $\mathbf{v}, \mathbf{w} \in V$ are \emph{orthogonal} if $(\mathbf{v}, \mathbf{w}) = 0$.
 \end{defi}
 
 \begin{defi}[Orthonormal set]
@@ -3993,7 +4065,7 @@ This is something we've seen in IB Methods, for infinite dimensional spaces. How
 \end{proof}
 
 \subsection{Gram-Schmidt orthogonalization}
-As mentioned, we want to make sure every vector space has an orthonormal basis, and we can extend any orthonormal set to an orthonormal basis, at least in the case of finite-dimensional vector spaces. The way to do this is the Gram-Schmidt process.
+As mentioned, we want to make sure every vector space has an orthonormal basis, and we can extend any orthonormal set to an orthonormal basis, at least in the case of finite-dimensional vector spaces. The idea is to start with an arbitrary basis, which we know exists, and produce an orthonormal basis out of it. The way to do this is the Gram-Schmidt process.
 \begin{thm}[Gram-Schmidt process]
   Let $V$ be an inner product space and $\mathbf{e}_1, \mathbf{e}_2, \cdots$ a linearly independent set. Then we can construct an orthonormal set $\mathbf{v}_1, \mathbf{v}_2, \cdots$ with the property that
   \[
@@ -4028,7 +4100,7 @@ Note that we are not requiring the set to be finite. We are just requiring it to
 
   Therefore, we can define
   \[
-    \mathbf{v}_{k + 1} = \frac{\mathbf{u}_{k + 1}}{\|\mathbf{v}_{k + 1}\|}.
+    \mathbf{v}_{k + 1} = \frac{\mathbf{u}_{k + 1}}{\|\mathbf{u}_{k + 1}\|}.
   \]
   Then $\mathbf{v}_1, \cdots, \mathbf{v}_{k + 1}$ is orthonormal and $\bra \mathbf{v}_1, \cdots, \mathbf{v}_{k + 1}\ket = \bra \mathbf{e}_1, \cdots, \mathbf{e}_{k + 1}\ket$ as required.
 \end{proof}
@@ -4193,7 +4265,7 @@ This external direct sum is equivalent to the internal direct sum of $\{(\mathbf
   We can compute the other side and get
   \begin{align*}
     \left(\sum \lambda_i \mathbf{v}_i, \alpha^*\left(\sum \mu_j \mathbf{w}_j\right)\right) &= \sum_{i, j} \bar{\lambda}_i \mu_j \left(\mathbf{v}_i, \sum_k A^{\dagger} A_{kj} \mathbf{v}_k\right)\\
-    &= \sum_{i, j} \lambda_{ij} \bar{\lambda}_i \bar{A}_{ji} \mu_j.
+    &= \sum_{i, j} \bar{\lambda}_i \bar{A}_{ji} \mu_j.
   \end{align*}
   So done.
 \end{proof}
@@ -4453,6 +4525,7 @@ We can deduce similar results for complex finite-dimensional vector spaces, with
   \end{enumerate}
 \end{prop}
 
+That's all for self-adjoint matrices. How about unitary matrices?
 \begin{thm}
   Let $V$ be a finite-dimensional complex vector space and $\alpha \in U(V)$ be unitary. Then $V$ has an orthonormal basis of $\alpha$ eigenvectors.
 \end{thm}
@@ -4468,7 +4541,7 @@ We can deduce similar results for complex finite-dimensional vector spaces, with
   \]
   So $\alpha(\mathbf{w}) \in W$ and $\alpha|_W \in \End(W)$. Also, $\alpha|_W$ is unitary since $\alpha$ is. So by induction on $\dim V$, $W$ has an orthonormal basis of $\alpha$ eigenvectors. If we add $\mathbf{v}/\|\mathbf{v}\|$ to this basis, we get an orthonormal basis of $V$ itself comprised of $\alpha$ eigenvectors.
 \end{proof}
-This theorem and the analogous one for self-adjoint endomorphisms have a common generalization, at least for complex inner product spaces. The key fact that leads to the existence of an orthonormal basis of eigenvectors is that $\alpha$ and $\alpha^*$ commute. This is clearly a necessary condition, since if $\alpha$ is diagonalizable (by a basis of eigenvectors), then $\alpha^*$ is diagonal in the same basis (since it is just the transpose (and conjugate)), and hence they commute. It turns out this is also a sufficient condition, as you will show in example sheet 4.
+This theorem and the analogous one for self-adjoint endomorphisms have a common generalization, at least for complex inner product spaces. The key fact that leads to the existence of an orthonormal basis of eigenvectors is that $\alpha$ and $\alpha^*$ commute. This is clearly a necessary condition, since if $\alpha$ is diagonalizable, then $\alpha^*$ is diagonal in the same basis (since it is just the transpose (and conjugate)), and hence they commute. It turns out this is also a sufficient condition, as you will show in example sheet 4.
 
 However, we cannot generalize this in the real orthogonal case. For example,
 \[
@@ -4477,5 +4550,5 @@ However, we cannot generalize this in the real orthogonal case. For example,
     - \sin \theta & \cos \theta
   \end{pmatrix} \in O(\R^2)
 \]
-cannot be diagonalized (if $\theta \not\in \pi \Z$). However, in example sheet 4, you will find a classification of $O(V)$.
+cannot be diagonalized (if $\theta \not\in \pi \Z$). However, in example sheet 4, you will find a classification of $O(V)$, and you will see that the above counterexample is the worst that can happen in some sense.
 \end{document}
