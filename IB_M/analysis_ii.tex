@@ -6,7 +6,6 @@
 \def\nlecturer {N. Wickramasekera}
 \def\ncourse {Analysis II}
 \def\nlectures {MWF.12}
-\def\nnotready {}
 
 \input{header}
 
@@ -38,11 +37,22 @@ The contraction mapping theorem. Applications including the inverse function the
 
 \tableofcontents
 
+\setcounter{section}{-1}
+\section{Introduction}
+Analysis II, is, unsurprisingly, a continuation of IA Analysis I. The key idea in the course is to generalize what we did in Analysis I. The first thing we studied in Analysis I was the convergence of sequences of numbers. Here, we would like to study what it means for a sequence of \emph{functions} to converge (this is \emph{technically} a generalization of what we did before, since a sequence of numbers is just a sequence of functions $f_n: \{0\} \to \R$, but this is not necessarily a helpful way to think about it). It turns out this is non-trivial, and there are many ways in which we can define the convergence of functions, and different notions are useful in different circumstances.
+
+The next thing is the idea of \emph{uniform} continuity. This is a stronger notion than just continuity. Despite being stronger, we will prove in important theorem saying any continuous function on $[0, 1]$ (and in general a closed, bounded subset of $\R$) is uniform continuous. This does not mean that uniform continuity is a useless notion, even if we are just looking at functions on $[0, 1]$. The \emph{definition} of uniform continuity is much stronger than just continuity, so we now know continuous functions on $[0, 1]$ are really nice, and this allows us to prove many things with ease.
+
+We can also generalize in other directions. Instead of looking at functions, we might want to define convergence for \emph{arbitrary} sets. Of course, if we are given a set of, say, apples, oranges and pears, we cannot define convergence in a natural way. Instead, we need to give the set some additional structure, such as a \emph{norm} or \emph{metric}. We can then define convergence in a very general setting.
+
+Finally, we will extend the notion of differentiation from functions $\R \to \R$ to general vector functions $\R^n \to \R^m$. This might sound easy --- we have been doing this in IA Vector Calculus all the time. We just need to formalize it a bit, just like what we did in IA Analysis I, right? It turns out differentiation from $\R^n$ to $\R^m$ is much more subtle, and we have to be really careful when we do so, and it takes quite a long while before we can prove that, say, $f(x, y, z) = x^2 e^{3z} \sin (2xy)$ is differentiable.
+
 \section{Uniform convergence}
-Here we are concerned with sequences of functions. In general, let $E$ be any set, and $f_n: E\to \R$ for $n = 1, 2, \cdots$. Suppose for all $x\in E$, the sequence $(f_n(x))$ of real numbers converges (to some element in the real line).
+In IA Analysis I, we understood what it means for a sequence of real numbers to converge. Suppose instead we have sequence of functions. In general, let $E$ be any set (not necessarily a subset of $\R$), and $f_n: E\to \R$ for $n = 1, 2, \cdots$ be a sequence of functions. What does it mean for $f_n$ to converge to some other function $f: E \to \R$?
 
-We can define $f: E \to \R$ by $f(x) = \lim\limits_{n \to \infty} f_n(x)$. We say that $f_n$ converges \emph{pointwise} to $f$.
+We want this notion of convergence to have properties similar to that of convergence of numbers. For example, a constant sequence $f_n = f$ has to converge to $f$, and convergence should not be affected if we change finitely many terms. It should also act nicely with products and sums.
 
+An obvious first attempt would be to define it in terms of the convergence of numbers.
 \begin{defi}[Pointwise convergence]
   The sequence $f_n$ converges \emph{pointwise} to $f$ if
   \[
@@ -50,20 +60,31 @@ We can define $f: E \to \R$ by $f(x) = \lim\limits_{n \to \infty} f_n(x)$. We sa
   \]
   for all $x$.
 \end{defi}
-
-Ideally, We want to deduce properties of $f$ from properties of $f_n$. For example, it would be great that continuity of all $f_n$ implies continuity of $f$, and similarly for integrability and values of derivatives and integrals. However, it turns out we cannot. The notion of pointwise convergence is too weak. We will look at many examples where $f$ fails to preserve the properties of $f_n$.
+This is an easy definition that is simple to check, and has the usual properties of convergence. However, there is a problem. Ideally, We want to deduce properties of $f$ from properties of $f_n$. For example, it would be great if continuity of all $f_n$ implies continuity of $f$, and similarly for integrability and values of derivatives and integrals. However, it turns out we cannot. The notion of pointwise convergence is too weak. We will look at many examples where $f$ fails to preserve the properties of $f_n$.
 
 \begin{eg}
-  Let $f_n: [-1, 1] \to \R$ be defined by $f_n(x) = x^{1/(2n + 1)}$. These are all continuous, but the limit function is
+  Let $f_n: [-1, 1] \to \R$ be defined by $f_n(x) = x^{1/(2n + 1)}$. These are all continuous, but the pointwise limit function is
   \[
     f_n(x) \to f(x) =
     \begin{cases}
       1 & 0 < x \leq 1\\
-      0 & x = 1\\
+      0 & x = 0\\
       -1 & -1 \leq x < 0
     \end{cases},
   \]
   which is not continuous.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (-3, 0) -- (3, 0) node [right] {$x$};
+      \draw [->] (0, -1.5) -- (0, 1.5) node [above] {$y$};
+
+      \foreach \n in {1,2,3,4,5,6} {
+        \pgfmathsetmacro\c{40 + 10 * \n};
+        \pgfmathsetmacro\k{1 / (2*\n + 1)};
+        \draw [domain=-3:3, samples=100, mblue!\c!white] plot (\x, {\x ^ \k});
+      }
+    \end{tikzpicture}
+  \end{center}
 \end{eg}
 
 \begin{eg}
@@ -106,7 +127,9 @@ Ideally, We want to deduce properties of $f$ from properties of $f_n$. For examp
 \end{eg}
 This suggests that we need a stronger notion of convergence. Of course, we don't want this notion to be too strong. For example, we could define $f_n \to f$ to mean ``$f_n = f$ for all sufficiently large $n$'', then any property common to $f_n$ is obviously inherited by the limit. However, this is clearly silly since only the most trivial sequences would converge.
 
-Hence we want to find a middle ground between the two cases --- a notion of convergence that is sufficiently strong to preserve most interesting properties, without being too trivial. This is uniform convergence.
+Hence we want to find a middle ground between the two cases --- a notion of convergence that is sufficiently strong to preserve most interesting properties, without being too trivial. To do so, we can examine what went wrong in the examples above. In the last example, even though our sequence $f_n$ does indeed tends pointwise to $f$, different points converge at different rates to $f$. For example, at $x = 1$, we already have $f_1(1) = f(1) = 1$. However, at $x = (100!)^{-1}$, $f_{99}(x) = 0$ while $f(x) = 1$. No matter how large $n$ is, we can still find some $x$ where $f_n(x)$ differs a lot from $f(x)$. In other words, if we are given pointwise convergence, there is no guarantee that for very large $n$, $f_n$ will ``look like'' $f$, since there might be some points for which $f_n$ has not started to move towards $f$.
+
+Hence, what we need is for $f_n$ to converge to $f$ at the same pace. This is known as uniform convergence.
 
 \begin{defi}[Uniform convergence]
   A sequence of functions $f_n: E\to \R$ converges \emph{uniformly} to $f$ if
@@ -118,13 +141,15 @@ Hence we want to find a middle ground between the two cases --- a notion of conv
     (\forall \varepsilon)(\exists N)(\forall n > N)\; \sup_{x\in E} |f_n(x) - f(x)| < \varepsilon.
   \]
 \end{defi}
-We can compare this with the definition of pointwise convergence:
+Note that similar to pointwise convergence, the definition does not require $E$ to be a subset of $\R$. It could as well be the set $\{\text{Winnie},\text{Piglet},\text{Tigger}\}$. However, many of our \emph{theorems} about uniform convergence will require $E$ to be a subset of $\R$, or else we cannot sensibly integrate or differentiate our function.
+
+We can compare this definition with the definition of pointwise convergence:
 \[
   (\forall \varepsilon)(\forall x)(\exists N)(\forall n > N)\; |f_n(x) - f(x)| < \varepsilon.
 \]
 The only difference is in where there $(\forall x)$ sits, and this is what makes all the difference. Uniform convergence requires that there is an $N$ that works for \emph{every} $x$, while pointwise convergence just requires that for each $x$, we can find an $N$ that works.
 
-It should now be clear from definition that if $f_n \to f$ uniformly, then $f_n \to f$ pointwise. We will show that the converse is false:
+It should be clear from definition that if $f_n \to f$ uniformly, then $f_n \to f$ pointwise. We will show that the converse is false:
 \begin{eg}
   Again consider our first example, where $f_n: [-1, 1] \to \R$ is defined by $f_n(x) = x^{1/(2n + 1)}$. If the uniform limit existed, then it must be given by
   \[
@@ -183,9 +208,11 @@ Our first theorem will be that uniform Cauchy convergence and uniform convergenc
   We want to show that $f_n \to f$ uniformly. Given $\varepsilon > 0$, choose $N$ such that whenever $n, m > N$, $x\in E$, we have $|f_n(x) - f_m(x)| < \frac{\varepsilon}{2}$. Letting $m\to \infty$, $f_m(x) \to f(x)$. So we have $|f_n(x) - f(x)| \leq \frac{\varepsilon}{2} < \varepsilon$. So done.
 \end{proof}
 
-The important theorem here is that continuity is conserved by uniform convergence.
+This is an important result. If we are given a concrete sequence of functions, then the usual way to show it converges is to compute the pointwise limit and then prove that the convergence is uniform. However, if we are dealing with sequences of functions in general, this is less likely to work. Instead, it is often much easier to show that a sequence of functions is uniformly convergent by showing it is uniformly Cauchy.
+
+We now move on to show that uniform convergence tends to preserve properties of functions.
 \begin{thm}[Uniform convergence and continuity]
-  Let $f_n, f: E\to \R$, where $E\subseteq \R$. If $f_n \to f$ uniformly and $f_n$ are all continuous at some point $x\in E$ for all $n$, then $f$ is also continuous at $x$.
+  Let $E \subseteq \R$, $x \in E$ and $f_n, f: E\to \R$. Suppose $f_n \to f$ uniformly, and $f_n$ are continuous at $x$ for all $n$. Then $f$ is also continuous at $x$.
 
   In particular, if $f_n$ are continuous everywhere, then $f$ is continuous everywhere.
 \end{thm}
@@ -206,7 +233,7 @@ This can be concisely phrased as ``the uniform limit of continuous functions is 
   \]
 \end{proof}
 
-\begin{thm}[Uniform convergnece and integrals]
+\begin{thm}[Uniform convergence and integrals]
   Let $f_n, f: [a, b]\to \R$ be Riemann integrable, with $f_n \to f$ uniformly. Then
   \[
     \int_a^b f_n(t)\;\d t \to \int_a^b f(t)\;\d t.
@@ -216,18 +243,22 @@ This can be concisely phrased as ``the uniform limit of continuous functions is 
 \begin{proof}
   We have
   \begin{align*}
-    \left|\int_a^b f_n(t) \;\d t - \int_a^b f(t)\;\d t\right| &= \left|\int_a^b f_n(t) - f(t))\;\d t\right|\\
+    \left|\int_a^b f_n(t) \;\d t - \int_a^b f(t)\;\d t\right| &= \left|\int_a^b f_n(t) - f(t)\;\d t\right|\\
     &\leq \int_a^b |f_n(t) - f(t)|\;\d t\\
     &\leq \sup_{t\in [a, b]}|f_n(t) - f(t)| (b - a)\\
     &\to 0\text{ as }n\to \infty
   \end{align*}
 \end{proof}
-This is really the easy part. What we would also want to prove is that if $f_n$ is integrable, $f_n \to f$ uniformly, then $f$ is integrable. We will come to this later on at the part where we talk a lot about integrability.
+This is really the easy part. What we would also want to prove is that if $f_n$ is integrable, $f_n \to f$ uniformly, then $f$ is integrable. This is indeed true, but we will not prove it yet. We will come to this later on at the part where we talk a lot about integrability.
 
-So far so good. However, the relationship between uniform convergence and differentiability, things are more subtle. The uniform limit of differential functions need not be differentiable. Even if it were, the limit of the derivative is not necessarily the same as the derivative of the limit, even if we just want pointwise convergence of the derivative.
+So far so good. However, the relationship between uniform convergence and differentiability is more subtle. The uniform limit of differentiable functions need not be differentiable. Even if it were, the limit of the derivative is not necessarily the same as the derivative of the limit, even if we just want pointwise convergence of the derivative.
 
 \begin{eg}
-  Let $f_n = |x|^{1 + 1/n}$, where $x \in [-1, 1]$. Then $f_n \to f$ uniformly (exercise).
+  Let $f_n, f: [-1, 1] \to \R$ be defined by
+  \[
+    f_n(x) = |x|^{1 + 1/n}, \quad f(x) = |x|.
+  \]
+  Then $f_n \to f$ uniformly (exercise).
 
   Each $f_n$ is differentiable --- this is obvious at $x \not= 0$, and at $x = 0$, the derivative is
   \[
@@ -249,7 +280,7 @@ So far so good. However, the relationship between uniform convergence and differ
   \[
     f_n'(x) = \sqrt{n} \cos nx,
   \]
-  which does not converge to $0$, eg. at $x = 0$.
+  which does not converge to $f' = 0$, eg. at $x = 0$.
 \end{eg}
 
 Hence, for differentiability to play nice, we need a condition even stronger than uniform convergence.
@@ -304,7 +335,7 @@ Note that we do \emph{not} assume that $f_n'$ are continuous or even Riemann int
       h(y) & x = y
     \end{cases}
   \]
-  Then $f$ is differentiable with derivative $h$ at $y$ iff $g$ is continuous at $y$. However, we know that $g_x \to g$ pointwise on $[a, b]$, and we know that $g_x$ are all continuous. To conclude that $g$ is continuous, we have to show that the convergence is uniform. To show that $g_x$ converges uniformly, we rely on the Cauchy criterion and the mean value theorem.
+  Then $f$ is differentiable with derivative $h$ at $y$ iff $g$ is continuous at $y$. However, we know that $g_n \to g$ pointwise on $[a, b]$, and we know that $g_n$ are all continuous. To conclude that $g$ is continuous, we have to show that the convergence is uniform. To show that $g_n$ converges uniformly, we rely on the Cauchy criterion and the mean value theorem.
 
   For $x \not = y$, we know that
   \[
@@ -368,7 +399,7 @@ Note that (ii) is false without assuming boundedness. An easy example is to take
 
 \section{Series of functions}
 \subsection{Convergence of series}
-Recall that in Analysis I, we studied the convergence of a series of numbers. Here we will look at a series of \emph{functions}.
+Recall that in Analysis I, we studied the convergence of a series of numbers. Here we will look at a series of \emph{functions}. The definitions are almost exactly the same.
 \begin{defi}[Convergence of series]
   Let $g_n; E \to \R$ be a sequence of functions. Then we say the series $\sum_{n = 1}^\infty g_n$ converges at a point $x \in E$ if the sequence of partial sums
   \[
@@ -427,6 +458,7 @@ It is important to remember that uniform convergence plus absolute pointwise con
   \]
   If $\sum M_n$ converges, then $\sum g_n$ converges absolutely uniformly.
 \end{thm}
+This is in fact a very easy result, and we could as well reproduce the proof whenever we need it. However, this pattern of proving absolute uniform convergence is so common that we prove it as a test.
 
 \begin{proof}
   Let $f_n = \sum\limits_{j = 1}^n |g_j|$ be the partial sums. Then for $n > m$, we have
@@ -441,6 +473,8 @@ It is important to remember that uniform convergence plus absolute pointwise con
 \end{proof}
 
 \subsection{Power series}
+A particularly interesting kind of series is a \emph{power series}. We have already met these in IA Analysis I and proved some results about them. However, our results were pointwise results, discussing how $\sum c_n (x - a)^n$ behaves at a each particular point $x$. Here we will quickly look into how the power series behaves as a function of $x$. In particular, we want to know whether it converges absolutely uniformly.
+
 \begin{thm}
   Let $\sum\limits_{n = 0}^\infty c_n (x - a)^n$ be a real power series. Then there exists a unique number $R\in [0, +\infty]$ (called the radius of convergence) such that
   \begin{enumerate}
@@ -454,7 +488,7 @@ It is important to remember that uniform convergence plus absolute pointwise con
 \end{thm}
 Note that the first two statements are things we already know from IA Analysis I, and we are not going to prove them.
 \begin{proof}
-  See Analysis I for (i) and (ii).
+  See IA Analysis I for (i) and (ii).
 
   For (iii), note that from (i), taking $x = a - r$, we know that $\sum |c_n| r^n$ is convergent. But we know that if $x\in [a - r, a + r]$, then
   \[
@@ -485,13 +519,13 @@ Note that uniform convergence need not hold on the entire interval of convergenc
 
 \begin{proof}\leavevmode
   \begin{enumerate}
-    \item Let $R_1$ be the radius of convergence of the derived series. Since
+    \item Let $R_1$ be the radius of convergence of the derived series. We know
       \[
         |c_n(x - a)^n| = |c_n||x - a|^{n - 1}|x - a| \leq |n c_n (x - a)^{n - 1}| |x - a|.
       \]
       Hence if the derived series $\sum n c_n(x - a)^{n - 1}$ converges absolutely for some $x$, then so does $\sum c_n (x - a)^n$. So $R_1 \leq R$.
 
-      Suppose that the inequality is strict, ie. $R_1 < R$, then there are $r_1, r$ such that $R_1 < r_1 < r < R$, where $\sum n|c_n| r_1^{n - 1}$ diverges while $\sum |c_n| r^n$ converges. But this cannot be true since $n|c_n| r_1^{n - 1} \leq |c_n| r^n$ for sufficiently large $n$.
+      Suppose that the inequality is strict, ie. $R_1 < R$, then there are $r_1, r$ such that $R_1 < r_1 < r < R$, where $\sum n|c_n| r_1^{n - 1}$ diverges while $\sum |c_n| r^n$ converges. But this cannot be true since $n|c_n| r_1^{n - 1} \leq |c_n| r^n$ for sufficiently large $n$. So we must have $R_1 = R$.
 
     \item Let $f_n(x) = \sum\limits_{j = 0}^n c_j (x - a)^j$. Then $f_n '(x) = \sum\limits_{j = 1}^n j c_j (x - a)^{j - 1}$. We want to use the result that the derivative of limit is limit of derivative. This requires that $f_n$ converges at a point, and that $f_n'$ converges uniformly. The first is obviously true, and we know that $f_n'$ converges uniformly on $[a - r, a + r]$ for any $r < R$. So for each $x_0$, there is some interval containing $x_0$ on which $f_n'$ is convergent. So on this interval, we know that
       \[
@@ -525,7 +559,7 @@ Compare this to the definition of continuity:
 \]
 Again, we have shifted the $(\forall x)$ out of the $(\exists \delta)$ quantifier. The difference is that in regular continuity, $\delta$ can depend on our choice of $x$, but in uniform continuity, it only depends on $y$. Again, clearly a uniformly continuous function is continuous.
 
-A very important theorem is
+In general, the converse is not true, as we will soon see in two examples. However, the converse is true in a lot of cases.
 \begin{thm}
   Any continuous function on a closed, bounded interval is uniformly continuous.
 \end{thm}
@@ -535,32 +569,32 @@ A very important theorem is
 
   Since we are on a closed, bounded interval, by Bolzano-Weierstrass, $(x_n)$ has a convergent subsequence $(x_{n_i}) \to x$. Then we also have $y_{n_i}\to x$. So by continuity, we must have $f(x_{n_i}) \to f(x)$ and $f(y_{n_i}) \to f(x)$. But $|f(x_{n_i}) - f(y_{n_i})| > \varepsilon$ for all $n_i$. This is a contradiction.
 \end{proof}
-Note that we proved this in the special case where the domain is $[a, b]$ and the image is $\R$. In fact, $[a, b]$ can be replaced by any compact metric space, $\R$ by any metric space. This is since all we need is for Bolzano-Weierstrass to hold in the domain, ie. the domain is sequentially compact (ignore this comment if you have not taken IB Metric and Topological Spaces).
+Note that we proved this in the special case where the domain is $[a, b]$ and the image is $\R$. In fact, $[a, b]$ can be replaced by any compact metric space; $\R$ by any metric space. This is since all we need is for Bolzano-Weierstrass to hold in the domain, ie. the domain is sequentially compact (ignore this comment if you have not taken IB Metric and Topological Spaces).
 
 Instead of a contradiction, we can also do a direct proof of this statement, using the Heine-Borel theorem which says that $[0, 1]$ is compact.
 
 While this is a nice theorem, in general a continuous function need not be uniformly continuous.
 
 \begin{eg}
-Consider $f: (0, 1] \to \R$ given by $f(x) = \frac{1}{x}$. This is not uniformly continuous, since when we get very close to $0$, a small change in $x$ produces a large change in $\frac{1}{x}$.
+  Consider $f: (0, 1] \to \R$ given by $f(x) = \frac{1}{x}$. This is not uniformly continuous, since when we get very close to $0$, a small change in $x$ produces a large change in $\frac{1}{x}$.
 
-In particular, for any $\delta < 1$ and $x < \delta$, $y = \frac{x}{2}$, then $|x - y| = \frac{x}{2} < \delta$ but $|f(x) - f(y)| = \frac{1}{x} > 1$.
+  In particular, for any $\delta < 1$ and $x < \delta$, $y = \frac{x}{2}$, then $|x - y| = \frac{x}{2} < \delta$ but $|f(x) - f(y)| = \frac{1}{x} > 1$.
 \end{eg}
 
 In this example, the function is unbounded. However, even bounded functions can be not uniformly continuous.
 \begin{eg}
-Let $f: (0, 1] \to \R$, $f(x) = \sin \frac{1}{x}$. We let
-\[
-  x_n = \frac{1}{2n\pi},\quad y_n = \frac{1}{(2n + \frac{1}{2})\pi}.
-\]
-Then we have
-\[
-  |f(x_n) - f(y_n)| = |0 - 1| = 1,
-\]
-while
-\[
-  |x_n - y_n| = \frac{\pi}{2n(4n + 1)} \to 0.
-\]
+  Let $f: (0, 1] \to \R$, $f(x) = \sin \frac{1}{x}$. We let
+  \[
+    x_n = \frac{1}{2n\pi},\quad y_n = \frac{1}{(2n + \frac{1}{2})\pi}.
+  \]
+  Then we have
+  \[
+    |f(x_n) - f(y_n)| = |0 - 1| = 1,
+  \]
+  while
+  \[
+    |x_n - y_n| = \frac{\pi}{2n(4n + 1)} \to 0.
+  \]
 \end{eg}
 
 \subsection{Applications to Riemann integrability}
@@ -707,11 +741,11 @@ As an immediate consequence, we know that any continuous function is integrable,
   \[
     c_n = \sup_{[a, b]} |f_n - f|.
   \]
-  Then uniform convergence says that $c_n \to 0$. So
+  Then uniform convergence says that $c_n \to 0$. By definition, for each $x$, we have
   \[
-    f_n(x) - c_n \leq f(x) \leq f_n(x) + c_n
+    f_n(x) - c_n \leq f(x) \leq f_n(x) + c_n.
   \]
-  by definition. Since $f_n$ is bounded, this implies that $f$ is bounded by $\sup |f| + c_n$. Also, for any $x, y\in [a, b]$, we know
+  Since $f_n$ is bounded, this implies that $f$ is bounded by $\sup |f_n| + c_n$. Also, for any $x, y\in [a, b]$, we know
   \[
     f(x) - f(n) \leq (f_n(x) - f(n)) + 2 c_n.
   \]
@@ -767,6 +801,7 @@ This is a rather random result, but we include it here because it will be helpfu
   \end{align*}
   Divide by $\|\mathbf{v}\|$ and we are done.
 \end{proof}
+\subsection{Non-examinable fun*}
 Since there is time left in the lecture, we'll write down a really remarkable result.
 \begin{thm}[Weierstrass Approximation Theorem*]
   If $f: [0, 1] \to \R$ is continuous, then there exists a sequence of polynomials $(p_n)$ such that $p_n \to f$ uniformly. In fact, the sequence can be given by
@@ -782,7 +817,7 @@ Of course, there are many different sequences of polynomials converging uniforml
   \[
     p_{n, k}(x) = \binom{n}{k}x^k (1 - x)^{n - k}.
   \]
-  First we need a few facts about these functions. Firstly, $p_{n, k}(x) \geq 0$ for all $x\in [0, 1]$. Also, by the binomial theorem,
+  First we need a few facts about these functions. Clearly, $p_{n, k}(x) \geq 0$ for all $x\in [0, 1]$. Also, by the binomial theorem,
   \[
     \sum_{k = 0}^n \binom{n}{k}x^k y^{n - k} = (x + y)^n.
   \]
@@ -833,7 +868,7 @@ Of course, there are many different sequences of polynomials converging uniforml
   Hence given any $\varepsilon$ and $\delta$, we can pick $n$ sufficiently large that that $|p_n(x) - f(x)| < 2\varepsilon$. This is picked independently of $x$. So done.
 \end{proof}
 
-We might be interested in the question --- when is a function Riemann integrable? A possible answer is if it satisfies the Riemann integrability criterion, but this is not really helpful. We know that a function is integrable if it is continuous. But it need not be. It could be discontinuous at finitely many points and still be integrable. If it has countably many discontinuities, then we still can integrate it. How many points of discontinuity can we accommodate if we want to keep integrability?
+Unrelatedly, we might be interested in the question --- when is a function Riemann integrable? A possible answer is if it satisfies the Riemann integrability criterion, but this is not really helpful. We know that a function is integrable if it is continuous. But it need not be. It could be discontinuous at finitely many points and still be integrable. If it has countably many discontinuities, then we still can integrate it. How many points of discontinuity can we accommodate if we want to keep integrability?
 
 To answer this questions, we have Lebesgue's theorem. To state this theorem, we need the following definition:
 \begin{defi}[Lebesgue measure zero*]
@@ -853,7 +888,7 @@ This is a way to characterize ``small'' sets, and in general a rather good way. 
   \begin{itemize}
     \item The empty set has measure zero.
     \item Any finite set has measure zero.
-    \item Any countable set has measure zero. If $A = \{a_0, a_1, \cdots, \}$, take
+    \item Any countable set has measure zero. If $A = \{a_0, a_1, \cdots\}$, take
       \[
         I_j = \left(a_j - \frac{\varepsilon}{2^{j + 1}}, a_j + \frac{\varepsilon}{2^{j + 1}}\right).
       \]
@@ -881,11 +916,13 @@ Using this result, a lot of our theorems follow easily of these. Apart from the 
 
 Similarly, we can show that the uniform limit of integrable functions is integrable, since the points of discontinuities of the uniform limit is at most the (countable) union of all discontinuities of the functions in the sequence.
 
+Proof is left as an exercise for the reader, in the example sheet.
+
 \section{\texorpdfstring{$\R^n$}{Rn} as a normed space}
 \subsection{Normed spaces}
-The basic idea here is to extend most of the notions we had about functions of a single variable $f: \R \to \R$ to functions of multiple variables $f: \R^n \to \R$. More generally, we can have something like $f: \Omega \to \R^m$. We wish to define analytic notions such as continuity, differentiability and even integrability (even though we are not doing integrability in this course).
+Our objective is to extend most of the notions we had about functions of a single variable $f: \R \to \R$ to functions of multiple variables $f: \R^n \to \R$. More generally, we want to study functions $f: \Omega \to \R^m$, where $\Omega \subseteq \R^n$. We wish to define analytic notions such as continuity, differentiability and even integrability (even though we are not doing integrability in this course).
 
-In order to do this, we need more structure on $\R^n$. We already know that $\R^n$ is a vector space, which means that we can add and multiply by scalars. But to do analysis, we need something to replace our notion of $|x - y|$ in $\R$. This is known as a \emph{norm}.
+In order to do this, we need more structure on $\R^n$. We already know that $\R^n$ is a vector space, which means that we can add, subtract and multiply by scalars. But to do analysis, we need something to replace our notion of $|x - y|$ in $\R$. This is known as a \emph{norm}.
 
 It is useful to define and study this structure in an abstract setting, as opposed to thinking about $\R^n$ specifically. This leads to the general notion of \emph{normed spaces}.
 
@@ -898,7 +935,7 @@ It is useful to define and study this structure in an abstract setting, as oppos
   \end{enumerate}
   A \emph{normed space} is a pair $(V, \|\ph \|)$. If the norm is understood, we just say $V$ is a normed space. We do have to be slightly careful since there can be multiple norms on a vector space.
 \end{defi}
-
+Intuitively, $\|\mathbf{x}\|$ is the \emph{length} or \emph{magnitude} of $\mathbf{x}$.
 \begin{eg}
   We will first look at finite-dimensional spaces. This is typically $\R^n$ with different norms.
   \begin{itemize}
@@ -928,9 +965,9 @@ It is useful to define and study this structure in an abstract setting, as oppos
       \[
         \|\mathbf{x}\|_p = \left(\sum |x_i|^p\right)^{1/p}.
       \]
-      It is, however, not trivial to check the triangle inequality.
+      It is, however, not trivial to check the triangle inequality, and we will not do this.
 
-      We can show that as $p\to \infty$, $\|\mathbf{x}\|_p \to \|\mathbf{x}\|_\infty$.
+      We can show that as $p\to \infty$, $\|\mathbf{x}\|_p \to \|\mathbf{x}\|_\infty$, which justifies our notation above.
   \end{itemize}
   We also have some infinite dimensional examples. Often, we can just extend our notions on $\R^n$ to infinite sequences with some care. We write $\R^\N$ for the set of all infinite real sequences $(x_k)$. This is a vector space with termwise addition and scalar multiplication.
   \begin{itemize}
@@ -1020,10 +1057,11 @@ To show that $L^2$ is actually a norm, we can use the Cauchy-Schwarz inequality 
   \]
   So done.
 \end{proof}
-Note that the way we defined $L^p$ is rather unsatisfactory. To define the $\ell^p$ spaces, we first have the norm defined as a sum, and then $\ell^p$ to be the set of all sequences for which the sum converges. However, to define the $L^p$ space, we restrict ourselves to $C([0, 1])$, and then define the norm. Can we just define, say, $L^1$ to be the set of all functions such that $\int_0^1 |f|\;\d x$ exists? We could, but then the norm would no longer be the norm, since if we have the function $f(x) = \begin{cases} 1 & x = 0.5\\ 0 & x \not= 0.5\end{cases}$, then $f$ is integrable with integral $0$, but is not identically zero. So we cannot expand our vector space to be too large. To defined $L^p$ properly, we need some more sophisticated notions such as Lebesgue integrability and other fancy stuff, which will be done in the IID Probability and Measure course.
+Note that the way we defined $L^p$ is rather unsatisfactory. To define the $\ell^p$ spaces, we first have the norm defined as a sum, and then $\ell^p$ to be the set of all sequences for which the sum converges. However, to define the $L^p$ space, we restrict ourselves to $C([0, 1])$, and then define the norm. Can we just define, say, $L^1$ to be the set of all functions such that $\int_0^1 |f|\;\d x$ exists? We could, but then the norm would no longer be the norm, since if we have the function $f(x) = \begin{cases} 1 & x = 0.5\\ 0 & x \not= 0.5\end{cases}$, then $f$ is integrable with integral $0$, but is not identically zero. So we cannot expand our vector space to be too large. To define $L^p$ properly, we need some more sophisticated notions such as Lebesgue integrability and other fancy stuff, which will be done in the IID Probability and Measure course.
 
-We are now going to define the notion of (Lipschitz) equivalence of norms. We are also going to extend familiar notions from the real line like convergence and completeness to general normed spaces.
+We have just defined many norms on the same space $\R^n$. These norms are clearly not the same, in the sense that for many $\mathbf{x}$, $\|\mathbf{x}\|_1$ and $\|\mathbf{x}\|_2$ have different values. However, it turns out the norms are all ``equivalent'' in some sense. This intuitively means the norms are ``not too different'' from each other, and give rise to the same notions of, say, convergence and completeness.
 
+A precise definition of equivalence is as follows:
 \begin{defi}[Lipschitz equivalence of norms]
   Let $V$ be a (real) vector space. Two norms $\|\ph \|, \|\ph \|'$ on $V$ are \emph{Lipschitz equivalent} if there are real constants $0 < a < b$ such that
   \[
@@ -1094,7 +1132,7 @@ These are easy to check manually. However, later we will show that in fact, any 
   where the width is $\frac{2}{n}$ and the height is $1$. Then $\|f_n\|_\infty = 1$ but $\|f_n\|_1 = \frac{1}{n} \to 0$.
 \end{eg}
 \begin{eg}
-  Similarly, the space $\ell^2 = \left\{(x_n): \sum x_n^2 < \infty\right\}$ under the regular $\ell^2$ norm and the $\ell^\infty$ norm, we have
+  Similarly, consider the space $\ell^2 = \left\{(x_n): \sum x_n^2 < \infty\right\}$ under the regular $\ell^2$ norm and the $\ell^\infty$ norm. We have
   \[
     \|(x_k)\|_\infty \leq \|(x_k)\|_{\ell^2},
   \]
@@ -1146,14 +1184,16 @@ We have some easy facts about convergence:
   Let $(V, \|\ph \|)$ be a normed space. Then
   \begin{enumerate}
     \item If $\mathbf{x}_k \to \mathbf{x}$ and $\mathbf{x}_k \to \mathbf{y}$, then $\mathbf{x} = \mathbf{y}$.
-    \item If $\mathbf{x}_k \to \mathbf{x}$, $\mathbf{y}_k \to \mathbf{y}$, then $a\mathbf{x}_n \to a\mathbf{x}$ and $\mathbf{x}_k + \mathbf{y}_k \to \mathbf{x} + \mathbf{y}$.
+    \item If $\mathbf{x}_k \to \mathbf{x}$, then $a\mathbf{x}_k \to a\mathbf{x}$.
+    \item If $\mathbf{x}_k \to \mathbf{x}$, $\mathbf{y}_k \to \mathbf{y}$, then $\mathbf{x}_k + \mathbf{y}_k \to \mathbf{x} + \mathbf{y}$.
   \end{enumerate}
 \end{prop}
 
 \begin{proof}\leavevmode
   \begin{enumerate}
     \item $\|\mathbf{x} - \mathbf{y}\| \leq \|\mathbf{x} - \mathbf{x}_k\| + \|\mathbf{x}_k - \mathbf{y}\| \to 0$. So $\|\mathbf{x} - \mathbf{y}\| = 0$. So $\mathbf{x} = \mathbf{y}$.
-    \item Easy exercise.
+    \item $\|a \mathbf{x}_k - a \mathbf{x}\| = |a|\|\mathbf{x}_k - \mathbf{x}\| \to 0$.
+  \item $\|(\mathbf{x}_k + \mathbf{y}_k) - (\mathbf{x} + \mathbf{y})\| \leq \|\mathbf{x}_k - \mathbf{x}\| + \|\mathbf{y}_k - \mathbf{y}\| \to 0$.
   \end{enumerate}
 \end{proof}
 
@@ -1187,7 +1227,7 @@ We'll now generalize the Bolzano-Weierstrass theorem to $\R^n$.
 
   Assume the theorem holds in $\R^{n - 1}$, and let $\mathbf{x}^{(k)} = (x^{(k)}_1, \cdots, x_n^{(k)})$ be a bounded sequence in $\R^n$. Then let $\mathbf{y}^{(k)} = (x^{(k)}_1, \cdots, x_{n - 1}^{(k)})$. Since for any $k$, we know that
   \[
-    \|\mathbf{y}^{(k)}\| + |x_n^{(k)}| = \|\mathbf{x}^{(k)}\|,
+    \|\mathbf{y}^{(k)}\|^2 + |x_n^{(k)}|^2 = \|\mathbf{x}^{(k)}\|^2,
   \]
   it follows that both $(\mathbf{y}^{(k)})$ and $(x_n^{(k)})$ are bounded. So by the induction hypothesis, there is a subsequence $(k_j)$ of $(k)$ and some $\mathbf{y} \in \R^{n - 1}$ such that $\mathbf{y}^{(k_j)} \to \mathbf{y}$. Also, by Bolzano-Weierstrass in $\R$, there is a further subsequence $(x_n^{(k_{j_\ell})})$ of $(x_n^{(k_j)})$ that converges to, say, $y_n \in \R$. Then we know that
   \[
@@ -1202,7 +1242,7 @@ Note that this is generally \emph{not} true for normed spaces. Finite-dimensiona
   Consider $(\ell^\infty, \|\ph\|_\infty)$. We let $e^{(k)}_j = \delta_{jk}$ be the sequence with $1$ in the $k$th component and $0$ in other components. Then $e_j^{(k)} \to 0$ for all fixed $j$, and hence $e^{(k)}$ converges componentwise to the zero element $0 = (0, 0, \cdots)$. However, $e^{(k)}$ does not converge to the zero element since $\|e^{(k)} - 0\|_\infty = 1$ for all $k$. Also, this is bounded but does not have a convergent subsequence for the same reasons.
 \end{eg}
 
-Is it true that every normed vector space that satisfies the Bolzano-Weierstrass property must be finite dimensional? The answer is yes, and the proof is in the example sheet.
+We know that all finite dimensional vector spaces are isomorphic to $\R^n$ as vector spaces for some $n$, and we will later show that all norms on finite dimensional spaces are equivalent. This means every finite-dimensional normed space satisfies the Bolzano-Weierstrass property. Is the converse true? If a normed vector space satisfies the Bolzano-Weierstrass property, must it be finite dimensional? The answer is yes, and the proof is in the example sheet.
 
 \begin{eg}
   Let $C([0, 1])$ have the $\|\ph \|_{L^2}$ norm. Consider $f_n(x) = \sin 2n\pi x$. We know that
@@ -1224,7 +1264,7 @@ Note that the same argument shows also that the sequence $(\sin 2n\pi x)$ has no
 \begin{defi}[Cauchy sequence]
   Let $(V, \|\ph \|)$ be a normed space. A sequence $(\mathbf{x}^{(k)})$ in $V$ is a \emph{Cauchy sequence} if
   \[
-    (\forall \varepsilon)(\exists N)n, m \geq N \Rightarrow \|\mathbf{x}^{(n)} - \mathbf{x}^{(m)}\| < \varepsilon.
+    (\forall \varepsilon)(\exists N)(\forall n, m \geq N)\; \|\mathbf{x}^{(n)} - \mathbf{x}^{(m)}\| < \varepsilon.
   \]
 \end{defi}
 
@@ -1262,7 +1302,7 @@ We'll start with some easy facts about Cauchy sequences and complete spaces.
 \begin{proof}
   Suppose $\mathbf{x}_{k_j} \to \mathbf{x}$. Since $(\mathbf{x}_k)$ is Cauchy, given $\varepsilon > 0$, we can choose an $N$ such that $\|\mathbf{x}_n - \mathbf{x}_m\| < \frac{\varepsilon}{2}$ for all $n, m \geq N$. We can also choose $j_0$ such that $k_{j_0} \geq n$ and $\|\mathbf{x}_{k_{j_0}} - \mathbf{x}\| < \frac{\varepsilon}{2}$. Then for any $n \geq N$, we have
   \[
-    \|\mathbf{x}_n, \mathbf{x}\| \leq \|\mathbf{x}_n - \mathbf{x}_{k_{j_0}}\| + \|\mathbf{x} - \mathbf{x}_{k_{j_0}}\| < \varepsilon.
+    \|\mathbf{x}_n - \mathbf{x}\| \leq \|\mathbf{x}_n - \mathbf{x}_{k_{j_0}}\| + \|\mathbf{x} - \mathbf{x}_{k_{j_0}}\| < \varepsilon.
   \]
 \end{proof}
 
@@ -1330,12 +1370,12 @@ We first check that the open ball is open.
 \end{proof}
 
 \begin{defi}[Limit point]
-  Let $(V, \|\ph\|)$ be a normed space, $E\subseteq V$. A point $y \in V$ is a \emph{limit point} of $E$ if there is a sequence $(x_k)$ in $E$ with $x_k \not= y$ for all $k$ and $x_k \to y$.
+  Let $(V, \|\ph\|)$ be a normed space, $E\subseteq V$. A point $\mathbf{y} \in V$ is a \emph{limit point} of $E$ if there is a sequence $(\mathbf{x}_k)$ in $E$ with $\mathbf{x}_k \not= \mathbf{y}$ for all $k$ and $\mathbf{x}_k \to \mathbf{y}$.
 \end{defi}
-(Some people allow $x_k = y$, but we will use this definition in this course)
+(Some people allow $\mathbf{x}_k = \mathbf{y}$, but we will use this definition in this course)
 
 \begin{eg}
-  Let $V = \R$, $E = (0, 1)$. Then $0, 1$ are limit points of $E$. The set of \emph{all} limit points in $[0, 1]$.
+  Let $V = \R$, $E = (0, 1)$. Then $0, 1$ are limit points of $E$. The set of \emph{all} limit points is $[0, 1]$.
 
   If $E' = (0, 1) \cup \{2\}$. Then the set of limit points of $E'$ is still $[0, 1]$.
 \end{eg}
@@ -1373,13 +1413,13 @@ Now we can prove our proposition.
 \end{prop}
 
 \begin{proof}
-  $(\Rightarrow)$ Suppose $E$ contains all its limit points. To show $V\setminus E$ is open, we let $\mathbf{y} \in V\setminus E$. So $\mathbf{y}$ is not a limit point of $E$. So for some $r$, we have $(B_r(y)\setminus \{y\}) \cap E = \emptyset$. Hence it follows that $B_r(y) \subseteq V\setminus E$ (since $\mathbf{y} \not\in E$).
+  $(\Rightarrow)$ Suppose $E$ contains all its limit points. To show $V\setminus E$ is open, we let $\mathbf{y} \in V\setminus E$. So $\mathbf{y}$ is not a limit point of $E$. So for some $r$, we have $(B_r(\mathbf{y})\setminus \{\mathbf{y}\}) \cap E = \emptyset$. Hence it follows that $B_r(\mathbf{y}) \subseteq V\setminus E$ (since $\mathbf{y} \not\in E$).
 
   $(\Leftarrow)$ Suppose $V\setminus E$ is open. Let $\mathbf{y} \in V\setminus E$. Since $V\setminus E$ is open, there is some $r$ such that $B_r(\mathbf{y}) \subseteq V\setminus E$. By the lemma, $\mathbf{y}$ is not a limit point of $E$. So all limit points of $E$ are in $E$.
 \end{proof}
 
 \subsection{Sequential compactness}
-In general, there are two different notions of sequential compactness and compactness. However, in normed spaces (and metric spaces, as we will later encounter), these two notions are equivalent. So we might be lazy and just say ``compactness'' as opposed to ``sequential compactness''.
+In general, there are two different notions of compactness --- ``sequential compactness'' and just ``compactness''. However, in normed spaces (and metric spaces, as we will later encounter), these two notions are equivalent. So we will be lazy and just say ``compactness'' as opposed to ``sequential compactness''.
 
 \begin{defi}[(Sequentially) compact set]
   Let $V$ be a normed vector space. A subset $K\subseteq V$ is said to be \emph{compact} (or \emph{sequentially compact}) if every sequence in $K$ has a subsequence that converges to a point in $K$.
@@ -1415,9 +1455,9 @@ Let $(V, \|\ph\|)$, $(V', \|\ph\|')$ be normed spaces, and let $E \subseteq K$ b
     (\forall \mathbf{x} \in E)\; \|\mathbf{x} - \mathbf{y}\|_V < \delta \Rightarrow \|f(\mathbf{x}) - f(\mathbf{y})\|_{V'} < \varepsilon.
   \]
 \end{defi}
-Note that $\mathbf{x} \in E$ and $\|\mathbf{x} - \mathbf{y}\| < \delta$ is equivalent to saying $\mathbf{x} \in B_\delta(\mathbf{y}) \cap E$. Similarly, $\|f(\mathbf{x}) - f(\mathbf{y})\| < \varepsilon$ is equivalent to $f(\mathbf{x}) \in B_\varepsilon(f(\mathbf{y}))$. In other words, $x \in f^{-1}(B_\varepsilon(f(\mathbf{y})))$. So we can rewrite this statement as there is some $\delta > 0$ such that
+Note that $\mathbf{x} \in E$ and $\|\mathbf{x} - \mathbf{y}\| < \delta$ is equivalent to saying $\mathbf{x} \in B_\delta(\mathbf{y}) \cap E$. Similarly, $\|f(\mathbf{x}) - f(\mathbf{y})\| < \varepsilon$ is equivalent to $f(\mathbf{x}) \in B_\varepsilon(f(\mathbf{y}))$. In other words, $\mathbf{x} \in f^{-1}(B_\varepsilon(f(\mathbf{y})))$. So we can rewrite this statement as there is some $\delta > 0$ such that
 \[
-  f^{-1}(B_\varepsilon(f(\mathbf{y}))) \subseteq B_\delta(\mathbf{y})
+  E \cap B_\delta(\mathbf{y}) \subseteq f^{-1}(B_\varepsilon(f(\mathbf{y}))).
 \]
 We can use this to provide an alternative characterization of continuity.
 \begin{thm}
@@ -1466,7 +1506,7 @@ We can use this to provide an alternative characterization of continuity.
   \end{enumerate}
 \end{proof}
 
-Next, we want to show that any two norms on a finite dimensional space are Lipschitz equivalent. The key lemma is the following:
+Finally, we will end the chapter by proving that any two norms on a finite dimensional space are Lipschitz equivalent. The key lemma is the following:
 \begin{lemma}
   Let $V$ be an $n$-dimensional vector space with a basis $\{\mathbf{v}_1, \cdots, \mathbf{v}_n\}$. Then for any $\mathbf{x} \in V$, write $\mathbf{x} = \sum_{j = 1}^n x_j \mathbf{v}_j$, with $x_j \in \R$. We define the Euclidean norm by
   \[
@@ -1654,7 +1694,7 @@ Clearly, any Lipschitz equivalent norms give Lipschitz equivalent metrics. Any m
 Note that unlike vector subspaces, we do not require our subsets to have any structure. We can take \emph{any} subset of $X$ and get a metric subspace.
 
 \begin{eg}
-  Any subspace of $\R^n$ is a metric space for the Euclidean metric.
+  Any subspace of $\R^n$ is a metric space with the Euclidean metric.
 \end{eg}
 
 \begin{defi}[Convergence]
@@ -1675,7 +1715,7 @@ Again, $B_r(a)$ is the open ball centered at $a$ with radius $r$, defined as
 \begin{proof}
   Same as that of normed spaces.
 \end{proof}
-Note that notions such as convergence, open and closed subsets and continuity of mappings all make sense in an even more general setting called \emph{topological spaces}. However, in this setting, limits of convergent sequences can fail to be unique. However, we will not worry ourselves about these since we will just focus on metric spaces.
+Note that notions such as convergence, open and closed subsets and continuity of mappings all make sense in an even more general setting called \emph{topological spaces}. However, in this setting, limits of convergent sequences can fail to be unique. We will not worry ourselves about these since we will just focus on metric spaces.
 
 \subsection{Topology of metric spaces}
 We will define open subsets of a metric space in exactly the same way as we did for normed spaces.
@@ -1790,7 +1830,7 @@ We can write down an analogous theorem for closed sets:
 \begin{defi}[Cauchy sequence]
   Let $(X, d)$ be a metric space. A sequence $(x_n)$ in $X$ is \emph{Cauchy} if
   \[
-    (\forall \varepsilon)(\exists N)(\forall n, m)\; n, m \geq N \Rightarrow d(x_n, x_m) < \varepsilon.
+    (\forall \varepsilon)(\exists N)(\forall n, m, m \geq N)\; d(x_n, x_m) < \varepsilon.
   \]
 \end{defi}
 
@@ -1840,7 +1880,7 @@ It is easy to produce incomplete metric spaces. Since arbitrary subsets of metri
   \[
     \frac{\|x\|}{1 + \|x\|} = \frac{\|y\|}{ 1 + \|y\|}.
   \]
-  So we must have $\|x\| = \|y\|$. Since $h(x) = h(y)$, this implies $x = y$.
+  So we must have $\|x\| = \|y\|$, ie. $x = y$. So $h(x) = h(y)$ implies $x = y$.
 
   Now we define
   \[
@@ -1848,7 +1888,7 @@ It is easy to produce incomplete metric spaces. Since arbitrary subsets of metri
   \]
   It is an easy check that this is a metric on $\R^n$.
 
-  In fact, we can show that $h: \R^n \to B(0)$, and $h$ is a homeomorphism (ie. continuous bijection with continuous inverse) between $\R^n$ and the unit ball $B(0)$, both with the Euclidean metric.
+  In fact, we can show that $h: \R^n \to B_1(0)$, and $h$ is a homeomorphism (ie. continuous bijection with continuous inverse) between $\R^n$ and the unit ball $B_1(0)$, both with the Euclidean metric.
 
   To show that this metric is incomplete, we can consider the sequence $x_k = (k - 1) e_1$, where $e_1 = (1, 0, 0, \cdots, 0)$ is the usual basis vector. Then $(x_k)$ is Cauchy in $(\R^n, d)$. To show this, first note that
   \[
@@ -1860,15 +1900,15 @@ It is easy to produce incomplete metric spaces. Since arbitrary subsets of metri
   \]
   So it is Cauchy. To show it does not converge in $(\R^n, d)$, suppose $d(x_k, x) \to 0$ for some $x$. Then since
   \[
-    d(x_k, x) = \|h(x_k) - h(x)\| \geq \big| \|h(x_k)\| - \|h(x)\|\big|.
+    d(x_k, x) = \|h(x_k) - h(x)\| \geq \big| \|h(x_k)\| - \|h(x)\|\big|,
   \]
-  So we must have
+  We must have
   \[
     \|h(x)\| = \lim_{k \to \infty} \|h(x_k)\| = 1.
   \]
   However, there is no element with $\|h(x)\| = 1$.
 \end{eg}
-What is happening in this example, is that we are pulling in the whole $\R^n$ in to the unit ball. Then under this norm, a sequence the ``goes to infinity'' will be Cauchy, but we have nothing at infinity for it to converge to.
+What is happening in this example, is that we are pulling in the whole $\R^n$ in to the unit ball. Then under this norm, a sequence that ``goes to infinity'' in the usual norm will be Cauchy in this norm, but we have nothing at infinity for it to converge to.
 
 Suppose we have a complete metric space $(X, d)$. We know that we can form arbitrary subspaces by taking subsets of $X$. When will this be complete? Clearly it has to be closed, since it has to include all its limit points. It turns it closedness is a sufficient condition.
 \begin{thm}
@@ -1903,7 +1943,7 @@ The following theorem relates completeness with compactness.
 Note that $X$ is bounded iff $X = B_r(x_0)$ for some $r \in \R, x_0 \in X$ (or $X$ is empty).
 
 \begin{proof}
-  Let $(X, d)$ be a compact metric space. Let $(x_k)$ be Cauchy in $X$. By compactness, it has some convergent subsequence, say $x_{k_j} \to x$. So $x_k \to x$.
+  Let $(X, d)$ be a compact metric space. Let $(x_k)$ be Cauchy in $X$. By compactness, it has some convergent subsequence, say $x_{k_j} \to x$. So $x_k \to x$. So it is complete.
 
   If $(X, d)$ is not bounded, by definition, for any $x_0$, there is a sequence $(x_k)$ such that $d(x_k, x_0) > k$ for every $k$. But then $(x_k)$ cannot have a convergent subsequence. Otherwise, if $x_{k_j} \to x$, then
   \[
@@ -2067,6 +2107,8 @@ Note that the definition of continuity says something like (iii), but with open 
 \end{proof}
 
 \subsection{The contraction mapping theorem}
+If you have already taken IB Metric and Topological Spaces, then you were probably bored by the above sections, since you've already met them all. Finally, we get to something new. This section is comprised of just two theorems. The first is the contraction mapping theorem, and we will use it to prove Picard-Lindel\"of existence theorem. Later, we will prove the inverse function theorem using the contraction mapping theorem. All of these are really powerful and important theorems in analysis. They have many more applications and useful corollaries, but we do not have time to get into those.
+
 \begin{defi}[Contraction mapping]
   Let $(X, d)$ be metric space. A mapping $f: X \to X$ is a \emph{contraction} if there exists some $\lambda$ with $0 \leq \lambda < 1$ such that
   \[
@@ -2130,7 +2172,7 @@ Based on the proof of the theorem, we have the following error estimate in the c
 \]
 If $x_n \to x$, taking the limit of the above bound as $m \to \infty$ gives
 \[
-  d(x, x_0) \leq \frac{\lambda^n}{1 - \lambda} d(x_1, x_0).
+  d(x, x_n) \leq \frac{\lambda^n}{1 - \lambda} d(x_1, x_0).
 \]
 This is valid for all $n$.
 
@@ -2138,15 +2180,15 @@ We are now going to use this to obtain the Picard-Lindel\"of existence theorem f
 \[
   \mathbf{F} = (F_1, F_2, \cdots, F_n): \R\times \R^n \to \R^n.
 \]
-We interpret the $\R$ as time and the $\R^n$ as time.
+We interpret the $\R$ as time and the $\R^n$ as space.
 
 Given $t_0 \in \R$ and $\mathbf{x}_0 \in \R^n$, we want to know when can we find a solution to the ODE
 \[
   \frac{\d \mathbf{f}}{\d t} = \mathbf{F}(t, \mathbf{f}(t))
 \]
-subject to $f(t_0) = \mathbf{x}_0$. We would like this solution to be valid (at least) for all $t$ in some interval $I$ containing $t_0$?
+subject to $f(t_0) = \mathbf{x}_0$. We would like this solution to be valid (at least) for all $t$ in some interval $I$ containing $t_0$.
 
-More explicitly, we want to understand when will there be some $\varepsilon > 0$ and a differentiable function $\mathbf{f} = (f_1, \cdots, f_n): (t_0 - \varepsilon, t_0 + \varepsilon) \to \R^n$ (ie. $f_j: (t_0 - \varepsilon, t_0 + \varepsilon): \to \R$ is differentiable for all $j$) satisfying
+More explicitly, we want to understand when will there be some $\varepsilon > 0$ and a differentiable function $\mathbf{f} = (f_1, \cdots, f_n): (t_0 - \varepsilon, t_0 + \varepsilon) \to \R^n$ (ie. $f_j: (t_0 - \varepsilon, t_0 + \varepsilon) \to \R$ is differentiable for all $j$) satisfying
 \[
   \frac{\d f_j}{\d t} = F_j(t, f_1(t), \cdots, f_n(t))
 \]
@@ -2167,9 +2209,9 @@ Then the theorem says
 \begin{thm}[Picard-Lindel\"of existence theorem]
   Let $\mathbf{x}_0 \in \R^n$, $R > 0$, $a < b$, $t_0 \in [a, b]$. Let $\mathbf{F}: [a, b] \times \overline{B_R(\mathbf{x}_0)} \to \R^n$ be a continuous function satisfying
   \[
-    \|\mathbf{F}(t, \mathbf{x}) - \mathbf{F}(t, \mathbf{y})\|_2 \leq K\|\mathbf{x} - \mathbf{y}\|_2
+    \|\mathbf{F}(t, \mathbf{x}) - \mathbf{F}(t, \mathbf{y})\|_2 \leq \kappa\|\mathbf{x} - \mathbf{y}\|_2
   \]
-  for some fixed $K > 0$ and all $t \in [a, b], \mathbf{x} \in \overline{B_R(\mathbf{x}_0)}$. In other words, $F(t, \ph): \R^n \to \R^n$ is Lipschitz on $\overline{B_R(\mathbf{x}_0})$ with the same Lipschitz constant for every $t$. Then
+  for some fixed $\kappa > 0$ and all $t \in [a, b], \mathbf{x} \in \overline{B_R(\mathbf{x}_0)}$. In other words, $F(t, \ph): \R^n \to \R^n$ is Lipschitz on $\overline{B_R(\mathbf{x}_0})$ with the same Lipschitz constant for every $t$. Then
   \begin{enumerate}
     \item There exists an $\varepsilon > 0$ and a unique differentiable function $f: [t_0 - \varepsilon, t_0 + \varepsilon] \cap [a, b] \to \R^n$ such that
       \[
@@ -2248,7 +2290,7 @@ We are now going to use the contraction mapping theorem to prove this. In genera
   \[
     \|\mathbf{g} - \mathbf{h}\| = \sup_{t \in [a, b]} \|\mathbf{g}(t) - \mathbf{h}(t)\|_2.
   \]
-  We see that $X$ is a closed subbset of the complete metric space $C([a, b] , \R^n)$ (again taken with the supremum metric). So $X$ is complete. For every $\mathbf{g} \in X$, we define a function $T\mathbf{g}: [a, b] \to \R^n$ by
+  We see that $X$ is a closed subset of the complete metric space $C([a, b] , \R^n)$ (again taken with the supremum metric). So $X$ is complete. For every $\mathbf{g} \in X$, we define a function $T\mathbf{g}: [a, b] \to \R^n$ by
   \[
     (T\mathbf{g}) (t) = \mathbf{x}_0 + \int_{t_0}^t \mathbf{F}(s, \mathbf{g}(s))\;\d s.
   \]
@@ -2287,7 +2329,7 @@ We are now going to use the contraction mapping theorem to prove this. In genera
   \]
   However, we do not necessarily have $(\dagger)$. There are many ways we can solve this problem. Here, we can solve it by finding an $m$ such that $T^{(m)} = T\circ T \circ \cdots \circ T: X \to X$ is a contraction map. We will in fact show that this map satisfies the bound
   \[
-    \sup_{t \in [a, b]} \|T^{(m)}\mathbf{g}_1(t) - T^{(m)}\mathbf{g}_2(t)\| \leq \frac{(b - a)^m k^m}{m!} \sup_{t \in [a, b]} \|\mathbf{g}_1(t) - \mathbf{g}_2(t)\|. \tag{$\ddag$}
+    \sup_{t \in [a, b]} \|T^{(m)}\mathbf{g}_1(t) - T^{(m)}\mathbf{g}_2(t)\| \leq \frac{(b - a)^m \kappa^m}{m!} \sup_{t \in [a, b]} \|\mathbf{g}_1(t) - \mathbf{g}_2(t)\|. \tag{$\ddag$}
   \]
   The key is the $m!$, since this grows much faster than any exponential. Given this bound, we know that for sufficiently large $m$, we have
   \[
@@ -2304,7 +2346,7 @@ We are now going to use the contraction mapping theorem to prove this. In genera
   To prove this pointwise bound, we induct on $m$. We wlog assume $t > t_0$. We know that for every $m$, the difference is given by
   \begin{align*}
     \|T^{(m)}g_1(t) - T^{(m)}g_2(t)\|_2 &= \left\|\int_{t_0}^t F(s, T^{(m - 1)}g_1(s)) - F(s, T^{(m - 1)} g_2(s))\;\d s\right\|_2.\\
-    &\leq k\int_{t_0}^t \|T^{(m - 1)} g_1(s) - T^{(m - 1)} g_2(s)\|_2 \;\d s.
+    &\leq \kappa\int_{t_0}^t \|T^{(m - 1)} g_1(s) - T^{(m - 1)} g_2(s)\|_2 \;\d s.
   \end{align*}
   This is true for all $m$. If $m = 1$, then this gives
   \[
@@ -2320,11 +2362,19 @@ We are now going to use the contraction mapping theorem to prove this. In genera
   \end{align*}
   So done.
 \end{proof}
-Note that to get the factor of $m!$, we had to actually perform the integral, instead of just bounding $(s - t_0)^{m -1 }$ by $(t - t_0)$.
+Note that to get the factor of $m!$, we had to actually perform the integral, instead of just bounding $(s - t_0)^{m -1 }$ by $(t - t_0)$. In general, this is a good strategy if we want tight bounds. Instead of bounding
+\[
+  \left|\int_a^b f(x) \;\d x\right| \leq (b - a) \sup |f(x)|,
+\]
+we write $f(x) = g(x) h(x)$, where $h(x)$ is something easily integrable. Then we can have a bound
+\[
+  \left|\int_a^b f(x) \;\d x\right| \leq \sup |g(x)| \int_a^b |h(x)| \;\d x.
+\]
 
-\section{Differentiation in \texorpdfstring{$\R^n$}{Rn}}
-\subsection{Differentiation in \texorpdfstring{$\R^n$}{Rn}}
-In this section, we will always use the usual Euclidean norm.
+\section{Differentiation from \texorpdfstring{$\R^m$}{Rm} to \texorpdfstring{$\R^n$}{Rn}}
+\subsection{Differentiation from \texorpdfstring{$\R^m$}{Rm} to \texorpdfstring{$\R^n$}{Rn}}
+We are now going to investigate differentiation of functions $f: \R^n \to \R^m$. The hard part is to first come up with a sensible definition of what this means. There is no obvious way to generalize what we had for real functions. After defining it, we will need to do some hard work to come up with easy ways to check if functions are differentiable. Then we can use it to prove some useful results like the mean value inequality. We will always use the usual Euclidean norm.
+
 
 To define differentiation in $\R^n$, we first we need a definition of the limit.
 
@@ -2335,10 +2385,10 @@ To define differentiation in $\R^n$, we first we need a definition of the limit.
   \]
   if for every $\varepsilon > 0$, there is some $\delta > 0$ such that
   \[
-    x \in E\text{ and } 0 < \|\mathbf{x} - \mathbf{a}\| < \delta \Rightarrow \|f(\mathbf{x}) - \mathbf{b}\| < \varepsilon.
+    (\forall \mathbf{x} \in E)\; 0 < \|\mathbf{x} - \mathbf{a}\| < \delta \Rightarrow \|f(\mathbf{x}) - \mathbf{b}\| < \varepsilon.
   \]
 \end{defi}
-Is in the case of $\R$ in IA Analysis I, we do not impose any requirements on $F$ when $\mathbf{x} = \mathbf{a}$. In particular, we don't assume that $a$ is in the domain $E$.
+As in the case of $\R$ in IA Analysis I, we do not impose any requirements on $F$ when $\mathbf{x} = \mathbf{a}$. In particular, we don't assume that $a$ is in the domain $E$.
 
 We would like a definition of differentiation for functions $f: \R^n \to \R$ (or more generally $\mathbf{f}: \R^n \to \R^m$) that directly extends the familiar definition on the real line. Recall that if $f: (b, c) \to \R$ and $a \in (b, c)$, we say $f$ is \emph{differentiable} if the limit
 \[
@@ -2381,9 +2431,9 @@ This is equivalent to saying
 \[
   \lim_{\mathbf{x} \to \mathbf{a}} \frac{\mathbf{f}(\mathbf{x}) - \mathbf{f}(\mathbf{a}) - A (\mathbf{x} - \mathbf{a})}{\|\mathbf{x} - \mathbf{a}\|} = 0.
 \]
-Note that this is completely consistent with our usual definition the case where $n = m = 1$, as we have discussed above, since a linear transformations $\alpha: \R \to \R$ is just given by $\alpha(h) = Ah$ for some real $A \in \R$.
+Note that this is completely consistent with our usual definition the case where $n = m = 1$, as we have discussed above, since a linear transformation $\alpha: \R \to \R$ is just given by $\alpha(h) = Ah$ for some real $A \in \R$.
 
-One might instead attempt to define differentiability as follows: for any $f: \R^m \to \R$, we say $f$ is differentiable at $x$ if $f$ is differentiable when restricted to any line passing through $x$. However, we will later see that if we define differentiability this way, then differentiability will no longer imply continuity, which is bad.
+One might instead attempt to define differentiability as follows: for any $f: \R^m \to \R$, we say $f$ is differentiable at $x$ if $f$ is differentiable when restricted to any line passing through $x$. However, this is a weaker notion, and we will later see that if we define differentiability this way, then differentiability will no longer imply continuity, which is bad.
 
 Having defined differentiation, we want to show that the derivative is unique.
 \begin{prop}[Uniqueness of derivative]
@@ -2446,7 +2496,7 @@ Note that we require the domain $U$ of $\mathbf{f}$ to be open, so that for each
 
 We can interpret the definition of differentiability as saying we can find a ``good'' linear approximation (technically, it is affine, not linear) to the function $\mathbf{f}$ near $\mathbf{a}$.
 
-While the definition of the derivative is good, it is purely existential. This is unlike the defintion of differentiability of real functions, where we are asked to compute an explicit limit --- if the limit exists, that's the derivative. If not, it is not differentiable. In the higher-dimensional world, this is not the cases. We have completely no idea hwere to find the derivataive, even if we know it exists. So we would like an explicit formula for it.
+While the definition of the derivative is good, it is purely existential. This is unlike the definition of differentiability of real functions, where we are asked to compute an explicit limit --- if the limit exists, that's the derivative. If not, it is not differentiable. In the higher-dimensional world, this is not the cases. We have completely no idea where to find the derivative, even if we know it exists. So we would like an explicit formula for it.
 
 The idea is to look at specific ``directions'' instead of finding the general derivative. As always, let $\mathbf{f}: U \to \R^m$ be differentiable at $\mathbf{a} \in U$. Fix some $\mathbf{u} \in \R^n$, take $\mathbf{h} = t \mathbf{u}$ (with $t \in \R$). Assuming $\mathbf{u} \not= \mathbf{0}$, differentiability tells
 \[
@@ -2456,7 +2506,7 @@ This is equivalent to saying
 \[
   \lim_{t \to 0} \frac{\mathbf{f}(\mathbf{a} + t\mathbf{u}) - \mathbf{f}(\mathbf{a}) - t D \mathbf{f}(\mathbf{a}) \mathbf{u}}{|t|\|\mathbf{u}\|} = 0.
 \]
-This in turn is equivalent to
+Since $\|\mathbf{u}\|$ is fixed, This in turn is equivalent to
 \[
   \lim_{t \to 0} \frac{\mathbf{f}(\mathbf{a} + t\mathbf{u}) - \mathbf{f}(\mathbf{a}) - t D \mathbf{f}(\mathbf{a}) \mathbf{u}}{t} = 0.
 \]
@@ -2464,11 +2514,11 @@ This, finally, is equal to
 \[
   D\mathbf{f}(\mathbf{a}) \mathbf{u} = \lim_{t \to 0} \frac{\mathbf{f}(\mathbf{a} + t\mathbf{u}) - \mathbf{f}(\mathbf{a})}{t}.
 \]
-We derived this assuming $\mathbf{u} \not= \mathbf{a}$, but this is trivially true for $\mathbf{u} = \mathbf{0}$. So this valid for all $\mathbf{u}$.
+We derived this assuming $\mathbf{u} \not= \mathbf{0}$, but this is trivially true for $\mathbf{u} = \mathbf{0}$. So this valid for all $\mathbf{u}$.
 
 This is of the same form as the usual derivative, and it is usually not too difficult to compute this limit. Note, however, that this says if the derivative exists, then the limit above is related to the derivative as above. However, even if the limit exists for all $\mathbf{u}$, we still cannot conclude that the derivative exists.
 
-Regardsless, even if the derivative does not exist, this limit is still often a useful notion.
+Regardless, even if the derivative does not exist, this limit is still often a useful notion.
 
 \begin{defi}[Directional derivative]
   We write
@@ -2492,7 +2542,7 @@ Often, it is convenient to focus on the special cases where $\mathbf{u} = \mathb
   \]
   when the limit exists. We often write this as
   \[
-    D_{\mathbf{e}_j} f(\mathbf{a}) = D_j f(\mathbf{a}) = \frac{\partial f}{\partial \mathbf{x}_j}.
+    D_{\mathbf{e}_j} f(\mathbf{a}) = D_j f(\mathbf{a}) = \frac{\partial f}{\partial x_j}.
   \]
 \end{defi}
 Note that these definitions do not require differentiability of $\mathbf{f}$ at $\mathbf{a}$. We will see some examples shortly. Before that, we first establish some elementary properties of differentiable functions.
@@ -2534,7 +2584,7 @@ The second property is useful, since instead of considering arbitrary $\R^m$-val
   \begin{enumerate}
     \item By definition, if $\mathbf{f}$ is differentiable, then as $\mathbf{h} \to \mathbf{0}$, we know
       \[
-        \mathbf{f}(\mathbf{a} + \mathbf{h}) - \mathbf{f}(\mathbf{a}) - D \mathbf{f}(\mathbf{a}) \mathbf{h} \to 0.
+        \mathbf{f}(\mathbf{a} + \mathbf{h}) - \mathbf{f}(\mathbf{a}) - D \mathbf{f}(\mathbf{a}) \mathbf{h} \to \mathbf{0}.
       \]
       Since $D \mathbf{f}(\mathbf{a})\mathbf{h} \to \mathbf{0}$ as well, we must have $\mathbf{f}(\mathbf{a} + \mathbf{h}) \to \mathbf{f}(\mathbf{h})$.
     \item Exercise on example sheet 4.
@@ -2559,7 +2609,7 @@ The second property is useful, since instead of considering arbitrary $\R^m$-val
   \end{enumerate}
 \end{proof}
 
-The above says differentiability at a point implies the existence of all directional derivatives, which in turn implies the existence of all partial derivatives. The converse impilication does not hold in either of these.
+The above says differentiability at a point implies the existence of all directional derivatives, which in turn implies the existence of all partial derivatives. The converse implication does not hold in either of these.
 \begin{eg}
   Let $f^2: \R^2 \to \R$ be defined by
   \[
@@ -2589,7 +2639,7 @@ The above says differentiability at a point implies the existence of all directi
       0 & y = 0
     \end{cases}
   \]
-  Then for $\mathbf{u} = (u_1, u_2) \not= 0$ and $t \not= 0$, we can compute
+  Then for $\mathbf{u} = (u_1, u_2) \not= \mathbf{0}$ and $t \not= 0$, we can compute
   \[
     \frac{f(\mathbf{0} + t\mathbf{u}) - f(\mathbf{0})}{t} =
     \begin{cases}
@@ -2617,7 +2667,7 @@ The above says differentiability at a point implies the existence of all directi
       0 & (x, y) = (0, 0)
     \end{cases}.
   \]
-  It is clear that $f$ continuous at poionts other than $0$, and $f$ is also continuous at $0$ since $|f(x, y)| \leq |x|$. We can compute the partial derivatives as
+  It is clear that $f$ continuous at points other than $0$, and $f$ is also continuous at $0$ since $|f(x, y)| \leq |x|$. We can compute the partial derivatives as
   \[
     \frac{\partial f}{\partial x}(0, 0) = 1,\quad \frac{\partial f}{\partial y} (0, 0) = 0.
   \]
@@ -2649,7 +2699,7 @@ The above says differentiability at a point implies the existence of all directi
   \[
     \frac{f(\mathbf{0} + \mathbf{h}) - f(\mathbf{0}) - D f(\mathbf{0}) \mathbf{h}}{\|\mathbf{h}\|} = \frac{\frac{h_1^3}{h_1^2 + h_2^2} - h_1}{\sqrt{h_1^2 + h_2^2}} = -\frac{h_1 h_2^2}{\sqrt{h_1^2 + h_2^2}^3},
   \]
-  which does not tend to $0$ as $h \to 0$. For exmaple, if $\mathbf{h} = (t, t)$, this quotient is
+  which does not tend to $0$ as $h \to 0$. For example, if $\mathbf{h} = (t, t)$, this quotient is
   \[
     -\frac{1}{2^{3/2}}
   \]
@@ -2658,7 +2708,7 @@ The above says differentiability at a point implies the existence of all directi
 
 To decide if a function is differentiable, the first step would be to compute the partial derivatives. If they don't exist, then we can immediately know the function is not differentiable. However, if they do, then we have a \emph{candidate} for what the derivative is, and we plug it into the definition to check if it actually is the derivative.
 
-Note that this is in general a cumbersome thing to do. It turns out that while existence of partial derivatives does not imply differentiability in general, it turns out we can get differentiability if we add some more slight conditions.
+This is a cumbersome thing to do. It turns out that while existence of partial derivatives does not imply differentiability in general, it turns out we can get differentiability if we add some more slight conditions.
 
 \begin{thm}
   Let $U\subseteq \R^n$ be open, $\mathbf{f}: U \to \R^m$. Let $\mathbf{a} \in U$. Suppose there exists some open ball $B_r(\mathbf{a}) \subseteq U$ such that
@@ -2683,13 +2733,14 @@ Note that this is in general a cumbersome thing to do. It turns out that while e
     f(\mathbf{a} + \mathbf{h}) - f(\mathbf{a}) &= \sum_{j = 1}^n f(\mathbf{a} + \mathbf{h}^{(j)}) - f(a + \mathbf{h}^{(j - 1)}) \\
     &= \sum_{j = 1}^n f(\mathbf{a} + \mathbf{h}^{(j - 1)} + h_j \mathbf{e}_j) - f(\mathbf{a} + \mathbf{h}^{(j - 1)}).
   \end{align*}
-  Note that in each term, we are just moving along the coordinate axes. Since the partial derivatives exists, the mean value theorem of single-variable calculus applied to
+  Note that in each term, we are just moving along the coordinate axes. Since the partial derivatives exist, the mean value theorem of single-variable calculus applied to
   \[
     g(t) = f(\mathbf{a} + \mathbf{h}^{(j - 1)} + t \mathbf{e}_j)
   \]
   on the interval $t \in [0, h_j]$ allows us to write this as
   \begin{align*}
-    f(\mathbf{a} + \mathbf{h}) - f(\mathbf{a}) &= \sum_{j = 1}^n h_j D_j f (\mathbf{a} + \mathbf{h}^{(j - 1)} + \theta_j h_j \mathbf{e}_j)\\
+    &f(\mathbf{a} + \mathbf{h}) - f(\mathbf{a}) \\
+    &= \sum_{j = 1}^n h_j D_j f (\mathbf{a} + \mathbf{h}^{(j - 1)} + \theta_j h_j \mathbf{e}_j)\\
     &= \sum_{j = 1}^n h_j D_j f(\mathbf{a}) + \sum_{j = 1}^n h_j \Big(D_j f (\mathbf{a} + \mathbf{h}^{(j - 1)} + \theta_j h_j \mathbf{e}_j) - D_j f(\mathbf{a})\Big)
   \end{align*}
   for some $\theta_j \in (0, 1)$.
@@ -2699,6 +2750,20 @@ Note that this is in general a cumbersome thing to do. It turns out that while e
     D f (\mathbf{a})\mathbf{h}= \sum_{j = 1}^n D_j f (\mathbf{a})h_j.
   \]
 \end{proof}
+This is a very useful result. For example, we can now immediately conclude that the function
+\[
+  \begin{pmatrix}
+    x\\y\\z
+  \end{pmatrix}
+  \mapsto
+  \begin{pmatrix}
+    3x^2 + 4\sin y + e^{6z}\\
+    xyze^{14x}
+  \end{pmatrix}
+\]
+is differentiable everywhere, since it has continuous partial derivatives. This is much better than messing with the definition itself.
+
+\subsection{The operator norm}
 So far, we have only looked at derivatives at a single point. We haven't discussed much about the derivative at, say, a neighbourhood or the whole space. We might want to ask if the derivative is continuous or bounded. However, this is not straightforward, since the derivative is a linear map, and we need to define these notions for functions whose values are linear maps. In particular, we want to understand the map $D\mathbf{f}: B_r(\mathbf{a}) \to L(\R^n; \R^m)$ given by $\mathbf{x} \mapsto D \mathbf{f}(\mathbf{x})$. To do so, we need a metric on the space $L(\R^n; \R^m)$. In fact, we will use a norm.
 
 Let $\mathcal{L} = L(\R^n; \R^m)$. This is a vector space over $\R$ defined with addition and scalar multiplication defined pointwise. In fact, $\mathbf{L}$ is a subspace of $C(\R^n, \R^m)$.
@@ -2715,7 +2780,7 @@ By Cauchy-Schwarz, we know
 \[
   \|A(\mathbf{x})\| \leq \sum_{j = 1}^n |x_j| \|A(\mathbf{e}_j\| \leq \|\mathbf{x}\| \sqrt{\sum_{j = 1}^n \|A (\mathbf{e}_j)\|^2}.
 \]
-So we see $A$ is Lipschitz, and is hence continuous.
+So we see $A$ is Lipschitz, and is hence continuous. Alternatively, this follows from the fact that linear maps are differentiable and hence continuous.
 
 We can use this fact to define the norm of linear maps. Since $\mathcal{L}$ is finite-dimensional (it is isomorphic to the space of real $m\times n$ matrices, as vector spaces, and hence have dimension $mn$), it really doesn't matter which norm we pick as they are all Lipschitz equivalent, but a convenient choice is the sup norm, or the \emph{operator norm}.
 
@@ -2735,7 +2800,7 @@ We can use this fact to define the norm of linear maps. Since $\mathcal{L}$ is f
         \|A\| = \sup_{ \R^n\setminus \{0\}} \frac{\|A \mathbf{x}\|}{\|\mathbf{x}\|}.
       \]
     \item $\|A \mathbf{x}\| \leq \|A\| \|\mathbf{x}\|$ for all $\mathbf{x} \in \R^n$.
-    \item Let $A \in L(\R^n; \R^m)$ and $B \in L(\R^m; \R^p)$. Then $BA = B\circ A \in L(\R^m; \R^p)$ and
+    \item Let $A \in L(\R^n; \R^m)$ and $B \in L(\R^m; \R^p)$. Then $BA = B\circ A \in L(\R^n; \R^p)$ and
       \[
         \|B A\| \leq \|B\| \|A\|.
       \]
@@ -2757,7 +2822,10 @@ We can use this fact to define the norm of linear maps. Since $\mathcal{L}$ is f
         \left\|\frac{\mathbf{x}}{\|\mathbf{x}\|}\right\| = 1.
       \]
     \item Immediate from above.
-    \item Exercise.
+    \item
+      \[
+        \|BA\| = \sup_{\R^n\setminus \{0\}} \frac{\|BA \mathbf{x}\|}{\|\mathbf{x}\|} \leq \sup_{\R^n \setminus \{0\}} \frac{\|B\| \|A \mathbf{x}\|}{\|\mathbf{x}\|} = \|B\|\|A\|.
+      \]
   \end{enumerate}
 \end{proof}
 
@@ -2834,7 +2902,7 @@ We first prove it for the case when the domain is a subset of $\R$, and then red
 \begin{proof}
   Let $\mathbf{v} = \mathbf{f}(b) - \mathbf{f}(a)$. We define
   \[
-    g(t) = \mathbf{v}\cdot \mathbf{f}(\mathbf{t}) = \sum_{i = 1}^m v_i f_i(t).
+    g(t) = \mathbf{v}\cdot \mathbf{f}(t) = \sum_{i = 1}^m v_i f_i(t).
   \]
   Since each $f_i$ is differentiable, $g$ is continuous on $[a, b]$ and differentiable on $(a, b)$ with
   \[
@@ -2859,6 +2927,7 @@ We first prove it for the case when the domain is a subset of $\R$, and then red
   If $\mathbf{f}(b) = \mathbf{f}(a)$, then there is nothing to prove. Otherwise, divide by $\|\mathbf{f}(b) - \mathbf{f}(a)\|$ and done.
 \end{proof}
 
+We now apply this to prove the general version.
 \begin{thm}[Mean value inequality]
   Let $\mathbf{a} \in \R^n$ and $\mathbf{f}: B_r(\mathbf{a}) \to \R^m$ be differentiable on $B_r(\mathbf{a})$ with $\|D\mathbf{f}(\mathbf{x})\| \leq M$ for all $\mathbf{x} \in B_r(\mathbf{a})$. Then
   \[
@@ -2918,7 +2987,7 @@ The problem with this is that the sets are disconnected. We cannot connect point
 \begin{thm}
   Let $U\subseteq \R^m$ be open and path-connected. Then for any differentiable $\mathbf{f}: U \to \R^m$, if $D\mathbf{f}(\mathbf{x}) = 0$ for all $\mathbf{x} \in U$, then $\mathbf{f}$ is constant on $U$.
 \end{thm}
-A naive approach would be to replace $t\mathbf{b}_1 - (1 - t)\mathbf{b}_2$ in the proof of the mean value theorem with a path $\gamma(t)$. However, this is not a correct proof, since this has to assume $\gamma$ is differentiable. So this doesn't work. We have to think some more.
+A naive attempt would be to replace $t\mathbf{b}_1 - (1 - t)\mathbf{b}_2$ in the proof of the mean value theorem with a path $\gamma(t)$. However, this is not a correct proof, since this has to assume $\gamma$ is differentiable. So this doesn't work. We have to think some more.
 
 \begin{proof}
   We are going to use the fact that $\mathbf{f}$ is locally constant. wlog, assume $m = 1$. Given any $\mathbf{a}, \mathbf{b} \in U$, we show that $f(\mathbf{a}) = f(\mathbf{b})$. Let $\gamma: [0, 1] \to U$ be a (continuous) path from $\mathbf{a}$ to $\mathbf{b}$. For any $s \in (0, 1)$, there exists some $\varepsilon$ such that $B_\varepsilon(\gamma(s)) \subseteq U$ since $U$ is open. By continuity of $\gamma$, there is a $\delta$ such that $(s - \delta, s + \delta) \subseteq [0, 1]$ with $\gamma((\sigma - \delta, s + \delta)) \subseteq B_\varepsilon(\gamma(s)) \subseteq U$.
@@ -2945,7 +3014,7 @@ Before we can state the inverse function theorem, we need a definition.
 
 First we get a convenient alternative characterization of $C^1$.
 \begin{prop}
-  Let $U \subseteq \R^n$ be open. Then $\mathbf{f} = (f_1, \cdots, f_n): U \to \R^m$ is $C^1$ on $U$ if and only if the partial derivatives $D_j f_i(\mathbf{x})$ exists for all $\mathbf{x} \in U$, $1 \leq i\leq n$, $1 \leq j \leq n$, and $D_j f_i: U \to \R$ are continuous.
+  Let $U \subseteq \R^n$ be open. Then $\mathbf{f} = (f_1, \cdots, f_n): U \to \R^n$ is $C^1$ on $U$ if and only if the partial derivatives $D_j f_i(\mathbf{x})$ exists for all $\mathbf{x} \in U$, $1 \leq i\leq n$, $1 \leq j \leq n$, and $D_j f_i: U \to \R$ are continuous.
 \end{prop}
 
 \begin{proof}
@@ -3002,6 +3071,8 @@ We have a fancy name for these functions.
 \begin{defi}[Diffeomorphism]
   Let $U, U' \subseteq \R^n$ are open, then a map $\mathbf{g}: U \to U'$ is a \emph{diffeomorphism} if it is $C^1$ with a $C^1$ inverse.
 \end{defi}
+Note that different people have different definitions for the word ``diffeomorphism''. Some require it to be merely differentiable, while others require it to be \emph{infinitely} differentiable. We will stick with this definition.
+
 Then the inverse function theorem says: if $\mathbf{f}$ is $C^1$ and $D \mathbf{f} (\mathbf{a})$ is invertible, then $\mathbf{f}$ is a local diffeomorphism at $\mathbf{a}$.
 
 Before we prove this, we look at the simple case where $n = 1$. Suppose $f'(a) \not= 0$. Then there exists a $\delta$ such that $f'(t) > 0$ or $f'(t) < 0$ in $t \in (a - \delta, a + \delta)$. So $f|_{(a - \delta, a + \delta)}$ is monotone and hence is invertible. This is a triviality. However, this is not a triviality even for $n = 2$.
@@ -3011,7 +3082,7 @@ Before we prove this, we look at the simple case where $n = 1$. Suppose $f'(a) \
   \[
     \|D \mathbf{f}(\mathbf{x}) - I\| < \frac{1}{2}
   \]
-  for all $\mathbf{x} \in \overline{B_r(\mathbf{a})}$. Also, we can assume $\overline{B_r(\mathbf{a})} \subseteq U$. Let $W = B_{r/2}(\mathbf{f}(\mathbf{a}))$, and let $V = \mathbf{f}^{-1}(W) \cap B_r(\mathbf{a})$.
+  for all $\mathbf{x} \in \overline{B_r(\mathbf{a})}$. By shrinking $r$ sufficiently, we can assume $\overline{B_r(\mathbf{a})} \subseteq U$. Let $W = B_{r/2}(\mathbf{f}(\mathbf{a}))$, and let $V = \mathbf{f}^{-1}(W) \cap B_r(\mathbf{a})$.
 
   That was just our setup. There are three steps to actually proving the theorem.
   \begin{claim}
@@ -3077,9 +3148,17 @@ Before we prove this, we look at the simple case where $n = 1$. Suppose $f'(a) \
       D \mathbf{g}(\mathbf{y}) = D \mathbf{f}(\mathbf{g}(\mathbf{y}))^{-1}.\tag{$*$}
     \]
   \end{claim}
-  We are not proving this due to the lack of time (and it is non-examinable).
+  Note that if $\mathbf{g}$ where differentiable, then its derivative must be given by $(*)$, since by definition, we know
+  \[
+    \mathbf{f}(\mathbf{g}(\mathbf{y})) = \mathbf{y},
+  \]
+  and hence the chain rule gives
+  \[
+    D \mathbf{f}(\mathbf{g}(\mathbf{y})) \cdot D \mathbf{g}(\mathbf{y}) = I.
+  \]
+  Also, we immediately know $D \mathbf{g}$ is continuous, since it is the composition of continuous functions (the inverse of a matrix is given by polynomial expressions of the components). So we only need to check that $D \mathbf{f}(\mathbf{g}(\mathbf{y}))^{-1}$ satisfies the definition of the derivative.
 
-  Note that $D\mathbf{f}(\mathbf{x})$ is invertible for every $\mathbf{x} \in \overline{B_r(\mathbf{a})}$ using the fact that
+  First we check that $D\mathbf{f}(\mathbf{x})$ is indeed invertible for every $\mathbf{x} \in \overline{B_r(\mathbf{a})}$. We use the fact that
   \[
     \|D \mathbf{f}(\mathbf{x}) - I\| \leq \frac{1}{2}.
   \]
@@ -3087,21 +3166,28 @@ Before we prove this, we look at the simple case where $n = 1$. Suppose $f'(a) \
   \[
     \|\mathbf{v}\| = \|D \mathbf{f}(\mathbf{x})\mathbf{v} - \mathbf{v}\| \leq \|D \mathbf{f}(\mathbf{x}) - I\| \|\mathbf{v}\| \leq \frac{1}{2} \|\mathbf{v}\|.
   \]
-  So we must have $\|\mathbf{v}\| = 0$, ie. $\mathbf{v} = \mathbf{0}$. So $\ker (D \mathbf{f}(\mathbf{x})) = \{\mathbf{0}\}$. So the $D \mathbf{f}(\mathbf{g}(\mathbf{y}))^{-1}$ in $(*)$ exists.
+  So we must have $\|\mathbf{v}\| = 0$, ie. $\mathbf{v} = \mathbf{0}$. So $\ker D \mathbf{f}(\mathbf{x}) = \{\mathbf{0}\}$. So $D \mathbf{f}(\mathbf{g}(\mathbf{y}))^{-1}$ exists.
 
-  Once we know that $g$ is differentiable, $(*)$ follows from the chain rule. By definition,
+  Let $\mathbf{x} \in V$ be fixed, and $\mathbf{y} = \mathbf{f}(\mathbf{x})$. Let $\mathbf{k}$ be small and
   \[
-    \mathbf{f}(\mathbf{g}(\mathbf{y})) = \mathbf{y}
+    \mathbf{h} = \mathbf{g}(\mathbf{y} + \mathbf{k}) - \mathbf{g}(\mathbf{y}).
   \]
-  for all $\mathbf{y} \in W$. So we must have
+  In other words,
   \[
-    D \mathbf{f}(\mathbf{g}(\mathbf{y})) \cdot D \mathbf{g}(\mathbf{y}) = I.
+    \mathbf{f}(\mathbf{x} + \mathbf{h}) - \mathbf{f}(\mathbf{x}) = \mathbf{k}.
   \]
-  So it follows that
-  \[
-    D \mathbf{g}(\mathbf{y}) = D \mathbf{f}(\mathbf{g}(\mathbf{y}))^{-1}.\tag{$*$}
-  \]
-  In reality, to prove this theorem, what we do is we directly check that this $D \mathbf{f}(\mathbf{g}(\mathbf{y}))^{-1}$ is the derivative. It then follows that the derivative is invertible, since this is a composition of continuous maps.
+  Since $\mathbf{g}$ is invertible, whenever $\mathbf{k} \not= \mathbf{0}$, $\mathbf{h} \not= \mathbf{0}$. Since $\mathbf{g}$ is continuous, as $\mathbf{k} \to \mathbf{0}$, $\mathbf{h} \to \mathbf{0}$ as well.
+
+  We have
+  \begin{align*}
+    &\frac{\mathbf{g}(\mathbf{y} + \mathbf{k}) - \mathbf{g}(\mathbf{y}) - D \mathbf{f}(\mathbf{g}(\mathbf{y}))^{-1} \mathbf{k}}{\|\mathbf{k}\|}\\
+    &= \frac{\mathbf{h} - D\mathbf{f}(\mathbf{g}(\mathbf{y}))^{-1} \mathbf{k}}{\|\mathbf{k}\|}\\
+    &= \frac{D \mathbf{f}(\mathbf{x})^{-1}(D \mathbf{f}(\mathbf{x})\mathbf{h} - \mathbf{k})}{\|\mathbf{k}\|}\\
+    &= \frac{-D \mathbf{f}(\mathbf{x})^{-1}(\mathbf{f}(\mathbf{x} + \mathbf{h}) - \mathbf{f}(\mathbf{x}) - D \mathbf{f}(\mathbf{x})\mathbf{h})}{\|\mathbf{k}\|}\\
+    &= -D \mathbf{f}(\mathbf{x})^{-1} \left(\frac{\mathbf{f}(\mathbf{x} + \mathbf{h}) - \mathbf{f}(\mathbf{x}) - D \mathbf{f}(\mathbf{x}) \mathbf{\mathbf{h}}}{\|\mathbf{h}\|} \cdot \frac{\|\mathbf{h}\|}{\|\mathbf{k}\|}\right)\\
+    &= -D \mathbf{f}(\mathbf{x})^{-1} \left(\frac{\mathbf{f}(\mathbf{x} + \mathbf{h}) - \mathbf{f}(\mathbf{x}) - D \mathbf{f}(\mathbf{x}) \mathbf{\mathbf{h}}}{\|\mathbf{h}\|} \cdot \frac{\|\mathbf{g}(\mathbf{y} + \mathbf{k}) - \mathbf{g}(\mathbf{y})\|}{\|(\mathbf{y} + \mathbf{k}) - \mathbf{y}\|}\right).
+  \end{align*}
+  As $\mathbf{k} \to \mathbf{0}$, $\mathbf{h} \to \mathbf{0}$. The first factor $-D \mathbf{f}(\mathbf{x})^{-1}$ is fixed; the second factor tends to $\mathbf{0}$ as $\mathbf{h} \to \mathbf{0}$; the third factor is bounded by $2$. So the whole thing tends to $\mathbf{0}$. So done.
 \end{proof}
 Note that in the case where $n = 1$, if $f: (a, b) \to \R$ is $C^1$ with $f'(x) \not= 0$ for every $x$, then $f$ is monotone on the \emph{whole} domain $(a, b)$, and hence $f: (a, b) \to f((a, b))$ is a bijection. In higher dimensions, this is not true. Even if we know that $D \mathbf{f}(\mathbf{x})$ is invertible for all $\mathbf{x} \in U$, we cannot say $\mathbf{f}|_U$ is a bijection. We still only know there is a local inverse.
 
@@ -3135,6 +3221,8 @@ Note that in the case where $n = 1$, if $f: (a, b) \to \R$ is $C^1$ with $f'(x) 
 One major application of the inverse function theorem is to prove the \emph{implicit function theorem}. We will not go into details here, but an example of the theorem can be found on example sheet 4.
 
 \subsection{2nd order derivatives}
+We've done so much work to understand first derivatives. For real functions, we can immediately know a lot about higher derivatives, since the derivative is just a normal real function again. Here, it slightly more complicated, since the derivative is a linear operator. However, this is not really a problem, since the space of linear operators is just yet another vector space, so we can essentially use the same definition.
+
 \begin{defi}[2nd derivative]
   Let $U \subseteq \R^n$ be open, $\mathbf{f}: U \to \R^m$ be differentiable. Then $D\mathbf{f}: U \to L(\R^n; \R^m)$. We say $D\mathbf{f}$ is \emph{differentiable} at $\mathbf{a} \in U$ if there exists $A \in L(\R^n; L(\R^n; \R^m))$ such that
   \[
@@ -3204,7 +3292,7 @@ for all $i, j = 1, \cdots, n$. Taking the $D^2 \mathbf{f}(\mathbf{a})(\mathbf{e}
 \end{align*}
 In other words, we have
 \[
-  D^2 \mathbf{f}(\mathbf{e}_i, \mathbf{e}_j) = \sum_{k = 1}^m D_{ij} f_k(\mathbf{a}) = \mathbf{b}_k,
+  D^2 \mathbf{f}(\mathbf{e}_i, \mathbf{e}_j) = \sum_{k = 1}^m D_{ij} f_k(\mathbf{a}) \mathbf{b}_k,
 \]
 where $\{\mathbf{b}_1, \cdots, \mathbf{b}_m\}$ is the standard basis for $\R^m$. So we have
 \[
@@ -3286,23 +3374,33 @@ Finally, we conclude with a version of Taylor's theorem for multivariable functi
 \end{thm}
 
 \begin{proof}
-  If $g: [0, 1] \to \R$ is $C^2$, then integrating by parts, we know
-  \[
-    \int_0^1 (1 - t) g''(t) \;\d t = g(1) - g(0) - g'(0).
-  \]
-  Use this with
+  Consider the function
   \[
     g(t) = f(\mathbf{a} + t\mathbf{h}).
   \]
-  Then we find
+  Then the assumptions tell us $g$ is twice differentiable. By the 1D Taylor's theorem, we know
   \[
-    E(\mathbf{h}) = h_i h_j \int_0^1 (1 - t) (D_{ij} \mathbf{f}(\mathbf{a}) (\mathbf{a} + t \mathbf{h}, \mathbf{a} + t \mathbf{h}) - D_{ij} \mathbf{f}(\mathbf{a}) (\mathbf{a}, \mathbf{a}))\;\d t.
+    g(1) = g(0) + g'(0) + g''(s)
   \]
-  For any $\varepsilon > 0$, there is some $\delta$ such that
+  for some $s \in [0, 1]$.
+
+  In other words,
+  \begin{align*}
+    f(\mathbf{a} + \mathbf{h}) &= f(\mathbf{a}) + Df(\mathbf{a}) \mathbf{h} + D^2 f(\mathbf{a} + s \mathbf{h}) (\mathbf{h}, \mathbf{h})\\
+    &= f(\mathbf{a}) + Df(\mathbf{a}) \mathbf{h} + D^2 f(\mathbf{a}) (\mathbf{h}, \mathbf{h}) + E(\mathbf{h}),
+  \end{align*}
+  where
   \[
-    E(\mathbf{h}) \leq \varepsilon \|\mathbf{h}\|^2.
+    E(\mathbf{h}) = D^2 f(\mathbf{a} + s \mathbf{h}) (\mathbf{h}, \mathbf{h}) - D^2 f(\mathbf{a}) (\mathbf{h}, \mathbf{h}).
   \]
-  for all $\mathbf{h}$ with $\|\mathbf{h}\| < \delta$. So done.
+  By definition of the operator norm, we get
+  \[
+    |E(\mathbf{h})| \leq \|D^2 f(\mathbf{a} + s \mathbf{h}) - D^2 f(\mathbf{a})\| \|\mathbf{h}\|^2.
+  \]
+  By continuity of the second derivative, as $\mathbf{h} \to \mathbf{0}$, we get
+  \[
+    \|D^2 f(\mathbf{a} + s \mathbf{h}) - D^2 f(\mathbf{a})\| \to 0.
+  \]
+  So $E(\mathbf{h}) = o(\|\mathbf{h}\|^2)$. So done.
 \end{proof}
-% improvement pending
 \end{document}
