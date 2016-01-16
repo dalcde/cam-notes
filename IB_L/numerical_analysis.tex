@@ -6,6 +6,8 @@
 \def\nlecturer {G. Moore}
 \def\ncourse {Numerical Analysis}
 \def\nlectures {MWF.10}
+\def\nofficial {http://www.damtp.cam.ac.uk/user/sjc1/teaching/NAIB/notes.pdf}
+ % remove?
 \def\nnotready {}
 
 \input{header}
@@ -25,5 +27,124 @@ Euler's method and proof of convergence. Multistep methods, including order, the
 LU triangular factorization of matrices. Relation to Gaussian elimination. Column pivoting. Factorizations of symmetric and band matrices. The Newton-Raphson method for systems of non-linear algebraic equations. QR factorization of rectangular matrices by Gram-Schmidt, Givens and Householder techniques. Application to linear least squares calculations.\hspace*{\fill} [5]}
 
 \tableofcontents
+\setcounter{section}{-1}
+\section{Introduction}
+What is numerical analysis? It is the study of algorithms. It is about algorithms for solving problems in, say, linear algebra. In the course, you will find that many of the algorithms are named after great figures in the past, like Newton, Euler and Gauss. They have done a lot of work to come up with good algorithms that aids computation. In the past, they had to implement these algorithms by hand, and it makes sense for them to try to simplify them! Nowadays, we are much luckier and have computers to help us solve problems. We can often solve problems by the press of a button.
 
+However, it is also useful to understand how algorithms works, since we might in the future encounter problems with no pre-written solutions by others, and we might need to come up with something ourselves.
+
+\section{Polynomial interpolation}
+Polynomials are important. Many many ideas in numerical analysis are based on polynomials approximations, and it is important to understand. The simplest place to start is through polynomial interpolations.
+
+\begin{notation}
+  We write $P_n[x]$ for the real linear vector space of polynomials (with real coefficients) having degree $n$ or less.
+\end{notation}
+Of course, we can also work with complex polynomials which form a complex vector space. However, for simplicity, we will focus on real polynomials.
+
+It is easy to show that $\dim (P_n[x]) = n + 1$.
+
+\subsection{The interpolation problem}
+Suppose we are given $n + 1$ distinct interpolation points $\{x_i\}_{i = 0}^n \subseteq \R$, and $n + 1$ data values $\{f_i\}_{i = 0}^n \subseteq \R$. The objective is to find a $p \in P_n[x]$ such that $p(x_i) = f_i$ for all $i$. In other words, we want to fit a polynomial through the points $(x_i, f_i)$.
+
+We have $n + 1$ coefficients to choose from, and $n + 1$ conditions to satisfy. Given this, in general, there is no guarantee that there is a solution, or that the solution is unique. Our first goal is to show that in the case of polynomial interpolation, the solution exists and is unique.
+
+There are many situations where this may come up. For example, we may have $n + 1$ actual data points, and want to fit a polynomial through the points. Alternatively, we might have a given function $f$, and want to approximate it with a polynomial $p$ such that $p$ and $f$ agree on at least that $n + 1$ points.
+
+\subsection{The Lagrange formula}
+It turns out the problem is not too hard. You can probably figure it out yourself if you lock yourself in a room for a few days (or hours). The first solution to this would be via Lagrange cardinal polynomials.
+\begin{defi}[Lagrange cardinal polynomials]
+  The \emph{Lagrange cardinal polynomials} with respect to the interpolation points $\{x_i\}_{i = 0}^n$ are, for $k = 0, \cdots, n$,
+  \[
+    \ell_k (x) = \prod_{i = 0, i \not= k}^n \frac{x - x_i}{x_k - x_i}.
+  \]
+\end{defi}
+Note that these polynomials have degree exactly $n$. The significance of these polynomials is that they satisfy
+\[
+  \ell_k(x_j) = \delta_{jk}.
+\]
+This is obvious from definition.
+
+With these cardinal polynomials, we can immediately write down a solution to the interpolation problem.
+\begin{thm}
+  The interpolation problem has exactly one solution.
+\end{thm}
+
+\begin{proof}
+  We define $p \in P_n[x]$ by
+  \[
+    p(x) = \sum_{k = 0}^n f_k \ell_k (x).
+  \]
+  Evaluating at $x_i$ gives
+  \[
+    p(x_j) = \sum_{k = 0}^n f_k \ell_k(x_j) = \sum_{k = 0}^n f_k \delta_{jk} = f_j.
+  \]
+  So we get existence.
+
+  For uniqueness, suppose $p, q \in P_n[x]$ are solutions. Then the difference $r = p - q \in P_n[x]$ satisfies $r(x_j) = 0$ for all $j$, ie. it has $n + 1$ roots. However, a non-zero polynomial of degree $n$ can have at most $n$ roots. So in fact $p - q$ is zero, ie. $p = q$.
+\end{proof}
+So we have solved the problem of polynomials. However, it turns out there is a better way to approach the problem.
+
+\subsection{The Newton formula}
+For $k = 0, \cdots, n$, let $p_k \in P_k[x]$ satisfy $p_k(x_i) = f_i$ for $i = 0, \cdots, k$. These are the unique degree-$k$ polynomials that satisfies the first $k$ conditions. Then we can write
+\[
+  p(x) = p_n(x) = p_0(x) + (p_1(x) - p_0(x)) + \cdots + (p_n(x) - p_{n - 1}(x)).
+\]
+Hence it suffices to find the differences $p_k - p_{k - 1}$. However, we know that $p_k$ and $p_{k - 1}$ agree on $x_0, \cdots, x_{k - 1}$. So the difference is $0$ at those points, and we have
+\[
+  p_k(x) - p_{k - 1}(x) = A_k \prod_{i = 0}^{k - 1}(x - x_i),
+\]
+for some $A_k$ yet to be found out. Then we can write
+\[
+  p_k(x) = p_n(x) = A_0 + \sum_{k = 1}^n A_k \prod_{i = 0}^{k - 1} (x - x_i).
+\]
+This formula has the advantage that it is built up gradually from the interpolation points one-by-one. If we stop the sum at any point, we have obtained the polynomial that interpolates the data for the first $k$ points (for some $k$).
+
+What are the $A_k$'s? For $k = 0$, we know $A_0$ is the unique constant polynomial that interpolates the point at $x_0$, ie. $A_0 = f_0$.
+
+For the others, we note that in the formula for $p_k - p_{k - 1}$, $A_k$ is the leading coefficient of $x^k$. Also, $p_{k - 1}(x)$ has no degree $k$ term. So $A_k$ must be the leading coefficient of $p_k$.
+
+We thus need an efficient algorithm for these \emph{Newton divided differences}. The standard notation for these is
+\[
+  A_k = f[x_0, \cdots, x_k].
+\]
+Note in particular that these coefficients depend only on the first $k$ interpolation points.
+
+We will look for a recurrence relation --- a way to express $A_k$ in terms of $A_j$ for $j < k$.
+
+To do so, we first generalize this notion to $f[x_j, \cdots, x_k]$ for $0 \leq j \leq k$. This denotes the leading coefficient of the unique $q \in P_{k - j}[x]$ satisfying $q(x_i) = f_i$ for $i = j, \cdots, k$. Then we get
+\begin{thm}[Recurrence relation for Newton divided differences]
+  For $0 \leq j < k \leq n$, we have
+  \[
+    f[x_j, \cdots, x_k] = \frac{f[x_{j + 1}, \cdots, x_k] - f[x_j, \cdots, x_{k - 1}]}{x_k - x_j}.
+  \]
+\end{thm}
+
+\begin{proof}
+  The key to proving this is to relate the interpolating polynomials. Let $q_0, q_1 \in P_{k - j - 1}[x]$ and $q_2 \in P_{k - j}$ satisfy
+  \begin{align*}
+    q_0(x_i) &= f_i & i &=j, \cdots, k - 1\\
+    q_1(x_i) &= f_i & i &=j + 1, \cdots, k\\
+    q_2(x_i) &= f_i & i &=j, \cdots, k
+  \end{align*}
+  We now claim that
+  \[
+    q_2(x) = \frac{x - x_j}{x_k - x_j} q_1(x) + \frac{x_k - x}{x_k - x_j} q_0(x).
+  \]
+  Using the properties of $q_0$ and $q_1$, it is easy to show that the right expression satisfies the interpolations of $q_2$. Hence by uniqueness, we know that this is indeed $q_1$. The leading coefficients thus give the result.
+\end{proof}
+Thus the famous Newton divided difference table can be constructed
+\begin{center}
+  \begin{tabular}{cccccc}
+    \toprule
+    $x_i$ & $f_i$ & $f[*, *]$ & $f[*, *, *]$ & $\cdots$ & $f[*, \cdots,*]$\\
+    \midrule
+    $x_0$ & $f[x_0]$ & $f[x_0, x_1]$ & $f[x_0, x_1, x_2]$ & $\cdots$ & $f[x_0, x_1, \cdots, x_n]$\\
+    $x_1$ & $f[x_1]$ & $f[x_1, x_2]$ & $f[x_1, x_2, x_3]$ & $\cdots$\\
+    $x_2$ & $f[x_2]$ & $f[x_2, x_3]$ & $f[x_2, x_3, x_4]$ & $\cdots$\\
+    $\vdots$ & $\vdots$ & $\vdots$ &\\
+    $x_n$ & $f[x_n]$\\
+    \bottomrule
+  \end{tabular}
+\end{center} % beautify
+From the first $n$ columns, we can find the $n + 1$th column using the recurrence relation. The values of $A_k$ can then be found at the first row, and this is all we really need. However, to compute the first row, we will need to compute everything in the table.
 \end{document}

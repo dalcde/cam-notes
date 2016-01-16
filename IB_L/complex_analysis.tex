@@ -26,9 +26,159 @@ Uniform convergence of analytic functions; local uniform convergence. Differenti
 
 \vspace{10pt}
 \noindent\textbf{The residue theorem}\\
-Winding numbers. Residue theorem. Jordan's lemma. Evaluation of definite integrals by contour
-integration. Rouch\'es theorem, principle of the argument. Open mapping theorem.\hspace*{\fill} [4]}
+Winding numbers. Residue theorem. Jordan's lemma. Evaluation of definite integrals by contour integration. Rouch\'es theorem, principle of the argument. Open mapping theorem.\hspace*{\fill} [4]}
 
 \tableofcontents
+\section{Complex differentiation}
+We first recall a few basic definitions. We are going to look at functions defined on subsets of the complex plane. Often, we just want to look at open subsets.
+\begin{defi}[Open subset]
+  A subset $U \subseteq \C$ is \emph{open} if for any $x \in U$, there is some $\varepsilon > 0$ such that the open ball $B_x(\varepsilon) = B(x; \varepsilon) \subseteq U$.
+\end{defi}
+The notation used for the open ball varies form time to time, even within the same sentence. For example, instead of putting $x$ as the subscript, we could put $\varepsilon$ as the subscript and $x$ inside the brackets. Hopefully, it will be clear from context.
 
+\begin{defi}[Path-connected subset]
+  A subset $U \subseteq \C$ is path-connected if for any $x, y \in U$, there is some $\gamma: [0, 1] \to U$ continuous such that $\gamma(0) = x$ and $\gamma(1) = y$.
+\end{defi}
+
+\begin{defi}[Domain]
+  A \emph{domain} is a non-empty open path-connected subset of $\C$.
+\end{defi}
+
+Consider a domain $U \subseteq \C$ and a function $f: U \to \C$.
+\begin{defi}[Differentiable function]
+  We say a function $f$ is \emph{differentiable} at $w \in U$ if
+  \[
+    f'(w) = \lim_{z\to w} \frac{f(z) - f(w)}{z - w}
+  \]
+  exists.
+\end{defi}
+Here we implicitly require that the limit does not depend on which direction we approach $w$ from. It turns out this is a very strong condition to impose.
+
+\begin{defi}[Analytic/holomorphic function]
+  A function $f$ is \emph{analytic} or \emph{holomorphic} at $w \in U$ if $f$ is differentiable on an open neighbourhood $B(w, \varepsilon)$ of $w$.
+\end{defi}
+
+\begin{defi}[Entire function]
+  If $f: \C \to \C$ is defined on all of $\C$ and is holomorphic on $\C$, then $f$ is said to be \emph{entire}.
+\end{defi}
+
+The goal of the course is to develop the rich theory of these complex differentiable functions and see how we can integrate them along continuously differentiable ($C^1$) paths in the complex plane.
+
+First, we want to figure out when a function is differentiable. Given $f: U \to \C$, we can write it as $f = u + iv$, where $u, v: U \to \R$ are real-valued functions. Recall from IB Analysis II that a function $u: U \to \R$ viewed as a real-valued function of two variables is differentiable at a point $(c, d) \in U$, with derivative $Du|_{(c, d)} = (\lambda, \mu)$, if and only if
+\[
+  \frac{u(x, y) - u(c, d) - (\lambda (x - c) + \mu (y - d))}{\|(x, y) - (c, d)\|} \to 0
+\]
+as $(x, y) \to (c, d)$.
+
+This allows us to come up with a nice criterion for when a function is differentiable
+\begin{prop}
+  Let $f$ be defined on an open set $U \subseteq \C$. Let $w = c + id \in U$ and write $f = u + iv$. Then $f$ is complex differentiable at $w$ if and only if $u$ and $v$ are differentiable at $(c, d)$, viewed as a real function of two real variables, \emph{and}
+  \begin{align*}
+    u_x &= v_y\\
+    u_y &= -v_x
+  \end{align*}
+  These equations are the \emph{Cauchy-Riemann equations}. In this case, we have
+  \[
+    f'(w) = u_x(c, d) + iv_x(c, d) = v_y(c, d) -i u_y(c, d).
+  \]
+\end{prop}
+
+\begin{proof}
+  By definition, $f$ is differentiable at $w$ with $f'(w) = p + iq$ if and only if
+  \[
+    \lim_{z \to w} \frac{f(z) - f(w) - f'(w)(z - w)}{z - w} = 0. \tag{$\dagger$}
+  \]
+  If $z = x + iy$, then
+  \[
+    f'(w) (z - w) = p(x - c) - q(y - d) + i(q(x - c) + p (y - c)).
+  \]
+  So $(\dagger)$ holds if and only if
+  \[
+    \lim_{(x, y) \to (c, d)} \frac{u(x, y) - u(c, d) - (p(x - c) - q(y - d))}{\sqrt{(x - c)^2 + (y - d)^2}} = 0
+  \]
+  and
+  \[
+    \lim_{(x, y) \to (c, d)} \frac{v(x, y) - v(c, d) - (q(x - c) + p(y - d))}{\sqrt{(x - c)^2 + (y - d)^2}} = 0.
+  \]
+  Comparing this to the definition of the differentiability of a real-valued function, we see this holds exactly if $u$ and $v$ are differentiable at $(c, d)$ with
+  \[
+    Du|_{(c, d)} = (p, -q),\quad Dv|_{(c, d)} = (q, p).
+  \]
+\end{proof}
+A standard warning is given that $f: U \to \C$ can be written as $f = u + iv$, where $u_x = v_y$ and $u_y = -v_x$ at $(c, d) \in U$, we \emph{cannot} conclude that $f$ is complex differentiable at $(c, d)$. These conditions only say the partial derivatives exist, but this does \emph{not} imply imply that $u$ and $v$ are differentiable, as required by the proposition. However, if the partial derivatives exist and are continuous, then by IB Analysis II we know they are differentiable.
+
+\begin{eg}\leavevmode
+  \begin{enumerate}
+    \item A polynomial $p: \C \to \C$ is entire. This can be checked directly from definition.
+    \item A \emph{rational function} $\frac{p(z)}{q(z)}: U \to \C$, where $U \subseteq \C \setminus \{z: q(z) = 0\}$, is holomorphic on any such $U$. Here $p, q$ are polynomials.
+    \item $f(z) = |z|$ is \emph{not} complex differentiable at \emph{any} point of $\C$. Indeed, we can write this as $f = u + iv$, where
+      \[
+        u(x, y) = \sqrt{x^2 + y^2},\quad v(x, y) = 0.
+      \]
+      If $(x, y) \not= (0, 0)$, then
+      \[
+        u_x = \frac{x}{\sqrt{x^2 + y^2}},\quad u_y = \frac{y}{\sqrt{x^2 + y^2}}.
+      \]
+      If we are not at the origin, then clearly both cannot vanish, but the partials of $v$ both vanish. Hence the Cauchy-Riemann equations do not hold and it is not differentiable outside of the origin.
+
+      At the origin, we can compute directly that
+      \[
+        \frac{f(h) - f(0)}{h} = \frac{|h|}{h}.
+      \]
+      This is, say, $+1$ for $h \in \R^+$ and $-1$ for $h \in \R^-$. So the limit as $h \to 0$ does not exists.
+  \end{enumerate}
+\end{eg}
+
+\begin{defi}[Conformal function]
+  Let $f: U \to \C$ be a function holomorphic at $w \in U$. If $f'(w) \not= 0$, we say $f$ is \emph{conformal}.
+\end{defi}
+
+Note that if $f = u + iv$, then viewed as a map $\R^2 \to \R^2$, we find the Jacobian matrix is
+\[
+  Df =
+  \begin{pmatrix}
+    u_x & u_y\\
+    v_x & v_y
+  \end{pmatrix}
+\]
+Then
+\[
+  \det (Df) = u_x v_y + u_y v_x = u_x^2 + u_y^2.
+\]
+Using the formula for the complex derivative in terms of the partials, this shows that if $f'(w) \not= 0$, then $\det(Df|_w) \not= 0$. Hence, by the inverse function theorem (viewing $f$ as a function $\R^2 \to \R^2$), $f$ is locally invertible at $w$.
+
+It is an exercise to show that the usual rules of differentiation (sum, product, chain rule, derivative of inverse function) all hold for complex differentiation just as in the real case, with exactly the same proof. In particular, if a holomorphic function is conformal at a point $w$, then it has a local inverse which is also holomorphic and conformal.
+
+Another useful property of conformal mappings is that they preserve angles. To give a precise statement of this, we need to specify how ``angles'' work.
+
+The idea is to look at tangent vectors of paths. Let $\gamma_1, \gamma_2: [-1, 1] \to U$ be continuously differentiable paths that intersect when $t = 0$ at $w = \gamma_1(0) = \gamma_2(0)$. Moreover, assume $\gamma_i'(0) \not= 0$.
+
+Then we can compare the angles between the paths by looking at the difference in arguments of the tangents at $w$. In particular, we define
+\[
+  \mathrm{angle} (\gamma_1, \gamma_2) = \arg (\gamma_1'(0)) - \arg (\gamma_2'(0)).
+\]
+(here we take $\arg$ to be the argument we would have if $w$ were the origin)
+
+Let $f: U \to \C$ and $w \in U$. Suppose $f$ is conformal at $w$. Then $f$ maps our two paths to $f \circ \gamma_i: [-1, 1] \to \C$. These two paths now intersect at $f(w)$. Then the angle between them is
+\begin{align*}
+  \mathrm{angle} (f \circ \gamma_1, f\circ \gamma_2) &= \arg((f\circ \gamma_1)'(0)) - \arg((f \circ \gamma_2)'(0))\\
+  &= \arg\left(\frac{(f\circ \gamma_1)'(0)}{(f \circ \gamma_2)'(0)}\right)\\
+  &= \arg\left(\frac{\gamma_1'(0)}{\gamma_2'(0)}\right)\\
+  &= \mathrm{angle} (\gamma_1, \gamma_2),
+\end{align*}
+using the chain rule and the fact that $f'(w) \not= 0$.
+
+What the word ``conformal'' really should mean is that it preserves angles. However, we adopt the definition of having non-zero derivative because it is easier to state and check.
+
+We will later prove that if $f: U \to \C$ is holomorphic on an open set $U$, then $f': U \to \C$ is \emph{also} holomorphic. Hence $f$ is infinitely differentiable.
+
+Moreover, if we write $f = u + iv$, then using the formula for $f'$ in terms of the partials, we know $u$ and $v$ are also \emph{infinitely differentiable}. Differentiating the Cauchy-Riemann equations, we get
+\[
+  u_{xx} = v_{yx} = -u_{yy}.
+\]
+In other words,
+\[
+  u_{xx} + u_{yy} = 0,
+\]
+We get similar results for $v$ instead. Hence $\Re(f)$ and $\Im(f)$ satisfy the Laplace equation and are hence \emph{harmonic} (by definition).
 \end{document}
