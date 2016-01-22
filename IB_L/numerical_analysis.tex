@@ -265,4 +265,251 @@ Two key properties of $T_n$ on $[-1, 1]$ are
     for $k = 1, \cdots, n$.
 \end{enumerate}
 Notice there is an intentional clash between the use of $x_k$ as the zeroes and $x_k$ as the interpolation points --- we will show these are indeed the optimal interpolation points.
+\begin{center}
+  \begin{tikzpicture}[scale=2]
+    \draw [->] (-1.5, 0) -- (1.5, 0) node [right] {$x$};
+    \draw [->] (0, -1.5) -- (0, 1.5) node [above] {$T_4(x)$};
+
+    \draw [mblue,domain=0:180, samples=40] plot [smooth] ({cos(\x)}, {cos(4*\x)});
+    \draw [dashed] (-1, -1) rectangle (1, 1);
+    \node at (-1, 0) [below] {$-1$};
+    \node at (1, 0) [below] {$1$};
+    \node at (0, 1) [anchor = south west] {$1$};
+    \node at (0, -1) [left] {$-1$};
+  \end{tikzpicture}
+\end{center}
+We first prove a recurrence relation for the Chebyshev polynomials:
+\begin{lemma}[3-term recurrence relation]
+  The Chebyshev polynomials satisfy the recurrence relations
+  \[
+    T_{n + 1}(x) = 2x T_n(x) - T_{n - 1}(x)
+  \]
+  with initial conditions
+  \[
+    T_0(x) = 1,\quad T_1(x) = x.
+  \]
+\end{lemma}
+\begin{proof}
+  \[
+    \cos((n + 1) \theta) + \cos((n - 1)\theta) = 2\cos \theta \cos(n\theta).
+  \]
+\end{proof}
+In particular, we know the leading coefficient of $T_n$ is $2^{n - 1}$ (for $n \geq 1$).
+
+\begin{thm}[Minimal property for $n \geq 1$]
+  On $[-1, 1]$, among all polynomials $p \in P_n[x]$ with leading coefficient $1$, $\frac{1}{2^{n - 1}} \|T_n\|$ minimizes $\|p\|_{\infty}$. Thus, the minimum value is $\frac{1}{2^{n - 1}}$.
+\end{thm}
+
+\begin{proof}
+  We proceed by contradiction. Suppose there is a polynomial $q_n \in P_n$ with leading coefficient $1$ such that $\|q_n\|_{\infty} < \frac{1}{2^{n - 1}}$. Define a new polynomial
+  \[
+    r = \frac{1}{2^{n - 1}}T_n - q_n.
+  \]
+  This is, by assumption, non-zero.
+
+  Since both the polynomials have leading coefficient $1$, the difference must have degree at most $n - 1$, ie. $r \in P_{n - 1}[x]$. Since $\frac{1}{2^{n - 1}}T_n(X_k) = \pm \frac{1}{2^{n - 1}}$, and $|q_n(X_n)| < \frac{1}{2^{n - 1}}$ by assumption, $r$ alternates in sign between these $n + 1$ points. But then by the intermediate value theorem, $r$ has to have at least $n$ zeroes. This is a contradiction, since $r$ has degree $n - 1$, and cannot be zero.
+\end{proof}
+
+\begin{cor}
+  Consider
+  \[
+    w_\Delta = \prod_{i = 0}^n (x - x_i) \in P_{n + 1}[x]
+  \]
+  for any distinct points $\Delta = \{x_i\}_{i = 0}^n \subseteq [-1, 1]$. Then
+  \[
+    \min_{\Delta} \|\omega_{\Delta}\|_{\infty} = \frac{1}{2^n}.
+  \]
+  This minimum is achieved by picking the interpolation points to be the zeroes of $T_{n + 1}$, namely
+  \[
+    x_k = \cos\left(\frac{2k + 1}{2n + 2} \pi\right), \quad k = 0, \cdots, n.
+  \]
+\end{cor}
+
+\begin{thm}
+  For $f \in C^{n + 1}[-1, 1]$, the Chebyshev choice of interpolation points gives
+  \[
+    \|f - p_n\|_{\infty} \leq \frac{1}{2^n} \frac{1}{(n + 1)!} \|f^{(n + 1)}\|_{\infty}.
+  \]
+\end{thm}
+Suppose $f$ has as many continuous derivatives as we want. Then as we increase $n$, what happens to the error bounds? The coefficients involve dividing by an exponential \emph{and} a factorial. Hence as long as the higher derivatives of $f$ don't blow up to badly, in general, the error will tend to zero as $n \to \infty$.
+
+The last two results can be easily generalized to arbitrary intervals $[a, b]$, and this is left as an exercise for the reader.
+
+\section{Orthogonal polynomials}
+We are now going to look at general orthogonal polynomials, where the Chebyshev polynomials is a famous set of example.
+
+Of course, the property of being orthogonal depends on our choice on the scalar product.
+
+\subsection{Scalar product}
+The scalar products we are interested in would be generalization of the usual scalar product on Euclidean space,
+\[
+  \bra \mathbf{x}, \mathbf{y}\ket = \sum_{i = 1}^n x_i y_i.
+\]
+We want to generalize this to vector spaces of functions and polynomials. We will not provide a formal definition of vector spaces and scalar products on an abstract vector space. Instead, we will just provide some examples of commonly used ones.
+\begin{eg}\leavevmode
+  \begin{enumerate}
+    \item Let $V = C^s[a, b]$, where $[a, b]$ is a finite interval and $s \geq 0$. Pick a weight function $w(x) \in C(a, b)$ such that $w(x) > 0$ for all $x \in (a, b)$, and $w$ is integrable over $[a, b]$. In particular, we allow $w$ to vanish at the end points, or blow up mildly such that it is still integrable.
+
+      We then define the inner product to be
+      \[
+        \bra f, g\ket = \int_a^b w(x) f(x) d(x)\;\d x.
+      \]
+    \item We can allow $[a, b]$ to be infinite, eg. $[0, \infty)$ or even $(-\infty, \infty)$, but we have to be more careful. We first define
+      \[
+        \bra f, g\ket = \int_a^b w(x) f(x) g(x) \;\d x
+      \]
+      as before, but we now need more conditions. We require that $\int_a^b w(x) x^n\;\d x$ to exist for all $n \geq 0$, since we want to allow polynomials in our vector space. For example, $w(x) = e^{-x}$ on $[0, \infty)$, works, or $w(x) = e^{-x^2}$ on $(-\infty, \infty)$. These are scalar products for $P_n[x]$ for $n \geq 0$, but we cannot extend this definition to all smooth functions since they might blow up too fast at infinity. We will not go into the technical details, since we are only interested in polynomials, and knowing it works for polynomials suffices.
+    \item We can also have a discrete inner product, defined by
+      \[
+        \bra f, g\ket = \sum_{j = 1}^m w_j f(\xi_j) g(\xi_j)
+      \]
+      with $\{\xi_j\}_{j = 1}^m$ distinct points and $\{w_j\}_{j = 1}^m > 0$. Now we have to restrict ourselves a lot. This is a scalar product for $V = P_{m - 1}[x]$, but not for higher degrees, since a scalar product should satisfy $\bra f, f \ket > 0$ for $f \not= 0$. In particular, we cannot extend this to all smooth functions.
+  \end{enumerate}
+\end{eg}
+With an inner product, we can define orthogonality.
+\begin{defi}[Orthogonalilty]
+  Given a vector space $V$ and an inner product $\bra \ph, \ph\ket$, two vectors $f, g \in V$ are \emph{orthogonal} if $\bra f, g\ket = 0$.
+\end{defi}
+
+\subsection{Orthogonal polynomials}
+\begin{defi}[Orthogonal polynomial]
+  Given a vector space $V$ of polynomials and inner product $\bra \ph, \ph\ket$, we say $p_n \in P_n[x]$ is the \emph{$n$th orthogonal polynomial} if
+  \[
+    \bra p_n, q\ket = 0\text{ for all }q \in P_{n - 1}[x].
+  \]
+  In particular, $\bra p_n, p_m\ket = 0$ for $n \not= m$.
+\end{defi}
+
+We said \emph{the} orthogonal polynomial, but we need to make sure such a polynomial has to be unique. It is clearly not unique, since if $p_n$ satisfies these relations, then so does $\lambda p_n$ for all $\lambda \not= 0$. For uniqueness, we need to impose some scaling. We usually do so by requiring the leading polynomial to be $1$, ie. it is monic.
+
+\begin{defi}[Monic polynomial]
+  A polynomial $p \in P_n[x]$ is \emph{monic} if the coefficient of $x^n$ is $1$.
+\end{defi}
+However, most famous traditional polynomials are not monic. They have a different scaling imposed. Still, picking a different scaling will not affect the uniqueness result.
+
+We will stick to requiring them to be monic since this is useful for proving things.
+
+\begin{thm}
+  Given a vector space $V$ of functions and an inner product $\bra \ph, \ph \ket$, there exists a unique monic orthogonal polynomial for each degree $n \geq 0$. In addition, $\{p_k\}_{k = 0}^n$ form a basis for $P_n[x]$.
+\end{thm}
+
+\begin{proof}
+  This is a big induction proof over both parts of the theorem. We induct over $n$. For the base case, we pick $p_0(x) = 1$, which is the only degree-zero monic polynomial.
+
+  Now suppose we already have $\{p_n\}_{k = 0}^n$ satisfying the induction hypothesis.
+
+  Now pick any monic $q_{n + 1} \in P_{n + 1}[x]$, eg. $x^{n + 1}$. We now construct $p_{n + 1}$ from $q_{n + 1}$ by the Gram-Schmidt process. We define
+  \[
+    p_{n + 1} = q_{n + 1} - \sum_{k = 0}^n \frac{\bra q_{n + 1}, p_k\ket}{\bra p_k, p_k\ket} p_k.
+  \]
+  This is again monic since $q_{n + 1}$ is, and we have
+  \[
+    \bra p_{n + 1}, p_m \ket = 0
+  \]
+  for all $m \leq n$, and hence $\bra p_{n + 1}, p\ket = 0$ for all $p \in P_n[x] = \bra p_0, \cdots,p_n\ket$.
+
+  To obtain uniqueness, assume both $p_{n + 1}, \hat{p}_{n + 1} \in P_{n + 1}[x]$ are both monic orthogonal polynomials. Then $r = p_{n + 1} - \hat{p}_{n + 1} \in P_n[x]$. So
+  \[
+    \bra r, r\ket = \bra r, p_{n + 1} - \hat{p}_{n + 1}\ket = \bra r, p_{n + 1}\ket - \bra r, \hat{p}_{n + 1}\ket = 0 - 0 = 0.
+  \]
+  So $r = 0$. So $p_{n + 1} = \hat{p}_{n - 1}$.
+
+  Finally, we have to show that $p_0, \cdots, p_{n + 1}$ form a basis for $P_{n + 1}[x]$. Now note that every $p \in P_{n + 1}[x]$ can be written uniquely as
+  \[
+    p = cp_{n + 1} + q,
+  \]
+  where $q \in P_n[x]$. But $\{p_k\}_{k = 0}^n$ is a basis for $P_n[x]$. So $q$ can be uniquely decomposed as a linear combination of $p_0, \cdots, p_n$.
+
+  Alternatively, this follows from the fact that any set of orthogonal vectors must be linearly independent, and since there are $n + 2$ of these vectors and $P_{n + 1}[x]$ has dimension $n + 2$, they must be a basis.
+\end{proof}
+
+In practice, following the proof naively is not the best way of producing the new $p_{n + 1}$. Instead, we can reduce a lot of our work by making a clever choice of $q_{n + 1}$.
+
+\subsection{Three-term recurrence relation}
+Recall that for the Chebyshev polynomials, we obtained a three-term recurrence relation for them. It turns out these recurrence relations exist in general.
+
+We start by picking $q_{n + 1} = xp_n$ in the previous proof. We now use the fact that
+\[
+  \bra xf, g\ket = f, xg\ket.
+\]
+This is not necessarily true for arbitrary inner products, but for most sensible inner products we will meet in this course, this is true. In particular, it is clearly true for inner products of the form
+\[
+  \bra f, g\ket = \int w(x) f(x) g(x)\;\d x.
+\]
+Assuming this, we obtain the following theorem.
+\begin{thm}
+  Monic orthogonal polynomials are generated by
+  \[
+    p_{k + 1}(x) = (x - \alpha_k)p_k(x) - \beta_k p_{k - 1}(x)
+  \]
+  with initial conditions
+  \[
+    p_0 = 1,\quad p_1(x) = (x - \alpha_0) p_0,
+  \]
+  where
+  \[
+    \alpha_k = \frac{\bra x p_k, p_k\ket}{\bra p_k, p_k\ket},\quad \beta_k = \frac{\bra p_k, p_k\ket}{\bra p_{k - 1}, p_{k - 1}\ket}.
+  \]
+\end{thm}
+
+\begin{proof}
+  By inspection, the $p_1$ given is monic and satisfies
+  \[
+    \bra p_1, p_0\ket = 0.
+  \]
+  Using $q_{n + 1} = x p_n$ in the Gram-Schmidt process gives
+  \begin{align*}
+    p_{n + 1} &= xp_n - \sum_{k = 0}^n \frac{\bra x p_n, p_k\ket}{\bra p_k, p_k\ket} p_k\\
+    \intertext{We have $\bra xp_n, p_k\ket = \bra p_n, xp_k\ket$, and vanishes whenever $x p_k$ has degree less than $n$. So we are left with}
+    &= (x - \alpha_n) p_n - \frac{\bra p_n, xp_{n - 1}\ket}{\bra p_{n - 1}, p_{n - 1}\ket} p_{n - 1}.
+  \end{align*}
+  Now we notice that $xp_{n - 1}$ is a monic polynomial of degree $n$ so we can write this as $x p_{n - 1} = p_n + q$. Thus
+  \[
+    \bra p_n, xp_{n - 1}\ket = \bra p_n, p_n + q\ket = \bra p_n, p_n\ket.
+  \]
+  Hence the coefficient of $p_{n - 1}$ is indeed the $\beta$ we defined.
+\end{proof}
+
+\subsection{Examples}
+The four famous examples are the Legendre polynomials, Chebyshev polynomials, Laguerre polynomials and Hermite polynomials. We will not waste time looking at them. Instead, we will see how the Chebyshev polynomials fit into this framework.
+
+Chebyshev is based on the scalar product defined by
+\[
+  \bra f, g\ket = \int_{-1}^1 \frac{1}{\sqrt{1 - x^2}} f(x) g(x)\;\d x.
+\]
+Note that the weight function blows up mildly at the end.
+
+This links up with
+\[
+  T_n (x) = \cos(n\theta)
+\]
+for $x = \cos \theta$ via the usual trigonometric substitution. We have
+\begin{align*}
+  \bra T_n, T_m \ket &= \int_0^\pi \frac{1}{\sqrt{1 - \cos^2 \theta}} \cos(n\theta) \cos (m\theta) \sin \theta \;\d \theta\\
+  &= \int_0^\pi \cos(n\theta) \cos (m\theta)\;\d \theta\\
+  &= 0\text{ if }m\not= n.
+\end{align*}
+\subsection{Least-squares polynomial approximation}
+This is an alternative to polynomial interpolation. Instead of trying to make a polynomial agree with $f$ at certain points and hoping it is a good approximation elsewhere, the idea is to choose a polynomial $p \in P_n[x]$ to minimize the error
+\[
+  \bra f - p, f - p\ket = \int_a^b w(x) [f(x) - p(x)]^2 \;\d x.
+\]
+We can also use alternative inner products such as
+\[
+  \bra f - p, f - p\ket = \sum_{j = 1}^m w_j [f(\xi_i) - p(\xi_i)]^2.
+\]
+Unlike polynomial interpolation, there is no guarantee that the approximation agrees with the function anywhere. Unlike polynomial interpolation, there is some guarantee that the total error is small (or as small as we can get, by definition).
+
+The solution is to use orthogonal polynomials with respect to the corresponding inner products
+\[
+  \bra f, g\ket = \int_a^b w(x) f(x) g(x)\;\d x
+\]
+or
+\[
+  \bra f, g\ket = \sum_{j = 1}^m w_j f(\xi_j) g(\xi_j),
+\]
+in order to minimize
+\[
+  \|f - p\|^2 = \bra f - p, f - p\ket.
+\]
 \end{document}

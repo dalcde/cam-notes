@@ -172,8 +172,6 @@ Let $f: U \to \C$ and $w \in U$. Suppose $f$ is conformal at $w$. Then $f$ maps 
 \end{align*}
 using the chain rule and the fact that $f'(w) \not= 0$.
 
-What the word ``conformal'' really should mean is that it preserves angles. However, we adopt the definition of having non-zero derivative because it is easier to state and check.
-
 We will later prove that if $f: U \to \C$ is holomorphic on an open set $U$, then $f': U \to \C$ is \emph{also} holomorphic. Hence $f$ is infinitely differentiable.
 
 Moreover, if we write $f = u + iv$, then using the formula for $f'$ in terms of the partials, we know $u$ and $v$ are also \emph{infinitely differentiable}. Differentiating the Cauchy-Riemann equations, we get
@@ -342,7 +340,7 @@ Thus for instance the map
 \[
   z \mapsto -\left(\frac{z - 1}{z + 1}\right)^2
 \]
-is a conformal equivalence from $\mathcal{U}$ to $\H$. This is since $z \mapsto \frac{z - 1}{z + 1}$ maps the disk to the upper half plane, and hence $\mathcal{U}$ to the top-left quadrant. Squaring doubles the angle and gives the lower half-plane, and multiplying by $-1$ gives the upper half plane.
+is a conformal equivalence from $\mathcal{U}$ to $\H$. This is since if $z \in \mathcal{U}$, then $\frac{z - 1}{z + 1}$ has argument in $\left[\frac{\pi}{2}, \pi\right]$. Squaring doubles the angle and gives the lower half-plane, and multiplying by $-1$ gives the upper half plane.
 \begin{center}
   \begin{tikzpicture}[scale=0.5]
     \fill [mblue, opacity=0.5] (2, 0) arc (0:180:2) -- (2, 0);
@@ -441,6 +439,7 @@ If we believe that the unit disk is relatively simple, then since all simply con
   \end{center}
 \end{eg}
 
+\subsection{Power series and logarithms}
 At this point, we need to recall some facts from IB Analysis II.
 \begin{defi}[Uniform convergence]
   A sequence $(f_n)$ of functions \emph{converge uniformly} to $f$ if for all $\varepsilon > 0$, there is some $N$ such that $n > N$ implies $|f_n(z) - f(z)| < \varepsilon$ for all $z$.
@@ -457,8 +456,403 @@ We also had the following nice test for uniform convergence of a series:
 
 Finally, we have the following result.
 \begin{prop}
-  Given any constants $\{c_n\}_{n \geq 0} \subseteq \C$, there is a unique $R \in [0, \infty]$ such that the series $z \mapsto \sum_{n = 0}^\infty c_n(z - a)^n$ converges absolutely if $|z - a| < R$ and diverges if $|z - a| > R$. Moreover, if $0 < r < R$, then the series converges uniformly on $|z| < r$.
+  Given any constants $\{c_n\}_{n \geq 0} \subseteq \C$, there is a unique $R \in [0, \infty]$ such that the series $z \mapsto \sum_{n = 0}^\infty c_n(z - a)^n$ converges absolutely if $|z - a| < R$ and diverges if $|z - a| > R$. Moreover, if $0 < r < R$, then the series converges uniformly on $|z| < r$. This $R$ is known as the \emph{radius of convergence}.
 \end{prop}
 So while we don't necessarily get uniform convergence on the whole domain, we get uniform convergence on all compact subsets of the domain.
 
+We are now going to look at power series. They will serve as examples, and as we will see later, universal examples, of holomorphic functions.
+
+\begin{thm}
+  Let
+  \[
+    f(z) = \sum_{n = 0}^\infty c_n (z - a)^n
+  \]
+  be a power series with radius of convergence $R > 0$. Then
+  \begin{enumerate}
+    \item $f$ is holomorphic on $B(a; R) = \{z: |z - a| < R\}$.
+    \item $f'(z) = \sum n c_n (z - 1)^{n - 1}$, which also has radius of convergence $R$.
+    \item Therefore $f$ is infinitely complex differentiable on $B(a; R)$. Furthermore,
+      \[
+        c_n = \frac{f^{(n)}(a)}{n!}.
+      \]
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}
+  Without loss of generality, take $a = 0$. The third part obviously follows from the previous two, and we will prove the first two parts simultaneously. We would like to first prove that the series has radius of convergence $R$, so that we can freely happily manipulate it.
+
+  Certainly, we have $|n c_n| \geq |c_n|$. So by comparison to the series for $f$, we can see that the radius of convergence of $\sum n c_n z^{n - 1}$ is at most $R$. But if $|z| < \rho < R$, then we can see
+  \[
+    \frac{|n c_n z^{n - 1}|}{|c_n \rho^{n - 1}|} = n \left|\frac{z}{\rho}\right|^{n - 1} \to 0
+  \]
+  as $n \to \infty$. So by comparison to $\sum c_n \rho^{n - 1}$, which converges, we see that the radius of convergence of $\sum n c_n z^{n - 1}$ is at least $\rho$. So the radius of convergence must be exactly $R$.
+
+  Now we want to show $f$ really is differentiable with that derivative. Pick $z, w$ such that $|z|, |w| \leq \rho$ for some $\rho < R$ as before.
+
+  Define a new function
+  \[
+    \varphi (z, w) = \sum_{n = 1}^\infty c_n \sum_{j = 0}^{n - 1} z^j w^{n - 1 - j}.
+  \]
+  Noting
+  \[
+    \left|c_n \sum_{j = 0}^{n - 1} z^j w^{n - 1 - j}\right| \leq n |c_n| \rho^n,
+  \]
+  we know the series defining $\varphi$ converges uniformly on $\{|z| \leq \rho, |w| < \rho\}$, and hence to a continuous limit.
+
+  If $z \not= w$, then using the formula for the (finite) geometric series, we know
+  \[
+    \varphi(z, w) = \sum_{n = 1}^\infty c_n\left(\frac{z^n - w^n}{z - w}\right) = \frac{f(z) - f(w)}{z - w}.
+  \]
+  On the other hand, if $z = w$, then
+  \[
+    \varphi(z, z) = \sum_{n = 1}^\infty c_n n z^{n - 1}.
+  \]
+  Since $\varphi$ is continuous, we know
+  \[
+    \lim_{w \to z} \frac{f(z) - f(w)}{z - w} \to \sum_{n = 1}^\infty c_n nz^{n - 1}.
+  \]
+  So $f'(z) = \varphi(z, z)$ as claimed. Then (iii) follows from (i) and (ii) directly.
+\end{proof}
+
+\begin{cor}
+  Given a power series
+  \[
+    f(z) = \sum_{n \geq 0} c_n (z - a)^n
+  \]
+  with radius of convergence $R > 0$, and given $0 < \varepsilon < R$, if $f$ vanishes on $B(a, \varepsilon)$, then $f$ vanishes identically.
+\end{cor}
+
+\begin{proof}
+  If $f$ vanishes on $B(a, \varepsilon)$, then all its derivatives vanish, and hence the coefficients all vanish. So it is identically zero.
+\end{proof}
+This is obviously true, but will come up useful some time later.
+
+It is might be useful to have an explicit expression for $R$. For example, we can have
+\begin{align*}
+  R &= \sup \{r \geq 0: |c_n|r^n \to 0\text{ as }n \to \infty\}\\
+  &= \frac{1}{\limsup \sqrt[n]{|c_n|}}.
+\end{align*}
+But we probably won't need these.
+
+Recall that the exponential function
+\[
+  e^z = \exp(z) = 1 + z + \frac{z^2}{2!} + \frac{z^3}{3!} + \cdots
+\]
+has a radius of convergence of $\infty$. So it is an entire function. We have the usual standard properties, such as $e^{z + w} = e^z e^w$, and also
+\[
+  e^{x + iy} = e^x e^{iy} = e^x(\cos y + i \sin y).
+\]
+So given $w \in \C^* = \C\setminus\{0\}$, there are solutions to $e^z = w$. In fact, this has infinitely many solutions, differing by adding integer multiples of $2\pi i$. In particular, $e^z = 1$ if and only if $z$ is an integer multiple of $2\pi i$.
+
+This means we have to be a bit more careful if we want to talk about the inverse function of the exponential. We make the following definition:
+
+\begin{defi}[Branch of logarithm]
+  Let $U \subseteq \C^*$ be an open subset. A \emph{branch of the logarithm} on $U$ is a continuous function $\lambda: U \to \C$ for which $e^{\lambda (z)} = z$ for all $z \in U$.
+\end{defi}
+This is like a ``local inverse'' to the exponential function. These need not exist for all $U$. For example, there is no branch of the logarithm on the whole $\C^*$, as we will later prove.
+
+\begin{eg}
+  Let $U = \C\setminus \R_{\leq 0}$, a ``slit plane''.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (0, 0) -- (2, 0);
+      \draw [thick] (-2, 0) -- (0, 0);
+      \draw [->] (0, -2) -- (0, 2);
+      \node [circ] at (0, 0) {};
+    \end{tikzpicture}
+  \end{center}
+  Then for each $z \in U$, we write $z = r^{i \theta}$, with $-\pi < \theta < \pi$. Then $\lambda(z) = \log (r) + i \theta$ is a branch of the logarithm. This is the \emph{principal branch}.
+
+  On $U$, there is a continuous function $\arg: U \to (-\pi, \pi)$, which is why we can construct a branch. This is not true on, say, the unit circle.
+\end{eg}
+
+\begin{prop}
+  On $\{z \in \C: z \not\in \R_{\leq 0}\}$, the principal branch $\log: U \to \C$ is holomorphic function. Moreover,
+  \[
+    \frac{\d}{\d z}\log z = \frac{1}{z}.
+  \]
+  If $|z| < 1$, then
+  \[
+    \log (1 + z) = \sum_{n \geq 1} (-1)^{n - 1} \frac{z^n}{n} = z - \frac{z^2}{2} + \frac{z^3}{3} - \cdots.
+  \]
+\end{prop}
+
+\begin{proof}
+  That logarithm is holomorphic follows from the chain rule and $e^{\log z} = z$. This shows $\frac{\d}{\d z} (\log z) = \frac{1}{z}$.
+
+  To show that $\log(1 + z)$ is indeed given by the said power series, note that the power series does have a radius of convergence $1$ by, say, the ratio test. So by the previous result, it has derivative
+  \[
+    1 - z + z^2 + \cdots = \frac{1}{1 + z}.
+  \]
+  Therefore, $\log(1 + z)$ and the power series have equal derivative, and hence coincide up to a constant. Since they agree at $z = 0$, they must in fact be equal.
+\end{proof}
+Note that if $\alpha \in \C$ and $\log: U \to \C$ is a branch of the logarithm, we can define
+\[
+  z^{\alpha} = e^{\alpha \log z}
+\]
+on $U$.
+
+We can view $\log$ as a multivalued function on $\C^*$. In general, we say that a point $p \in \C $ is a \emph{branch point} of a multivalued function if the function cannot be given a continuous single-valued definition in a (punctured) neighbourhood $B(p, \varepsilon) \setminus \{p\}$ of $p$ for any $\varepsilon > 0$. For example, $0$ is a branch point of $\log$.
+
+\begin{eg}
+  Consider the function
+  \[
+    f(z) = \sqrt{z(z - 1)}.
+  \]
+  This has \emph{two} branch points, $z = 0$ and $z = 1$, since we cannot consistently a square root consistently near $0$, as it is defined via the logarithm.
+\end{eg}
+
+Note we can define a continuous branch of $f$ on either
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-2, 0) -- (2, 0);
+    \draw [thick] (-2, 0) -- (0, 0);
+    \draw [thick] (1, 0) -- (2, 0);
+    \draw [->] (0, -2) -- (0, 2);
+    \node [below] at (1, 0) {$1$};
+    \node [anchor = north east] {$0$};
+    \node [circ] at (1, 0) {};
+    \node [circ] at (0, 0) {};
+  \end{tikzpicture}
+\end{center}
+or we can just kill a finite slit by
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-2, 0) -- (2, 0);
+    \draw [thick] (1, 0) -- (0, 0);
+    \draw [->] (0, -2) -- (0, 2);
+    \node [below] at (1, 0) {$1$};
+    \node [anchor = north east] {$0$};
+    \node [circ] at (1, 0) {};
+    \node [circ] at (0, 0) {};
+  \end{tikzpicture}
+\end{center}
+Why is the second case possible? Note that
+\[
+  f(z) = e^{\frac{1}{2}(\log(z) + \log(z - 1))}.
+\]
+If we move around a path encircling the finite slit, the argument of each of $f(z)$ and $\log(z - 1)$ will jump by $2\pi i$, and the total change in the exponent is $2\pi i$. So the expression for $f(z)$ becomes uniquely defined.
+
+While these two ways of cutting slits look rather different, if we consider this to be on the Riemann sphere, then these two cuts now look similar. It's just that one passes through the point $\infty$, and the other doesn't.
+
+However, this is not a very good treatment of the problem. A better treatment will be performed in the IID Riemann Surfaces course.
+
+\section{Contour integration}
+Our next task is to develop a theory of integration of $\C$-valued functions along paths and closed contours. At first, this would look just like an obvious generalization of real integration. However, this will suddenly become amazing and get a life of its own when we get to Cauchy's theorem.
+
+Recall that a function $f: [a, b] \to \C$ is Riemann integrable if $\Re(f)$ and $\Im (f)$ are individually, by definition. Also, by definition,
+\[
+  \int_a^b f(t) \;\d t = \int_a^b \Re(f(t))\;\d t + i \int_a^b \Im(f(t))\;\d t.
+\]
+Recall also that if $f$ is continuous, then it is integrable. This will apply in most cases we care about in this course. After all, this is not a course on exotic functions.
+
+We start from some less interesting facts, and slowly develop and prove some really amazing results.
+\begin{lemma}
+  Suppose $f: [a, b] \to \C$ is continuous (and hence integrable). Then
+  \[
+    \left|\int_a^b f(t)\;\d t\right| \leq (b - a) \sup_t |f(t)|
+  \]
+  with equality if and only if $f$ is constant.
+\end{lemma}
+
+\begin{proof}
+  We let
+  \[
+    \theta = \arg\left(\int_a^b f(t)\;\d t\right),
+  \]
+  and
+  \[
+    M = \sup_t |f(T)|.
+  \]
+  Then we have
+  \begin{align*}
+    \left|\int_a^b f(t)\;\d t\right| &= \int_a^b e^{-i\theta} f(t)\;\d t\\
+    &= \int_a^b \Re(e^{-i\theta} f(t))\;\d t\\
+    &\leq (b - a) M,
+  \end{align*}
+  with equality if and only if $|f(t)| =M$ and $\arg f(t) = \theta$ for all $t$, ie. $f$ is constant.
+\end{proof}
+
+\begin{defi}[Simple path]
+  A path $\gamma: [a, b] \to \C$ is \emph{simple} if $\gamma(t_1) = \gamma(t_2)$ only if $t_1 = t_2$ or $\{t_1, t_2\} = \{a, b\}$.
+\end{defi}
+In other words, it either does not intersect itself, or only intersects itself at the end points.
+
+\begin{defi}[Closed path]
+  A path $\gamma: [a, b] \to \C$ is \emph{closed} if $\gamma(a) = \gamma(b)$.
+\end{defi}
+
+\begin{defi}[Contour]
+  A \emph{contour} is a simple closed path which is piecewise $C^1$, ie. piecewise continuously differentiable.
+\end{defi}
+
+For example, it can look something like this:
+\begin{center}
+  \begin{tikzpicture}[scale=2]
+    \draw [->-=0.6] plot [smooth] coordinates {(0, 0) (0.5, 0.1) (1, -0.1)};
+    \node [circ] at (0, 0) {};
+    \draw [->-=0.4, ->-=0.7] plot [smooth] coordinates {(1, -0.1) (0.5, -1) (0, 0)};
+  \end{tikzpicture}
+\end{center}
+
+\begin{defi}[Complex integration]
+  If $\gamma: [a, b] \to U \subseteq \C$ is $C^1$-smooth and $f: U \to \C$ is continuous, then we define the \emph{integral} of $f$ along $\gamma$ as
+  \[
+    \int_\gamma f(z) \;\d z = \int_a^b f(\gamma(t)) \gamma'(t) \;\d t.
+  \]
+  By summing over subdomains, the definition extends to piecewise $C^1$-smooth paths, and in particular contours.
+\end{defi}
+
+We have the following properties:
+\begin{enumerate}
+  \item The definition is insensitive to reparametrization. Let $\phi: [a', b'] \to [a, b]$ be $C^1$ such that $\phi(a') = a, \phi(b') = b$. If $\gamma$ is a $C^1$ path and $\delta= \gamma \circ \phi$, then
+    \[
+      \int_{\gamma} f(z) \;\d z = \int_{\delta}f(z) \;\d z.
+    \]
+    This is just the regular change of variables formula, since
+    \[
+      \int_{a'}^{b'} f(\gamma(\phi(t))) \gamma'(\phi(t)) \phi'(t)\;\d t= \int_a^b f(\gamma(u)) \gamma'(u)\;\d u
+    \]
+    if $u = \phi(t)$.
+  \item If $a < u < b$, then
+    \[
+      \int_\gamma f(z)\;\d z = \int_{\gamma|_{[a, u]}} f(z)\;\d z + \int_{\gamma|_{[u, b]}}f(z) \;\d z.
+    \]
+\end{enumerate}
+These tells us the integral depends only on the path itself, not how we look at the path or how we cut up the path into pieces.
+
+We also have the following easy properties:
+\begin{enumerate}[resume]
+  \item If $-\gamma$ is $\gamma$ with reversed orientation, then
+    \[
+      \int_{-\gamma} f(z)\;\d z = -\int_\gamma f(z)\;\d z.
+    \]
+  \item If we set for $\gamma: [a, b] \to \C$ the \emph{length}
+    \[
+      \mathrm{length}(\gamma) = \int_a^b |\gamma'(t)|\;\d t,
+    \]
+    then
+    \[
+      \left|\int_\gamma f(z)\;\d z\right| \leq \mathrm{length} (\gamma) \sup_{t \in \im \gamma}|f(t)|.
+    \]
+\end{enumerate}
+
+\begin{eg}
+  Take $U = \C^*$, and let $f(z) = z^n$ for $n \in \Z$. We pick $\phi: [0, 2\pi] \to U$ that sends $\theta \mapsto e^{i\theta}$. Then
+  \[
+    \int_\phi f(z)\;\d z =
+    \begin{cases}
+      2\pi i & n = -1\\
+      0& \text{otherwise}
+    \end{cases}
+  \]
+  To show this, we have
+  \begin{align*}
+    \int_{\phi} f(z)\;\d z &= \int_0^{2\pi} e^{in\theta} ie^{i\theta}\;\d \theta\\
+    &= i\int_0^{2\pi} e^{i(n + 1)\theta}\;\d \theta.
+  \end{align*}
+  If $n = -1$, then the integrand is constantly $1$, and hence gives $2\pi i$. Otherwise, the integrand is a non-trivial exponential which is made of trigonometric functions, and when integrated over $2\pi$ gives zero.
+\end{eg}
+
+\begin{eg}
+  Take $\gamma$ to be the contour
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (-3, 0) -- (3, 0);
+      \draw [->] (0, -1) -- (0, 3);
+      \draw [->-=0.7] (-2, 0) -- (2, 0) node [pos=0.7, below] {$\gamma_1$};
+      \draw [->-=0.3, ->-=0.75] (2, 0) arc (0:180:2) node [pos=0.3, anchor = south west] {$\gamma_2$};
+      \node [below] at (2, 0) {$R$};
+      \node [below] at (-2, 0) {$-R$};
+      \node [anchor = south west] at (0, 2) {$iR$};
+    \end{tikzpicture}
+  \end{center}
+  We take the first path to be $\gamma_1: [-R, R] \to \C$ by $\gamma(t) = t$, while $\gamma_2: [0, 1] \to \C$ by $t \mapsto R e^{i\pi t}$.
+
+  Consider the function $f(z) = z^2$. Then the integral is
+  \begin{align*}
+    \int_\gamma f(z)\;\d z &= \int_{-R}^R t^2 \;\d t + \int_0^1 R^2 e^{2\pi i t} i\pi R e^{i\pi t}\;\d t\\
+    &= \frac{2}{3}R^3 + R^3 i\pi \int_0^1 e^{3 \pi i t}\;\d t\\
+    &= \frac{2}{3}R^3 + R^3 i\pi \left[\frac{e^{3\pi it}}{3\pi i}\right]_0^1\\
+    &= 0
+  \end{align*}
+\end{eg}
+We worked this out explicitly, but this is just an instance of the fundamental theorem of calculus!
+
+\begin{defi}[Antiderivative]
+  Let $U \in \C$ and $f: U \to \C$ be continuous. An \emph{antiderivative} of $f$ is a holomorphic function $F: U \to \C$ such that $F'(z) = f(z)$.
+\end{defi}
+
+Then the fundamental theorem of calculus tells us:
+\begin{thm}[Fundamental theorem of calculus]
+  Let $f: U \to \C$ be continuous with antiderivative $F$. If $\gamma: [a, b] \to U$ is piecewise $C^1$-smooth, then
+  \[
+    \int_\gamma f(z)\;\d z= F(\gamma(b)) - F(\gamma(a)).
+  \]
+\end{thm}
+In particular, the integral depends only on the end points, and not the path itself. Moreover, if $\gamma$ is closed, then the integral vanishes.
+
+\begin{proof}
+  We have
+  \[
+    \int_\gamma f(z)\;\d z = \int_a^b f(\gamma(t)) \gamma'(t) \;\d t = \int_a^b (F \circ \gamma)' (t)\;\d t.
+  \]
+  Then the result follows from the usual fundamental theorem of calculus, applied to the real and imaginary parts separately.
+\end{proof}
+
+\begin{eg}
+  This allows us to understand the first example we had. Recall that for $f(z) = z^n$ on $\phi(t) = e^{it}$ (with $0 \leq t \leq 2\pi$), if $n \not= -1$, then
+  \[
+    f = \frac{\d}{\d t}\left(\frac{z^{n + 1}}{n + 1}\right).
+  \]
+  So $f$ has a well-defined antiderivative, and the integral vanishes. On the other hand, if $n = -1$, then
+  \[
+    f(z) = \frac{\d}{\d z} (\log z),
+  \]
+  where $\log$ can only be defined on a \emph{slit} plane. It is not defined on the whole unit circle. So we cannot apply the fundamental theorem of calculus.
+
+  Reversing the argument around, since $\int_\phi f(z)\;\d z$ does not vanish, this implies there is not a continuous branch of $\log$ on any set $U$ containing the unit circle.
+\end{eg}
+
+\begin{prop}
+  Let $U \subseteq \C$ be a domain (ie. path-connected non-empty open set), and $f: U \to \C$ be continuous. Moreover, suppose
+  \[
+    \int_\gamma f(z)\;\d z = 0
+  \]
+  for any closed piecewise $C^1$-smooth path $\gamma$ in $U$. Then $f$ has an antiderivative.
+\end{prop}
+
+This is more-or-less the same proof we gave in IA Vector Calculus that a real function is a gradient if and only if the integral about any closed path vanishes.
+
+\begin{proof}
+  Pick our favorite $a_0 \in U$. For $w \in U$, we choose a path $\gamma_w: [0, 1] \to U$ such that $\gamma_w(0) = a_0$ and $\gamma_w(1) = w$. This exists because $U$ is path connected. Using some fancy topological arguments, we can indeed pick this to be piecewise linear, and hence piecewise smooth. We thus defin
+  \[
+    F(w) = \int_{\gamma w} f(z)\;\d z.
+  \]
+  Note that this $F(w)$ is independent of the choice of $\gamma_w$, by our hypothesis on $f$ --- given another choice $\tilde{\gamma}_w$, then $\gamma_w$ concatenated with $-\tilde{\gamma}_w$, written $\gamma_w * (-\tilde{\gamma}_w)$, is a closed piecewise $C^1$ path on $U$. So
+  \[
+    \int_{\gamma_w * (-\tilde{\gamma}_w)} f(z) \;\d z = 0.
+  \]
+  The left hand side is
+  \[
+    \int_{\gamma_W} f(z)\;\d z + \int_{-\tilde{\gamma}_w}f(z)\;\d z = \int_{\gamma_w} f(z)\;\d z - \int_{\tilde{\gamma}_w} f(z) \;\d z.
+  \]
+  So the two integrals agree.
+
+  Now we need to check that $F$ is complex differentiable. Since $U$ is open, we can pick $\theta > 0$ such that $B(w; \varepsilon) \subseteq U$. Let $\delta_h$ be the radial path in $B(w, \varepsilon)$ from $W$ to $w + h$, with $|h| < \varepsilon$.
+
+  Now note that $\gamma_w * \delta_h$ is a path from $a_0$ to $w + h$. So
+  \begin{align*}
+    F(w + h) &= \int_{\gamma_w * \delta_h} f(z)\;\d z\\
+    &= F(w) + \int_{\delta_h} f(z)\;\d z\\
+    &= F(w) + hf(w) + \int_{\delta_h} (f(z) - f(w))\;\d z.
+  \end{align*}
+  Thus, we know
+  \begin{align*}
+    \left|\frac{F(w + h) - F(w)}{h} - f(w)\right| &\leq \frac{1}{|h|} \left|\int_{\delta_h} f(z) - f(w)\;\d z\right| \\
+    &\leq \frac{1}{|h|} \mathrm{length}(\delta_h) \sup_{\delta_h} |f(z) - f(w)|\\
+    &=\sup_{\delta_h} |f(z) - f(w)|.
+  \end{align*}
+  Since $f$ is continuous, as $h \to 0$, we know $f(z) - f(w) \to 0$. So $F$ is differentiable with derivative $f$.
+\end{proof}
 \end{document}
