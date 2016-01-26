@@ -533,4 +533,160 @@ Since the $U$ cancels out, we get
   \delta \sim \sqrt{\nu T}.
 \]
 We can figure out approximately how big this is. For water, we have $\nu_{\mathrm{water}} \approx \SI{10e-6}{\meter\squared\per\second}$. For air, we have $\nu_{\mathrm{air}} \approx \SI{10e-5}{\meter\squared\per\second}$. These are, in general, very tiny.
+\subsubsection{Similarity solution}
+We now solve the problem properly. In an infinite domain with no extrinsic length scale, the diffusion equation admits a similarity solution. We write
+\[
+  u(y, t) = U f(\eta),
+\]
+where $f(\eta)$ is a dimensionless function of the dimensionless variable $\eta$. To make $y$ dimensionless, we define
+\[
+  \eta = \frac{y}{\delta} = \frac{y}{\sqrt{\nu t}}.
+\]
+We substitute this form of the solution into the differential equation. Then we get
+\[
+  -\frac{1}{2} \eta f'(\eta) = f''(\eta),
+\]
+with boundary condition $f = 1$ on $\eta = 0$. Then the solution is by definition
+\[
+  f = \erfc \left(\frac{\eta}{2}\right).
+\]
+Hence
+\[
+  u = U \erfc \left(\frac{y}{2\sqrt{\eta t}}\right).
+\]
+\begin{center}
+  \begin{tikzpicture}
+    \fill [gray, path fading=south] (0.5, 0) rectangle (5, -1);
+    \draw [->] (0.5, 0) -- (5, 0) node [right] {$U$};
+    \draw [->] (3.3, 0) -- +(0, 1.2) node [right, pos=0.5] {$\delta \sim \sqrt{\eta t}$};
+
+    \draw (1, 0) -- (1, 1.5);
+    \draw (2.5, 0) parabola (1, 1.5);
+    \foreach \y in {0.3,0.6,0.9,1.2} {
+      \pgfmathsetmacro\x{1.5 - sqrt(1.5 * \y)};
+      \draw [-latex'] (1, \y) -- +(\x, 0);
+    }
+  \end{tikzpicture}
+\end{center}
+
+\subsubsection{Kinematic and dynamic viscosities}
+Here we note the viscosities of some common fluids
+\begin{center}
+  \begin{tabular}{cccc}
+    \toprule
+    & $\mu(\SI{}{\kilo\gram\per\meter\per\second})$ & $\rho(\SI{}{\kilo\gram\per\meter\cubed})$ & $\nu(\SI{}{\meter\squared\per\second})$\\
+    \midrule
+    water & $10^{-3}$ & $10^3$ & $10^{-6}$\\
+    air & $10^{-5}$ & $1$ & $10^{-5}$\\
+    \bottomrule
+  \end{tabular}
+\end{center}
+We can compute the tangential stress of the fluid in the above case to be
+\[
+  \tau_s \mu\frac{\partial u}{\partial y} = \left.\mu \frac{U}{\sqrt{\nu t}} \left(\frac{2}{\sqrt{\pi}}\right) e^{-y^{2}}\right|_{y = 0} = \frac{\mu U}{\sqrt{\pi \nu t}}.
+\]
+For comparison, we find that $\frac{\mu}{\sqrt{\nu}}$ is $1$ for water and $10^{-3}$ for air.
+
+This is significant in, say, the motion of ocean current. When the wind blows, it causes the water in the ocean to move along with it. This is done in a way such that the surface tension between the two fluids match at the boundary. Hence we see that even if the air blows really quickly, the resultant ocean current is much smaller, say a hundredth to a thousandth of it.
+
+\section{Kinematics}
+\subsection{Material time derivative}
+In this picture, in order to study fluid motion, we mark (with, say, a dye) a fluid particle, and follow its trajectory. This is a very natural thing to do. For example, if we see smoke coming out of a chimney, we follow the smoke and see how it goes. The problem with this is that trajectories can cross, and this makes writing down differential equations difficult.
+\begin{center}
+  \begin{tikzpicture}
+    \node [circ] at (0, 0) {};
+    \node [circ] at (4, 0) {};
+    \draw [->-=0.13, ->-=0.3, ->-=0.5, ->-=0.9] plot [smooth] coordinates {(0, 0) (1, -0.1) (1.5, 0.3) (2.2, -0.5) (4, 0)};
+
+    \node [circ] at (1, -1) {};
+    \node [circ] at (3, 1) {};
+
+    \draw [->-=0.2, ->-=0.8] plot [smooth] coordinates {(1, -1) (1.4, -0.6) (1.8, 0.1) (3, 1)};
+  \end{tikzpicture}
+\end{center}
+There is an alternative way to do this, known as the Eulerian picture (or lazy person's picture). We sit at one place, and watch the world go by. For example, we stand at the top of a tower and hold an instrument still.
+
+This way, we can formulate equations for observables, such as the velocity $\mathbf{u}(\mathbf{x}, t)$, measured at fixed locations as functions of time $t$.
+
+Let's look at these two pictures, and see how they relate to each other. Consider a time-dependent field $f(\mathbf{x}, t)$. For example, it might be the pressure of the system, or the temperature of the fluid. Consider a path $\mathbf{x}(t)$ through the field, and we want to know how the field varies as we move along the path.
+
+Along the path $\mathbf{x}(t)$, the chain rule gives
+\begin{align*}
+  \frac{\d f}{\d t}(\mathbf{x}(t), t) &= \frac{\partial f}{\partial x} \frac{\d x}{\d t} + \frac{\partial f}{\partial y}\frac{\d y}{\d t} + \frac{\partial f}{\partial z}\frac{\d z}{\d t} + \frac{\partial f}{\partial t}\\
+  &= \nabla f \cdot \dot{\mathbf{x}} + \frac{\partial f}{\partial t}.
+\end{align*}
+\begin{defi}[Material derivative]
+  If $\mathbf{x}(t)$ is the (Lagrangian) path followed by a fluid particle, then necessarily $\dot{\mathbf{x}}(t) = \mathbf{u}$ by definition. In this case, we write
+  \[
+    \frac{\d f}{\d t} = \frac{\D f}{\D t}.
+  \]
+  This is the \emph{material derivative}.
+
+  In other words, we have
+  \[
+    \frac{\D f}{\D t} = \mathbf{u}\cdot \nabla f + \frac{\partial f}{\partial t}.
+  \]
+\end{defi}
+On the left of this equation, we have the \emph{Lagrangian derivative}, which is the change in $f$ as we follow the path. On the right of this equation, the first term is $\frac{\partial f}{\partial t}$, the \emph{Eulerian time derivative}, which is the change at a fixed point. The last term is the \emph{advective derivative}, which is the change due to change in position.
+
+For example, consider a river that gets wider as we go downstream. We know (from, say, experience) that the flow is faster upstream than downstream. If the motion is steady, then the Eulerian time derivative vanishes, but the Lagrangian derivative does not, since as the fluid goes down the stream, the fluid slows down, and there is a spacial variation.
+
+In practice, most of the time, we will use the Eulerian formulation, because this allows us to formulate differential equations.
+
+\subsection{Conservation of mass}
+The first equation we want to formulate is the conservation of mass.
+
+We fix an arbitrary region of space $\mathcal{D}$ with boundary $\partial \mathcal{D}$ and outward normal $\mathbf{n}$. We imagine there is some flow through this volume
+\begin{center}
+  \begin{tikzpicture}
+    \draw [mblue, ->-=0.13, ->-=0.4, ->-=0.9] plot [smooth] coordinates {(-3, 0) (-2, -0.3) (-0.5, 0.5) (0.5, 0.5) (2, 1.5)};
+    \draw [mblue, ->-=0.13, ->-=0.4, ->-=0.9] plot [smooth] coordinates {(-3, -1) (-2, -1) (0, -0.5) (2, -1.5)};
+    \draw plot [smooth cycle] coordinates {(-1.2, -0.7) (0, -0.7) (0.7, -1) (1.3, -0.9) (1.4, 0.4) (0.3, 1) (-1.7, 0.6)};
+    \node at (0, 0) {$\mathcal{D}$};
+    \node [above] at (0.3, 1) {$\partial D$};
+    \draw [->] (1.4, 0.4) -- +(0.4, 0.2666) node [right] {$\mathbf{n}$};
+  \end{tikzpicture}
+\end{center}
+What we want to say is that the change in the mass inside $\mathcal{D}$ is equal to the total flow of fluid through the boundary. We can write this as
+\[
+  \frac{\d }{\d t}\int_{\mathcal{D}} \rho \;\d V = -\int_{\partial \mathcal{D}} \rho \mathbf{u}\cdot \mathbf{n}\;\d S.
+\]
+We have the negative sign since we picked the outward normal, and hence the integral measures the outward flow of fluid.
+
+Since the domain is fixed, we can interchange the derivative and the integral on the left; on the right, we can use the divergence theorem to get
+\[
+  \int_{\mathcal{D}} \left(\frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \mathbf{u})\right) \;\d V = 0.
+\]
+Since $\mathcal{D}$ was arbitrary, we must have
+\[
+  \frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \mathbf{u}) = 0
+\]
+everywhere in space.
+
+This is the general form of a conservation law --- the rate of change of ``stuff'' density plus the divergence of the ``stuff'' flux is constantly zero. We will later formulate a similar result for, say, the momentum.
+
+In the conservation equation, we can expand $\nabla \cdot (\rho \mathbf{u})$ to get
+\[
+  \frac{\partial u}{\partial t} + \mathbf{u}\cdot \nabla \rho + \rho \nabla \cdot \mathbf{u} = 0.
+\]
+We notice the first term is just the material derivative of $\rho$. So we get
+\[
+  \frac{\D \rho}{\D t} + \rho \nabla \cdot \mathbf{u} = 0.
+\]
+\subsection{Incompressible flow}
+We have previously handwavily talked about incompressible flows. We now make this notion precise. What exactly happens when we compress a fluid? When we compress mass, in order to conserve mass, we must increase the density. If we don't allow changes in density, then the material derivative $\frac{\D \rho}{\D t}$ must vanish. So we define an incompressible fluid as follows:
+\begin{defi}[Incompressible fluid]
+  A fluid is \emph{incompressible} if the density of a fluid particle does not change. This implies
+  \[
+    \frac{\D \rho}{\D t} = 0,
+  \]
+  and hence
+  \[
+    \nabla \cdot \mathbf{u} = 0.
+  \]
+  This is also known as the \emph{continuity equation}.
+\end{defi}
+For parallel flow, $\mathbf{u} = (u, 0, 0)$. So if the flow is incompressible, we must have $\frac{\partial u}{\partial x} = \nabla \cdot \mathbf{u} = 0$. So we considered $u$ of the form $u = u(y, z, t)$.
+
+Of course, incompressibility is just an approximation. Since we can hear things, everything must be compressible. So what really matters is whether the slow speed is small compared to the speed of sound. If it is relatively small, then incompressibility is a good approximation. In air, the speed of sound is approximately $\SI{340}{\meter\per\second}$. In water, the speed of sound is approximately $\SI{1500}{\meter\per\second}$.
 \end{document}

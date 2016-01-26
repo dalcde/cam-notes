@@ -331,7 +331,7 @@ In particular, we know the leading coefficient of $T_n$ is $2^{n - 1}$ (for $n \
     \|f - p_n\|_{\infty} \leq \frac{1}{2^n} \frac{1}{(n + 1)!} \|f^{(n + 1)}\|_{\infty}.
   \]
 \end{thm}
-Suppose $f$ has as many continuous derivatives as we want. Then as we increase $n$, what happens to the error bounds? The coefficients involve dividing by an exponential \emph{and} a factorial. Hence as long as the higher derivatives of $f$ don't blow up to badly, in general, the error will tend to zero as $n \to \infty$.
+Suppose $f$ has as many continuous derivatives as we want. Then as we increase $n$, what happens to the error bounds? The coefficients involve dividing by an exponential \emph{and} a factorial. Hence as long as the higher derivatives of $f$ don't blow up too badly, in general, the error will tend to zero as $n \to \infty$.
 
 The last two results can be easily generalized to arbitrary intervals $[a, b]$, and this is left as an exercise for the reader.
 
@@ -498,7 +498,7 @@ We can also use alternative inner products such as
 \[
   \bra f - p, f - p\ket = \sum_{j = 1}^m w_j [f(\xi_i) - p(\xi_i)]^2.
 \]
-Unlike polynomial interpolation, there is no guarantee that the approximation agrees with the function anywhere. Unlike polynomial interpolation, there is some guarantee that the total error is small (or as small as we can get, by definition).
+Unlike polynomial interpolation, there is no guarantee that the approximation agrees with the function anywhere. Unlike polynomial interpolation, there is some guarantee that the total error is small (or as small as we can get, by definition). In particular, if $f$ is continuous, then the Weierstrass approximation theorem tells us the total error must eventually vanish.
 
 The solution is to use orthogonal polynomials with respect to the corresponding inner products
 \[
@@ -512,4 +512,136 @@ in order to minimize
 \[
   \|f - p\|^2 = \bra f - p, f - p\ket.
 \]
+\begin{thm}
+  If $\{p_n\}_{k = 0}^n$ are orthogonal polynomials with respect to $\bra \ph, \ph \ket$, then
+  \[
+    p = \sum_{k = 0}^n c_k p_k,
+  \]
+  where
+  \[
+    c_k = \frac{\bra f, p_k\ket}{\|p_k\|^2},
+  \]
+  and
+  \[
+    \|f - p\|^2 = \|f\|^2 - \sum_{k = 0}^n \frac{\bra f, p_k\ket^2}{\|p_k\|^2}.
+  \]
+\end{thm}
+Note that the solution decouples, in the sense that $c_k$ depends only on $f$ and $p_k$. If we want to take one more term, we just need to compute an extra term, and not redo our previous work.
+
+Also, we notice that the formula for the error is a positive term $\|f\|^2$ subtracting a lot of squares. As we increase $n$, we subtract more squares, and the error decreases. If we are lucky, the error tends to $0$ as we take $n \to \infty$. Even though we might not know how many terms we need in order to get the error to be sufficiently small, we can just keep adding terms until the computed error small enough (which is something we have to do anyway even if we know what $n$ to take).
+
+\begin{proof}
+  We consider a general polynomial
+  \[
+    p = \sum_{k = 0}^n c_k p_k.
+  \]
+  We substitute this in to obtain
+  \[
+    \bra f - p, f - p\ket = \bra f, f\ket - 2 \sum_{k = 0}^n c_k \bra f, p_k\ket + \sum_{k = 0}^n c_k^2 \|p_k\|^2.
+  \]
+  Note that there are no cross terms between the different coefficients. We minimize this quadratic by setting the partial derivatives to zero:
+  \[
+    0 = \frac{\partial}{\partial c_k} \bra f - p, f - p\ket = -2 \bra f, p_k\ket + 2c_k \|p_k\|^2.
+  \]
+  To check this is indeed a minimum, note that the Hessian matrix is simply $2I$, which is positive definite. So this is really a minimum. So we get the formula for the $c_k$'s as claimed, and putting the formula for $c_k$ gives the error formula.
+\end{proof}
+
+Note that our constructed $p \in P_n[x]$ has a nice property: for $k \leq n$, we have
+\[
+  \bra f - p, p_k\ket = \bra f, p_k\ket - \bra p, p_k\ket = \bra f, p_k\ket - \frac{\bra f, p_k\ket}{\|p_k\|^2} \bra p_k, p_k\ket = 0.
+\]
+Thus for all $q \in P_n[x]$, we have
+\[
+  \bra f - p, q\ket = 0.
+\]
+In particular, this is true when $q = p$, and tells us $\bra f, p\ket = \bra p, p\ket$. Using this to expand $\bra f - p, f - p\ket$ gives
+\[
+  \|f - p\|^2 + \|p\|^2 = \|f\|^2,
+\]
+which is just a glorified Pythagoras theorem.
+\section{Approximation of linear functionals}
+\subsection{Linear functionals}
+We start by explaining what we mean ``functional''.
+\begin{defi}[Linear functional]
+  A \emph{linear functional} is a linear mapping $L: V \to \R$, where $V$ is a real vector space of functions.
+\end{defi}
+In generally, a linear functional is a linear mapping from a vector space to its underlying field of scalars, but for the purposes of this course, we will restrict to this special case.
+
+\begin{eg}\leavevmode
+  \begin{enumerate}
+    \item We can choose some fixed $\xi \in \R$, and define a linear functional by
+      \[
+        L(f) = f(\xi).
+      \]
+    \item Alternatively, for fixed $\eta \in \R$ we can define our functional by
+      \[
+        L(f) = f'(\eta).
+      \]
+      In this case, we need to pick a vector space in which this makes sense, eg. the space of continuously differentiable functions.
+    \item We can define
+      \[
+        L(f) = \int_a^b f(x)\;\d x.
+      \]
+      The set of continuous (or even just integrable) functions defined on $[a, b]$ will be a sensible domain for this linear functional.
+    \item Any linear combination of these linear functions are also linear functionals. For example, we can pick some fixed $\alpha, \beta \in \R$, and define
+      \[
+        L(f) = f(\beta) - f(\alpha) - \frac{\beta - \alpha}{2} [f'(\beta) - f'(\alpha)].
+      \]
+  \end{enumerate}
+\end{eg}
+
+We will attempt to construct approximations to more complicated linear functionals (usually integrals, possibly derivatives point values) in terms of simpler linear functionals (usually point values of $f$ itself).
+
+For example, we might produce an approximation of the form
+\[
+  L(f) \approx \sum_{i = 0}^N a_i f(x_i),
+\]
+where $V = C^p[a, b]$, $p \geq 0$, and $\{x_i\}_{i = 0}^N \subseteq [a, b]$ are distinct points.
+
+How can we choose the coefficients $a_i$ and the points $x_i$ so that our approximation is ``good''?
+
+For a start, we let $ \{x_i\}_{i = 0}^N \subseteq [a, b]$ be arbitrary points. Then $\{a_i\}_{i = 0}^N$ can be derived from interpolation theory. We first approximate $f$ by polynomials, and then attempt to find $L(p)$ exactly for polynomials. In particular, we have
+\[
+  L(f) \approx L\left(\sum_{i = 0}^N f(x_i) \ell_i(x)\right) = \sum_{i = 0}^N L(\ell_i) f(x_i).
+\]
+Similar to polynomial interpolation, this formula is exact for $f \in P_N[x]$.
+
+Suppose we can freely choose $\{a_i\}_{i = 0}^N$ and $\{x_i\}_{i = 0}^N$. Then since we now have $2n + 2$ free parameters, we might expect to find an approximation that is exact for $f \in P_{2N + 1}[x]$. This is not always possible, but there are cases when we can. The most famous example is Gaussian quadrature.
+
+\subsection{Gaussian quadrature}
+Note that traditionally, we have a different set of notations used for Gaussian quadrature. So the notation used here will be inconsistent with what we are doing elsewhere in the course.
+
+Let
+\[
+  \bra f, g\ket = \int_a^b w(x) f(x)g(x)\;\d x
+\]
+be a scalar product for $P_\nu[x]$. Then we can find \emph{weights}, written $\{b_n\}_{k = 1}^\nu$, and \emph{nodes}, written $\{c_k\}_{k = 1}^\nu \subseteq [a, b]$, such that the approximation
+\[
+  \int_a^b w(x) f(x)\;\d x \approx \sum_{k = 1}^{\nu} b_k f(c_k)
+\]
+is exact for $f \in P_{2\nu - 1}[x]$. The nodes $\{c_k\}_{k = 1}^{\nu}$ will turn out to be the zeroes of the orthogonal polynomial $p_\nu$ with respect to the scalar product. The aim of this section is to work this thing out.
+
+We start by showing that this is the best we can achieve.
+\begin{prop}
+  There is no choice of $\nu$ weights and nodes such that the approximation of $\int_a^b w(x) f(x)\;\d x$ is exact for all $f \in P_{2\nu}[x]$.
+\end{prop}
+
+\begin{proof}
+  Define
+  \[
+    q(x) = \prod_{k = 1}^{\nu} (x - c_k) \in P_{\nu}[x].
+  \]
+  Then we know
+  \[
+    \int_a^b w(x) q^2(x)\;\d x > 0,
+  \]
+  since $q^2$ is always non-negative and has finitely many zeroes. However,
+  \[
+    \sum_{k = 1}^\nu b_k q^2(c_n) = 0.
+  \]
+  So this cannot be exact for $q^2$.
+\end{proof}
+
+What should we do now? Recall that we wanted to pick the nodes to be the zeroes of the orthogonal polynomial. However, to do this, we must make sure the roots indeed lie in $[a, b]$. This is what we will prove now --- given any inner product, the roots of the orthogonal polynomials must lie in $[a, b]$.
 \end{document}
+

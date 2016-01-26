@@ -412,7 +412,7 @@ If we believe that the unit disk is relatively simple, then since all simply con
   \[
     e^z = 1 + z + \frac{z^2}{2!} + \frac{z^3}{3!} + \cdots
   \]
-  defines a function $\C \to \C^*$. In fact it is conformal mapping. This sends the region $\{z: \Re(z): [a, b]\}$ to the annulus $\{e^a \leq |w| \leq e^b\}$. One is simply connected, but the other is not --- this is not a problem since $e^z$ is \emph{not} bijective on the strip.
+  defines a function $\C \to \C^*$. In fact it is a conformal mapping. This sends the region $\{z: \Re(z) \in [a, b]\}$ to the annulus $\{e^a \leq |w| \leq e^b\}$. One is simply connected, but the other is not --- this is not a problem since $e^z$ is \emph{not} bijective on the strip.
   \begin{center}
     \begin{tikzpicture}[scale=0.75]
       \draw [->] (-3, 0) -- (3, 0);
@@ -729,11 +729,11 @@ We also have the following easy properties:
     \]
   \item If we set for $\gamma: [a, b] \to \C$ the \emph{length}
     \[
-      \mathrm{length}(\gamma) = \int_a^b |\gamma'(t)|\;\d t,
+      \length(\gamma) = \int_a^b |\gamma'(t)|\;\d t,
     \]
     then
     \[
-      \left|\int_\gamma f(z)\;\d z\right| \leq \mathrm{length} (\gamma) \sup_t |f(\gamma(t))|.
+      \left|\int_\gamma f(z)\;\d z\right| \leq \length (\gamma) \sup_t |f(\gamma(t))|.
     \]
 \end{enumerate}
 
@@ -825,7 +825,9 @@ In particular, the integral depends only on the end points, and not the path its
 This is more-or-less the same proof we gave in IA Vector Calculus that a real function is a gradient if and only if the integral about any closed path vanishes.
 
 \begin{proof}
-  Pick our favorite $a_0 \in U$. For $w \in U$, we choose a path $\gamma_w: [0, 1] \to U$ such that $\gamma_w(0) = a_0$ and $\gamma_w(1) = w$. This exists because $U$ is path connected. Using some fancy topological arguments, we can indeed pick this to be piecewise linear, and hence piecewise smooth. We thus defin
+  Pick our favorite $a_0 \in U$. For $w \in U$, we choose a path $\gamma_w: [0, 1] \to U$ such that $\gamma_w(0) = a_0$ and $\gamma_w(1) = w$. We want to show we can pick $\gamma_w$ such that this is piecewise $C^1$. We already know a \emph{continuous} path $\gamma: [0, 1] \to U$ from $a_0$ to $w$ exists. Since $U$ is open, for all $x$ in the image of $\gamma$, there is some $\varepsilon(x) > 0$ such that $B(x, \varepsilon(x)) \subseteq U$. Since the image of $\gamma$ is compact, it is covered by finitely many such balls. Then it is trivial to pick a piecewise straight path living inside the union of these balls, which is clearly piecewise smooth.
+
+  We thus define
   \[
     F(w) = \int_{\gamma w} f(z)\;\d z.
   \]
@@ -850,9 +852,167 @@ This is more-or-less the same proof we gave in IA Vector Calculus that a real fu
   Thus, we know
   \begin{align*}
     \left|\frac{F(w + h) - F(w)}{h} - f(w)\right| &\leq \frac{1}{|h|} \left|\int_{\delta_h} f(z) - f(w)\;\d z\right| \\
-    &\leq \frac{1}{|h|} \mathrm{length}(\delta_h) \sup_{\delta_h} |f(z) - f(w)|\\
+    &\leq \frac{1}{|h|} \length(\delta_h) \sup_{\delta_h} |f(z) - f(w)|\\
     &=\sup_{\delta_h} |f(z) - f(w)|.
   \end{align*}
   Since $f$ is continuous, as $h \to 0$, we know $f(z) - f(w) \to 0$. So $F$ is differentiable with derivative $f$.
 \end{proof}
+
+In the proof, we constructed the piecewise straight path from $a_0$ to $w$. These paths are nice. In general, we make the following definition:
+\begin{defi}[Star-shaped domain]
+  A \emph{star-shaped domain} or \emph{star domain} is a domain $U$ such that there is some $p \in U$ such that the line segment $[p, w] \subseteq U$ for all $w \in U$.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (1, 0) -- (2, 2) -- (0, 1) -- (-2, 2) -- (-1, 0) -- (-2, -2) -- (0, -1) -- (2, -2) -- (1, 0);
+      \node [circ] {};
+      \node [below] {$p$};
+      \draw (0, 0) -- (1, 1.1) node [circ] {} node [right] {$w$};
+    \end{tikzpicture}
+  \end{center}
+\end{defi}
+This is weaker than requiring $U$ to be convex, which says any line segment between \emph{any two points} in $U$, lies in $U$.
+
+Note that we have
+\[
+  U\text{ is a disc }\Rightarrow U\text{ is convex} \Rightarrow U\text{ is star-shaped} \Rightarrow U\text{ is path-connected},
+\]
+and none of the implications reverse.
+
+Recall that when constructing the antiderivative, we assumed $\int_\gamma f(z) \;\d z = 0$ for all closed path $\gamma$. We could have required something weaker. All we needed was to intiially pick some $\gamma_w$ for each $w$, and we just need $\int_\gamma f(z)\;\d z = 0$ for all paths of the form $\gamma = \gamma_w * \delta_h * (-\gamma_{w + h})$. If $U$ is a star-shaped domain, then we can pick our pasepoint to be the special point $p$, and then these $\gamma$ are just three straight line segments.
+
+\begin{defi}[Triangle]
+  A \emph{triangle} in a domain $U$ is what it ought to be --- the Euclidean convex hull of $3$ points in $U$, lying wholly in $U$. We write its boundary as $\partial T$, which we view as an oriented piecewise $C^1$ path, ie. a contour.
+\end{defi}
+\begin{center}
+  \begin{tikzpicture}
+    \begin{scope}[shift={(-3, 0)}]
+      \draw [fill=gray!50!white] plot [smooth cycle, tension=0.7] coordinates {(0, 1) (-0.7, 0.7) (-1, 0) (-0.6, -1) (0.6, -1) (1, 0) (0.7, 0.7)};
+      \draw (-0.5, -0.5) node [circ] {} -- (0.5, -0.5) node [circ] {} -- (0, 0.366) node [circ] {} -- cycle;
+
+      \node at (0, -1.5) {good};
+    \end{scope}
+
+    \begin{scope}
+      \draw [fill=gray!50!white] plot [smooth cycle, tension=0.7] coordinates {(0, 1) (-0.7, 0.7) (-1, 0) (-0.6, -1) (0, 0) (0.6, -1) (1, 0) (0.7, 0.7)};
+      \draw (-0.5, -0.5) node [circ] {} -- (0.5, -0.5) node [circ] {} -- (0, 0.366) node [circ] {} -- cycle;
+
+      \node at (0, -1.5) {bad};
+    \end{scope}
+
+    \begin{scope}[shift={(3, 0)}]
+      \draw [fill=gray!50!white] plot [smooth cycle, tension=0.7] coordinates {(0, 1) (-0.7, 0.7) (-1, 0) (-0.6, -1) (0.6, -1) (1, 0) (0.7, 0.7)};
+      \draw (-0.5, -0.5) node [circ] {} -- (0.5, -0.5) node [circ] {} -- (0, 0.366) node [circ] {} -- cycle;
+      \draw [fill=white] (0, -0.2113) circle [radius=0.2];
+
+      \node at (0, -1.5) {really bad};
+    \end{scope}
+  \end{tikzpicture}
+\end{center}
+Our earlier result on constructing antiderivative shows:
+\begin{prop}
+  If $U$ is a star domain, and $f: U \to \C$ is continuous, and if
+  \[
+    \int_{\partial T} f(z)\;\d z = 0
+  \]
+  for all triangles $T \subseteq U$, then $f$ has an antiderivative on $U$.
+\end{prop}
+
+\begin{proof}
+  As before, taking $\gamma_w = [a_0, w] \subseteq U$ if $U$ is star-shaped about $a_0$.
+\end{proof}
+
+This is in some sense a weaker proposition --- while our hypothesis only requires the integral to vanish over triangles, and not arbitrary closed loops, we are restricted to star domains only.
+
+It turns out triangles are in general nice:
+\begin{thm}[Cauchy's theorem for a triangle]
+  Let $U$ be a domain, and let $f: U \to \C$ be holomorphic. If $T \subseteq U$ is a triangle, then $\int_{\partial T} f(z)\;\d z = 0$.
+\end{thm}
+So for holomorphic functions, the hypothesis of the previous theorem automatiaclly holds.
+
+We immediately get the following corollary, which is what we will end up using most of the time.
+\begin{cor}[Convex Cauchy]
+  If $U$ is a convex or star-shaped domain, and $f: U \to \C$ is holomorphic, then for \emph{any} closed piecewise $C^1$ paths $\gamma \in U$, we must have
+  \[
+    \int_\gamma f(z)\;\d z = 0.
+  \]
+\end{cor}
+
+\begin{proof}(of corollary)
+  If $f$ is holomorphic, then Cauchy's theorem says the integral over any triangle vanishes. If $U$ is star shaped, our proposition says $f$ has an antiderivative. Then the fundamental theorem of calculus tells us the integral around any closed path vanishes.
+\end{proof}
+
+Hence, all we need to do is to prove that fact about triangles.
+\begin{proof}(of Cauchy's theorem for a triangle)
+  Fix a triangle $T$. Let
+  \[
+    \eta = \left|\int_{\partial T} f(z)\;\d z\right|, \ell = \length (\partial T).
+  \]
+  The idea is to show for any $\varepsilon > 0$ that $\eta < \varepsilon$, and hence we must have $\varepsilon = 0$. To do so, we subdivide our triangles.
+
+  Before we start, it helps to motivate the idea of subdividing a bit. By subdividing the triangle further and further, we are focusing on a smaller and smaller region of the complex plane. This allows us to study how the integral behaves locally. This is helpful since we are given that $f$ is holomorphic, and holomorphicity is a local property.
+
+  We start with $T = T^0:$
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->-=0.2, ->-=0.533, ->-=0.866] (0, 0) -- (2, 0) -- (1, 1.732) -- cycle;
+    \end{tikzpicture}
+  \end{center}
+  We then add more lines to get $T_a^0, T_b^0, T_c^0, T_d^0$ (it doesn't really matter which is which).
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->-=0.112, ->-=0.279, ->-=0.445, ->-=0.612, ->-=0.779, ->-=0.945] (0, 0) -- (2, 0) -- (1, 1.732) -- cycle;
+      \draw [mred, ->-=0.22, ->-=0.553, ->-=0.886] (1, 0) -- (0.5, 0.866) -- (1.5, 0.866) -- cycle;
+    \end{tikzpicture}
+  \end{center}
+  Then we have
+  \[
+    \int_{\partial T^0} f(z)\;\d z = \sum_{a, b, c, d} \int_{\partial T^0_{\Cdot}} f(z)\;\d z,
+  \]
+  if we orient the middle triangle by the anticlockwise orientation, as then each internal edge occurs twice, with opposite orientation.
+
+  For this to be possible, if $\eta = \left|\int_{\partial T^0} f(z)\;\d z\right|$, then there must be some subscript in $\{a, b, c, d\}$ such that
+  \[
+    \left|\int_{\partial T^0_{\Cdot}} f(z)\;\d z\right| \geq \frac{\eta}{4}.
+  \]
+  We call this $T_{\Cdot}^0 = T^1$. Then the length of $\partial T^1$ has length
+  \[
+    \length(\partial T^0_{\Cdot}) = \frac{\ell}{2}.
+  \]
+  Iterating this, we obtain triangles
+  \[
+    T^0 \supseteq T^1 \supseteq T^2 \supseteq \cdots
+  \]
+  such that
+  \[
+    \left|\int_{\partial T^i} f(z)\;\d z\right| \geq \frac{\eta}{4^i},\quad \length (\partial T^i) = \frac{\ell}{2^i}.
+  \]
+  Now we are given a nested sequence of closed sets. By IB Metric and Topological Spaces (or IB Analysis II), there is some $z_0 \in \bigcap_{i \geq 0} T^i$.
+
+  Now fix an $\varepsilon > 0$. Since $f$ is holomorphic at $z_0$, we can find a $\delta > 0$ such that
+  \[
+    |f(w) - f(z_0) - (w - z_0) f'(z_0)| \leq \varepsilon|w - z_0|
+  \]
+  whenever $|w - z_0| < \delta$. Since the diameters of the triangles are shrinking each time, we can pick an $n$ such that $T^n \subseteq B(z_0, \varepsilon)$. We're almost there. We just need to do one last thing that is slightly sneaky. Note that
+  \[
+    \int_{\partial T^n} 1 \;\d z = 0 = \int_{\partial T^n} z \;\d z,
+  \]
+  since these functions certainly do have antiderivatives on $T^n$. Therefore, noting that $f(z_0)$ and $f'(z_0)$ are just constants, we have
+  \begin{align*}
+    \left|\int_{\partial T^n}f(z)\;\d z\right| &= \left|\int_{\partial T^n} (f(z) - f(z_0) - (z - z_0) f'(z_0))\;\d z\right|\\
+    &\leq \int_{\partial T^n} |f(z) - f(z_0) - (z - z_0) f'(z_0)|\;\d z\\
+    &\leq \length(\partial T^n) \varepsilon \sup_{z \in \partial T^n}|z - z_0|\\
+    &\leq \varepsilon \length(\partial T^n)^2,
+  \end{align*}
+  since $z_0 \in T^n$, and the distance between any two points in the triangle cannot be greater than the perimeter of the triangle. Substituting our fomulas for these in, we have
+  \[
+    \frac{\eta}{4^n}\leq \frac{1}{4^n} \ell^2 \varepsilon.
+  \]
+  So
+  \[
+    \eta \leq \ell^2 \varepsilon.
+  \]
+  Since $\ell$ is fixed and $\varepsilon$ was arbitrary, it follows that we must have $\eta = 0$.
+\end{proof}
+Is this the best we can do? Can we formulate this for an arbitrary domain, and not just star-shaped ones? It is obviously not true if the domain is not simply connected, eg. for $f(z) = \frac{1}{z}$ defined on $\C \setminus \{0\}$. However, it turns out Cauchy's theorem holds as long as the domain is simply connected, but we probably won't get to prove that. However, this is not surprising given the Riemann mapping theorem, since any simply connected domain is conformally eequivalent to the unit disk.
+
 \end{document}
