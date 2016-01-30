@@ -688,7 +688,7 @@ We are now going to prove a theorem about the area of spherical triangles. This 
   \]
 \end{prop}
 
-\newcommand\filllune[9]{
+\newcommand\filllunefront[9]{
   \pgfmathsetmacro{\xx}{#3 * cos(#4)};
   \pgfmathsetmacro{\xy}{#3 * sin(#4)};
   \pgfmathsetmacro{\yx}{#3 * cos(#5)};
@@ -707,6 +707,15 @@ We are now going to prove a theorem about the area of spherical triangles. This 
   \pgfpatharcto{#3 cm}{#3 cm}{0}{0}{#9}{\pgfpoint{\yx cm}{\yy cm}};
   \pgfpatharcto{#3 cm}{#7 cm}{#5}{0}{#9}{\pgfpoint{#1}{#2}};
   \pgfusepath{fill};
+}
+
+\newcommand\fillluneback[9]{
+  \pgfmathsetmacro{\xx}{#3 * cos(#4)};
+  \pgfmathsetmacro{\xy}{#3 * sin(#4)};
+  \pgfmathsetmacro{\yx}{#3 * cos(#5)};
+  \pgfmathsetmacro{\yy}{#3 * sin(#5)};
+
+  \color{#8};
 
   \pgfsetfillopacity{0.11};
   \pgfpathmoveto{\pgfpoint{-#1}{-#2}};
@@ -721,7 +730,6 @@ We are now going to prove a theorem about the area of spherical triangles. This 
   \pgfpatharcto{#3 cm}{#7 cm}{#5}{0}{int(1-#9)}{\pgfpoint{-#1}{-#2}};
   \pgfusepath{fill};
 }
-
 \begin{proof}
   We start with the concept of a double lune. A \emph{double lune} with angle $0 < \alpha < \pi$ is two regions $S$ cut out by two planes through a pair of antipodal points, where $\alpha$ is the angle between the two planes.
   \begin{center}
@@ -753,7 +761,8 @@ We are now going to prove a theorem about the area of spherical triangles. This 
       \getCoord{\ax}{\ay}{A};
       \getCoord{\aax}{\aay}{A'};
       \begin{pgfonlayer}{col}
-        \filllune{\ax}{\ay}{\radius}{\ct}{\dt}{\crad}{\drad}{mblue}{1};
+        \filllunefront{\ax}{\ay}{\radius}{\ct}{\dt}{\crad}{\drad}{mblue}{1};
+        \fillluneback{\ax}{\ay}{\radius}{\ct}{\dt}{\crad}{\drad}{mblue}{1};
       \end{pgfonlayer}
 
     \end{tikzpicture}
@@ -810,9 +819,13 @@ We are now going to prove a theorem about the area of spherical triangles. This 
       \getCoord{\cx}{\cy}{C};
 
       \begin{pgfonlayer}{col}
-        \filllune{\ax}{\ay}{\radius}{\ct}{\dt}{\crad}{\drad}{mblue}{1};
-        \filllune{\bx}{\by}{\radius}{\ct}{180+\et}{\crad}{\erad}{mgreen}{0};
-        \filllune{\cx}{\cy}{\radius}{\dt}{\et}{\drad}{\erad}{morange}{1};
+        \fillluneback{\ax}{\ay}{\radius}{\ct}{\dt}{\crad}{\drad}{mblue}{1};
+        \fillluneback{\bx}{\by}{\radius}{\ct}{180+\et}{\crad}{\erad}{mgreen}{0};
+        \fillluneback{\cx}{\cy}{\radius}{\dt}{\et}{\drad}{\erad}{morange}{1};
+
+        \filllunefront{\ax}{\ay}{\radius}{\ct}{\dt}{\crad}{\drad}{mblue}{1};
+        \filllunefront{\bx}{\by}{\radius}{\ct}{180+\et}{\crad}{\erad}{mgreen}{0};
+        \filllunefront{\cx}{\cy}{\radius}{\dt}{\et}{\drad}{\erad}{morange}{1};
       \end{pgfonlayer}
     \end{tikzpicture}
   \end{center}
@@ -830,7 +843,7 @@ Moreover, if $M$ is a convex $n$-gon on $S^2$ (with $n \geq 3$), ie. if $P, Q \i
 \]
 This is easy to show by cutting the polygon up into triangles.
 
-\subsubsection*{M\"obius geometry}
+\subsection{M\"obius geometry}
 One other useful thing in the study of spherical geometry is M\"obius transformations.
 
 Consider $\C_\infty = \C \cup \{\infty\}$, the extended complex plane, with coordinates $\zeta \in \C_\infty$. One useful notion is the \emph{stereographic projection} $\pi: S^2 \to \C_\infty$, which is a bijection given by
@@ -884,7 +897,7 @@ Then we obtain the formula
   \pi(x, y, z) = \frac{x + iy}{1 - z}
 \]
 \begin{lemma}
-  if $\pi': S^2 \to C_{\infty}$ denotes the stereographic projection from the South Pole instead, then
+  If $\pi': S^2 \to \C_{\infty}$ denotes the stereographic projection from the South Pole instead, then
   \[
     \pi'(P) = \frac{1}{\overline{\pi(P)}}.
   \]
@@ -907,4 +920,169 @@ Then we obtain the formula
 \end{proof}
 
 We can use this to infer that $\pi' \circ \pi^{-1}: C_{\infty} \to C_{\infty}$ takes $\zeta \mapsto \frac{1}{\bar{\zeta}}$, which is the inversion in the unit circle $|\zeta| = 1$.
+
+M\"obius transformations act on $\C_{\infty}$ and form a group $G$ by composition. For each matrix
+\[
+  A =
+  \begin{pmatrix}
+    a & b\\
+    c & d
+  \end{pmatrix} \in \GL(2, \C),
+\]
+we get a M\"obius map $\C_\infty \to \C_\infty$ by
+\[
+  \zeta \mapsto \frac{a \zeta + b}{c \zeta + d}.
+\]
+Moreover, composition of M\"obius map is the same multiplication of matrices.
+
+This is not exactly a bijective map between $G$ and $\GL(2, \C)$. For any $\lambda \in \C^* = \C \setminus \{0\}$, we know $\lambda A$ defines the same map M\"obius map as $A$. Conversely, if $A_1$ and $A_2$ gives the same M\"obius map, then there is some $\lambda_1 \not= 0$ such that $A_1 = \lambda A_2$.
+
+Hence, we have
+\[
+  G \cong \PGL(2, \C) = \GL(2, \C)/\C^*,
+\]
+where
+\[
+  \C^* \cong \{ \lambda I: \lambda \in \C^*\}.
+\]
+Instead of taking the whole $\GL(2, \C)$ and quotienting out multiples of the identities, we can instead start with $\SL(2, \C)$. Again, $A_1, A_2 \in \SL(2, \C)$ define the same map if and only if $A_1 = \lambda A_2$ for some $\lambda$. What are the possible values of $\lambda$? By definition of the special linear group, we must have
+\[
+  1 = \det(\lambda A) = \lambda^2 \det A = \lambda^2.
+\]
+So $\lambda^2 = \pm 1$. So each M\"obius map is represented by two matrices, $A$ and $-A$, and we get
+\[
+  G \cong \PSL(2, \C) = \SL(2, \C)/\{\pm 1\}.
+\]
+Now let's think about the sphere. On $S^2$, the rotations $\SO(3)$ act as isometries. In fact, the full isometry group of $S^2$ is $\Or(3)$. The proof is on the first example sheet.
+
+\begin{thm}
+  Via the stereographic projection, every rotation of $S^2$ induces a M\"obius map defined by a matrix in $\SU(2) \subseteq \GL(2, \C)$, where
+  \[
+    \SU(2) = \left\{
+      \begin{pmatrix}
+        a & -b\\
+        \bar{b} & \bar{a}
+      \end{pmatrix}
+      : |a|^2 + |b|^2 = 1
+    \right\}.
+  \]
+\end{thm}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item Consider the $r(\hat{\mathbf{z}}, \theta)$, the rotations about the $z$ axis by $\theta$. These corresponds to the M\"obius map $\zeta \mapsto e^{i\theta} \zeta$, which is given by the unitary matrix
+      \[
+        \begin{pmatrix}
+          e^{i\theta/2} & 0\\
+          0 & e^{-i\theta/2}.
+        \end{pmatrix}
+      \]
+    \item Consider the rotation $r(\hat{\mathbf{y}}, \frac{\pi}{2})$. This has the matrix
+      \[
+        \begin{pmatrix}
+          0 & 0 & 1\\
+          0 & 1 & 0\\
+          -1 & 0 & 0
+        \end{pmatrix}
+        \begin{pmatrix}
+          x\\y\\z
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+          z\\y\\-x
+        \end{pmatrix}.
+      \]
+      This corresponds to the map
+      \[
+        \zeta = \frac{x + iy}{1 - z} \mapsto \zeta' = \frac{z + iy}{1 + x}
+      \]
+      We want to show this is a M\"obius map. To do so, we guess what the M\"obius map should be, and check it works. We can manually compute that $-1 \mapsto \infty$, $1 \mapsto 0$, $i \mapsto i$.
+      \begin{center}
+        \begin{tikzpicture}
+          \draw circle [radius=2.5];
+          \draw (-2.5, 0) arc(180:360:2.5 and 0.5);
+          \draw [dashed] (-2.5, 0) arc(180:0:2.5 and 0.6);
+
+          \node [circ] at (-2.5, 0) {};
+          \node [circ] at (2.5, 0) {};
+          \node [circ] at (-0.5, -0.49) {};
+          \node [left] at (-2.5, 0) {$1$};
+          \node [right] at (2.5, 0) {$-1$};
+          \node [below] at (-0.5, -0.49) {$i$};
+
+          \node [circ] at (0, -2.5) {};
+          \node [below] at (0, -2.5) {$0$};
+          \node [circ] at (0, 2.5) {};
+          \node [above] at (0, 2.5) {$\infty$};
+        \end{tikzpicture}
+      \end{center}
+      The only M\"obius map that does this is
+      \[
+        \zeta' = \frac{\zeta - 1}{\zeta + 1}.
+      \]
+      We now check:
+      \begin{align*}
+        \frac{\zeta - 1}{\zeta + 1} &= \frac{x + iy - 1 + z}{x + iy + 1 - z}\\
+        &= \frac{x - 1 + z + iy}{x + 1 - (z - iy)}\\
+        &= \frac{(z + iy)(x - 1 + z + iy)}{(x + 1)(z + iy) - (z^2 + y^2)}\\
+        &= \frac{(z + iy)(x - 1 + z + iy)}{(x + 1)(z + iy) + (x^2 - 1)}\\
+        &= \frac{(z + iy)(x - 1 + z + iy)}{(x + 1)(z + iy + x - 1)}\\
+        &= \frac{z + iy}{x + 1}.
+      \end{align*}
+      So done. We finally have to write this in the form of an $\SU(2)$ matrix:
+      \[
+        \frac{1}{\sqrt{2}}
+        \begin{pmatrix}
+          1 & -1\\
+          1 & 1
+        \end{pmatrix}.
+      \]
+    \item We claim that $\SO(3)$ is generated by $r\left(\hat{\mathbf{y}}, \frac{\pi}{2}\right)$ and $r(\hat{\mathbf{z}}, \theta)$ for $0 \leq \theta < 2\pi$.
+
+      To show this, we observe that $r(\hat{\mathbf{x}}, \phi) = r(\hat{\mathbf{y}}, \frac{\pi}{2}) r(\hat{\mathbf{z}}, \varphi) r(y, -\frac{\pi}{2})$. Note that we read the composition from right to left. You can convince yourself this is true by taking a physical sphere and try rotating. To prove it formally, we can just multiply the matrices out.
+
+      Next, observe that for $\mathbf{v} \in S^2 \subseteq \R^3$, there are some angles $\varphi, \psi$ such that $g = r(\hat{\mathbf{z}}, \psi) r(\hat{\mathbf{x}}, \psi)$ maps $\mathbf{v}$ to $\hat{\mathbf{x}}$. We can do so by first picking $r(\mathbf{x}, \varphi)$ to rotate $\mathbf{v}$ into the $(x, y)$-plane. Then we rotate about the $z$-axis to send it to $\hat{\mathbf{x}}$. This is in fact just what we do in spherical polar coordinates!
+
+      Then for any $\theta$, we have $r(\mathbf{v}, \theta) = g^{-1} r(x, \theta) g$, and our claim follows by composition.
+    \item Thus, via the stereographic projection, every rotation of $S^2$ corresponds to products of M\"obius transformations of $\C_\infty$ with matrices in $\SU(2)$.
+  \end{enumerate}
+\end{proof}
+The key of the proof is step (iii). Apart from enabling us to perform the proof, it exemplifies a useful technique in geometry --- we know how to rotate arbitrary things in the $z$ axis. When we want to rotate things about the $x$ axis instead, we first rotate the sphere to move the $x$ axis to where the $z$ axis used to be, do those rotations, and then rotate it back. In general, we can use some isometries or rotations to move what we want to do to a convenient location.
+
+\begin{thm}
+  The group of rotations $\SO(3)$ acting on $S^2$ corresponds precisely with the subgroup $\PSU(2) = \SU(2)/ \pm 1$ of M\"obius transformations acting on $\C_\infty$.
+\end{thm}
+What this is in some sense a converse of the previous theorem. We are saying that for each M\"obius map from $\SU(2)$, we can find some rotation of $S^2$ that induces that M\"obius map, and there is exactly one.
+
+\begin{proof}
+  Let $g \in \PSU(2)$ be a M\"obius transformation
+  \[
+    g(z) = \frac{az + b}{\bar{b} z + \bar{a}}.
+  \]
+  Suppose first that $g(0) = 0$. So $b = 0$. So $a\bar{a} = 1$. Hence $a = e^{i\theta/2}$. Then $g$ corresponds to $r(\hat{\mathbf{z}}, \theta)$, as we have previously seen.
+
+  In general, let $g(0) = w \in \C_\infty$. Let $Q \in S^2$ be such that $\pi(Q) = w$. Choose a rotation $A \in \SO(3)$ such that $A(Q) = -\hat{\mathbf{z}}$. Since $A$ is a rotation, let $\alpha \in \PSU(2)$ be the corresponding M\"obius transformation. By construction we have $\alpha(w) = 0$. Then the composition $\alpha \circ g$ fixes zero. So it corresponds to some $B = r(z, \theta)$. We then see that $g$ corresponds to $A^{-1} B \in \SO(3)$. So done.
+\end{proof}
+Again, we solved an easy case, where $g(0) = 0$, and then performed some rotations to transform any other case into this simple case.
+
+We have now produced a $2$-to-$1$ map
+\[
+  \SU(2) \to \PSU(2) \cong \SO(3).
+\]
+If we treat these groups as topological spaces, this map does something funny.
+
+We start with a (non-closed) path from $I$ to $-I$ in $\SU(2)$. Applying the map, we get a \emph{closed} loop from $I$ to $I$ in $\SO(3)$.
+
+Hence, in $\SO(3)$, loops are behave slightly weirdly. If we go around the loop in $\SO(3)$, we didn't really get back to the same place. Instead, we have actually moved from $I$ to $-I$ in $\SU(2)$. It takes \emph{two} full loops to actually get back to $I$. In physics, this corresponds to the idea of spinors.
+
+We can also understand this topologically as follows: since $\SU(2)$ is defined by two complex points $a, b \in \C$ such that $|a|^2 + |b|^2$, we can view it as as three-sphere $S^3$ in $\SO(3)$.
+
+A nice property of $S^3$ is it is \emph{simply connected}, as in any loop in $S^3$ can be shrunk to a point. In other words, given any loop in $S^3$, we can pull and stretch it (continuously) until becomes the ``loop'' that just stays at a single point.
+
+On the other hand, $\SO(3)$ is not simply connected. We have just constructed a loop in $\SO(3)$ from the path from $I$ to $-I$ in $\SU(2)$. We \emph{cannot} deform this loop until it just sits at a single point, since if we lift it back up to $\SU(2)$, it still has to move from $I$ to $-I$.
+
+The neat thing is that in some sense, $S^3 \cong \SU(2)$ is just ``two copies'' of $\SO(3)$. By duplicating $\SO(3)$, we have produced $\SU(2)$, a simply connected space. Thus we say $\SU(2)$ is a \emph{universal cover} of $\SO(3)$.
+
+We've just been waffling about spaces and loops, and throwing around terms we haven't defined properly. These vague notions will be made precise in IID Algebraic Topology, and we will then (maybe) see that $\SU(2)$ is a \emph{universal cover} of $\SO(3)$.
+
 \end{document}

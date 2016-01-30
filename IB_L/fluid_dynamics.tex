@@ -224,7 +224,7 @@ We know that this block of fluid moves in the $x$ direction without acceleration
 
 We first consider the $x$ direction. There are normal stresses at the sides, and tangential stresses at the top and bottom. The sum of forces in the $x$-direction (per unit transverse width) gives
 \[
-  p(x) \delta y - p(x + \delta x) \delta y + \tau_s(t + \delta y) \delta x + \tau_s(\tau) \delta x = 0.
+  p(x) \delta y - p(x + \delta x) \delta y + \tau_s(y + \delta y) \delta x + \tau_s(y) \delta x = 0.
 \]
 By the definition of $\tau_s$, we can write
 \[
@@ -489,7 +489,7 @@ The no slip condition gives $u = 0$ when $y = 0$. The other condition is that th
 
 The solution is thus
 \[
-  u = \frac{gp\sin \alpha}{2 \mu} y(2h - y).
+  u = \frac{g\rho\sin \alpha}{2 \mu} y(2h - y).
 \]
 This is a bit like the Poiseuille flow, with $\frac{gp \sin \alpha}{2\mu}$ as the pressure gradient. But instead of going to zero at $y = h$, we get to zero at $y = 2h$ instead. So this is half a Poiseuille flow. % diagram
 
@@ -689,4 +689,220 @@ We have previously handwavily talked about incompressible flows. We now make thi
 For parallel flow, $\mathbf{u} = (u, 0, 0)$. So if the flow is incompressible, we must have $\frac{\partial u}{\partial x} = \nabla \cdot \mathbf{u} = 0$. So we considered $u$ of the form $u = u(y, z, t)$.
 
 Of course, incompressibility is just an approximation. Since we can hear things, everything must be compressible. So what really matters is whether the slow speed is small compared to the speed of sound. If it is relatively small, then incompressibility is a good approximation. In air, the speed of sound is approximately $\SI{340}{\meter\per\second}$. In water, the speed of sound is approximately $\SI{1500}{\meter\per\second}$.
+
+\subsection{Kinematic boundary conditions}
+Suppose our system has a boundary. There are two possible cases --- either the boundary is rigid, like a wall, or it moves with the fluid. One important property of the boundary is that fluids are not allowed to pass through them.
+
+To deal with boundaries, we first suppose it has a velocity $\mathbf{U}$ (which may vary with position if the boundary extends through space). We define a local reference frame moving with velocity $\mathbf{U}$, so that in this frame of reference, the boundary is stationary.
+
+In this frame of reference, the fluid has relative velocity
+\[
+  \mathbf{u}' = \mathbf{u} - \mathbf{U}.
+\]
+As we mentioned, fluids are not allowed to cross the boundary. Let the normal to the boundary be $\mathbf{n}$, then we must have
+\[
+  \mathbf{u}' \cdot \mathbf{n} = 0.
+\]
+In terms of the outside frame, we get
+\[
+  \mathbf{u}\cdot \mathbf{n} = \mathbf{U} \cdot \mathbf{n}.
+\]
+This is the condition we have for the boundary.
+\subsubsection{Stationary rigid boundary}
+If we have a stationary rigid boundary, eg. the wall, then $\mathbf{U} = \mathbf{0}$. So our boundary condition is
+\[
+  \mathbf{u}\cdot \mathbf{n}= 0.
+\]
+\subsubsection{Free material boundary}
+A good example of a free material body is the surface of a water wave, or interface between two immiscible fluids --- say oil and water.
+\begin{center}
+  \begin{tikzpicture}
+    \draw (0, 0) sin (1, 0.2) cos (2, 0) sin (3, -0.2) cos (4, 0);
+    \node at (3, 1) {air};
+    \node at (3, -1) {water};
+
+    \draw [->] (1, 0.2) -- +(0, 0.7) node [above] {$\mathbf{n}$};
+
+    \node [circ] at (3, -0.2) {};
+    \node [above] at (3, -0.2) {$\zeta(x, y, t)$};
+  \end{tikzpicture}
+\end{center}
+We can define the surface by a function
+\[
+  z = \zeta(x, y, t).
+\]
+We can alternatively define the surface as a contour of
+\[
+  F(x, y, z, t) = z - \zeta(x, y, t).
+\]
+Then the surface is defined by $F = 0$. By IA vector calculus, the normal is parallel to
+\[
+  \mathbf{n} \parallel \nabla F = (-\zeta_x, -\zeta_y, 1).
+\]
+Also, we have
+\[
+  \mathbf{U} = (0, 0, \zeta_t).
+\]
+We now let the velocity of the fluid be
+\[
+  \mathbf{u} = (u, v, w).
+\]
+Then the boundary condition requires
+\[
+  \mathbf{u}\cdot \mathbf{n} = \mathbf{U}\cdot \mathbf{n}.
+\]
+In other words, we have
+\[
+  -u \zeta_x - v\zeta_y + w = \zeta_t.
+\]
+So we get
+\[
+  w = u \zeta_x + v\zeta_y + \zeta_t = \mathbf{u}\cdot \nabla \zeta + \delta t = \frac{\D \zeta}{\D t}.
+\]
+So all the boundary condition says is
+\[
+  \frac{\D \zeta}{\D t} = w.
+\]
+Alternatively, since $F$ is a material surface, its material derivative must vanish. So
+\[
+  \frac{\D F}{\D t} = 0,
+\]
+and this just gives the same result as above. We will discuss surface waves towards the end of the course, and then come back and use this condition.
+
+\subsection{Streamfunction for incompressible flow}
+We suppose our fluid is incompressible, ie.
+\[
+  \nabla \cdot \mathbf{u} = 0.
+\]
+By IA Vector Calculus, this implies there is a vector potential $\mathbf{A}$ such that
+\begin{defi}[Vector potential]
+  A \emph{vector potential} is an $\mathbf{A}$ such that
+  \[
+    \mathbf{u} = \nabla \times \mathbf{A}.
+  \]
+\end{defi}
+
+\subsubsection{Two-dimensional flow}
+Imagine we are living in the $x, y$ plane, and hence
+\[
+  \mathbf{u} = (u(x, y, t), v(x, y, t), 0).
+\]
+(we can also imagine this as a flow that does not depend on the $z$ dimension). Then we can immediately know $\mathbf{A}$ is of the form
+\[
+  \mathbf{A} = (0, 0, \psi(x, y, t)),
+\]
+Taking the curl of this, we get
+\[
+  \mathbf{u} = \left(\frac{\partial \psi}{\partial y}, -\frac{\partial \psi}{\partial x}, 0\right).
+\]
+\begin{defi}[Streamfunction]
+  The $\psi$ such that $\mathbf{A} = (0, 0, \psi)$ is the \emph{streamfunction}.
+\end{defi}
+This streamfunction is both physically significant, and mathematically convenient, as we will soon see.
+
+We look at some properties of the streamfunction
+\subsubsection{Properties of the streamfunction}
+This is related to question 7 on the first example sheet.
+
+The first thing we can do is to look at the contours $\psi = c$. These have normal
+\[
+  \mathbf{n} = \nabla \psi = \left(\psi_x, \psi_y, 0\right).
+\]
+We immediately see that
+\[
+  \mathbf{u}\cdot \mathbf{n} = \frac{\partial \psi}{\partial x} \frac{\partial \psi}{\partial y} - \frac{\partial \psi}{\partial y}\frac{\partial \psi}{\partial x} = 0.
+\]
+So the flow is perpendicular to the normal, ie. tangent to the contours of $\psi$.
+\begin{defi}[Streamlines]
+  The \emph{streamlines} are the contours of the streamfunction $\psi$.
+\end{defi}
+This gives an instantaneous picture of flow.
+
+Note that if the flow is \emph{unsteady}, then the streamlines are \emph{not} particle paths.
+\begin{eg}
+  Consider $\mathbf{u} = (t, 1, 0)$. When $t = 0$, the velocity is purely in the $y$ direction, and the streamlines are also vertical; at $t = 1$, the velocity makes an $45^\circ$ angle with the horizontal, and the streamlines are slanted:
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->-=0.57] (0, 0) -- +(0, 2);
+      \draw [->-=0.57] (0.5, 0) -- +(0, 2);
+      \draw [->-=0.57] (1, 0) -- +(0, 2);
+      \draw [->-=0.57] (1.5, 0) -- +(0, 2);
+      \draw [->-=0.57] (2, 0) -- +(0, 2);
+
+      \node [below] at (1, -0.5) {$t = 0$};
+
+      \begin{scope}[shift={(4, 0)}]
+        \draw [->-=0.6] (0, 0) -- +(2, 2);
+        \draw [->-=0.6] (0.5, 0) -- +(2, 2);
+        \draw [->-=0.6] (1, 0) -- +(2, 2);
+        \draw [->-=0.6] (1.5, 0) -- +(2, 2);
+        \draw [->-=0.6] (2, 0) -- +(2, 2);
+
+        \node [below] at (1, -0.5) {$t = 1$};
+      \end{scope}
+    \end{tikzpicture}
+  \end{center}
+  However, \emph{no} particles will actually follow any of these streamlines. For a particle released at $\mathbf{x}_0 = (x_0, y_0)$. Then we get
+  \[
+    \dot{x}(t) = u = t,\quad \dot{y} = v = 1.
+  \]
+  Hence we get
+  \[
+    x = \frac{1}{2}t^2 + x_0,\quad y = t + y_0.
+  \]
+  Eliminating $t$, we get that the path is given by
+  \[
+    (x - x_0) = \frac{1}{2}(y - y_0)^2.
+  \]
+  So the particle paths are parabolas.
+\end{eg}
+Note that the flow is faster where streamlines are closer together:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [-<-=0.44] (4, 0.5) parabola (0, 1);
+    \draw [-<-=0.44] (4, 0) -- (0, 0);
+    \draw [-<-=0.44] (4, -0.5) parabola (0, -1);
+
+    \node [left] {slow};
+    \node [right] at (4, 0) {fast};
+  \end{tikzpicture}
+\end{center}
+This is since the fluid between any two stream lines must be between the stream lines. So if the flow is incompressible, to conserve mass, they mast move faster when the streamlines are closer.
+
+We can also consider the volume flux (per unit length in the $z$-direction), crossing any curve from $\mathbf{x}_0$ to $\mathbf{x}_1$.
+\begin{center}
+  \begin{tikzpicture}
+    \draw [-<-=0.44] (4, 0.5) parabola (0, 1);
+    \draw [-<-=0.44] (4, 0) -- (0, 0);
+    \draw [-<-=0.44] (4, -0.5) parabola (0, -1);
+
+    \draw [mred, thick] plot [smooth, tension=1] coordinates {(1, 0.78125) (2, 0.3) (3, -0.53125)};
+    \node [left] {slow};
+    \node [right] at (4, 0) {fast};
+
+    \node [circ] at (1, 0.78125) {};
+    \node [above] at (1, 0.78125) {$\mathbf{x}_0$};
+    \node [circ] at (3, -0.53125) {};
+    \node [below] at (3, -0.53125) {$\mathbf{x}_1$};
+
+    \draw [->] (0.5, 0.45) -- (1, 0.4) node [right] {$\mathbf{u}$};
+
+  \end{tikzpicture}
+\end{center}
+% some flow, path from x_0 to x_1 crossing streamlines, label path as $\Gamma$. Label \mathbf{u} and \mathbf{n}
+Then the volume flux is
+\[
+  q = \int_{\mathbf{x}_0}^{\mathbf{x}_1} \mathbf{u}\cdot \mathbf{n}\;\d \ell.
+\]
+We see that
+\[
+  \mathbf{n}\;\d \ell = (-\d y, \d x).
+\]
+So we can write this as
+\[
+  q = \int_{\mathbf{x}_0}^{\mathbf{x}_1} -\frac{\partial \psi}{\partial y}\;\d y - \frac{\partial \psi}{\partial x}\;\d x = \psi(\mathbf{x}_0) - \psi(\mathbf{x}_1).
+\]
+So the flux depends only the difference in the value of $\psi$. Hence, for closer streamlines, to maintain the same volume flux, we need a higher speed.
+
+Also, note that $\psi$ is constant on a stationary rigid boundary, ie. the boundary is a streamline, since the flow is tangential at the boundary. This is a consequence of $\mathbf{u}\cdot \mathbf{n} = 0$. We often choose $\psi = 0$ as our boundary.
 \end{document}

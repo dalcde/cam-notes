@@ -719,6 +719,336 @@ Often, the easiest way to find the image set of a conformal map acting on a set 
         \end{tikzpicture}
       \end{center}
       The map sends $1 \mapsto 2 \mapsto 3 \mapsto 4 \mapsto 1$ and $5 \mapsto 6 \mapsto 7 \mapsto 8 \mapsto 5$. In particular, this agrees with what we had above --- it sends the complete circle to the left hand half plane.
+    \item Consider the map $f(z) = \frac{1}{z}$. This is just another M\"obius map! Hence everything we know about M\"obius maps apply to this. In particular, it is useful for acting on vertical and horizontal lines. Details are left for the first example sheet.
   \end{enumerate}
 \end{eg}
+In practice, complicated conformal maps are usually built up from individual building blocks, each a simple conformal map. The required map is the composition of these. For this to work, we have to note that the composition of conformal maps is conformal, by the chain rule.
+
+\begin{eg}
+  Suppose we want to map the upper half-disc $|z| < 1$, $\Im z > 0$ to the full disc $|z| < 1$. We might want to just do $z \mapsto z^2$. However, this does not work, since the image does not include the non-negative real axis, say $z = \frac{1}{2}$. Instead, we need to do something more complicated. We will do this in several steps:
+  \begin{enumerate}
+    \item We apply $f_1(z) = \frac{z - 1}{z + 1}$ to take the half-disc to the second quadrant.
+    \item We now recall that $f_1$ also takes the right-hand half plane to the disc. So we square and rotate to get the right-hand half plane. We apply $f_2(z) = iz^2$.
+    \item We apply $f_3(z) = f_1(z)$ again to obtain the disc.
+  \end{enumerate}
+  Then the desired conformal map is $f_3 \circ f_2 \circ f_1$, you can, theoretically, expand this out and get an explicit expression, but that would be a waste of time.
+  \begin{center}
+    \begin{tikzpicture}[scale=0.5]
+      \fill [mblue, opacity=0.5] (2, 0) arc (0:180:2) -- (2, 0);
+      \draw (2, 0) arc (0:180:2);
+      \draw (-3, 0) -- (3, 0);
+      \draw (0, -3) -- (0, 3);
+
+      \draw [->] (4, 0) -- (6, 0) node [pos=0.5, above] {$z \mapsto \frac{z - 1}{z + 1}$};
+      \begin{scope}[shift={(10,0)}]
+        \fill [mblue, opacity=0.5] (-3, 3) rectangle (0, 0);
+        \draw (-3, 0) -- (3, 0);
+        \draw (0, -3) -- (0, 3);
+      \end{scope}
+
+      \begin{scope}[shift={(0,-8)}]
+        \draw [->] (-6, 0) -- (-4, 0) node [pos=0.5, above] {$z \mapsto iz^2$};
+
+        \fill [mblue, opacity=0.5] (0, 3) rectangle (3, -3);
+        \draw (-3, 0) -- (3, 0);
+        \draw (0, -3) -- (0, 3);
+
+        \draw [->] (4, 0) -- (6, 0) node [pos=0.5, above] {$z \mapsto \frac{z - 1}{z + 1}$};
+      \end{scope}
+
+      \begin{scope}[shift={(10,-8)}]
+        \fill [mblue, opacity=0.5] circle [radius=2];
+        \draw circle [radius=2];
+        \draw (-3, 0) -- (3, 0);
+        \draw (0, -3) -- (0, 3);
+      \end{scope}
+    \end{tikzpicture}
+  \end{center}
+\end{eg}
+
+
+\subsection{Solving Laplace's equation using conformal maps}
+The following algorithm can be used to solve Laplace's Equation $\nabla^2 \phi(x, y) = 0$ on a tricky domain $U \subseteq \R^2$ with given Dirichlet boundary conditions on $\partial U$. We now pretend $\R^2$ is actually $\C$, and identify subsets of $\R^2$ with subsets of $\C$ in the obvious manner.
+\begin{enumerate}
+  \item Find a conformal map $f: U \to V$, where $U$ is now considered a subset of $\C$, and $V$ is a ``nice'' domain of our choice. Our aim is to find a harmonic function $\Phi$ in $V$ that satisfies the same boundary conditions as $\phi$.
+  \item Map the boundary conditions on $\partial U$ directly to the equivalent points on $\partial V$.
+  \item Now solve $\nabla^2 \Phi = 0$ in $V$ with the new boundary conditions.
+  \item The required harmonic function $\phi$ in $U$ is then given by
+    \[
+      \phi(x, y) = \phi(\Re(f(x + iy)), \Im f(x + iy)).
+    \]
+\end{enumerate}
+To prove this works, we can take the $\nabla^2$ of this expression, write $f = u + iv$, use the Cauchy-Riemann equation, and expand the mess.
+
+Alternatively, we perform magic. Note that since $\Phi$ is harmonic, it is the real part of some complex analytic function $F(z) = \Phi(x, y) + i \Psi(x, y)$, where $z = x + iy$. Now $F(f(z))$ is analytic, as it is a composition of analytic functions. So its real part, which is $\Phi(\Re f, \Im f)$, is harmonic.
+
+Let's do an example. In this case, you might be able to solve this directly just by looking at it, using what you've learnt from IB Methods. However, we will do it with this complex methods magic.
+\begin{eg}
+  Find a bounded solution of $\nabla^2 \phi = 0$ on the first quadrant of $\R^2$ subject to $\phi(x, 0) = 0$ and $\phi(0, y) = 1$ when, $x, y > 0$.
+
+  This is a bit silly, since our $U$ is supposed to be a nasty region, but our $U$ is actually quite nice. Nevertheless, we still do this since this is a good example.
+
+  We choose $f(z) = \log z$, which maps $U$ to the strip $0 < \Im z < \frac{\pi}{2}$.
+  \begin{center}
+    \begin{tikzpicture}[scale=0.75]
+      \fill [mblue, opacity=0.5] (3, 3) rectangle (0, 0);
+      \draw (-3, 0) -- (0, 0);
+      \draw (0, -3) -- (0, 0);
+
+      \node at (1.5, 1.5) {$U$};
+      \node [mred, left] at (0, 1.5) {$1$};
+      \node [mgreen, below] at (1.5, 0) {$0$};
+      \draw [thick, mgreen] (0, 0) -- (3, 0);
+      \draw [thick, mred] (0, 0) -- (0, 3);
+
+      \draw [->] (3.5, 0) -- (5.5, 0) node [pos=0.5, above] {$z \mapsto \log z$};
+      \begin{scope}[shift={(9,0)}]
+        \fill [mblue, opacity=0.5] (-3, 1) rectangle (3, 0);
+
+        \node at (1, 0.5) {$V$};
+        \draw [mgreen, thick] (-3, 1) -- (3, 1);
+        \draw [mred, thick] (-3, 0) -- (3, 0);
+        \draw (0, -3) -- (0, 3);
+
+        \node [anchor = south west] at (0, 1) {$i\frac{\pi}{2}$};
+        \node [anchor = north west] at (0, 0) {$0$};
+
+        \node [mgreen, below] at (-1, 0) {$0$};
+        \node [mred, above] at (-1, 1) {$1$};
+      \end{scope}
+    \end{tikzpicture}
+  \end{center}
+  Recall that we said $\log$ maps an annulus to a rectangle. This is indeed the case here --- $U$ is an annulus with zero inner radius and infinite outer radius; $V$ is an infinitely long rectangle.
+
+  Now, we must now solve $\nabla^2 \Phi = 0$ in $V$ subject to
+  \[
+    \Phi(x, 0) = 0,\quad \Phi\left(x, \frac{\pi}{2}\right) = 1
+  \]
+  for all $x \in \R$. Note that we have these boundary conditions since $f(z)$ takes positive real axis of $\partial V$ to the line $\Im z = 0$, and the positive imaginary axis to $\Im z = \frac{\pi}{2}$.
+
+  By inspection, the solution is
+  \[
+    \Phi(x, y) = \frac{2}{\pi}y.
+  \]
+  Hence,
+  \begin{align*}
+    \Phi(x, y) &= \Phi(\Re \log z, \Im \log z)\\
+    &= \frac{2}{\pi} \Im \log z\\
+    &= \frac{2}{\pi} \tan^{-1}\left(\frac{y}{x}\right).
+  \end{align*}
+\end{eg}
+
+\section{Contour integration and Cauchy's theorem}
+\subsection{Contour and integrals}
+Most of this section will be definitions and stuff like that. Got to be done some time.
+
+\begin{defi}[Curve]
+  A \emph{curve} $\gamma(t)$ is a (continuous) map $\gamma: [0, 1] \to \C$.
+\end{defi}
+
+\begin{defi}[Closed curve]
+  A \emph{closed curve} is a curve $\gamma$ such that $\gamma(0) = \gamma(1)$.
+\end{defi}
+
+\begin{defi}[Simple curve]
+  A \emph{simple curve} is one which does not intersect itself, except at $t = 0, 1$ in the case of a closed curve.
+\end{defi}
+
+\begin{defi}[Contour]
+  A \emph{contour} is a piecewise smooth curve.
+\end{defi}
+Everything we do is going to be about contours. We shall, in an abuse of notation, often use the symbol $\gamma$ to denote both the map \emph{and} its image, namely the actual curve in $\C$ traversed in a particular direction.
+
+\begin{notation}
+  The contour $-\gamma$ is the contour $\gamma$ traversed in the opposite direction. Formally, we say
+  \[
+    (-\gamma)(t) = \gamma(1 - t).
+  \]
+  Given two contours $\gamma_1$ and $\gamma_2$ with $\gamma_1(1) = \gamma_2(0)$, $\gamma_1 + \gamma_2$ denotes the two contours joined end-to-end. Formally,
+  \[
+    (\gamma_1 + \gamma_2)(t) =
+    \begin{cases}
+      \gamma_1(2t) & t < \frac{1}{2}\\
+      \gamma_2(2t - 1) & t \geq \frac{1}{2}
+    \end{cases}.
+  \]
+\end{notation}
+
+\begin{defi}[Contour integral]
+  The \emph{contour integral} $\int_\gamma f(z)\;\d z$ is defined to be the usual real integral
+  \[
+    \int_\gamma f(z)\;\d z= \int_0^1 f(\gamma(t)) \gamma'(t)\;\d t.
+  \]
+\end{defi}
+Alternatively, and equivalently, dissect $[0, 1]$ into $0 = t_0 < t_1 < \cdots < t_n = 1$, and let $z_n = \gamma(t_n)$ for $n = 0, \cdots, N$. We define
+\[
+  \delta t_n = t_{n + 1} - t_n,\quad \delta z_n = z_{n + 1} - z_n.
+\]
+Then
+\[
+  \int_\gamma f(z)\;\d z = \lim_{\Delta \to 0} \sum_{n = 0}^{N - 1} f(z_n) \delta z_n,
+\]
+where
+\[
+  \Delta = \max_{n = 0, \cdots, N - 1} \delta t_n,
+\]
+and as $\Delta \to 0, N \to \infty$.
+
+All this says is that the integral is what we expect it to be --- an infinite sum.
+
+The result of a contour integral between two points in $\C$ may depend on the choice of contour.
+\begin{eg}
+  Consider
+  \[
+    I_1 = \int_{\gamma_1} \frac{\d z}{z},\quad I_2 = \int_{\gamma_2} \frac{\d z}{z},
+  \]
+  where the paths are given by
+  \begin{center}
+    \begin{tikzpicture}[scale=0.75]
+      \draw [->] (-3, 0) -- (3, 0);
+      \draw [->] (0, -3) -- (0, 3);
+
+      \draw [->-=0.7, mred] (-2, 0) arc(180:0:2) node [pos=0.7, anchor = south west] {$\gamma_1$};
+      \draw [->-=0.7, mblue] (-2, 0) arc(180:360:2) node [pos=0.7, anchor = north west] {$\gamma_2$};
+
+      \draw (0, 0) -- (1.414, 1.414);
+      \draw (0.4, 0) arc(0:45:0.4) node [pos=0.8, right] {$\theta$};
+
+      \node [anchor = north west] at (2, 0) {$1$};
+      \node [anchor = north east] at (-2, 0) {$-1$};
+      \node [circ] at (0, 0) {};
+      \node [anchor = north east] {$0$};
+    \end{tikzpicture}
+  \end{center}
+  In both cases, we integrate from $z = -1$ to $+1$ around a unit circle: $\gamma_1$ above, $\gamma_2$ below the real axis. Substitute $z = e^{i\theta}$, $\d z = ie^{i\theta} \;\d \theta$. Then we get
+  \begin{align*}
+    I_1 &= \int_{\pi}^0 \frac{ie^{i\theta}\;\d \theta}{e^{i\theta}} = -i\pi\\
+    I_2 &= \int_{-\pi}^0 \frac{ie^{i\theta}\;\d \theta}{e^{i\theta}} = i\pi.
+  \end{align*}
+\end{eg}
+
+\subsubsection*{Elementary properties of the integral}
+\begin{prop}\leavevmode
+  \begin{enumerate}
+    \item We write $\gamma_1 + \gamma_2$ for the path obtained by joining $\gamma_1$ and $\gamma_2$. We have
+      \[
+        \int_{\gamma_1 + \gamma_2} f(z)\;\d z = \int_{\gamma_1} f(z)\;\d z + \int_{\gamma_2} f(z)\;\d z\\
+      \]
+      Compare this with the equivalent result on the real line:
+      \[
+        \int_a^c f(x)\;\d x = \int_a^b f(x)\;\d x + \int_b^c f(x)\;\d x.
+      \]
+    \item Recall $-\gamma$ is the path obtained from reversing $\gamma$. Then we have
+      \[
+        \int_{-\gamma} f(z)\;\d z = -\int_\gamma f(z)\;\d z.
+      \]
+      Compare this with the real result
+      \[
+        \int_a^b f(x)\;\d x = -\int_b^a f(x)\;\d x.
+      \]
+    \item If $\gamma$ is a contour from $a$ to $b$ in $\C$, then
+      \[
+        \int_\gamma f'(z)\;\d z = f(b) - f(a).
+      \]
+      This looks innocuous. This is just the fundamental theorem of calculus. However, there is some subtlety. This requires $f$ to be differentiable at every point on $\gamma$. In particular, it must not cross a branch cut. For example, our previous example had $\log z$ as the antiderivative of $\frac{1}{z}$. However, this does not imply the integrals along different paths are the same, since we need to pick different branches of $\log$ for different paths, and things become messy.
+
+    \item Integration by substitution and by parts work exactly as for integrals on the real line.
+    \item If $\gamma$ has length $L$ and $|f(z)|$ is bounded by $M$ on $\gamma$, then
+      \[
+        \left|\int_\gamma f(z)\;\d z\right| \leq L M.
+      \]
+      This is since
+      \[
+        \left|\int_\gamma f(z)\;\d z\right| \leq \int_\gamma |f(z)| |\;\d z| \leq M \int_\gamma |\d z| = ML.
+      \]
+      We will be using this result a lot later on.
+  \end{enumerate}
+\end{prop}
+We will not prove this. Again, if you like proofs, go to IB Complex Analysis.
+
+\subsubsection*{Integrals on closed contours}
+If $\gamma$ is a closed contour, then it doesn't matter where we start from on $\gamma$; $\oint_\gamma f(z)\;\d z$ means the same thing in any case, so long as we go all the way round ($\oint$ denotes an integral around a closed contour).
+
+The usual direction of traversal is anticlockwise (the ``positive sense''). If we traverse $\gamma$ in a negative sense (clockwise), then we get negative the previous result. More technically, the positive sense is the direction that keeps the interior of the contour on the left. This ``more technical'' definition might seem pointless --- if you can't tell what anticlockwise is, then you probably can't tell which is the left. However, when we deal with more complicated structures in the future, it turns out it is easier to define what is ``on the left'' than ``anticlockwise''.
+
+\subsubsection*{Simply connected domain}
+\begin{defi}[Simply connected domain]
+  A domain $\mathcal{D}$ (an open subset of $\C$) is \emph{simply connected} if it is connected and every closed curve in $\mathcal{D}$ encloses only points which are also in $\mathcal{D}$.
+\end{defi}
+In other words, it does not have holes. For example, this is not simply-connected:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [fill=gray!50!white] plot [smooth cycle, tension=0.7] coordinates {(0, 1) (-0.7, 0.7) (-1, 0) (-0.6, -1) (0.6, -1) (1, 0) (0.7, 0.7)};
+    \draw [fill=white] (0, -0.2113) circle [radius=0.2];
+  \end{tikzpicture}
+\end{center}
+These ``holes'' need not be big holes like this, but just individual points at which a function under consider consideration is singular.
+
+\subsection{Cauchy's theorem}
+This theorem is the highlight of the course:
+\begin{thm}[Cauchy's theorem]
+  If $f(z)$ is analytic in a simply-connected domain $\mathcal{D}$, then for every simple closed contour $\gamma$ in $\mathcal{D}$, we have
+  \[
+    \oint_\gamma f(z)\;\d z = 0.
+  \]
+\end{thm}
+This is quite a powerful statement, and will allow us to do a lot! This also means we will be working with non-analytic functions quite a lot in the course, since analytic ones are boring.
+
+\begin{proof}(non-examinable)
+  The proof of this remarkable theorem is simple (with a catch), and follows from the Cauchy-Riemann equations and Green's theorem. Recall that Green's theorem says
+  \[
+    \oint_{\partial S} (P \;\d x + Q\;\d y) = \iint_S \left(\frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y}\right)\;\d x\;\d y.
+  \]
+  Let $u, v$ be the real and imaginary parts of $f$. Then
+  \begin{align*}
+    \oint \gamma f(z) \;\d z &= \oint_\gamma (u + iv) (\d x + i\;\d y)\\
+    &= \oint_\gamma (u\;\d x - v\;\d y) + i \oint_\gamma (v \;\d x + u \;\d y)\\
+    &= \iint_S \left(-\frac{\partial v}{\partial x} - \frac{\partial u}{\partial y}\right)\;\d x\;\d y + i\iint_S \left(\frac{\partial u}{\partial x} - \frac{\partial v}{\partial y}\right)\;\d x \;\d y
+  \end{align*}
+  But both integrands vanish by the Cauchy-Riemann equations, since $f$ is differentiable throughout $S$. So the result follows.
+\end{proof}
+In fact, this proof requires $u$ and $v$ to have continuous partial derivatives in $S$ (otherwise Green's theorem does not apply). We shall see later that in fact $f$ is differentiable infinitely many time, so actually $u$ and $v$ \emph{do} have continuous partial derivatives. However, our proof of that will utilize Cauchy's theorem! So a completely different proof (and a very elegant one!) is required if we do not wish to make assumptions about $u$ and $v$. However, we shall not worry about this in this course since it is easy to verify that the functions we use do have continuous partial derivatives. And we are not doing Complex Analysis.
+
+\subsection{Contour deformation}
+\begin{prop}
+  Suppose that $\gamma_1$ and $\gamma_2$ are contours from $a$ to $b$, and that $f$ is analytic on the contours \emph{and} between the contours. Then
+  \[
+    \int_{\gamma_1}f(z)\;\d z = \int_{\gamma_2} f(z)\;\d z.
+  \]
+\end{prop}
+\begin{center}
+  \begin{tikzpicture}
+    \node [circ] {};
+    \node [anchor = north east] {$a$};
+    \node [circ] at (2, 3) {};
+    \node [anchor = south west] at (2, 3) {$b$};
+
+    \draw [->-=0.5] plot [smooth, tension=1] coordinates {(0, 0) (0.5, 2.5) (2, 3)};
+    \draw [->-=0.5] plot [smooth, tension=1] coordinates {(0, 0) (1.2, 0.3) (2, 3)};
+
+    \node at (1.8, 0.9) {$\gamma_2$};
+    \node at (-0.1, 1.6) {$\gamma_1$};
+  \end{tikzpicture}
+\end{center}
+
+\begin{proof}
+  Suppose first that $\gamma_1$ and $\gamma_2$ do not cross. Then $\gamma_1 - \gamma_2$ is a simple closed contour. So
+  \[
+    \oint_{\gamma_1 - \gamma_2} f(z)\;\d z = 0
+  \]
+  by Cauchy's theorem. Then the result follows.
+
+  If $\gamma_1$ and $\gamma_2$ \emph{do} cross, then dissect them at each crossing point, and apply the previous result to each section.
+\end{proof}
+So we conclude that if $f$ has no singularities, then $\int_a^b f(z)\;\d z$ does not depend on the chosen contour.
+
+This result of path independence, and indeed Cauchy's theorem itself, becomes less surprising if we think of $\int f(z)\;\d z$ as a path integral in $\R^2$, because
+\[
+  f(z)\;\d z = (u + iv)(\d z + i\;\d y) = (u + iv) \;\d x + (-v + iu)\;\d y
+\]
+is an exact differential, since
+\[
+  \pd{y} (u + iv) = \pd{x} (-v + iu)
+\]
+from the Cauchy-Riemann equations.
 \end{document}

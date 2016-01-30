@@ -1015,4 +1015,331 @@ Hence, all we need to do is to prove that fact about triangles.
 \end{proof}
 Is this the best we can do? Can we formulate this for an arbitrary domain, and not just star-shaped ones? It is obviously not true if the domain is not simply connected, eg. for $f(z) = \frac{1}{z}$ defined on $\C \setminus \{0\}$. However, it turns out Cauchy's theorem holds as long as the domain is simply connected, but we probably won't get to prove that. However, this is not surprising given the Riemann mapping theorem, since any simply connected domain is conformally eequivalent to the unit disk.
 
+We can generalize our result when $f: U \to \C$ is continuous on the whole of $U$, and holomorphic except on finitely many points. In this case, the same conclusion holds --- $\int_\gamma f(z)\;\d z = 0$ for all piecewise smooth closed $\gamma$.
+
+Why is this? In the proof, it was sufficient to focus on showing $\int_{\partial T} f(z)\;\d z = 0$ for a triangle $T \subseteq U$. Consider the simple case where we only have a single point of non-holomorphicity $a \in T$. The idea is again to subdivide.
+\begin{center}
+  \begin{tikzpicture}[scale=0.75]
+    \draw (-2, 0) -- (2, 0) -- (0, 3.464) -- cycle;
+    \draw (-0.5, 0.866) -- (0.5, 0.866) -- (0, 1.732) -- cycle;
+    \node [circ] at (0, 1.15589) {};
+    \node [above] at (0, 1.15589) {$a$};
+
+    \draw (-2, 0) -- (-0.5, 0.866);
+    \draw (2, 0) -- (0.5, 0.866);
+    \draw (0, 3.464) -- (0, 1.732);
+
+    \draw (-2, 0) -- (0, 1.732);
+    \draw (2, 0) -- (-0.5, 0.866);
+    \draw (0, 3.464) -- (0.5, 0.866);
+  \end{tikzpicture}
+\end{center}
+We call the center triangle $T'$. Along all other triangles in our subdivision, we get $\int f(z)\;\d z = 0$, as these triangles lie in a region where $f$ is holomorphic. So
+\[
+  \int_{\partial T} f(z)\;\d z = \int_{\partial T'} f(z)\;\d z.
+\]
+Note now that we can make $T'$ as small as we like. But
+\[
+  \left|\int_{\partial T'} f(z)\;\d z\right| \leq \length(\partial T') \sup_{z \in \partial T'} |f(z)|.
+\]
+Since $f$ is continuous, it is bounded. As we take smaller and smaller subdivisions, $\length(\partial T') \to 0$. So we must have $\int_{\partial T} f(z)\;\d z = 0$.
+
+From here, it's straightforward to conclude the general case --- we can divide the triangle in a way such that each small triangle contains one bad point.
+
+\subsection{The Cauchy integral formula}
+We will use that to prove the Cauchy integral formula.
+
+\begin{thm}[Cauchy integral formula]
+  Let $U$ be a domain, and $f: U \to \C$ be holomorphic. Suppose there is some $\overline{B(z_0; r)} \subseteq U$ for some $z_0$ and $r > 0$. Then for all $z \in B(z_0; r)$, we have
+  \[
+    f(z) = \frac{1}{2\pi i} \int_{\partial \overline{B(z_0; r)}} \frac{f(w)}{w - z}\;\d w.
+  \]
+\end{thm}
+Recall that we previously computed $\int_{\partial \overline{B(0, 1)}} \frac{1}{z} \;\d z= 2\pi i$. This is indeed a special case of the Cauchy integral formula. We will provide two proofs. The first proof relies on the above generalization of Cauchy's theorem.
+
+\begin{proof}
+  Since $U$ is open, there is some $\delta > 0$ such that $\overline{B(z_0; r + \delta)} \subseteq U$. We define $g: B(z_0; r+ \delta) \to \C$ by
+  \[
+    g(w) =
+    \begin{cases}
+      \frac{f(w) - f(z)}{w - z} & w = z\\
+      f'(z) & w = z
+    \end{cases},
+  \]
+  where we have \emph{fixed} $z \in B(z_0; r)$ as in the statement of the theorem. Now note that $g$ is holomorphic as a function of $w \in B(z_0, r + \delta)$, except perhaps at $w = z$. But since $f$ is holomorphic, by definition $g$ is continuous everywhere on $B(z_0, r + \delta)$. So the previous result says
+  \[
+    \int_{\partial \overline{B(z_0; r)}} g(w)\;\d w = 0.
+  \]
+  This is exactly saying that
+  \[
+    \int_{\partial \overline{B(z_0; r)}} \frac{f(w)}{w - z} = \int_{\partial \overline{B(z_0; r)}} \frac{f(z)}{w - z}\;\d w.
+  \]
+  We now rewrite
+  \[
+    \frac{1}{w - z} = \frac{1}{w - z_0} \cdot \frac{1}{1 - \left(\frac{z - z_0}{w - z_0}\right)} = \sum_{n = 0}^\infty \frac{(z - z_0)^n}{(w - z_0)^{n + 1}}.
+  \]
+  Note that this sum converges uniformly on $\partial \overline{B(z_0; r)}$ since
+  \[
+    \left|\frac{z - z_0}{w - z_0}\right| < 1
+  \]
+  for $w$ on this circle.
+
+  By uniform convergence, we can exchange summation and integration. So
+  \[
+    \int_{\partial \overline{B(z_0; r)}} \frac{f(w)}{w - z} \;\d w = \sum_{n = 0}^\infty \int_{\partial \overline{B(z_0, r)}} f(z) \frac{(z - z_0)^n}{(w - z_0)^{n + 1}}\;\d w.
+  \]
+  We note that $f(z) (z - z_0)^n$ is just a constant, and that we have previously proven
+  \[
+    \int_{\partial \overline{B(z_0; r)}} (w - z_0)^k \;\d w =
+    \begin{cases}
+      2\pi i & k = -1\\
+      0 & k \not= -1
+    \end{cases}.
+  \]
+  So the right hand side is just $2\pi i f(z)$. So done.
+\end{proof}
+
+\begin{cor}[Local maximum principle]
+  Let $f: B(z, r) \to \C$ be holomorphic. Suppose $|f(w)| \leq |f(z)|$ for all $w \in B(z\; r)$. Then $f$ is constant. In other words, a non-constant function cannot achieve an interior local maximum.
+\end{cor}
+
+\begin{proof}
+  Let $0 < \rho < r$. Applying the Cauchy integral formula, we get
+  \begin{align*}
+    |f(z)| &= \left|\frac{1}{2\pi i}\int_{\partial \overline{B(z; \rho)}} \frac{f(w)}{w - z}\;\d w\right|\\
+    \intertext{Setting $w = z + \rho e^{2\pi i\theta}$, we get}
+    &= \left|\int_0^1 f(z + \rho e^{2 \pi i \theta})\;\d \theta\right|\\
+    &\leq \sup_{|z - w| = \rho} |f(w)|\\
+    &\leq f(z).
+  \end{align*}
+  So we must have equality throughout. When we proved the supremum bound for the integral, we showed equality can happen only if the integrand is constant. So $|f(w)|$ is constant on the circle $|z - w| = \rho$, and is equal to $f(z)$. Since this is true for all $\rho \in (0, r)$, it follows that $|f|$ is constant on $B(z; r)$. Then the Cauchy-Riemann equations then entail that $f$ must be constant, as you have shown in example sheet 1.
+\end{proof}
+In particular, since harmonic functions in $\R^2$ are the real parts of holomorphic functions, the same result holds for harmonic functions as well, as we have seen in IA Vector Calculus, via a similar argument.
+
+Going back to the Cauchy integral formula, recall that we had $\overline{B(z_0; r)} \subseteq U$, $f: U \to C$ holomorphic, and we want to show
+\[
+  f(z) = \frac{1}{2\pi i} \int_{\partial \overline{B(z_0; r)}} \frac{f(w)}{w - z}\;\d w.
+\]
+When we proved it last time, we remember we know how to integrate things of the form $\frac{1}{(w - z_0)^n}$, and manipulated the formula such that we get the integral is made of things like this.
+
+The second strategy is to change the contour of integration instead of changing the integrand. If we can change it so that the integral is performed over a circle around $z$ instead of $z_0$, then we know what to do.
+\begin{center}
+  \begin{tikzpicture}
+    \node [circ] {};
+    \node [right] {$z_0$};
+    \draw [->] circle [radius=2]; % arrow counterclockwise
+
+    \node [circ] at (0, 1) {};
+    \node [right] at (0, 1) {$z$};
+    \draw [->] (0, 1) circle [radius=0.5];
+  \end{tikzpicture}
+\end{center}
+\begin{proof}(of Cauchy integral formula again)
+  Given $\varepsilon > 0$, we pick $\delta > 0$ such that $\overline{B(z, \delta)} \subseteq B(z_0, r)$, and such that whenever $|w - z| + \delta$, then $|f(w) - f(z)| < \varepsilon$. This is possible since $f$ is uniformly continuous on the neighbourhood of $z$. We now cut our region apart:
+  \begin{center}
+    \begin{tikzpicture}
+      \node [circ] {};
+      \node [right] {$z_0$};
+      \draw circle [radius=2];
+
+      \node [circ] at (0, 1) {};
+      \node [right] at (0, 1) {$z$};
+      \draw (0, 1) circle [radius=0.5];
+
+      \draw [red, ->-=0.04, ->-=0.35, ->-=0.72] (0, 2) -- (0, 1.5) arc(90:-90:0.5) -- (0, -2) arc(-90:90:2);
+      \fill [mblue, opacity=0.5] (0, 2) -- (0, 1.5) arc(90:-90:0.5) -- (0, -2) arc(-90:90:2);
+
+      \begin{scope}[shift={(5, 0)}]
+        \node [circ] {};
+        \node [right] {$z_0$};
+        \draw circle [radius=2];
+
+        \node [circ] at (0, 1) {};
+        \node [right] at (0, 1) {$z$};
+        \draw (0, 1) circle [radius=0.5];
+
+        \draw [red, -<-=0.01, -<-=0.31, -<-=0.69] (0, 2) -- (0, 1.5) arc(90:270:0.5) -- (0, -2) arc(270:90:2);
+        \fill [mblue, opacity=0.5] (0, 2) -- (0, 1.5) arc(90:270:0.5) -- (0, -2) arc(270:90:2);
+      \end{scope}
+    \end{tikzpicture}
+  \end{center}
+  We know $\frac{f(w)}{w - z}$ is holomorphic on sufficiently small open neighbourhoods of the half-contours indicated. The area enclosed by the contours might not be star-shaped, but we can definitely divide it once more so that it is. Hence the integral of $\frac{f(w)}{w - z}$ around the half-contour vanishes by Cauchy's theorem. Adding these together, we get
+  \[
+    \int_{\partial \overline{B(z_0, r)}} \frac{f(w)}{w - z}\;\d w = \int_{\partial \overline{B(z, \delta)}} \frac{f(w)}{w - z}\;\d w,
+  \]
+  where the balls are both oriented anticlockwise. now we have
+  \[
+    \left|f(z) - \frac{1}{2\pi i} \int_{\partial \overline{B(z_0, r)}} \frac{f(w)}{w - z}\;\d w\right| = \left|f(z) - \frac{1}{2\pi i} \int_{\partial \overline{B(z, \delta)}} \frac{f(w)}{w - z}\;\d w\right|.
+  \]
+  Now we once again use the fact that
+  \[
+    \int_{\partial \overline{B(z, \delta)}} \frac{1}{w - z}\;\d z = 2\pi i
+  \]
+  to show this is equal to
+  \[
+    \left|\frac{1}{2\pi i} \int_{\partial \overline{B(z, \delta)}} \frac{f(z) - f(w)}{w - z} \;\d w\right| \leq \frac{1}{2\pi} \cdot 2\pi \delta \cdot \frac{1}{\delta} \cdot \varepsilon = \varepsilon.
+  \]
+  Taking $\varepsilon \to 0$, we see that the Cauchy integral formula holds.
+\end{proof}
+Note that the subdivision we did above was something we can do in general.
+
+\begin{defi}[Elementary deformation]
+  Given a pair of $C^1$-smooth (or piecewise smooth) closed paths $\phi, \psi: [0, 1] \to U$, we say $\psi$ is an elementary deformation of $\phi$ if there exists convex open sets $C_1, \cdots, C_n \subseteq U$ and a division of the interval $0 = x_0 < x_1 < \cdots < x_n = 1$ such that on $[x_{i - 1}, x_i]$, both $\phi(t)$ and $\psi(t)$ both belong to $C_i$.
+\end{defi}
+\begin{center}
+  \begin{tikzpicture}
+    \draw [decorate, decoration={snake, segment length=1.5cm}] ellipse (2 and 0.5);
+    \node [right] at (2, 0) {$\phi$};
+    \draw [decorate, decoration={snake, segment length=1cm}] ellipse (0.5 and 2);
+    \node [above] at (0, 2.1) {$\psi$};;
+
+    \node [circ] at (-0.5, -0.21) {};
+    \node [scale=0.6, above] at (-0.3, -0.21) {$\phi(x_{i - 1})$};
+
+    \node [circ] at (0.4, -0.35) {};
+    \node [scale=0.6, above] at (0.26, -0.35) {$\phi(x_i)$};
+
+    \node [circ] at (-0.48, -1.21) {};
+    \node [scale=0.6, left] at (-0.48, -1.21) {$\phi(x_{i - 1})$};
+
+    \node [circ] at (0.28, -1.11) {};
+    \node [scale=0.6, right] at (0.28, -1.11) {$\phi(x_i)$};
+
+    \draw [fill opacity=0.5, fill=mblue] (-0.5, -0.21) -- (0.4, -0.35) -- (0.28, -1.11) -- (-0.48, -1.21) -- cycle;
+  \end{tikzpicture}
+\end{center}
+Then there are straight lines $\gamma_i: \phi(x_i) \to \psi(x_i)$ lying inside $C_i$. If $f$ is holomorphic on $U$, considering the shaded square, we find
+\[
+  \int_\phi f(z)\;\d z = \int_\psi f(z)\;\d z
+\]
+when $\phi$ and $\psi$ are convex deformations.
+
+We now explore some classical consequences of the Cauchy Integral formula.
+\subsection{Liouville's theorem}
+\begin{thm}[Liouville's theorem]
+  Let $f: \C \to \C$ be an entire function (ie. holomorphic everywhere). If $f$ is bounded, then $f$ is constant.
+\end{thm}
+This, for example, means there is no interesting holomorphic period functions like $\sin$ and $\cos$ that are bounded everywhere.
+
+\begin{proof}
+  Suppose $|f(z)| \leq M$ for all $z \in \C$. We fix $z_1, z_2 \in \C$, and estimate $|f(z_1) - f(z_2)|$ with the integral formula.
+
+  Let $R > \max \{2 |z_1|, 2|z_2|\}$. By the integral formula, we know
+  \begin{align*}
+    |f(z_1) - f(z_2)| &= \left|\frac{1}{2\pi i}\int_{\partial B(0, R)} \left(\frac{f(w)}{w - z_1} - \frac{f(w)}{w - z_2}\right)\;\d w\right|\\
+    &= \left|\frac{1}{2\pi i}\int_{\partial B(0, R)} \frac{f(w)(z_1 - z_2)}{(w - z_1)(w - z_2)} \;\d w\right|\\
+    &\leq \frac{1}{2\pi} \cdot 2\pi R \cdot \frac{M |z_1 - z_2|}{(R/2)^2} \\
+    &= \frac{4M|z_1 - z_2|}{R}.
+  \end{align*}
+  Note that we get the bound on the denominator since $|w| = R$ implies $|w - z_i| > \frac{R}{2}$ by our choice of $R$. Letting $R \to \infty$, we know we must have $f(z_1) = f(z_2)$. So $f$ is constant.
+\end{proof}
+
+\begin{cor}[Fundamental theorem of algebra]
+  A non-constant complex polynomial has a root in $\C$.
+\end{cor}
+
+\begin{proof}
+  Let
+  \[
+    P(z) = a_n z^n + a_{n - 1}z^{n - 1} + \cdots + a_0,
+  \]
+  where $a_n \not= 0$ and $n > 0$. So $P$ is non-constant. Thus, as $|z| \to \infty$, $|P(z)| \to \infty$. In particular, there is some $R$ such that for $|z| > R$, we have $|P(z)| \geq 1$.
+
+  Now suppose for contradiction that $P$ does not have a root in $\C$. Then consider
+  \[
+    f(z) = \frac{1}{P(z)},
+  \]
+  which is then an entire function, since it is a rational function. On $\overline{B(0, R)}$, we know $f$ is certainly continuous, and hence bounded. Outside this ball, we get $|f(z)| \leq 1$. So $f(z)$ is constant, by Liouville's theorem. But $P$ is non-constant. This is absurd. Hence the result follows.
+\end{proof}
+Note that there are many many ways we can prove the fundamental theorem of algebra. However, none of them belong wholely to algebra. They all involve some analysis or topology, as you might encounter in the IID Algebraic Topology and IID Riemann Surface courses.
+
+This is not surprising since the construction of $\R$, and hence $\C$, is intrinsically analytic --- we get from $\N$ to $\Z$ by requiring it to have additive inverses; $\Z$ to $\Q$ by requiring multiplicative inverses; $\R$ to $\C$ by requiring the root to $x^2 + 1 = 0$. These are all algebraic. However, to get from $\Q$ to $\R$, we are requiring something about convergence in $\Q$. This is not algebraic. It requires a particular of metric on $\Q$. If we pick a different metric, then you get a different completion, as you may have seen in IB Metric and Topological Spaces. Hence the construction of $\R$ is actually analytic, and not purely algebraic.
+
+\subsection{Taylor's theorem}
+Recall our first source of interesting holomorphic came from power series, within their radius of convergence. It turns out these are everything we've got.
+\begin{thm}[Taylor's theorem]
+  Let $f: B(a, r) \to \C$ be holomorphic. then $f$ has a convergent power series representation
+  \[
+    f(z) = \sum_{n = 0}^\infty c_n (z - a)^n
+  \]
+  on $B(a, r)$. Moreover,
+  \[
+    c_n = \frac{f^{(n)}(a)}{n!} = \frac{1}{2\pi i}\int_{\partial B(a, \rho)}\frac{f(z)}{(z - a)^{n + 1}}\;\d z
+  \]
+  for any $0 < \rho < r$.
+\end{thm}
+Note that the very statement of the theorem already implies any holomorphic function has to be infinitely differentiable.
+\begin{proof}
+  We'll use Cauchy's integral formula. If $|w - a|< \rho < r$, then
+  \[
+    f(w) = \frac{1}{2\pi i} \int_{\partial B(a, \rho)} \frac{f(z)}{z - w}\;\d z.
+  \]
+  Now (cf. the first proof of the Cauchy integral formula), we note that
+  \[
+    \frac{1}{z - w} = \dfrac{1}{(z - a)\left(1 - \frac{w - a}{z - a}\right)} = \sum_{n = 0}^n \frac{(w - a)^n}{(z - a)^{n + 1}}.
+  \]
+  This series is uniformly convergent everywhere on the $\rho$ disk, including its boundary. By uniform convergence, we can exchange integration and summation to get
+  \begin{align*}
+    f(w) &= \sum_{n = 0}^\infty \left(\frac{1}{2\pi i} \int_{\partial B(a, \rho)} \frac{f(z)}{(z - a)^{n + 1}}\;\d z\right) (w - a)^n\\
+    &= \sum_{n = 0^\infty} c_n (w - a)^n.
+  \end{align*}
+  Since $c_n$ does not depend on $w$, this is a genuine power series representation, and this is valid on any disk $B(a, \rho) \subseteq B(a, r)$.
+
+  Then the formula for $c_n$ in terms of the derivative comes for free since that's the formula for the derivative of a power series.
+\end{proof}
+Contrast this with functions like $e^{-1/x^2}$ on $\R$ that have a trivial Taylor series expansion but is non-trivial. This also means we cannot use functions like these to build bump functions that are non-zero only on a compact set (even though we already know this from Liouville's theorem).
+
+\begin{cor}
+  If $f: B(a, r) \to \C$ is holomorphic on a disc, then $f$ is infinitely differentiable on the disc.
+\end{cor}
+
+\begin{proof}
+  Complex power series are infinitely differentiable (and $f$ had better be infinitely differentiable for us to write down the formula for $c_n$ in terms of $f^{(n)}$).
+\end{proof}
+
+This justifies our claim from the very beginning that $\Re(f)$ and $\Im(f)$ are harmonic functions if $f$ is holomorphic.
+
+\begin{cor}
+  If $f: U\to \C$ is a complex-valued function, then $f = u + iv$ is holomorphic at $p \in U$ if and only if $u, v$ satisfy the Cauchy-Riemann equations, and that $u_x, u_y, v_x, v_y$ are continuous at $p$.
+\end{cor}
+
+\begin{proof}
+  If $u_x, u_y, v_x, v_y$ exist and are continuous at $p$, then $u$ and $v$ are differentiable as functions $\R^2 \to \R^2$ at $p$, and then we proved that the Cauchy-Riemann equations imply holomorphicity.
+
+  On the other hand, if $f$ is holomorphic, then it is infinitely differentiable. In particular, $f'(z)$ is also holomorphic. So $u_x, u_y, v_x, v_y$ are differentiable, hence continuous.
+\end{proof}
+
+We also get the following (partial) converse to Cauchy's theorem.
+\begin{cor}[Morera's theorem]
+  Let $U\subseteq \C$ be a domain. Let $f:U \to \C$ be continuous such that
+  \[
+    \int_\gamma f(z)\;\d z = 0
+  \]
+  for all piecewise-$C^1$ closed curves $\gamma \in U$. Then $f$ is holomorphic on $U$.
+\end{cor}
+
+\begin{proof}
+  We have previously shown that the condition implies that $f$ has an antiderivative $F: U \to \C$, ie. $F$ is a holomorphic function such that $F' = f$. But $F$ is infinitely differentiable. So $f$ must be holomorphic.
+\end{proof}
+
+Recall that Cauchy's theorem required $U$ to be sufficiently nice, eg. being star-shaped or just simply-connected. However, Morera's theorem does not. It just requires that $U$ is a domain. This is since holomorphicity is a local property, while vanishing on closed curves is a global result. Cauchy's theorem gets us from a local property to a global property, and hence we need to assume more about what the ``globe'' looks like. On the other hand, passing from a global property to a local one does not. Hence we have this asymmetry.
+
+\begin{cor}
+  Let $U \subseteq \C$ be a domain, $f_n; U \to \C$ be a holomorphic function. If $f_n \to f$ uniformly, then $f$ is in fact holomorphic, and
+  \[
+    f'(z) = \lim_n f_n'(z).
+  \]
+\end{cor}
+\begin{proof}
+  Given a piecewise $C^1$ path $\gamma$, uniformity of convergence says
+  \[
+    \int_\gamma f_n(z)\;\d z \to \int_\gamma f(z)\;\d z
+  \]
+  uniformly. Since $f$ being holomorphic is a local condition, so we fix $p \in U$ and work in some small, convex disc $B(p, \varepsilon) \subseteq U$. Then for any curve $\gamma$ inside this disk, we have
+  \[
+    \int_\gamma f_n(z) \;\d z = 0.
+  \]
+  Hence we also have $\int_\gamma f(z)\;\d z = 0$. Since this is true for all curves, we conclude $f$ is holomorphic inside $B(p, \varepsilon)$ by Morera's theorem. Since $p$ was arbitrary, we know $f$ is holomorphic. % remaining part?
+\end{proof}
+There is a lot of passing between knowledge of integrals and knowledge of holomorphicity all the time, as we can see in these few results. These few lectures is in some sense the heart of the course, where we derive the central theorems from Cauchy's theorem and Cauchy's integral formula.
 \end{document}
