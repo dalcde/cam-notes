@@ -856,7 +856,9 @@ Note that if the flow is \emph{unsteady}, then the streamlines are \emph{not} pa
   \]
   So the particle paths are parabolas.
 \end{eg}
-Note that the flow is faster where streamlines are closer together:
+Typically, we draw streamlines that are ``evenly spaced'', ie. we pick the streamlines $\psi = c_0$, $\psi = c_1$, $\psi c_2$ etc. such that $c_3 - c_2 = c_2 - c_1$.
+
+Then we know the flow is faster where streamlines are closer together:
 \begin{center}
   \begin{tikzpicture}
     \draw [-<-=0.44] (4, 0.5) parabola (0, 1);
@@ -905,4 +907,135 @@ So we can write this as
 So the flux depends only the difference in the value of $\psi$. Hence, for closer streamlines, to maintain the same volume flux, we need a higher speed.
 
 Also, note that $\psi$ is constant on a stationary rigid boundary, ie. the boundary is a streamline, since the flow is tangential at the boundary. This is a consequence of $\mathbf{u}\cdot \mathbf{n} = 0$. We often choose $\psi = 0$ as our boundary.
+
+\subsubsection{Plane polar coordinates}
+We now want to consider two-dimensional flow in plane polars --- we embed these in cylindrical polars $(r, \theta, z)$, with
+\[
+  \mathbf{u} = \nabla \times (0, 0, \psi) = \frac{1}{r}
+  \begin{vmatrix}
+    \mathbf{e}_r & r \mathbf{e}_\theta & \mathbf{e}_z\\
+    \partial_r & \partial_\theta & \partial_z\\
+    0 & 0 & \psi
+  \end{vmatrix}
+  =\left(r \frac{\partial \psi}{\partial \theta}, -\frac{\partial \psi}{\partial r}, 0\right).
+\]
+As an exercise, we can verify that $\nabla \cdot \mathbf{u} = 0$. Note that in plane polars,
+\[
+  \nabla \cdot \mathbf{u} = \frac{1}{r} \frac{\partial}{\partial r} (r \mathbf{u}_r) + \frac{1}{r} \frac{\partial u_\theta}{\partial \theta}.
+\]
+\section{Dynamics}
+\subsection{Navier-Stokes equations}
+The Navier-Stokes equation is basically Newton's second law for a fluid particle.
+\begin{law}[Navier-Stokes equation]
+  \[
+    \rho \frac{\D \mathbf{u}}{\D t} = - \nabla p + \mu \nabla^2 \mathbf{u} + \mathbf{f}.
+  \]
+\end{law}
+We will just assume this is true.
+
+This is the general equation for fluid motion. The left hand side is mass times acceleration, and the right is the individual forces --- the pressure gradient, viscosity, and the body forces (per unit volume) respectively.
+
+These are very difficult equations to solve because of non-linearity. For example, in the material derivative, we have the term $\mathbf{u} \cdot \nabla \mathbf{u}$.
+
+There are a few things to note:
+\begin{enumerate}
+  \item The acceleration of a fluid particle is the Lagrangian material derivative of the velocity.
+  \item As we said, the Navier-Stokes equation is per unit volume.
+  \item The derivation of the viscous term is complicated, since for each side of the cube, there is one normal direction and two tangential directions. Thus this requires consideration of the \emph{stress tensor}. This is only done in IID Fluid Dynamics.
+  \item In a gravitational field, we just have $\mathbf{f} = \mathbf{g}\rho$. This is the only body force we will consider in this course
+  \item Note that $\nabla^2 \mathbf{u}$ can be written as
+    \[
+      \nabla^2 \mathbf{u} = \nabla (\nabla \cdot \mathbf{u}) - \nabla \times (\nabla \times \mathbf{u}).
+    \]
+    In an incompressible fluid, this reduces to
+    \[
+      \nabla^2 \mathbf{u} = -\nabla \times (\nabla \times \mathbf{u}) = -\nabla \times \boldsymbol\omega,
+    \]
+    where $\boldsymbol\omega = \nabla \times \mathbf{u}$ is the vorticity. In Cartesian coordinates, for $\mathbf{u} = (u_x, u_y, u_z)$, we have
+    \[
+      \nabla^2 \mathbf{u} = (\nabla^2 u_x, \nabla^2 u_y, \nabla^2 u_z),
+    \]
+    where
+    \[
+      \nabla^2 = \pd[2]{x} + \pd[2]{y} + \pd[2]{z}.
+    \]
+  \item The Navier-Stokes equation reduces to the parallel flow equation in the special case of parallel flow, ie. $\mathbf{u} = (u(y, t), 0, 0)$. This verification is left as an exercise for the reader.
+\end{enumerate}
+
+\subsection{Hydrostatic pressure}
+Hydrostatic pressure is the pressure in a fluid at rest (hence ``hydro'' and ``static''). In other words, $\mathbf{u} = 0$. We done the hydrostatic pressure as $p_H$. Then the Navier-Stokes equation reduces to
+\[
+  \nabla p_H = \mathbf{f} = \rho \mathbf{g}.
+\]
+We can integrate this to obtain
+\[
+  p_h = p \mathbf{g}\cdot \mathbf{x} + p_0,
+\]
+where $p_0$ is some arbitrary constant. Usually, we have $\mathbf{g} = (0, 0, -g)$. Then
+\[
+  p_h = p_0 - g \rho z.
+\]
+In other words, it is just the weight of the fluid above you (per unit area).
+
+\subsubsection{Force on a submerged body in a fluid at rest}
+Suppose we have a body $\mathcal{D}$ with boundary $\partial \mathcal{D}$ and outward normal $\mathbf{n}$. Then the force is
+\begin{align*}
+  \mathbf{F} &= - \int_{\partial \mathcal{D}} p_H \mathbf{n}\cdot dS \\
+  &= - \int_\mathcal{D} \nabla p_H \;\d V\\
+  &= - \int_{\mathcal{D}} \mathbf{g} \rho \;\d V\\
+  &= - \mathbf{g} \int_\mathcal{D} \rho \;\d V\\
+  &= - M\mathbf{g},
+\end{align*}
+where $M$ is the mass of fluid displaced. This is Archimedes' principle.
+
+In particular, if the body is less dense than the fluid, it will float; if the body is denser than the fluid, it will sink; if the density is the same, then it does not move, and we say it is neutrally buoyant.
+
+This is valid only when nothing is moving. So we want to know what happens when things move.
+
+\subsection{Dynamic pressure}
+This is what is causing or resulting from fluid flow. For example, in the Poiseuille flow, we have a pressure driving the fluid flow; if we have a flow, this can also create some extra pressure.
+
+In general, we write
+\[
+  p = p_H + p',
+\]
+where $p_H$ is the hydrostatic pressure, and $p'$ caused/results from motion.
+
+We substitute this into the Navier-Stokes equation to obtain
+\[
+  \rho \frac{\D u}{\D t} = -\nabla p' + \mu \nabla^2 \mathbf{u}.
+\]
+What we usually do is drop the ``prime'', and just look at the deviation from hydrostatic pressure. What this means is that gravity no longer plays a role, and we can ignore gravity in any flow in which the density is constant. Then all fluid particles are neutrally buoyant. This is the case in most of the course, except when we consider motion of water waves, since there is a difference in air density and water density.
+
+\subsection{Reynolds number} % may be new section
+As we mentioned, the Navier-Stokes equation is very difficult to solve. So we want to find some approximations to the equation. We would like to know if we can ignore some terms. For example, if we can neglect the viscous term, then we are left with a first-order equation, not a second-order one.
+
+To do so, we look at the balance of terms, and see if some terms dominate the others. This is done via Reynolds number.
+
+We suppose the flow has a characteristic speed $U$ and an extrinsic length scale $L$, externally imposed by geometry. For example, if we look at the flow between two planes, the characteristic speed can be the maximum (or average) speed of the fluid, and a sensible length scale would be the length between the planes.
+
+Next, we have to define the time scale $T = L/U$. Finally, we suppose pressure \emph{differences} have characteristic magnitude $P$. We are concerned with differences since it is pressure differences that drive the flow.
+
+We are going to take the Navier-Stokes equation, and look at the scales of the terms. Dividing by $\rho$, we get
+\[
+  \frac{\partial \mathbf{u}}{\partial t} + \mathbf{u}\cdot \nabla \mathbf{u} = -\frac{1}{\rho} \nabla p + \nu \nabla^2 \mathbf{u},
+\]
+where again $\nu = \frac{\mu}{\rho}$. We are going to estimate the size of these terms. We get
+\[
+  \frac{U}{(L/U)} \quad\quad U \cdot \frac{U}{L} \quad\quad \frac{1}{\rho} \frac{P}{L} \quad\quad \nu \frac{U}{L^2}.
+\]
+Dividing by $U^2/L$, we get
+\[
+  1 \quad\quad 1 \quad\quad \frac{P}{\rho U^2} \quad\quad \frac{\nu}{UL}.
+\]
+\begin{defi}[Reynolds number]
+  The \emph{Reynolds number} is
+  \[
+    Re = \frac{UL}{\nu},
+  \]
+  which is a dimensionless number.
+\end{defi}
+So if $Re$ is very large, then the viscous term is small, and we can probably neglect it. For example, for an aircraft, we have $U \sim 10^4$, $L \sim 10$ and $\nu \sim 10^{-5}$. So the Reynolds number is small, and we can ignore the viscous term.
+
+On the other hand, if we have a small slow-moving object in viscous fluid, then $Re$ will be small, and the viscous term is significant.
 \end{document}

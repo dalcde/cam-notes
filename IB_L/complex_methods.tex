@@ -1051,4 +1051,206 @@ is an exact differential, since
   \pd{y} (u + iv) = \pd{x} (-v + iu)
 \]
 from the Cauchy-Riemann equations.
+
+The same idea of ``moving the contour'' applies to \emph{closed} contours. Suppose that $\gamma_1$ is a closed contour that can be continuously deformed to another one, $\gamma_2$, inside it; and suppose $f$ has no singularities in the region between them.
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] plot [smooth cycle] coordinates {(-1.2, -0.7) (0, -0.7) (0.7, -1) (1.3, -0.9) (1.4, 0.4) (0.3, 1) (-1.7, 0.6)};
+    \draw [->] plot [smooth cycle] coordinates {(-2.4, -1.3) (0, -1.3) (1.4, -2) (2.6, -1.7) (2.8, 0.6) (0.6, 1.9) (-3.4, 0.8)};
+
+    \node [right] at (1.4, 0.4) {$\gamma_2$};
+    \node [right] at (2.8, 0.6) {$\gamma_1$};
+    \node at (0.1, 0) {$\times$};
+    \node at (-0.3, 0) {$\times$};
+    \node at (3, 2) {$\times$};
+  \end{tikzpicture}
+\end{center}
+We can instead consider the following contour $\gamma$:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [-<-=0.4, -<-=0.8] plot [smooth cycle] coordinates {(-1.2, -0.7) (0, -0.7) (0.7, -1) (1.3, -0.9) (1.4, 0.4) (0.3, 1) (-1.7, 0.6)};
+    \draw [->-=0.3, ->-=0.7, ->-=0.9] plot [smooth cycle] coordinates {(-2.4, -1.3) (0, -1.3) (1.4, -2) (2.6, -1.7) (2.8, 0.6) (0.6, 1.9) (-3.4, 0.8)};
+
+    \node [right] at (2.8, 0.6) {$\gamma$};
+    \node at (0.1, 0) {$\times$};
+    \node at (-0.3, 0) {$\times$};
+    \node at (3, 2) {$\times$};
+
+    \draw [white, very thick] (2.4, 1.07) -- (2.1, 1.3);
+    \draw [white, line width=0.5cm] (1.16, 0.65) -- (1.4, 0.4);
+    \draw [->-=0.7] (2.4, 1.07) -- (1.4, 0.4);
+    \draw [-<-=0.4] (2.1, 1.3) -- (1.16, 0.65);
+  \end{tikzpicture}
+\end{center}
+By Cauchy's theorem, we know $\oint_\gamma f(z)\;\d z = 0$ since $f(z)$ is analytic throughout the region enclosed by $\gamma$. Now we let the distance between the two ``cross-cuts'' tend to zero: those contributions cancel and, in the limit, we have
+\[
+  \oint_{\gamma_1 - \gamma_2} f(z)\;\d z = 0.
+\]
+hence we know
+\[
+  \oint_{\gamma_1} f(z)\;\d z = \oint_{\gamma_2} f(z)\;\d z = 0.
+\]
+
+\subsection{Cauchy's integral formula}
+\begin{thm}[Cauchy's integral formula]
+  Suppose that $f(z)$ is analytic in a domain $\mathcal{D}$ and that $z_0 \in \mathcal{D}$. Then
+  \[
+    f(z_0) = \frac{1}{2\pi i} \oint_\gamma \frac{f(z)}{z - z_0}\;\d z
+  \]
+  for any simple closed contour $\gamma$ in $\mathcal{D}$ encircling $z_0$ anticlockwise.
+\end{thm}
+This result is going to be very important in a brief moment, for proving one thing. Afterwards, it will be mostly useless.
+
+\begin{proof}(non-examinable)
+  We let $\gamma_\varepsilon$ be a circle of radius $\varepsilon$ about $z_0$, within $\gamma$.
+  \begin{center}
+    \begin{tikzpicture}
+      \node [circ] {};
+      \node [right] {$z_0$};
+      \draw [->] circle [radius=0.5];
+      \node [right] at (0.5, 0) {$\gamma_\varepsilon$};
+
+      \draw [->] plot [smooth cycle] coordinates {(-2.4, -1.3) (0, -1.3) (1.4, -2) (2.6, -1.7) (2.8, 0.6) (0.6, 1.9) (-3.4, 0.8)};
+      \node [right] at (2.8, 0.6) {$\gamma$};
+    \end{tikzpicture}
+  \end{center}
+  Since $\frac{f(z)}{z - z_0}$ is analytic except when $z = z_0$, we know
+  \[
+    \oint_\gamma \frac{f(z)}{z - z_0} \;\d z = \oint_{\gamma_\varepsilon} \frac{f(z)}{z - z_0}\;\d z.
+  \]
+  We now evaluate the right integral directly. Substituting $z = z_0 + \varepsilon e^{i\theta}$, we get
+  \begin{align*}
+    \oint_{\gamma_\varepsilon} \frac{f(z)}{z - z_0}\;\d z &= \int_0^{2\pi} \frac{f(z_0 + \varepsilon e^{i\theta})}{\varepsilon e^{i\theta}} i\varepsilon e^{i\theta} \;\d \theta\\
+    &= i\int_0^2\pi (f(z_0) + O(\varepsilon))\;\d \theta\\
+    &\rightarrow 2\pi i f(z_0)
+  \end{align*}
+  as we take the limit $\varepsilon \to 0$. The result then follows.
+\end{proof}
+So, if we know $f$ on $\gamma$, then we know it at all points within $\gamma$. While this seems magical, it is less surprising if we look at it in another way. We can write $f = u + iv$, where $u$ and $v$ are harmonic functions, ie. they satisfy Laplace's equation. Then if we know the values of $u$ and $v$ on $\gamma$, then what we essentially have is Laplace's equation with Dirichlet boundary conditions! Then the fact that this tells us everything about $f$ within the boundary is just the statement that Laplace's equation with Dirichlet boundary conditions has a unique solution!
+
+The difference between this and what we've got in IA Vector Calculus is that Cauchy's integral formula gives an explicit formula for the value of $f(z_0)$, while in IA Vector Calculus, we just know there is one solution, whatever that might be.
+
+Note that this does not hold if $z_0$ does not lie on or inside $\gamma$, since Cauchy's theorem just gives
+\[
+  \frac{1}{2\pi i} \oint_\gamma \frac{f(z)}{z - z_0} \;\d z = 0.
+\]
+Now, we can differentiate Cauchy's integral formula with respect to $z_0$, and obtain
+\[
+  f'(z_0) = \frac{1}{2\pi i} \oint_\gamma \frac{f(z)}{(z - z_0)^2}\;\d z.
+\]
+We have just taken the differentiation inside the integral sign. This is valid since \st{it's Complex Methods and we don't care} the integrand, both before and after, is a continuous function of both $z$ and $z_0$.
+
+We see that the integrand is still differentiable. So we can differentiate it again, and obtain
+\[
+  f^{(n)}(z_0) = \frac{n!}{2\pi i} \oint_{\gamma} \frac{f(z)}{(z - z_0)^{n + 1}}\;\d z.
+\]
+Hence at any point $z_0$ where $f$ is analytic, \emph{all} its derivatives exist, and we have just found a formula for them. So it is differentiable infinitely many times as advertised.
+
+A classic example of Cauchy's integral formula is Liouville's theorem.
+\begin{thm}[Liouville's theorem*]
+  Any bounded entire function is a constant.
+\end{thm}
+
+\begin{proof}(non-examinable)
+  Suppose that $|f(z)| \leq M$ for all $z$, and consider a circle of radius $r$ centered at an arbitrary point $z_0 \in \C$. Then
+  \[
+    f'(z_0) = \frac{1}{2\pi i} \oint_{|z - z_0| = r} \frac{f(z)}{(z - z_0)^2}\;\d z.
+  \]
+  Hence we know
+  \[
+    \frac{1}{2\pi i} \leq \frac{1}{2\pi} \cdot 2\pi r \cdot \frac{M}{r^2} \to 0
+  \]
+  as $r \to \infty$. So $f'(z_0) = 0$ for all $z_0 \in \C$. So $f$ is constant.
+\end{proof}
+
+\section{Laurent series and singularities}
+\subsection{Taylor and Laurent series}
+If $f$ is analytic at $z_0$, then it has a Taylor series
+\[
+  f(z) = \sum_{n = 0}^\infty a_n (z - z_0)^n
+\]
+in a neighbourhood of $z_0$. Exactly which neighbourhood it applies in depends on the function. Of course, we know the coefficients are given by
+\[
+  a_n = \frac{f^{(n)}(z_0)}{n!},
+\]
+but this doesn't matter. All the standard Taylor series from real analysis apply in $\C$ as well. For example,
+\[
+  e^z = \sum_{n = 0}^\infty \frac{z^n}{n!},
+\]
+and this converges for all $z$. Also, we have
+\[
+  (1 - z)^{-1} = \sum_{n = 0}^\infty z^n.
+\]
+This converges for $|z| < 1$.
+
+But if $f$ has a singularity at $z_0$, we cannot expect such a Taylor series. Fortunately, we have a different series, the Laurent series.
+\begin{prop}[Laurent series]
+  If $f$ is analytic in an \emph{annulus} $R_1 < |z - z_0| < R_2$, then it has a \emph{Laurent series}
+  \[
+    f(z) = \sum_{n = -\infty}^\infty a_n (z - z_0)^n.
+  \]
+  This is convergent within the annulus.
+\end{prop}
+
+\begin{proof}
+  We wlog $z_0 = 0$. Given a $z$ in the annulus, we pick $r_1, r_2$ such that
+  \[
+    R_1 < r_1 < |z| < r_2 < R_2,
+  \]
+  and we let $\gamma_1$ and $\gamma_2$ be the contours $|z| = r_1$, $|z| = r_2$ traversed anticlockwise respectively. We choose $\gamma$ to be the contour shown in the diagram below.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [<-] circle [radius=1];
+      \draw [->] circle [radius=2];
+      \node [circ] {};
+      \node [right] {$z_0$};
+      \draw (0, 0) -- (-0.707, 0.707) node [pos=0.5, anchor = south west] {$r_1$};
+      \draw (0, 0) -- (-2, 0) node [pos=0.7, above] {$r_2$};
+
+      \node [circ] at (1.3, 0.8) {};
+      \node [right] at (1.3, 0.8) {$z$};
+
+      \draw [white, line width=0.5cm] (0.1, 1) -- (-0.1, 1);
+      \draw [white, line width=0.5cm] (0.1, 2) -- (-0.1, 2);
+      \draw [-<-=0.3] (0.1, 1) -- (0.1, 2);
+      \draw [->-=0.6] (-0.1, 1) -- (-0.1, 2);
+
+      \node [right] at (2, 0) {$\gamma$};
+    \end{tikzpicture}
+  \end{center}
+  We now apply Cauchy's integral formula (after a change of notation):
+  \[
+    f(z) = \frac{1}{2\pi i} \oint_\gamma \frac{f(\zeta)}{\zeta - z} \;\d \zeta.
+  \]
+  We let the distance between the cross-cuts tend to zero. Then we get
+  \[
+    f(z) = \frac{1}{2\pi i} \oint_{\gamma_2} \frac{f(\zeta)}{\zeta - z}\;\d z - \frac{1}{2\pi i} \oint_{\gamma_1} \frac{f(\zeta)}{\zeta - z}\;\d \zeta,
+  \]
+  We have to subtract the second integral because it is traversed in the opposite direction. We do the integrals one by one. We have
+  \begin{align*}
+    \oint_{\gamma_1} \frac{f(\zeta)}{\zeta - z} &= -\frac{1}{z} \oint_{\gamma_1} \frac{f(\zeta)}{1 - \frac{\zeta}{z}}\;\d \zeta\\
+    \intertext{Taking the Taylor series of $\frac{1}{1 - \frac{\zeta}{z}}$, which is valid since $|\zeta| = r_1 < |z|$ on $\gamma_1$, we obtain}
+    &= -\frac{1}{z}\oint_{\gamma_1} f(\zeta) \sum_{m = 0}^\infty \left(\frac{\zeta}{z}\right)^m \;\d \zeta\\
+    &= -\sum_{m = 0}^\infty z^{-m - 1} \oint_{\gamma_1}f(\zeta) \zeta^m \;\d \zeta.
+  \end{align*}
+  This is valid since $\oint \sum = \sum \oint$ by uniform convergence. So we can deduce
+  \[
+    -\frac{1}{2\pi i} \oint_{\gamma_1} \frac{f(\zeta)}{\zeta - z}\;\d \zeta = \sum_{n = -\infty}^{-1} a_n z^n,
+  \]
+  where
+  \[
+    a_n = \frac{1}{2\pi i}\oint_{\gamma_1} f(\zeta) \zeta^{-n - 1} \;\d \zeta
+  \]
+  for $n < 0$.
+
+  Similarly, we obtain
+  \[
+    \frac{1}{2\pi i} \oint_{\gamma_2} \frac{f(\zeta)}{\zeta - z}\;\d \zeta = \sum_{n = 0}^\infty a_n z^n,
+  \]
+  for the same definition of $a_n$, except $n \geq 0$, by expanding
+  \[
+    \frac{1}{\zeta - z} = \frac{1}{\zeta} \frac{1}{1 - \frac{z}{\zeta}} = \sum_{n = 0}^\infty \frac{z^n}{\zeta^{n + 1}}.
+  \]
+  This is again valid since $|\zeta| = r_2 > |z|$ on $\gamma_2$. Putting these result together, we obtain the Laurent series. The general result then follows by translating the origin by $z_0$.
+\end{proof}
 \end{document}
