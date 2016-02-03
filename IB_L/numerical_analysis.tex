@@ -1055,7 +1055,7 @@ We see that $\theta = \frac{1}{2}$ gives us an order $2$ method. Otherwise, we g
 \subsection{Multi-step methods}
 We can try to make our methods more efficient by making use of previous values of $\mathbf{y}_n$ instead of the most recent one. We consider a simple example:
 \begin{defi}[2-step Adams-Bashforth method]
-  The \emph{2-step Adams-Bashforth method} has
+  The \emph{2-step Adams-Bashforth (AB2) method} has
   \[
     \mathbf{y}_{n + 2} = \mathbf{y}_{n + 1} + \frac{1}{2}h \left(3 \mathbf{f}(t_{n + 1}, \mathbf{y}_{n + 1}) - \mathbf{f}(t_n, \mathbf{y}_n)\right).
   \]
@@ -1074,4 +1074,164 @@ One point to note is that we get the same method if we multiply all the constant
   \mathbf{y}_{n + s} = h \sum_{\ell = 0}^s \sigma_\ell \mathbf{f}(t_{n + \ell}, \mathbf{y}_{n + \ell}) - \sum_{\ell = 0}^{s - 1} \rho_\ell \mathbf{y}_{n + \ell}.
 \]
 This method is an implicit method if $\sigma_s \not= 0$. Otherwise, it is explicit.
+
+Note that this method is \emph{linear} in the sense that the coefficients $\rho_\ell$ and $\sigma_\ell$ appear linearly, outside the $\mathbf{f}$s. Later we will see more complicated numerical methods where these coefficients appear inside the arguments of $\mathbf{f}$.
+
+For multi-step methods, we have a slight problem to solve. In a one-step method, we are given $\mathbf{y}_0$, and this allows us to immediately apply the one-step method to get higher values of $\mathbf{y}_n$. However, for an $s$-step method, we need to use other (possible $1$-step) method to obtain $\mathbf{y}_1, \cdots, \mathbf{y}_{s - 1}$ before we can get started.
+
+Fortunately, we only need to apply the one-step method a fixed, small number of times, even as $h \to 0$. So the accuracy of the one-step method does not matter too much.
+
+We now study the properties of a general multi-step method. The first thing we can talk about is the order:
+\begin{thm}
+  A one-step method has order $p$ ($p \geq 1$) if and only if
+  \[
+    \sum_{\ell = 0}^s \rho_\ell = 0
+  \]
+  and
+  \[
+    \sum_{\ell = 0}^s \rho_\ell \ell^k = k\sum_{\ell = 0}^s \sigma_\ell \ell^{k - 1}
+  \]
+  for $k = 1, \cdots, p$.
+\end{thm}
+
+This is just a rather technical result coming directly from definition.
+\begin{proof}
+  The local truncation error is
+  \[
+    \sum_{\ell = 0}^s \rho_\ell \mathbf{y}(t_{n + \ell}) - h \sum_{\ell = 0}^s \sigma_\ell \mathbf{y}'(t_{n + \ell}).
+  \]
+  We now expand the $\mathbf{y}$ and $\mathbf{y}'$ about $t_n$, and obtain
+  \[
+    \left(\sum_{\ell = 0}^s \rho_\ell\right) \mathbf{y}(t_n) = \sum_{k = 1}^\infty \frac{h^k}{k!}\left(\sum_{\ell = 0}^s \rho_\ell \ell^k - k \sum_{\ell = 0}^s \sigma_\ell \ell^{k - 1}\right)\mathbf{y}^{(k)}(t_n).
+  \]
+  This is $O(h^{p + 1})$ under the given conditions.
+\end{proof}
+
+\begin{eg}[AB2]
+  In the two-step Adams-Bashforth method, We see that the conditions hold for $p = 2$ but not $p = 3$. So the order is $2$.
+\end{eg}
+
+There is also an alternative, totally equivalent formula for order. This uses two polynomials associated with the numerical method. Unsurprisingly, they are
+\[
+  \rho(w) = \sum_{\ell = 0}^s \rho_\ell w^\ell,\quad \sigma(w) = \sum_{\ell = 0}^s \sigma_\ell w^\ell.
+\]
+We can then use this to restate the above theorem..
+\begin{thm}
+  A one-step method has order $p$ (with $p \geq 1$) if and only if
+  \[
+    \rho(e^x) - x \sigma(e^x) = O(x^{p + 1})
+  \]
+  as $x \to 0$.
+\end{thm}
+
+\begin{proof}
+  We expand
+  \[
+    \rho(e^x) - x \sigma(e^x) = \sum_{\ell = 0}^s \rho_\ell e^{\ell x} - x \sum_{\ell = 0}^s \sigma_\ell e^{\ell x}.
+  \]
+  We now expand the $e^{\ell x}$ in Taylor series about $x = 0$. This comes out as
+  \[
+    \sum_{\ell = 0}^s \rho_\ell + \sum_{k = 1}^\infty \frac{1}{k!} \left(\sum_{\ell = 0}^s \rho_\ell \ell^k - k \sum_{\ell = 0}^s \sigma_\ell \ell^{k - 1}\right) x^k.
+  \]
+\end{proof}
+Note that $\sum_{\ell = 0}^s \rho_\ell = 0$, which is the condition required for the method to even have an order at all, can be expressed as $\rho(1) = 0$.
+
+\begin{eg}[AB2]
+  In the two-step Adams-Bashforth method, we get
+  \[
+    \rho(w) = w^2 - w,\quad \sigma(w) = \frac{3}{2} w - \frac{1}{2}..
+  \]
+  We can immediately check that $\rho(1) = 0$. We also have
+  \[
+    \rho(e^x) - x \sigma(e^x) = \frac{5}{12} x^3 + O(x^4).
+  \]
+  So the order is $2$.
+\end{eg}
+
+We've sorted out the order of multi-step methods. The next thing to check is convergence. This is where the difference between one-step and multi-step methods come in. For one-step methods, we only needed the order to understand convergence. For multi-step methods, we need an extra condition.
+
+\begin{defi}[Root condition]
+  We say $\rho(w)$ satisfies the \emph{root condition} if all its zeros are bounded by $1$ in size, ie. all roots $w$ satisfy $|w| \leq 1$. Moreover any zero with $|w| = 1$ must be simple.
+\end{defi}
+We can imagine this as saying large roots are bad --- they cannot get past $1$, and we cannot have too many with modulus $1$.
+
+We saw any sensible multi-step method must have $\rho(1) = 0$. So in particular, $1$ must be a simple zero.
+
+\begin{thm}[Dahlquist equivalence theorem]
+  A multi-step method is convergent if and only if
+  \begin{enumerate}
+    \item The order $p$ is at least $1$; and
+    \item The root condition holds.
+  \end{enumerate}
+\end{thm}
+The proof is too difficult to include in this course, or even the Part II version. This is only done in Part III.
+
+\begin{eg}[AB2]
+  Again consider the two-step Adams-Bashforth method. We have seen it has order $p = 2 \geq 1$. So we need to check the root condition. So $\rho(w) = w^2 - w = w(w - 1)$. So it satisfies the root condition.
+\end{eg}
+
+Let's now come up with a sensible strategy for constructing convergent $s$-step methods:
+\begin{enumerate}
+  \item Choose a $\rho$ so that $\rho(1) = 0$ and the root condition holds.
+  \item Choose $\sigma$ to maximize the order, ie.
+    \[
+      \sigma = \frac{\rho(w)}{\log w} +
+      \begin{cases}
+        O(|w - 1|^{s + 1}) & \text{if implicit}\\
+        O(|w - 1|^s) & \text{if explicit}
+      \end{cases}
+    \]
+    We have the two different conditions since for implicit methods, we have one more coefficient to fiddle with, so we can get a higher order.
+\end{enumerate}
+Where does the $\frac{1}{\log w}$ come from? We try to substitute $w = e^x$ (noting that $e^x - 1\sim x$). Then the formula says
+\[
+  \sigma(e^x) = \frac{1}{x} \rho(e^x) +
+  \begin{cases}
+    O(x^{s + 1}) & \text{if implicit}\\
+    O(x^s) & \text{if explicit}
+  \end{cases}.
+\]
+Rearranging gives
+\[
+  \rho(e^x) -x \sigma (e^x) =
+  \begin{cases}
+    O(x^{s + 2}) & \text{if implicit}\\
+    O(x^{s + 1}) & \text{if explicit}
+  \end{cases}.
+\]
+So given any $\rho$, there is only one sensible way to pick $\sigma$. So the key is in picking a good enough $\rho$.
+
+The root conditions is ``best'' satisfied if $\rho(w) = w^{s - 1}(w - 1)$, ie. all but one roots are $0$. Then we have
+\[
+  \mathbf{y}_{n + s} - \mathbf{y}_{n + s - 1} = h \sum_{\ell = 0}^s \sigma_\ell \mathbf{f}(t_{n + \ell}, \mathbf{y}_{n + \ell}),
+\]
+where $\alpha$ is chosen to maximize order.
+
+\begin{defi}[Adams method]
+  An \emph{Adams method} is a multi-step numerical method with $\rho(w) = w^{s - 1}(w - 1)$.
+\end{defi}
+These can be either explicit or implicit. In different cases, we get different names.
+
+\begin{defi}[Adams-Bashforth method]
+  An \emph{Adams-Bashforth} method is an explicit Adams method.
+\end{defi}
+
+\begin{defi}[Adams-Moulton method]
+  An \emph{Adams-Moulton} method is an implicit Adams method.
+\end{defi}
+
+\begin{eg}
+  We look at the two-step third-order Adams-Moulton method. This is given by
+  \[
+    \mathbf{y}_{n + 2} - \mathbf{y}_{n + 1} = h \left(-\frac{1}{2} \mathbf{f}(t_n, \mathbf{y}_n) + \frac{2}{3} \mathbf{f}(t_{n + 1}, \mathbf{y}_{n + 1}) + \frac{5}{12} \mathbf{f}(t_{n + 1}, \mathbf{y}_{n + 2})\right).
+  \]
+  Where do these coefficients come from? We have to first expand our $\frac{\rho(w)}{\log w}$ about $w - 1$:
+  \[
+    \frac{\rho(w)}{ \log w} = \frac{w(w - 1)}{\log w} = 1 + \frac{3}{2} (w - 1) + \frac{5}{12}(w - 1)^2 + O(|w - 1|^3).
+  \]
+  These aren't our coefficients of $\sigma$, since what we need to do is to rearrange the first three terms to be expressed in terms of $w$. So we have
+  \[
+    \frac{\rho(w)}{\log w} = -\frac{1}{12} + \frac{2}{3} w + \frac{5}{12}w^2 + O(|w - 1|^3).
+  \]
+\end{eg}
 \end{document}
