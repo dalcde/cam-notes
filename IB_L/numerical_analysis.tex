@@ -1227,11 +1227,148 @@ These can be either explicit or implicit. In different cases, we get different n
   \]
   Where do these coefficients come from? We have to first expand our $\frac{\rho(w)}{\log w}$ about $w - 1$:
   \[
-    \frac{\rho(w)}{ \log w} = \frac{w(w - 1)}{\log w} = 1 + \frac{3}{2} (w - 1) + \frac{5}{12}(w - 1)^2 + O(|w - 1|^3).
+    \frac{\rho(w)}{\log w} = \frac{w(w - 1)}{\log w} = 1 + \frac{3}{2} (w - 1) + \frac{5}{12}(w - 1)^2 + O(|w - 1|^3).
   \]
   These aren't our coefficients of $\sigma$, since what we need to do is to rearrange the first three terms to be expressed in terms of $w$. So we have
   \[
     \frac{\rho(w)}{\log w} = -\frac{1}{12} + \frac{2}{3} w + \frac{5}{12}w^2 + O(|w - 1|^3).
   \]
 \end{eg}
+
+Another important class of multi-step methods is constructed in the opposite way --- we choose a particular $\sigma$, and then find the most optimal $\rho$.
+
+\begin{defi}[Backward differentiation method]
+  A \emph{backward differentiation method} (BDF) has $\sigma (w) = \sigma_s w^s$, ie.
+  \[
+    \sum_{\ell = 0}^s \rho_\ell \mathbf{y}_{n + \ell} = \sigma_s \mathbf{f}(t_{n + s}, \mathbf{y}_{n + s}).
+  \]
+\end{defi}
+This is a generalization of the one-step backwards Euler method.
+
+Given this $\sigma$, we need to choose the appropriate $\rho$. Fortunately, this can be done quite easliy.
+\begin{lemma}
+  An $s$-step backward differentiation method of order $s$ is obtained by choosing
+  \[
+    \rho(w) = \sigma_s \sum_{\ell = 1}^s \frac{1}{\ell} w^{s - \ell}(w - 1)^\ell,
+  \]
+  with $\sigma_s$ chosen such that $\rho(s) = 1$, namely
+  \[
+    \sigma_s = \left(\sum_{\ell = 1}^s \frac{1}{\ell}\right)^{-1}.
+  \]
+\end{lemma}
+
+\begin{proof}
+  We need to construct $\rho$ so that
+  \[
+    \rho(w) = \sigma_s w^s \log w + O(|w - 1|^{s + 1}).
+  \]
+  This is easy, if we write
+  \begin{align*}
+    \log w &= - \log\left(\frac{1}{w}\right)\\
+    &= -\log \left(1 - \frac{w - 1}{w}\right)\\
+    &= \sum_{\ell = 1}^\infty \frac{1}{\ell} \left(\frac{w - 1}{w}\right)^\ell.
+  \end{align*}
+  Multiplying by $\sigma_s w^s$ gives the desired result.
+\end{proof}
+For this method to be convergent, we need to make sure it does satisfy the root condition. It turns out the root condition is satisfied only for $s \leq 6$. This is not obivous by first sight, but we can certainly verify this manually.
+
+\subsection{Runge-Kutta methods}
+There is one last type of methods for initial value ODEs we wish to investigate. These methods are in some sense linked up with quadrature methods.
+
+\begin{defi}[Runge-Kutta method]
+  General (implicit) $\nu$-stage \emph{Runge-Kutta (RK) methods} have the form
+  \[
+    \mathbf{y}_{n + 1} = \mathbf{y}_n + h \sum_{\ell = 1}^\nu b_\ell \mathbf{k}_\ell,
+  \]
+  where
+  \[
+    \mathbf{k}_\ell = \mathbf{f}\left(t_n + c_n h, \mathbf{y}_n + h\sum_{j = 1}^\nu a_{\ell_j} \mathbf{k}_j\right)
+  \]
+  for $\ell = 1, \cdots, \nu$.
+\end{defi}
+There are a lot of parameters we have to choose. We need to pick
+\[
+  \{b_\ell\}_{\ell = 1}^\nu,\quad \{c\}_{\ell = 1}^\nu,\quad \{a_{\ell j}\}_{\ell, j = 1}^\nu.
+\]
+Note that in general, $\{\mathbf{k}_{\ell}\}_{\ell = 1}^\nu$ have to be solved for, since they are defined in terms of one another. However, for certain choices of parameters, we can make this an explicit method. This makes it easier to compute, but we would have lost some accuracy and flexibility.
+
+Unlike all the other methods we've seen so far, the parameters appear \emph{inside} $\mathbf{f}$. They appear non-linearly inside the functions. This makes the method much more complicated, and difficult to analyse using Taylor series. Yet, once we manage to do this properly, these have lots of nice properties.
+
+Notice this is a one-step method. So once we get order $p \geq 1$, we will have convergence. So what conditions do we need for a decent order? We can consider the case where $\mathbf{f}$ is a constant. This immediately gives the requirement
+\[
+  \sum_{\ell = 1}^\nu b_\ell = 1.
+\]
+It turns out we also need, for $\ell = 1, \cdots, \nu$,
+\[
+  c_\ell = \sum_{j = 1}^\nu a_{\ell j}.
+\]
+While these are necessary conditions, they are not sufficient. We need other conditions as well, which we shall get to later.
+
+The best possible order of a $\nu$-stage Runge-Kutta method is $2 \nu$. This is a \emph{double} accuracy. This should ring a bell about Gaussian quadrature --- that also has double accuracy. It turns out these are in fact related.
+
+The standard notation for describing a Runge-Kutta method is the Butcher table
+\begin{center}
+  \begin{tabular}{c|ccc}
+    $c_1$ & $a_{11}$ & $\cdots$ & $a_{1\nu}$\\
+    $\vdots$ & $\vdots$ & $\ddots$ & $\vdots$\\
+    $c_\nu$ & $a_{\nu 1}$ & $\cdots$ & $a_{\nu\nu}$\\\hline
+    & $b_1$ & $\cdots$ & $b_\nu$
+  \end{tabular}
+\end{center}
+We sometimes more concisely write it as
+\begin{center}
+\begin{tabular}{c|ccc}
+  \\
+  $\mathbf{c}$ &\vphantom{a} &{\Large $A$}&\vphantom{a}\\
+  \\\hline
+  & &$\mathbf{v}^T$
+\end{tabular}
+\end{center}
+While we are considering implicit methods in general, initially, explicit methods came out first, since they are much easier to compute. Explicit Runge-Kutta methods have $A$ strictly lower triangular, ie. $a_{\ell j}$ whenever $\ell \leq j$.
+
+\begin{eg}
+  The most famous explicit Runge-Kutta method is the 4-stage 4th order one, often called the \emph{classical} Runge-Kutta method. The formula can be given explicitly by
+  \[
+    \mathbf{y}_{n + 1} = \mathbf{y}_n + \frac{h}{6}(\mathbf{k}_1 + 2\mathbf{k}_2 + 2\mathbf{k}_3 + \mathbf{k}_4),
+  \]
+  where
+  \begin{align*}
+    \mathbf{k}_1 &= \mathbf{f}(x_n, \mathbf{y}_n)\\
+    \mathbf{k}_2 &= \mathbf{f}\left(x_n + \frac{1}{2}h, \mathbf{y}_n + \frac{1}{2}h \mathbf{k}_1\right)\\
+    \mathbf{k}_3 &= \mathbf{f}\left(x_n + \frac{1}{2}h, \mathbf{y}_n + \frac{1}{2}h \mathbf{k}_2\right)\\
+    \mathbf{k}_4 &= \mathbf{f}\left(x_n + h, \mathbf{y}_n + h \mathbf{k}_3\right).
+  \end{align*}
+  We see that this is an explicit method. We don't need to solve any equations.
+\end{eg}
+Choosing the parameters for the RK method to maximize order is \emph{hard}. Consider the simplest case, the $2$-stage explicit method. The general formula is
+\[
+  \mathbf{y}_{n + 1} = \mathbf{y}_n + h(b_1 \mathbf{k}_1 + b_2 \mathbf{k}_2),
+\]
+where
+\begin{align*}
+  \mathbf{k}_1 &= f(x_n, \mathbf{y}_n)\\
+  \mathbf{k}_2 &= f(x_n + c_2 h, \mathbf{y}_n + r_2 h\mathbf{k}_1).
+\end{align*}
+To analyse this, we insert the true solution into the method. First, we need to insert the true solution of the ODE into the $\mathbf{k}$'s. We get
+\begin{align*}
+  \mathbf{k}_1 &= \mathbf{y}'(t_n)\\
+  \mathbf{k}_2 &= \mathbf{f}(t_n + c_2 h, \mathbf{y}(t_n) + c_2 h \mathbf{y}'(t_n))\\
+  &= \mathbf{y}'(t_n) + c_2 h \left(\frac{\partial \mathbf{f}}{\partial t}(t_n. \mathbf{y}, (t_n)) + \nabla \mathbf{f}(t_n, \mathbf{y}(t_n)) \mathbf{y}'(t_n)\right) + O(h^2)\\
+  \intertext{Fortunately, we notice that the thing inside the huge brackets is just $\mathbf{y}''(t_n)$. So this is}
+  &= \mathbf{y}'(t_n) + c_2 h \mathbf{y}''(t_n) + O(h^2).
+\end{align*}
+Hence, our local truncation method for the Runge-Kutta method is
+\begin{multline*}
+  \mathbf{y}(t_{n + 1}) - \mathbf{y}(t_n) - h(b_1 \mathbf{k}_1 + b_2 \mathbf{k}_2) \\
+  = (1 - b_1 - b_2)h \mathbf{y}'(t_n) + \left(\frac{1}{2} - b_2 c_2\right) h^2 \mathbf{y}''(t_n) + O(h^3).
+\end{multline*}
+Now we see why Runge-Kutta methods are hard to analyse. The coefficients appear non-linearly in this expression. It is still solvable in this case, in the obvious way, but for higher stage methods, this becomes much more complicated.
+
+In this case, we have a $1$-parameter family of order $2$ methods, satisfying
+\[
+  b_1 + b_2 = 1,\quad b_2c_2 = \frac{1}{2}.
+\]
+It is easy to check using a simple equation $y' = \lambda h$ that it is not possible to get a higher order method. So as long as our choice of $b_1$ and $b_2$ satisfy this equation, we get a decent order $2$ method.
+
+As we have seen, Runge-Kutta methods are really complicated, even in the simplest case. However, they have too many good properties that they are becoming very popular nowadays.
 \end{document}
