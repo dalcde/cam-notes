@@ -385,7 +385,7 @@ It should be clear (though not trivial to prove) that a simple closed curve sepa
 
 The more general statement requires the following definition:
 \begin{defi}[Simply connected]
-  A domain $\mathcal{U}\subseteq \C$ is \emph{simply connected} if every continuous map from the circle $f: S^1 \to \mathcal{U}$ can be extended to a continuous map from the disk $F: \overline{D^2} \to \mathcal{U}$ such that$F|_{\partial \overline{D^2}} = f$. Alternatively, any loop can be continuously shrunk to a point.
+  A domain $\mathcal{U}\subseteq \C$ is \emph{simply connected} if every continuous map from the circle $f: S^1 \to \mathcal{U}$ can be extended to a continuous map from the disk $F: \overline{D^2} \to \mathcal{U}$ such that $F|_{\partial \overline{D^2}} = f$. Alternatively, any loop can be continuously shrunk to a point.
 \end{defi}
 
 \begin{eg}
@@ -1100,7 +1100,7 @@ Recall that we previously computed $\int_{\partial \overline{B(0, 1)}} \frac{1}{
 \end{proof}
 
 \begin{cor}[Local maximum principle]
-  Let $f: B(z, r) \to \C$ be holomorphic. Suppose $|f(w)| \leq |f(z)|$ for all $w \in B(z\; r)$. Then $f$ is constant. In other words, a non-constant function cannot achieve an interior local maximum.
+  Let $f: B(z, r) \to \C$ be holomorphic. Suppose $|f(w)| \leq |f(z)|$ for all $w \in B(z; r)$. Then $f$ is constant. In other words, a non-constant function cannot achieve an interior local maximum.
 \end{cor}
 
 \begin{proof}
@@ -1772,5 +1772,290 @@ From now on, the course will involve applying the techniques we've developed so 
   Hence $h(z) = f(z) - g(z)$ is holomorphic on $\C \setminus \Z$. However, since its principal part vanishes at the integers, it has at worst a removable singularity. Removing the singularity, we know $h(z)$ is entire.
 
   Since we want to prove $f(z) = g(z)$, we need to show $h(z) = 0$. To do this, we only have to show it is bounded and vanishes at a point, by Liouville's theorem.
+
+  We first show boundedness. We know $f$ and $g$ are both periodic with period $1$. So it is natural to focus attention on the strip $-\frac{1}{2} \leq x = \Re(z) \leq \frac{1}{2}$.
+
+  If we further focus on the rectangle $x \in [-\frac{1}{2}, \frac{1}{2}]$, $y \in [-Y, Y]$, then we get a bound from the continuity on $h$ on a closed bounded set. Finally, for $z = x + iy$, $|x| \leq \frac{1}{2}$, wlog $y > 0$, we bound $f$ and $g$ separately for large $y$: we have
+  \[
+    |g(z)| \leq \frac{4\pi^2}{|e^{\pi y} - e^{- \pi y}|} \to 0
+  \]
+  as $y \to \infty$. Exactly analogously,
+  \[
+    |f(z)| \leq \sum_{n \in \Z} \frac{1}{|x + iy - n|^2} \leq \frac{1}{y^2} + 2 \sum_{n = 1}^\infty \frac{1}{(n - \frac{1}{2})^2 + y^2} \to 0
+  \]
+  as $y \to \infty$. So $h$ is bounded on the strip, and tends to $0$ as $y \to \infty$, and is hence constant by Liouville's theorem. But if $h \to 0$ as $y \to \infty$, then the constant better be zero. So we get
+  \[
+    h(z) = 0.
+  \]
 \end{eg}
+
+\section{Residue calculus}
+\subsection{Winding numbers}
+Recall that the integral of a curve around a singularity tells us something about the singularity, via the Laurent series and the Cauchy integral formula. This allows us to deal with cases with exactly one singularity and rather simple curves. To deal with more complicated objects, we need some more definitions.
+
+\begin{defi}[Residue]
+  Let $f: B (a, r) \setminus \{a\} \to \C$ be holomorphic, with Laurent series
+  \[
+    f(z) = \sum_{n = -\infty}^\infty c_n (z - a)^n.
+  \]
+  Then the \emph{residue} of $f$ at $a$ is
+  \[
+    \Res(f, a) = \Res_f(a) = c_{-1}.
+  \]
+\end{defi}
+Note that if $\rho < r$, then we have
+\[
+  \int_{\partial \overline{B(a, \rho)}} f(z)\;\d z = 2\pi i c_{-1}.
+\]
+So we can alternatively write
+\[
+  \Res_f(a) = \frac{1}{2 \pi i}\int_{\partial \overline{B(a, \rho)}} f(z)\;\d z.
+\]
+This gives us a formulation of the residue without reference to the Laurent series.
+
+However, consider non-simple a $C^1$ curve $\gamma$ as shown below:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->-=0.45] plot [smooth cycle, tension=1] coordinates {(0.5, -1) (-0.6, 0) (-0.8, -1.2) (0.8, -1.2) (0.6, 0) (-0.5, -1)};
+    \node [circ] at (0, -0.8) {};
+    \node [below] at (0, -0.8) {$a$};
+  \end{tikzpicture}
+\end{center}
+by the additivity of the integral, we can break this curve into two closed contours, and then we know
+\[
+  \frac{1}{2\pi i} \int_\gamma f(z)\;\d z = 2 \Res_f(a).
+\]
+We obtained the coefficient $2$ by looking at the curve and trying to chop it up into two. However, while this works for this particular case, it is difficult to formalize and generalize. We want more generally a notion of how a given closed curve (not necessarily simple) winds around a point $a$ not lying on the curve.
+
+\begin{lemma}
+  Let $\gamma: [a, b] \to \C$ be a continuous closed curve, and let $w \in \C \setminus \image (\gamma)$. Then there are continuous functions $r: [a, b] \to \R \geq 0$ and $\theta: [a, b] \to \R$ such that
+  \[
+    \gamma(t) = w + r(t) e^{i\theta(t)}.
+  \]
+\end{lemma}
+Of course, at each point $t$, we can find $r$ and $\theta$ such that the above holds. The key point of the lemma is that we can do so continuously.
+
+\begin{proof}
+  Clearly $r(t) = |\gamma(t) - w|$ exists and is continuous, since it is the composition of continuous functions. Note that this is never zero since $\gamma(t)$ is never $w$. The actual content is in defining $\theta$.
+
+  To define $\theta(t)$, we for simplicity assume $w = 0$. Furthermore, by considering instead the function $\frac{\gamma(t)}{r(t)}$, which is continuous and well-defined since $r$ is never zero, we can assume $|\gamma(t)| = 1$ for all $t$.
+
+  Recall that the principal branch of $\log$, and hence of the argument $\Im (\log)$, takes values in $(-\pi, \pi)$ and is defined on $\C \setminus \R_{\leq 0}$.
+  \begin{center}
+    \begin{tikzpicture}
+      \fill [mblue, opacity=0.5] (0, 2) rectangle (2, -2);
+      \draw [->] (0, 0) -- (2, 0);
+      \draw [thick] (-2, 0) -- (0, 0);
+      \draw [->] (0, -2) -- (0, 2);
+      \node [circ] at (0, 0) {};
+    \end{tikzpicture}
+  \end{center}
+  If $\gamma(t)$ always lied in, say, the right-hand half plane, we would have no problem defining $\theta$ consistently, since we can just let
+  \[
+    \theta(t) = \arg(\gamma(t))
+  \]
+  for $\arg$ the principal branch. There is nothing special about the right-hand half plane. Similarly, if $\gamma$ lies in the region as shaded below:
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (0, 0) -- (2, 0);
+      \draw [->] (0, -2) -- (0, 2);
+
+      \fill [mblue, opacity=0.5] (-1, 2) -- (1, -2) -- (2, -2) -- (2, 2) -- cycle;
+      \draw (-1, 2) -- (1, -2);
+
+      \draw (0, 0.8) arc(90:116.56:0.8) node [pos=0.5, above] {$\alpha$};
+    \end{tikzpicture}
+  \end{center}
+  ie. we have
+  \[
+    \gamma(t) \in \left\{z : \Re\left(\frac{z}{e^{i\alpha}}\right) > 0\right\}
+  \]
+  for a fixed $\alpha$, we can define
+  \[
+    \theta(t) = \alpha + \arg\left(\frac{\gamma(t)}{e^{i\alpha}}\right).
+  \]
+  Since $\gamma: [a, b] \to \C$ is continuous, it is uniformly continuous, and we can find a subdivision
+  \[
+    a = a_0 < a_1 < \cdots < a_m = b,
+  \]
+  such that if $s, t \in [a_{i - 1}, a_i]$, then $|\gamma(s) - \gamma(t)| < \sqrt{2}$, and hence $\gamma(s)$ and $\gamma(t)$ belong to such a half-plane.
+
+  So we define $\theta_j: [a_{j - 1}, a_j] \to \R$ such that
+  \[
+    \gamma(t) = e^{i\theta_j(t)}
+  \]
+  for $t \in [a_{j - 1}, a_j]$, and $1 \leq j \leq n - 1$.
+
+  What happens at the boundary? We know $\theta_j(a_j)$ and $\theta_{j + 1}(a_j)$ are both values of the argument for a fixed complex number, hence differ by an element of $2\pi \Z$.
+
+  Now, for $j > 1$, we can successively re-define $\theta_j$ such that the resulting map $\theta$ is continuous, by shifting the individual $\theta_j$'s by integer multiples of $2\pi$. So done.
+\end{proof}
+This allows us to define the winding number by considering how $\theta$ varies along the path.
+
+\begin{defi}[Winding number]
+  Given a continuous path $\gamma: [a, b] \to \C$ such that $\gamma(a) = \gamma(b)$ and $w \not\in \image(\gamma)$, the \emph{winding number} of $\gamma$ about $w$ is
+  \[
+    \frac{\theta(b) - \theta(a)}{2\pi},
+  \]
+  where $\theta: [a, b] \to \R$ is a continuous function as above. This is denoted by $I(\gamma, w)$ or $n_\gamma(W)$.
+\end{defi}
+$I$ and $n$ stand for index and number respectively.
+
+Note that we always have $I(\gamma, w) \in \Z$, since $\theta(b)$ and $\theta(a)$ are arguments of the same number. More importantly, $I(\gamma, w)$ is well-defined --- suppose $\gamma(t) = r(t) e^{i \theta_1(t)} = r(t) e^{i\theta_2(t)}$ for continuous functions $\theta_1, \theta_2: [a, b] \to \R$. Then $\theta_1 - \theta_2 : [a, b] \to \R$ is continuous, but takes values in the discrete set $2\pi \Z$. So it must in fact be constant, and thus $\theta_1(b) - \theta_1(a) = \theta_2(b) - \theta_2(a)$.
+
+So far, what we've done is something that is true for arbitrary continuous closed curve. However, if we focus on piecewise $C^1$-smooth closed path, then we get an alternative expression:
+\begin{lemma}
+  Suppose $\gamma: [a, b] \to \C$ is a piecewise $C^1$-smooth closed path, and $w \not\in \image(\gamma)$. Then
+  \[
+    I(\gamma, w) = \frac{1}{2\pi i} \int_\gamma \frac{1}{z - w} \;\d z.
+  \]
+\end{lemma}
+
+\begin{proof}
+  Let $\gamma(t) - w = r(t) e^{i \theta(t)}$, with now $r$ and $\theta$ piecewise $C^1$-smooth. Then
+  \begin{align*}
+    \int_\gamma \frac{1}{z - w}\;\d z &= \int_a^b \frac{\gamma'(t)}{\gamma(t) - w}\;\d t\\
+    &= \int_a^b \left(\frac{r'(t)}{r(t)} + i \theta'(t)\right) \;\d t\\
+    &= [\ln r(t) + i\theta(t)]^b_a\\
+    &= i(\theta(b) - \theta(a))\\
+    &= 2\pi i I(\gamma, w).
+  \end{align*}
+  So done.
+\end{proof}
+
+In some books, this integral expression is taken as the definition of the winding number. While this is elegant in complex analysis, it is not clear \emph{a priori} that this is an integer, and only works for piecewise $C^1$-smooth closed curves, not arbitrary continuous closed curves.
+
+On the other hand, what is evident from this expression is that $I(\gamma, w)$ is continuous as a function of $w \in \C \setminus \image(\gamma)$, since it is even holomorphic as a function of $w$. Since $I(\gamma; w)$ is integer valued, $I(\gamma)$ must be locally constant on path components of $\C \setminus \image(\gamma)$.
+
+Also, since $\image(\gamma)$ is compact, all points of sufficiently large modulus in $\C$ belong to one component of $\C \setminus \image(\gamma)$. This is indeed the only path component of $\C\setminus \image(\gamma)$ that is unbounded. This is a distinguished path component of $\C \setminus \image(\gamma)$. So the winding number has a distinguished value at this unbounded component. Fortunately, this is zero.
+
+Indeed, as $I(\gamma; w)$ is consistent on this component, we can consider arbitrarily larger $w$. By the integral formula,
+\[
+  |I(\gamma, w)| \leq \frac{1}{2\pi} \length(\gamma) \max_{z \in \gamma} \frac{1}{|w - z|} \to 0
+\]
+as $w \to \infty$. However, inside the other path components, we can still have some interesting values of the winding number.
+
+\subsection{The Cauchy residue theorem}
+We are now going to obtain a more general version of Cauchy's theorem. This will involve the idea of winding numbers. This will also need the idea of curves being homotopic.
+\begin{defi}[Homotopy of closed curves]
+  Let $U \subseteq \C$ be a domain, and let $\phi: [a, b] \to U$ and $\psi: [a, b] \to U$ be piecewise $C^1$-smooth closed paths. A \emph{homotopy} from $\phi: \psi$ is a continuous map $F: [0, 1] \times [a, b] \to U$ such that
+  \[
+    F(0, t) = \phi(t),\quad F(1, t) = \psi(t),
+  \]
+  and moreover, for all $s \in [0, t]$, the map $t \mapsto F(s, t)$ viewed as a map $[a, b] \to U$ is closed and piecewise $C^1$-smooth.
+\end{defi}
+We can imagine this as a process of ``continuously deforming'' the path $\phi$ to $\psi$, with a path $F(s, \ph)$ at each point in time $s \in [0, 1]$.
+
+Recall from long time ago that we have the notion of a convex deformation --- given $\phi, \psi: [a, b] \to U$, which are closed, we say $\psi$ is an \emph{elementary deformation} or \emph{convex deformation} of $\phi$ if there exists a decomposition $a = x_0 < x_1 < \cdots < x_n = b$ and convex open sets $C_1, \cdots, C_n \subseteq U$ such that for $x_{i - 1} \leq t \leq x_i$, we have $\phi(t)$ and $\psi(t)$ in $C_i$. Let $\gamma_i \subseteq C_i$ be the straight path from $\phi(x_i)$ to $\psi(x_i)$.
+
+Then if $f: U \to \C$ is holomorphic, we claimed that
+\[
+  \int_\phi f(x)\;\d z = \int_\psi f(z)\;\d z.
+\]
+This is since we can let $\phi_i = \phi|_{[x_{i - 1}, x_i]}$, and similarly for $\psi$ and then by the convex Cauchy theorem, we know
+\[
+  \int_{\phi_i + \gamma_i - \psi_i - \gamma_{i - 1}} f(z)\;\d z = 0.
+\]
+Summing this over all $i$, we obtain the required identity.
+
+While the definition of elementary deformation allowed us to prove this property with ease, the definition itself is unnatural and weird. We have to make reference to this arbitrarily constructed dissection of $[a, b]$ and convex sets $C_i$. Moreover, this rigid definition of elementary definition fails to be transitive (exercise). % fill
+Homotopy is a much more natural definition to use, and is easily seen to be an equivalence relation. Fortunately, we have the following proposition:
+
+\begin{prop}
+  Let $\phi, \psi: [a, b] \to U$ be homotopic (piecewise $C^1$) closed paths in a domain $U$. Then there exists some $\phi = \phi_0, \phi_1, \cdots, \phi_N = \psi$ such that each $\phi_j$ is piecewise $C^1$ closed and $\phi_{i + 1}$ is obtained from $\phi_i$ by elementary deformation.
+\end{prop}
+
+\begin{proof}
+  This is an exercise in uniform continuity. We let $F: [0, 1] \times [a, b] \to U$ be a homotopy from $\phi$ to $\psi$. Since $\image (F)$ is compact and $U$ is open, there is some $\varepsilon > 0$ such that $B(F(s, t), \varepsilon) \subseteq U$ for all $(s, t) \in [0, 1] \times [a, b]$ (for each $s, t$, there is an $\varepsilon_{s, t}$ such that $B(F(s, t), \varepsilon_{s, t}) \subseteq U$, and by compactness, finitely many of these balls cover $\image(F)$. Then taking the minimum of all these $\varepsilon_{s, t}$ gives the desired $\varepsilon$).
+
+  Since $F$ is uniformly continuous, there is some $\delta$ such that $\|(s, t) - (s', t')\| < \delta$ implies $|F(s, t) - F(s', t')| < \varepsilon$.
+
+  Now we pick $n \in \N$ such that $\frac{1 + (b - a)}{n} < \delta$, and let
+  \begin{align*}
+    x_j &= a + (b - a) \frac{j}{n}\\
+    \phi_i(t) &= F\left(\tfrac{i}{n}, t\right)\\
+    C_{ij} &= B\left(F\left(\tfrac{i}{n}, x_j\right), \varepsilon\right)
+  \end{align*}
+  Then $C_{ij}$ is clearly convex. These definitions are cooked up precisely so that if $s \in \left(\frac{i - 1}{n}, \frac{i}{n}\right)$ and $t \in [x_{j - 1}, x_j]$, then $F(s, t) \in C_{ij}$. So the result follows.
+\end{proof}
+So homotopies are sequences of elementary deformations, and elementary deformations don't change integrals.
+
+We can now ``upgrade'' our Cauchy integral formula. We first re-define what it means for a domain to be simply connected:
+\begin{defi}[Simply connected domain]
+  A domain $U$ is \emph{simply connected} if every $C^1$ smooth closed path is homotopic to a constant path.
+\end{defi}
+This is in fact equivalent to our earlier definition that every continuous map $S^1 \to U$ can be extended to a continuous map $D^2 \to U$. This is almost immediately obvious, except that our old definition only required the map to be continuous, while the new definition only works with piecewise $C^1$ paths. We will need something that allows us to approximate any continuous curve with a piecewise $C^1$-smooth one, but we shall not do that here. Instead, we will just forget about the old definition and stick to the new one.
+
+\begin{cor}
+  Let $U$ be a domain, $f: U \to \C$ be holomorphic, and $\gamma_1, \gamma_2$ be homotopic piecewise $C^1$-smooth closed curves in $U$. Then
+  \[
+    \int_{\gamma_1}f(z)\;\d z = \int_{\gamma_2}f(z)\;\d z.
+  \]
+\end{cor}
+This means the integral around any path depends only on the homotopy class of the path, and not the actual path itself.
+
+This then implies
+\begin{cor}[Cauchy's theorem for simply connected domains]
+  Let $U$ be a simply connected domain, and let $f: U \to \C$ be holomorphic. If $\gamma$ is any piecewise $C^1$-smooth closed curve in $U$, then
+  \[
+    \int_\gamma f(z)\;\d z = 0.
+  \]
+\end{cor}
+
+\begin{proof}
+  By definition of simply-connected, $\gamma$ is homotopic to the constant path, and it is easy to see the integral along a constant path is zero.
+\end{proof}
+
+Recall we also had the Cauchy integral formula. If $f: B(a, r) \to \C$ is holomorphic, $w \in B(a, \rho)$ and $\rho < r$, then
+\[
+  f(w) = \frac{1}{2\pi i} \int_{\partial \overline{B(a, \rho)}} \frac{f(z)}{z - w}\;\d z.
+\]
+This is a version of Cauchy's theorem where $g: U \to \C$ is holomorphic only $U\setminus \{w\}$, with $g(z) = \frac{f(z)}{z - w}$.
+
+The idea is that if the function $g$ is not holomorphic at $w$, then we pick up a non-zero value as we go around the point $w$.
+
+The following result is a powerful generalization of these ideas:
+\begin{thm}[Cauchy's Residue theorem]
+  Let $U$ be a simply connected domain, and let $\{z_1, \cdots, z_k\} \subseteq U$, and let $f: U \setminus \{z_1, \cdots, z_k\} \to \C$ be holomorphic. Let $\gamma: [a, b] \to U$ be a piecewise $C^1$-smooth closed curve such that $z_i \not= \image(\gamma)$ for all $i$. The
+  \[
+    \frac{1}{2\pi i} \int_{\gamma}f(z)\;\d z = \sum_{j = 1}^k I(\gamma, z_i) \Res(f; z_i).
+  \]
+\end{thm}
+The Cauchy integral formula and simply-connected Cauchy are special cases of this.
+
+\begin{proof}
+  At $z_i$, $f$ has a Laurent expansion
+  \[
+    f(z) = \sum_{n \in \Z} c_n^{(i)} (z - z_i)^n,
+  \]
+  valid in some neighbourhood of $z_i$. Let $g_i(z)$ be the principal part, namely
+  \[
+    g_i(z) = \sum_{n = -\infty}^{-1} c_n^{(i)}(z - z_i)^n.
+  \]
+  From the proof of the Laurent series, we know $g_i(z)$ gives a holomorphic function on $U \setminus \{z_i\}$.
+
+  We now consider $f - g_1 - g_2 - \cdots - g_k$, which is holomorphic on $U \setminus \{z_1, \cdots, z_k\}$, and has a \emph{removable} singularity at each $z_i$. So
+  \[
+    \int_\gamma (f - g_1 - \cdots - g_k)(z)\;\d z = 0,
+  \]
+  by simply-connected Cauchy. Hence we know
+  \[
+    \int_\gamma f(z)\;\d z = \sum_{j = 1}^k \int_\gamma g_j(z)\;\d z.
+  \]
+  For each $j$, we use uniform convergence of the series $\sum_{n \leq -1} c_n^{(j)} (z - z_j)^n$ on compact subsets of $U \setminus \{z_j\}$, and hence on $\gamma$, to write
+  \[
+    \int_\gamma g_j(z)\;\d z = \sum_{n \leq -1} c_n^{(j)} \int_\gamma (z - z_j)^n\;\d z.
+  \]
+  However, for $n \not= -1$, the function $(z - z_j)^n$ has an antiderivative, and hence the integral around $\gamma$ vanishes. So this is equal to
+  \[
+    c_{-1}^{(j)} \int_\gamma \frac{1}{z - z_j}\;\d z.
+  \]
+  But $c_{-1}^{(j)}$ is by definition the residue of $f$ at $z_j$, and the integral is just the integral definition of the winding number (up to a factor of $2\pi i$). So we get
+  \[
+    \int_\gamma f(z)\;\d z = 2\pi i \sum_{j = 1}^k \Res(f; z_j) I(\gamma, z_j).
+  \]
+  So done.
+\end{proof}
+
+
 \end{document}

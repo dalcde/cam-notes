@@ -1340,7 +1340,7 @@ While we are considering implicit methods in general, initially, explicit method
   \end{align*}
   We see that this is an explicit method. We don't need to solve any equations.
 \end{eg}
-Choosing the parameters for the RK method to maximize order is \emph{hard}. Consider the simplest case, the $2$-stage explicit method. The general formula is
+Choosing the parameters for the Runge-Kutta method to maximize order is \emph{hard}. Consider the simplest case, the $2$-stage explicit method. The general formula is
 \[
   \mathbf{y}_{n + 1} = \mathbf{y}_n + h(b_1 \mathbf{k}_1 + b_2 \mathbf{k}_2),
 \]
@@ -1371,4 +1371,369 @@ In this case, we have a $1$-parameter family of order $2$ methods, satisfying
 It is easy to check using a simple equation $y' = \lambda h$ that it is not possible to get a higher order method. So as long as our choice of $b_1$ and $b_2$ satisfy this equation, we get a decent order $2$ method.
 
 As we have seen, Runge-Kutta methods are really complicated, even in the simplest case. However, they have too many good properties that they are becoming very popular nowadays.
+
+\section{Stiff equations}
+\subsection{Introduction}
+Initially, when people were developing numerical methods, people focused mostly on quantitative properties like order and accuracy. We then develop many different methods like multi-step methods and Runge-Kutta methods.
+
+More recently, people started to look at \emph{structural properties}. Often, equations come with some special properties. For example, a differential equation describing the motion of a particle would most probably conserve energy. When we approximate it numerically, we would like the numerical approximation to satisfy conservation of energy as well. This is what recent developments are looking at --- we want to look at whether numerical methods preserve certain nice properties.
+
+We are not going to look at conservation of energy --- this is too complicated for a first course. Instead, we look at the following problem. Suppose we have a system of ODEs for $0 \leq t \leq T$:
+\begin{align*}
+  \mathbf{y}'(t) &= \mathbf{f}(t, \mathbf{y}(t))\\
+  \mathbf{y}(0) &= \mathbf{y}_0.
+\end{align*}
+Suppose $T > 0$ is arbitrary, and
+\[
+  \lim_{t \to \infty} \mathbf{y}(t) = \mathbf{0}.
+\]
+What restriction on $h$ is necessary for a numerical method to satisfy $\lim\limits_{n \to \infty} \mathbf{y}_n = \mathbf{0}$?
+
+This question is still too complicated for us to tackle. It can only be easily solved for linear problems, namely ODEs of the form
+\[
+  \mathbf{y}'(t) = A \mathbf{y}(t),
+\]
+for $A \in R^{N \times N}$.
+
+Firstly, for what $A$ do we have $\mathbf{y}(t) \to 0$ as $t \to \infty$? By some basic linear algebra, we know this holds only if $\Re(\lambda) < 0$ for all eigenvalues $A$. To simplify further, we consider the case where
+\[
+  y'(t) = \lambda y(t),\quad \Re(\lambda) < 0.
+\]
+It should be clear that if $A$ is diagonalizable, then it can be reduced to multiple instances of this case. Otherwise, we need to do some more work, but we'll not do that in this course.
+
+And that, at last, is enough simplification.
+
+\subsection{Linear stability}
+This is the easy part of the course, where we are just considering the problem $y' = \lambda y$. No matter how complicated are numerical method is, when applied to this problem, it usually becomes really simple.
+
+\begin{defi}[Linear stability domain]
+  If we apply a numerical method to
+  \[
+    y'(t) = \lambda y(t)
+  \]
+  with $y(0) = 1$, $\lambda \in \C$, then its linear stability domain is
+  \[
+    D = \left\{z = h\lambda: \lim_{n \to \infty} y_n = 0\right\}.
+  \]
+\end{defi}
+
+\begin{eg}
+  Consider the Euler method. The discrete solution is
+  \[
+    y_n = (1 + h\lambda)^n.
+  \]
+  Thus we get
+  \[
+    D = \{z \in \C: |1 + z| < 1\}.
+  \]
+  We can visualize this on the complex plane as the open unit ball
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (-2.5, 0) -- (2.5, 0) node [right] {$\Re$};
+      \draw [->] (0, -2) -- (0, 2) node [above] {$\Im$};
+
+      \draw [fill=mblue, fill opacity=0.5] (-1, 0) circle [radius=1];
+      \node [circ] at (-1, 0) {};
+      \node [below] at (-1, 0) {$-1$};
+    \end{tikzpicture}
+  \end{center}
+\end{eg}
+
+\begin{eg}
+  Consider instead the backward Euler method. This method is implicit, but since our problem is simple, we can find what $n$th step is. We have
+  \[
+    y_n = (1 - \lambda h)^{-n}.
+  \]
+  Then we get
+  \[
+    D = \{z \in \C: |1 - z| > 1\}.
+  \]
+  We can visualize this as the region:
+  \begin{center}
+    \begin{tikzpicture}
+      \fill [mblue, opacity=0.5] (-2.5, 2) rectangle (2.5, -2);
+
+      \draw [fill=white] (1, 0) circle [radius=1];
+      \node [circ] at (1, 0) {};
+      \node [below] at (1, 0) {$1$};
+      \draw [->] (-2.5, 0) -- (2.5, 0) node [right] {$\Re$};
+      \draw [->] (0, -2) -- (0, 2) node [above] {$\Im$};
+    \end{tikzpicture}
+  \end{center}
+\end{eg}
+We make the following definition:
+\begin{defi}[A-stability]
+  A numerical method is \emph{A-stable} if
+  \[
+    \C^- = \{z \in \C: \Re(z) < 0\} \subseteq D.
+  \]
+\end{defi}
+In particular, for $\Re(z) < \lambda$, A-stability means that $y_n$ will tend to $0$ regardless of how large $h$ is.
+
+Hence the backwards Euler method is A-stable, but the Euler method is not.
+
+A-stability is a very strong requirement. It is hard to get A-stability. In particular, Dahlquist proved that no multi-step method of order $p \geq 3$ is A-stable. Moreover, no explicit Runge-Kutta method can be A-stable.
+
+So let's look at some other implicit methods.
+\begin{eg}[Trapezoidal rule]
+  Again consider $y'(t) = \lambda y$, with the trapezoidal rule. So
+  \[
+    y_n = -\left(\frac{1 + h\lambda/2}{1 - h\lambda/2}\right)^n.
+  \]
+  So the linear stability domain is
+  \[
+    D = \left\{z \in \C: \left|\frac{2 + z}{2 - z}\right| < 1 \right\}.
+  \]
+  What this says is that $z$ has to be closer to $-2$ than to $2$. In other words, $D$ is exactly $\C^-$.
+\end{eg}
+
+When testing a numerical method for A-stability in general, complex analysis is helpful. Usually, when applying a numerical method to the problem $y' = \lambda y$, we get
+\[
+  y_n = [r(h\lambda)]^n,
+\]
+where $r$ is some rational function. So
+\[
+  D = \{z \in \C: |r(z)| < 1\}.
+\]
+We want to know if $D$ contains the left half-plane. For more complicated expressions of $r$, like the case of the trapezoidal rule, this is not so obvious. Fortunately, we have the \emph{maximum principle}:
+\begin{thm}[Maximum principle]
+  Let $g$ be analytic and non-constant in an open set $\Omega \subseteq \C$. Then $|g|$ has no maximum in $\Omega$.
+\end{thm}
+Since $|g|$ needs to have a maximum in the closure of $\Omega$, the maximum must occur on the boundary. So to show $|g| \leq 1$ on the region $\Omega$, we only need to show the inequality holds on the boundary $\partial \Omega$.
+
+We try $\Omega = \C^-$. The trick is to first check that $g$ is analytic in $\Omega$, and then check what happens at the boundary. This technique is made clear in the following example:
+
+\begin{eg}
+  Consider
+  \[
+    r(z) = \frac{6 - 2z}{6 - 4z + z^2}.
+  \]
+  This is still pretty simple, but can illustrate how we can use the maximum principle.
+
+  We first check if it is analytic. This certainly has some poles, but they are $2 \pm \sqrt{2} i$, and are in the right-half plane. So this is analytic in $\C^-$.
+
+  Next, what happens at the boundary of the left-half plane? Firstly, as $|z| \to \infty$, we find $r(z) \to 0$, since we have a squared at the denominator. The next part is checking when $z$ is on the imaginary axis, say $z = it$ with $t \in \R$. Then we can check by some messy algebra that
+  \[
+    |r(it)| \leq 1
+  \]
+  for $t \in \R$. Therefore, by the maximum principle, we must have $|r(z)| \leq 1$ for all $z \in \C^-$.
+\end{eg}
+
+\section{Implementation of ODE methods}
+Finally, we get to the last part of the course on ODEs. We talk about some implementation details.
+
+\subsection{Local error estimation}
+The first problem we want to tackle is what $h$ we should pick. Usually, when using numerical analysis software, you will be asked for an error tolerance, and then the software will automatically compute the required $h$ we need. How is this done?
+
+Milne's device is a method for estimating the local truncation error of a multi-step method, and hence changing the step-length $h$ (there are similar techniques for Runge-Kutta methods, but they are more complicated). This uses two multi-step methods of the same order.
+
+To keep things simple, we consider the two-step Adams-Bashforth method. Recall that this is given by
+\[
+  \mathbf{y}_{n + 1} = \mathbf{y}_n + \frac{h}{2} (2 \mathbf{f}(t_n, \mathbf{y}_n) - \mathbf{f}(t_{n - 1}, \mathbf{y}_{n - 1})).
+\]
+This is an order $2$ error with
+\[
+  \boldsymbol\eta_{n + 1} = \frac{5}{12}h^3 \mathbf{y}'''(t_n) + O(h^4).
+\]
+The other multi-step method of order $2$ is our old friend, the trapezoidal rule. This is an implicit method
+\[
+  \mathbf{y}_{n + 1} = \mathbf{y}_n + \frac{h}{2} (\mathbf{f}(t_n, \mathbf{y}_n) + \mathbf{f}(t_{n + 1}, \mathbf{y}_{n + 1})).
+\]
+This has a local truncation error of
+\[
+  \boldsymbol\eta_{n + 1} = -\frac{1}{12}h^3 \mathbf{y}'''(t_n) + O(h^4).
+\]
+The key to Milne's device is the coefficients of $h^3 \mathbf{y}'''(y_n)$, namely
+\[
+  c_{\mathrm{AB}} = \frac{5}{12},\quad c_{\mathrm{TR}} = -\frac{1}{12}.
+\]
+Since these are two different methods, we get different $\mathbf{y}_{n + 1}$'s. We distinguish these by superscripts, and have
+\begin{align*}
+  \mathbf{y}(t_{n + 1}) - \mathbf{y}_{n + 1}^{\mathrm{AB}} &\simeq c_{\mathrm{AB}} h^3 \mathbf{y}'''(t_n)\\
+  \mathbf{y}(t_{n + 1}) - \mathbf{y}_{n + 1}^{\mathrm{TR}} &\simeq c_{\mathrm{TR}} h^3 \mathbf{y}'''(t_n)
+\end{align*}
+We can now eliminate some terms to obtain
+\[
+  \mathbf{y}(t_{n + 1}) - \mathbf{y}_{n + 1}^{\mathrm{TR}} \simeq \frac{-c_{\mathrm{TR}}}{c_{\mathrm{AB}} - c_{\mathrm{TR}}} (\mathbf{y}_{n + 1}^{\mathrm{AB}} - \mathbf{y}_{n + 1}^{\mathrm{TR}}).
+\]
+In this case, the constant we have is $\frac{1}{6}$. So we can estimate the local truncation error for the trapezoidal rule, without knowing the value of $\mathbf{y}'''$. We can then use this to adjust $h$ accordingly.
+
+The extra work we need for this is to compute numerical approximations with two methods. Usually, we will use a simple, explicit method such as the Adams-Bashforth method as the second method, when we want to approximate the error of a more complicated but nicer method, like the trapezoidal rule.
+
+\subsection{Solving for implicit methods}
+Implicit methods are often more likely to preserve nice properties like conservation of energy. Since we have more computational power nowadays, it is often preferable to use these more complicated methods.
+
+As an example, we consider the backward Euler method
+\[
+  \mathbf{y}_{n + 1} = \mathbf{y}_n + h \mathbf{f}(t_{n + 1}, \mathbf{y}_{n + 1}).
+\]
+There are two ways to solve this equation for $\mathbf{y}_{n + 1}$. The simplest method is \emph{functional iteration}. As the name suggests, this method is iterative. So we use superscripts to denote the iterates. We use the formula
+\[
+  \mathbf{y}_{n + 1}^{(k + 1)} = \mathbf{y}_n + h \mathbf{f}(t_{n + 1}, \mathbf{y}_{n + 1}^{(k + 1)}).
+\]
+To do this, we need to find a $\mathbf{y}_{n + 1}^{(0)}$. Usually, we start $\mathbf{y}_{n + 1}^{(0)} = \mathbf{y}_n$. Even better, we can use some simpler explicit method to obtain our first guess of $\mathbf{y}_{n + 1}^{(0)}$.
+
+The question, of course, is whether this converges. Fortunately, this converges to a locally unique solution if $\lambda h$ is sufficiently small, where $\lambda$ is the Lipschitz constant of $\mathbf{f}$. For the backward Euler, we will require $\lambda h < 1$. This relies on the contraction mapping theorem, which you may have met in IB Analysis II.
+
+Does this matter? Sometimes it does. Usually, we pick an $h$ using accuracy considerations, picking the largest possible $h$ that still gives us the desired accuracy. However, if we use this method, we might need to pick a much smaller $h$ in order for this to work. This will require us to compute much more iterations, and can take a lot of time.
+
+An alternative is Newton's method. This is given by the formula
+\begin{align*}
+  (I - hJ^{(k)}) \mathbf{z}^{(k)} &= \mathbf{y}_{n + 1}^{(k)} - (\mathbf{y}_n + h \mathbf{f}(t_{n + 1}, \mathbf{y}_{n + 1}^{(k)}))\\
+  \mathbf{y}_{n + 1}^{(k + 1)} &= \mathbf{y}_n^{(k)} - \mathbf{z}^{(k)},
+\end{align*}
+where $J^{(k)}$ is the Jacobian matrix
+\[
+  J^{(k)} = \nabla \mathbf{f}(t_{n + 1}, \mathbf{y}_{n + 1}^{(k)}) \in \R^{N \times N}.
+\]
+This requires us to solve for $\mathbf{z}$ in the first equation, but this is a linear system, which we have some efficient methods for solving.
+
+There are several variants to Newton's method. This is the full Newton's method, where we re-compute the Jacobian in every iteration. It is also possible to just use the same Jacobian over and over again. There are some speed gains in solving the equation, but then we will need more iterations before we can get our $\mathbf{y}_{n + 1}$.
+
+\section{Numerical linear algebra}
+We start off with the simplest problem in linear algebra: given $A \in R^{n \times n}$, $\mathbf{b} \in R^n$, we want to find an $\mathbf{x}$ such that
+\[
+  A\mathbf{x} = \mathbf{b}.
+\]
+We all know about the theory --- if $A$ is non-singular, then there is a unique solution for every possible $\mathbf{b}$. Otherwise, there are no solutions for some $\mathbf{b}$ and infinitely many solutions for other $\mathbf{b}$'s.
+
+Most of the time, we will only consider the case where $A$ is non-singular. However, we will sometimes comment on what happens when $A$ is singular.
+
+\subsection{Triangular matrices}
+A general technique for dealing with linear algebra problems is to see what happens when we have a triangular matrix, since these tend to be simpler.
+
+What happens if $A$ is triangular? First of all it is easy to see if the matrix is singular or not --- it is singular if and only if there is a zero in the diagonal.
+
+We note that there are actually two types of triangular matrices. Lower triangular matrices are denoted as $L$, and upper triangular matrices are denoted as $U$. It is easy to find their determinants. We have
+\[
+  \det(L) = \prod_{i = 1}^n L_{ii},\quad U = \prod_{i = 1}^n U_{11}.
+\]
+How do we solve equations involving triangular matrices? Suppose we have a lower triangular matrix equation
+\[
+  \begin{pmatrix}
+    L_{11} & 0 & \cdots & 0\\
+    L_{12} & L_{22} & \cdots & 0\\
+    \vdots & \vdots & \ddots & \vdots\\
+    L_{1n} & L_{2n} & \cdots & L_{nn}
+  \end{pmatrix}
+  \begin{pmatrix}
+    x_1\\
+    x_2\\
+    \vdots\\
+    x_n
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    b_1\\
+    b_2\\
+    \vdots\\
+    b_n
+  \end{pmatrix}.
+\]
+There is nothing to solve in the first line. We can immediately write down the value of $x_1$. Substituting this into the second line, we can then solve for $x_2$. In general, we have
+\[
+  x_i = \frac{1}{L_{ii}} \left(b_i - \sum_{j = 1}^{i - 1} L_{ij} x_j\right).
+\]
+This is known as \emph{forward substitution}.
+
+For upper triangular matrices, we can do a similar thing, but we have to solve from the bottom instead. We have
+\[
+  x_i = \frac{1}{U_{ii}} \left(b_i - \sum_{j = 1 + i}^n U_{ij} x_j\right).
+\]
+This is known as \emph{backwards substitution}.
+
+This can be used to find the inverse of matrices as well. We solve for the columns instead. In particular, the solution to $L \mathbf{x}_j = \mathbf{e}_j$ is the $j$th column of $L^{-1}$. It is then easy to see from this that the inverse of a lower triangular matrix is also lower triangular.
+
+Similarly, the columns of $U^{-1}$ are given by solving $U\mathbf{x}_j = \mathbf{e}_i$, and we see that $U^{-1}$ is also upper triangular.
+
+It is also helpful to analyse how many operations it takes to compute this. If we look carefully, solving $L\mathbf{x} =\mathbf{b}$ or $U\mathbf{x} = \mathbf{b}$ this way requires $O(n^2)$ operations.
+
+\subsection{LU factorization}
+In general, we don't always have triangular matrices. The idea is, for every matrix $A$, find some lower and triangular matrices $L, U$ such that $A = LU$. If we can do this, then we can solve $A\mathbf{x} = \mathbf{b}$ in two steps --- we first find a $\mathbf{y}$ such that $L\mathbf{y} = \mathbf{b}$. Then we find an $\mathbf{x}$ such that $U\mathbf{x} = \mathbf{y}$. Then
+\[
+  A\mathbf{x} = LU\mathbf{x} = L\mathbf{y} = \mathbf{b}.
+\]
+This is the basic idea. However, this is not quite so straightforward.
+
+\begin{defi}[LU factorization]
+  $A = LU$ is an \emph{LU factorization} if $U$ is upper triangular and $L$ is \emph{unit} lower triangular (ie. the diagonals of $L$ are all $1$).
+\end{defi}
+Why do we require $L$ to be a unit? There is no reason why we are requiring $L$ instead of $R$. This is merely by convention. However, we do have to impose it somewhere in order to guarantee uniqueness of the LU factorization. Otherwise, we can just divide $U$ by some constant and multiply $L$ by the same constant to get another factorization.
+
+Note that since $L$ has to be unit, it must be non-singular. However, we still allow $A$ and $U$ to be singular.
+
+Unfortunately, even if $A$ is non-singular, it may not have an LU factorization. We take a simple example of
+\[
+  \begin{pmatrix}
+    0 & 1\\
+    1 & 1
+  \end{pmatrix}
+\]
+This is clearly non-singular, with determinant $-1$. However, we can manually check that there is no LU factorization of this.
+
+What we do get is uniqueness --- as long as $A$ is non-singular, if an LU factorization exists, it is unique (and $U$ is non-singular).
+
+While we don't really like singular matrices, singular matrices can still have LU factorizations. For example,
+\[
+  \begin{pmatrix}
+    0 & 0\\
+    0 & 1
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    1 & 0\\
+    0 & 1
+  \end{pmatrix}
+  \begin{pmatrix}
+    0 & 0\\
+    0 & 1
+  \end{pmatrix}
+\]
+is trivially an LU factorization of a singular matrix.
+
+To understand when LU factorizations exist, we try to construct one, and see when it could fail.
+
+We write $L$ in terms of its columns, and $U$ in terms of its rows:
+\[
+  L =
+  \begin{pmatrix}
+    \mathbf{l}_1 & \mathbf{l}_2 & \cdots & \mathbf{l}_n
+  \end{pmatrix},
+  \quad
+  U =
+  \begin{pmatrix}
+    \mathbf{u}_1^T\\
+    \mathbf{u}_2^T\\
+    \vdots\\
+    \mathbf{u}_n^T
+  \end{pmatrix}
+\]
+Clearly, these rows and columns cannot be arbitrary, since $L$ and $U$ are triangular. In particular, $\mathbf{l}_i, \mathbf{u}_i$ must be zero in the first $i - 1$ entries.
+
+Suppose this is an LU factorization of $A$. Then we can write
+\[
+  A = L\cdot U = \mathbf{l}_1 \mathbf{u}_1^T + \mathbf{l}_2 \mathbf{u}_2^T + \cdots + \mathbf{l}_n \mathbf{u}_n^T.
+\]
+What do these matrices look like? For each $i$, we know $\mathbf{l}_i$ and $\mathbf{u}_i$ have the first $i - 1$ entries zero. So the first $i - 1$ rows and columns of $\mathbf{l}_i \mathbf{u}_i^T$ are zero. In particular, the first row and columns only have contributions from $\mathbf{l}_1\mathbf{u}_1^T$, the second row/column only has contributions from $\mathbf{l}_2 \mathbf{u}_2^T$ and $\mathbf{l}_1 \mathbf{u}_1^T$ etc.
+
+The plan is as follows:
+\begin{enumerate}
+  \item Obtain $\mathbf{l}_1$ and $\mathbf{u}_1$ from the first row and column of $A$.
+  \item Obtain $\mathbf{l}_2$ and $\mathbf{u}_2$ form the second row and column of $A - \mathbf{l}_1 \mathbf{u}_1^T$.
+  \item $\cdots$
+  \item Obtain $\mathbf{l}_n$ and $\mathbf{u}_n^T$ from the $n$th row and column of $A - \sum_{i = 1}^{n - 1} \mathbf{l}_i \mathbf{u}_i^T$.
+\end{enumerate}
+We can turn this into an algorithm. We define the intermediate matrices, starting with
+\[
+  A^{(0)} = A.
+\]
+For $k = 1, \cdots, n$, we let
+\begin{align*}
+  U_{kj} &= A_{kj}^{(k - 1}) & j &=k, \cdots, n\\
+  L_{ik} &= \frac{A_{ik}}{A_{kk}^{(k - 1)}} & i &= k, \cdots, n\\
+  A_{ij}^{(k)} &= A_{ij}^{(k - 1)} - L_{ik} U_{kj} & i, j &\geq k
+\end{align*}
+When $k = n$, we end up with a zero matrix, and then $U$ and $L$ are completely filled.
+
+We can now see when this will break down. A sufficient condition for $A = LU$ to exist is that $A_{kk}^{(k - 1)} \not= 0$ for all $k$. If this is the case, then it is also unique, since it \emph{must} be given by the result of this algorithm. However, most of these coefficients do not appear in the matrix $A$. They are constructed during the process. We don't know easily what they are in terms of the coefficients of $A$. We will later come up with an equivalent condition on our origin $A$ that is easier to check.
 \end{document}

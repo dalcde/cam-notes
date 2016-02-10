@@ -1171,4 +1171,140 @@ So we've got two equations for $g$ and $p$. The trick is to take the $y$ derivat
   g'g'' - gg''' = g^{(4)}.
 \]
 So we have a single equation for $g$ that we shall solve.
+
+\subsubsection{Boundary conditions}
+We now look at our boundary conditions. The no-slip condition gives $\mathbf{u} = \mathbf{0}$ on $y = 0$. So $g'(0) = g(0) = 0$ when $\eta = 0$.
+
+As as $y \to \infty$, the boundary conditions for $\mathbf{u}$ gives $g'(\eta) \to 1$, $g(\eta) \to \eta$ as $\eta \to \infty$.
+
+All dimensional variables are absorbed into the scaled variables $g$ and $\eta$. So we only have to solve the ODE once. The far field velocity $\mathbf{u} = (Ex, -E y, 0)$ is reached to a very good approximation when
+\[
+  \eta \lesssim 1,\quad y \lesssim \delta = \frac{\eta}{E}.
+\]
+% include plot of g'(\eta) vs \eta, showing intrinsic length scale (width to reach asymptotic) as O(1).
+\subsubsection{Overall picture}
+We get the horizontal velocity profile as follows:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-0.5, 0) -- (4, 0) node [right] {$x$};
+    \draw [->] (0, -0.5) -- (0, 3) node [above] {$y$};
+
+    \draw (1, 0) arc(270:360:1 and 1.5) -- (2, 3) node [pos=0.5, right] {$Ex$};
+
+    \draw [dashed] (-1, 1.5) -- (4, 1.5);
+
+    \draw [<->] (3, 0) -- (3, 1.5) node [pos=0.5, fill=white] {$\delta$};
+
+    \foreach \x in {0.55, 1.1} {
+      \pgfmathsetmacro\y{sqrt(1 - (1 - \x/1.5)^2)};
+      \draw [-latex'] (1, \x) -- +(\y, 0);
+    }
+  \end{tikzpicture}
+\end{center}
+At the scale $\delta$, we get a Reynolds number of
+\[
+  Re_\delta = \frac{U\delta}{\nu}\sim O(1).
+\]
+This is the \emph{boundary layer}. For a larger extrinsic scale $L \gg \delta$, we get
+\[
+  Re_L = \frac{UL}{2} \gg 1.
+\]
+\subsubsection{Inviscid approximation}
+When interested in flow on scales much larger than $\delta$, we ignore the region $y < \delta$ (since it is small), and we imagine a rigid boundary at $y = \delta$ at which the no-slip condition does not apply.
+
+When $Re_L \gg 1$, we solve the Euler equations, namely
+\begin{align*}
+  \rho \frac{\D \mathbf{u}}{\D t} &= - \nabla p + \mathbf{f}\\
+  \nabla \cdot \mathbf{u} &= 0.
+\end{align*}
+We still have a boundary condition --- we don't allow fluid to flow \emph{through} the boundary. So we require
+\[
+  \mathbf{u}\cdot \mathbf{n} = 0\quad\text{at a stationary rigid boundary}.
+\]
+The no-slip condition is no longer satisfied.
+
+It is an exercise for the reader to show that $\mathbf{u} = (Ex, -Ey, 0)$ satisfies the Euler equations in $y > 0$ with a rigid boundary of $y = 0$, with
+\[
+  p = p_0 - \frac{1}{2} \rho E^2(x^2 + y^2).
+\]
+We can plot the curves of constant pressure, as well as the streamlines:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-3, 0) -- (3, 0) node [right] {$x$};
+    \draw [->] (0, -1) -- (0, 3) node [above] {$y$};
+    \foreach \r in {0.6, 1.2, 1.8, 2.4} {
+      \draw (\r, 0) arc(0:180:\r);
+    }
+    \node [circ] {};
+    \node [anchor = north west] {$p_0$};
+
+    \draw [mred, ->-=0.5, domain=0.167:3] plot (\x, {0.5/\x});
+    \draw [mred, ->-=0.5, domain=0.5:3] plot (\x, {1.5/\x});
+    \draw [mred, ->-=0.5, domain=0.667:3] plot (\x, {2/\x});
+
+    \draw [mred, ->-=0.5, domain=0.167:3] plot ({-\x}, {0.5/\x});
+    \draw [mred, ->-=0.5, domain=0.5:3] plot ({-\x}, {1.5/\x});
+    \draw [mred, ->-=0.5, domain=0.667:3] plot ({-\x}, {2/\x});
+  \end{tikzpicture}
+\end{center}
+As a flow enters from the top, the pressure keeps increases, and this slows down the flow. We say the $y$-pressure gradient is \emph{adverse}. As it moves down and flows sideways, the pressure \emph{pushes} the flow. So the $x$-pressure gradient is \emph{favorable}.
+
+At the origin, the velocity is zero, and this is a \emph{stagnation point}. This is also the point of highest pressure. In general, velocity is high at low pressures and low at high pressures.
+
+\subsection{Momentum equation for inviscid (\texorpdfstring{$\nu = 0$}{nu = 0}) incompressible fluid}
+Consider an arbitrary volume $\mathcal{D}$ with boundary $\partial \mathcal{D}$ and outward pointing normal $\mathbf{n}$. The momentum of the fluid in $\mathcal{D}$ can change owing to four things:
+\begin{enumerate}
+  \item Momentum flux across the boundary $\partial \mathcal{D}$;
+  \item Surface pressure forces;
+  \item Body forces;
+  \item Viscous surface forces.
+\end{enumerate}
+We will ignore the last one. We can then write the rate of change of the total momentum as
+\[
+  \frac{\d}{\d t} \int_{\mathcal{D}} p \mathbf{u} \;\d V = -\int_{\partial \mathcal{D}} \rho \mathbf{u} (\mathbf{u}\cdot \mathbf{n}) \;\d S - \int_{\partial \mathcal{D}} p \mathbf{n}\;\d S + \int_{\mathcal{D}} \mathbf{f}\;\d V.
+\]
+It is helpful to write this in suffix notation. In this case, the equation becomes
+\[
+  \frac{\d}{\d t} \int_{\mathcal{D}} \rho u_i \;\d V = -\int_{\partial \mathcal{D}} \rho u_i u_j n_j \;\d S - \int_{\partial \mathcal{D}} - p n_i \;\d S + \int_{\mathcal{D}} f_i \;\d V.
+\]
+Just as in the case of mass conservation, we can use the divergence theorem to write
+\[
+  \int_{\mathcal{D}} \left(\rho \frac{\partial u_i}{\partial t} + \rho \frac{\partial}{\partial x_j} (u_i u_j)\right)\;\d V = \int_{\mathcal{D}} \left(-\frac{\partial p}{\partial x_i} + f_i\right) \;\d V.
+\]
+Since $\mathcal{D}$ is arbitrary, we must have
+\[
+  \rho \frac{\partial u_i}{\partial t} + \rho \frac{\partial u_i}{\partial x_j} + \rho u_i \frac{\partial u_j}{\partial x_j} = -\frac{\partial p}{\partial x_i} + f_i.
+\]
+The last term on the left is the gradient of $\mathbf{u}$, which vanishes by incompressibility, and the remaining terms is just the material derivative of $\mathbf{u}$. So we get
+\begin{prop}[Euler momentum equation]
+  \[
+    \rho \frac{\D \mathbf{u}}{\d t} = - \nabla p + \mathbf{f}.
+  \]
+\end{prop}
+This is just the equation we get from the Navier-Stokes equation by ignoring the viscous terms. However, we were able to derive this directly from momentum conservation.
+
+For conservative forces, we can write $\mathbf{f} = -\nabla \chi$, where $\chi$ is a scalar potential. For example, gravity can be given by $\mathbf{f} = \rho \mathbf{g} = \nabla (\rho \mathbf{g}\cdot \mathbf{x})$ (for $\rho$ constant). So $\chi = - \rho \mathbf{g}\cdot \mathbf{x} = g \rho z$ if $\mathbf{g} = (0, 0, -g)$.
+
+\subsection{Momentum integral for steady flow}
+In the case of a steady flow, $\frac{\partial \mathbf{u}}{\partial t}$ vanishes. Then the momentum equation becomes
+\[
+  0 = -\int_{\partial \mathcal{D}} \rho \mathbf{u} (\mathbf{u} \cdot \mathbf{n}) \;\d S - \int_{\partial \mathcal{D}}p \mathbf{n} \;\d S - \int_{\mathcal{D}} \nabla \chi \;\d V.
+\]
+We can then convert this to
+\[
+  \int_{\partial \mathcal{D}} (\rho \mathbf{u} (\mathbf{u}\cdot \mathbf{n}) + p \mathbf{n} + \chi \mathbf{n}) \;\d S = 0.
+\]
+\subsection{Bernoulli's equation}
+The first thing to notice is we have a vector identity
+\[
+  \mathbf{u}\times (\nabla \times \mathbf{u}) = \nabla\left(\frac{1}{2}|\mathbf{u}|^2\right) - \mathbf{u}\cdot \nabla \mathbf{u}.
+\]
+We use this to rewrite the Euler momentum equation as
+\[
+  \rho \frac{\partial \mathbf{u}}{\partial t} + \rho \nabla \left(\frac{1}{2}|\mathbf{u}|^2\right) - \rho \mathbf{u}\times (\nabla \times \mathbf{u}) = -\nabla p - \nabla \chi.
+\]
+Dotting with $\mathbf{u}$, the last term on the left vanishes, and we get
+\[
+  \frac{1}{2}\rho \frac{\partial|\mathbf{u}|^2}{\partial t} = -\mathbf{u}\cdot \left(\nabla \left(\frac{1}{2} \rho |\mathbf{u}|^2\right) + \nabla p + \nabla \chi\right).
+\]
 \end{document}
