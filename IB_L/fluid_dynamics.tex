@@ -309,7 +309,7 @@ This is a flow driven by a pressure gradient between stationary boundaries. Agai
       \pgfmathsetmacro\len{\x * (1 - \x)}
       \draw [->] (2, \x) -- +(3 * \len, 0);
     };
-    \draw [rotate=270, yscale=-1, shift={(-3,-3)}] (2.5, 0.25) parabola (2, 1); % magic
+    \draw [rotate=270, yscale=-1, shift={(-3,-3)}] (2.5, 0.25) parabola (2, 1);% magic
     \draw [rotate=90, shift={(-2,-3)}] (2.5, 0.25) parabola (2, 1);
     \draw (2, 0) -- (2, 1);
   \end{tikzpicture}
@@ -413,7 +413,7 @@ we have
       \pgfmathsetmacro\len{\x * (1 - \x)}
       \draw [->] (2, \x) -- +(3 * \len, 0);
     };
-    \draw [rotate=270, yscale=-1, shift={(-3,-3)}] (2.5, 0.25) parabola (2, 1); % magic
+    \draw [rotate=270, yscale=-1, shift={(-3,-3)}] (2.5, 0.25) parabola (2, 1);% magic
     \draw [rotate=90, shift={(-2,-3)}] (2.5, 0.25) parabola (2, 1);
     \draw (2, 0) -- (2, 1);
 
@@ -495,7 +495,7 @@ This is a bit like the Poiseuille flow, with $\frac{gp \sin \alpha}{2\mu}$ as th
 
 It is an exercise for the reader to calculate the volume flux $q$.
 
-% can insert profile
+ % can insert profile
 \subsection{Unsteady parallel viscous flow}
 Consider fluid initially at rest in $y > 0$, resting on a flat surface.
 \begin{center}
@@ -1181,7 +1181,17 @@ All dimensional variables are absorbed into the scaled variables $g$ and $\eta$.
 \[
   \eta \lesssim 1,\quad y \lesssim \delta = \frac{\eta}{E}.
 \]
-% include plot of g'(\eta) vs \eta, showing intrinsic length scale (width to reach asymptotic) as O(1).
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-0.5, 0) -- (5, 0) node [right] {$\eta$};
+    \draw [->] (0, -0.5) -- (0, 2.5) node [above] {$g'(\eta)$};
+    \draw (0, 0) .. controls (1, 0) and (1, 2) .. (3, 2) -- (5, 2);
+    \draw [dashed] (0, 2) -- (3, 2);
+
+    \draw [<->] (0, 1) -- (3, 1) node [pos=0.5, fill=white] {$\delta = O(1)$};
+  \end{tikzpicture}
+\end{center}
+
 \subsubsection{Overall picture}
 We get the horizontal velocity profile as follows:
 \begin{center}
@@ -1304,7 +1314,201 @@ We use this to rewrite the Euler momentum equation as
   \rho \frac{\partial \mathbf{u}}{\partial t} + \rho \nabla \left(\frac{1}{2}|\mathbf{u}|^2\right) - \rho \mathbf{u}\times (\nabla \times \mathbf{u}) = -\nabla p - \nabla \chi.
 \]
 Dotting with $\mathbf{u}$, the last term on the left vanishes, and we get
+\begin{prop}[Bernoulli's equation]
+  \[
+    \frac{1}{2}\rho \frac{\partial|\mathbf{u}|^2}{\partial t} = -\mathbf{u}\cdot \nabla \left(\frac{1}{2} \rho |\mathbf{u}|^2 + p + \chi\right).
+  \]
+\end{prop}
+In the case where we have a steady flow, we know
 \[
-  \frac{1}{2}\rho \frac{\partial|\mathbf{u}|^2}{\partial t} = -\mathbf{u}\cdot \left(\nabla \left(\frac{1}{2} \rho |\mathbf{u}|^2\right) + \nabla p + \nabla \chi\right).
+  H = \frac{1}{2}\rho |\mathbf{u}|^2 + p + \chi
 \]
+is constant along streamlines.
+
+Even if the flow is not steady, we can still define the value $H$, and then we can integrate Bernoulli's equation over a volume $\mathcal{D}$ to obtain
+\[
+  \frac{\d}{\d t}\int_{\mathcal{D}} \frac{1}{2}\rho |\mathbf{u}|^2 \;\d V = -\int_{\partial \mathcal{D}} H \mathbf{u}\cdot \mathbf{n} \;\d S.
+\]
+So $H$ is the transportable energy of the flow.
+
+\begin{eg}
+  Consider a pipe with a constriction. Ignore the vertical pipes for the moment --- they are there just so that we can measure the pressure in the fluid, as we will later see.
+  \begin{center}
+    \begin{tikzpicture}
+      \fill [mblue, opacity=0.5] (-3, 2) -- (-0.2, 2) -- (-0.2, 2.8) arc(180:360:0.2 and 0.05) -- (0.2, 3) -- (0.2, 2) .. controls (1.2, 2) and (0.8, 1.5) .. (1.8, 1.5) -- (1.8, 2.1) arc(180:360:0.2 and 0.05) -- (2.2, 3) -- (2.2, 1.5) .. controls (3.2, 1.5) and (3, 2) .. (4, 2) -- (4, 0) .. controls (3, 0) and (3.2, 0.5) .. (2.2, 0.5) -- (1.8, 0.5) .. controls (0.8, 0.5) and (1.2, 0) .. (0.2, 0) -- (-3, 0) -- cycle;
+
+      \draw [dashed] (0.2, 2.1) -- (1.8, 2.1);
+      \draw [dashed] (0.2, 2.8) -- (1.8, 2.8);
+
+      \draw [<->] (1, 2.1) -- (1, 2.8) node [pos=0.5, right] {$h$};
+
+      \draw (-3, 2) -- (-0.2, 2) -- (-0.2, 3);
+      \draw (0.2, 3) -- (0.2, 2) .. controls (1.2, 2) and (0.8, 1.5) .. (1.8, 1.5) -- (1.8, 3);
+      \draw (-3, 0) -- (0.2, 0) .. controls (1.2, 0) and (0.8, 0.5) .. (1.8, 0.5) -- (2.2, 0.5) .. controls (3.2, 0.5) and (3, 0) .. (4, 0);
+      \draw (2.2, 3) -- (2.2, 1.5) .. controls (3.2, 1.5) and (3, 2) .. (4, 2);
+
+      \draw [gray, ->-=0.5] (-3, 1) -- (4, 1);
+
+      \node [align=left, left] at (-3, 1) {$U$\\$P$\\$A$};
+      \node [below] at (2, 1) {$u, p, a$};
+
+      \draw [->] (-2.5, 1.5) -- +(1, 0);
+      \draw [->] (-2.5, 0.5) -- +(1, 0);
+    \end{tikzpicture}
+  \end{center}
+  Suppose at the left, we have a uniform speed $U$, area $A$ and pressure $P$. In the middle constricted area, we have speed $u$, area $a$ and pressure $p$.
+
+  By the conservation of mass, we have
+  \[
+    q = UA = ua.
+  \]
+  We apply Bernoulli along the central streamline, using the fact that $H$ is constant along streamlines. We can omit the body force $\chi = \rho gy$, since this is the same at both locations. Then we get
+  \[
+    \frac{1}{2}\rho U^2 + P = \frac{1}{2} \rho u^2 + p.
+  \]
+  Replacing our $U$ with $q/A$ and $u$ with $q/a$, we obtain
+  \[
+    \frac{1}{2} \rho \left(\frac{q}{A}\right)^2 + P = \frac{1}{2} \rho \left(\frac{q}{a}\right)^2 + p.
+  \]
+  Rearranging gives
+  \[
+    \left(\frac{1}{A^2} - \frac{1}{a^2}\right)q^2 = \frac{2(p - P)}{\rho}.
+  \]
+  We see there is a difference in pressure due to the difference in area. This is balanced by the difference in heights $h$. Using the $y$-momentum equation, we get
+  \[
+    \left(\frac{1}{A^2} - \frac{1}{a^2}\right)q^2 = \frac{2(p - P)}{\rho} = -2gh.
+  \]
+  Then we obtain
+  \[
+    q = \sqrt{2gh} \frac{Aa}{\sqrt{A^2 - a^2}}.
+  \]
+  Therefore we can measure $h$ in order to find out the flow rate. This allows us to measure fluid velocity just by creating a constriction and then putting in some pipes.
+\end{eg}
+Note also that Bernoulli's equation tells us that high velocity goes with low pressure; low pressure goes with high velocity.
+
+\begin{eg}[Force on a fire hose nozzle]
+  Suppose we have a fire hose nozzle like this:
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (-3, 0.75) -- (-0.5, 0.75) .. controls (0, 0.75) and (0.5, 0.25) .. (1, 0.25) -- (2, 0.25);
+      \draw (-3, -0.75) -- (-0.5, -0.75) .. controls (0, -0.75) and (0.5, -0.25) .. (1, -0.25) -- (2, -0.25);
+
+      \draw [->] (-3, 0.5) -- +(0.5, 0);
+      \draw [->] (-3, 0) -- +(0.5, 0);
+      \draw [->] (-3, -0.5) -- +(0.5, 0);
+
+      \draw [->] (1.5, 0) -- +(0.5, 0);
+
+      \draw [mred, dashed] (-3, 0.7) -- (-0.5, 0.7) node [pos=0.5, above] {$(2)$}.. controls (0, 0.7) and (0.5, 0.2) .. (1, 0.2) node [pos=0.5, anchor = south west] {$(3)$} -- (2, 0.2) node [pos=0.5, above] {$(4)$} -- (2, -0.2) node [pos=0.5, right] {$(5)$} -- (1, -0.2) .. controls (0.5, -0.2) and (0, -0.7) .. (-0.5, -0.7) -- (-3, -0.7) -- cycle node [pos=0.5, left] {$(1)$};
+
+      \node [align=left] at (-4, 0) {$U$\\$A$\\$P$};
+      \node at (3.7, 0) {$u, a, p = 0$};
+    \end{tikzpicture}
+  \end{center}
+  We consider the steady-flow equation and integrate along the surface indicated above. We integrate each section separately. The end $(1)$ contributes
+  \[
+    \rho U(-U)A - PA.
+  \]
+  On $(2)$, everything vanishes. On $(3)$, the first term vanishes since the velocity is parallel to the surface. Then we get a contribution of
+  \[
+    0 + \int_{\mathrm{nozzle}} p \mathbf{n}\cdot \hat{\mathbf{x}}\;\d S.\tag{3}
+  \]
+  Similarly, everything in $(4)$ vanishes. Finally, on $(5)$, noting that $p = 0$, we get
+  \[
+    \rho u^2 a.
+  \]
+  By the steady flow equation, we know these all sum to zero. Hence, the force on the nozzle is just
+  \[
+    F = \int_{\mathrm{nozzle}} p\mathbf{n}\cdot \hat{\mathbf{x}}\;\d S = \rho AU^2 - \rho au^2 + PA.
+  \]
+  We can again apply Bernoulli along a streamline in the middle, which says
+  \[
+    \frac{1}{2}\rho U^2 + P = \frac{1}{2} \rho u^2.
+  \]
+  So we can get
+  \[
+    F = \rho AU^2 - \rho au^2 + \frac{1}{2} \rho A(u^2 - U^2) = \frac{1}{2} \rho\frac{A}{a^2}q^2 \left(1 - \frac{a}{A}\right)^2.
+  \]
+  Let's now put some numbers in. Suppose $A = (0.1)^2 \pi\SI{}{\meter\squared}$ and $a = (0.05)^2 \pi\SI{}{\meter\squared}$. So we get
+  \[
+    \frac{A}{a} = 4.
+  \]
+  A typical fire hose has a flow rate of
+  \[
+    q = \SI{0.01}{\meter\cubed\per\second}.
+  \]
+  So we get
+  \[
+    F = \frac{1}{2} \cdot 1000 \cdot \frac{4}{\pi/40} \cdot 10^{-4} \cdot \left(\frac{3}{4}\right)^2 \approx \SI{14}{N}.
+  \]
+\end{eg}
+
+\subsection{Linear flows}
+We fix our favorite point $\mathbf{x}_0$, and consider the flow in a neighbourhood of $\mathbf{x}_0$. We expand this in a Taylor series:
+\begin{align*}
+  \mathbf{u}(\mathbf{x}) &= \mathbf{u}(\mathbf{x}_0) + (\mathbf{x} - \mathbf{x}_0) \cdot \nabla \mathbf{u}(\mathbf{x}_0) + \cdots\\
+  &= \mathbf{u}_0 + \mathbf{r}\cdot \nabla \mathbf{u}_0,
+\end{align*}
+with $\mathbf{r} = \mathbf{x} - \mathbf{x}_0$ and $\mathbf{u}_0 = \mathbf{u}(\mathbf{x}_0)$. This is a linear approximation to the flow field. We also write
+\[
+  \nabla \mathbf{u} = \frac{\partial u_i}{\partial x_j} = E_{ij} + \Omega_{ij} = E + \Omega,
+\]
+where
+\begin{align*}
+  E_{ij} &= \frac{1}{2}\left(\frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i}\right),\\
+  \Omega_{ij} &=\frac{1}{2}\left(\frac{\partial u_i}{\partial x_j} - \frac{\partial u_j}{\partial x_i}\right),
+\end{align*}
+ie. we break $\nabla \mathbf{u}$ up into symmetric and anti-symmetric parts. These different parts have some physical meaning.
+\begin{defi}[Vorticity]
+  We define the \emph{vorticity} by
+  \[
+    \boldsymbol\omega = \nabla \times \mathbf{u}.
+  \]
+\end{defi}
+Then we have
+\[
+  \boldsymbol\omega \times \mathbf{r} = (\nabla \times \mathbf{u}) \times \mathbf{r} = r_j \left(\frac{\partial u_i}{\partial x_j} - \frac{\partial u_j}{\partial x_i}\right) = 2 \Omega_{ij}r_j.
+\]
+So we can write
+\[
+  \mathbf{u} = \mathbf{u}_0 + E \mathbf{r} + \frac{1}{2} \boldsymbol\omega \times \mathbf{r}.
+\]
+The first component is uniform flow; the second is the strain field; and the last is the rotation component.
+\begin{center}
+  \begin{tikzpicture}
+    \foreach \x in {0,0.5,1,1.5} {
+      \draw [->-=0.6] (\x, 0) -- +(1, 2);
+    }
+    \node at (1.25, -0.5) {uniform flow};
+
+    \begin{scope}[shift={(5, 1)}, xscale=0.3, yscale=0.7692]
+      \draw [->-=0.785, -<-=0.215] (-4, -1) -- (4, 1);
+      \draw [->-=0.25, -<-=0.75] (-4, 0.667) -- (4, -0.667);
+
+      \draw [->- = 0.3, ->- = 0.7] (-4, 1) .. controls (0, 0.333) and (0, 0.35) .. (4, 1.3);
+      \draw [-<- = 0.3, -<- = 0.8] (-4, -1.3) .. controls (0, -0.3) and (0, -0.333) .. (4, -1);
+
+      \draw [->- = 0.3, ->- = 0.8] (-4, 0.333) .. controls (-2, 0) and (-2, -0.3) .. (-4, -0.6);
+      \draw [->- = 0.3, ->- = 0.7] (4, -0.333) .. controls (2, 0) and (2, 0.3) .. (4, 0.6);
+      \node [circ] at (0, 0) {};
+    \end{scope}
+    \node at (5, -0.5) {pure strain};
+
+    \node [circ] at (8.5, 1) {};
+
+    \draw [->] (9, 1) arc(0:270:0.5);
+
+    \node at (8.5, -0.5) {pure rotation};
+  \end{tikzpicture}
+\end{center}
+Since we have an incompressible fluid, we have $\nabla \cdot \mathbf{u} = 0$. So $E$ has zero trace, ie. if
+\[
+  E =
+  \begin{pmatrix}
+    E_1 & 0 & 0\\
+    0 & E_2 & 0\\
+    0 & 0 & E_3
+  \end{pmatrix},
+\]
+then $E_1 + E_2 + E_3 = 0$. This justifies the picture above.
 \end{document}

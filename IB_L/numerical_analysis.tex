@@ -1736,4 +1736,123 @@ For $k = 1, \cdots, n$, we let
 When $k = n$, we end up with a zero matrix, and then $U$ and $L$ are completely filled.
 
 We can now see when this will break down. A sufficient condition for $A = LU$ to exist is that $A_{kk}^{(k - 1)} \not= 0$ for all $k$. If this is the case, then it is also unique, since it \emph{must} be given by the result of this algorithm. However, most of these coefficients do not appear in the matrix $A$. They are constructed during the process. We don't know easily what they are in terms of the coefficients of $A$. We will later come up with an equivalent condition on our origin $A$ that is easier to check.
+
+Note that as long as this method does not break down, we need $O(n^3)$ operations to perform this factorization. Recall we only needed $O(n^2)$ operations to solve the equation after factorization. So the bulk of the work in solving $A\mathbf{x} = \mathbf{b}$ is in doing the LU factorization.
+
+Note also that
+\[
+  \det (A) = \det(L) \det (U) = \det(U).
+\]
+So either both are singular or both are not.
+
+As before, this allows us to find the inverse of $A$ if it is non-singular. In particular, solving $A\mathbf{x}_j = \mathbf{e}_j$ gives the $j$th column of $A^{-1}$. Note that we are solving the system for the same $A$ for each $j$. So we only have to perform the LU factorization once, and then solve $n$ different equations. So in total we need $O(n^3)$ operations.
+
+However, we still have the problem that factorization is not always possible. Requiring that we must factorize $A$ as $LU$ is too restrictive. The idea is to factor something closely related, but not exactly $A$. Instead, we want a factorization
+\[
+  PA = LU,
+\]
+where $P$ is a permutation matrix. Recall a permutation matrix acting on a column vector just permutes the elements of the vector, and $P$ acting on $A$ would just permute the rows of $A$. So we want to factor $A$ up to a permutation of rows.
+
+Our goal now is to extend the previous algorithm to allow permutations of rows, and then we shall show that we will be able to perform this factorization all the time.
+
+Suppose our breakdown occurs at $k = 1$, ie. $A_{11}^{(0)} = A_{11} = 0$. We find a permutation matrix $P_1$ and let it act via $P_1A^{(0)}$. The idea is to look down the first column of $A$, and find a row starting with a non-zero element, say $p$. Then we use $P_1$ to interchange rows $1$ and $p$ such that $P_1A^{(0)}$ has a non-zero top-most entry. For simplicity, we assume we always need a $P_1$, and if $A_{11}^{(0)}$ is non-zero in the first place, we just take $P_1$ to be the identity.
+
+After that, we can carry on. We construct $\mathbf{l}_1$ and $\mathbf{u}_1$ from $P_1A^{(0)}$ as before, and set $A^{(1)} = P_1A^{(0)} - \mathbf{l}_1 \mathbf{u}_1^T$.
+
+But what happens if the first column of $A$ is completely zero? Then no interchange will make the $(1, 1)$ entry non-zero. However, in this case, we don't actually have to do anything. We can immediately find our $\mathbf{l}_1$ and $\mathbf{u}_1$, namely set $\mathbf{l}_1 = \mathbf{e}_1$ and let $\mathbf{u}_1^T$ be the first row of $A^{(0)}$. Then this already works. Note however that this corresponds to $A$ (and hence $U$) being singular, and we are not too interested with these.
+
+The later steps are exactly analogous. Suppose we have $A_{kk}^{(k - 1)} = 0$. Again we find a $P_k$ such that $P_k A^{(k - 1)}$ has a non-zero $(k, k)$ entry. We then construct $\mathbf{l}_k$ and $\mathbf{u}_k$ from $P_k A^{(k - 1)}$ and set
+\[
+  A^{(k)} = P_k A^{(n - 1)} - \mathbf{l}_k \mathbf{u}_k^t.
+\]
+Again, if the $k$th column of $A^{(k - 1)}$ is completely zero, we set $\mathbf{l}_k = \mathbf{e}_k$ and $\mathbf{u}_k^T$ to be the $k$th row of $A^{(k - 1)}$. But again this implies $A$ and $U$ will be singular.
+
+However, as we do this, the permutation matrices appear all over the place inside the algorithm. It is not immediately clear that we do get a factorization of the form $PA = LU$. Fortunately, keeping track of the interchanges, we \emph{do} have an LU factorization
+\[
+  PA = \tilde{L}U,
+\]
+where $U$ is what we got from the algorithm,
+\[
+  P = P_{n - 1} \cdots P_2 P_1,
+\]
+while $\tilde{L}$ is given by
+\[
+  \tilde{L} =
+  \begin{pmatrix}
+    \tilde{\mathbf{l}}_1 & \cdots & \tilde{\mathbf{l}}_n
+  \end{pmatrix},
+  \quad \tilde{\mathbf{l}}_k = P_{n - 1} \cdots P_{k - 1} \mathbf{l}_k.
+\]
+Note that in particular, we have
+\[
+  \tilde{\mathbf{l}}_{n - 1} = \mathbf{l}_{n - 1},\quad \tilde{\mathbf{l}}_n = \mathbf{l}_n.
+\]
+One problem we have not considered is the problem of inexact arithmetic. While these formula are correct mathematically, when we actually implement things, we do them on computers with finite precision. As we go through the algorithm, errors will accumulate, and the error might be amplified to a significant amount when we get the reach the end. We want an algorithm that is insensitive to errors. In order to work safely in inexact arithmetic, we will put the element of \emph{largest} modulus in the $(k, k)$th position, not just an arbitrary non-zero one, as this minimizes the error when dividing.
+
+\subsection{\texorpdfstring{$A = LU$}{A = LU} for special \texorpdfstring{$A$}{A}}
+There is one thing we haven't figured out yet. Can we just look at the matrix $A$, and then determine whether it has an LU factorization (that does not involve permutations)? To answer this, we start with some definitions
+
+\begin{defi}[Leading principal submatrix]
+  The \emph{leading principal submatrices} $A_k \in \R^{k \times k}$ for $k = 1, \cdots, n$ of $A \in \R^{n \times n}$ are
+  \[
+    (A_k)_{ij} = A_{ij},\quad i, j = 1, \cdots, k.
+  \]
+  In other words, we take the first $k$ rows and columns of $A$.
+\end{defi}
+
+\begin{thm}
+  A sufficient condition for the existence for both the existence and uniqueness of $A = LU$ is that $\det(A_{k}) \not= 0$ for $k = 1, \cdots, n - 1$.
+\end{thm}
+Note that we don't need $A$ to be non-singular. This is equivalent to the restriction $A_{kk}^{(k - 1)} \not= 0$ for $k = 1, \cdots, n - 1$.
+
+\begin{proof}
+  Straightforward induction. % include
+\end{proof}
+
+We extend this result a bit:
+\begin{thm}
+  If $\det (A_k) \not= 0$ for all $k = 1, \cdots, n$, then $A \in R^{n \times n}$ has a unique factorization of the form
+  \[
+    A = LD \hat{U},
+  \]
+  where $D$ is non-singular diagonal matrix, and both $L$ and $\hat{U}$ are unit triangular.
+\end{thm}
+
+\begin{proof}
+  From the previous theorem, $A = LU$ exists. Since $A$ is non-singular, $U$ is non-singular. So we can write this as
+  \[
+    U = D\hat{U},
+  \]
+  where $D$ consists of the diagonals of $U$ and $\hat{U} = D^{-1}U$ is unit.
+\end{proof}
+This is not hard, but is rather convenient.
+
+\begin{thm}
+  Let $A \in \R^{n \times n}$ be non-singular and $\det(A_k) \not= 0$ for all $k = 1, \cdots, n$. Then there is a unique ``symmetric'' factorization
+  \[
+    A = LDL^T,
+  \]
+  with $L$ unit lower triangular and $D$ diagonal and non-singular.
+\end{thm}
+
+\begin{proof}
+  From the previous theorem, we can factorize $A$ uniquely as
+  \[
+    A = LD\hat{U}.
+  \]
+  We take the transpose to obtain
+  \[
+    A = A^T = \hat{U}^T D L^T.
+  \]
+  This is a factorization of the form ``unit lower''-``diagonal''-``unit upper''. By uniqueness, we must have $\hat{U} = L^T$. So done.
+\end{proof}
+
+We just looked at a special type of matrices, the symmetric matrices. We look at another type of matrices:
+\begin{defi}[Positive definite matrix]
+  A matrix $A \in R^{n\times n}$ is \emph{positive-definite} if
+  \[
+    \mathbf{x}^T A\mathbf{x} > 0
+  \]
+  for $\mathbf{x}\not= \mathbf{0} \in \R^n$.
+\end{defi}
 \end{document}
