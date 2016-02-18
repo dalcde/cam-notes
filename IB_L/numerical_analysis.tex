@@ -1083,7 +1083,7 @@ Fortunately, we only need to apply the one-step method a fixed, small number of 
 
 We now study the properties of a general multi-step method. The first thing we can talk about is the order:
 \begin{thm}
-  A one-step method has order $p$ ($p \geq 1$) if and only if
+  An $s$-step method has order $p$ ($p \geq 1$) if and only if
   \[
     \sum_{\ell = 0}^s \rho_\ell = 0
   \]
@@ -1091,7 +1091,7 @@ We now study the properties of a general multi-step method. The first thing we c
   \[
     \sum_{\ell = 0}^s \rho_\ell \ell^k = k\sum_{\ell = 0}^s \sigma_\ell \ell^{k - 1}
   \]
-  for $k = 1, \cdots, p$.
+  for $k = 1, \cdots, p$, where $0^0 = 1$.
 \end{thm}
 
 This is just a rather technical result coming directly from definition.
@@ -1478,7 +1478,7 @@ So let's look at some other implicit methods.
 \begin{eg}[Trapezoidal rule]
   Again consider $y'(t) = \lambda y$, with the trapezoidal rule. So
   \[
-    y_n = -\left(\frac{1 + h\lambda/2}{1 - h\lambda/2}\right)^n.
+    y_n = \left(\frac{1 + h\lambda/2}{1 - h\lambda/2}\right)^n.
   \]
   So the linear stability domain is
   \[
@@ -1803,7 +1803,7 @@ There is one thing we haven't figured out yet. Can we just look at the matrix $A
 \begin{thm}
   A sufficient condition for the existence for both the existence and uniqueness of $A = LU$ is that $\det(A_{k}) \not= 0$ for $k = 1, \cdots, n - 1$.
 \end{thm}
-Note that we don't need $A$ to be non-singular. This is equivalent to the restriction $A_{kk}^{(k - 1)} \not= 0$ for $k = 1, \cdots, n - 1$.
+Note that we don't need $A$ to be non-singular. This is equivalent to the restriction $A_{kk}^{(k - 1)} \not= 0$ for $k = 1, \cdots, n - 1$. Also, this is a \emph{sufficient} condition, not a necessary one.
 
 \begin{proof}
   Straightforward induction. % include
@@ -1825,7 +1825,7 @@ We extend this result a bit:
   \]
   where $D$ consists of the diagonals of $U$ and $\hat{U} = D^{-1}U$ is unit.
 \end{proof}
-This is not hard, but is rather convenient.
+This is not hard, but is rather convenient. In particular, it allows us to factorize symmetric matrices in a nice way.
 
 \begin{thm}
   Let $A \in \R^{n \times n}$ be non-singular and $\det(A_k) \not= 0$ for all $k = 1, \cdots, n$. Then there is a unique ``symmetric'' factorization
@@ -1855,4 +1855,387 @@ We just looked at a special type of matrices, the symmetric matrices. We look at
   \]
   for $\mathbf{x}\not= \mathbf{0} \in \R^n$.
 \end{defi}
+
+\begin{thm}
+  Let $A \in \R^{n\times n}$ be a positive-definite matrix. Then $\det(A_k) \not= 0$ for all $k = 1, \cdots, n$.
+\end{thm}
+
+\begin{proof}
+  First consider $k = n$. To show $A$ is non-singular, it suffices to show that $A\mathbf{x} = \mathbf{0}$ implies $\mathbf{x} = \mathbf{0}$. But we can multiply the equation by $\mathbf{x}^T$ to obtain $\mathbf{x}^T A\mathbf{x} = 0$. By positive-definiteness, we must have $\mathbf{x} = \mathbf{0}$. So done.
+
+  Now suppose $A_k \mathbf{y} = \mathbf{0}$ for $k < n$ and $\mathbf{y} = \R^k$. Then $\mathbf{y}^T A_k \mathbf{y} = 0$. We invent a new $\mathbf{x} \in \R^n$ by taking $\mathbf{y}$ and pad it with zeros. Then $\mathbf{x}^T A\mathbf{x} = 0$. By positive-definiteness, we know $\mathbf{x} = \mathbf{0}$. Then in particular $\mathbf{y} = \mathbf{0}$.
+\end{proof}
+
+We are going to use this to prove the most important result in this section. We are going to consider matrices that are symmetric \emph{and} positive-definite.
+
+\begin{thm}
+  A symmetric matrix $A \in \R^{n \times n}$ is \emph{positive-definite} iff we can factor it as
+  \[
+    A = LDL^T,
+  \]
+  where $L$ is unit lower triangular, $D$ is diagonal and $D_{kk} > 0$.
+\end{thm}
+
+\begin{proof}
+  First suppose such a factorization exists, then
+  \[
+    \mathbf{x}^T A\mathbf{x} = \mathbf{x}^T L DL^T \mathbf{x} = (L^T\mathbf{x})^T D(L^T\mathbf{x}).
+  \]
+  We let $\mathbf{y} = L^T\mathbf{x}$. Note that $\mathbf{y} = \mathbf{0}$ if and only if $\mathbf{x} = \mathbf{0}$, since $L$ is invertible. So
+  \[
+    \mathbf{x}^TA\mathbf{x} = \mathbf{y}^T D\mathbf{y} = \sum_{k = 1}^n y_k^2 D_{kk} > 0
+  \]
+  if $\mathbf{y} \not= 0$.
+
+  Now if $A$ is positive definite, it has an LU factorization, and since $A$ is symmetric, we can write it as
+  \[
+    A = LDL^T,
+  \]
+  where $L$ is unit lower triangular and $D$ is diagonal. Now we have to show $D_{kk} > 0$. We define $\mathbf{y}_k$ such that $L^T \mathbf{y}_k = \mathbf{e}_k$, which exist, since $L$ is invertible. Then clearly $\mathbf{y}_k \not= \mathbf{0}$. Then we have
+  \[
+    D_{kk} = \mathbf{e}_k^T D\mathbf{e}_k = \mathbf{y}_k^T LDL^T \mathbf{y}_k = \mathbf{y}_k^T A\mathbf{y}_k > 0.
+  \]
+  So done.
+\end{proof}
+This is a practical check for symmetric $A$ being positive definite. We can perform this LU factorization, and then check whether the diagonal has positive entries.
+
+\begin{defi}[Cholesky factorization]
+  The \emph{Cholesky factorization} of a symmetric positive-definite matrix $A$ is a factorization of the form
+  \[
+    A = LDL^T,
+  \]
+  with $L$ unit lower triangular and $D$ a positive-definite diagonal matrix.
+\end{defi}
+There is another way of doing this. We let $D^{1/2}$ be the ``square root'' of $D$, by taking the positive square root of the diagonal entries of $D$. Then we have
+\[
+  A = LDL^T = LD^{1/2}D^{1/2}L^T = (LD^{1/2})(LD^{1/2})^T = GG^T,
+\]
+where $G$ is lower triangular with $G_{kk} > 0$. This is another way of presenting this result.
+
+Finally, we look at the LU factorization of band matrices.
+\begin{defi}[Band matrix]
+  A \emph{band matrix} of \emph{band width} $r$ is a matrix $A$ such that $A_{ij} \not= 0$ implies $|i - j| \leq r$.
+\end{defi}
+For example, a band matrix of band width $0$ is a diagonal matrix; a band matrix of band width $1$ is a tridiagonal matrix.
+
+The result is
+\begin{prop}
+  If a band matrix $A$ has band width $r$ and an LU factorization $A = LU$, then $L$ and $U$ are both band matrices of width $r$.
+\end{prop}
+
+\begin{proof}
+  Straightforward verification.
+\end{proof}
+
+\section{Linear least squares}
+The question we are interested in is how we can ``solve''
+\[
+  A\mathbf{x} = \mathbf{b},
+\]
+where $A \in \R^{m \times n}$, with $m > n$, and $\mathbf{b} \in \R^m$ and $\mathbf{x} \in \R^n$. Of course, this is an over-determined system. In general, this has no solution. So we want to find the ``best'' solution to this system of equations. More precisely, we want to find an $\mathbf{x}^* \in \R^n$ that minimizes $\|A\mathbf{x} - \mathbf{b}\|^2$. Note that we use the Euclidean norm. This is the \emph{least squares problem}.
+
+Why would one be interested in this? Often in, say, statistics, we have some linear model that says the outcome $B$ is related to the input variables $A_1, \cdots, A_n$ by
+\[
+  B = A_1 X_1 + A_2 X_2 + \cdots + A_n X_n + \varepsilon,
+\]
+where the $X_i$ are some unknown parameters, and $\varepsilon$ is some random variable. The idea is to do lots of experiments, say $m$ of them, collect the data in $A \in R^{m \times n}$ and $\mathbf{b} \in R^m$, and then find the $X_i$'s that predict these results the most accurately, ie. find the $\mathbf{x}$ such that $A\mathbf{x}$ is as close to $\mathbf{b}$ as possible.
+
+So how can we find this $\mathbf{x}^*$? First of all, we find a necessary and sufficient condition for $\mathbf{x}^*$ to be a solution to this.
+\begin{thm}
+  A vector $\mathbf{x}^* \in \R^n$ minimizes $\|A\mathbf{x} - \mathbf{b}\|^2$ if and only if
+  \[
+    A^T(A\mathbf{x}^* - \mathbf{b}) = 0.
+  \]
+\end{thm}
+
+\begin{proof}
+  A solution, by definition, minimizes
+  \begin{align*}
+    f(\mathbf{x}) &= \bra A\mathbf{x} - \mathbf{b}, A\mathbf{x} - \mathbf{b}\ket\\
+    &= \mathbf{x}^T AA\mathbf{x} - 2\mathbf{x}^T A^T \mathbf{b} + \mathbf{b}^T \mathbf{b}.
+  \end{align*}
+  Then as a function of $\mathbf{x}$, the partial derivatives of this must vanish. We have
+  \[
+    \nabla f(\mathbf{x}) = 2A^T(A\mathbf{x} - \mathbf{b}).
+  \]
+  So a necessary condition is
+  \[
+    A^T (A\mathbf{x} - \mathbf{b}).
+  \]
+  Now suppose our $\mathbf{x}^*$ satisfies $A^T (A\mathbf{x}^* - \mathbf{b}) = 0$. Then for all $\mathbf{x} \in \R^n$, we write $\mathbf{x} = \mathbf{x}^* + \mathbf{y}$, and then we have
+  \begin{align*}
+    \|A\mathbf{x} - \mathbf{b}\|^2 &= \|A(\mathbf{x}^* + \mathbf{y}) - \mathbf{b}\|\\
+    &= \|A \mathbf{x}^* - \mathbf{b}\| + 2\mathbf{y}^T A^T (A\mathbf{x} - \mathbf{b}) + \|A\mathbf{y}\|^2\\
+    &= \|A \mathbf{x}^* - \mathbf{b}\| + \|A\mathbf{y}\|^2\\
+    &\geq \|A \mathbf{x}^* - \mathbf{b}\|.
+  \end{align*}
+  So $\mathbf{x}^*$ must minimize the Euclidean norm.
+\end{proof}
+
+\begin{cor}
+  If $A \in \R^{m \times n}$ is a full-rank matrix, then there is a unique solution to the least squares problem.
+\end{cor}
+
+\begin{proof}
+  We know all minimizers are solutions to
+  \[
+    (A^T A)\mathbf{x} = A^T \mathbf{b}.
+  \]
+  The matrix $A$ being full rank means $\mathbf{y} \not= \mathbf{0} \in \R^n$ implies $A\mathbf{y} \not= \mathbf{0} \in \R^m$. Hence $A^T A \in \R^{n \times n}$ is positive definite (and in particular non-singular), since $\mathbf{x}^TA^T A\mathbf{x} = (A \mathbf{x})^T (A \mathbf{x}) = \|A \mathbf{x}\|^2 > 0$ for $\mathbf{x} \not= \mathbf{0}$.
+\end{proof}
+
+Now to find the minimizing $\mathbf{x}^*$, we need to solve the \emph{normal equations}
+\[
+  A^T A\mathbf{x} = A^T \mathbf{b}.
+\]
+If $A$ has full rank, then $A^T A$ is non-singular, and there is a unique solution. If not, then the general theory of linear equations tells us there are either infinitely many solution or no solutions. But for this particular form of equations, it turns out we can show this is always consistent. So there will always be a solution. However, solving these equations is not the recommended algorithm for finding $\mathbf{x}^*$ for accuracy reasons. Instead the solution of these is based on orthogonal matrices.
+
+\subsection{QR factorization}
+\begin{defi}[Orthogonal matrix]
+  A square matrix $Q \in \R^{n \times n}$ is orthogonal if $Q^T Q = I$.
+\end{defi}
+
+A key property of the orthogonal matrices is that we get
+\[
+  \|Q\mathbf{x}\| = \|\mathbf{x}\|
+\]
+for all $\mathbf{x} \in \R^n$. This is helpful since what we are trying to do in the least-squares problem involves minimizing the Euclidean norm of something.
+
+The idea is that for any orthogonal matrix, minimizing $\|A\mathbf{x} - \mathbf{b}\|$ is the same as minimizing $\|QA \mathbf{x} - Q\mathbf{b}\|$. So $Q$ should we pick? Recall that a simple kind of matrices is triangular matrices. So we might want to get something, say, upper triangular.
+
+\begin{defi}[QR factorization]
+  A \emph{QR factorization} of an $m \times n$ matrix $A$ is a factorization of the form
+  \[
+    A = QR,
+  \]
+  where $Q \in \R^{m \times m}$ is an orthogonal matrix, and $R \in \R^{m \times n}$ is ``upper triangular'' matrix, where ``upper triangular means''
+  \[
+    R =
+    \begin{pmatrix}
+      R_{11} & R_{12} & \cdots & R_{1m}\\
+      0 & R_{22} & \cdots & R_{2m}\\
+      \vdots & \vdots & \ddots & \vdots\\
+      0 & 0 & \cdots & R_{mm}\\
+      0 & 0 & \cdots & 0\\
+      \vdots & \vdots & \ddots & \vdots\\
+      0 & 0 & \cdots & 0
+    \end{pmatrix}
+  \]
+\end{defi}
+Note that every $A \in R^{m \times n}$ has a QR factorization, as we will soon show, but this is not unique (eg. we can multiply both $Q$ and $R$ by $-1$).
+
+Once we have the QR factorization, we can multiply $\|A\mathbf{x} - \mathbf{b}\|$ by $Q^T = Q^{-1}$, and get an equivalent problem of minimizing $\|R \mathbf{x} - Q^T \mathbf{b}\|$. We will not go into details, but it should be clear that this is not too hard to solve.
+
+There is an alternative ``skinny'' QR factorization, with $A = \tilde{Q} \tilde{R}$, where we remove redundant rows and columns such that $\tilde{Q} \in \R^{m \times n}$ and $\tilde{R} \in \R^{n \times n}$. % insert some pictures.
+This is good enough to solve the least squares problem.
+
+We will see that if $A$ has full rank, then the skinny QR is unique up to a sign, ie. if we require $\tilde{R}_{kk} > 0$ for $k = 1, \cdots, n$.
+
+We shall demonstrate three standard algorithms for QR factorization:
+\begin{enumerate}
+  \item Gram-Schmidt factorization
+  \item Givens rotations
+  \item Householder reflections
+\end{enumerate}
+The latter two are based on some geometric ideas, while the first is based on the familiar Gram-Schmidt process.
+
+\subsection{Gram-Schmidt factorization}
+This targets the skinny version. So we stop writing the tildes above, and just write $Q \in \R^{m \times n}$ and $R \in \R^{n \times n}$.
+
+As we all know, the Gram-Schmidt process orthogonalizes vectors. What we are going to orthogonalize are the columns of $A$. We write
+\[
+  A =
+  \begin{pmatrix}
+    \mathbf{a}_1 & \cdots & \mathbf{a}_n
+  \end{pmatrix},\quad
+  Q =
+  \begin{pmatrix}
+    \mathbf{q}_1 & \cdots & \mathbf{q}_n
+  \end{pmatrix}.
+\]
+By definition of the QR factorization, we need
+\[
+  \mathbf{a}_j = \sum_{i = 1}^j R_{ij} \mathbf{q}_j.
+\]
+This is just done in the usual Gram-Schmidt way.
+\begin{enumerate}
+  \item To construct column $1$, if $\mathbf{a}_1 \not= \mathbf{0}$, then we set
+    \[
+      \mathbf{q}_1 = \frac{\mathbf{a}_1}{\|\mathbf{a}_1\|},\quad R_{11} = \|\mathbf{a}_1\|.
+    \]
+    Note that the only non-unique possibility here is the sign --- we can let $R_{11} = - \|\mathbf{a}_1\|$ and $\mathbf{q}_1 = -\frac{\mathbf{a}_1}{\|\mathbf{a}_1\|}$ instead. But if we require $R_{11} > 0$, then this is fixed.
+
+    In the degenerate case, $\mathbf{a}_1 = \mathbf{0}$, then we can just set $R_{11} = 0$, and the pick any $\mathbf{q}_1 \in \R^n$ with $\|\mathbf{q}_1\| = 1$.
+  \item For columns $1 < k \leq n$, for $i = 1, \cdots, k - 1$, we set
+    \[
+      R_{ik} = \bra \mathbf{q}_i, \mathbf{a}_k\ket,
+    \]
+    and set
+    \[
+      \mathbf{d}_k = \mathbf{a}_k - \sum_{i = 1}^{k - 1} \mathbf{q}_i \bra \mathbf{q}_i, \mathbf{a}_k\ket.
+    \]
+    If $\mathbf{d}_k \not= \mathbf{0}$, then we set
+    \[
+      \mathbf{q}_k = \frac{\mathbf{d}_k}{\|\mathbf{d}_k\|},
+    \]
+    and
+    \[
+      R_{kk} = \|\mathbf{d}_k\|.
+    \]
+    In the case where $\mathbf{d}_k = \mathbf{0}$, we again set $R_{kk} = 0$, and pick $\mathbf{q}_k$ to be anything orthonormal to $\mathbf{q}_1, \cdots, \mathbf{q}_{k - 1}$.
+\end{enumerate}
+
+In practice, a slightly different algorithm (modified Gram-Schmidt process) is used, which is (much) superior with inexact arithmetic. The modified Gram-Schmidt process is in fact the same algorithm, but performed in a different order in order to minimize errors.
+
+\subsubsection*{Givens rotations}
+This works with the full QR factorization.
+
+Recall that in $\R^2$, a clockwise rotation of $\theta \in [-\pi, \pi]$ is performed by
+\[
+  \begin{pmatrix}
+    \cos \theta & \sin \theta\\
+    -\sin \theta & \cos \theta
+  \end{pmatrix}
+  \begin{pmatrix}
+    \alpha\\ \beta
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    \alpha \cos \theta + \beta \sin \theta\\
+    -\alpha \sin \theta + \beta \cos \theta
+  \end{pmatrix}.
+\]
+By choosing $\theta$ such that
+\[
+  \cos \theta = \frac{\alpha}{\sqrt{\alpha^2 + \beta^2}},\quad \sin \theta = \frac{\beta}{\sqrt{\alpha^2 + \beta^2}},
+\]
+this then becomes
+\[
+  \begin{pmatrix}
+    \sqrt{\alpha^2 + \beta^2}\\
+    0
+  \end{pmatrix}.
+\]
+Of course, by choosing a slightly different $\theta$, we can make the result zero in the first component and $\sqrt{\alpha^2 + \beta^2}$ in the second.
+
+\begin{defi}[Givens rotation]
+  In $\R^m$, where $m > 2$, we define the \emph{Givens rotation} on $3$ parameters $1 \leq p < q \leq m, \theta \in [-\pi, \pi]$ by
+  \setcounter{MaxMatrixCols}{11}
+  \[
+    \Omega_\theta^{[p, q]} =
+    \begin{pmatrix}
+      1 &\\
+      & \ddots\\
+      & & 1\\
+      & & & \cos \theta & & & & \sin \theta\\
+      & & & & 1\\
+      & & & & & \ddots\\
+      & & & & & & 1\\
+      & & & -\sin \theta & & & & \cos \theta\\
+      & & & & & & & & 1\\
+      & & & & & & & & & \ddots\\
+      & & & & & & & & & & 1
+    \end{pmatrix} \in \R^{m \times m},
+  \]
+  where the $\sin$ and $\cos$ appear at the $p, q$th rows and columns.
+\end{defi}
+Note that for $\mathbf{y} \in \R^m$, the effect of $\Omega_\theta^{[p, q]}$ only alters the $p$ and $q$ components. In general, for $B \in \R^{m \times n}$, then $\Omega_\theta^{[p, q]} B$ only alters the $p$ and $q$ rows of $B$.
+
+Moreover, just like the $\R^2$ case, given a particular $\mathbf{z} \in \R^m$, we can choose $\theta$ such that the $q$th component $(\Omega^{[p, q]}_\theta \mathbf{z})_q = 0$.
+
+Hence, $A \in \R^{m \times n}$ can be transformed into an ``upper triangular'' form by applying $s = mn - \frac{n(n + 1)}{2}$ Given rotations, since we need to introduce $s$ many zeros. Then
+\[
+  Q_s \cdots Q_1 A = R.
+\]
+How exactly do we do this? Instead of writing down a general algorithm, we illustrate it with a matrix $A \in R^{4 \times 3}$. The resultant $R$ would look like
+\[
+  R =
+  \begin{pmatrix}
+    R_{11} & R_{12} & R_{13}\\
+    0 & R_{22} & R_{23}\\
+    0 & 0 & R_{33}\\
+    0 & 0 & 0
+  \end{pmatrix}.
+\]
+We will apply the Givens rotations in the following order:
+\[
+  \Omega_{\theta_6}^{[3, 4]}\Omega_{\theta_5}^{[3, 4]} \Omega_{\theta_4}^{[2, 3]} \Omega_{\theta_3}^{[1, 4]} \Omega_{\theta_2}^{[1, 3]} \Omega_{\theta_1}^{[1, 2]} A = R.
+\]
+The matrix $A$ transforms as follows:
+\begin{center}
+  \begin{tikzpicture}[scale=0.35]
+    \begin{scope}
+      \draw (-1.5, -2) rectangle (1.5, 2);
+      \node at (-1, 1.5) {$\times$}; \node at (0, 1.5) {$\times$}; \node at (1, 1.5) {$\times$};
+      \node at (-1, 0.5) {$\times$}; \node at (0, 0.5) {$\times$}; \node at (1, 0.5) {$\times$};
+      \node at (-1, -0.5) {$\times$}; \node at (0, -0.5) {$\times$}; \node at (1, -0.5) {$\times$};
+      \node at (-1, -1.5) {$\times$}; \node at (0, -1.5) {$\times$}; \node at (1, -1.5) {$\times$};
+      \draw [->] (2, 0) -- (5, 0) node [pos=0.5, above] {$\Omega_{\theta_1}^{[1, 2]}$};
+    \end{scope}
+
+    \begin{scope}[shift={(7, 0)}]
+      \draw (-1.5, -2) rectangle (1.5, 2);
+      \node at (-1, 1.5) {$\times$}; \node at (0, 1.5) {$\times$}; \node at (1, 1.5) {$\times$};
+      \node at (-1, 0.5) {$0$}; \node at (0, 0.5) {$\times$}; \node at (1, 0.5) {$\times$};
+      \node at (-1, -0.5) {$\times$}; \node at (0, -0.5) {$\times$}; \node at (1, -0.5) {$\times$};
+      \node at (-1, -1.5) {$\times$}; \node at (0, -1.5) {$\times$}; \node at (1, -1.5) {$\times$};
+      \draw [->] (2, 0) -- (5, 0) node [pos=0.5, above] {$\Omega_{\theta_2}^{[1, 3]}$};
+    \end{scope}
+    \begin{scope}[shift={(14, 0)}]
+      \draw (-1.5, -2) rectangle (1.5, 2);
+      \node at (-1, 1.5) {$\times$}; \node at (0, 1.5) {$\times$}; \node at (1, 1.5) {$\times$};
+      \node at (-1, 0.5) {$0$}; \node at (0, 0.5) {$\times$}; \node at (1, 0.5) {$\times$};
+      \node at (-1, -0.5) {$0$}; \node at (0, -0.5) {$\times$}; \node at (1, -0.5) {$\times$};
+      \node at (-1, -1.5) {$\times$}; \node at (0, -1.5) {$\times$}; \node at (1, -1.5) {$\times$};
+      \draw [->] (2, 0) -- (5, 0) node [pos=0.5, above] {$\Omega_{\theta_3}^{[1, 3]}$};
+    \end{scope}
+
+    \begin{scope}[shift={(21, 0)}]
+      \draw (-1.5, -2) rectangle (1.5, 2);
+      \node at (-1, 1.5) {$\times$}; \node at (0, 1.5) {$\times$}; \node at (1, 1.5) {$\times$};
+      \node at (-1, 0.5) {$0$}; \node at (0, 0.5) {$\times$}; \node at (1, 0.5) {$\times$};
+      \node at (-1, -0.5) {$0$}; \node at (0, -0.5) {$\times$}; \node at (1, -0.5) {$\times$};
+      \node at (-1, -1.5) {$0$}; \node at (0, -1.5) {$\times$}; \node at (1, -1.5) {$\times$};
+    \end{scope}
+
+    \begin{scope}[shift={(3.5, -6)}]
+      \draw [->] (-5, 0) -- (-2, 0) node [pos=0.5, above] {$\Omega_{\theta_4}^{[2, 3]}$};
+      \draw (-1.5, -2) rectangle (1.5, 2);
+      \node at (-1, 1.5) {$\times$}; \node at (0, 1.5) {$\times$}; \node at (1, 1.5) {$\times$};
+      \node at (-1, 0.5) {$0$}; \node at (0, 0.5) {$\times$}; \node at (1, 0.5) {$\times$};
+      \node at (-1, -0.5) {$0$}; \node at (0, -0.5) {$0$}; \node at (1, -0.5) {$\times$};
+      \node at (-1, -1.5) {$0$}; \node at (0, -1.5) {$\times$}; \node at (1, -1.5) {$\times$};
+      \draw [->] (2, 0) -- (5, 0) node [pos=0.5, above] {$\Omega_{\theta_5}^{[3, 4]}$};
+    \end{scope}
+
+    \begin{scope}[shift={(10.5, -6)}]
+      \draw (-1.5, -2) rectangle (1.5, 2);
+      \node at (-1, 1.5) {$\times$}; \node at (0, 1.5) {$\times$}; \node at (1, 1.5) {$\times$};
+      \node at (-1, 0.5) {$0$}; \node at (0, 0.5) {$\times$}; \node at (1, 0.5) {$\times$};
+      \node at (-1, -0.5) {$0$}; \node at (0, -0.5) {$0$}; \node at (1, -0.5) {$\times$};
+      \node at (-1, -1.5) {$0$}; \node at (0, -1.5) {$0$}; \node at (1, -1.5) {$\times$};
+      \draw [->] (2, 0) -- (5, 0) node [pos=0.5, above] {$\Omega_{\theta_6}^{[3, 4]}$};
+    \end{scope}
+
+    \begin{scope}[shift={(17.5, -6)}]
+      \draw (-1.5, -2) rectangle (1.5, 2);
+      \node at (-1, 1.5) {$\times$}; \node at (0, 1.5) {$\times$}; \node at (1, 1.5) {$\times$};
+      \node at (-1, 0.5) {$0$}; \node at (0, 0.5) {$\times$}; \node at (1, 0.5) {$\times$};
+      \node at (-1, -0.5) {$0$}; \node at (0, -0.5) {$0$}; \node at (1, -0.5) {$\times$};
+      \node at (-1, -1.5) {$0$}; \node at (0, -1.5) {$0$}; \node at (1, -1.5) {$0$};
+    \end{scope}
+  \end{tikzpicture}
+\end{center}
+Note that when applying, say, $\Omega_{\theta_4}^{[2, 3]}$, the zeros of the first column get preserved, since $\Omega_{\theta_4}^{[2, 3]}$ only mixes together things in row $2$ and $3$, both of which are zero in the first column. So we are safe.
+
+Note that this gives us something of the form
+\[
+  Q_s \cdots Q_1 A = R.
+\]
+We can obtain a QR factorization by inverting to get
+\[
+  A = Q_1^T \cdots Q_s^T R.
+\]
+However, we don't really need to do this if we just want to do use this to solve the least squares problem.
+
 \end{document}

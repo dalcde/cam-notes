@@ -1903,7 +1903,7 @@ Let's do more examples.
       \draw [->] (0, -3) -- (0, 3);
       \draw [thick,decorate, decoration=zigzag] (0, 0) -- (3, 0);
 
-      \draw [mred, thick, ->-=0.1, ->-=0.45, ->-=0.75, ->-=0.84, ->-=0.95] (1.977, 0.3) arc(8.63:351.37:2) node [pos=0.15, anchor = south west] {$C_R$} -- (0.4, -0.3) arc(323.13:36.87:0.5) node [pos=0.7, left] {$C_\varepsilon$} -- cycle;;
+      \draw [mred, thick, ->-=0.1, ->-=0.45, ->-=0.75, ->-=0.84, ->-=0.95] (1.977, 0.3) arc(8.63:351.37:2) node [pos=0.15, anchor = south west] {$C_R$} -- (0.4, -0.3) arc(323.13:36.87:0.5) node [pos=0.7, left] {$C_\varepsilon$} -- cycle;
 
       \node [circ] at (0, 0) {};
 
@@ -1975,7 +1975,7 @@ Let's do more examples.
       \draw [mred, thick, ->-=0.3, ->-=0.78] (-2, 0) node [below] {$-R$} -- (2, 0) node [pos=0.7, below] {$\gamma_0$} node [below] {$R$} -- (2, 1.5) node [pos=0.5, right] {$\gamma_R^+$} -- (-2, 1.5) node [pos=0.3, above] {$\gamma_1$} -- (-2, 0) node [pos=0.5, left] {$\gamma_R^-$};
 
       \node at (0, 0.75) {$\times$};
-      \node [left] at (0, 0.75) {$\pi i/2$};
+      \node [left] at (0, 0.75) {$\frac{\pi i}{2}$};
 
       \node [circ] at (0, 1.5) {};
       \node [anchor = south east] at (0, 1.5) {$\pi i$};
@@ -2080,7 +2080,7 @@ These rectangular contours tend to be useful for trigonometric and hyperbolic fu
 \end{eg}
 
 \subsection{Jordan's lemma}
-\begin{lemma}
+\begin{lemma}[Jordan's lemma]
   Suppose that $f$ is an analytic function, except for a finite number of singularities, and that $f(z) \to 0$ as $|z| \to \infty$.
   \begin{center}
     \begin{tikzpicture}
@@ -2133,5 +2133,423 @@ But for functions decaying less rapidly than $o(|z|^{-1})$ (eg. if $f(z) = \frac
   \end{align*}
   as required. Same for $\gamma_R'$ when $\lambda < 0$.
 \end{proof}
+Note that we are not allowed to use the Jordan's lemma in the Tripos exam. If we want to use it, we must prove it ourselves. Fortunately, for most cases, we don't actually need it, but can just bound it by $R \sup_{|z| = R} f(z)$.
 
+\begin{eg}
+  Suppose we want to compute
+  \[
+    I = \int_0^\infty \frac{\cos \alpha x}{1 + x^2}\;\d x,
+  \]
+  where $\alpha$ is a positive real constant. We consider the following contour:
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (-3, 0) -- (3, 0);
+      \draw [->] (0, -1) -- (0, 3);
+
+      \draw [mred, thick, ->-=0.3, ->-=0.8] (-2, 0) -- (2, 0) node [pos=0.3, below] {$\gamma_0$} arc(0:180:2) node [pos=0.3, right] {$\gamma_R$};
+
+      \node [below] at (-2, 0) {$-R$};
+      \node [below] at (2, 0) {$R$};
+
+      \node at (0, 1) {$\times$};
+      \node [right] at (0, 1) {$i$};
+    \end{tikzpicture}
+  \end{center}
+  and we compute
+  \[
+    \Re \int_\gamma \frac{e^{i\alpha z}}{1 + z^2}\;\d z.
+  \]
+  Along $\gamma_0$, we obtain $2I$ as $R \to \infty$. On $\gamma_R$, we do not actually need Jordan's lemma to show that we obtain zero in the limit, but we can still use it to save ink. So
+  \[
+    I = \frac{1}{2} \Re \left(2\pi i\res_{z = i} \frac{e^{i\alpha z}}{1 + z^2}\right) = \frac{1}{2} \Re\left(2\pi i\frac{e^{-\alpha}}{2i}\right) = \frac{1}{2}\pi e^{-\alpha}.
+  \]
+  Note that taking the real part does not do anything here --- the result of the integral is completely real. This is since the imaginary part of $\int_\gamma \frac{e^{i\alpha z}}{1 + z^2} \;\d z$ is integrating $\frac{\sin \alpha z}{1 + z^2}$, which is odd and vanishes.
+
+  Note that if we had attempted to integrate $\int_\gamma \frac{\cos \alpha z}{1 + z^2}\;\d z$ directly, we would have found that $\int_{\gamma_R} \not\to 0$. In fact, $\cos \alpha z$ is unbounded at $\infty$.
+\end{eg}
+
+\begin{eg}
+  We want to find
+  \[
+    I = \int_{-\infty}^\infty \frac{\sin x}{x}\;\d x.
+  \]
+  This time, we \emph{do} require Jordan's lemma. Here we have an extra complication --- while $\frac{\sin x}{x}$ is well-behaved at the origin, to perform the contour integral, we need to integrate $\frac{e^{iz}}{z}$ instead, which \emph{is} singular at the origin.
+
+  Instead, we split the integral in half, and write
+  \begin{align*}
+    \int_{-\infty}^\infty &= \lim_{\substack{\mathllap{\varepsilon} \to \mathrlap{0}\\\mathllap{R}\to\mathrlap{\infty}}} \left(\int_{-R}^{-\varepsilon} \frac{\sin x}{x}\;\d x + \int_\varepsilon^R \frac{\sin x}{x}\;\d x\right)\\
+    &= \Im \lim_{\substack{\mathllap{\varepsilon} \to \mathrlap{0}\\\mathllap{R}\to\mathrlap{\infty}}} \left(\int_{-R}^{-\varepsilon} \frac{e^{iz}}{x}\;\d x + \int_\varepsilon^R \frac{e^{iz}}{x}\;\d x\right)
+  \end{align*}
+  We now let $C$ be the contour from $-R$ to $-\varepsilon$, then round a semi-circle $C_\varepsilon$ to $\varepsilon$, then to $R$, then returning via a semi-circle $C_R$ of radius $R$. Then $C$ misses all our singularities.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (-3, 0) -- (3, 0);
+      \draw [->] (0, -0.5) -- (0, 3);
+      \draw [mred, thick, ->-=0.09, ->-=0.37, ->-=0.8] (-2, 0) node [below] {$-R$} -- (-0.5, 0) node [below] {$-\varepsilon$} arc(180:0:0.5) node [pos=0.2, left] {$C_\varepsilon$} node [below] {$\varepsilon$} -- (2, 0) node [below] {$R$} arc(0:180:2) node [pos=0.3, right] {$C_R$};
+
+      \node {$\times$};
+    \end{tikzpicture}
+  \end{center}
+  Since $C$ misses all singularities, we must have
+  \[
+    \int_{-R}^{-\varepsilon} \frac{e^{iz}}{z} \;\d z + \int_\varepsilon^R \frac{e^{iz}}{z} \;\d z = -\int_{C_\varepsilon} \frac{e^{iz}}{z} \;\d z - \int_{C_R} \frac{e^{iz}}{z}\;\d z.
+  \]
+  By Jordan's lemma, the integral around $C_R$ vanishes as $R \to \infty$. On $C_\varepsilon$, we substitute $z = \varepsilon e^{i\theta}$ and $e^{iz} = 1 + O(\varepsilon)$ to obtain
+  \[
+    \int_{C_\varepsilon} \frac{e^{iz}}{z} \;\d z = \int_\pi^0 \frac{1 + O(\varepsilon)}{\varepsilon e^{i\theta}} i\varepsilon e^{i\theta} \;\d \theta = -i\pi + O(\varepsilon).
+  \]
+  Hence, in the limit $\varepsilon \to 0$ and $R \to \infty$, we get
+  \[
+    \int_{-\infty}^\infty \frac{\sin x}{x} \;\d x = \Im(i\pi) = \pi.
+  \]
+  Similarly, we can compute
+  \[
+    \int_{-\infty}^\infty \frac{\sin^2 x}{x^2}\;\d x = \pi.
+  \]
+  Alternatively, we notice that $\frac{\sin z}{z}$ has a removable singularity at the origin. Removing the singularity, the integrand is completely analytic. Therefore the original integral is equivalent to the integral along this path:
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (-3, 0) -- (3, 0);
+      \draw [->] (0, -0.5) -- (0, 2);
+      \draw [mred, thick, ->-=0.53] (-3, 0) -- (-2, 0) .. controls (-1, 0) and (-1, 0.5) .. (0, 0.5) .. controls (1, 0.5) and (1, 0) .. (2, 0) -- (3, 0);
+    \end{tikzpicture}
+  \end{center}
+  We can then write $\sin z = \frac{e^{iz} - e^{-iz}}{2i}$, and then apply our standard techniques and Jordan's lemma.
+\end{eg}
+
+\section{Transform theory}
+\subsection{Fourier transforms}
+We have already done Fourier transforms in IB Methods. What's new in this course is that we have a new way of calculating them --- contour integrals.
+
+\begin{defi}[Fourier transform]
+  The \emph{Fourier transform} of a function $f(x)$ that decays sufficiently as $|x| \to \infty$ is defined as
+  \[
+    \tilde{f}(k) = \int_{-\infty}^\infty f(x)e^{-ikx}\;\d x,
+  \]
+  and the inverse transform is
+  \[
+    f(x) = \frac{1}{2\pi} \int_{-\infty}^\infty \tilde{f}(k) e^{ikx}\;\d k.
+  \]
+\end{defi}
+It is common for the terms $e^{-ikx}$ and $e^{ikx}$ to be swapped around in these definitions. It might even be swapped around by the same author in the same paper --- for some reason, if we have a function in two variables, then it is traditional to transform one variable with $e^{-ikx}$ and the other with $e^{ikx}$, just to confuse people. More rarely, factors of $2\pi$ or $\sqrt{2\pi}$ rearranged.
+
+Traditionally, if $f$ is a function of position $x$, then the transform variable is called $k$; while if $f$ is a function of time $t$, then it is called $\omega$.
+
+In fact, a more precise version of the inverse transform is
+\[
+  \frac{1}{2}(f(x^+) + f(x^-)) = \frac{1}{2\pi} \mathrm{PV} \int_{-\infty}^\infty \tilde{f}(k) e^{ikx}\;\d k.
+\]
+The left-hand side indicates that at a discontinuity, the inverse Fourier transform gives the \emph{average} value. The right-hand side shows that only the \emph{Cauchy principal value} of the integral (denoted $\mathrm{PV} \int$, $\mathrm{P}\int$ or $\dashint$) is required, ie. the limit
+\[
+  \lim_{R \to \infty} \int_{-R}^R \tilde{f}(k) e^{ikx} \;\d k,
+\]
+rather than
+\[
+  \lim_{\substack{\mathllap{R} \to \mathrlap{\infty} \\ \mathllap{S}\to \mathrlap{-\infty}}}\quad \int_S^R\tilde{f}(k) e^{ikx} \;\d k.
+\]
+Several functions have $\mathrm{PV}$ integrals, but not normal ones. For example,
+\[
+  \mathrm{PV} \int_{-\infty}^\infty \frac{x}{1 + x^2}\;\d x = 0,
+\]
+since it is an odd function, but
+\[
+  \int_{-\infty}^\infty \frac{x}{1 + x^2}\;\d x
+\]
+diverges at both $-\infty$ and $\infty$. So the normal proper integral does not exist.
+
+So for the inverse Fourier transform, we only have to care about the Cauchy principal value. This is convenient because that's how we are used to compute contour integrals all the time!
+
+\begin{notation}
+  The Fourier transform can also be denoted by $\tilde{f} = \mathcal{F}(f)$ or $\tilde{f}(k) = \mathcal{F}(f)(k)$. In a slight abuse of notation, we often write $\tilde{f}(k) = \mathcal{F}(f(x))$, but this is not correct notation, since $\mathcal{F}$ takes in a function at a parameter, not a function evaluated at a particular point.
+\end{notation}
+
+Note that in the Tripos exam, you are expected to know about all the properties of the Fourier transform you have learned from IB Methods.
+
+We now calculate some Fourier transforms using the calculus of residues.
+\begin{eg}
+  Consider $f(x) = e^{-x^2/2}$. Then
+  \begin{align*}
+    \tilde{f}(k) &= \int_{-\infty}^\infty e^{-x^2/2} e^{-ikx}\;\d x\\
+    &= \int_{-\infty}^\infty e^{-(x + ik)^2/2} e^{-k^2/2}\;\d x\\
+    &= e^{-k^2/2}\int_{-\infty + ik}^{\infty + ik} e^{-z^2/2}\;\d z
+  \end{align*}
+  We create a rectangular contour that looks like this:
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (-3, 0) -- (3, 0);
+      \draw [->] (0, -1) -- (0, 3);
+
+      \draw [mred, thick, -<-=0.3, -<-=0.78] (-2, 0) node [below] {$-R$} -- (2, 0) node [pos=0.7, below] {$\gamma_1$} node [below] {$R$} -- (2, 1.5) node [pos=0.5, right] {$\gamma_R^+$} -- (-2, 1.5) node [pos=0.3, above] {$\gamma_0$} -- (-2, 0) node [pos=0.5, left] {$\gamma_R^-$};
+
+      \node [circ] at (0, 1.5) {};
+      \node [anchor = south east] at (0, 1.5) {$ik$};
+    \end{tikzpicture}
+  \end{center}
+  The integral we want is the integral along $\gamma_0$ as shown, in the limit as $R \to \infty$. We can show that $\int_{\gamma_R^+} \to 0$ and $\int_{\gamma_R^-} \to 0$. Then we notice there are no singularities inside the contour. So
+  \[
+    \int_{\gamma_0} e^{-z^2/2}\;\d z = -\int_{\gamma_1} e^{-z^2/2}\;\d z,
+  \]
+  in the limit. Since $\gamma_1$ is traversed in the reverse direction, we have
+  \[
+    \tilde{f}(k) = e^{-k^2/2} \int_{-\infty}^\infty e^{-z^2/2}\;\d z = \sqrt{2\pi} e^{-k^2/2},
+  \]
+  using a standard result from real analysis.
+\end{eg}
+
+When inverting Fourier transforms, we generally use a semicircular contour (in the upper half-plane if $x > 0$, lower if $x < 0$), and apply Jordan's lemma.
+\begin{eg}
+  Consider the real function
+  \[
+    f(x) =
+    \begin{cases}
+      0 & x < 0\\
+      e^{-ax} & x > 0
+    \end{cases},
+  \]
+  where $a > 0$ is a real constant. The Fourier transform of $f$ is
+  \begin{align*}
+    \tilde{f}(k) &= \int_{-\infty}^\infty f(x) e^{-ikx}\;\d x\\
+    &= \int_0^\infty e^{-ax - ikx}\;\d x\\
+    &= -\frac{1}{a + ik} [e^{-ax - ikx}]_0^\infty\\
+    &= \frac{1}{a + ik}.
+  \end{align*}
+  We shall compute the inverse Fourier transform by evaluating
+  \[
+    \frac{1}{2\pi} \int_{-\infty}^\infty \tilde{f}(k) e^{ikx}\;\d k.
+  \]
+  In the complex plane, we let $\gamma_0$ be the contour from $-R$ to $R$ in the real axis; $\gamma_R$ be the semicircle of radius $R$ in the upper half-plane, $\gamma_R'$ the semicircle in the lower half-plane. We let $\gamma = \gamma_0 + \gamma_R$ and $\gamma' = \gamma_0 + \gamma_R'$.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (-3, 0) -- (3, 0);
+      \draw [->] (0, -3) -- (0, 3);
+
+      \draw [mred, thick, ->-=0.3, ->-=0.8] (-2, 0) -- (2, 0) node [pos=0.3, below] {$\gamma_0$} arc(0:180:2) node [pos=0.3, right] {$\gamma_R$};
+      \draw [dashed, mblue, thick, ->-=0.3, ->-=0.8] (-2, 0) -- (2, 0) arc(0:-180:2) node [pos=0.3, right] {$\gamma_R'$};
+
+      \node [anchor = north east] at (-2, 0) {$-R$};
+      \node [anchor = north west] at (2, 0) {$R$};
+
+      \node at (0, 1) {$\times$};
+      \node [right] at (0, 1) {$i$};
+    \end{tikzpicture}
+  \end{center}
+  We see $\tilde{f}(k)$ has only one pole, at $k = ia$, which is a simple pole. So we get
+  \[
+    \oint_\gamma \tilde{f}(k) e^{ikx} \;\d k = 2\pi i \res_{k = ia} \frac{e^{ikx}}{i(k - ia)} = 2\pi e^{-ax},
+  \]
+  while
+  \[
+    \oint_{\gamma'}\tilde{f}(k) e^{ikx} \;\d k = 0.
+  \]
+  Now if $x > 0$, applying Jordan's lemma (with $\lambda = x$) to $C_R$ shows that $\int_{C_R} \tilde{f}(k) e^{ikx}\;\d k \to 0$ as $R \to \infty$. Hence we get
+  \begin{align*}
+    \frac{1}{2\pi} \int_{-\infty}^\infty &= \frac{1}{2\pi} \lim_{R \to \infty}\int_{\gamma_0}\tilde{f}(k) e^{ikx}\;\d k\\
+    &= \frac{1}{2\pi} \lim_{R \to \infty}\left(\int_\gamma\tilde{f}(k) e^{ikx}\;\d k - \int_{\gamma_R}\tilde{f}(k) e^{ikx}\;\d k\right)\\
+    &= e^{-ax}.
+  \end{align*}
+  For $x < 0$, we have to close in the lower half plane. Since there are no singularities, we get
+  \[
+    \frac{1}{2\pi} \int_{-\infty}^\infty \tilde{f}(k) e^{ikx}\;\d k = 0.
+  \]
+  Combining these results, we obtain
+  \[
+    \frac{1}{2\pi} \int_{-\infty}^\infty \tilde{f}(k) e^{ikx}\;\d k =
+    \begin{cases}
+      0 & x < 0\\
+      e^{-ax} & x > 0
+    \end{cases},
+  \]
+\end{eg}
+We've already done Fourier transforms in IB Methods, so we will no spend any more time on it. We move on to the new exciting topic of \emph{Laplace transforms}.
+
+\subsection{Laplace transform}
+The Fourier transform is a powerful tool for solving differential equations and investigating physical systems, but it has two key restrictions:
+\begin{enumerate}
+  \item Many functions of interest grow exponentially (eg. $e^x$), and so do not have Fourier transforms;
+  \item There is no way of incorporating initial or boundary conditions in the transform variable. When used to solve an ODE, the Fourier transform merely gives a particular integral: there are no arbitrary constance produced by the method.
+\end{enumerate}
+So for solving differential equations, the Fourier transform is pretty limited. Right into our rescue is the \emph{Laplace transform}, which gets around these two restrictions. However, we have to pay the price with a different restriction --- it is only defined for functions $f(t)$ which vanishes for $t < 0$ (by convention).
+
+From now on, we shall make this assumption, so that if we refer to the function $f(t) = e^t$ for instance, we really mean $f(t) = e^t H(t)$, where $H(t)$ is the Heaviside step function,
+\[
+  H(t) =
+  \begin{cases}
+    1 & t > 0\\
+    0 & t < 0
+  \end{cases}.
+\]
+\begin{defi}[Laplace transform]
+  The \emph{Laplace transform} of a function $f(t)$ such that $f(t) = 0$ for $t < 0$ is defined by
+  \[
+    \hat{f}(p) = \int_0^\infty f(t) e^{-pt}\;\d t.
+  \]
+  This exists for functions that grow no more than exponentially fast.
+\end{defi}
+There is no standard notation for the Laplace transform.
+\begin{notation}
+  We sometimes write
+  \[
+    \hat{f} = \mathcal{L}(f),
+  \]
+  or
+  \[
+    \hat{f}(p) = \mathcal{L}(f(t)).
+  \]
+\end{notation}
+The variable $p$ is also not standard. Sometimes, $s$ is used instead.
+
+Many functions (eg. $t$ and $e^t$) which do not have Fourier transforms do have Laplace transforms.
+
+Note that $\hat{f}(p) = \tilde{f}(-ip)$, where $\tilde{f}$ is the Fourier transform, provided that both transforms exist.
+
+\begin{eg}
+  Let's do some exciting examples.
+  \begin{enumerate}
+    \item
+      \[
+        \mathcal{L}(1) = \int_0^\infty e^{-pt} \;\d t = \frac{1}{p}.
+      \]
+    \item Integrating by parts, we find
+      \[
+        \mathcal{L}(t) = \frac{1}{p^2}.
+      \]
+    \item
+      \[
+        \mathcal{L}(e^{\lambda t}) = \int_0^\infty e^{(\lambda - p)t}\;\d t = \frac{1}{p - \lambda}.
+      \]
+    \item We have
+      \begin{align*}
+        \mathcal{L}(\sin t) &= \mathcal{L}\left(\frac{1}{2i} \left(e^{it} - e^{-it}\right)\right) \\
+        &= \frac{1}{2i} \left(\frac{1}{p - i} - \frac{1}{p + i}\right)\\
+        &= \frac{1}{p^2 + 1}.
+      \end{align*}
+  \end{enumerate}
+\end{eg}
+Note that the integral only converges if $\Re p$ is sufficiently large. For example, in (iii), we require $\Re p > \Re \lambda$. However, once we have calculated $\hat{f}$ in this domain, we can consider it to exist everywhere in the complete $p$-plane, except at singularities (such as at $p = \lambda$ in this example). This process of extending a complex function initially defined in some part of the plane to a larger part is known as \emph{analytic continuation}.
+
+So far, we haven't done anything interesting with Laplace transform, and this is going to continue in the next section!
+\subsection{Elementary properties of the Laplace transform}
+We will come up with seven elementary properties of the Laplace transform. The first $4$ properties are easily proved by direct substitution
+\begin{prop}\leavevmode
+  \begin{enumerate}
+    \item Linearity:
+      \[
+        \mathcal{L}(\alpha f + \beta g) = \alpha \mathcal{L}(f) + \beta \mathcal{L}(g).
+      \]
+    \item Translation:
+      \[
+        \mathcal{L}(f(t - t_0)H(t - t_0)) = e^{-pt_0} \hat{f}(p).
+      \]
+    \item Scaling:
+      \[
+        \mathcal{L}(f(\lambda t)) = \frac{1}{\lambda} \hat{f} \left(\frac{p}{\lambda}\right),
+      \]
+      where we require $\lambda > 0$ so that $f(\lambda t)$ vanishes for $t < 0$.
+    \item Shifting:
+      \[
+        \mathcal{L}(e^{p_0 t}f(t)) = \hat{f}(p - p_0).
+      \]
+    \item Transform of a derivative:
+      \[
+        \mathcal{L}(f'(t)) = p \hat{f}(p) - f(0).
+      \]
+      Repeating the process,
+      \[
+        \mathcal{L}(f''(t)) = p \mathcal{L}(f'(t)) - f'(0) = p^2 \hat{f}(p) - p f(0) - f'(0),
+      \]
+      and so on. This is the key fact for solving ODEs using Laplace transforms.
+    \item Derivative of a transform:
+      \[
+        \hat{f}'(p) = \mathcal{L}(-tf(t)).
+      \]
+      Of course, the point of this is not that we know what the derivative of $\hat{f}$ is. It is we know how to find the Laplace transform of $tf(t)$! For example, this lets us find the derivative of $t^2$ with ease.
+
+      In general,
+      \[
+        \hat{f}^{(n)} (p) = \mathcal{L}((-t)^n f(t)).
+      \]
+    \item Asymptotic limits
+      \[
+        p\hat{f(p)} \to
+        \begin{cases}
+          f(0) & \text{as }p \to \infty\\
+          f(\infty) & \text{as }p \to 0
+        \end{cases},
+      \]
+      where the second case requires $f$ to have a limit at $\infty$.
+  \end{enumerate}
+\end{prop}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}\setcounter{enumi}{4}
+    \item We have
+      \[
+        \int_0^\infty f'(t) e^{-pt}\;\d t = [f(t) e^{-pt}]^{\infty}_0 + p \int_0^\infty f(t) e^{-pt}\;\d t = p \hat{f}(p) - f(0).
+      \]
+    \item We have
+      \[
+        \hat{f}(p) = \int_0^\infty f(t) e^{-pt}\;\d t.
+      \]
+      Differentiating with respect to $p$, we have
+      \[
+        \hat{f}'(p) = -\int_0^\infty t f(t) e^{-pt}\;\d t.
+      \]
+    \item Using (v), we know
+      \[
+        p\hat{f}(p) = f(0) + \int_0^\infty f'(t) e^{-pt} \;\d t.
+      \]
+      As $p \to \infty$, we know $e^{-pt} \to 0$ for all $t$. So $p \hat{f}(p) \to f(0)$. This proof looks dodgy, but is actually valid since $f'$ grows no more than exponentially fast.
+
+      Similarly, as $p \to 0$, then $e^{-pt} \to 1$. So
+      \[
+        p \hat{f}(p) \to f(0) + \int_0^\infty f'(t) \;\d t = f(\infty).
+      \]
+  \end{enumerate}
+\end{proof}
+
+\begin{eg}
+  We can compute
+  \[
+    \mathcal{L}(t \sin t) = -\frac{\d}{\d p} \mathcal{L}(\sin t) = -\frac{\d}{\d p} \frac{1}{p^2 + 1} = \frac{2p}{(p^2 + 1)^2}.
+  \]
+\end{eg}
+
+\subsection{The inverse Laplace transform}
+It's no good trying to find the Laplace transforms of functions if we can't invert them. Given $\hat{f}(p)$, we can calculate $f(t)$ using the \emph{Bromwich inversion formula}.
+\begin{prop}
+  The inverse Laplace transform is given by
+  \[
+    f(t) = \frac{1}{2\pi i} \int_{c - i \infty}^{c + i\infty} \hat{f}(p) e^{pt} \;\d p,
+  \]
+  where $c$ is a real constant, and the \emph{Bromwich inversion contour} $\gamma$ runs along the vertical line $\Re p = c$.
+
+  Importantly, $\gamma$ must lie to the \emph{right} of all the singularities of $\hat{f}(p)$.
+
+  In the case that $\hat{f}(p)$ has only a finite number of isolated singularities $p_k$ for $k = 1, \cdots, n$, and $\hat{f}(p) \to 0$ as $|p| \to \infty$, then
+  \[
+    f(t) = \sum_{k = 1}^n \res_{p = p_k} (\hat{f}(p) e^{pt})
+  \]
+  for $t > 0$ (and vanishes for $t < 0$).
+\end{prop}
+
+\begin{proof}
+  When $t < 0$ consider the contour $\gamma_0 + \gamma_R'$ as shown, which encloses no singularities.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (-1.5, 0) -- (3.5, 0);
+      \draw [->] (0, -3) -- (0, 3);
+
+      \draw [->-=0.3, ->-=0.8] (1, -2) node [below] {$c - iR$} -- (1, 2) node [pos=0.7, right] {$\gamma_0$} node [above] {$c + iR$} arc(90:-90:2) node [pos=0.3, right] {$\gamma_R'$};
+
+      \node at (-0.3, -0.6) {$\times$};
+      \node at (-1, 0.8) {$\times$};
+      \node at (0.2, 0.4) {$\times$};
+    \end{tikzpicture}
+  \end{center}
+  Now if $\hat{f}(p) = o(|p|^{-1})$ as $|p| \to \infty$, then
+  \[
+    \left|\int_{\gamma_R'} \hat{f}(p) e^{pt}\;\d p\right| \leq \pi R e^{ct} \sup_{p \in \gamma_R'} |\hat{f}(p)| \to 0 \text{ as }R \to \infty.
+  \]
+  Here we used the fact $|e^{pt}| \leq e^{ct}$, which arises from $\Re (pt) \leq ct$, noting that $t < 0$.
+\end{proof}
 \end{document}
