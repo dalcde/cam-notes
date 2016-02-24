@@ -5,7 +5,6 @@
 \def\nyear {2016}
 \def\nlecturer {I. Smith}
 \def\ncourse {Complex Analysis}
-\def\nlectures {MWF.11}
 \def\nnotready {}
 
 \input{header}
@@ -26,57 +25,90 @@ Uniform convergence of analytic functions; local uniform convergence. Differenti
 
 \vspace{10pt}
 \noindent\textbf{The residue theorem}\\
-Winding numbers. Residue theorem. Jordan's lemma. Evaluation of definite integrals by contour integration. Rouch\'es theorem, principle of the argument. Open mapping theorem.\hspace*{\fill} [4]}
+Winding numbers. Residue theorem. Jordan's lemma. Evaluation of definite integrals by contour integration. Rouch\'e's theorem, principle of the argument. Open mapping theorem.\hspace*{\fill} [4]}
 
 \tableofcontents
+\setcounter{section}{-1}
+\section{Introduction}
+Complex analysis is the study of complex differentiable functions. While this sounds like it should be a rather straightforward generalization of real analysis, it turns out complex differentiable functions behave rather differently. Requiring that a function is complex differentiable is a very strong condition, and consequently these functions have very nice properties.
+
+One of the most distinguishing results from complex analysis is Liouville's theorem, which says that every bounded complex differentiable function $f: \C \to \C$ must be constant. This is very false for real functions (eg. $\sin x$). This gives a strikingly simple proof of the fundamental theorem of algebra --- if the polynomial $p$ has no roots, then $\frac{1}{p}$ is well-defined on all of $\C$, and it is easy to show this must be bounded. So $p$ is constant.
+
+Many things we hoped were true in real analysis are indeed true in complex analysis. For example, if a complex function is once differentiable, then it is infinitely differentiable. In particular, every complex differentiable function has a Taylor series and is indeed equal to its Taylor series (in reality, to prove these, we show that every complex differentiable function is equal to its Taylor series, and then notice that power series are always infinitely differentiable).
+
+Another result we will prove is that the uniform limit of complex differentiable functions is again complex differentiable. Contrast this with the huge list of weird conditions we needed for real analysis!
+
+Not only is differentiation nice. It turns out integration is also easier in complex analysis. In fact, we will exploit this fact to perform real integrals by pretending they are complex integrals. However, this will not be our main focus here --- those belong to the IB Complex Methods course instead.
+
+
 \section{Complex differentiation}
 \subsection{Differentiation}
-We first recall a few basic definitions. We are going to look at functions defined on subsets of the complex plane. Often, we just want to look at open subsets.
+We start with some definitions. As mentioned in the introduction, Liouville's theorem says functions defined on the whole of $\C$ are often not that interesting. Hence, we would like to work with some subsets of $\C$ instead. As in real analysis, for differentiability to be well-defined, we would want a function to be defined on an open set, so that we can see how $f: U \to \C$ varies as we approach a point $z_0 \in U$ from all different directions.
+
 \begin{defi}[Open subset]
-  A subset $U \subseteq \C$ is \emph{open} if for any $x \in U$, there is some $\varepsilon > 0$ such that the open ball $B_x(\varepsilon) = B(x; \varepsilon) \subseteq U$.
+  A subset $U \subseteq \C$ is \emph{open} if for any $x \in U$, there is some $\varepsilon > 0$ such that the open ball $B_\varepsilon(x) = B(x; \varepsilon) \subseteq U$.
 \end{defi}
-The notation used for the open ball varies form time to time, even within the same sentence. For example, instead of putting $x$ as the subscript, we could put $\varepsilon$ as the subscript and $x$ inside the brackets. Hopefully, it will be clear from context.
+The notation used for the open ball varies form time to time, even within the same sentence. For example, instead of putting $\varepsilon$ as the subscript, we could put $x$ as the subscript and $\varepsilon$ inside the brackets. Hopefully, it will be clear from context.
+
+This is good, but we also want to rule out some silly cases, such as functions defined on subsets that look like this:
+\begin{center}
+  \begin{tikzpicture}[scale=0.7]
+    \draw [fill=mblue, fill opacity=0.5] plot [smooth cycle] coordinates {(-1.2, -0.7) (0, -0.7) (0.7, -1) (1.3, -0.9) (1.4, 0.6) (0.3, 1.2) (-1.7, 0.8)};
+    \begin{scope}[shift={(5, 0)}]
+      \draw [fill=mblue, fill opacity=0.5] plot [smooth cycle] coordinates {(-1.2, -0.7) (0, -0.7) (0.7, -1) (1.3, -0.9) (1.4, 0.6) (0.3, 1.2) (-1.7, 0.8)};
+    \end{scope}
+  \end{tikzpicture}
+\end{center}
+This would violate results such as functions with zero derivative must be constant. Hence, we would require our subset to be connected. This means for any two points in the set, we can find a path joining them. A path can be formally defined as a function $\gamma: [0, 1] \to \C$, with start point $\gamma(0)$ and end point $\gamma(1)$.
 
 \begin{defi}[Path-connected subset]
   A subset $U \subseteq \C$ is path-connected if for any $x, y \in U$, there is some $\gamma: [0, 1] \to U$ continuous such that $\gamma(0) = x$ and $\gamma(1) = y$.
 \end{defi}
 
+Together, these define what it means to be a domain. These are (usually) things that will be the domains of our functions.
 \begin{defi}[Domain]
   A \emph{domain} is a non-empty open path-connected subset of $\C$.
 \end{defi}
 
-Consider a domain $U \subseteq \C$ and a function $f: U \to \C$.
+With this, we can define what it means to be differentiable at a point. This is, in fact, exactly the same definition as that for real functions.
 \begin{defi}[Differentiable function]
-  We say a function $f$ is \emph{differentiable} at $w \in U$ if
+  Let $U \subseteq \C$ be a domain and $f: U \to \C$ be a function. We say $f$ is \emph{differentiable} at $w \in U$ if
   \[
     f'(w) = \lim_{z\to w} \frac{f(z) - f(w)}{z - w}
   \]
   exists.
 \end{defi}
-Here we implicitly require that the limit does not depend on which direction we approach $w$ from. It turns out this is a very strong condition to impose.
+Here we implicitly require that the limit does not depend on which direction we approach $w$ from. This requirement is also present for real differentiability, but there are just two directions we can approach $w$ from --- the positive direction and the negative direction. For complex analysis, there are infinitely many directions to choose from, and it turns out this is a very strong condition to impose.
+
+Complex differentiability at a point $w$ is not too interesting. Instead, what we want is a slightly stronger condition that the function is complex differentiable in a neighbourhood of $w$.
 
 \begin{defi}[Analytic/holomorphic function]
-  A function $f$ is \emph{analytic} or \emph{holomorphic} at $w \in U$ if $f$ is differentiable on an open neighbourhood $B(w, \varepsilon)$ of $w$.
+  A function $f$ is \emph{analytic} or \emph{holomorphic} at $w \in U$ if $f$ is differentiable on an open neighbourhood $B(w, \varepsilon)$ of $w$ (for some $\varepsilon$).
 \end{defi}
 
 \begin{defi}[Entire function]
   If $f: \C \to \C$ is defined on all of $\C$ and is holomorphic on $\C$, then $f$ is said to be \emph{entire}.
 \end{defi}
 
+It is not universally agreed what the words analytic and holomorphic should mean. Some people take one of these word to mean instead that the function has a (and is given by the) Taylor series, and then take many pages to prove that these two notions are indeed the same. But since they are the same, we shall just opt for the simpler definition.
+
 The goal of the course is to develop the rich theory of these complex differentiable functions and see how we can integrate them along continuously differentiable ($C^1$) paths in the complex plane.
 
-First, we want to figure out when a function is differentiable. Given $f: U \to \C$, we can write it as $f = u + iv$, where $u, v: U \to \R$ are real-valued functions. Recall from IB Analysis II that a function $u: U \to \R$ viewed as a real-valued function of two variables is differentiable at a point $(c, d) \in U$, with derivative $Du|_{(c, d)} = (\lambda, \mu)$, if and only if
-\[
-  \frac{u(x, y) - u(c, d) - (\lambda (x - c) + \mu (y - d))}{\|(x, y) - (c, d)\|} \to 0
-\]
-as $(x, y) \to (c, d)$.
+Before we try to achieve our lofty goals, we first want to figure out when a function is differentiable. Sure we can do this by checking the definition directly, but this quickly becomes cumbersome for more complicated functions. Instead, we would want to see if we can relate complex differentiability to real differentiability, since we know how to differentiate real functions.
 
-This allows us to come up with a nice criterion for when a function is differentiable
+Given $f: U \to \C$, we can write it as $f = u + iv$, where $u, v: U \to \R$ are real-valued functions. We can further view $u$ and $v$ as real-valued functions of two real variables, instead of one complex variable.
+
+Then from IB Analysis II, we know this function $u: U \to \R$ is differentiable (as a real function) at a point $(c, d) \in U$, with derivative $Du|_{(c, d)} = (\lambda, \mu)$, if and only if
+\[
+  \frac{u(x, y) - u(c, d) - (\lambda (x - c) + \mu (y - d))}{\|(x, y) - (c, d)\|} \to 0\quad \text{as}\quad (x, y) \to (c, d).
+\]
+This allows us to come up with a nice criterion for when a complex function is differentiable.
+
 \begin{prop}
-  Let $f$ be defined on an open set $U \subseteq \C$. Let $w = c + id \in U$ and write $f = u + iv$. Then $f$ is complex differentiable at $w$ if and only if $u$ and $v$ are differentiable at $(c, d)$, viewed as a real function of two real variables, \emph{and}
+  Let $f$ be defined on an open set $U \subseteq \C$. Let $w = c + id \in U$ and write $f = u + iv$. Then $f$ is complex differentiable at $w$ if and only if $u$ and $v$, viewed as a real function of two real variables, are differentiable at $(c, d)$, \emph{and}
   \begin{align*}
-    u_x &= v_y\\
-    u_y &= -v_x
+    u_x &= v_y,\\
+    u_y &= -v_x.
   \end{align*}
   These equations are the \emph{Cauchy-Riemann equations}. In this case, we have
   \[
@@ -93,7 +125,7 @@ This allows us to come up with a nice criterion for when a function is different
   \[
     f'(w) (z - w) = p(x - c) - q(y - d) + i(q(x - c) + p (y - c)).
   \]
-  So $(\dagger)$ holds if and only if
+  So, breaking into real and imaginary parts, we know $(\dagger)$ holds if and only if
   \[
     \lim_{(x, y) \to (c, d)} \frac{u(x, y) - u(c, d) - (p(x - c) - q(y - d))}{\sqrt{(x - c)^2 + (y - d)^2}} = 0
   \]
@@ -110,7 +142,8 @@ A standard warning is given that $f: U \to \C$ can be written as $f = u + iv$, w
 
 \begin{eg}\leavevmode
   \begin{enumerate}
-    \item A polynomial $p: \C \to \C$ is entire. This can be checked directly from definition.
+    \item The usual rules of differentiation (sum rule, product, rule, chain rule, derivative of inverse) all hold for complex differentiable functions, with the same proof as the real case.
+    \item A polynomial $p: \C \to \C$ is entire. This can be checked directly from definition, or using the product rule.
     \item A \emph{rational function} $\frac{p(z)}{q(z)}: U \to \C$, where $U \subseteq \C \setminus \{z: q(z) = 0\}$, is holomorphic on any such $U$. Here $p, q$ are polynomials.
     \item $f(z) = |z|$ is \emph{not} complex differentiable at \emph{any} point of $\C$. Indeed, we can write this as $f = u + iv$, where
       \[
@@ -134,26 +167,26 @@ A standard warning is given that $f: U \to \C$ can be written as $f = u + iv$, w
 The course schedules has a weird part where we are supposed to talk about conformal mappings for a lecture, but not use it anywhere else. We have to put them \emph{somewhere}, and we might as well do it now. However, this section will be slightly disconnected from the rest of the lectures.
 
 \begin{defi}[Conformal function]
-  Let $f: U \to \C$ be a function holomorphic at $w \in U$. If $f'(w) \not= 0$, we say $f$ is \emph{conformal}.
+  Let $f: U \to \C$ be a function holomorphic at $w \in U$. If $f'(w) \not= 0$, we say $f$ is \emph{conformal} at $w$.
 \end{defi}
 
-Note that if $f = u + iv$, then viewed as a map $\R^2 \to \R^2$, we find the Jacobian matrix is
+What exactly does $f'(w) \not= 0$ tell us? In the real case, if we know a function $f: (a, b) \to \R$ is continuous differentiable, and $f'(c) \not= 0$, then $f$ is locally increasing or decreasing at $c$, and hence has a local inverse. This is also true in the case of complex functions.
+
+We write $f = u + iv$, then viewed as a map $\R^2 \to \R^2$, the Jacobian matrix is given by
 \[
   Df =
   \begin{pmatrix}
     u_x & u_y\\
     v_x & v_y
-  \end{pmatrix}
+  \end{pmatrix}.
 \]
 Then
 \[
-  \det (Df) = u_x v_y + u_y v_x = u_x^2 + u_y^2.
+  \det (Df) = u_x v_y - u_y v_x = u_x^2 + u_y^2.
 \]
-Using the formula for the complex derivative in terms of the partials, this shows that if $f'(w) \not= 0$, then $\det(Df|_w) \not= 0$. Hence, by the inverse function theorem (viewing $f$ as a function $\R^2 \to \R^2$), $f$ is locally invertible at $w$.
+Using the formula for the complex derivative in terms of the partials, this shows that if $f'(w) \not= 0$, then $\det(Df|_w) \not= 0$. Hence, by the inverse function theorem (viewing $f$ as a function $\R^2 \to \R^2$), $f$ is locally invertible at $w$ (technically, we need $f$ to be \emph{continuously} differentiable, instead of just differentiable, but we will later show that $f$ in fact must be infinitely differentiable). Moreover, by the same proof as in real analysis, the local inverse to a holomorphic function is holomorphic (and conformal).
 
-It is an exercise to show that the usual rules of differentiation (sum, product, chain rule, derivative of inverse function) all hold for complex differentiation just as in the real case, with exactly the same proof. In particular, if a holomorphic function is conformal at a point $w$, then it has a local inverse which is also holomorphic and conformal.
-
-Another useful property of conformal mappings is that they preserve angles. To give a precise statement of this, we need to specify how ``angles'' work.
+But being conformal is more than just being locally invertible. An important property of conformal mappings is that they preserve angles. To give a precise statement of this, we need to specify how ``angles'' work.
 
 The idea is to look at tangent vectors of paths. Let $\gamma_1, \gamma_2: [-1, 1] \to U$ be continuously differentiable paths that intersect when $t = 0$ at $w = \gamma_1(0) = \gamma_2(0)$. Moreover, assume $\gamma_i'(0) \not= 0$.
 
@@ -161,8 +194,6 @@ Then we can compare the angles between the paths by looking at the difference in
 \[
   \mathrm{angle} (\gamma_1, \gamma_2) = \arg (\gamma_1'(0)) - \arg (\gamma_2'(0)).
 \]
-(here we take $\arg$ to be the argument we would have if $w$ were the origin)
-
 Let $f: U \to \C$ and $w \in U$. Suppose $f$ is conformal at $w$. Then $f$ maps our two paths to $f \circ \gamma_i: [-1, 1] \to \C$. These two paths now intersect at $f(w)$. Then the angle between them is
 \begin{align*}
   \mathrm{angle} (f \circ \gamma_1, f\circ \gamma_2) &= \arg((f\circ \gamma_1)'(0)) - \arg((f \circ \gamma_2)'(0))\\
@@ -170,11 +201,13 @@ Let $f: U \to \C$ and $w \in U$. Suppose $f$ is conformal at $w$. Then $f$ maps 
   &= \arg\left(\frac{\gamma_1'(0)}{\gamma_2'(0)}\right)\\
   &= \mathrm{angle} (\gamma_1, \gamma_2),
 \end{align*}
-using the chain rule and the fact that $f'(w) \not= 0$.
+using the chain rule and the fact that $f'(w) \not= 0$. So angles are preserved.
+
+What else can we do with conformal maps? It turns out we can use it to solve Laplace's equation.
 
 We will later prove that if $f: U \to \C$ is holomorphic on an open set $U$, then $f': U \to \C$ is \emph{also} holomorphic. Hence $f$ is infinitely differentiable.
 
-Moreover, if we write $f = u + iv$, then using the formula for $f'$ in terms of the partials, we know $u$ and $v$ are also \emph{infinitely differentiable}. Differentiating the Cauchy-Riemann equations, we get
+In particular, if we write $f = u + iv$, then using the formula for $f'$ in terms of the partials, we know $u$ and $v$ are also \emph{infinitely differentiable}. Differentiating the Cauchy-Riemann equations, we get
 \[
   u_{xx} = v_{yx} = -u_{yy}.
 \]
@@ -189,6 +222,10 @@ We get similar results for $v$ instead. Hence $\Re(f)$ and $\Im(f)$ satisfy the 
 \end{defi}
 Note that in general, a bijective continuous map need not have a continuous inverse. However, if we are given further that it is \emph{conformal}, then the inverse mapping theorem tells us there is a local conformal inverse, and if the function is bijective, these patch together to give a global conformal inverse.
 
+The idea is that if we are required to solve the 2D Laplace's equation on a funny domain $U$ subject to some boundary conditions, we can try to find a conformal equivalence $f$ between $U$ and some other nice domain $V$. We can then solve Laplace's equation on $V$ subject to the boundary conditions carried forward by $f$, which is hopefully easier. Afterwards, we pack this solution into the real part of a conformal function $g$, and then $g \circ f: U \to \C$ is a holomorphic function on $U$ whose real part satisfies the boundary conditions we want. So we have found a solution to Laplace's equation.
+
+You will have a chance to try that on the first example sheet. Instead, we will focus on finding conformal equivalences between different regions, since examiners like these questions.
+
 \begin{eg}
   Any M\"obius map $A(z) = \frac{az + b}{cz + d}$ (with $ad - bc \not= 0$) defines a conformal equivalence $\C \cup \{\infty\} \to \C\cup \{\infty\}$ in the obvious sense. $A'(z) \not= 0$ follows from the chain rule and the invertibility of $A(z)$.
 
@@ -197,7 +234,7 @@ Note that in general, a bijective continuous map need not have a continuous inve
     \text{M\"ob}(D) &= \{f \in \text{M\"obius group}: f(D) = D\} \\
     &= \left\{\lambda\frac{z - a}{\bar{a}z - 1} \in \text{M\"ob} : |a| < 1, |\lambda| = 1\right\}
   \end{align*}
-  is a group of conformal equivalences of the disk. You will prove that the M\"obius group of the disk is indeed of this form in the first example sheet.
+  is a group of conformal equivalences of the disk. You will prove that the M\"obius group of the disk is indeed of this form in the first example sheet, and that these are all conformal equivalences of the disk on example sheet 2.
 \end{eg}
 \begin{eg}
   The map $z \mapsto z^n$ for $n \geq 2$ is holomorphic everywhere and conformal except at $z = 0$. This gives a conformal equivalence
@@ -224,7 +261,7 @@ Note that in general, a bijective continuous map need not have a continuous inve
   \[
     \left|\frac{z - i}{z + i}\right| < 1.
   \]
-  So $z \mapsto \frac{z - i}{z + i}$ defines a conformal equivalence $\H \to D$, the unit disc. We know this is conformal since it is a special case of the M\"obius map.
+  So $z \mapsto \frac{z - i}{z + i}$ defines a conformal equivalence $\H \to D$, the unit disk. We know this is conformal since it is a special case of the M\"obius map.
 \end{eg}
 
 \begin{eg}
@@ -283,7 +320,7 @@ Note that in general, a bijective continuous map need not have a continuous inve
 
   This is a crude model of an aerofoil, and the transformation is known as the Joukowsky transform.
 
-  In applied mathematics, this is used to model fluid flow over a wing in terms of the analytically simpler flow across a circular section. This is (apparently) useful because the Laplace's equation comes up a lot in fluid flow, and we have seen a connection between Laplace's equation and analytic functions.
+  In applied mathematics, this is used to model fluid flow over a wing in terms of the analytically simpler flow across a circular section.
 \end{eg}
 
 We interlude with a little trick. Often, there is no simple way to describe regions in space. However, if the region is bounded by circular arcs, there is a trick that can be useful.
@@ -309,7 +346,11 @@ Suppose we have a circular arc between $\alpha$ and $\beta$.
     \node [below] at (4, 1.6) {$\mu$};
   \end{tikzpicture}
 \end{center}
-Along this arc, $\mu = \theta - \phi = \arg(z - \alpha) - \arg(z - \beta)$ is constant. Thus, for each $\mu$, we get an arc from $\alpha$ to $\beta$.
+Along this arc, $\mu = \theta - \phi = \arg(z - \alpha) - \arg(z - \beta)$ is constant, by elementary geometry. Thus, for each fixed $\mu$, the equation
+\[
+  \arg(z - \alpha) - \arg(z - \beta) = \mu
+\]
+determines an arc through the points $\alpha, \beta$.
 
 To obtain a region bounded by two arcs, we find the two $\mu_-$ and $\mu_+$ that describe the boundary arcs. Then a point lie between the two arcs if and only if its $\mu$ is in between $\mu_-$ and $\mu_+$, ie. the region is
 \[
@@ -340,7 +381,7 @@ Thus for instance the map
 \[
   z \mapsto -\left(\frac{z - 1}{z + 1}\right)^2
 \]
-is a conformal equivalence from $\mathcal{U}$ to $\H$. This is since if $z \in \mathcal{U}$, then $\frac{z - 1}{z + 1}$ has argument in $\left[\frac{\pi}{2}, \pi\right]$. Squaring doubles the angle and gives the lower half-plane, and multiplying by $-1$ gives the upper half plane.
+is a conformal equivalence from $\mathcal{U}$ to $\H$. This is since if $z \in \mathcal{U}$, then $\frac{z - 1}{z + 1}$ has argument in $\left[\frac{\pi}{2}, \pi\right]$, and can have arbitrary magnitude since $z$ can be made as close to $-1$ as you wish. Squaring doubles the angle and gives the lower half-plane, and multiplying by $-1$ gives the upper half plane.
 \begin{center}
   \begin{tikzpicture}[scale=0.5]
     \fill [mblue, opacity=0.5] (2, 0) arc (0:180:2) -- (2, 0);
@@ -439,8 +480,12 @@ If we believe that the unit disk is relatively simple, then since all simply con
   \end{center}
 \end{eg}
 
-\subsection{Power series and logarithms}
-At this point, we need to recall some facts from IB Analysis II.
+\subsection{Power series}
+Some of our favorite functions are all power series, including polynomials (which are degenerate power series in some sense), exponential functions and trigonometric functions. We will later show that \emph{all} holomorphic functions are (locally) given by power series, but without knowing this fact, we shall now study some of the basic properties of power series.
+
+It turns out power series are nice. The key property is that power series are infinitely differentiable (as long as it converges), and the derivative is given pointwise.
+
+We begin by recalling some facts about convergence from IB Analysis II.
 \begin{defi}[Uniform convergence]
   A sequence $(f_n)$ of functions \emph{converge uniformly} to $f$ if for all $\varepsilon > 0$, there is some $N$ such that $n > N$ implies $|f_n(z) - f(z)| < \varepsilon$ for all $z$.
 \end{defi}
@@ -449,18 +494,16 @@ At this point, we need to recall some facts from IB Analysis II.
   The uniform limit of continuous functions is continuous.
 \end{prop}
 
-We also had the following nice test for uniform convergence of a series:
 \begin{prop}[Weierstrass M-test]
   For a sequence of functions $f_n$, if we can find $(M_n) \subseteq \R_{>0}$ such that $|f_n(x)| < M_n$ for all $x$ in the domain, then $\sum M_n$ converges implies $\sum f_n(x)$ converges uniformly on the domain.
 \end{prop}
 
-Finally, we have the following result.
 \begin{prop}
-  Given any constants $\{c_n\}_{n \geq 0} \subseteq \C$, there is a unique $R \in [0, \infty]$ such that the series $z \mapsto \sum_{n = 0}^\infty c_n(z - a)^n$ converges absolutely if $|z - a| < R$ and diverges if $|z - a| > R$. Moreover, if $0 < r < R$, then the series converges uniformly on $|z| < r$. This $R$ is known as the \emph{radius of convergence}.
+  Given any constants $\{c_n\}_{n \geq 0} \subseteq \C$, there is a unique $R \in [0, \infty]$ such that the series $z \mapsto \sum_{n = 0}^\infty c_n(z - a)^n$ converges absolutely if $|z - a| < R$ and diverges if $|z - a| > R$. Moreover, if $0 < r < R$, then the series converges uniformly on $\{z: |z - a| < r\}$. This $R$ is known as the \emph{radius of convergence}.
 \end{prop}
 So while we don't necessarily get uniform convergence on the whole domain, we get uniform convergence on all compact subsets of the domain.
 
-We are now going to look at power series. They will serve as examples, and as we will see later, universal examples, of holomorphic functions.
+We are now going to look at power series. They will serve as examples, and as we will see later, universal examples, of holomorphic functions. The most important result we need is the following result about their differentiability.
 
 \begin{thm}
   Let
@@ -479,7 +522,7 @@ We are now going to look at power series. They will serve as examples, and as we
 \end{thm}
 
 \begin{proof}
-  Without loss of generality, take $a = 0$. The third part obviously follows from the previous two, and we will prove the first two parts simultaneously. We would like to first prove that the series has radius of convergence $R$, so that we can freely happily manipulate it.
+  Without loss of generality, take $a = 0$. The third part obviously follows from the previous two, and we will prove the first two parts simultaneously. We would like to first prove that the derivative series has radius of convergence $R$, so that we can freely happily manipulate it.
 
   Certainly, we have $|n c_n| \geq |c_n|$. So by comparison to the series for $f$, we can see that the radius of convergence of $\sum n c_n z^{n - 1}$ is at most $R$. But if $|z| < \rho < R$, then we can see
   \[
@@ -527,13 +570,14 @@ We are now going to look at power series. They will serve as examples, and as we
 \end{proof}
 This is obviously true, but will come up useful some time later.
 
-It is might be useful to have an explicit expression for $R$. For example, we can have
+It is might be useful to have an explicit expression for $R$. For example, by IA Analysis I, we know
 \begin{align*}
   R &= \sup \{r \geq 0: |c_n|r^n \to 0\text{ as }n \to \infty\}\\
   &= \frac{1}{\limsup \sqrt[n]{|c_n|}}.
 \end{align*}
 But we probably won't need these.
 
+\subsection{Logarithm and branch cuts}
 Recall that the exponential function
 \[
   e^z = \exp(z) = 1 + z + \frac{z^2}{2!} + \frac{z^3}{3!} + \cdots
@@ -544,19 +588,20 @@ has a radius of convergence of $\infty$. So it is an entire function. We have th
 \]
 So given $w \in \C^* = \C\setminus\{0\}$, there are solutions to $e^z = w$. In fact, this has infinitely many solutions, differing by adding integer multiples of $2\pi i$. In particular, $e^z = 1$ if and only if $z$ is an integer multiple of $2\pi i$.
 
-This means we have to be a bit more careful if we want to talk about the inverse function of the exponential. We make the following definition:
+This means $e^x$ does not have a well-defined inverse. However, we \emph{do} want to talk about the logarithm. The solution would be to just fix a particular range of $\theta$ allowed. For example, we can define the logarithm as the function sending $r e^{i\theta}$ to $\log r + i\theta$, where we now force $-\pi < \theta < \pi$. This is all well, except it is now not defined at $-1$ (we can define it as, say, $i \pi$, but we would then lose continuity).
 
+There is no reason why we should pick $-\pi < \theta < \pi$. We could as well require $300 \pi < \theta < 302\pi$. In general, we make the following definition:
 \begin{defi}[Branch of logarithm]
   Let $U \subseteq \C^*$ be an open subset. A \emph{branch of the logarithm} on $U$ is a continuous function $\lambda: U \to \C$ for which $e^{\lambda (z)} = z$ for all $z \in U$.
 \end{defi}
-This is like a ``local inverse'' to the exponential function. These need not exist for all $U$. For example, there is no branch of the logarithm on the whole $\C^*$, as we will later prove.
+This is a partially defined inverse to the exponential function, only defined on some domain $U$. These need not exist for all $U$. For example, there is no branch of the logarithm defined on the whole $\C^*$, as we will later prove.
 
 \begin{eg}
   Let $U = \C\setminus \R_{\leq 0}$, a ``slit plane''.
   \begin{center}
     \begin{tikzpicture}
       \draw [->] (0, 0) -- (2, 0);
-      \draw [thick] (-2, 0) -- (0, 0);
+      \draw [very thick] (-2, 0) -- (0, 0);
       \draw [->] (0, -2) -- (0, 2);
       \node [circ] at (0, 0) {};
     \end{tikzpicture}
@@ -566,6 +611,7 @@ This is like a ``local inverse'' to the exponential function. These need not exi
   On $U$, there is a continuous function $\arg: U \to (-\pi, \pi)$, which is why we can construct a branch. This is not true on, say, the unit circle.
 \end{eg}
 
+Fortunately, as long as we have picked a branch, most things we want to be true about $\log$ is indeed true.
 \begin{prop}
   On $\{z \in \C: z \not\in \R_{\leq 0}\}$, the principal branch $\log: U \to \C$ is holomorphic function. Moreover,
   \[
@@ -584,30 +630,34 @@ This is like a ``local inverse'' to the exponential function. These need not exi
   \[
     1 - z + z^2 + \cdots = \frac{1}{1 + z}.
   \]
-  Therefore, $\log(1 + z)$ and the power series have equal derivative, and hence coincide up to a constant. Since they agree at $z = 0$, they must in fact be equal.
+  Therefore, $\log(1 + z)$ and the claimed power series have equal derivative, and hence coincide up to a constant. Since they agree at $z = 0$, they must in fact be equal.
 \end{proof}
-Note that if $\alpha \in \C$ and $\log: U \to \C$ is a branch of the logarithm, we can define
+Having defined the logarithm, we can now define general power functions.
+
+Let $\alpha \in \C$ and $\log: U \to \C$ be a branch of the logarithm. Then we can define
 \[
   z^{\alpha} = e^{\alpha \log z}
 \]
-on $U$.
+on $U$. This is again only defined when $\log$ is.
 
-We can view $\log$ as a multivalued function on $\C^*$. In general, we say that a point $p \in \C $ is a \emph{branch point} of a multivalued function if the function cannot be given a continuous single-valued definition in a (punctured) neighbourhood $B(p, \varepsilon) \setminus \{p\}$ of $p$ for any $\varepsilon > 0$. For example, $0$ is a branch point of $\log$.
+In a more general setting, we can view $\log$ as an instance of a multi-valued function on $\C^*$. At each point, the function $\log$ can take many possible values, and every time we use $\log$, we have to pick one of those values (in a continuous way).
+
+In general, we say that a point $p \in \C $ is a \emph{branch point} of a multivalued function if the function cannot be given a continuous single-valued definition in a (punctured) neighbourhood $B(p, \varepsilon) \setminus \{p\}$ of $p$ for any $\varepsilon > 0$. For example, $0$ is a branch point of $\log$.
 
 \begin{eg}
   Consider the function
   \[
     f(z) = \sqrt{z(z - 1)}.
   \]
-  This has \emph{two} branch points, $z = 0$ and $z = 1$, since we cannot consistently a square root consistently near $0$, as it is defined via the logarithm.
+  This has \emph{two} branch points, $z = 0$ and $z = 1$, since we cannot define a square root consistently near $0$, as it is defined via the logarithm.
 \end{eg}
 
 Note we can define a continuous branch of $f$ on either
 \begin{center}
   \begin{tikzpicture}
     \draw [->] (-2, 0) -- (2, 0);
-    \draw [thick] (-2, 0) -- (0, 0);
-    \draw [thick] (1, 0) -- (2, 0);
+    \draw [very thick] (-2, 0) -- (0, 0);
+    \draw [very thick] (1, 0) -- (2, 0);
     \draw [->] (0, -2) -- (0, 2);
     \node [below] at (1, 0) {$1$};
     \node [anchor = north east] {$0$};
@@ -619,7 +669,7 @@ or we can just kill a finite slit by
 \begin{center}
   \begin{tikzpicture}
     \draw [->] (-2, 0) -- (2, 0);
-    \draw [thick] (1, 0) -- (0, 0);
+    \draw [very thick] (1, 0) -- (0, 0);
     \draw [->] (0, -2) -- (0, 2);
     \node [below] at (1, 0) {$1$};
     \node [anchor = north east] {$0$};
@@ -631,20 +681,21 @@ Why is the second case possible? Note that
 \[
   f(z) = e^{\frac{1}{2}(\log(z) + \log(z - 1))}.
 \]
-If we move around a path encircling the finite slit, the argument of each of $f(z)$ and $\log(z - 1)$ will jump by $2\pi i$, and the total change in the exponent is $2\pi i$. So the expression for $f(z)$ becomes uniquely defined.
+If we move around a path encircling the finite slit, the argument of each of $\log(z)$ and $\log(z - 1)$ will jump by $2\pi i$, and the total change in the exponent is $2\pi i$. So the expression for $f(z)$ becomes uniquely defined.
 
 While these two ways of cutting slits look rather different, if we consider this to be on the Riemann sphere, then these two cuts now look similar. It's just that one passes through the point $\infty$, and the other doesn't.
 
-However, this is not a very good treatment of the problem. A better treatment will be performed in the IID Riemann Surfaces course.
+The introduction of these slits is practical and helpful for many of our problems. However, theoretically, this is not the best way to think about multi-valued functions. A better treatment will be provided in the IID Riemann Surfaces course.
 
 \section{Contour integration}
-Our next task is to develop a theory of integration of $\C$-valued functions along paths and closed contours. At first, this would look just like an obvious generalization of real integration. However, this will suddenly become amazing and get a life of its own when we get to Cauchy's theorem.
+In the remaining of the course, we will spend all our time studying integration of complex functions. At first, you might think this is just an obvious generalization of integration of real functions. This is not true. Starting from Cauchy's theorem, beautiful and amazing properties of complex integration comes one after another. Using these, we can prove many interesting properties of holomorphic functions as well as do lots of integrals we previously were not able to do.
 
-Recall that a function $f: [a, b] \to \C$ is Riemann integrable if $\Re(f)$ and $\Im (f)$ are individually, by definition. Also, by definition,
+\subsection{Basic properties of complex integration}
+We start by considering functions $f: [a, b] \to \C$. We say such a function is Riemann integrable if $\Re(f)$ and $\Im (f)$ are individually, and the integral is defined to be
 \[
   \int_a^b f(t) \;\d t = \int_a^b \Re(f(t))\;\d t + i \int_a^b \Im(f(t))\;\d t.
 \]
-Recall also that if $f$ is continuous, then it is integrable. This will apply in most cases we care about in this course. After all, this is not a course on exotic functions.
+While Riemann integrability is a technical condition to check, we know that all continuous functions are integrable, and this will apply in most cases we care about in this course. After all, this is not a course on exotic functions.
 
 We start from some less interesting facts, and slowly develop and prove some really amazing results.
 \begin{lemma}
@@ -673,6 +724,15 @@ We start from some less interesting facts, and slowly develop and prove some rea
   with equality if and only if $|f(t)| =M$ and $\arg f(t) = \theta$ for all $t$, ie. $f$ is constant.
 \end{proof}
 
+Integrating functions of the form $f: [a, b] \to \C$ is easy. What we really care about is integrating a genuine complex function $f: U \subseteq \C \to \C$. However, we cannot just ``integrate'' such a function. There is no given one-dimensional domain we can integrate along. Instead, we have to make some up ourselves. We have to define some \emph{paths} in the complex plane, and integrate along them.
+
+\begin{defi}[Path]
+  A \emph{path} in $\C$ is a continuous function $\gamma: [a, b] \to \C$, where $a, b\in \R$.
+\end{defi}
+For general paths, we just require continuity, and do not impose any conditions about, say, differentiability.
+
+Unfortunately, the world is full of weird paths. There are even paths that fill up the whole of the unit square. So we might want to look at some nicer paths.
+
 \begin{defi}[Simple path]
   A path $\gamma: [a, b] \to \C$ is \emph{simple} if $\gamma(t_1) = \gamma(t_2)$ only if $t_1 = t_2$ or $\{t_1, t_2\} = \{a, b\}$.
 \end{defi}
@@ -691,10 +751,12 @@ For example, it can look something like this:
   \begin{tikzpicture}[scale=2]
     \draw [->-=0.6] plot [smooth] coordinates {(0, 0) (0.5, 0.1) (1, -0.1)};
     \node [circ] at (0, 0) {};
-    \draw [->-=0.4, ->-=0.7] plot [smooth] coordinates {(1, -0.1) (0.5, -1) (0, 0)};
+    \draw [->-=0.3, ->-=0.8] plot [smooth] coordinates {(1, -0.1) (0.5, -1) (0, 0)};
   \end{tikzpicture}
 \end{center}
+Most of the time, we are just interested in integration along contours. However, it is also important to understand integration along just simple $C^1$ smooth paths, since we might want to break our contour up into different segments. Later, we will move on to consider more general closed piecewise $C^1$ paths, where we can loop around a point many many times.
 
+We can now define what it means to integrate along a smooth path.
 \begin{defi}[Complex integration]
   If $\gamma: [a, b] \to U \subseteq \C$ is $C^1$-smooth and $f: U \to \C$ is continuous, then we define the \emph{integral} of $f$ along $\gamma$ as
   \[
@@ -703,7 +765,7 @@ For example, it can look something like this:
   By summing over subdomains, the definition extends to piecewise $C^1$-smooth paths, and in particular contours.
 \end{defi}
 
-We have the following properties:
+We have the following elementary properties:
 \begin{enumerate}
   \item The definition is insensitive to reparametrization. Let $\phi: [a', b'] \to [a, b]$ be $C^1$ such that $\phi(a') = a, \phi(b') = b$. If $\gamma$ is a $C^1$ path and $\delta= \gamma \circ \phi$, then
     \[
@@ -713,13 +775,13 @@ We have the following properties:
     \[
       \int_{a'}^{b'} f(\gamma(\phi(t))) \gamma'(\phi(t)) \phi'(t)\;\d t= \int_a^b f(\gamma(u)) \gamma'(u)\;\d u
     \]
-    if $u = \phi(t)$.
+    if we let $u = \phi(t)$.
   \item If $a < u < b$, then
     \[
       \int_\gamma f(z)\;\d z = \int_{\gamma|_{[a, u]}} f(z)\;\d z + \int_{\gamma|_{[u, b]}}f(z) \;\d z.
     \]
 \end{enumerate}
-These tells us the integral depends only on the path itself, not how we look at the path or how we cut up the path into pieces.
+These together tells us the integral depends only on the path itself, not how we look at the path or how we cut up the path into pieces.
 
 We also have the following easy properties:
 \begin{enumerate}[resume]
@@ -767,8 +829,11 @@ We also have the following easy properties:
       \node [anchor = south west] at (0, 2) {$iR$};
     \end{tikzpicture}
   \end{center}
-  We take the first path to be $\gamma_1: [-R, R] \to \C$ by $\gamma(t) = t$, while $\gamma_2: [0, 1] \to \C$ by $t \mapsto R e^{i\pi t}$.
-
+  We parametrize the path in segments by
+  \begin{align*}
+    \gamma_1: [-R, R] &\to \C & \gamma_2: [0, 1] &\to \C\\
+    t &\mapsto t & t &\mapsto R e^{i\pi t}
+  \end{align*}
   Consider the function $f(z) = z^2$. Then the integral is
   \begin{align*}
     \int_\gamma f(z)\;\d z &= \int_{-R}^R t^2 \;\d t + \int_0^1 R^2 e^{2\pi i t} i\pi R e^{i\pi t}\;\d t\\
@@ -777,10 +842,10 @@ We also have the following easy properties:
     &= 0
   \end{align*}
 \end{eg}
-We worked this out explicitly, but this is just an instance of the fundamental theorem of calculus!
+We worked this out explicitly, but we have just wasted our time, since this is just an instance of the fundamental theorem of calculus!
 
 \begin{defi}[Antiderivative]
-  Let $U \in \C$ and $f: U \to \C$ be continuous. An \emph{antiderivative} of $f$ is a holomorphic function $F: U \to \C$ such that $F'(z) = f(z)$.
+  Let $U \subseteq \C$ and $f: U \to \C$ be continuous. An \emph{antiderivative} of $f$ is a holomorphic function $F: U \to \C$ such that $F'(z) = f(z)$.
 \end{defi}
 
 Then the fundamental theorem of calculus tells us:
@@ -801,7 +866,9 @@ In particular, the integral depends only on the end points, and not the path its
 \end{proof}
 
 \begin{eg}
-  This allows us to understand the first example we had. Recall that for $f(z) = z^n$ on $\phi(t) = e^{it}$ (with $0 \leq t \leq 2\pi$), if $n \not= -1$, then
+  This allows us to understand the first example we had. We had the function $f(z) = z^n$ integrated along the path $\phi(t) = e^{it}$ (for $0 \leq t \leq 2\pi$).
+
+  If $n \not= -1$, then
   \[
     f = \frac{\d}{\d t}\left(\frac{z^{n + 1}}{n + 1}\right).
   \]
@@ -811,9 +878,11 @@ In particular, the integral depends only on the end points, and not the path its
   \]
   where $\log$ can only be defined on a \emph{slit} plane. It is not defined on the whole unit circle. So we cannot apply the fundamental theorem of calculus.
 
-  Reversing the argument around, since $\int_\phi f(z)\;\d z$ does not vanish, this implies there is not a continuous branch of $\log$ on any set $U$ containing the unit circle.
+  Reversing the argument around, since $\int_\phi z^{-1} \;\d z$ does not vanish, this implies there is not a continuous branch of $\log$ on any set $U$ containing the unit circle.
 \end{eg}
 
+\subsection{Cauchy's theorem}
+A question we might ask ourselves is when the anti-derivative exists. A necessary condition, as we have seen, is that the integral around any closed curve has to vanish. This is also sufficient.
 \begin{prop}
   Let $U \subseteq \C$ be a domain (ie. path-connected non-empty open set), and $f: U \to \C$ be continuous. Moreover, suppose
   \[
@@ -825,24 +894,68 @@ In particular, the integral depends only on the end points, and not the path its
 This is more-or-less the same proof we gave in IA Vector Calculus that a real function is a gradient if and only if the integral about any closed path vanishes.
 
 \begin{proof}
-  Pick our favorite $a_0 \in U$. For $w \in U$, we choose a path $\gamma_w: [0, 1] \to U$ such that $\gamma_w(0) = a_0$ and $\gamma_w(1) = w$. We want to show we can pick $\gamma_w$ such that this is piecewise $C^1$. We already know a \emph{continuous} path $\gamma: [0, 1] \to U$ from $a_0$ to $w$ exists. Since $U$ is open, for all $x$ in the image of $\gamma$, there is some $\varepsilon(x) > 0$ such that $B(x, \varepsilon(x)) \subseteq U$. Since the image of $\gamma$ is compact, it is covered by finitely many such balls. Then it is trivial to pick a piecewise straight path living inside the union of these balls, which is clearly piecewise smooth.
+  Pick our favorite $a_0 \in U$. For $w \in U$, we choose a path $\gamma_w: [0, 1] \to U$ such that $\gamma_w(0) = a_0$ and $\gamma_w(1) = w$.
 
+  We first go through some topological nonsense to show we can pick $\gamma_w$ such that this is piecewise $C^1$. We already know a \emph{continuous} path $\gamma: [0, 1] \to U$ from $a_0$ to $w$ exists, by definition of path connectedness. Since $U$ is open, for all $x$ in the image of $\gamma$, there is some $\varepsilon(x) > 0$ such that $B(x, \varepsilon(x)) \subseteq U$. Since the image of $\gamma$ is compact, it is covered by finitely many such balls. Then it is trivial to pick a piecewise straight path living inside the union of these balls, which is clearly piecewise smooth.
+  \begin{center}
+    \begin{tikzpicture}[scale=2]
+      \draw [thick] plot [smooth] coordinates {(0, 0) (0.7, -0.1) (1.5, 0.2) (2, 0.1)};
+      \node [above] at (1.5, 0.2) {$\gamma$};
+      \node [left] at (0, 0) {$a_0$};
+      \node [circ] at (0, 0) {};
+      \node [right] at (2, 0.1) {$w$};
+      \node [circ] at (2, 0.1) {};
+
+      \draw [mblue, fill=mblue, fill opacity=0.3] (0, 0) circle [radius=0.25];
+      \draw [mblue, fill=mblue, fill opacity=0.3] (0.35, -0.06) circle [radius=0.15];
+      \draw [mblue, fill=mblue, fill opacity=0.3] (0.7, -0.1) circle [radius=0.35];
+      \draw [mblue, fill=mblue, fill opacity=0.3] (1.1, 0.04) circle [radius=0.18];
+      \draw [mblue, fill=mblue, fill opacity=0.3] (1.5, 0.2) circle [radius=0.31];
+      \draw [mblue, fill=mblue, fill opacity=0.3] (2, 0.1) circle [radius=0.23];
+
+      \draw [mred, thick] (0, 0) -- (0.2, -0.07) -- (0.4, -0.15) -- (1.2, 0.010) -- (1.81, 0.12) node [pos=0.5, below] {$\gamma_w$} -- (2, 0.1);
+    \end{tikzpicture}
+  \end{center}
   We thus define
   \[
-    F(w) = \int_{\gamma w} f(z)\;\d z.
+    F(w) = \int_{\gamma_w} f(z)\;\d z.
   \]
-  Note that this $F(w)$ is independent of the choice of $\gamma_w$, by our hypothesis on $f$ --- given another choice $\tilde{\gamma}_w$, then $\gamma_w$ concatenated with $-\tilde{\gamma}_w$, written $\gamma_w * (-\tilde{\gamma}_w)$, is a closed piecewise $C^1$ path on $U$. So
+  Note that this $F(w)$ is independent of the choice of $\gamma_w$, by our hypothesis on $f$ --- given another choice $\tilde{\gamma}_w$, we can form the new path $\gamma_w * (-\tilde{\gamma}_w)$, namely the path obtained by concatenating $\gamma_w$ with $-\tilde{\gamma}_w$.
+  \begin{center}
+    \begin{tikzpicture}
+      \node [circ] {};
+      \node [left] {$a_0$};
+      \node at (2, 2) [circ] {};
+      \node at (2, 2) [right] {$w$};
+      \draw [->-=0.6] plot [smooth, tension=1] coordinates {(0, 0) (0.8, 1.7) (2, 2)};
+      \node [above] at (0.8, 1.7) {$\tilde{\gamma}_w$};
+      \draw [->-=0.6] plot [smooth, tension=1] coordinates {(0, 0) (1.2, -0.1) (2, 2)};
+      \node at (2, 1) {$\gamma_w$};
+    \end{tikzpicture}
+  \end{center}
+  This is a closed piecewise $C^1$-smooth curve. So
   \[
     \int_{\gamma_w * (-\tilde{\gamma}_w)} f(z) \;\d z = 0.
   \]
   The left hand side is
   \[
-    \int_{\gamma_W} f(z)\;\d z + \int_{-\tilde{\gamma}_w}f(z)\;\d z = \int_{\gamma_w} f(z)\;\d z - \int_{\tilde{\gamma}_w} f(z) \;\d z.
+    \int_{\gamma_w} f(z)\;\d z + \int_{-\tilde{\gamma}_w}f(z)\;\d z = \int_{\gamma_w} f(z)\;\d z - \int_{\tilde{\gamma}_w} f(z) \;\d z.
   \]
   So the two integrals agree.
 
   Now we need to check that $F$ is complex differentiable. Since $U$ is open, we can pick $\theta > 0$ such that $B(w; \varepsilon) \subseteq U$. Let $\delta_h$ be the radial path in $B(w, \varepsilon)$ from $W$ to $w + h$, with $|h| < \varepsilon$.
+  \begin{center}
+    \begin{tikzpicture}
+      \node [circ] at (0, 0) {};
+      \node [left] at (0, 0) {$a$};
+      \draw [->-=0.6] plot [smooth, tension=1] coordinates {(0, 0) (1.2, -0.1) (2, 2)};
+      \node at (2, 1) {$\gamma_w$};
+      \node at (2, 2) [circ] {};
+      \node at (2, 2) [right] {$w$};
 
+      \draw [->-=0.7] (2, 2) -- (1.4, 1.9) node [pos=0.5, above] {$\delta_h$} node [circ] {} node [left] {$w + h$};
+    \end{tikzpicture}
+  \end{center}
   Now note that $\gamma_w * \delta_h$ is a path from $a_0$ to $w + h$. So
   \begin{align*}
     F(w + h) &= \int_{\gamma_w * \delta_h} f(z)\;\d z\\
@@ -857,28 +970,36 @@ This is more-or-less the same proof we gave in IA Vector Calculus that a real fu
   \end{align*}
   Since $f$ is continuous, as $h \to 0$, we know $f(z) - f(w) \to 0$. So $F$ is differentiable with derivative $f$.
 \end{proof}
+To construct the anti-derivative, we assumed $\int_\gamma f(z) \;\d z = 0$. But we didn't really need that much. To simplify matters, we can just consider curves consisting of straight line segments. To do so, we need to make sure we really can draw line segments between two points.
 
-In the proof, we constructed the piecewise straight path from $a_0$ to $w$. These paths are nice. In general, we make the following definition:
+You might think --- aha! We should work with convex spaces. No. We do not need such a strong condition. Instead, all we need is that we have a distinguished point $a_0$ such that there is a line segment from $a_0$ to any other point.
+
 \begin{defi}[Star-shaped domain]
-  A \emph{star-shaped domain} or \emph{star domain} is a domain $U$ such that there is some $p \in U$ such that the line segment $[p, w] \subseteq U$ for all $w \in U$.
+  A \emph{star-shaped domain} or \emph{star domain} is a domain $U$ such that there is some $a_0 \in U$ such that the line segment $[a_0, w] \subseteq U$ for all $w \in U$.
   \begin{center}
     \begin{tikzpicture}
       \draw (1, 0) -- (2, 2) -- (0, 1) -- (-2, 2) -- (-1, 0) -- (-2, -2) -- (0, -1) -- (2, -2) -- (1, 0);
       \node [circ] {};
-      \node [below] {$p$};
+      \node [below] {$a_0$};
       \draw (0, 0) -- (1, 1.1) node [circ] {} node [right] {$w$};
     \end{tikzpicture}
   \end{center}
 \end{defi}
 This is weaker than requiring $U$ to be convex, which says any line segment between \emph{any two points} in $U$, lies in $U$.
 
-Note that we have
+In general, we have the implications
 \[
-  U\text{ is a disc }\Rightarrow U\text{ is convex} \Rightarrow U\text{ is star-shaped} \Rightarrow U\text{ is path-connected},
+  U\text{ is a disc}\Rightarrow U\text{ is convex} \Rightarrow U\text{ is star-shaped} \Rightarrow U\text{ is path-connected},
 \]
 and none of the implications reverse.
 
-Recall that when constructing the antiderivative, we assumed $\int_\gamma f(z) \;\d z = 0$ for all closed path $\gamma$. We could have required something weaker. All we needed was to intiially pick some $\gamma_w$ for each $w$, and we just need $\int_\gamma f(z)\;\d z = 0$ for all paths of the form $\gamma = \gamma_w * \delta_h * (-\gamma_{w + h})$. If $U$ is a star-shaped domain, then we can pick our pasepoint to be the special point $p$, and then these $\gamma$ are just three straight line segments.
+In the proof, we also needed to construct a small straight line segment $\delta_h$. However, this is a non-issue. By the openness of $U$, we can pick an open ball $B(w, \varepsilon) \subseteq U$, and we can certainly construct the straight line in this ball.
+
+Finally, we get to the integration part. Suppose we picked all our $\gamma_w$ to be the fixed straight line segment from $a_0$. Then for antiderivative to be differentiable, we needed
+\[
+  \int_{\gamma_w * \delta_h} f(z) \;\d z = \int_{\gamma_{w + h}} f(z)\;\d z.
+\]
+In other words, we needed to the integral along the path $\gamma_w * \delta_h * (-\gamma_{w + h})$ to vanish. This is a rather simple kind of paths. It is just (the boundary of) a triangle, consisting of three line segments.
 
 \begin{defi}[Triangle]
   A \emph{triangle} in a domain $U$ is what it ought to be --- the Euclidean convex hull of $3$ points in $U$, lying wholly in $U$. We write its boundary as $\partial T$, which we view as an oriented piecewise $C^1$ path, ie. a contour.
@@ -908,7 +1029,7 @@ Recall that when constructing the antiderivative, we assumed $\int_\gamma f(z) \
     \end{scope}
   \end{tikzpicture}
 \end{center}
-Our earlier result on constructing antiderivative shows:
+Our earlier result on constructing antiderivative then shows:
 \begin{prop}
   If $U$ is a star domain, and $f: U \to \C$ is continuous, and if
   \[
@@ -923,11 +1044,14 @@ Our earlier result on constructing antiderivative shows:
 
 This is in some sense a weaker proposition --- while our hypothesis only requires the integral to vanish over triangles, and not arbitrary closed loops, we are restricted to star domains only.
 
-It turns out triangles are in general nice:
+But well, this is technically a weakening, but how is it useful? Surely if we can somehow prove that the integral of a particular function vanishes over all triangles, then we can easily modify the proof such that it works for all possible curves.
+
+Turns out, it so happens that for triangles, we can fiddle around with some geometry to prove the following result:
+
 \begin{thm}[Cauchy's theorem for a triangle]
   Let $U$ be a domain, and let $f: U \to \C$ be holomorphic. If $T \subseteq U$ is a triangle, then $\int_{\partial T} f(z)\;\d z = 0$.
 \end{thm}
-So for holomorphic functions, the hypothesis of the previous theorem automatiaclly holds.
+So for holomorphic functions, the hypothesis of the previous theorem automatically holds.
 
 We immediately get the following corollary, which is what we will end up using most of the time.
 \begin{cor}[Convex Cauchy]
@@ -937,17 +1061,17 @@ We immediately get the following corollary, which is what we will end up using m
   \]
 \end{cor}
 
-\begin{proof}(of corollary)
+\begin{proof}[Proof of corollary]
   If $f$ is holomorphic, then Cauchy's theorem says the integral over any triangle vanishes. If $U$ is star shaped, our proposition says $f$ has an antiderivative. Then the fundamental theorem of calculus tells us the integral around any closed path vanishes.
 \end{proof}
 
 Hence, all we need to do is to prove that fact about triangles.
-\begin{proof}(of Cauchy's theorem for a triangle)
+\begin{proof}[Proof of Cauchy's theorem for a triangle]
   Fix a triangle $T$. Let
   \[
-    \eta = \left|\int_{\partial T} f(z)\;\d z\right|, \ell = \length (\partial T).
+    \eta = \left|\int_{\partial T} f(z)\;\d z\right|,\quad \ell = \length (\partial T).
   \]
-  The idea is to show for any $\varepsilon > 0$ that $\eta < \varepsilon$, and hence we must have $\varepsilon = 0$. To do so, we subdivide our triangles.
+  The idea is to show to bound $\eta$ by $\varepsilon$, for every $\varepsilon > 0$, and hence we must have $\eta = 0$. To do so, we subdivide our triangles.
 
   Before we start, it helps to motivate the idea of subdividing a bit. By subdividing the triangle further and further, we are focusing on a smaller and smaller region of the complex plane. This allows us to study how the integral behaves locally. This is helpful since we are given that $f$ is holomorphic, and holomorphicity is a local property.
 
@@ -964,19 +1088,19 @@ Hence, all we need to do is to prove that fact about triangles.
       \draw [mred, ->-=0.22, ->-=0.553, ->-=0.886] (1, 0) -- (0.5, 0.866) -- (1.5, 0.866) -- cycle;
     \end{tikzpicture}
   \end{center}
-  Then we have
+  We orient the middle triangle by the anti-clockwise direction. Then we have
   \[
     \int_{\partial T^0} f(z)\;\d z = \sum_{a, b, c, d} \int_{\partial T^0_{\Cdot}} f(z)\;\d z,
   \]
-  if we orient the middle triangle by the anticlockwise orientation, as then each internal edge occurs twice, with opposite orientation.
+  since each internal edge occurs twice, with opposite orientation.
 
   For this to be possible, if $\eta = \left|\int_{\partial T^0} f(z)\;\d z\right|$, then there must be some subscript in $\{a, b, c, d\}$ such that
   \[
     \left|\int_{\partial T^0_{\Cdot}} f(z)\;\d z\right| \geq \frac{\eta}{4}.
   \]
-  We call this $T_{\Cdot}^0 = T^1$. Then the length of $\partial T^1$ has length
+  We call this $T_{\Cdot}^0 = T^1$. Then we notice $\partial T^1$ has length
   \[
-    \length(\partial T^0_{\Cdot}) = \frac{\ell}{2}.
+    \length(\partial T^1) = \frac{\ell}{2}.
   \]
   Iterating this, we obtain triangles
   \[
@@ -996,14 +1120,14 @@ Hence, all we need to do is to prove that fact about triangles.
   \[
     \int_{\partial T^n} 1 \;\d z = 0 = \int_{\partial T^n} z \;\d z,
   \]
-  since these functions certainly do have antiderivatives on $T^n$. Therefore, noting that $f(z_0)$ and $f'(z_0)$ are just constants, we have
+  since these functions certainly do have anti-derivatives on $T^n$. Therefore, noting that $f(z_0)$ and $f'(z_0)$ are just constants, we have
   \begin{align*}
     \left|\int_{\partial T^n}f(z)\;\d z\right| &= \left|\int_{\partial T^n} (f(z) - f(z_0) - (z - z_0) f'(z_0))\;\d z\right|\\
     &\leq \int_{\partial T^n} |f(z) - f(z_0) - (z - z_0) f'(z_0)|\;\d z\\
     &\leq \length(\partial T^n) \varepsilon \sup_{z \in \partial T^n}|z - z_0|\\
     &\leq \varepsilon \length(\partial T^n)^2,
   \end{align*}
-  since $z_0 \in T^n$, and the distance between any two points in the triangle cannot be greater than the perimeter of the triangle. Substituting our fomulas for these in, we have
+  where the last line comes from the fact that $z_0 \in T^n$, and the distance between any two points in the triangle cannot be greater than the perimeter of the triangle. Substituting our formulas for these in, we have
   \[
     \frac{\eta}{4^n}\leq \frac{1}{4^n} \ell^2 \varepsilon.
   \]
@@ -1013,7 +1137,7 @@ Hence, all we need to do is to prove that fact about triangles.
   \]
   Since $\ell$ is fixed and $\varepsilon$ was arbitrary, it follows that we must have $\eta = 0$.
 \end{proof}
-Is this the best we can do? Can we formulate this for an arbitrary domain, and not just star-shaped ones? It is obviously not true if the domain is not simply connected, eg. for $f(z) = \frac{1}{z}$ defined on $\C \setminus \{0\}$. However, it turns out Cauchy's theorem holds as long as the domain is simply connected, but we probably won't get to prove that. However, this is not surprising given the Riemann mapping theorem, since any simply connected domain is conformally eequivalent to the unit disk.
+Is this the best we can do? Can we formulate this for an arbitrary domain, and not just star-shaped ones? It is obviously not true if the domain is not simply connected, eg. for $f(z) = \frac{1}{z}$ defined on $\C \setminus \{0\}$. However, it turns out Cauchy's theorem holds as long as the domain is simply connected, as we will show in a later part of the course. However, this is not surprising given the Riemann mapping theorem, since any simply connected domain is conformally equivalent to the unit disk, which \emph{is} star-shaped (and in fact convex).
 
 We can generalize our result when $f: U \to \C$ is continuous on the whole of $U$, and holomorphic except on finitely many points. In this case, the same conclusion holds --- $\int_\gamma f(z)\;\d z = 0$ for all piecewise smooth closed $\gamma$.
 
@@ -1044,10 +1168,10 @@ Note now that we can make $T'$ as small as we like. But
 \]
 Since $f$ is continuous, it is bounded. As we take smaller and smaller subdivisions, $\length(\partial T') \to 0$. So we must have $\int_{\partial T} f(z)\;\d z = 0$.
 
-From here, it's straightforward to conclude the general case --- we can divide the triangle in a way such that each small triangle contains one bad point.
+From here, it's straightforward to conclude the general case with many points of non-holomorphicity --- we can divide the triangle in a way such that each small triangle contains one bad point.
 
 \subsection{The Cauchy integral formula}
-We will use that to prove the Cauchy integral formula.
+Our next amazing amazing result will be Cauchy's integral formula. This formula allows us to find the value of $f$ inside a ball $B(z_0, r)$ just given the values of $f$ on the boundary $\partial \overline{B(z_0, r)}$.
 
 \begin{thm}[Cauchy integral formula]
   Let $U$ be a domain, and $f: U \to \C$ be holomorphic. Suppose there is some $\overline{B(z_0; r)} \subseteq U$ for some $z_0$ and $r > 0$. Then for all $z \in B(z_0; r)$, we have
@@ -1062,7 +1186,7 @@ Recall that we previously computed $\int_{\partial \overline{B(0, 1)}} \frac{1}{
   \[
     g(w) =
     \begin{cases}
-      \frac{f(w) - f(z)}{w - z} & w = z\\
+      \frac{f(w) - f(z)}{w - z} & w \not= z\\
       f'(z) & w = z
     \end{cases},
   \]
@@ -1114,8 +1238,6 @@ Recall that we previously computed $\int_{\partial \overline{B(0, 1)}} \frac{1}{
   \end{align*}
   So we must have equality throughout. When we proved the supremum bound for the integral, we showed equality can happen only if the integrand is constant. So $|f(w)|$ is constant on the circle $|z - w| = \rho$, and is equal to $f(z)$. Since this is true for all $\rho \in (0, r)$, it follows that $|f|$ is constant on $B(z; r)$. Then the Cauchy-Riemann equations then entail that $f$ must be constant, as you have shown in example sheet 1.
 \end{proof}
-In particular, since harmonic functions in $\R^2$ are the real parts of holomorphic functions, the same result holds for harmonic functions as well, as we have seen in IA Vector Calculus, via a similar argument.
-
 Going back to the Cauchy integral formula, recall that we had $\overline{B(z_0; r)} \subseteq U$, $f: U \to C$ holomorphic, and we want to show
 \[
   f(z) = \frac{1}{2\pi i} \int_{\partial \overline{B(z_0; r)}} \frac{f(w)}{w - z}\;\d w.
@@ -1127,7 +1249,7 @@ The second strategy is to change the contour of integration instead of changing 
   \begin{tikzpicture}
     \node [circ] {};
     \node [right] {$z_0$};
-    \draw [->] circle [radius=2]; % arrow counterclockwise
+    \draw [->] circle [radius=2];
 
     \node [circ] at (0, 1) {};
     \node [right] at (0, 1) {$z$};
@@ -1135,7 +1257,7 @@ The second strategy is to change the contour of integration instead of changing 
   \end{tikzpicture}
 \end{center}
 \begin{proof}(of Cauchy integral formula again)
-  Given $\varepsilon > 0$, we pick $\delta > 0$ such that $\overline{B(z, \delta)} \subseteq B(z_0, r)$, and such that whenever $|w - z| + \delta$, then $|f(w) - f(z)| < \varepsilon$. This is possible since $f$ is uniformly continuous on the neighbourhood of $z$. We now cut our region apart:
+  Given $\varepsilon > 0$, we pick $\delta > 0$ such that $\overline{B(z, \delta)} \subseteq B(z_0, r)$, and such that whenever $|w - z| < \delta$, then $|f(w) - f(z)| < \varepsilon$. This is possible since $f$ is uniformly continuous on the neighbourhood of $z$. We now cut our region apart:
   \begin{center}
     \begin{tikzpicture}
       \node [circ] {};
@@ -1167,7 +1289,7 @@ The second strategy is to change the contour of integration instead of changing 
   \[
     \int_{\partial \overline{B(z_0, r)}} \frac{f(w)}{w - z}\;\d w = \int_{\partial \overline{B(z, \delta)}} \frac{f(w)}{w - z}\;\d w,
   \]
-  where the balls are both oriented anticlockwise. now we have
+  where the balls are both oriented anticlockwise. Now we have
   \[
     \left|f(z) - \frac{1}{2\pi i} \int_{\partial \overline{B(z_0, r)}} \frac{f(w)}{w - z}\;\d w\right| = \left|f(z) - \frac{1}{2\pi i} \int_{\partial \overline{B(z, \delta)}} \frac{f(w)}{w - z}\;\d w\right|.
   \]
@@ -1184,7 +1306,7 @@ The second strategy is to change the contour of integration instead of changing 
 Note that the subdivision we did above was something we can do in general.
 
 \begin{defi}[Elementary deformation]
-  Given a pair of $C^1$-smooth (or piecewise smooth) closed paths $\phi, \psi: [0, 1] \to U$, we say $\psi$ is an elementary deformation of $\phi$ if there exists convex open sets $C_1, \cdots, C_n \subseteq U$ and a division of the interval $0 = x_0 < x_1 < \cdots < x_n = 1$ such that on $[x_{i - 1}, x_i]$, both $\phi(t)$ and $\psi(t)$ both belong to $C_i$.
+  Given a pair of $C^1$-smooth (or piecewise smooth) closed paths $\phi, \psi: [0, 1] \to U$, we say $\psi$ is an elementary deformation of $\phi$ if there exists convex open sets $C_1, \cdots, C_n \subseteq U$ and a division of the interval $0 = x_0 < x_1 < \cdots < x_n = 1$ such that on $[x_{i - 1}, x_i]$, both $\phi(t)$ and $\psi(t)$ belong to $C_i$.
 \end{defi}
 \begin{center}
   \begin{tikzpicture}
@@ -1214,8 +1336,7 @@ Then there are straight lines $\gamma_i: \phi(x_i) \to \psi(x_i)$ lying inside $
 \]
 when $\phi$ and $\psi$ are convex deformations.
 
-We now explore some classical consequences of the Cauchy Integral formula.
-\subsection{Liouville's theorem}
+We now explore some classical consequences of the Cauchy Integral formula. The next is Liouville's theorem, as promised.
 \begin{thm}[Liouville's theorem]
   Let $f: \C \to \C$ be an entire function (ie. holomorphic everywhere). If $f$ is bounded, then $f$ is constant.
 \end{thm}
@@ -1343,7 +1464,7 @@ Recall that Cauchy's theorem required $U$ to be sufficiently nice, eg. being sta
 \end{proof}
 There is a lot of passing between knowledge of integrals and knowledge of holomorphicity all the time, as we can see in these few results. These few lectures is in some sense the heart of the course, where we derive the central theorems from Cauchy's theorem and Cauchy's integral formula.
 
-\subsection{Identity theorems}
+\subsection{Zeroes and singularities}
 \begin{defi}[Order of zero]
   Let $f: B(a, r) \to \C$ be holomorphic. Then we know we can write
   \[
@@ -2080,7 +2201,7 @@ On the other hand, through the same trick of power series expansions, we obtaine
 \[
   \frac{1}{2\pi i} \int_{\gamma} f(z)\;\d z = \sum \Res(f, z_i) I(\gamma, z_i).
 \]
-This will further lead us to Rouchi's theorem and the argument principle, to be done later.
+This will further lead us to Rouch\'e's theorem and the argument principle, to be done later.
 
 Notice how all of these build upon the two ``geometric'' theorems of Cauchy's theorem for triangles and the antiderivative theorem. Afterwards, the main ideas used in the course is the deformation and cutting of paths, as well as the power series expansion of $\frac{1}{z - w}$. There really isn't much going around.
 
@@ -2353,35 +2474,35 @@ In previous cases, we had $f(z) = O(R^{-2})$, and then we can bound the integral
   \[
     |e^{i \alpha z}| = e^{-R\alpha \sin t}
   \]
-  on $\gamma_R$. To avoid messing with $\sin t$, we note that on $(0, \frac{\pi}{2}]$, the function $\frac{\sin \theta}{\theta}$ is decreasing, since
-  \[
-    \frac{\d}{\d \theta} \left(\frac{\sin \theta}{\theta}\right) = \frac{\theta \cos \theta - \sin \theta}{\theta^2} \leq 0.
-  \]
-  Then by consider the end points, we find
-  \[
-    \sin(t) \geq \frac{2t}{\pi}
-  \]
-  for $t \in [0, \frac{\pi}{2}]$. This gives us the bound
-  \[
-    |e^{i\alpha z}| = e^{-R\alpha \sin t} \leq
-    \begin{cases}
-      e^{-Ra2t/\pi} & 0 \leq t \leq \frac{\pi}{2}\\
-      e^{-Ra2t'/\pi} & 0 \leq t' = \pi - t \leq \frac{\pi}{2}
-    \end{cases}
-  \]
-  So we get
-  \begin{align*}
-    \left|\int_0^{\pi/2} e^{iR\alpha e^{it}} f(Re^{it}) Re^{it}\;\d t\right| &\leq \int_0^{2\pi} e^{-2\alpha Rt/\pi} \cdot M \;\d t\\
-    &= \frac{1}{2R} (1 - e^{\alpha R})\\
-    &\to 0
-  \end{align*}
-  as $R \to \infty$.
+on $\gamma_R$. To avoid messing with $\sin t$, we note that on $(0, \frac{\pi}{2}]$, the function $\frac{\sin \theta}{\theta}$ is decreasing, since
+\[
+  \frac{\d}{\d \theta} \left(\frac{\sin \theta}{\theta}\right) = \frac{\theta \cos \theta - \sin \theta}{\theta^2} \leq 0.
+\]
+Then by consider the end points, we find
+\[
+  \sin(t) \geq \frac{2t}{\pi}
+\]
+for $t \in [0, \frac{\pi}{2}]$. This gives us the bound
+\[
+  |e^{i\alpha z}| = e^{-R\alpha \sin t} \leq
+  \begin{cases}
+    e^{-Ra2t/\pi} & 0 \leq t \leq \frac{\pi}{2}\\
+    e^{-Ra2t'/\pi} & 0 \leq t' = \pi - t \leq \frac{\pi}{2}
+  \end{cases}
+\]
+So we get
+\begin{align*}
+  \left|\int_0^{\pi/2} e^{iR\alpha e^{it}} f(Re^{it}) Re^{it}\;\d t\right| &\leq \int_0^{2\pi} e^{-2\alpha Rt/\pi} \cdot M \;\d t\\
+  &= \frac{1}{2R} (1 - e^{\alpha R})\\
+  &\to 0
+\end{align*}
+as $R \to \infty$.
 
-  The estimate for
-  \[
-    \int_{\pi/2}^\pi f(z) e^{i\alpha z}\;\d z
-  \]
-  is analogous.
+The estimate for
+\[
+  \int_{\pi/2}^\pi f(z) e^{i\alpha z}\;\d z
+\]
+is analogous.
 \end{proof}
 
 \begin{eg}
@@ -2652,8 +2773,8 @@ In this case, we had a branch cut, and we managed to avoid it by going around ou
   What the residues are depends on what the quadratic actually is, but we will not go into details.
 \end{eg}
 
-\subsection{Rouch\`es theorem}
-We now want to move away from computing integrals, and look at a different application --- Rouch\`es theorem. Recall one of the first applications of complex analysis is to use Liouville's theorem to prove the fundamental theorem of algebra, and show that every polynomial has a root. One might wonder --- if we know a bit more about the polynomial, can we say a bit more about how the roots behave?
+\subsection{Rouch\'es theorem}
+We now want to move away from computing integrals, and look at a different application --- Rouch\'es theorem. Recall one of the first applications of complex analysis is to use Liouville's theorem to prove the fundamental theorem of algebra, and show that every polynomial has a root. One might wonder --- if we know a bit more about the polynomial, can we say a bit more about how the roots behave?
 
 To do this, recall we said that if $f: B(a; r) \to \C$ is holomorphic, and $f(a) = 0$, then $f$ has a zero of \emph{order $k$} if, locally,
 \[
@@ -2720,8 +2841,8 @@ Alternatively, without resorting to such a powerful theorem, we can define ``bou
 \]
 for a particular choice of orientation on $\gamma$.
 
-The main application of the argument principle is Rouch\`es theorem.
-\begin{cor}[Rouch\`es theorem]
+The main application of the argument principle is Rouch\'es theorem.
+\begin{cor}[Rouch\'es theorem]
   Let $U$ be a domain and $\gamma$ a closed curve which bounds a domain in $U$ (the key case is when $U$ is simply connected and $\gamma$ is a simple closed curve). Let $f, g$ be holomorphic on $U$, and suppose $|f| > |g|$ for all $z \in \image(\gamma)$. Then $f$ and $f + g$ have the same number of zeroes in the domain bound by $\gamma$, when counted with multiplicity.
 \end{cor}
 
@@ -2738,4 +2859,103 @@ The main application of the argument principle is Rouch\`es theorem.
 
   Thus, as the zeroes of $h$ are the zeroes of $f + g$, and the poles of $h$ are the poles of $f$, the result follows.
 \end{proof}
+
+\begin{eg}
+  Consider the function $z^6 + 6z + 3$. This has three roots (with multiplicity) in $\{1 < |z| < 2\}$. To show this, note that on $|z| = 2$, we have
+  \[
+    |z|^4 = 16 > 6|z| + 3 \geq |6z + 3|.
+  \]
+  So if we let $f(z) = z^4$ and $g(z) = 6z + 3$, then $f$ and $f + g$ have the same number of roots in $\{|z| < 2\}$. Hence all four roots lie inside $\{|z| < 2\}$.
+
+  On the other hand, on $|z| = 1$, we have
+  \[
+    |6z| = 6 > |z^4 + 3|.
+  \]
+  So $6z$ and $z^6 + 6z + 3$ have the same number of roots in $\{|z| < 1\}$. So there is exactly one root in there, and the remaining three must lie in $\{1 < |z| < 2\}$ (the bounds above show that $|z|$ cannot be exactly $1$ or $2$). So done.
+\end{eg}
+
+\begin{eg}
+  Let
+  \[
+    P(x) = x^n + a_{n - 1} x^{n - 1} + \cdots + a_1 x + a_0 \in \Z[x],
+  \]
+  and suppose $a_0 \not= 0$. If
+  \[
+    |a_{n - 1}| > 1 + |a_{n - 2}| + \cdots + |a_1| + |a_0|,
+  \]
+  then $P$ is irreducible over $\Z$ (and hence irreducible over $\Q$, by Gauss' lemma from IB Groups, Rings and Modules).
+
+  To show this, we let
+  \begin{align*}
+    f(z) &= a_{n - 1} z^{n - 1},\\
+    g(z) &= z^n + a_{n - 2}z^{n - 2} + \cdots + a_1 z + a_0.
+  \end{align*}
+  Then our hypothesis tells us $|f| > |g|$ on $|z| = 1$.
+
+  So $f$ and $P = f + g$ both have $n - 1$ roots in the open unit disc $\{|z| < 1\}$.
+
+  Now if we could factor $P(z) = Q(z)R(z)$, where $Q, R \in \Z[x]$, then at least one of $Q, R$ must have all its roots inside the unit disk. Say all roots of $Q$ are inside the unit disk. But we assumed $a_0 \not= 0$. So it is not a root of $P$. Hence it is not a root of $Q$. But the product of the roots $Q$ is a coefficient of $Q$, hence an integer strictly between $0$ and $1$. This is a contradiction.
+\end{eg}
+
+\begin{defi}[Local degree]
+  Let $f: B(a, r) \to \C$ be holomorphic and non-constant. Then the \emph{local degree} of $f$ at $a$, written $\deg(f, a)$ is the order of the zero of $f(z) - f(a)$ at $a$.
+\end{defi}
+
+\begin{lemma}
+  The local degree is given by
+  \[
+    \deg (f, a) = I (f \circ \gamma, f(a)),
+  \]
+  where
+  \[
+    \gamma(t) = a + re^{it},
+  \]
+  with $0 \leq t \leq 2\pi$, for $r > 0$ sufficiently small.
+\end{lemma}
+
+\begin{proof}
+  Note that by the identity theorem, we know that, $f(z) - f(a)$ has an isolated zero at $a$ (since $f$ is non-constant). So for sufficiently small $r$, the function $f(z) - f(a)$ does not vanish on $\overline{B(a, r)} \setminus \{a\}$. If we use this $r$, then $f \circ \gamma$ never hits $f(a)$, and the winding number is well-defined.
+
+  The result then follows directly from the argument principle.
+\end{proof}
+
+\begin{prop}[Local degree theorem]
+  Let $f: B(a, r) \to \C$ be holomorphic and non-constant. Suppose $\deg(f, a) > 0$. Then for $r > 0$ sufficiently small, there is $\varepsilon > 0$ such that $f(z) = w$ has exactly $\deg(f, a)$ distinct solutions for $w \in B(f(a), \varepsilon) \setminus \{f(a)\}$.
+\end{prop}
+
+\begin{proof}
+  We pick $r > 0$ such that $f(z) - f(a)$ and $f'(z)$ don't vanish on $B(a, r) \setminus \{a\}$. We let $\gamma(t) = a + re^{it}$. Then $f(a) \not\in \image(f \circ \gamma)$. So there is some $\varepsilon > 0$ such that $B(f(a), \varepsilon) \cap \image(f \circ \gamma) = \emptyset$. We now let $w \in B(f(a), \varepsilon)$. Then the number of zeros of $f(z) - w$ in $B(a, r)$ is just $I(f \circ \gamma, w)$, by the argument principle. This is just equal to $I(f \circ \gamma, f(a)) = \deg(f, a)$, by the invariance of $I(\Gamma, *)$ as we move $*$ in a component $\C \setminus \Gamma$.
+
+  Now if $w \not= f(a)$, since $f'(z) \not= 0$ on $B(a, r)\setminus \{a\}$, all roots of $f(z) - w$ must be simple. So there are exactly $\deg (f; a)$ distinct zeros.
+\end{proof}
+
+The local degree theorem says the equation $f(z) = w$ has $\deg(f, a)$ roots for $w$ sufficiently close to $f(a)$. In particular, we know there \emph{are} some roots. So $B(f(a), \varepsilon)$ is contained in the image of $f$. So we get the following result:
+
+\begin{cor}[Open mapping theorem]
+  Let $U$ be a domain and $f: U \to \C$ is holomorphic and non-constant, then $f$ is an open map, ie. for all open $V \subseteq U$, we get that $f(V)$ is open.
+\end{cor}
+
+\begin{proof}
+  This is an immediate consequence of the local degree theorem. It suffices to prove that for every $z \in U$ and $r > 0$ sufficiently small, we can find $\varepsilon > 0$ such that $B(f(a), \varepsilon) \subseteq f(B(a, r))$. This is true by the local degree theorem.
+\end{proof}
+
+Recall that Liouville's theorem says every holomorphic $f: \C \to B(0, 1)$ is constant. However, for any other simply connected domain, we know there are some interesting functions we can write down.
+
+\begin{cor}
+  Let $U\subseteq \C$ be a simply connected domain, and $U \not= \C$. Then there is a non-constant holomorphic function $U \to B(0, 1)$.
+\end{cor}
+This is a weak form of the Riemann mapping theorem, which says that there is a \emph{conformal equivalence} to $B(0, 1)$. This just says there is a map that is not boring.
+
+\begin{proof}
+  We let $q \in \C \setminus U$, and let $\phi(z) = z - q$. So $\phi: U \to \C$ is non-vanishing. It is also clearly holomorphic and non-constant. By an exercise (possbily on the example sheet), there is a holomorphic function $g: U \to \C$ such that $\phi(z) = e^{g(z)}$ for all $z$. In particular, our function $\phi(z) = z - q: U \to \C^*$ can be written as $\phi(z) = h(z)^2$, for some function $h: u \to \C^*$ (by letting $h(z) = e^{\frac{1}{2}g(z)}$).
+
+  We let $y \in h(U)$, and then the open mapping theorem says there is some $r > 0$ with $B(y, r) \subseteq h(U)$. But notice $\phi$ is injective by observation, and that $h(z_1) = \pm h(z_2)$ implies $\phi(z_1) = \phi(z_2)$. So we deduce that $B(-y, r) \cap h(U) = \emptyset$ (note that since $y \not= 0$, we have $B(y, r) \cap B(-y, r) = \emptyset$ for sufficiently small $r$).
+
+  Now define
+  \[
+    f: z \mapsto \frac{r}{2(h(z) + y)}.
+  \]
+  This is a holomorphic function $f: U \to B(0, 1)$, and is non-constant.
+\end{proof}
+This shows the amazing difference between $\C$ and $\C \setminus \{0\}$.
 \end{document}

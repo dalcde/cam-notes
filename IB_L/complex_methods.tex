@@ -5,7 +5,6 @@
 \def\nyear {2016}
 \def\nlecturer {R. E. Hunt}
 \def\ncourse {Complex Methods}
-\def\nlectures {MWF.9}
 \def\nnotready {}
 
 \input{header}
@@ -2521,19 +2520,39 @@ It's no good trying to find the Laplace transforms of functions if we can't inve
   \[
     f(t) = \frac{1}{2\pi i} \int_{c - i \infty}^{c + i\infty} \hat{f}(p) e^{pt} \;\d p,
   \]
-  where $c$ is a real constant, and the \emph{Bromwich inversion contour} $\gamma$ runs along the vertical line $\Re p = c$.
+  where $c$ is a real constant such that the \emph{Bromwich inversion contour} $\gamma$ given by $\Re p = c$ lies to the \emph{right} of all the singularities of $\hat{f}(p)$.
+\end{prop}
 
-  Importantly, $\gamma$ must lie to the \emph{right} of all the singularities of $\hat{f}(p)$.
-
+\begin{proof}
+  Since $f$ has a Laplace transform, it grows no more than exponentially. So we can find a $c \in \R$ such that
+  \[
+    g(t) = f(t) e^{-ct}
+  \]
+  decays at infinity (and is zero for $t < 0$, of course). So $g$ has a Fourier transform, and
+  \[
+    jtilde{g}(\omega) = \int_{-\infty}^\infty f(t) e^{-ct} e^{-i\omega t}\;\d t= \hat{f}(c + i\omega).
+  \]
+  Then we use the Fourier inversion formula to obtain
+  \[
+    g(t) = \frac{1}{2\pi} \int_{-\infty}^\infty \hat{f}(c+ i\omega) e^{i\omega t}\;\d \omega.
+  \]
+  So we make the substitution $p = c + i\omega$, and thus obtain
+  \[
+    f(t) e^{-ct} = \frac{1}{2 \pi i} \int_{c - i\infty}^{c + i\infty} \hat{f}(p) e^{(p - c)t}\;\d p.
+  \]
+  Multiplying both sides by $e^{ct}$, we get the result we were looking for (the requirement that $c$ lies to the right of all singularities arises from the requirement that $f(t) = 0$ for all $t < 0$).
+\end{proof}
+In most cases, we don't have to use the full inversion formula. Instead, we use the following special case:
+\begin{prop}
   In the case that $\hat{f}(p)$ has only a finite number of isolated singularities $p_k$ for $k = 1, \cdots, n$, and $\hat{f}(p) \to 0$ as $|p| \to \infty$, then
   \[
     f(t) = \sum_{k = 1}^n \res_{p = p_k} (\hat{f}(p) e^{pt})
   \]
-  for $t > 0$ (and vanishes for $t < 0$).
+  for $t > 0$, and vanishes for $t < 0$.
 \end{prop}
 
 \begin{proof}
-  When $t < 0$ consider the contour $\gamma_0 + \gamma_R'$ as shown, which encloses no singularities.
+  We first do the case where $t < 0$, consider the contour $\gamma_0 + \gamma_R'$ as shown, which encloses no singularities.
   \begin{center}
     \begin{tikzpicture}
       \draw [->] (-1.5, 0) -- (3.5, 0);
@@ -2551,5 +2570,185 @@ It's no good trying to find the Laplace transforms of functions if we can't inve
     \left|\int_{\gamma_R'} \hat{f}(p) e^{pt}\;\d p\right| \leq \pi R e^{ct} \sup_{p \in \gamma_R'} |\hat{f}(p)| \to 0 \text{ as }R \to \infty.
   \]
   Here we used the fact $|e^{pt}| \leq e^{ct}$, which arises from $\Re (pt) \leq ct$, noting that $t < 0$.
+
+  If $\hat{f}$ decays less rapidly at infinity, but still tends to zero there, the same result holds, but we need to use a slight modification of Jordan's lemma. So in either case, the integral
+  \[
+    \int_{\gamma_R'} \hat{f}(p) e^{pt}\;\d p \to 0\text{ as }R\to \infty.
+  \]
+  Thus, we know $\int_{\gamma_0} \to \int_\gamma$. Hence, by Cauchy's theorem, we know $f(t) = 0$ for $t < 0$. This is in agreement with the requirement that functions with Laplace transform vanish for $t < 0$.
+
+  Here we see why $\gamma$ must lie to the right of all singularities. If not, then the contour would encircle some singularities, and then the integral would no longer be zero.
+
+  When $t > 0$, we close the contour to the left.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (-3, 0) -- (2, 0);
+      \draw [->] (0, -3) -- (0, 3);
+
+      \draw [->-=0.3, ->-=0.8] (1, -2.5) node [below] {$c - iR$} -- (1, 2.5) node [pos=0.7, right] {$\gamma_0$} node [above] {$c + iR$} arc(90:270:2.5) node [pos=0.3, left] {$\gamma_R$};
+
+      \node at (-0.3, -0.6) {$\times$};
+      \node at (-1, 0.8) {$\times$};
+      \node at (0.2, 0.4) {$\times$};
+    \end{tikzpicture}
+  \end{center}
+  This time, our $\gamma$ \emph{does} enclose some singularities. Since there are only finitely many singularities, we enclose all singularities for sufficiently large $R$. One again, we get $\int_{\gamma_R} \to 0$ as $R \to \infty$. Thus, by the residue theorem, we know
+  \[
+    \int_{\gamma} \hat{f}(p) e^{pt} \;\d p = \lim_{R \to \infty} \int_{\gamma_0}\hat{f}(p) e^{pt}\;\d p = 2\pi i \sum_{k = 1}^n \res_{p = p_k} (\hat{f}(p) e^{pt}).
+  \]
+  So from the Bromwich inversion formula,
+  \[
+    f(t) = \sum_{k = 1}^n \res_{p = p_k} (\hat{f}(p) e^{pt}),
+  \]
+  as required.
+\end{proof}
+
+\begin{eg}
+  We know
+  \[
+    \hat{f}(p) = \frac{1}{p - 1}
+  \]
+  has a pole at $p = 1$. So we must use $c > 1$. We have $\hat{f}(p) \to 0$ as $|p| \to \infty$. So Jordan's lemma applies as above. Hence $f(t) = 0$ for $t < 0$, and for $t > 0$, we have
+  \[
+    f(t) = \res_{p = 1} \left(\frac{e^{pt}}{p - 1}\right) = e^t.
+  \]
+  This agrees with what we computed before.
+\end{eg}
+
+\begin{eg}
+  Consider $\hat{f}(p) = p^{-n}$. This has a pole of order $n$ at $p = 0$. So we pick $c > 0$. Then for $t > 0$, we have
+  \[
+    f(t) = \res_{p = 0}\left(\frac{e^{pt}}{p^n}\right) = \lim_{p \to 0} \left(\frac{1}{(n - 1)!} \frac{\d^{n - 1}}{\d p^{n - 1}} e^{pt}\right) = \frac{t^{n - 1}}{(n - 1)!}.
+  \]
+  This again agrees with what we computed before.
+\end{eg}
+
+\begin{eg}
+  In the case where
+  \[
+    \hat{f}(p) = \frac{e^{-p}}{p},
+  \]
+  then we cannot use the standard result about residues, since $\hat{f}(p)$ does not vanish as $|p| \to \infty$. But we can use the original Bromwich inversion formula to get
+  \begin{align*}
+    f(t) &= \frac{1}{2\pi i} \int_\gamma \frac{e^{-p}}{p} e^{pt}\;\d p\\
+    &= \frac{1}{2\pi i} \int_\gamma \frac{1}{p} e^{pt'}\;\d p,
+  \end{align*}
+  where $t' = t - 1$. Now we can close to the right when $t' < 0$, and to the left when $t' > 0$, picking up the residue from the pole at $p = 0$. Then we get
+  \[
+    f(t) =
+    \begin{cases}
+      0 & t' < 0\\
+      1 & t' > 0
+    \end{cases}
+    =
+    \begin{cases}
+      0 & t< 1\\
+      1 & t > 1
+    \end{cases} = H(t - 1).
+  \]
+  This again agrees with what we've got before.
+\end{eg}
+
+\begin{eg}
+  If $\hat{f}(p)$ has a branch point (at $p = 0$, say), then we must use a Bromwich keyhole contour as shown.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (-3, 0) -- (3, 0);
+      \draw [->] (0, -3) -- (0, 3);
+      \draw [thick,decorate, decoration=zigzag] (0, 0) -- (-3, 0);
+
+      \draw [mred, thick] (1, 2.5) arc(90:173.11:2.5) -- (-0.4, 0.3) arc (143.13:-143.13:0.5);
+      \draw [mred, thick] (1, 2.5) -- (1, -2.5) arc(-90:-173.11:2.5) -- (-0.4, -0.3);
+      \node [circ] at (0, 0) {};
+    \end{tikzpicture}
+  \end{center}
+\end{eg}
+
+\subsection{Solution of differential equations using the Laplace transform}
+The Laplace transform converts ODEs to algebraic equations, and PDEs to ODEs.
+ % include worked example
+
+\begin{eg}
+  Consider the differential equation
+  \[
+    t\ddot{y} - t\dot{y} + y = 0,
+  \]
+  with $y(0) = 2$ and $\dot{y}(0) = -1$. Note that
+  \[
+    \mathcal{L}(t \dot{y}) = -\frac{\d}{\d p} \mathcal{L}(\dot{y}) - \frac{\d}{\d p} (p\hat{y} - y(0)) = -p\hat{y}' - \hat{y}.
+  \]
+  Similarly, we find
+  \[
+    \mathcal{L}(t\ddot{y}) = -p^2 \hat{y}' - 2p \hat{y} + y(0).
+  \]
+  Substituting and rearranging, we obtain
+  \[
+    p \hat{y}' + 2\hat{y} = \frac{2}{p},
+  \]
+  which is a simpler differential equation. We can solve this using an integrating factor to obtain
+  \[
+    \hat{y} = \frac{2}{p} + \frac{A}{p^2},
+  \]
+  where $A$ is an arbitrary constant. Hence we have
+  \[
+    y = 2 + At,
+  \]
+  and $A = -1$ from the initial conditions.
+\end{eg}
+
+\begin{eg}
+  A system of ODEs can always be written in the form
+  \[
+    \dot{\mathbf{x}} = M \mathbf{x},\quad \mathbf{x}(0) = \mathbf{x}_0,
+  \]
+  where $\mathbf{x} \in \R^n$ and $M$ is an $n \times n$ matrix. Taking the Laplace transform, we obtain
+  \[
+    p \hat{\mathbf{x}} - \mathbf{x}_0 = M \hat{\mathbf{x}}.
+  \]
+  So we get
+  \[
+    \hat{\mathbf{x}} = (pI - M)^{-1} \mathbf{x}_0.
+  \]
+  This has singularities when $p$ is equal to an eigenvalue of $M$.
+\end{eg}
+
+\subsection{The convolution theorem for Laplace transforms}
+\begin{defi}[Convolution]
+  The \emph{convolution} of two functions $f$ and $g$ is defined as
+  \[
+    (f * g)(t) = \int_{-\infty}^\infty f(t - t') g(t') \;\d t'.
+  \]
+\end{defi}
+
+When $f$ and $g$ vanish for negative $t$, this simplifies to
+\[
+  (f * g) (t) = \int_0^t f(t - t') g(t) \;\d t.
+\]
+\begin{thm}[Convolution theorem]
+  The Laplace transform of a convolution is given by
+  \[
+    \mathcal{L}(f * g)(p) = \hat{f}(p) \hat{g}(p).
+  \]
+\end{thm}
+
+\begin{proof}
+  \begin{align*}
+    \mathcal{L}(f * g)(p) &= \int_0^\infty \left(\int_0^t f(t - t') g(t') \;\d t'\right) e^{-pt} \;\d t\\
+    \intertext{We change the order of integration in the $(t, t')$ plane, and adjust the limits accordingly (see picture below)}
+    &= \int_0^\infty \left(\int_{t'}^\infty f(t - t') g(t') e^{-pt} \;\d t\right) \;\d t'\\
+    \intertext{We substitute $u = t - t'$ to get}
+    &= \int_0^\infty \left(\int_0^\infty f(u) g(t') e^{-pu}e^{-pt'} \;\d u\right)\;\d t'\\
+    &= \int_0^\infty \left(\int_0^\infty f(u) e^{-pu} \;\d u\right) g(t') e^{-pt'} \;\d t'\\
+    &= \hat{f}(p) \hat{g}(p).
+  \end{align*}
+  Note the limits of integration are correct since they both represent the region below
+  \begin{center}
+    \begin{tikzpicture}
+      \fill [mblue, opacity=0.5] (0, 0) -- (2, 2) -- (2, 0) -- cycle;
+      \draw [->] (0, 0) -- (2, 0) node [right] {$t$};
+      \draw [->] (0, 0) -- (0, 2) node [right] {$t'$};
+      \draw (0, 0) -- (2, 2);
+    \end{tikzpicture}
+  \end{center}
 \end{proof}
 \end{document}

@@ -5,7 +5,6 @@
 \def\nyear {2016}
 \def\nlecturer {G. Moore}
 \def\ncourse {Numerical Analysis}
-\def\nlectures {MWF.10}
 \def\nofficial {http://www.damtp.cam.ac.uk/user/sjc1/teaching/NAIB/notes.pdf}
  % remove?
 \def\nnotready {}
@@ -2143,7 +2142,7 @@ Note that for $\mathbf{y} \in \R^m$, the effect of $\Omega_\theta^{[p, q]}$ only
 
 Moreover, just like the $\R^2$ case, given a particular $\mathbf{z} \in \R^m$, we can choose $\theta$ such that the $q$th component $(\Omega^{[p, q]}_\theta \mathbf{z})_q = 0$.
 
-Hence, $A \in \R^{m \times n}$ can be transformed into an ``upper triangular'' form by applying $s = mn - \frac{n(n + 1)}{2}$ Given rotations, since we need to introduce $s$ many zeros. Then
+Hence, $A \in \R^{m \times n}$ can be transformed into an ``upper triangular'' form by applying $s = mn - \frac{n(n + 1)}{2}$ Givens rotations, since we need to introduce $s$ many zeros. Then
 \[
   Q_s \cdots Q_1 A = R.
 \]
@@ -2236,6 +2235,177 @@ We can obtain a QR factorization by inverting to get
 \[
   A = Q_1^T \cdots Q_s^T R.
 \]
-However, we don't really need to do this if we just want to do use this to solve the least squares problem.
+However, we don't really need to do this if we just want to do use this to solve the least squares problem, since to do so, we need to multiply by $Q^T$, not $Q$, which is exactly $Q_s \cdots \Q_1$.
 
+\subsubsection*{Householder reflections}
+\begin{defi}[Householder reflection]
+  For $\mathbf{u} \not= \mathbf{0} \in \R^m$, we define the \emph{Householder reflection} by
+  \[
+    H_{\mathbf{u}} = I - 2\frac{\mathbf{u}\mathbf{u}^T}{ \mathbf{u}^T \mathbf{u}} \in \R^{m \times m}.
+  \]
+\end{defi}
+Note that this is symmetric, and we can see $H_{\mathbf{u}}^2 = I$. So this is indeed orthogonal.
+
+To show this is a reflection, suppose we resolve $\mathbf{x}$ as the perpendicular and parallel parts as $\mathbf{x} = \alpha \mathbf{u} + \mathbf{w} \in \R^m$, where
+\[
+  \alpha = \frac{\mathbf{u}^T \mathbf{x}}{\mathbf{u}^T \mathbf{u}},\quad \mathbf{u}^T \mathbf{w} = 0.
+\]
+Then we have
+\[
+  H_{\mathbf{u}} \mathbf{x} = -\alpha \mathbf{u} + \mathbf{w}.
+\]
+So this is a reflection in the $m - 1$-dimensional hyperplane $\mathbf{u}^T \mathbf{y} = 0$.
+
+What is the cost of computing $H_{\mathbf{u}}\mathbf{z}$? This is evaluated as
+\[
+  H_{\mathbf{u}}\mathbf{z} = \mathbf{z} - \frac{\mathbf{u}^T \mathbf{z}}{\mathbf{u}^T \mathbf{u}}\mathbf{u}.
+\]
+This only requires $O(m)$ operations, which is nice.
+
+\begin{prop}
+  A matrix $A \in \R^{m \times n}$ can be transformed into upper-triangular form by applying $n$ Householder reflections, namely
+  \[
+    H_n \cdots H_1 A = R,
+  \]
+  where each $H_n$ introduces zero into column $k$ and leaves the other zeroes alone.
+\end{prop}
+This is much less multiplications needed than the number needed for Givens rotations, in general.
+
+To show this, we first prove some lemmas.
+
+\begin{lemma}
+  Let $\mathbf{a}, \mathbf{b} \in \R^m$, with $\mathbf{a} \not= \mathbf{b}$, but $\|\mathbf{a}\| = \|\mathbf{b}\|$. Then if we pick $\mathbf{u} = \mathbf{a} - \mathbf{b}$, then
+  \[
+    H_\mathbf{u} \mathbf{a} = \mathbf{b}.
+  \]
+\end{lemma}
+This is obvious if we draw some pictures in low dimensions.
+\begin{proof}
+  We just do it:
+  \[
+    H_\mathbf{u} \mathbf{a} = \mathbf{a} - \frac{2(\|\mathbf{a}\| - \mathbf{a}^T \mathbf{b})}{\|\mathbf{a}\|^2 - 2\mathbf{a}^T \mathbf{b} + \|\mathbf{b}\|^2} (\mathbf{a} - \mathbf{b}) = \mathbf{a} - (\mathbf{a} - \mathbf{b}) = \mathbf{b},
+  \]
+  where we used the fact that $\|\mathbf{a}\| = \|\mathbf{b}\|$.
+\end{proof}
+We will keep applying the lemma. Since we want to get an upper triangular matrix, it makes sense to pick $\mathbf{b}$ to have many zeroes, and the best option would be to pick $\mathbf{b}$ to be a unit vector.
+
+So we begin our algorithm: we want to clear the first column of $A$. We let $\mathbf{a}$ be the first column of $A$, and assume $\mathbf{a} \in \R^m$ is not already in the correct form, ie. $\mathbf{a}$ is not a multiple of $\mathbf{e}_1$. Then we define
+\[
+  \mathbf{u} = \mathbf{a} \mp \|\mathbf{a}\| \mathbf{e}_1,
+\]
+where either choice of the sign is pure-mathematically valid. However, we will later see that there is one choice that is better when we have to deal with inexact arithmetic. Then we end up with
+\[
+  H_1 \mathbf{a} = H_{\mathbf{u}} \mathbf{a} = \pm \|\mathbf{a}\| \mathbf{e}_1.
+\]
+Now we have
+\[
+  H_1 A =
+  \begin{tikzpicture}[scale=0.35, baseline=-0.65ex]
+    \draw (-1.5, -2) rectangle (1.5, 2);
+    \node at (-1, 1.5) {$\times$}; \node at (0, 1.5) {$\times$}; \node at (1, 1.5) {$\times$};
+    \node at (-1, 0.5) {$0$}; \node at (0, 0.5) {$\times$}; \node at (1, 0.5) {$\times$};
+    \node at (-1, -0.5) {$0$}; \node at (0, -0.5) {$\times$}; \node at (1, -0.5) {$\times$};
+    \node at (-1, -1.5) {$0$}; \node at (0, -1.5) {$\times$}; \node at (1, -1.5) {$\times$};
+  \end{tikzpicture}.
+\]
+To do the next step, we need to be careful, since we don't want to destroy the previously created zeroes.
+
+\begin{lemma}
+  If the first $k - 1$ components of $\mathbf{u}$ are zero, then
+  \begin{enumerate}
+    \item For every $\mathbf{x} \in \R^m$, $H_{\mathbf{u}} \mathbf{x}$ does not alter the first $k - 1$ components of $\mathbf{x}$.
+    \item If the last $(m - k + 1)$ components of $\mathbf{y} \in \R^m$ are zero, then $H_{\mathbf{u}}\mathbf{y} = \mathbf{y}$.
+  \end{enumerate}
+\end{lemma}
+These are all obvious from definition. All these say is that reflections don't affect components perpendicular to $\mathbf{u}$, and in particular fixes all vectors perpendicular to $\mathbf{u}$.
+
+\begin{lemma}
+  Let $\mathbf{a}, \mathbf{b} \in \R^m$, with
+  \[
+    \begin{pmatrix}
+      a_k\\
+      \vdots\\
+      a_m
+    \end{pmatrix} \not=
+    \begin{pmatrix}
+      b_k\\
+      \vdots\\
+      b_m
+    \end{pmatrix},
+  \]
+  but
+  \[
+    \sum_{j = k}^m a_j^2 = \sum_{j = k}^m b_j^2.
+  \]
+  Suppose we pick
+  \[
+    \mathbf{u} = (0, 0, \cdots, 0, a_k - b_k, \cdots, a_m - b_m)^T.
+  \]
+  Then we have
+  \[
+    H_\mathbf{u} \mathbf{a} = (a_1, \cdots, a_{k - 1} b_k, \cdots, b_m).
+  \]
+\end{lemma}
+This is a generalization of what we've had before for $k = 1$. Again, the proof is just straightforward verification.
+
+Now we can mess with the second column of $H_1 A$. We let $\mathbf{a}$ be the second column of $H_1 A$, and assume $a_3, \cdots, a_m$ are not all zero, ie. $(0, a_2, \cdots, a_m)^T$ is not a multiple of $\mathbf{e}_2$. We choose
+\[
+  \mathbf{u} = (0, a_2 \mp \gamma, a_3, \cdots, a_m)^T,
+\]
+where
+\[
+  \gamma = \sqrt{\sum_{j = 2}^m a_j}.
+\]
+Then
+\[
+  H_\mathbf{u} \mathbf{a} = (a_1, \pm \gamma, 0, \cdots).
+\]
+Also, by the previous lemma, this does not affect anything in the first column and the first row. Now we have
+\[
+  H_2 H_1 A =
+  \begin{tikzpicture}[scale=0.35, baseline=-0.65ex]
+    \draw (-1.5, -2) rectangle (1.5, 2);
+    \node at (-1, 1.5) {$\times$}; \node at (0, 1.5) {$\times$}; \node at (1, 1.5) {$\times$};
+    \node at (-1, 0.5) {$0$}; \node at (0, 0.5) {$\times$}; \node at (1, 0.5) {$\times$};
+    \node at (-1, -0.5) {$0$}; \node at (0, -0.5) {$0$}; \node at (1, -0.5) {$\times$};
+    \node at (-1, -1.5) {$0$}; \node at (0, -1.5) {$0$}; \node at (1, -1.5) {$\times$};
+  \end{tikzpicture}
+\]
+Suppose we have reached $H_{k - 1} \cdots H_1 A$, where the first $k - 1$ rows are of the correct form, ie.
+\[
+  H_{k - 1} \cdots H_1 A =
+  \begin{tikzpicture}[baseline=-0.65ex, scale=0.35]
+    \draw (-1.5, -2) rectangle (1.5, 2);
+    \draw (-1.5, 2) -- (0, 0.5);
+    \draw (0, -2) -- (0, 0.5) -- (1.5, 0.5);
+    \node at (-0.75, -0.75) {$0$};
+    \draw [semithick, decorate, decoration={brace, mirror}, yshift=-2pt] (-1.5, -2) -- (0, -2) node [pos=0.5, below] {$k - 1$};
+  \end{tikzpicture}
+\]
+We consider the $k$th column of $H_{k - 1} \cdots H_1 A$, say $\mathbf{a}$. We assume $(0, \cdots, 0, a_k, \cdots, a_m)^T$ is not a multiple of $\mathbf{e}_k$. Choosing
+\[
+  \mathbf{u} = \gamma(0, \cdots, 0, a_k \mp \gamma, a_{k + 1}, \cdots, a_m)^t,\quad \gamma = \sqrt{\sum_{j = k}^m a_j^2},
+\]
+we find that
+\[
+  H_\mathbf{u} \mathbf{a} = (a_1, \cdots, a_{k - 1}, \pm \gamma, 0, \cdots, 0)^T.
+\]
+Now we have
+\[
+  H_k \cdots H_1 A =
+  \begin{tikzpicture}[baseline=-0.65ex, scale=0.35]
+    \draw (-1.5, -2) rectangle (1.5, 2);
+    \draw (-1.5, 2) -- (0.2, 0.3);
+    \draw (0.2, -2) -- (0.2, 0.3) -- (1.5, 0.3);
+    \node at (-0.75, -0.75) {$0$};
+    \draw [semithick, decorate, decoration={brace, mirror}, yshift=-2pt] (-1.5, -2) -- (0.2, -2) node [pos=0.5, below] {$k$};
+  \end{tikzpicture},
+\]
+and $H_k$ did \emph{not} alter the first $k -1 $ rows and columns of $H_{k - 1} \cdots H_1 A$.
+
+There is one thing we have to decide on --- which sign to pick. As mentioned, these do not matter in pure mathematics, but with inexact arithmetic, we should pick the sign in $a_k \mp \gamma$ such that $a_k \mp \gamma$ has maximum magnitude, ie. $a_k \mp \gamma = a_k + \sgn(a_k) \gamma$. It takes some analysis to justify why this is the right choice, but it is not too surprising that there is some choice that is better.
+
+So how do Householder and Givens compare? We notice that the Givens method generates zeros at one entry at a time, while Householder does it column by column. So in general, the Householder method is superior.
+
+However, for certain matrices with special structures, we might need the extra delicacy of introducing a zero one at a time. For example, if $A$ is a band matrix, then it might be beneficial to just remove the few non-zero entries one at a time.
 \end{document}
