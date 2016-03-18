@@ -5,9 +5,6 @@
 \def\nyear {2016}
 \def\nlecturer {G. Moore}
 \def\ncourse {Numerical Analysis}
-\def\nofficial {http://www.damtp.cam.ac.uk/user/sjc1/teaching/NAIB/notes.pdf}
- % remove?
-\def\nnotready {}
 
 \input{header}
 
@@ -28,36 +25,55 @@ LU triangular factorization of matrices. Relation to Gaussian elimination. Colum
 \tableofcontents
 \setcounter{section}{-1}
 \section{Introduction}
-What is numerical analysis? It is the study of algorithms. It is about algorithms for solving problems in, say, linear algebra. In the course, you will find that many of the algorithms are named after great figures in the past, like Newton, Euler and Gauss. They have done a lot of work to come up with good algorithms that aids computation. In the past, they had to implement these algorithms by hand, and it makes sense for them to try to simplify them! Nowadays, we are much luckier and have computers to help us solve problems. We can often solve problems by the press of a button.
+Numerical analysis is the study of algorithms. There are many problems we would like algorithms to solve. In this course, we will tackle the problems of polynomial approximation, solving ODEs and solving linear equations. These are all problems that frequently arise when we do (applied) maths.
 
-However, it is also useful to understand how algorithms works, since we might in the future encounter problems with no pre-written solutions by others, and we might need to come up with something ourselves.
+In general, there are two things we are concerned with --- accuracy and speed. Accuracy is particularly important in the cases of polynomial approximation and solving ODEs, since we are trying approximate things. We would like to make good approximations of the solution with relatively little work. On the other hand, in the case of solving linear equations, we are more concerned with speed --- our solutions will be exact (up to numerical errors due to finite precision of calculations), but we would like to solve it quickly. We might have to deal with huge systems, and we don't want the computation time to grow too quickly.
+
+In the past, this was an important subject, since they had no computers. The algorithms had to be implemented by hand. It was thus very important to find some practical and efficient methods of computing things, or else it would take them forever to calculate what they wanted. So we wanted quick algorithms that give reasonably accurate results.
+
+Nowadays, this is still an important subject. While we have computers that are much faster at computation, we still want our programs to be fast. We would also want to get really accurate results, since we might be using them to, say, send our rocket to the Moon. Moreover, with more computational power, we might sacrifice efficiency for some other desirable properties. For example, if we are solving for the trajectory of a particle, we might want the solution to satisfy the conservation of energy. This would require some much more complicated and slower algorithms that no one would have considered in the past. Nowadays, with computers, these algorithms become more feasible, and are becoming increasingly more popular.
 
 \section{Polynomial interpolation}
-Polynomials are important. Many many ideas in numerical analysis are based on polynomials approximations, and it is important to understand. The simplest place to start is through polynomial interpolations.
+Polynomials are nice. Writing down a polynomial of degree $n$ involves only $n + 1$ numbers. They are easy to evaluate, integrate and differentiate. So it would be nice if we can approximate things with polynomials. For simplicity, we will only deal with real polynomials.
 
 \begin{notation}
   We write $P_n[x]$ for the real linear vector space of polynomials (with real coefficients) having degree $n$ or less.
 \end{notation}
-Of course, we can also work with complex polynomials which form a complex vector space. However, for simplicity, we will focus on real polynomials.
-
 It is easy to show that $\dim (P_n[x]) = n + 1$.
 
 \subsection{The interpolation problem}
-Suppose we are given $n + 1$ distinct interpolation points $\{x_i\}_{i = 0}^n \subseteq \R$, and $n + 1$ data values $\{f_i\}_{i = 0}^n \subseteq \R$. The objective is to find a $p \in P_n[x]$ such that $p(x_i) = f_i$ for all $i$. In other words, we want to fit a polynomial through the points $(x_i, f_i)$.
+The idea of polynomial interpolation is that we are given $n + 1$ distinct interpolation points $\{x_i\}_{i = 0}^n \subseteq \R$, and $n + 1$ data values $\{f_i\}_{i = 0}^n \subseteq \R$. The objective is to find a $p \in P_n[x]$ such that
+\[
+  p(x_i) = f_i\quad \text{for}\quad i = 0, \cdots, n.
+\]
+In other words, we want to fit a polynomial through the points $(x_i, f_i)$.
 
-We have $n + 1$ coefficients to choose from, and $n + 1$ conditions to satisfy. Given this, in general, there is no guarantee that there is a solution, or that the solution is unique. Our first goal is to show that in the case of polynomial interpolation, the solution exists and is unique.
+There are many situations where this may come up. For example, we may be given $n + 1$ actual data points, and we want to fit a polynomial through the points. Alternatively, we might have a complicated function $f$, and want to approximate it with a polynomial $p$ such that $p$ and $f$ agree on at least that $n + 1$ points.
 
-There are many situations where this may come up. For example, we may have $n + 1$ actual data points, and want to fit a polynomial through the points. Alternatively, we might have a given function $f$, and want to approximate it with a polynomial $p$ such that $p$ and $f$ agree on at least that $n + 1$ points.
+The naive way of looking at this is that we try a polynomial
+\[
+  p(x) = a_n x^n + a_{n - 1}x^{n - 1} + \cdots + a_0,
+\]
+and then solve the system of equations
+\[
+  f_i = p(x_i) = a_n x_i^n + a_{n - 1}x_i^{n - 1} + \cdots + a_0.
+\]
+This is a perfectly respectable system of $n + 1$ equations in $n + 1$ unknowns. From linear algebra, we know that in general, such a system is not guaranteed to have a solution, and if the solution exists, it is not guaranteed to be unique.
+
+That was not helpful. So our first goal is to show that in the case of polynomial interpolation, the solution exists and is unique.
 
 \subsection{The Lagrange formula}
-It turns out the problem is not too hard. You can probably figure it out yourself if you lock yourself in a room for a few days (or hours). The first solution to this would be via Lagrange cardinal polynomials.
+It turns out the problem is not too hard. You can probably figure it out yourself if you lock yourself in a room for a few days (or hours). In fact, we will come up with \emph{two} solutions to the problem.
+
+The first is via the Lagrange cardinal polynomials. These are simple to state, and it is obvious that these work very well. However, practically, this is not the best way to solve the problem, and we will not talk about them much. Instead, we use this solution as a proof of existence of polynomial interpolations. We will then develop our second method on the assumption that polynomial interpolations exist, and find a better way of computing them.
+
 \begin{defi}[Lagrange cardinal polynomials]
   The \emph{Lagrange cardinal polynomials} with respect to the interpolation points $\{x_i\}_{i = 0}^n$ are, for $k = 0, \cdots, n$,
   \[
     \ell_k (x) = \prod_{i = 0, i \not= k}^n \frac{x - x_i}{x_k - x_i}.
   \]
 \end{defi}
-Note that these polynomials have degree exactly $n$. The significance of these polynomials is that they satisfy
+Note that these polynomials have degree exactly $n$. The significance of these polynomials is we have $\ell_k(x_i) = 0$ for $i \not= k$, and $\ell_k(x_k) = 1$. In other words, we have
 \[
   \ell_k(x_j) = \delta_{jk}.
 \]
@@ -81,14 +97,21 @@ With these cardinal polynomials, we can immediately write down a solution to the
 
   For uniqueness, suppose $p, q \in P_n[x]$ are solutions. Then the difference $r = p - q \in P_n[x]$ satisfies $r(x_j) = 0$ for all $j$, ie. it has $n + 1$ roots. However, a non-zero polynomial of degree $n$ can have at most $n$ roots. So in fact $p - q$ is zero, ie. $p = q$.
 \end{proof}
-So we have solved the problem of polynomials. However, it turns out there is a better way to approach the problem.
+
+While this \emph{works}, it is not ideal. If we one day decide we should add one more interpolation point, we would have to recompute all the cardinal polynomials, and that is not fun. Ideally, we would like some way to reuse our previous computations when we have new interpolation points.
 
 \subsection{The Newton formula}
-For $k = 0, \cdots, n$, let $p_k \in P_k[x]$ satisfy $p_k(x_i) = f_i$ for $i = 0, \cdots, k$. These are the unique degree-$k$ polynomials that satisfies the first $k$ conditions. Then we can write
+The idea of Newton's formula is as follows --- for $k = 0, \cdots, n$, we write $p_k \in P_k[x]$ for the polynomial that satisfies
+\[
+  p_k(x_i) = f_i\quad\text{for}\quad i = 0, \cdots, k.
+\]
+This is the unique degree-$k$ polynomial that satisfies the first $k + 1$ conditions, whose existence (and uniqueness) is guaranteed by the previous section. Then we can write
 \[
   p(x) = p_n(x) = p_0(x) + (p_1(x) - p_0(x)) + \cdots + (p_n(x) - p_{n - 1}(x)).
 \]
-Hence it suffices to find the differences $p_k - p_{k - 1}$. However, we know that $p_k$ and $p_{k - 1}$ agree on $x_0, \cdots, x_{k - 1}$. So the difference is $0$ at those points, and we have
+Hence we are done if we have an efficient way of finding the differences $p_k - p_{k - 1}$.
+
+We know that $p_k$ and $p_{k - 1}$ agree on $x_0, \cdots, x_{k - 1}$. So $p_k - p_{k - 1}$ evaluates to $0$ at those points, and we must have
 \[
   p_k(x) - p_{k - 1}(x) = A_k \prod_{i = 0}^{k - 1}(x - x_i),
 \]
@@ -96,21 +119,24 @@ for some $A_k$ yet to be found out. Then we can write
 \[
   p(x) = p_n(x) = A_0 + \sum_{k = 1}^n A_k \prod_{i = 0}^{k - 1} (x - x_i).
 \]
-This formula has the advantage that it is built up gradually from the interpolation points one-by-one. If we stop the sum at any point, we have obtained the polynomial that interpolates the data for the first $k$ points (for some $k$).
+This formula has the advantage that it is built up gradually from the interpolation points one-by-one. If we stop the sum at any point, we have obtained the polynomial that interpolates the data for the first $k$ points (for some $k$), which is a good thing.
 
-What are the $A_k$'s? For $k = 0$, we know $A_0$ is the unique constant polynomial that interpolates the point at $x_0$, ie. $A_0 = f_0$.
+All that remains is to find the coefficients $A_k$. For $k = 0$, we know $A_0$ is the unique constant polynomial that interpolates the point at $x_0$, ie. $A_0 = f_0$.
 
-For the others, we note that in the formula for $p_k - p_{k - 1}$, $A_k$ is the leading coefficient of $x^k$. Also, $p_{k - 1}(x)$ has no degree $k$ term. So $A_k$ must be the leading coefficient of $p_k$.
+For the others, we note that in the formula for $p_k - p_{k - 1}$, we find that $A_k$ is the leading coefficient of $x^k$. But $p_{k - 1}(x)$ has no degree $k$ term. So $A_k$ must be the leading coefficient of $p_k$.
 
-We thus need an efficient algorithm for these \emph{Newton divided differences}. The standard notation for these is
+This is still not helpful. We need a good way of computing these coefficients, known as the \emph{Newton divided differences}.
 \[
   A_k = f[x_0, \cdots, x_k].
 \]
-Note in particular that these coefficients depend only on the first $k$ interpolation points.
+Note in particular that these coefficients depend only on the first $k$ interpolation points. Note that we don't have to start with $x_0$ (since the labels are arbitrary). In general, the coefficient
+\[
+  f[x_j, \cdots, x_k]
+\]
+is the leading coefficient of the unique $q \in P_{k - j}[x]$ such that $q(x_i) = f_i$ for $i = j, \cdots, k$.
 
-We will look for a recurrence relation --- a way to express $A_k$ in terms of $A_j$ for $j < k$.
+While we do not have an explicit formula for what these coefficients are, we can come up with a recurrence relation for these coefficients.
 
-To do so, we first generalize this notion to $f[x_j, \cdots, x_k]$ for $0 \leq j \leq k$. This denotes the leading coefficient of the unique $q \in P_{k - j}[x]$ satisfying $q(x_i) = f_i$ for $i = j, \cdots, k$. Then we get
 \begin{thm}[Recurrence relation for Newton divided differences]
   For $0 \leq j < k \leq n$, we have
   \[
@@ -129,7 +155,7 @@ To do so, we first generalize this notion to $f[x_j, \cdots, x_k]$ for $0 \leq j
   \[
     q_2(x) = \frac{x - x_j}{x_k - x_j} q_1(x) + \frac{x_k - x}{x_k - x_j} q_0(x).
   \]
-  Using the properties of $q_0$ and $q_1$, it is easy to show that the right expression satisfies the interpolations of $q_2$. Hence by uniqueness, we know that this is indeed $q_1$. The leading coefficients thus give the result.
+  We can check that the expression on the right correctly interpolates the points $x_i$ for $i = j, \cdots, k$. By uniqueness, the two expressions agree. Since $f[x_j, \cdots, x_k$], $f[x_{j + 1}, \cdots, x_k]$ and $f[x_j, \cdots, x_{k - 1}]$ are the leading coefficients of $q_2, q_1, q_0$ respectively, the result follows.
 \end{proof}
 Thus the famous Newton divided difference table can be constructed
 \begin{center}
@@ -137,34 +163,38 @@ Thus the famous Newton divided difference table can be constructed
     \toprule
     $x_i$ & $f_i$ & $f[*, *]$ & $f[*, *, *]$ & $\cdots$ & $f[*, \cdots,*]$\\
     \midrule
-    $x_0$ & $f[x_0]$ & $f[x_0, x_1]$ & $f[x_0, x_1, x_2]$ & $\cdots$ & $f[x_0, x_1, \cdots, x_n]$\\
-    $x_1$ & $f[x_1]$ & $f[x_1, x_2]$ & $f[x_1, x_2, x_3]$ & $\cdots$\\
-    $x_2$ & $f[x_2]$ & $f[x_2, x_3]$ & $f[x_2, x_3, x_4]$ & $\cdots$\\
-    $\vdots$ & $\vdots$ & $\vdots$ &\\
+    $x_0$ & $f[x_0]$\\
+    & & $f[x_0, x_1]$\\
+    $x_1$ & $f[x_1]$ & & $f[x_0, x_1, x_2]$ \\
+    & & $f[x_1, x_2]$ & & $\ddots$\\
+    $x_2$ & $f[x_2]$ & & $f[x_2, x_3, x_4]$ & $\cdots$ & $f[x_0, x_1, \cdots, x_n]$\\
+    & & $f[x_2, x_3]$ & & $\iddots$\\
+    $x_3$ & $f[x_3]$ & & $\iddots$\\
+    $\vdots$ & $\vdots$ & $\iddots$ &\\
     $x_n$ & $f[x_n]$\\
     \bottomrule
   \end{tabular}
 \end{center} % beautify
-From the first $n$ columns, we can find the $n + 1$th column using the recurrence relation. The values of $A_k$ can then be found at the first row, and this is all we really need. However, to compute the first row, we will need to compute everything in the table.
+From the first $n$ columns, we can find the $n + 1$th column using the recurrence relation above. The values of $A_k$ can then be found at the top diagonal, and this is all we really need. However, to compute this diagonal, we will need to compute everything in the table.
 
-Here we make two practical points:
 \begin{enumerate}
   \item An efficient algorithm ($O(n)$ operations) for evaluating $p(\hat{x})$ at some new value $\hat{x}$ using the above divided difference table is known as \emph{Horner's scheme}:
     \begin{alltt}
       S <- f[\(\mathtt{x\sb{0}}\),..., \(\mathtt{x\sb{n}}\)]
       for k = n - 1,..., 0
           S <- (\(\mathtt{\hat{x}}\) - \(\mathtt{x\sb{k}}\))S + f[\(\mathtt{x\sb{0}}\),..., \(\mathtt{x\sb{k}}\)]
-      end
-    \end{alltt}
+      end\end{alltt}
   \item If an extra data point $\{x_{n + 1}, f_{n + 1}\}$ is added, then we only have to compute an extra diagonal $f[x_k, \cdots, x_{n + 1}]$ for $k =n, \cdots, 0$ in the divided difference table to obtain the new coefficient, and the old results can be reused. This requires $O(n)$ operations. This is less straightforward for Lagrange's method.
 \end{enumerate}
 
 \subsection{A useful property of divided differences}
-In the next couple of sections, we are interested in the error of polynomial interpolation. Suppose the data points come from $f_i = f(x_i)$ for some complicated $f$ we want to approximate. How does the error $e_n(x) = f(x) - p_n(x)$ (where $p_n$ is a degree $n$-interpolation) depend on $n$ and the choice of interpolation points?
+In the next couple of sections, we are interested in the error of polynomial interpolation. Suppose the data points come from $f_i = f(x_i)$ for some complicated $f$ we want to approximate, and we interpolate $f$ at $n$ data points $\{x_i\}_{i = 1}^n$ with $p_n$. How does the error $e_n(x) = f(x) - p_n(x)$ depend on $n$ and the choice of interpolation points?
 
-Notice that the error is necessarily $0$ at the interpolation points, but this does not necessarily mean that the errors elsewhere will be small.
+At the interpolation point, the error is necessarily $0$, by definition of interpolation. However, this does not tell us anything about the error elsewhere.
 
-We first start with a lemma that is purely a calculus result:
+Our ultimate objective is to bound the error $e_n$ by suitable multiples of the derivatives of $f$. We will do this in two steps. We first relate the derivatives to the divided differences, and then relate the error to the divided differences.
+
+The first part is an easy result based on the following purely calculus lemma.
 \begin{lemma}
   Let $g \in C^m[a, b]$ have a continuous $m$th derivative. Suppose $g$ is zero at $m + \ell$ distinct points. Then $g^{(m)}$ has at least $\ell$ distinct zeros in $[a, b]$.
 \end{lemma}
@@ -174,7 +204,7 @@ We first start with a lemma that is purely a calculus result:
 \end{proof}
 
 \begin{thm}
-  If $\{x_i\}_{i = 0}^n \in [a, b]$ and $f \in C^n[a, b]$. Then there exists some $\xi \in (a, b)$ such that
+  Let $\{x_i\}_{i = 0}^n \in [a, b]$ and $f \in C^n[a, b]$. Then there exists some $\xi \in (a, b)$ such that
   \[
     f[x_0, \cdots, x_n] = \frac{1}{n!} f^{(n)}(\xi).
   \]
@@ -183,10 +213,9 @@ We first start with a lemma that is purely a calculus result:
 \begin{proof}
   Consider $e = f - p_n \in C^n[a, b]$. This has at least $n + 1$ distinct zeros in $[a, b]$. So by the lemma, $e^{(n)} = f^{(n)} - p_n^{(n)}$ must vanish at some $\xi \in (a, b)$. But then $p_n^{(n)} = n! f[x_0, \cdots, x_n]$ constantly. So the result follows.
 \end{proof}
-With this result, we can get error bounds rather easily.
 
 \subsection{Error bounds for polynomial interpolation}
-It turns out the error $e = f - p_n$ is ``like the next term in the Newton's formula''. This vague sentence is made precise in the following theorem:
+The actual error bound is not too difficult as well. It turns out the error $e = f - p_n$ is ``like the next term in the Newton's formula''. This vague sentence is made precise in the following theorem:
 \begin{thm}
   Assume $\{x_i\}_{i = 0}^n \subseteq [a, b]$ and $f \in C[a, b]$. Let $\bar{x} \in [a, b]$ be a non-interpolation point. Then
   \[
@@ -197,7 +226,7 @@ It turns out the error $e = f - p_n$ is ``like the next term in the Newton's for
     \omega(x) = \prod_{i = 0}^n (x - x_i).
   \]
 \end{thm}
-Note that we forbid the case where $\bar{x}$ is an interpolation point, since it is not clear what the expression $f[x_0, x_1, \cdots, x_n, \bar{x}]$ means. However, if $\bar{x}$ is an interpolation point, then both $e_n(\bar x)$ and $\omega(\bar{x})$ are zero, so the statement is trivial.
+Note that we forbid the case where $\bar{x}$ is an interpolation point, since it is not clear what the expression $f[x_0, x_1, \cdots, x_n, \bar{x}]$ means. However, if $\bar{x}$ is an interpolation point, then both $e_n(\bar x)$ and $\omega(\bar{x})$ are zero, so there isn't much to say.
 
 \begin{proof}
   We think of $\bar{x} = x_{n + 1}$ as a new interpolation point so that
@@ -231,13 +260,15 @@ This gives the more useful bound
   \]
 \end{prop}
 
-We are now going to see what happens when we vary the interpolation points. The error bound only depends on the interpolation points through $\omega(x)$. So can we minimize $\omega(x)$ in some sense by picking some clever interpolation points $\Delta = \{x_i\}_{i = 0}^n$? Here we will have $n$ fixed. So instead, we put $\Delta$ as the subscript. We can write
+Assuming our function $f$ is fixed, this error bound depends only on $\omega(x)$, which depends on our choice of interpolation points. So can we minimize $\omega(x)$ in some sense by picking some clever interpolation points $\Delta = \{x_i\}_{i = 0}^n$? Here we will have $n$ fixed. So instead, we put $\Delta$ as the subscript. We can write our bound as
 \[
   \|f - p_{\Delta}\|_{\infty} \leq \frac{1}{(n + 1)!} \|f^{(n + 1)}\|_{\infty} \|\omega_{\Delta}\|_{\infty}.
 \]
 So the objective is to find a $\Delta$ that minimizes $\|\omega_{\Delta}\|_{\infty}$.
 
-For the moment, we focus on the special case where the interval is $[-1, 1]$. Then later we can get the general solution by an easy change of variable. The solution involves the use of Chebyshev polynomials:
+For the moment, we focus on the special case where the interval is $[-1, 1]$. The general solution can be obtained by an easy change of variable.
+
+For some magical reasons, the optimal choice of $\Delta$ comes from the \emph{Chebyshev polynomials}.
 \begin{defi}[Chebyshev polynomial]
   The \emph{Chebyshev polynomial} of degree $n$ on $[-1, 1]$ is defined by
   \[
@@ -263,7 +294,6 @@ Two key properties of $T_n$ on $[-1, 1]$ are
     \]
     for $k = 1, \cdots, n$.
 \end{enumerate}
-Notice there is an intentional clash between the use of $x_k$ as the zeros and $x_k$ as the interpolation points --- we will show these are indeed the optimal interpolation points.
 \begin{center}
   \begin{tikzpicture}[scale=2]
     \draw [->] (-1.5, 0) -- (1.5, 0) node [right] {$x$};
@@ -277,7 +307,11 @@ Notice there is an intentional clash between the use of $x_k$ as the zeros and $
     \node at (0, -1) [left] {$-1$};
   \end{tikzpicture}
 \end{center}
-We first prove a recurrence relation for the Chebyshev polynomials:
+All that really matters about the Chebyshev polynomials is that the maximum is obtained at $n + 1$ distinct points with alternating sign. The exact form of the polynomial is not really important.
+
+Notice there is an intentional clash between the use of $x_k$ as the zeros and $x_k$ as the interpolation points --- we will show these are indeed the optimal interpolation points.
+
+We first prove a convenient recurrence relation for the Chebyshev polynomials:
 \begin{lemma}[3-term recurrence relation]
   The Chebyshev polynomials satisfy the recurrence relations
   \[
@@ -288,6 +322,7 @@ We first prove a recurrence relation for the Chebyshev polynomials:
     T_0(x) = 1,\quad T_1(x) = x.
   \]
 \end{lemma}
+
 \begin{proof}
   \[
     \cos((n + 1) \theta) + \cos((n - 1)\theta) = 2\cos \theta \cos(n\theta).
@@ -330,14 +365,12 @@ In particular, we know the leading coefficient of $T_n$ is $2^{n - 1}$ (for $n \
     \|f - p_n\|_{\infty} \leq \frac{1}{2^n} \frac{1}{(n + 1)!} \|f^{(n + 1)}\|_{\infty}.
   \]
 \end{thm}
-Suppose $f$ has as many continuous derivatives as we want. Then as we increase $n$, what happens to the error bounds? The coefficients involve dividing by an exponential \emph{and} a factorial. Hence as long as the higher derivatives of $f$ don't blow up too badly, in general, the error will tend to zero as $n \to \infty$.
+Suppose $f$ has as many continuous derivatives as we want. Then as we increase $n$, what happens to the error bounds? The coefficients involve dividing by an exponential \emph{and} a factorial. Hence as long as the higher derivatives of $f$ don't blow up too badly, in general, the error will tend to zero as $n \to \infty$, which makes sense.
 
 The last two results can be easily generalized to arbitrary intervals $[a, b]$, and this is left as an exercise for the reader.
 
 \section{Orthogonal polynomials}
-We are now going to look at general orthogonal polynomials, where the Chebyshev polynomials is a famous set of example.
-
-Of course, the property of being orthogonal depends on our choice on the scalar product.
+It turns out the Chebyshev polynomials is just an example of a more general class of polynomials, known as \emph{orthogonal polynomials}. As in linear algebra, we can define a scalar product on the space of polynomials, and then find a basis of orthogonal polynomials of the vector space under this scalar product. We shall show that each set of orthogonal polynomials has a three-term recurrence relation, just like the Chebyshev polynomials.
 
 \subsection{Scalar product}
 The scalar products we are interested in would be generalization of the usual scalar product on Euclidean space,
@@ -384,9 +417,9 @@ We said \emph{the} orthogonal polynomial, but we need to make sure such a polyno
 \begin{defi}[Monic polynomial]
   A polynomial $p \in P_n[x]$ is \emph{monic} if the coefficient of $x^n$ is $1$.
 \end{defi}
-However, most famous traditional polynomials are not monic. They have a different scaling imposed. Still, picking a different scaling will not affect the uniqueness result.
+However, most famous traditional polynomials are not monic. They have a different scaling imposed. Still, as long as we have \emph{some} scaling, we will have uniqueness.
 
-We will stick to requiring them to be monic since this is useful for proving things.
+We will not mess with other scalings, and stick to requiring them to be monic since this is useful for proving things.
 
 \begin{thm}
   Given a vector space $V$ of functions and an inner product $\bra \ph, \ph \ket$, there exists a unique monic orthogonal polynomial for each degree $n \geq 0$. In addition, $\{p_k\}_{k = 0}^n$ form a basis for $P_n[x]$.
@@ -470,13 +503,13 @@ Assuming this, we obtain the following theorem.
 \end{proof}
 
 \subsection{Examples}
-The four famous examples are the Legendre polynomials, Chebyshev polynomials, Laguerre polynomials and Hermite polynomials. We will not waste time looking at them. Instead, we will see how the Chebyshev polynomials fit into this framework.
+The four famous examples are the Legendre polynomials, Chebyshev polynomials, Laguerre polynomials and Hermite polynomials. We first look at how the Chebyshev polynomials fit into this framework.
 
 Chebyshev is based on the scalar product defined by
 \[
   \bra f, g\ket = \int_{-1}^1 \frac{1}{\sqrt{1 - x^2}} f(x) g(x)\;\d x.
 \]
-Note that the weight function blows up mildly at the end.
+Note that the weight function blows up mildly at the end, but this is fine since it is still integrable.
 
 This links up with
 \[
@@ -488,29 +521,41 @@ for $x = \cos \theta$ via the usual trigonometric substitution. We have
   &= \int_0^\pi \cos(n\theta) \cos (m\theta)\;\d \theta\\
   &= 0\text{ if }m\not= n.
 \end{align*}
-\subsection{Least-squares polynomial approximation}
-This is an alternative to polynomial interpolation. Instead of trying to make a polynomial agree with $f$ at certain points and hoping it is a good approximation elsewhere, the idea is to choose a polynomial $p \in P_n[x]$ to minimize the error
+The other orthogonal polynomials come from scalar products of the form
 \[
-  \bra f - p, f - p\ket = \int_a^b w(x) [f(x) - p(x)]^2 \;\d x.
+  \bra f, g\ket = \int_a^b w(x) f(x) g(x)\;\d x,
 \]
-We can also use alternative inner products such as
+as described in the table below:
+\begin{center}
+  \begin{tabular}{ccc}
+    \toprule
+    Type & Range & Weight\\
+    \midrule
+    Legendre & $[-1, 1]$ & $1$\\
+    Chebyshev & $[-1, 1]$ & $\frac{1}{\sqrt{1 - x^2}}$\\
+    Laguerre & $[0, \infty)$ & $e^{-x}$\\
+    Hermite & $(-\infty, \infty)$ & $e^{-x^2}$\\
+    \bottomrule
+  \end{tabular}
+\end{center}
+\subsection{Least-squares polynomial approximation}
+If we want to approximate a function with a polynomial, polynomial interpolation might not be the best idea, since all we do is make sure the polynomial agrees with $f$ at certain points, and then hope it is a good approximation elsewhere. Instead, the idea is to choose a polynomial $p$ in $P_n[x]$ that ``minimizes the error''.
+
+What exactly do we mean by minimizing the error? The error is defined as the function $f - p$. So given an appropriate inner product on the vector space of continuous functions, we want to minimize
+\[
+  \|f - p\|^2 = \bra f - p, f - p\ket.
+\]
+This is usually of the form
+\[
+  \bra f - p, f - p\ket = \int_a^b w(x) [f(x) - p(x)]^2 \;\d x,
+\]
+but we can also use alternative inner products such as
 \[
   \bra f - p, f - p\ket = \sum_{j = 1}^m w_j [f(\xi_i) - p(\xi_i)]^2.
 \]
 Unlike polynomial interpolation, there is no guarantee that the approximation agrees with the function anywhere. Unlike polynomial interpolation, there is some guarantee that the total error is small (or as small as we can get, by definition). In particular, if $f$ is continuous, then the Weierstrass approximation theorem tells us the total error must eventually vanish.
 
-The solution is to use orthogonal polynomials with respect to the corresponding inner products
-\[
-  \bra f, g\ket = \int_a^b w(x) f(x) g(x)\;\d x
-\]
-or
-\[
-  \bra f, g\ket = \sum_{j = 1}^m w_j f(\xi_j) g(\xi_j),
-\]
-in order to minimize
-\[
-  \|f - p\|^2 = \bra f - p, f - p\ket.
-\]
+Unsurprisingly, the solution involves the use of the orthogonal polynomials with respect to the corresponding inner products.
 \begin{thm}
   If $\{p_n\}_{k = 0}^n$ are orthogonal polynomials with respect to $\bra \ph, \ph \ket$, then the choice of $c_k$ such that
   \[
@@ -560,7 +605,8 @@ In particular, this is true when $q = p$, and tells us $\bra f, p\ket = \bra p, 
 which is just a glorified Pythagoras theorem.
 \section{Approximation of linear functionals}
 \subsection{Linear functionals}
-We start by explaining what we mean ``functional''.
+In this chapter, we are going to study approximations of linear functions. Before we start, it is helpful to define what a linear functional is, and look at certain examples of these.
+
 \begin{defi}[Linear functional]
   A \emph{linear functional} is a linear mapping $L: V \to \R$, where $V$ is a real vector space of functions.
 \end{defi}
@@ -584,12 +630,11 @@ In generally, a linear functional is a linear mapping from a vector space to its
       The set of continuous (or even just integrable) functions defined on $[a, b]$ will be a sensible domain for this linear functional.
     \item Any linear combination of these linear functions are also linear functionals. For example, we can pick some fixed $\alpha, \beta \in \R$, and define
       \[
-        L(f) = f(\beta) - f(\alpha) - \frac{\beta - \alpha}{2} [f'(\beta) + f'(\alpha)]. % should be plus
+        L(f) = f(\beta) - f(\alpha) - \frac{\beta - \alpha}{2} [f'(\beta) + f'(\alpha)].
       \]
   \end{enumerate}
 \end{eg}
-
-We will attempt to construct approximations to more complicated linear functionals (usually integrals, possibly derivatives point values) in terms of simpler linear functionals (usually point values of $f$ itself).
+The objective of this chapter is to construct approximations to more complicated linear functionals (usually integrals, possibly derivatives point values) in terms of simpler linear functionals (usually point values of $f$ itself).
 
 For example, we might produce an approximation of the form
 \[
@@ -599,22 +644,38 @@ where $V = C^p[a, b]$, $p \geq 0$, and $\{x_i\}_{i = 0}^N \subseteq [a, b]$ are 
 
 How can we choose the coefficients $a_i$ and the points $x_i$ so that our approximation is ``good''?
 
-For a start, we let $ \{x_i\}_{i = 0}^N \subseteq [a, b]$ be arbitrary points. Then $\{a_i\}_{i = 0}^N$ can be derived from interpolation theory. We first approximate $f$ by polynomials, and then attempt to find $L(p)$ exactly for polynomials. In particular, we have
+We notice that most of our functionals can be easily evaluated exactly when $f$ is a polynomial. So we might approximate our function $f$ by a polynomial, and then do it exactly for polynomials.
+
+More precisely, we let $ \{x_i\}_{i = 0}^N \subseteq [a, b]$ be arbitrary points. Then using the Lagrange cardinal polynomials $\ell_i$, we have
+\[
+  f(x) \approx \sum_{i = 0}^N f(x_i) \ell_i(x).
+\]
+Then using linearity, we can approximate
 \[
   L(f) \approx L\left(\sum_{i = 0}^N f(x_i) \ell_i(x)\right) = \sum_{i = 0}^N L(\ell_i) f(x_i).
 \]
+So we have
+\[
+  a_i = L(\ell_i).
+\]
 Similar to polynomial interpolation, this formula is exact for $f \in P_N[x]$.
 
-Suppose we can freely choose $\{a_i\}_{i = 0}^N$ \emph{and} $\{x_i\}_{i = 0}^N$. Then since we now have $2n + 2$ free parameters, we might expect to find an approximation that is exact for $f \in P_{2N + 1}[x]$. This is not always possible, but there are cases when we can. The most famous example is Gaussian quadrature.
+In general, suppose we can freely choose $\{a_i\}_{i = 0}^N$ \emph{and} $\{x_i\}_{i = 0}^N$. Then since we now have $2n + 2$ free parameters, we might expect to find an approximation that is exact for $f \in P_{2N + 1}[x]$. This is not always possible, but there are cases when we can. The most famous example is Gaussian quadrature.
 
 \subsection{Gaussian quadrature}
-Note that traditionally, we have a different set of notations used for Gaussian quadrature. So the notation used here will be inconsistent with what we are doing elsewhere in the course.
+The objective of Gaussian quadrature is to approximate integrals of the form
+\[
+  L(f) = \int_a^b w(x) f(x)\;\d x,
+\]
+where $w(x)$ is a weight function that determines a scalar product.
 
-Let
+Traditionally, we have a different set of notations used for Gaussian quadrature. So just in this section, we will use some funny notation that is inconsistent with the rest of the course.
+
+We let
 \[
   \bra f, g\ket = \int_a^b w(x) f(x)g(x)\;\d x
 \]
-be a scalar product for $P_\nu[x]$. Then we can find \emph{weights}, written $\{b_n\}_{k = 1}^\nu$, and \emph{nodes}, written $\{c_k\}_{k = 1}^\nu \subseteq [a, b]$, such that the approximation
+be a scalar product for $P_\nu[x]$. We will show that we can find \emph{weights}, written $\{b_n\}_{k = 1}^\nu$, and \emph{nodes}, written $\{c_k\}_{k = 1}^\nu \subseteq [a, b]$, such that the approximation
 \[
   \int_a^b w(x) f(x)\;\d x \approx \sum_{k = 1}^{\nu} b_k f(c_k)
 \]
@@ -641,17 +702,21 @@ We start by showing that this is the best we can achieve.
   So this cannot be exact for $q^2$.
 \end{proof}
 
-We first revisit our previous naive method, and formulate it as a theorem.
+Recall that we initially had the idea of doing the approximation by interpolating $f$ at some arbitrary points in $[a, b]$. We call this \emph{ordinary quadrature}.
 \begin{thm}[Ordinary quadrature]
-  For any distinct $\{c_k\}_{k = 1}^\nu \subseteq [a, b]$, let $\{\ell_k\}_{k = 1}^\nu$ be the Lagrange cardinal polynomials with respect to $\{c_k\}_{k = 1}^\nu$. Then choosing
+  For any distinct $\{c_k\}_{k = 1}^\nu \subseteq [a, b]$, let $\{\ell_k\}_{k = 1}^\nu$ be the Lagrange cardinal polynomials with respect to $\{c_k\}_{k = 1}^\nu$. Then by choosing
   \[
     b_k = \int_a^b w(x) \ell_k(x) \;\d x,
   \]
-  we achieve exactness for $f \in P_{\nu - 1}[x]$.
+  the approximation
+  \[
+    L(f) = \int_a^b w(x) f(x)\;\d x \approx \sum_{k = 1}^\nu b_k f(c_k)
+  \]
+  is exact for $f \in P_{\nu - 1}[x]$.
 
   We call this method ordinary quadrature.
 \end{thm}
-This simple idea is how we generate many classical numerical integration techniques, such as the trapezoidal rule. But those are quite inaccurate. A clever choice of $\{c_k\}$ does much better --- take them to be the zeros of the orthogonal polynomials. However, to do this, we must make sure the roots indeed lie in $[a, b]$. This is what we will prove now --- given any inner product, the roots of the orthogonal polynomials must lie in $[a, b]$.
+This simple idea is how we generate many classical numerical integration techniques, such as the trapezoidal rule. But those are quite inaccurate. It turns out a clever choice of $\{c_k\}$ does much better --- take them to be the zeros of the orthogonal polynomials. However, to do this, we must make sure the roots indeed lie in $[a, b]$. This is what we will prove now --- given any inner product, the roots of the orthogonal polynomials must lie in $[a, b]$.
 
 \begin{thm}
   For $\nu \geq 1$, the zeros of the orthogonal polynomial $p_\nu$ are real, distinct and lie in $(a, b)$.
@@ -705,7 +770,10 @@ We have in fact proved this for a particular case in IB Methods, and the same ar
 \end{proof}
 
 \begin{eg}
-  Any of the famous four (Legendre, Chebyshev, Laguerre and Hermite) orthogonal polynomials generate corresponding famous quadrature rules.
+  Any of the famous four (Legendre, Chebyshev, Laguerre and Hermite) orthogonal polynomials generate corresponding famous quadrature rules that approximate the corresponding integrals
+  \[
+    \int_a^b w(x) f(x)\;\d x.
+  \]
 \end{eg}
 
 \section{Expressing errors in terms of derivatives}
@@ -727,21 +795,21 @@ How can we use this property to generate formulae for the error and error bounds
   \[
     L(f) \approx f(\alpha) + \frac{\beta - \alpha}{2} (f'(\beta) + f'(\alpha)),
   \]
-  where $\alpha \not= \beta$. This is clearly much easier to evaluate. One can check that
+  where $\alpha \not= \beta$. This is clearly much easier to evaluate. The error is given by
   \[
     e_L(f) = f(\beta) - f(\alpha) - \frac{\beta - \alpha}{2} (f'(\beta) + f'(\alpha)),
   \]
   and this vanishes for $f \in P_2[x]$.
 \end{eg}
-How can we get error formula? We can't just use the fact that it annihilates polynomials of degree $k$. We need to introduce something beyond this --- the $k + 1$th derivative. We now assume $f \in C^{k + 1}[a, b]$.
+How can we get a more useful error formula? We can't just use the fact that it annihilates polynomials of degree $k$. We need to introduce something beyond this --- the $k + 1$th derivative. We now assume $f \in C^{k + 1}[a, b]$.
 
-Note that so far, everything we've done works if the interval is infinite, as long as the weight function vanishes sufficiently quickly as we go far away. However, for this little bit, we will need to require $[a, b]$ to be finite.
+Note that so far, everything we've done works if the interval is infinite, as long as the weight function vanishes sufficiently quickly as we go far away. However, for this little bit, we will need to require $[a, b]$ to be finite, since we want to make sure we can take the supremum of our functions.
 
-Now, we seek an exact error formula in terms of $f^{(k + 1)}$, and bounds of the form
+We now seek an exact error formula in terms of $f^{(k + 1)}$, and bounds of the form
 \[
   |e_L(f)| \leq c_L \|f^{(k + 1)}\|_{\infty}
 \]
-for some constant $c_L$. Here we need finiteness of the interval to ensure $\|f^{(k + 1)}\|_{\infty}$ exists. Moreover, we want to make $c_L$ as small as possible. We don't want to give a constant of $10$ million, while in reality we can just use $2$.
+for some constant $c_L$. Moreover, we want to make $c_L$ as small as possible. We don't want to give a constant of $10$ million, while in reality we can just use $2$.
 
 \begin{defi}[Sharp error bound]
   The constant $c_L$ is said to be \emph{sharp} if for any $\varepsilon > 0$, there is some $f_{\varepsilon} \in C^{k + 1}[a, b]$ such that
@@ -797,7 +865,7 @@ Hence we arrive at
     K(\theta) = \lambda ((x - \theta)_+^k).
   \]
 \end{defi}
-The important thing is that the kernel $K$ is independent of $f$. Then we get the bounds:
+The important thing is that the kernel $K$ is independent of $f$. Taking suprema in different ways, we obtain different forms of bounds:
 \[
   |\lambda(f)| \leq \frac{1}{k!}
   \begin{dcases}
@@ -817,7 +885,7 @@ By fiddling with functions a bit, we can show these bounds are indeed sharp.
   \]
   with exactness up to polynomials of degree $2$. We wlog assume $\alpha < \beta$. Then
   \[
-    K(\theta) = e_L((x - \theta)_+^2) = (\beta - \theta)_+^2 - (\alpha - \theta)_+^2 - \frac{\beta}{\alpha}((\beta - \theta)_+ + (\alpha - \theta)_+).
+    K(\theta) = e_L((x - \theta)_+^2) = (\beta - \theta)_+^2 - (\alpha - \theta)_+^2 - (\beta - \alpha)((\beta - \theta)_+ + (\alpha - \theta)_+).
   \]
   Hence we get
   \[
@@ -835,17 +903,17 @@ By fiddling with functions a bit, we can show these bounds are indeed sharp.
   for all $f \in C^3[a, b]$.
 \end{eg}
 
-If $K$ does not change sign on $[a, b]$, then the bound
+Note that in this particular case, our function $K(\theta)$ does not change sign on $[a, b]$. Under this extra assumption, we can say a bit more.
+
+First, we note that the bound
 \[
   |\lambda(f)| \leq \left|\frac{1}{k!} \int_a^b K(\theta) \;\d \theta\right| \|f^{(k + 1)}\|_\infty
 \]
-can be achieved by $x^{k + 1}$, since this has constant $k + 1$th derivative.
-
-Also, if $K$ doesn't change sign, we can use the integral mean value theorem to get the bound
+can be achieved by $x^{k + 1}$, since this has constant $k + 1$th derivative. Also, we can use the integral mean value theorem to get the bound
 \[
   \lambda (f) = \frac{1}{k!} \left(\int_a^b K(\theta)\;\d \theta\right) f^{(k + 1)}(\xi),
 \]
-where $\xi \in (a, b)$ depends on $f$.
+where $\xi \in (a, b)$ depends on $f$. These are occasionally useful.
 
 \begin{eg}
   Continuing our previous example, we see that $K(\theta) \leq 0$ on $[a, b]$, and
@@ -863,11 +931,13 @@ where $\xi \in (a, b)$ depends on $f$.
   for some $f$-dependent value of some $\xi \in (a, b)$.
 \end{eg}
 
-The conclusion we have is that if $e_L(f) = 0$ for all $f \in P_k[x]$, then we know
+Finally, note that Peano's kernel theorem says if $e_L(f) = 0$ for all $f \in P_k[x]$, then we have
 \[
   e_L(f) = \frac{1}{k!} \int_a^b K(\theta) f^{(k + 1)}(\theta)\;\d \theta
 \]
-for all $f \in C^{k + 1}[a, b]$. But for all $j = 0, \cdots, k = 1$, we also have $e_L(f)$ for all $f \in P_j[x]$. So we get
+for all $f \in C^{k + 1}[a, b]$.
+
+But for any other fixed $j = 0, \cdots, k - 1$, we also have $e_L(f) = 0$ for all $f \in P_j[x]$. So we also know
 \[
   e_L(f) = \frac{1}{j!} \int_a^b K_j (\theta) f^{(j + 1)}(\theta)\;\d \theta
 \]
@@ -875,11 +945,9 @@ for all $f \in C^{j + 1}[a, b]$. Note that we have a different kernel.
 
 In general, this might not be a good idea, since we are throwing information away. Yet, this can be helpful if we get some less smooth functions that don't have $k + 1$ derivatives.
 
-This is the end of the first part.
-
 \section{Ordinary differential equations}
 \subsection{Introduction}
-Suppose we have a system of differential equation
+Our next big goal is to solve ordinary differential equations numerically. We will focus on differential equations of the form
 \[
   \mathbf{y}'(t) = \mathbf{f}(t, \mathbf{y}(t))
 \]
@@ -887,11 +955,12 @@ for $0 \leq t \leq T$, with initial conditions
 \[
   \mathbf{y}(0) = \mathbf{y}_0.
 \]
-The data we have is the function $\mathbf{f}: \R \times \R^N \to \R^N$, the ending time $T > 0$, and the initial condition $\mathbf{y}_0 \in \R^n$. What we seek is the function $\mathbf{y}: [0, T] \to \R^N$.
+The data we are provided is the function $\mathbf{f}: \R \times \R^N \to \R^N$, the ending time $T > 0$, and the initial condition $\mathbf{y}_0 \in \R^n$. What we seek is the function $\mathbf{y}: [0, T] \to \R^N$.
 
-For a unique solution to exist, we not only need $\mathbf{f}$ to be continuous, but Lipschitz.
+When solving the differential equation numerically, our goal would be to make our numerical solution as close to the true solution as possible. This makes sense only if a ``true'' solution actually exists, and is unique. From IB Analysis II, we know a unique solution to the ODE exists if $\mathbf{f}$ is \emph{Lipschitz}.
+
 \begin{defi}[Lipschitz function]
-  A function is \emph{Lipschitz with Lipschitz constant $\lambda \geq 0$} if
+  A function $\mathbf{f}: \R \times \R^N \to \R^N$ is \emph{Lipschitz with Lipschitz constant $\lambda \geq 0$} if
   \[
     \|\mathbf{f}(t, \mathbf{x}) - f(t, \hat{\mathbf{x}})\| \leq \lambda \|\mathbf{x} - \hat{\mathbf{x}}\|
   \]
@@ -901,20 +970,20 @@ For a unique solution to exist, we not only need $\mathbf{f}$ to be continuous, 
 \end{defi}
 It doesn't really matter what norm we pick. It will just change the $\lambda$. The importance is the existence of a $\lambda$.
 
-A special case is when $\lambda = 0$, ie. $\mathbf{f}$ does not depend on $\mathbf{x}$. This is just integration, and is usually easy. This is a convenient test case --- if our numerical approximation does not even work for these problems, then it's pretty useless.
+A special case is when $\lambda = 0$, ie. $\mathbf{f}$ does not depend on $\mathbf{x}$. In this case, this is just an integration problem, and is usually easy. This is a convenient test case --- if our numerical approximation does not even work for these easy problems, then it's pretty useless.
 
-Being Lipschitz is sufficient for existence and uniqueness of a unique solution to the differential equation, and hence we can ask if our solution converges to this unique solution. An extra assumption we will often make is that $\mathbf{f}$ can be expanded in a Taylor series to as many degrees as we want, since this is convenient.
+Being Lipschitz is sufficient for existence and uniqueness of a solution to the differential equation, and hence we can ask if our solution converges to this unique solution. An extra assumption we will often make is that $\mathbf{f}$ can be expanded in a Taylor series to as many degrees as we want, since this is convenient for our analysis.
 
-What do we actually do here? We are not trying to actually integrate and find a formula for the solution $\mathbf{y}$. Instead, we want to solve it numerically. We choose a small time step $h > 0$, and construct approximations
+What exactly does a numerical solution to the ODE consist of? We first choose a small time step $h > 0$, and then construct approximations
 \[
   \mathbf{y}_n \approx \mathbf{y}(t_n),\quad n = 1, 2, \cdots,
 \]
-with $t_n = nh$. In particular, $t_n - t_{n - 1} = h$ and is always constant. In practice, this restriction is useless, but theoretically it is more complicated to consider varying time step.
+with $t_n = nh$. In particular, $t_n - t_{n - 1} = h$ and is always constant. In practice, we don't fix the step size $t_n - t_{n - 1}$, and allow it to vary in each step. However, this makes the analysis much more complicated, and we will not consider varying time steps in this course.
 
-If we make $h$ smaller, then we will of course make finer approximations. However, this is more computationally demanding. So we want to study the behaviour of numerical methods in order to figure out what $h$ we should pick.
+If we make $h$ smaller, then we will (probably) make better approximations. However, this is more computationally demanding. So we want to study the behaviour of numerical methods in order to figure out what $h$ we should pick.
 
 \subsection{One-step methods}
-The simplest type of methods is the one-step ones.
+There are many ways we can classify numerical methods. One important classification is one-step versus multi-step methods. In one-step methods, the value of $\mathbf{y}_{n + 1}$ depends only on the previous iteration $t_n$ and $\mathbf{y}_n$. In multi-step methods, we are allowed to look back further in time and use further results.
 
 \begin{defi}[(Explicit) one-step method]
   A numerical method is \emph{(explicit) one-step} if $\mathbf{y}_{n + 1}$ depends only on $t_n$ and $\mathbf{y}_n$, ie.
@@ -925,15 +994,14 @@ The simplest type of methods is the one-step ones.
 \end{defi}
 We will later see what ``explicit'' means.
 
-We now see an example of a one-step method. This is the simplest type of one-step method.
+The simplest one-step method one can imagine is \emph{Euler's method}.
 \begin{defi}[Euler's method]
-  \emph{Euler's method} uses the simple formula
+  \emph{Euler's method} uses the formula
   \[
     \mathbf{y}_{n + 1} = \mathbf{y}_n + h\mathbf{f}(t_n, \mathbf{y}_n).
   \]
 \end{defi}
-
-We want to show that this method ``converges''. First of all, what do we mean by convergence? The Lipschitz condition means there is a unique solution to the differential equation. So we would want the numerical solution to be approximate the actual solution to arbitrary accuracy as long as we take a small enough $h$.
+We want to show that this method ``converges''. First of all, we need to make precise the notion of ``convergence''. The Lipschitz condition means there is a unique solution to the differential equation. So we would want the numerical solution to be able to approximate the actual solution to arbitrary accuracy as long as we take a small enough $h$.
 
 \begin{defi}[Convergence of numerical method]
   For each $h > 0$, we can produce a sequence of discrete values $\mathbf{y}_n$ for $n = 0, \cdots, [T/h]$, where $[T/h]$ is the integer part of $T/h$. A method \emph{converges} if, as $h \to 0$ and $nh \to t$ (hence $n \to \infty$), we get
@@ -943,7 +1011,8 @@ We want to show that this method ``converges''. First of all, what do we mean by
   where $\mathbf{y}$ is the true solution to the differential equation. Moreover, we require $\mathbf{y}_n$ to converge uniformly to $\mathbf{y}(t)$.
 \end{defi}
 
-We now prove that Euler's method converges.
+We now prove that Euler's method converges. We will only do this properly for Euler's method, since the algebra quickly becomes tedious and incomprehensible. However, the proof strategy is sufficiently general that it can be adapted to most other methods.
+
 \begin{thm}[Convergence of Euler's method]\leavevmode
   \begin{enumerate}
     \item For all $t \in [0, T]$, we have
@@ -960,13 +1029,11 @@ We now prove that Euler's method converges.
 Note that the bound in the second part is uniform. So this immediately gives the first part of the theorem.
 
 \begin{proof}
-  We introduce two key ideas, which not only apply to Euler's method, but numerical methods in general.
-
-  The first idea is to put the true solution into Euler. What do we mean by this? We consider
+  There are two parts to proving this. We first look at the \emph{local truncation error}. This is the error we would get at each step assuming we got the previous steps right. More precisely, we write
   \[
     \mathbf{y}(t_{n + 1}) = \mathbf{y}(t_n) + h (\mathbf{f}, t_n, \mathbf{y}(t_n)) + \mathbf{R}_n,
   \]
-  where $\mathbf{R}_n$ is the error term. For the Euler's method, it is easy to get $\mathbf{R}_n$, since $\mathbf{f}(t_n, \mathbf{y}(t_n)) = \mathbf{y}'(t_n)$, by definition. So this is just the Taylor series expansion of $\mathbf{y}$. We can write $\mathbf{R}_n$ as the integral remainder of the Taylor series, say
+  and $\mathbf{R}_n$ is the local truncation error. For the Euler's method, it is easy to get $\mathbf{R}_n$, since $\mathbf{f}(t_n, \mathbf{y}(t_n)) = \mathbf{y}'(t_n)$, by definition. So this is just the Taylor series expansion of $\mathbf{y}$. We can write $\mathbf{R}_n$ as the integral remainder of the Taylor series,
   \[
     \mathbf{R}_n = \int_{t_n}^{t_{n + 1}} (t_{n + 1} - \theta) y''(\theta)\;\d \theta.
   \]
@@ -978,15 +1045,15 @@ Note that the bound in the second part is uniform. So this immediately gives the
   \[
     c = \frac{1}{2} \|y''\|_{\infty}.
   \]
-  This is one of the key ideas.
+  This is the easy part, and tends to go rather smoothly even for more complicated methods.
 
-  The second key idea is to set up a recurrence relation for the errors. We have
+  Once we have bounded the local truncation error, we patch them together to get the actual error. We can write
   \begin{align*}
     \mathbf{e}_{n + 1} &= \mathbf{y}_{n + 1} - \mathbf{y}(t_{n + 1})\\
     &= \mathbf{y}_n + h \mathbf{f}(t_n, \mathbf{y}_n) - \Big(\mathbf{y}(t_n) + h \mathbf{f}(t_n, \mathbf{y}(t_n)) + \mathbf{R}_n\Big)\\
     &= (\mathbf{y}_n - \mathbf{y}(t_n)) + h \Big(\mathbf{f}(t_n, \mathbf{y}_n) - \mathbf{f}(t_n, \mathbf{y}(t_n))\Big) - \mathbf{R}_n
-    \intertext{Taking the infinity norm, we get}\\
-    \|\mathbf{e}_{n + 1}\|_{\infty} &\leq \|\mathbf{y}_n - \mathbf{y}(t_n)\|_\infty + h \|\mathbf{f}(t_n, \mathbf{y}_n) - \mathbf{f}(t_n, \mathbf{y}(t_n))\|_{\infty} + \|\mathbf{r}_n\|_\infty\\
+    \intertext{Taking the infinity norm, we get}
+    \|\mathbf{e}_{n + 1}\|_{\infty} &\leq \|\mathbf{y}_n - \mathbf{y}(t_n)\|_\infty + h \|\mathbf{f}(t_n, \mathbf{y}_n) - \mathbf{f}(t_n, \mathbf{y}(t_n))\|_{\infty} + \|\mathbf{R}_n\|_\infty\\
     &\leq \|\mathbf{e}_n\|_\infty + h \lambda \|\mathbf{e}_n\|_{\infty} + ch^2\\
     &= (1 + \lambda h)\|\mathbf{e}_n\|_\infty + ch^2.
   \end{align*}
@@ -1008,7 +1075,7 @@ Note that the bound in the second part is uniform. So this immediately gives the
   \]
   Then this tends to $0$ as we take $h \to 0$. So the method converges.
 \end{proof}
-What happens as $\lambda \to 0$? $\lambda = 0$ should be the easy case, sine it is just integration We check that directly, or alternatively use the fact that $\frac{e^{\lambda T} - 1}{\lambda} \to T$ as $\lambda \to 0$. This is why we keep the $-1$ in the bound, even though we can throw it away to get a better-looking bound.
+This works as long as $\lambda \not= 0$. However, $\lambda = 0$ is the easy case, since it is just integration. We can either check this case directly, or use the fact that $\frac{e^{\lambda T} - 1}{\lambda} \to T$ as $\lambda \to 0$.
 
 The same proof strategy works for most numerical methods, but the algebra will be much messier. We will not do those in full. We, however, take note of some useful terminology:
 \begin{defi}[Local truncation error]
@@ -1021,7 +1088,7 @@ The same proof strategy works for most numerical methods, but the algebra will b
     \boldsymbol\eta_{n + 1} = \mathbf{y}(t_{n + 1}) - \boldsymbol\phi_n(t_n, \mathbf{y}(t_0), \mathbf{y}(t_1), \cdots, \mathbf{y}(t_n)).
   \]
 \end{defi}
-This is the error we will make at the $n + 1$th step if we had accurate values for the first $n$ steps.
+This is the error we will make at the $(n + 1)$th step if we had accurate values for the first $n$ steps.
 
 For Euler's method, the local truncation error is just the Taylor series remainder term.
 
@@ -1037,11 +1104,11 @@ Let's try to get a little bit beyond Euler's method.
     \mathbf{y}_{n + 1} = \mathbf{y}_n + h\Big( \theta \mathbf{f}(t_n, \mathbf{y}_n) + (1 - \theta) \mathbf{f}(t_{n + 1}, \mathbf{y}_{n + 1})\Big).
   \]
 \end{defi}
-Note that if we put $\theta = 1$, then we just get Euler's method. The other two most common choices of $\theta$ are $\theta = 0$ (backward Euler) and $\theta = \frac{1}2$ (trapezoidal rule).
+If we put $\theta = 1$, then we just get Euler's method. The other two most common choices of $\theta$ are $\theta = 0$ (backward Euler) and $\theta = \frac{1}2$ (trapezoidal rule).
 
-Also, for $\theta \in [0, 1)$, ie. $\theta \not= 1$, we get an \emph{implicit method}. This is since $\mathbf{y}_{n + 1}$ doesn't just appear simply on the left hand side of the equality. So our formula for $y_{n + 1}$ involves $\mathbf{y}_{n + 1}$ itself! This means, in general, unlike the Euler method, we can't just write down the value of $\mathbf{y}_{n + 1}$ given the value of $\mathbf{y}_n$. Instead, we have to treat the formula as $N$ (in general) non-linear equations, and solve them to find $\mathbf{y}_{n + 1}$!
+Note that for $\theta \not= 1$, we get an \emph{implicit method}. This is since $\mathbf{y}_{n + 1}$ doesn't just appear simply on the left hand side of the equality. Our formula for $y_{n + 1}$ involves $\mathbf{y}_{n + 1}$ itself! This means, in general, unlike the Euler method, we can't just write down the value of $\mathbf{y}_{n + 1}$ given the value of $\mathbf{y}_n$. Instead, we have to treat the formula as $N$ (in general) non-linear equations, and solve them to find $\mathbf{y}_{n + 1}$!
 
-In the past, people did not like to use this, because they didn't have computers, or computers were too slow. Nowadays, these are becoming more and more popular because it is getting easier to solve equations, and $\theta$-methods have some huge theoretical advantages.
+In the past, people did not like to use this, because they didn't have computers, or computers were too slow. It is tedious to have to solve these equations in every step of the method. Nowadays, these are becoming more and more popular because it is getting easier to solve equations, and $\theta$-methods have some huge theoretical advantages.
 
 We now look at the error of the $\theta$-method. We have
 \begin{align*}
@@ -1052,13 +1119,14 @@ We now look at the error of the $\theta$-method. We have
 We see that $\theta = \frac{1}{2}$ gives us an order $2$ method. Otherwise, we get an order $1$ method.
 
 \subsection{Multi-step methods}
-We can try to make our methods more efficient by making use of previous values of $\mathbf{y}_n$ instead of the most recent one. We consider a simple example:
+We can try to make our methods more efficient by making use of previous values of $\mathbf{y}_n$ instead of the most recent one. One common method is the AB2 method:
 \begin{defi}[2-step Adams-Bashforth method]
   The \emph{2-step Adams-Bashforth (AB2) method} has
   \[
     \mathbf{y}_{n + 2} = \mathbf{y}_{n + 1} + \frac{1}{2}h \left(3 \mathbf{f}(t_{n + 1}, \mathbf{y}_{n + 1}) - \mathbf{f}(t_n, \mathbf{y}_n)\right).
   \]
 \end{defi}
+This is a particular example of the general class of \emph{Adams-Bashforth methods}.
 
 In general, a multi-step method is defined as follows:
 \begin{defi}[Multi-step method]
@@ -1076,9 +1144,9 @@ This method is an implicit method if $\sigma_s \not= 0$. Otherwise, it is explic
 
 Note that this method is \emph{linear} in the sense that the coefficients $\rho_\ell$ and $\sigma_\ell$ appear linearly, outside the $\mathbf{f}$s. Later we will see more complicated numerical methods where these coefficients appear inside the arguments of $\mathbf{f}$.
 
-For multi-step methods, we have a slight problem to solve. In a one-step method, we are given $\mathbf{y}_0$, and this allows us to immediately apply the one-step method to get higher values of $\mathbf{y}_n$. However, for an $s$-step method, we need to use other (possible $1$-step) method to obtain $\mathbf{y}_1, \cdots, \mathbf{y}_{s - 1}$ before we can get started.
+For multi-step methods, we have a slight problem to solve. In a one-step method, we are given $\mathbf{y}_0$, and this allows us to immediately apply the one-step method to get higher values of $\mathbf{y}_n$. However, for an $s$-step method, we need to use other (possibly $1$-step) method to obtain $\mathbf{y}_1, \cdots, \mathbf{y}_{s - 1}$ before we can get started.
 
-Fortunately, we only need to apply the one-step method a fixed, small number of times, even as $h \to 0$. So the accuracy of the one-step method does not matter too much.
+Fortunately, we only need to apply the one-step method a fixed, small number of times, even as $h \to 0$. So the accuracy of the one-step method at the start does not matter too much.
 
 We now study the properties of a general multi-step method. The first thing we can talk about is the order:
 \begin{thm}
@@ -1101,7 +1169,7 @@ This is just a rather technical result coming directly from definition.
   \]
   We now expand the $\mathbf{y}$ and $\mathbf{y}'$ about $t_n$, and obtain
   \[
-    \left(\sum_{\ell = 0}^s \rho_\ell\right) \mathbf{y}(t_n) = \sum_{k = 1}^\infty \frac{h^k}{k!}\left(\sum_{\ell = 0}^s \rho_\ell \ell^k - k \sum_{\ell = 0}^s \sigma_\ell \ell^{k - 1}\right)\mathbf{y}^{(k)}(t_n).
+    \left(\sum_{\ell = 0}^s \rho_\ell\right) \mathbf{y}(t_n) + \sum_{k = 1}^\infty \frac{h^k}{k!}\left(\sum_{\ell = 0}^s \rho_\ell \ell^k - k \sum_{\ell = 0}^s \sigma_\ell \ell^{k - 1}\right)\mathbf{y}^{(k)}(t_n).
   \]
   This is $O(h^{p + 1})$ under the given conditions.
 \end{proof}
@@ -1110,13 +1178,13 @@ This is just a rather technical result coming directly from definition.
   In the two-step Adams-Bashforth method, We see that the conditions hold for $p = 2$ but not $p = 3$. So the order is $2$.
 \end{eg}
 
-There is also an alternative, totally equivalent formula for order. This uses two polynomials associated with the numerical method. Unsurprisingly, they are
+Instead of dealing with the coefficients $\rho_\ell$ and $\sigma_\ell$ directly, it is often convenient to pack them together into two polynomials. This uses two polynomials associated with the numerical method. Unsurprisingly, they are
 \[
   \rho(w) = \sum_{\ell = 0}^s \rho_\ell w^\ell,\quad \sigma(w) = \sum_{\ell = 0}^s \sigma_\ell w^\ell.
 \]
 We can then use this to restate the above theorem..
 \begin{thm}
-  A one-step method has order $p$ (with $p \geq 1$) if and only if
+  A multi-step method has order $p$ (with $p \geq 1$) if and only if
   \[
     \rho(e^x) - x \sigma(e^x) = O(x^{p + 1})
   \]
@@ -1132,6 +1200,7 @@ We can then use this to restate the above theorem..
   \[
     \sum_{\ell = 0}^s \rho_\ell + \sum_{k = 1}^\infty \frac{1}{k!} \left(\sum_{\ell = 0}^s \rho_\ell \ell^k - k \sum_{\ell = 0}^s \sigma_\ell \ell^{k - 1}\right) x^k.
   \]
+  So the result follows.
 \end{proof}
 Note that $\sum_{\ell = 0}^s \rho_\ell = 0$, which is the condition required for the method to even have an order at all, can be expressed as $\rho(1) = 0$.
 
@@ -1147,7 +1216,7 @@ Note that $\sum_{\ell = 0}^s \rho_\ell = 0$, which is the condition required for
   So the order is $2$.
 \end{eg}
 
-We've sorted out the order of multi-step methods. The next thing to check is convergence. This is where the difference between one-step and multi-step methods come in. For one-step methods, we only needed the order to understand convergence. For multi-step methods, we need an extra condition.
+We've sorted out the order of multi-step methods. The next thing to check is convergence. This is where the difference between one-step and multi-step methods come in. For one-step methods, we only needed the order to understand convergence. It is a \emph{fact} that a one step method converges whenever it has an order $p \geq 1$. For multi-step methods, we need an extra condition.
 
 \begin{defi}[Root condition]
   We say $\rho(w)$ satisfies the \emph{root condition} if all its zeros are bounded by $1$ in size, ie. all roots $w$ satisfy $|w| \leq 1$. Moreover any zero with $|w| = 1$ must be simple.
@@ -1196,9 +1265,9 @@ Rearranging gives
   \begin{cases}
     O(x^{s + 2}) & \text{if implicit}\\
     O(x^{s + 1}) & \text{if explicit}
-  \end{cases}.
+  \end{cases},
 \]
-So given any $\rho$, there is only one sensible way to pick $\sigma$. So the key is in picking a good enough $\rho$.
+which is our order condition. So given any $\rho$, there is only one sensible way to pick $\sigma$. So the key is in picking a good enough $\rho$.
 
 The root conditions is ``best'' satisfied if $\rho(w) = w^{s - 1}(w - 1)$, ie. all but one roots are $0$. Then we have
 \[
@@ -1237,14 +1306,14 @@ These can be either explicit or implicit. In different cases, we get different n
 Another important class of multi-step methods is constructed in the opposite way --- we choose a particular $\sigma$, and then find the most optimal $\rho$.
 
 \begin{defi}[Backward differentiation method]
-  A \emph{backward differentiation method} (BDF) has $\sigma (w) = \sigma_s w^s$, ie.
+  A \emph{backward differentiation method} has $\sigma (w) = \sigma_s w^s$, ie.
   \[
     \sum_{\ell = 0}^s \rho_\ell \mathbf{y}_{n + \ell} = \sigma_s \mathbf{f}(t_{n + s}, \mathbf{y}_{n + s}).
   \]
 \end{defi}
 This is a generalization of the one-step backwards Euler method.
 
-Given this $\sigma$, we need to choose the appropriate $\rho$. Fortunately, this can be done quite easliy.
+Given this $\sigma$, we need to choose the appropriate $\rho$. Fortunately, this can be done quite easily.
 \begin{lemma}
   An $s$-step backward differentiation method of order $s$ is obtained by choosing
   \[
@@ -1269,10 +1338,12 @@ Given this $\sigma$, we need to choose the appropriate $\rho$. Fortunately, this
   \end{align*}
   Multiplying by $\sigma_s w^s$ gives the desired result.
 \end{proof}
-For this method to be convergent, we need to make sure it does satisfy the root condition. It turns out the root condition is satisfied only for $s \leq 6$. This is not obivous by first sight, but we can certainly verify this manually.
+For this method to be convergent, we need to make sure it does satisfy the root condition. It turns out the root condition is satisfied only for $s \leq 6$. This is not obvious by first sight, but we can certainly verify this manually.
 
 \subsection{Runge-Kutta methods}
-There is one last type of methods for initial value ODEs we wish to investigate. These methods are in some sense linked up with quadrature methods.
+Finally, we look at Runge-Kutta methods. These methods are very complicated, and are rather tedious to analyse. They have been largely ignored for a long time, until more powerful computers came along and made these methods much more practical. These are used quite a lot nowadays since they have many nice properties.
+
+Runge-Kutta methods can be motivated by Gaussian quadrature, but we will not go into that connection here. Instead, we'll go straight in and work with the method.
 
 \begin{defi}[Runge-Kutta method]
   General (implicit) $\nu$-stage \emph{Runge-Kutta (RK) methods} have the form
@@ -1281,7 +1352,7 @@ There is one last type of methods for initial value ODEs we wish to investigate.
   \]
   where
   \[
-    \mathbf{k}_\ell = \mathbf{f}\left(t_n + c_n h, \mathbf{y}_n + h\sum_{j = 1}^\nu a_{\ell_j} \mathbf{k}_j\right)
+    \mathbf{k}_\ell = \mathbf{f}\left(t_n + c_n h, \mathbf{y}_n + h\sum_{j = 1}^\nu a_{\ell j} \mathbf{k}_j\right)
   \]
   for $\ell = 1, \cdots, \nu$.
 \end{defi}
@@ -1291,9 +1362,11 @@ There are a lot of parameters we have to choose. We need to pick
 \]
 Note that in general, $\{\mathbf{k}_{\ell}\}_{\ell = 1}^\nu$ have to be solved for, since they are defined in terms of one another. However, for certain choices of parameters, we can make this an explicit method. This makes it easier to compute, but we would have lost some accuracy and flexibility.
 
-Unlike all the other methods we've seen so far, the parameters appear \emph{inside} $\mathbf{f}$. They appear non-linearly inside the functions. This makes the method much more complicated, and difficult to analyse using Taylor series. Yet, once we manage to do this properly, these have lots of nice properties.
+Unlike all the other methods we've seen so far, the parameters appear \emph{inside} $\mathbf{f}$. They appear non-linearly inside the functions. This makes the method much more complicated and difficult to analyse using Taylor series. Yet, once we manage to do this properly, these have lots of nice properties. Unfortunately, we will not have time to go into what these properties actually are.
 
-Notice this is a one-step method. So once we get order $p \geq 1$, we will have convergence. So what conditions do we need for a decent order? We can consider the case where $\mathbf{f}$ is a constant. This immediately gives the requirement
+Notice this is a one-step method. So once we get order $p \geq 1$, we will have convergence. So what conditions do we need for a decent order?
+
+This is in general very complicated. However, we can quickly obtain some necessary conditions. We can consider the case where $\mathbf{f}$ is a constant. Then $\mathbf{k}_\ell$ is always that constant. So we must have
 \[
   \sum_{\ell = 1}^\nu b_\ell = 1.
 \]
@@ -1301,11 +1374,9 @@ It turns out we also need, for $\ell = 1, \cdots, \nu$,
 \[
   c_\ell = \sum_{j = 1}^\nu a_{\ell j}.
 \]
-While these are necessary conditions, they are not sufficient. We need other conditions as well, which we shall get to later.
+While these are necessary conditions, they are not sufficient. We need other conditions as well, which we shall get to later. It is a fact that the best possible order of a $\nu$-stage Runge-Kutta method is $2 \nu$.
 
-The best possible order of a $\nu$-stage Runge-Kutta method is $2 \nu$. This is a \emph{double} accuracy. This should ring a bell about Gaussian quadrature --- that also has double accuracy. It turns out these are in fact related.
-
-The standard notation for describing a Runge-Kutta method is the Butcher table
+To describe a Runge-Kutta method, a standard notation is to put the coefficients in the \emph{Butcher table}:
 \begin{center}
   \begin{tabular}{c|ccc}
     $c_1$ & $a_{11}$ & $\cdots$ & $a_{1\nu}$\\
@@ -1316,14 +1387,14 @@ The standard notation for describing a Runge-Kutta method is the Butcher table
 \end{center}
 We sometimes more concisely write it as
 \begin{center}
-\begin{tabular}{c|ccc}
-  \\
-  $\mathbf{c}$ &\vphantom{a} &{\Large $A$}&\vphantom{a}\\
-  \\\hline
-  & &$\mathbf{v}^T$
-\end{tabular}
+  \begin{tabular}{c|ccc}
+    \\
+    $\mathbf{c}$ &\vphantom{a} &{\Large $A$}&\vphantom{a}\\
+    \\\hline
+    & &$\mathbf{v}^T$
+  \end{tabular}
 \end{center}
-While we are considering implicit methods in general, initially, explicit methods came out first, since they are much easier to compute. Explicit Runge-Kutta methods have $A$ strictly lower triangular, ie. $a_{\ell j}$ whenever $\ell \leq j$.
+This table allows for a general implicit method. Initially, explicit methods came out first, since they are much easier to compute. In this case, the matrix $A$ is strictly lower triangular, ie. $a_{\ell j}$ whenever $\ell \leq j$.
 
 \begin{eg}
   The most famous explicit Runge-Kutta method is the 4-stage 4th order one, often called the \emph{classical} Runge-Kutta method. The formula can be given explicitly by
@@ -1352,7 +1423,7 @@ To analyse this, we insert the true solution into the method. First, we need to 
 \begin{align*}
   \mathbf{k}_1 &= \mathbf{y}'(t_n)\\
   \mathbf{k}_2 &= \mathbf{f}(t_n + c_2 h, \mathbf{y}(t_n) + c_2 h \mathbf{y}'(t_n))\\
-  &= \mathbf{y}'(t_n) + c_2 h \left(\frac{\partial \mathbf{f}}{\partial t}(t_n. \mathbf{y}, (t_n)) + \nabla \mathbf{f}(t_n, \mathbf{y}(t_n)) \mathbf{y}'(t_n)\right) + O(h^2)\\
+  &= \mathbf{y}'(t_n) + c_2 h \left(\frac{\partial \mathbf{f}}{\partial t}(t_n. \mathbf{y} (t_n)) + \nabla \mathbf{f}(t_n, \mathbf{y}(t_n)) \mathbf{y}'(t_n)\right) + O(h^2)\\
   \intertext{Fortunately, we notice that the thing inside the huge brackets is just $\mathbf{y}''(t_n)$. So this is}
   &= \mathbf{y}'(t_n) + c_2 h \mathbf{y}''(t_n) + O(h^2).
 \end{align*}
@@ -1439,7 +1510,7 @@ This is the easy part of the course, where we are just considering the problem $
 \end{eg}
 
 \begin{eg}
-  Consider instead the backward Euler method. This method is implicit, but since our problem is simple, we can find what $n$th step is. We have
+  Consider instead the backward Euler method. This method is implicit, but since our problem is simple, we can find what $n$th step is. It turns out it is
   \[
     y_n = (1 - \lambda h)^{-n}.
   \]
@@ -1475,7 +1546,7 @@ A-stability is a very strong requirement. It is hard to get A-stability. In part
 
 So let's look at some other implicit methods.
 \begin{eg}[Trapezoidal rule]
-  Again consider $y'(t) = \lambda y$, with the trapezoidal rule. So
+  Again consider $y'(t) = \lambda y$, with the trapezoidal rule. Then we can find
   \[
     y_n = \left(\frac{1 + h\lambda/2}{1 - h\lambda/2}\right)^n.
   \]
@@ -1511,7 +1582,7 @@ We try $\Omega = \C^-$. The trick is to first check that $g$ is analytic in $\Om
 
   We first check if it is analytic. This certainly has some poles, but they are $2 \pm \sqrt{2} i$, and are in the right-half plane. So this is analytic in $\C^-$.
 
-  Next, what happens at the boundary of the left-half plane? Firstly, as $|z| \to \infty$, we find $r(z) \to 0$, since we have a squared at the denominator. The next part is checking when $z$ is on the imaginary axis, say $z = it$ with $t \in \R$. Then we can check by some messy algebra that
+  Next, what happens at the boundary of the left-half plane? Firstly, as $|z| \to \infty$, we find $r(z) \to 0$, since we have a $z^2$ at the denominator. The next part is checking when $z$ is on the imaginary axis, say $z = it$ with $t \in \R$. Then we can check by some messy algebra that
   \[
     |r(it)| \leq 1
   \]
@@ -1519,7 +1590,7 @@ We try $\Omega = \C^-$. The trick is to first check that $g$ is analytic in $\Om
 \end{eg}
 
 \section{Implementation of ODE methods}
-Finally, we get to the last part of the course on ODEs. We talk about some implementation details.
+We just did quite a lot of theory about numerical methods. To end this section, we will look at some more practical sides of ODE methods.
 
 \subsection{Local error estimation}
 The first problem we want to tackle is what $h$ we should pick. Usually, when using numerical analysis software, you will be asked for an error tolerance, and then the software will automatically compute the required $h$ we need. How is this done?
@@ -1560,15 +1631,15 @@ In this case, the constant we have is $\frac{1}{6}$. So we can estimate the loca
 The extra work we need for this is to compute numerical approximations with two methods. Usually, we will use a simple, explicit method such as the Adams-Bashforth method as the second method, when we want to approximate the error of a more complicated but nicer method, like the trapezoidal rule.
 
 \subsection{Solving for implicit methods}
-Implicit methods are often more likely to preserve nice properties like conservation of energy. Since we have more computational power nowadays, it is often preferable to use these more complicated methods.
+Implicit methods are often more likely to preserve nice properties like conservation of energy. Since we have more computational power nowadays, it is often preferable to use these more complicated methods. When using these implicit methods, we have to come up with some way to solve the equations involved.
 
 As an example, we consider the backward Euler method
 \[
   \mathbf{y}_{n + 1} = \mathbf{y}_n + h \mathbf{f}(t_{n + 1}, \mathbf{y}_{n + 1}).
 \]
-There are two ways to solve this equation for $\mathbf{y}_{n + 1}$. The simplest method is \emph{functional iteration}. As the name suggests, this method is iterative. So we use superscripts to denote the iterates. We use the formula
+There are two ways to solve this equation for $\mathbf{y}_{n + 1}$. The simplest method is \emph{functional iteration}. As the name suggests, this method is iterative. So we use superscripts to denote the iterates. In this case, we use the formula
 \[
-  \mathbf{y}_{n + 1}^{(k + 1)} = \mathbf{y}_n + h \mathbf{f}(t_{n + 1}, \mathbf{y}_{n + 1}^{(k + 1)}).
+  \mathbf{y}_{n + 1}^{(k + 1)} = \mathbf{y}_n + h \mathbf{f}(t_{n + 1}, \mathbf{y}_{n + 1}^{k}).
 \]
 To do this, we need to find a $\mathbf{y}_{n + 1}^{(0)}$. Usually, we start $\mathbf{y}_{n + 1}^{(0)} = \mathbf{y}_n$. Even better, we can use some simpler explicit method to obtain our first guess of $\mathbf{y}_{n + 1}^{(0)}$.
 
@@ -1590,6 +1661,8 @@ This requires us to solve for $\mathbf{z}$ in the first equation, but this is a 
 There are several variants to Newton's method. This is the full Newton's method, where we re-compute the Jacobian in every iteration. It is also possible to just use the same Jacobian over and over again. There are some speed gains in solving the equation, but then we will need more iterations before we can get our $\mathbf{y}_{n + 1}$.
 
 \section{Numerical linear algebra}
+In the last part of the course, we study numerical algorithms for solving certain problems in linear algebra. Here we are not so much concerned about accuracy --- the solutions we obtained are theoretically exact. Instead, we will try to find some efficient methods of solving these problems. However, we will occasionally make some comments about accuracy problems that arise from the fact that we only work with finite precision.
+
 We start off with the simplest problem in linear algebra: given $A \in R^{n \times n}$, $\mathbf{b} \in R^n$, we want to find an $\mathbf{x}$ such that
 \[
   A\mathbf{x} = \mathbf{b}.
@@ -1599,14 +1672,27 @@ We all know about the theory --- if $A$ is non-singular, then there is a unique 
 Most of the time, we will only consider the case where $A$ is non-singular. However, we will sometimes comment on what happens when $A$ is singular.
 
 \subsection{Triangular matrices}
-A general technique for dealing with linear algebra problems is to see what happens when we have a triangular matrix, since these tend to be simpler.
-
-What happens if $A$ is triangular? First of all it is easy to see if the matrix is singular or not --- it is singular if and only if there is a zero in the diagonal.
-
-We note that there are actually two types of triangular matrices. Lower triangular matrices are denoted as $L$, and upper triangular matrices are denoted as $U$. It is easy to find their determinants. We have
+While matrices in general and big and scary, triangular matrices tend to be much nicer.
+\begin{defi}[Triangular matrix]
+  A matrix $A$ is \emph{upper triangular} if $A_{ij} = 0$ whenever $i > j$. It is \emph{lower triangular} if $A_{ij} = 0$ whenever $i < j$. We usually denote upper triangular matrices as $U$ and lower triangular matrices as $L$.
+\end{defi}
+We can visualize these matrices as follows:
+\begin{center}
+  \begin{tikzpicture}
+    \draw (0, 0) -- (1, 0) -- (0, 1) -- cycle;
+    \node [below] at (0.5, 0) {$L$};
+    \begin{scope}[shift={(2, 0)}]
+      \draw (1, 1) -- (1, 0) -- (0, 1) -- cycle;
+      \node [below] at (0.5, 0) {$U$};
+    \end{scope}
+  \end{tikzpicture}
+\end{center}
+Why are triangular matrices nice? First of all, it is easy to find the determinants of triangular matrices. We have
 \[
-  \det(L) = \prod_{i = 1}^n L_{ii},\quad U = \prod_{i = 1}^n U_{11}.
+  \det(L) = \prod_{i = 1}^n L_{ii},\quad \det(U) = \prod_{i = 1}^n U_{11}.
 \]
+In particular, a triangular matrix is non-singular if and only if it has no zero entries in its diagonal.
+
 How do we solve equations involving triangular matrices? Suppose we have a lower triangular matrix equation
 \[
   \begin{pmatrix}
@@ -1627,7 +1713,23 @@ How do we solve equations involving triangular matrices? Suppose we have a lower
     b_2\\
     \vdots\\
     b_n
-  \end{pmatrix}.
+  \end{pmatrix},
+\]
+or, more visually, we have
+\[
+  \begin{tikzpicture}[baseline=-0.65ex]
+    \draw (0, -0.5) -- (1, -0.5) -- (0, 0.5) -- cycle;
+  \end{tikzpicture}
+  \;\;
+  \begin{tikzpicture}[baseline=-0.65ex]
+    \draw (0, -0.5) rectangle (0.3, 0.5);
+  \end{tikzpicture}
+  \;
+  =
+  \;
+  \begin{tikzpicture}[baseline=-0.65ex]
+    \draw (0, -0.5) rectangle (0.3, 0.5);
+  \end{tikzpicture}
 \]
 There is nothing to solve in the first line. We can immediately write down the value of $x_1$. Substituting this into the second line, we can then solve for $x_2$. In general, we have
 \[
@@ -1641,25 +1743,43 @@ For upper triangular matrices, we can do a similar thing, but we have to solve f
 \]
 This is known as \emph{backwards substitution}.
 
-This can be used to find the inverse of matrices as well. We solve for the columns instead. In particular, the solution to $L \mathbf{x}_j = \mathbf{e}_j$ is the $j$th column of $L^{-1}$. It is then easy to see from this that the inverse of a lower triangular matrix is also lower triangular.
+This can be used to find the inverse of matrices as well. The solution to $L \mathbf{x}_j = \mathbf{e}_j$ is the $j$th column of $L^{-1}$. It is then easy to see from this that the inverse of a lower triangular matrix is also lower triangular.
 
 Similarly, the columns of $U^{-1}$ are given by solving $U\mathbf{x}_j = \mathbf{e}_i$, and we see that $U^{-1}$ is also upper triangular.
 
-It is also helpful to analyse how many operations it takes to compute this. If we look carefully, solving $L\mathbf{x} =\mathbf{b}$ or $U\mathbf{x} = \mathbf{b}$ this way requires $O(n^2)$ operations.
+It is helpful to analyse how many operations it takes to compute this. If we look carefully, solving $L\mathbf{x} =\mathbf{b}$ or $U\mathbf{x} = \mathbf{b}$ this way requires $O(n^2)$ operations.
 
 \subsection{LU factorization}
-In general, we don't always have triangular matrices. The idea is, for every matrix $A$, find some lower and triangular matrices $L, U$ such that $A = LU$. If we can do this, then we can solve $A\mathbf{x} = \mathbf{b}$ in two steps --- we first find a $\mathbf{y}$ such that $L\mathbf{y} = \mathbf{b}$. Then we find an $\mathbf{x}$ such that $U\mathbf{x} = \mathbf{y}$. Then
+In general, we don't always have triangular matrices. The idea is, for every matrix $A$, find some lower and triangular matrices $L, U$ such that $A = LU$.
+\[
+  \begin{tikzpicture}[baseline=-0.65ex]
+    \draw (0, -0.5) rectangle (1, 0.5);
+  \end{tikzpicture}
+  \;
+  =
+  \;
+  \begin{tikzpicture}[baseline=-0.65ex]
+    \draw (0, -0.5) -- (1, -0.5) -- (0, 0.5) -- cycle;
+  \end{tikzpicture}
+  \;\;
+  \begin{tikzpicture}[baseline=-0.65ex]
+    \draw (1, 0.5) -- (1, -0.5) -- (0, 0.5) -- cycle;
+  \end{tikzpicture}
+\]
+If we can do this, then we can solve $A\mathbf{x} = \mathbf{b}$ in two steps --- we first find a $\mathbf{y}$ such that $L\mathbf{y} = \mathbf{b}$. Then we find an $\mathbf{x}$ such that $U\mathbf{x} = \mathbf{y}$. Then
 \[
   A\mathbf{x} = LU\mathbf{x} = L\mathbf{y} = \mathbf{b}.
 \]
-This is the basic idea. However, this is not quite so straightforward.
+So what we want is such a factorization. To guarantee uniqueness of the factorization, we require that $L$ is \emph{unit}, ie. the diagonals are all $1$. Otherwise, given any such factorization, we can divide $U$ by some (non-zero) constant and multiply $L$ by the same constant to get another factorization.
 
 \begin{defi}[LU factorization]
   $A = LU$ is an \emph{LU factorization} if $U$ is upper triangular and $L$ is \emph{unit} lower triangular (ie. the diagonals of $L$ are all $1$).
 \end{defi}
-Why do we require $L$ to be a unit? There is no reason why we are requiring $L$ instead of $R$. This is merely by convention. However, we do have to impose it somewhere in order to guarantee uniqueness of the LU factorization. Otherwise, we can just divide $U$ by some constant and multiply $L$ by the same constant to get another factorization.
-
-Note that since $L$ has to be unit, it must be non-singular. However, we still allow $A$ and $U$ to be singular.
+Note that since $L$ has to be unit, it must be non-singular. However, we still allow $A$ and $U$ to be singular. Note that
+\[
+  \det (A) = \det (L) \det(U) = \det(U).
+\]
+So $A$ is singular if and only if $U$ is.
 
 Unfortunately, even if $A$ is non-singular, it may not have an LU factorization. We take a simple example of
 \[
@@ -1670,9 +1790,7 @@ Unfortunately, even if $A$ is non-singular, it may not have an LU factorization.
 \]
 This is clearly non-singular, with determinant $-1$. However, we can manually check that there is no LU factorization of this.
 
-What we do get is uniqueness --- as long as $A$ is non-singular, if an LU factorization exists, it is unique (and $U$ is non-singular).
-
-While we don't really like singular matrices, singular matrices can still have LU factorizations. For example,
+On the other hand, while we don't really like singular matrices, singular matrices can still have LU factorizations. For example,
 \[
   \begin{pmatrix}
     0 & 0\\
@@ -1689,6 +1807,24 @@ While we don't really like singular matrices, singular matrices can still have L
   \end{pmatrix}
 \]
 is trivially an LU factorization of a singular matrix.
+
+Fortunately, if $A$ is non-singular and has an LU factorization, then this factorization is unique (this is not necessarily true if $A$ is singular. For example, we know
+\[
+  \begin{pmatrix}
+    0 & 0\\
+    0 & 1
+  \end{pmatrix}
+  =
+  \begin{pmatrix}
+    1 & 0\\
+    a & 1
+  \end{pmatrix}
+  \begin{pmatrix}
+    0 & 0\\
+    0 & 1
+  \end{pmatrix}
+\]
+for any real number $a$).
 
 To understand when LU factorizations exist, we try to construct one, and see when it could fail.
 
@@ -1717,8 +1853,9 @@ What do these matrices look like? For each $i$, we know $\mathbf{l}_i$ and $\mat
 
 The plan is as follows:
 \begin{enumerate}
-  \item Obtain $\mathbf{l}_1$ and $\mathbf{u}_1$ from the first row and column of $A$.
-  \item Obtain $\mathbf{l}_2$ and $\mathbf{u}_2$ form the second row and column of $A - \mathbf{l}_1 \mathbf{u}_1^T$.
+  \item Obtain $\mathbf{l}_1$ and $\mathbf{u}_1$ from the first row and column of $A$. Since the first entry of $\mathbf{l}_1$ is $1$, $\mathbf{u}_1^T$ is exactly the first row of $A$. We can then obtain $\mathbf{l}_2$ by taking the first column of $A$ and dividing by $U_{11} = A_{11}$.
+
+  \item Obtain $\mathbf{l}_2$ and $\mathbf{u}_2$ form the second row and column of $A - \mathbf{l}_1 \mathbf{u}_1^T$ similarly.
   \item $\cdots$
   \item Obtain $\mathbf{l}_n$ and $\mathbf{u}_n^T$ from the $n$th row and column of $A - \sum_{i = 1}^{n - 1} \mathbf{l}_i \mathbf{u}_i^T$.
 \end{enumerate}
@@ -1734,15 +1871,11 @@ For $k = 1, \cdots, n$, we let
 \end{align*}
 When $k = n$, we end up with a zero matrix, and then $U$ and $L$ are completely filled.
 
-We can now see when this will break down. A sufficient condition for $A = LU$ to exist is that $A_{kk}^{(k - 1)} \not= 0$ for all $k$. If this is the case, then it is also unique, since it \emph{must} be given by the result of this algorithm. However, most of these coefficients do not appear in the matrix $A$. They are constructed during the process. We don't know easily what they are in terms of the coefficients of $A$. We will later come up with an equivalent condition on our origin $A$ that is easier to check.
+We can now see when this will break down. A sufficient condition for $A = LU$ to exist is that $A_{kk}^{(k - 1)} \not= 0$ for all $k$. Since $A_{kk}^{(k - 1)} = U_{kk}$, this sufficient condition ensures $U$, and hence $A$ is non-singular. Conversely, if $A$ is non-singular and an LU factorization exists, then this would always work, since we must have $A_{kk}^{(k - 1)} = U_{kk} \not= 0$. Moreover, the LU factorization must be given by this algorithm. So we get uniqueness.
+
+The problem with this sufficient condition is that most of these coefficients do not appear in the matrix $A$. They are constructed during the algorithm. We don't know easily what they are in terms of the coefficients of $A$. We will later come up with an equivalent condition on our original $A$ that is easier to check.
 
 Note that as long as this method does not break down, we need $O(n^3)$ operations to perform this factorization. Recall we only needed $O(n^2)$ operations to solve the equation after factorization. So the bulk of the work in solving $A\mathbf{x} = \mathbf{b}$ is in doing the LU factorization.
-
-Note also that
-\[
-  \det (A) = \det(L) \det (U) = \det(U).
-\]
-So either both are singular or both are not.
 
 As before, this allows us to find the inverse of $A$ if it is non-singular. In particular, solving $A\mathbf{x}_j = \mathbf{e}_j$ gives the $j$th column of $A^{-1}$. Note that we are solving the system for the same $A$ for each $j$. So we only have to perform the LU factorization once, and then solve $n$ different equations. So in total we need $O(n^3)$ operations.
 
@@ -1758,7 +1891,7 @@ Suppose our breakdown occurs at $k = 1$, ie. $A_{11}^{(0)} = A_{11} = 0$. We fin
 
 After that, we can carry on. We construct $\mathbf{l}_1$ and $\mathbf{u}_1$ from $P_1A^{(0)}$ as before, and set $A^{(1)} = P_1A^{(0)} - \mathbf{l}_1 \mathbf{u}_1^T$.
 
-But what happens if the first column of $A$ is completely zero? Then no interchange will make the $(1, 1)$ entry non-zero. However, in this case, we don't actually have to do anything. We can immediately find our $\mathbf{l}_1$ and $\mathbf{u}_1$, namely set $\mathbf{l}_1 = \mathbf{e}_1$ and let $\mathbf{u}_1^T$ be the first row of $A^{(0)}$. Then this already works. Note however that this corresponds to $A$ (and hence $U$) being singular, and we are not too interested with these.
+But what happens if the first column of $A$ is completely zero? Then no interchange will make the $(1, 1)$ entry non-zero. However, in this case, we don't actually have to do anything. We can immediately find our $\mathbf{l}_1$ and $\mathbf{u}_1$, namely set $\mathbf{l}_1 = \mathbf{e}_1$ (or anything) and let $\mathbf{u}_1^T$ be the first row of $A^{(0)}$. Then this already works. Note however that this corresponds to $A$ (and hence $U$) being singular, and we are not too interested with these.
 
 The later steps are exactly analogous. Suppose we have $A_{kk}^{(k - 1)} = 0$. Again we find a $P_k$ such that $P_k A^{(k - 1)}$ has a non-zero $(k, k)$ entry. We then construct $\mathbf{l}_k$ and $\mathbf{u}_k$ from $P_k A^{(k - 1)}$ and set
 \[
@@ -1789,7 +1922,7 @@ Note that in particular, we have
 One problem we have not considered is the problem of inexact arithmetic. While these formula are correct mathematically, when we actually implement things, we do them on computers with finite precision. As we go through the algorithm, errors will accumulate, and the error might be amplified to a significant amount when we get the reach the end. We want an algorithm that is insensitive to errors. In order to work safely in inexact arithmetic, we will put the element of \emph{largest} modulus in the $(k, k)$th position, not just an arbitrary non-zero one, as this minimizes the error when dividing.
 
 \subsection{\texorpdfstring{$A = LU$}{A = LU} for special \texorpdfstring{$A$}{A}}
-There is one thing we haven't figured out yet. Can we just look at the matrix $A$, and then determine whether it has an LU factorization (that does not involve permutations)? To answer this, we start with some definitions
+There is one thing we haven't figured out yet. Can we just look at the matrix $A$, and then determine whether it has an LU factorization (that does not involve permutations)? To answer this, we start with some definitions.
 
 \begin{defi}[Leading principal submatrix]
   The \emph{leading principal submatrices} $A_k \in \R^{k \times k}$ for $k = 1, \cdots, n$ of $A \in \R^{n \times n}$ are
@@ -1916,7 +2049,13 @@ Finally, we look at the LU factorization of band matrices.
   A \emph{band matrix} of \emph{band width} $r$ is a matrix $A$ such that $A_{ij} \not= 0$ implies $|i - j| \leq r$.
 \end{defi}
 For example, a band matrix of band width $0$ is a diagonal matrix; a band matrix of band width $1$ is a tridiagonal matrix.
-
+\begin{center}
+  \begin{tikzpicture}
+    \draw (0, 0) rectangle (2, 2);
+    \draw (0, 1.6) -- (1.6, 0);
+    \draw (0.4, 2) -- (2, 0.4);
+  \end{tikzpicture}
+\end{center}
 The result is
 \begin{prop}
   If a band matrix $A$ has band width $r$ and an LU factorization $A = LU$, then $L$ and $U$ are both band matrices of width $r$.
@@ -1927,17 +2066,21 @@ The result is
 \end{proof}
 
 \section{Linear least squares}
+Finally, we consider a slightly different kind of problem, whose solution involves a different kind of factorization.
+
 The question we are interested in is how we can ``solve''
 \[
   A\mathbf{x} = \mathbf{b},
 \]
-where $A \in \R^{m \times n}$, with $m > n$, and $\mathbf{b} \in \R^m$ and $\mathbf{x} \in \R^n$. Of course, this is an over-determined system. In general, this has no solution. So we want to find the ``best'' solution to this system of equations. More precisely, we want to find an $\mathbf{x}^* \in \R^n$ that minimizes $\|A\mathbf{x} - \mathbf{b}\|^2$. Note that we use the Euclidean norm. This is the \emph{least squares problem}.
+where $A \in \R^{m \times n}$, with $m > n$, and $\mathbf{b} \in \R^m$ and $\mathbf{x} \in \R^n$.
+
+Of course, this is an over-determined system. In general, this has no solution. So we want to find the ``best'' solution to this system of equations. More precisely, we want to find an $\mathbf{x}^* \in \R^n$ that minimizes $\|A\mathbf{x} - \mathbf{b}\|^2$. Note that we use the Euclidean norm. This is the \emph{least squares problem}.
 
 Why would one be interested in this? Often in, say, statistics, we have some linear model that says the outcome $B$ is related to the input variables $A_1, \cdots, A_n$ by
 \[
   B = A_1 X_1 + A_2 X_2 + \cdots + A_n X_n + \varepsilon,
 \]
-where the $X_i$ are some unknown parameters, and $\varepsilon$ is some random variable. The idea is to do lots of experiments, say $m$ of them, collect the data in $A \in R^{m \times n}$ and $\mathbf{b} \in R^m$, and then find the $X_i$'s that predict these results the most accurately, ie. find the $\mathbf{x}$ such that $A\mathbf{x}$ is as close to $\mathbf{b}$ as possible.
+where the $X_i$ are some unknown parameters, and $\varepsilon$ is some random fluctuation. The idea is to do lots of experiments, say $m$ of them, collect the data in $A \in R^{m \times n}$ and $\mathbf{b} \in R^m$, and then find the $X_i$'s that predict these results the most accurately, ie. find the $\mathbf{x}$ such that $A\mathbf{x}$ is as close to $\mathbf{b}$ as possible.
 
 So how can we find this $\mathbf{x}^*$? First of all, we find a necessary and sufficient condition for $\mathbf{x}^*$ to be a solution to this.
 \begin{thm}
@@ -1980,7 +2123,11 @@ So how can we find this $\mathbf{x}^*$? First of all, we find a necessary and su
   \[
     (A^T A)\mathbf{x} = A^T \mathbf{b}.
   \]
-  The matrix $A$ being full rank means $\mathbf{y} \not= \mathbf{0} \in \R^n$ implies $A\mathbf{y} \not= \mathbf{0} \in \R^m$. Hence $A^T A \in \R^{n \times n}$ is positive definite (and in particular non-singular), since $\mathbf{x}^TA^T A\mathbf{x} = (A \mathbf{x})^T (A \mathbf{x}) = \|A \mathbf{x}\|^2 > 0$ for $\mathbf{x} \not= \mathbf{0}$.
+  The matrix $A$ being full rank means $\mathbf{y} \not= \mathbf{0} \in \R^n$ implies $A\mathbf{y} \not= \mathbf{0} \in \R^m$. Hence $A^T A \in \R^{n \times n}$ is positive definite (and in particular non-singular), since
+  \[
+    \mathbf{x}^TA^T A\mathbf{x} = (A \mathbf{x})^T (A \mathbf{x}) = \|A \mathbf{x}\|^2 > 0
+  \]
+  for $\mathbf{x} \not= \mathbf{0}$. So we can invert $A^T A$ and find a unique solution $\mathbf{x}$.
 \end{proof}
 
 Now to find the minimizing $\mathbf{x}^*$, we need to solve the \emph{normal equations}
@@ -1994,7 +2141,7 @@ If $A$ has full rank, then $A^T A$ is non-singular, and there is a unique soluti
   A square matrix $Q \in \R^{n \times n}$ is orthogonal if $Q^T Q = I$.
 \end{defi}
 
-A key property of the orthogonal matrices is that we get
+A key property of the orthogonal matrices is that we have
 \[
   \|Q\mathbf{x}\| = \|\mathbf{x}\|
 \]
@@ -2007,7 +2154,7 @@ The idea is that for any orthogonal matrix, minimizing $\|A\mathbf{x} - \mathbf{
   \[
     A = QR,
   \]
-  where $Q \in \R^{m \times m}$ is an orthogonal matrix, and $R \in \R^{m \times n}$ is ``upper triangular'' matrix, where ``upper triangular means''
+  where $Q \in \R^{m \times m}$ is an orthogonal matrix, and $R \in \R^{m \times n}$ is ``upper triangular'' matrix, where ``upper triangular'' means
   \[
     R =
     \begin{pmatrix}
@@ -2086,7 +2233,7 @@ This is just done in the usual Gram-Schmidt way.
 
 In practice, a slightly different algorithm (modified Gram-Schmidt process) is used, which is (much) superior with inexact arithmetic. The modified Gram-Schmidt process is in fact the same algorithm, but performed in a different order in order to minimize errors.
 
-\subsubsection*{Givens rotations}
+\subsubsection{Givens rotations}
 This works with the full QR factorization.
 
 Recall that in $\R^2$, a clockwise rotation of $\theta \in [-\pi, \pi]$ is performed by
@@ -2237,7 +2384,7 @@ We can obtain a QR factorization by inverting to get
 \]
 However, we don't really need to do this if we just want to do use this to solve the least squares problem, since to do so, we need to multiply by $Q^T$, not $Q$, which is exactly $Q_s \cdots \Q_1$.
 
-\subsubsection*{Householder reflections}
+\subsubsection{Householder reflections}
 \begin{defi}[Householder reflection]
   For $\mathbf{u} \not= \mathbf{0} \in \R^m$, we define the \emph{Householder reflection} by
   \[

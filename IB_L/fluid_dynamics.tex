@@ -5,7 +5,6 @@
 \def\nyear {2016}
 \def\nlecturer {P. F. Linden}
 \def\ncourse {Fluid Dynamics}
-\def\nlectures {TT.11}
 \def\nnotready {}
 
 \input{header}
@@ -2447,7 +2446,7 @@ Note that since we take the cross product of $\mathbf{f}$ with $\mathbf{u}$, onl
   f = 2 \Omega \sin \theta,
 \]
 where $\theta$ is the angle from the equator.
-\subsection{shallow water equations}
+\subsection{Shallow water equations}
 We are now going to derive the shallow water equations, where we have some water shallow relative to its horizontal extent. This is actually quite a good approximation for the ocean --- while the Atlantic is around $\SI{4}{\kilo\meter}$ deep, it is several thousand kilometers across. So the ratio is just like a piece of paper. Similar, this is also a good approximation for the atmosphere.
 
 Suppose we have a shallow layer of depth $z = h(x, y)$ with $p = p_0$ on $z = h$.
@@ -2556,4 +2555,186 @@ We can write this out in full In Cartesian coordinates:
 \[
   \frac{\partial h}{\partial t} + \frac{\partial}{\partial x}(uh) + \pd{y}(uh) = 0.
 \]
+\subsection{Linearized equation of motion}
+We suppose $h = h_0 + \eta(x, y, t)$, where $\eta \ll h_0$, and write
+\[
+  \mathbf{u} = (u(x, y), v(x, y)).
+\]
+Then we can rewrite our equations of motion as
+\[
+  \frac{\partial \mathbf{u}}{\partial t} + \mathbf{f} \times \mathbf{u} = -g \nabla \eta\tag{$*$}
+\]
+and, ignoring terms like $u\eta, v\eta$, the continuity equation gives
+\[
+  \frac{\d \eta}{\d t} + h_0 \nabla \cdot \mathbf{u} = 0.\tag{$\dagger$}
+\]
+Taking the curl of the $(*)$, we get
+\[
+  \frac{\partial \boldsymbol\zeta}{\partial t} + \mathbf{f}\nabla \cdot \mathbf{u} = 0,
+\]
+where
+\[
+  \boldsymbol\zeta = \nabla \times \mathbf{u}.
+\]
+Note that even though we wrote this as a vector equation, really only the $z$-component is non-zero. So we can also view $\boldsymbol\zeta$ and $\mathbf{f}$ as scalars, and get a scalar equation.
+
+We can express $\nabla \cdot \mathbf{u}$ in terms of $\eta$ using $(\dagger)$. So we get
+\[
+  \frac{\partial}{\partial t}\left(\boldsymbol\zeta - \frac{\eta}{h_0}\mathbf{f}\right) = \frac{\d \mathbf{Q}}{\d t} = 0,
+\]
+where
+\begin{defi}[Potential vorticity]
+  The \emph{potential vorticity} is
+  \[
+    \mathbf{Q} = \boldsymbol\zeta - \frac{\eta}{h_0}\mathbf{f},
+  \]
+\end{defi}
+and this is conserved.
+
+Hence we can obtain
+\[
+  \mathbf{Q}(x, y, t) = \mathbf{Q}(x, y, 0) = \mathbf{Q}_0
+\]
+from the initial conditions.
+
+\subsection{Geostrophic adjustment}
+We start by taking the divergence of $(*)$ above to get
+\[
+  \frac{\partial}{\partial t}(\nabla \cdot \mathbf{u}) - \mathbf{f} \cdot \nabla \times \mathbf{u} = - g \nabla^2 \eta,
+\]
+and use $(\dagger)$ to substitute
+\[
+  \nabla \cdot \mathbf{u} = -\frac{1}{h_0} \frac{\partial \eta}{\partial t}.
+\]
+We then get
+\[
+  -\frac{1}{h_0} \frac{\partial^2 \eta}{\partial t^2} - \mathbf{f}\cdot \boldsymbol\zeta = -\nabla^2 \eta.
+\]
+We now use the conservation of potential vorticity, namely
+\[
+  \boldsymbol\zeta = \mathbf{Q}_0 + \frac{\eta}{h_0}\mathbf{f},
+\]
+to rewrite this as
+\[
+  \frac{\partial^2 \eta}{\partial t^2} - gh_0 \nabla^2 \eta + \mathbf{f}\cdot \mathbf{f} \eta = - h_0 \mathbf{f}\cdot \mathbf{Q}_0.
+\]
+Note that the right hand side is just a constant (in time). So we have a nice differential equation we can solve.
+
+\begin{eg}
+  Suppose we have fluid with mean depth $h_0$, and we start with the following scenario:
+  \begin{center}
+    \begin{tikzpicture}
+      \fill [gray, path fading=south] (-3, 0) rectangle (3, -1);
+
+      \draw [dashed] (-3, 2) -- (3, 2) node [right] {$h_0$};
+      \fill [mblue, opacity=0.5] (-3, 0) -- (-3, 1.5) -- (0, 1.5) -- (0, 2.5) -- (3, 2.5) -- (3, 0) -- cycle;
+
+      \draw [latex'-latex'] (2, 2) -- +(0, 0.5) node [right, pos=0.5] {$\eta_0$};
+      \draw [latex'-latex'] (-2, 2) -- +(0, -0.5) node [right, pos=0.5] {$\eta_0$};
+
+      \draw [->] (0, 0) -- (0, 3) node [above] {$z$};
+    \end{tikzpicture}
+  \end{center}
+  Due to the differences in height, we have higher pressure on the right and lower pressure on the left.
+
+  If there is no rotation, then the final state is a flat surface with no flow. What happens if there is rotation?
+
+  At the beginning, there is no movement. So we have $\boldsymbol\zeta(t = 0) = 0$.. Thus we have
+  \[
+    Q_0 =
+    \begin{cases}
+      -\frac{\eta_0}{h_0}f & x > 0\\
+      \frac{\eta_0}{h_0}f & x < 0
+    \end{cases}.
+  \]
+  We seek the final steady state such that
+  \[
+    \frac{\partial \eta}{\partial t} = 0.
+  \]
+  We further assume that the final solution is independent of $y$, so
+  \[
+    \frac{\partial \eta}{\partial y} = 0.
+  \]
+  So $\eta = \eta(x)$ is just a function of $x$. Our equation then says
+  \[
+    \frac{\partial^2 \eta}{\partial x^2} = \frac{f^2}{gh_0} \eta = \frac{f}{g}Q_0 = \mp \frac{f^2}{gh_0}\eta_0.
+  \]
+  It is convenient to define a new variable
+  \[
+    R = \frac{\sqrt{gh_0}}{f},
+  \]
+  which is a length scale. We know $\sqrt{gh_0}$ is the fastest possible wave speed, and thus $R$ is how far a wave can travel in one rotation period. We rewrite our equation as
+  \[
+    \frac{\d^2 \eta}{\d x^2} - \frac{1}{R^2}\eta = \mp \frac{1}{R^2}\eta_0.
+  \]
+  \begin{defi}[Rossby radius of deformation]
+    The length scale
+    \[
+      R = \frac{\sqrt{gh_0}}{f}
+    \]
+    is the \emph{Rossby radius of deformation}.
+  \end{defi}
+  This is the fundamental length scale to use in rotating systems when gravity is involved as well.
+
+  We now impose our boundary conditions. We require $\eta \to \pm \eta_0$ as $x \to \pm \infty$. We also require $\eta$ and $\frac{\d \eta}{\d x}$ to be continuous at $x = 0$.
+
+  The solution is
+  \[
+    \eta = \eta_0
+    \begin{cases}
+      1 - e^{-x/R} & x > 0\\
+      -(1 - e^{x/R}) & x < 0
+    \end{cases}.
+  \]
+  We can see that this looks quite different form the non-rotating case. It looks like this:
+  \begin{center}
+    \begin{tikzpicture}
+      \fill [gray, path fading=south] (-3, 0) rectangle (3, -1);
+      \draw [->] (0, 0) -- (0, 3) node [above] {$z$};
+
+      \draw [dashed] (-3, 2) -- (3, 2) node [right] {$h_0$};
+      \fill [mblue, opacity=0.5] (-3, 0) -- (-3, 1.5) .. controls (1, 1.5) and (-1, 2.5) .. (3, 2.5) -- (3, 0) -- cycle;
+    \end{tikzpicture}
+  \end{center}
+  The horizontal length scale involved is $2R$.
+
+  We now look at the velocities. Using the steady flow equations, we have
+  \begin{align*}
+    u &= -\frac{g}{f} \frac{\partial \eta}{\partial y} = 0\\
+    v &= \frac{g}{f} \frac{\partial\eta}{\partial x} = \eta_0 \sqrt{\frac{g}{h_0}} e^{-|x|/R}.
+  \end{align*}
+  So there is still flow in this system, and is a flow in the $y$ direction into the paper. This flow gives Coriolis force to the right, and hence balances the pressure gradient of the system.
+
+  The final state is not one of rest, but one with motion in which the Coriolis force balances the pressure gradient. This is geostrophic flow.
+\end{eg}
+
+Going back to our pressure maps, if we have high and low pressure systems, we can have flows that look like this:
+\begin{center}
+  \begin{tikzpicture}
+    \node {L};
+
+    \node at (4, 0) {H};
+
+    \draw [->] circle [radius=1];
+    \draw [-<-=0.5] (4, 0) circle [radius=1];
+
+    \draw (1, -1.5) edge [out=60,in=-60, ->-=0.5] (1, 1.5);
+    \draw (3, -1.5) edge [out=120,in=-120, ->-=0.5] (3, 1.5);
+
+    \draw [->-=0.5] (2, -1.5) -- (2, 1.5);
+  \end{tikzpicture}
+\end{center}
+Then the Coriolis force will balance the pressure gradients.
+
+So weather maps describe balanced flows. We can compute the scales here. In the atmosphere, we have approximately
+\[
+  R \approx \frac{\sqrt{10 \cdot 10^3}}{10^{-4}} = 10^6 \approx \SI{1000}{\kilo\meter}.
+\]
+So the scales of cyclones are approximately $\SI{1000}{\kilo\meter}$.
+
+On the other hand, in the ocean, we have
+\[
+  R \approx \frac{\sqrt{10 \cdot 10}}{10^{-4}} = 10^5 = \SI{1000}{\kilo\meter}.
+\]
+So ocean scales are much smaller than atomospheric scales.
 \end{document}
