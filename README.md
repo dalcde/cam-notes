@@ -28,7 +28,13 @@ Currently, the notes for the following subjects are available.
  - Quantum Mechanics (2015, J. M. Evans)
 
 ### Lent Term
+ - Complex Analysis (2016, I. Smith)
+ - Complex Methods (2016, R. E. Hunt)
  - Electromagnetism (2015, D. Tong)
+ - Fluid Dynamics (2016, P. F. Linden)
+ - Geometry (2016, A. G. Kovalev)
+ - Groups, Rings and Modules (2016, O. Randal-Williams)
+ - Numerical Analysis (2016, G. Moore)
  - Statistics (2015, D. Spiegelhalter)
 
 ### Easter Term
@@ -44,3 +50,5 @@ Currently, the notes for the following subjects are available.
 
 ### Lent Term
  - Logic and Set Theory (2015, I. B. Leader)
+ - Number Fields (2016, I. Grojnowski)
+ - Representation Theory (2016, S. Martin)

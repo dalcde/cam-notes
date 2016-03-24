@@ -5,7 +5,6 @@
 \def\nyear {2016}
 \def\nlecturer {P. F. Linden}
 \def\ncourse {Fluid Dynamics}
-\def\nnotready {}
 
 \input{header}
 
@@ -56,6 +55,7 @@ There are many applications of fluid dynamics. On a small scale, the dynamics of
 \subsection{Preliminaries}
 This section is called preliminaries, not definitions, because the ``definitions'' we give will be a bit fuzzy. We will (hopefully) get better definitions later on.
 
+We start with an absolutely clear an unambiguous definition of the subject we are going to study.
 \begin{defi}[Fluid]
   A \emph{fluid} is a material that flows.
 \end{defi}
@@ -68,12 +68,12 @@ This section is called preliminaries, not definitions, because the ``definitions
   Sand, rice and foams are \emph{granular flows}. These have some fluid-like properties, but are fundamentally made of small granular solids.
 \end{eg}
 
-In this course, we will restrict our attention to Newtonian fluids, with a technical definition given as follows:
+In this course, we will restrict our attention to Newtonian fluids. Practically speaking, these are fluids for which our equations work. The assumption we will make when deriving our equations will be the following:
 
 \begin{defi}[Newtonian fluids and viscosity]
   A \emph{Newtonian fluid} is a fluid with a linear relationship between stress and rate of strain. The constant of proportionality is \emph{viscosity}.
 \end{defi}
-We will soon define what these words mean, but the key point is linearity.
+This, and other concepts we define here, will become more clear when we start to write down our equations.
 
 \begin{defi}[Stress]
   \emph{Stress} is force per unit area.
@@ -83,25 +83,26 @@ For example, pressure is a stress.
 \begin{defi}[Strain]
   \emph{Strain} is the extension per unit length. The \emph{rate of strain} is $\frac{\d}{\d t}(\mathrm{strain})$ is concerned with gradients of velocity.
 \end{defi}
-These quantities are in fact tensor fields, but we will not treat them as such in this course. We will just consider ``simplified'' cases. For the full-blown treatment with tensor fields, refer to the Part II course.
+As mentioned in the introduction, for fluid dynamics, we tend to study velocities instead of displacements. So we will mostly work with rate of strain instead of strain itself.
 
-While all fluids are viscous, much of the course will use the \emph{inviscid approximation}, ie. we set the viscosity to be $0$.
+These quantities are in fact tensor fields, but we will not treat them as such in this course. We will just consider ``simplified'' cases. For the full-blown treatment with tensor fields, refer to the IID Fluid Dynamics.
 
-We will first consider the special case, where the flow moves along parallel planes.
+In this course, we are going make a lot of simplifying assumptions, since the world is too complicated. For example, most of the time, we will make the \emph{inviscid approximation}, where we set the viscosity to $0$. We will also often consider motions in one direction only.
 
 \subsection{Stress}
-\subsubsection{Normal stress}
+We first look at stresses. These are the forces that exist inside the fluid. If we have a boundary, we can classify the stress according to the direction of the force --- whether it is normal to or parallel to the boundary. Note that the boundary can either be an actual physical boundary, or an imaginary surface we cook up in order to compute things.
+
+Suppose we have a fluid with pressure $p$ acting on a surface with unit normal $\mathbf{n}$, pointing \emph{into} the fluid. This causes
 \begin{center}
   \begin{tikzpicture}
     \fill [gray, path fading=south] (0, 0) rectangle (6, -1);
-    \draw [->] (3, 0) -- +(0, 1) node [above] {$\mathbf{n}$};
-    \draw [->] (3, 0) -- +(0, -1) node [below] {$\tau_p$};
+    \draw [->] (3.1, 0) -- +(0, 1) node [above] {$\mathbf{n}$};
+    \draw [->] (2.9, 0) -- +(0, -1) node [below] {$\tau_p$};
     \node at (0.5, -0.5) {solid};
     \node at (0.5, 0.5) {fluid};
     \node at (6, 1) [left] {pressure $p$};
   \end{tikzpicture}
 \end{center}
-Suppose we have a fluid with pressure $p$ acting on a surface with unit normal $\mathbf{n}$, pointing \emph{into} the fluid.
 
 \begin{defi}[Normal stress]
   The \emph{normal stress} is
@@ -109,7 +110,7 @@ Suppose we have a fluid with pressure $p$ acting on a surface with unit normal $
     \tau_p = -p\mathbf{n}.
   \]
 \end{defi}
-Gradients in pressure produce a force. For example, suppose we have a pipe, with the pump on the left:
+The normal stress is present everywhere, as long as we have a fluid (with pressure). However, pressure by itself does not do anything, since pressure acts in all directions, and the net effect cancels out. However, if we have a pressure \emph{gradient}, then gives an actual force and drives fluid flow. For example, suppose we have a pipe, with the pump on the left:
 \begin{center}
   \begin{tikzpicture}
     \draw (0, 0) -- +(4, 0);
@@ -123,10 +124,9 @@ Gradients in pressure produce a force. For example, suppose we have a pipe, with
     \draw (4, 0) arc (270:450:0.05 and 0.25);
   \end{tikzpicture}
 \end{center}
-This gives a \emph{body force} that drives the water from left to right.
+Then this gives a \emph{body force} that drives the water from left to right.
 
-\subsubsection{Tangential stress}
-Consider two infinite planes with fluids in between. We keep the bottom plane at rest, and move the top plate with velocity $U$.
+We can also have stress in the horizontal direction. Suppose we have two infinite plates with fluid in the middle. We keep the bottom plane at rest, and move the top plate with velocity $U$.
 \begin{center}
   \begin{tikzpicture}
     \fill [gray, path fading=south] (0, 0) rectangle (6, -1);
@@ -136,12 +136,14 @@ Consider two infinite planes with fluids in between. We keep the bottom plane at
     \draw [<->] (5.7, 0) -- +(0, 1) node [right, pos=0.5] {$h$};
   \end{tikzpicture}
 \end{center}
+By definition, the stress is the force per unit area. In this case, it is the horizontal force we need to exert to keep the top plate moving.
 
 \begin{defi}[Tangential stress]
   The \emph{tangential stress} $\tau_s$ is the force (per unit area) required to move the top plate at speed $U$.
 \end{defi}
+This is also the force we need to exert on the bottom plate to keep it still. Or the horizontal force at any point in fluid in order to maintain the velocity gradient.
 
-Experimentally, we find the following.
+By definition of a Newtonian fluid, this stress is proportional to the velocity gradient, ie.
 \begin{law}
   For a Newtonian fluid, we have
   \[
@@ -156,16 +158,16 @@ Experimentally, we find the following.
   \]
 \end{defi}
 
-We find the dimensions of these quantities as
+We can try to figure out the dimensions of these quantities:
 \begin{align*}
   [\tau_s] &= ML^{-1} T^{-2}\\
   \left[\frac{U}{h}\right] &= T^{-1}\\
   [\mu] &= ML^{-1} T^{-1}.
 \end{align*}
-In SI units, $\mu$ has units $\SI{}{\kilo\gram\per\meter\per\second}$.
+In SI units, $\mu$ has unit $\SI{}{\kilo\gram\per\meter\per\second}$.
 
 We have not yet said what the fluid in the middle does. It turns out this is simple: at the bottom, the fluid is constant, and at the top, the fluid moves with velocity $U$. In between, the speed varies linearly.
-\begin{center} % put axes in gray
+\begin{center}
   \begin{tikzpicture}
     \fill [gray, path fading=south] (0, 0) rectangle (6, -1);
     \fill [gray, path fading=north] (0, 1) rectangle (6, 2);
@@ -183,20 +185,38 @@ We have not yet said what the fluid in the middle does. It turns out this is sim
 \end{center}
 We will derive this formally later.
 
-For a general flow, let $u_T(\mathbf{x})$ be the velocity of the fluid at position $\mathbf{x}$. Then the tangential stress is
+For a general flow, let $u_T(\mathbf{x})$ be the velocity of the fluid at position $\mathbf{x}$. Then the velocity gradient is
+\[
+  \frac{\partial \mu_T(\mathbf{x})}{\partial \mathbf{n}}.
+\]
+Hence the tangential stress is given by
 \[
   \tau_s = \mu \frac{\partial u_T(\mathbf{x})}{\partial \mathbf{n}},
 \]
 and is in the direction of the tangential component of velocity. Again, the normal vector $\mathbf{n}$ points \emph{into} the fluid.
 
 \subsection{Steady parallel viscous flow}
-We first explain what the words in the title mean. Steady means there is no change in time, ie. there is no acceleration. In other words, all forces balance.
+We are first going to consider a very simple type of flow, known as \emph{steady parallel viscous flow}, and derive the equations of motion of it. We first explain what this name means. The word ``viscous'' simply means we do not assume the viscosity vanishes, and is not something new.
 
-``Parallel'' means the fluid only flows in one dimension, and only depends on the direction perpendicular to the plane. So the velocity can be written as
-\[
-  \mathbf{u} = (u(y), 0, 0).
-\]
-We can draw a flow profile as follows:
+\begin{defi}[Steady flow]
+  A \emph{steady flow} is a flow that does not change in time. In other words, all forces balance, and there is no acceleration.
+\end{defi}
+
+\begin{defi}[Parallel flow]
+  A \emph{parallel flow} is a flow where the fluid only flows in one dimension (say the $x$ direction), and only depends on the direction perpendicular to a plane (say the $x-z$ plane). So the velocity can be written as
+  \[
+    \mathbf{u} = (u(y), 0, 0).
+  \]
+\end{defi}
+These can be conveniently thought of as being two-dimensional, by forgetting the $z$ direction.
+
+Note that our velocity does not depend on the $x$ direction. This can be justified by the assumption that the fluid is incompressible. If we had a velocity gradient in the $x$-direction, then we will have fluid ``piling up'' at certain places, violating incompressibility.
+
+We will give a formal definition of incompressibility later. In general, though, fluids are not compressible. For example, sound waves are exactly waves of compression in air, and cannot exist if air is incompressible. So we can alternatively state the assumption of incompressibility as ``sound travels at infinite speed''.
+
+Hence, compressibility matters mostly when we are travelling near the speed of sound. If we are moving in low speeds, we can just pretend the fluid is indeed incompressible. This is what we will do in this course, since the speed of sound is in general very high.
+
+For a general steady parallel viscous flow, We can draw a flow profile like this:
 \begin{center}
   \begin{tikzpicture}
     \draw (0, 0) parabola (1, 2);
@@ -207,7 +227,9 @@ We can draw a flow profile as follows:
     \draw [->] (0, 0) -- (0, 2) node [above] {$y$};
   \end{tikzpicture}
 \end{center}
-We consider a small box in the fluid:
+The lengths of the arrow signify the magnitude of the velocity at that point.
+
+To derive the equations of motion, we can consider a small box in the fluid.
 \begin{center}
   \begin{tikzpicture}
     \draw (0, 0) parabola (1, 2);
@@ -229,35 +251,35 @@ By the definition of $\tau_s$, we can write
 \[
   \tau_s(y + \delta y) = \mu \frac{\partial u}{\partial y}(y + \delta y),\quad \tau_s (y) = -\mu \frac{\partial u}{\partial y}(y),
 \]
-where the different signs come from the different normals (for a normal pointing downwards, $\frac{\partial}{\partial \mathbf{n}} = \frac{\partial}{\partial -y}$).
+where the different signs come from the different normals (for a normal pointing downwards, $\frac{\partial}{\partial \mathbf{n}} = \frac{\partial}{\partial(-y)}$).
 
-Dividing by $\delta x \delta y$ and take the limit as $\delta x, \delta y \to 0$, we end up with the equation of motion
+Dividing by $\delta x \delta y$, we get
 \[
-  -\frac{\partial p}{\partial x} + \mu \frac{\partial^2 u}{\partial y^2} = 0.\tag{1.2a}
+  \frac{1}{\delta x}(p(x) - p(x + \delta x)) + \mu\frac{1}{\delta y}\left(\frac{\partial u}{\partial y}(y + \delta y) - \frac{\partial u}{\partial y}(y)\right).
 \]
-Looking at the $y$ direction, we find
+Taking the limit as $\delta x, \delta y \to 0$, we end up with the equation of motion
 \[
-  -\frac{\partial p}{\partial y} = 0.\tag{1.2b}
+  -\frac{\partial p}{\partial x} + \mu \frac{\partial^2 u}{\partial y^2} = 0.
+\]
+Performing similar calculations in the $y$ direction, we obtain
+\[
+  -\frac{\partial p}{\partial y} = 0.
 \]
 In the second equation, we keep the negative sign for consistency, but obviously in this case it is not necessary.
 
-This is the simplest possible case. We can extend this a bit by allowing, say, non-steady flows, For unsteady parallel viscous flows
+This is the simplest possible case. We can extend this a bit by allowing, non-steady flows and external forces on the fluid. Then the velocity is of the form
 \[
-  \mathbf{u} = (U(u, t), 0, 0)
+  \mathbf{u} = (u(y, t), 0, 0).
 \]
-of an (incompressible) fluid acted on by a body force (per unit volume) $(f_x, f_y, 0)$, we obtain the equations
+Writing the external body force (per unit volume) as $(f_x, f_y, 0)$, we obtain the equations
 \begin{align*}
-  \rho\frac{\partial u}{\partial t} &= -\frac{\partial p}{\partial x} + \mu \frac{\partial^2 u}{\partial y^2} + f_x\tag{1.3a}\\
-  0 &=-\frac{\partial p}{\partial y} + f_y.\tag{1.3b}
+  \rho\frac{\partial u}{\partial t} &= -\frac{\partial p}{\partial x} + \mu \frac{\partial^2 u}{\partial y^2} + f_x\\
+  0 &=-\frac{\partial p}{\partial y} + f_y.
 \end{align*}
-You will derive these in example sheet 1. Here $\rho$ is the density, ie. the mass per unit volume. For air, it is approximately $\SI{1}{\kilo\gram\per\meter\cubed}$, and for water, it is approximately $\SI{1000}{\kilo\gram\per\meter\cubed}$.
+The derivation of these equations is straightforward, and is left as an exercise for the reader on the example sheet. Here $\rho$ is the density, ie. the mass per unit volume. For air, it is approximately $\SI{1}{\kilo\gram\per\meter\cubed}$, and for water, it is approximately $\SI{1000}{\kilo\gram\per\meter\cubed}$.
 
-Here we said that the fluid is incompressible, which means it cannot be compressed (duh). We will give a form definition later. In general, though, fluids are not compressible. For example, sound waves are exactly waves of compression in air, and cannot exist if air is incompressible. Alternatively, we say that sound travels at an infinite speed.
+Along with equations, we also need boundary condition. In general, Newtonian fluids satisfy one of the following two boundary conditions:
 
-Hence, compressibility matters mostly when we are travelling near the speed of sound. If we are moving in low speeds, we can just pretend the fluid is indeed incompressible.
-
-\subsection{Boundary conditions for viscous fluids}
-Experimentally, we found (down to 2 molecular diameters for water, approximately $\SI{6}{\angstrom}$) that Newtonian fluids satisfy one of the following two boundary conditions:
 \begin{enumerate}
   \item \emph{No-slip condition}: at the boundary, the tangential component of the fluid velocity equals the tangential velocity of boundary. In particular, if the boundary is stable, the tangential component of the fluid velocity is zero. This means fluids stick to surfaces.
     \[
@@ -265,83 +287,87 @@ Experimentally, we found (down to 2 molecular diameters for water, approximately
     \]
   \item \emph{Stress condition}: alternatively, a tangential stress $\tau$ is imposed on the fluid. In this case,
     \[
-      -\mu \frac{\partial u_T}{\partial n} = \tau.\tag{1.5}
+      -\mu \frac{\partial u_T}{\partial n} = \tau.
     \]
 \end{enumerate}
+The no-slip condition is common when we have a fluid-solid boundary, where we think the fluid ``sticks'' to the solid boundary. The stress condition is more common when we have a fluid-fluid boundary (usually liquid and gas), where we require the tangential stresses to match up. In non-parallel flow, we will often require the flow not to penetrate the solid boundary, but this is automatically satisfied in parallel flow.
 
 We are going to look at some examples.
-\subsection{Couette flow}
-This is the flow driven by the motion of a boundary.
-\begin{center}
-  \begin{tikzpicture}
-    \fill [gray, path fading=south] (0, 0) rectangle (6, -1);
-    \fill [gray, path fading=north] (0, 1) rectangle (6, 2);
-    \draw [->] (2.5, 1.3) -- +(1, 0) node [right] {$U$};
+\begin{eg}[Couette flow]
+  This is flow driven by the motion of a boundary, as we have previously seen.
+  \begin{center}
+    \begin{tikzpicture}
+      \fill [gray, path fading=south] (0, 0) rectangle (6, -1);
+      \fill [gray, path fading=north] (0, 1) rectangle (6, 2);
+      \draw [->] (2.5, 1.3) -- +(1, 0) node [right] {$U$};
 
-    \draw (2, 0) -- (2, 1);
-    \draw (2, 0) -- (3, 1);
+      \draw (2, 0) -- (2, 1);
+      \draw (2, 0) -- (3, 1);
 
-    \foreach \x in {0.25,0.5,0.75} {
-      \draw [->] (2, \x) -- +(\x, 0);
-    }
-  \end{tikzpicture}
-\end{center}
-We assume that this is a stead flow, and there is no pressure gradient. So our equations give
-\[
-  \frac{\partial^2 u}{\partial y^2} = 0.
-\]
-Moreover, we have the boundary condition of $u = 0$ on $y = 0$; $u = U$ on $y = h$. The solution is thus
-\[
-  u = \frac{U y}{h}.
-\]
-\subsection{Pouseuille flow}
-This is a flow driven by a pressure gradient between stationary boundaries. Again we have two boundaries
-\begin{center}
-  \begin{tikzpicture}
-    \fill [gray, path fading=south] (0, 0) rectangle (6, -1);
-    \fill [gray, path fading=north] (0, 1) rectangle (6, 2);
+      \foreach \x in {0.25,0.5,0.75} {
+        \draw [->] (2, \x) -- +(\x, 0);
+      }
+    \end{tikzpicture}
+  \end{center}
+  We assume that this is a steady flow, and there is no pressure gradient. So our equations give
+  \[
+    \frac{\partial^2 u}{\partial y^2} = 0.
+  \]
+  Moreover, the no-slip condition says $u = 0$ on $y = 0$; $u = U$ on $y = h$. The solution is thus
+  \[
+    u = \frac{U y}{h}.
+  \]
+\end{eg}
 
-    \node [left] at (0, 0.5) {$P_1$};
-    \node [right] at (6, 0.5) {$P_0$};
+\begin{eg}[Poiseuille flow]
+  This is a flow driven by a pressure gradient between stationary boundaries. Again we have two boundaries
+  \begin{center}
+    \begin{tikzpicture}
+      \fill [gray, path fading=south] (0, 0) rectangle (6, -1);
+      \fill [gray, path fading=north] (0, 1) rectangle (6, 2);
 
-    \foreach \x in {0.25,0.5,0.75} {
-      \pgfmathsetmacro\len{\x * (1 - \x)}
-      \draw [->] (2, \x) -- +(3 * \len, 0);
-    };
-    \draw [rotate=270, yscale=-1, shift={(-3,-3)}] (2.5, 0.25) parabola (2, 1);% magic
-    \draw [rotate=90, shift={(-2,-3)}] (2.5, 0.25) parabola (2, 1);
-    \draw (2, 0) -- (2, 1);
-  \end{tikzpicture}
-\end{center}
-We have a high pressure $P_1$ on the left, and a low pressure $P_0 < P_1$ on the right. We solve this problem again, but we will also include gravity. So the equations of motion become
-\begin{align*}
-  -\frac{\partial p}{\partial x} + \mu\frac{\partial^2 u}{\partial y^2} &= 0\\
-  -\frac{\partial p}{\partial y} - g\rho &= 0
-\end{align*}
-The boundary conditions are $u = 0$ at $y = 0, h$. The second equation implies
-\[
-  p =- g\rho y + f(x)
-\]
-for some function $f$. Substituting into the first gives
-\[
-  \mu\frac{\partial^2 u}{\partial y^2} = f'(x).
-\]
-The left is a function of $y$ only, while the right depends only on $x$. So both must be constant, say $G$. Using the boundary conditions, we get
-\[
-  \mu\frac{\partial^2 u}{\partial y^2} = f'(x) = G = \frac{P_1 - P_0}{L},
-\]
-where $L$ is the length of the tube. Then we find
-\[
-  u = \frac{G}{2 \mu} y(h - y).
-\]
-Here the velocity is the greatest at the middle, where $y = \frac{h}{2}$.
+      \node [left] at (0, 0.5) {$P_1$};
+      \node [right] at (6, 0.5) {$P_0$};
 
-Since the equations of motion are linear, if we have both a moving boundary and a pressure gradient, we can just add the tow solutions up.
+      \foreach \x in {0.25,0.5,0.75} {
+        \pgfmathsetmacro\len{\x * (1 - \x)}
+        \draw [->] (2, \x) -- +(3 * \len, 0);
+      };
+      \draw [rotate=270, yscale=-1, shift={(-3,-3)}] (2.5, 0.25) parabola (2, 1);% magic
+      \draw [rotate=90, shift={(-2,-3)}] (2.5, 0.25) parabola (2, 1);
+      \draw (2, 0) -- (2, 1);
+    \end{tikzpicture}
+  \end{center}
+  We have a high pressure $P_1$ on the left, and a low pressure $P_0 < P_1$ on the right. We solve this problem again, but we will also include gravity. So the equations of motion become
+  \begin{align*}
+    -\frac{\partial p}{\partial x} + \mu\frac{\partial^2 u}{\partial y^2} &= 0\\
+    -\frac{\partial p}{\partial y} - g\rho &= 0
+  \end{align*}
+  The boundary conditions are $u = 0$ at $y = 0, h$. The second equation implies
+  \[
+    p =- g\rho y + f(x)
+  \]
+  for some function $f$. Substituting into the first gives
+  \[
+    \mu\frac{\partial^2 u}{\partial y^2} = f'(x).
+  \]
+  The left is a function of $y$ only, while the right depends only on $x$. So both must be constant, say $G$. Using the boundary conditions, we get
+  \[
+    \mu\frac{\partial^2 u}{\partial y^2} = f'(x) = G = \frac{P_1 - P_0}{L},
+  \]
+  where $L$ is the length of the tube. Then we find
+  \[
+    u = \frac{G}{2 \mu} y(h - y).
+  \]
+  Here the velocity is the greatest at the middle, where $y = \frac{h}{2}$.
+\end{eg}
+
+Since the equations of motion are linear, if we have both a moving boundary and a pressure gradient, we can just add the two solutions up.
 
 \subsection{Derived properties of a flow}
-We're going to look at some properties of these flows. One thing we want to know is how much of stuff is being transported.
+The velocity and pressure already fully describe the flow. However, there are some other useful quantities we can compute out of these.
 
-\subsubsection{Volume flux}
+The first thing we consider is how much stuff is being transported by the flow.
 \begin{defi}[Volume flux]
   The \emph{volume flux} is the volume of fluid traversing a cross-section per unit time. This is given by
   \[
@@ -356,13 +382,13 @@ We can calculate this immediately for the two flows.
   \[
     q = \int_0^h \frac{Uy}{h}\;\d y = \frac{Uh}{2}.
   \]
-  For the Pouseuille flow, we have
+  For the Poiseuille flow, we have
   \[
     q = \int_0^h \frac{G}{2\mu} y (h - y)\;\d y = \frac{Gh^3}{12 \mu}.
   \]
 \end{eg}
 
-\subsubsection{Vorticity}
+We can also ask how much ``rotation'' there is in the flow.
 \begin{defi}[Vorticity]
   The \emph{vorticity} is defined by
   \[
@@ -395,217 +421,217 @@ we have
       \node at (3.75, 0.5) [right] {$\omega$};
     \end{tikzpicture}
   \end{center}
-  For the case of the Pouseuille flow, we have
+  For the case of the Poiseuille flow, we have
   \[
     \boldsymbol\omega = \left(0, 0, \frac{G}{\mu}\left(y - \frac{h}{2}\right)\right).
   \]
-\begin{center}
-  \begin{tikzpicture}
-    \fill [gray, path fading=south] (0, 0) rectangle (6, -1);
-    \fill [gray, path fading=north] (0, 1) rectangle (6, 2);
+  \begin{center}
+    \begin{tikzpicture}
+      \fill [gray, path fading=south] (0, 0) rectangle (6, -1);
+      \fill [gray, path fading=north] (0, 1) rectangle (6, 2);
 
-    \node [left] at (0, 0.5) {$P_1$};
-    \node [right] at (6, 0.5) {$P_0$};
+      \node [left] at (0, 0.5) {$P_1$};
+      \node [right] at (6, 0.5) {$P_0$};
 
-    \foreach \x in {0.25,0.5,0.75} {
-      \pgfmathsetmacro\len{\x * (1 - \x)}
-      \draw [->] (2, \x) -- +(3 * \len, 0);
-    };
-    \draw [rotate=270, yscale=-1, shift={(-3,-3)}] (2.5, 0.25) parabola (2, 1);% magic
-    \draw [rotate=90, shift={(-2,-3)}] (2.5, 0.25) parabola (2, 1);
-    \draw (2, 0) -- (2, 1);
+      \foreach \x in {0.25,0.5,0.75} {
+        \pgfmathsetmacro\len{\x * (1 - \x)}
+        \draw [->] (2, \x) -- +(3 * \len, 0);
+      };
+      \draw [rotate=270, yscale=-1, shift={(-3,-3)}] (2.5, 0.25) parabola (2, 1);% magic
+      \draw [rotate=90, shift={(-2,-3)}] (2.5, 0.25) parabola (2, 1);
+      \draw (2, 0) -- (2, 1);
 
-    \draw [-latex'] (2.9, 0.2) arc(180:-90:0.1);
-    \node at (3.1, 0.2) [right] {$\omega$};
+      \draw [-latex'] (2.9, 0.2) arc(180:-90:0.1);
+      \node at (3.1, 0.2) [right] {$\omega$};
 
-    \draw [-latex'] (2.9, 0.8) arc(-180:90:0.1);
-    \node at (3.1, 0.8) [right] {$\omega$};
-  \end{tikzpicture}
-\end{center}
+      \draw [-latex'] (2.9, 0.8) arc(-180:90:0.1);
+      \node at (3.1, 0.8) [right] {$\omega$};
+    \end{tikzpicture}
+  \end{center}
 \end{eg}
 
-\subsubsection{Surface stress}
-Recall that $\tau_s$ is the tangential force per unit area exerted by the fluid on the surface, given by
+Recall that the tangential stress $\tau_s$ is the tangential force per unit area exerted by the fluid on the surface, given by
 \[
   \tau_s = \mu \frac{\partial u}{\partial \mathbf{n}},
 \]
 with $\mathbf{n}$ pointing into the fluid.
 
 \begin{eg}
-For the Couette flow, we have
-\[
-  \tau_s =
-  \begin{cases}
-    \mu \frac{U}{h} & y = 0\\
-    -\mu \frac{U}{h} & y = h
-  \end{cases}
-\]
-We see that at $y = 0$, the stress is positive, and pulls the surface forward. At $y = h$, it is negative, and the surface is pulled backwards.
-
-For the Pouseuille flow, we have
-\[
-  \tau_s =
-  \begin{cases}
-    \frac{Gh}{2} & y = 0\\
-    \frac{Gh}{2} & y = h\\
-  \end{cases}
-\]
-Both surfaces are pulled forward, and this is independent of the viscosity. This makes sense since the force on the surface is given by the pressure gradient, which is independent of the fluid.
-\end{eg}
-\subsection{Gravity-driven flow down a slope}
-\begin{center}
-  \begin{tikzpicture}
-    \draw (0, 1.5) -- (3, 0) -- (2, 0);
-    \fill [mblue, opacity=0.5] (0, 1.5) -- (3, 0) -- (4, 0) -- (0, 2) -- cycle;
-
-    \draw [gray, ->] (1, 1) -- +(0.5, 1) node [above] {$y$};
-    \draw [gray, ->] (1, 1) -- +(1, -0.5) node [below, pos=0.5] {$x$};
-    \draw [->] (3, 2) -- +(0, -0.7) node [pos=0.5, right] {$g$};
-    \draw [->] (1.5, 1) -- (2, 0.75) node [right] {$u$};
-    \node [right] at (4, 1.5) {$p_0$};
-    \node [right, align=left] at (4.5, 1.33) {atmospheric\\ pressure};
-    \draw (2.6, 0) arc(180:153.4349:0.4);
-    \node [left] at (2.66, 0.15) {$\alpha$};
-  \end{tikzpicture}
-\end{center}
-Here there is just atmosphere above the fluid, and we assume the fluid flow is steady, ie. $u$ is merely a function of $y$. We further assume that the atmospheric pressure does not vary over the vertical extent of the flow. This is a very good approximation because $\rho_{\mathrm{air}} \ll \rho_{\mathrm{liq}}$.
-
-Similarly, we assume $\mu_{\mathrm{air}} \ll \mu_{\mathrm{liq}}$. So the air exerts no significant tangential stress. This is known as a free surface.
-
-We first solve the $y$ momentum equation. The force in the $y$ direction is $-g \rho \cos \alpha$. Hence the equation is
-\[
-  \frac{\partial p}{\partial y} = - gp \cos \alpha.
-\]
-Using the fact that $p = p_0$ at the top boundary, we get
-\[
-  p = p_0 - g\rho \cos \alpha (y - h).
-\]
-In particular, $p$ is independent of $x$. In the $x$ component, we get
-\[
-  \mu \frac{\partial^2 u}{\partial y^2} = - g\rho \sin \alpha.
-\]
-The no slip condition gives $u = 0$ when $y = 0$. The other condition is that there is no stress at $y = h$. So we get $\frac{\partial u}{\partial y} = 0$ when $y = h$.
-
-The solution is thus
-\[
-  u = \frac{g\rho\sin \alpha}{2 \mu} y(2h - y).
-\]
-This is a bit like the Poiseuille flow, with $\frac{gp \sin \alpha}{2\mu}$ as the pressure gradient. But instead of going to zero at $y = h$, we get to zero at $y = 2h$ instead. So this is half a Poiseuille flow. % diagram
-
-It is an exercise for the reader to calculate the volume flux $q$.
-
- % can insert profile
-\subsection{Unsteady parallel viscous flow}
-Consider fluid initially at rest in $y > 0$, resting on a flat surface.
-\begin{center}
-  \begin{tikzpicture}
-    \fill [gray, path fading=south] (0, 0) rectangle (6, -1);
-    \draw [->] (0, 0) -- (0, 1) node [above] {$y$};
-    \draw [->] (0, 0) -- (1 , 0) node [below] {$x$};
-  \end{tikzpicture}
-\end{center}
-At time $t = 0$, the boundary $y = 0$ starts to move at constant speed $U$. There is no force and no pressure gradient.
-
-We use the $x$-momentum equation to get
-\[
-  \frac{\partial u}{\partial t} = \nu \frac{\partial^2 u}{\partial y^2},
-\]
-where $\nu = \frac{\mu}{\rho}$. This is clearly the diffusion equation, with the diffusivity $\nu$. We can view this as the diffusion coefficient for motion/momentum/vorticity.
-\begin{defi}[Kinematic viscosity]
-  The \emph{kinematic viscosity} is
+  For the Couette flow, we have
   \[
-    \nu = \frac{\mu}{\rho}.
+    \tau_s =
+    \begin{cases}
+      \mu \frac{U}{h} & y = 0\\
+      -\mu \frac{U}{h} & y = h
+    \end{cases}.
   \]
-\end{defi}
-The boundary conditions are $u = 0$ for $t = 0$ and $u \to 0$ as $y \to \infty$ for all $t$. The other boundary condition is obviously $u = U$ when $y = 0$, for $t > 0$.
+  We see that at $y = 0$, the stress is positive, and pulls the surface forward. At $y = h$, it is negative, and the surface is pulled backwards.
 
-You should have learnt how to solve this in, say, IB Methods. We will approach this differently here.
-\subsubsection{Dimensional analysis}
-We want to do some dimensional analysis. We are already provided with a velocity $U$. We let $T$ be our time scale. We would like to know how fast the movement of fluid propagates up the $y$ axis. We note that in this case, we don't really have an extrinsic length scale --- in the case where we have two boundaries, the distance between them is a natural length scale to compare with, but here the fluid is infinitely thick. So we need to come up with a characteristic intrinsic length scale somewhat arbitrarily. For example, at any time $T$, we can let $\delta$ be the amount of fluid that has reached a speed of at least $\frac{U}{10}$.
+  For the Poiseuille flow, we have
+  \[
+    \tau_s =
+    \begin{cases}
+      \frac{Gh}{2} & y = 0\\
+      \frac{Gh}{2} & y = h\\
+    \end{cases}
+  \]
+  Both surfaces are pulled forward, and this is independent of the viscosity. This makes sense since the force on the surface is given by the pressure gradient, which is independent of the fluid.
+\end{eg}
 
-Instead of trying to figure out the dimensions of, say, $\nu$ and trying to match them, we just replace terms in the differential equation with these quantities of the right dimension, since we know our differential equation is dimensionally correct. So we obtain
-\[
-  \frac{U}{T} \sim \nu \frac{U}{\delta^2}.
-\]
-Since the $U$ cancels out, we get
-\[
-  \delta \sim \sqrt{\nu T}.
-\]
-We can figure out approximately how big this is. For water, we have $\nu_{\mathrm{water}} \approx \SI{10e-6}{\meter\squared\per\second}$. For air, we have $\nu_{\mathrm{air}} \approx \SI{10e-5}{\meter\squared\per\second}$. These are, in general, very tiny.
-\subsubsection{Similarity solution}
-We now solve the problem properly. In an infinite domain with no extrinsic length scale, the diffusion equation admits a similarity solution. We write
-\[
-  u(y, t) = U f(\eta),
-\]
-where $f(\eta)$ is a dimensionless function of the dimensionless variable $\eta$. To make $y$ dimensionless, we define
-\[
-  \eta = \frac{y}{\delta} = \frac{y}{\sqrt{\nu t}}.
-\]
-We substitute this form of the solution into the differential equation. Then we get
-\[
-  -\frac{1}{2} \eta f'(\eta) = f''(\eta),
-\]
-with boundary condition $f = 1$ on $\eta = 0$. Then the solution is by definition
-\[
-  f = \erfc \left(\frac{\eta}{2}\right).
-\]
-Hence
-\[
-  u = U \erfc \left(\frac{y}{2\sqrt{\eta t}}\right).
-\]
-\begin{center}
-  \begin{tikzpicture}
-    \fill [gray, path fading=south] (0.5, 0) rectangle (5, -1);
-    \draw [->] (0.5, 0) -- (5, 0) node [right] {$U$};
-    \draw [->] (3.3, 0) -- +(0, 1.2) node [right, pos=0.5] {$\delta \sim \sqrt{\eta t}$};
+\subsection{More examples}
+Since we are probably bored by the Couette and Poiseuille flows, we do another more interesting example.
+\begin{eg}[Gravity-driven flow down a slope]
+  Suppose we have some fluid flowing along a slope.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (0, 1.5) -- (3, 0) -- (2, 0);
+      \fill [mblue, opacity=0.5] (0, 1.5) -- (3, 0) -- (4, 0) -- (0, 2) -- cycle;
 
-    \draw (1, 0) -- (1, 1.5);
-    \draw (2.5, 0) parabola (1, 1.5);
-    \foreach \y in {0.3,0.6,0.9,1.2} {
-      \pgfmathsetmacro\x{1.5 - sqrt(1.5 * \y)};
-      \draw [-latex'] (1, \y) -- +(\x, 0);
-    }
-  \end{tikzpicture}
-\end{center}
+      \draw [gray, ->] (1, 1) -- +(0.5, 1) node [above] {$y$};
+      \draw [gray, ->] (1, 1) -- +(1, -0.5) node [below, pos=0.5] {$x$};
+      \draw [->] (3, 2) -- +(0, -0.7) node [pos=0.5, right] {$g$};
+      \draw [->] (1.5, 1) -- (2, 0.75) node [right] {$u$};
+      \node [right] at (4, 1.5) {$p_0$};
+      \node [right, align=left] at (4.5, 1.33) {atmospheric\\ pressure};
+      \draw (2.6, 0) arc(180:153.4349:0.4);
+      \node [left] at (2.66, 0.15) {$\alpha$};
+    \end{tikzpicture}
+  \end{center}
+  Here there is just atmosphere above the fluid, and we assume the fluid flow is steady, ie. $u$ is merely a function of $y$. We further assume that the atmospheric pressure does not vary over the vertical extent of the flow. This is a very good approximation because $\rho_{\mathrm{air}} \ll \rho_{\mathrm{liq}}$.
 
-\subsubsection{Kinematic and dynamic viscosities}
-Here we note the viscosities of some common fluids
-\begin{center}
-  \begin{tabular}{cccc}
-    \toprule
-    & $\mu(\SI{}{\kilo\gram\per\meter\per\second})$ & $\rho(\SI{}{\kilo\gram\per\meter\cubed})$ & $\nu(\SI{}{\meter\squared\per\second})$\\
-    \midrule
-    water & $10^{-3}$ & $10^3$ & $10^{-6}$\\
-    air & $10^{-5}$ & $1$ & $10^{-5}$\\
-    \bottomrule
-  \end{tabular}
-\end{center}
-We can compute the tangential stress of the fluid in the above case to be
-\[
-  \tau_s \mu\frac{\partial u}{\partial y} = \left.\mu \frac{U}{\sqrt{\nu t}} \left(\frac{2}{\sqrt{\pi}}\right) e^{-y^{2}}\right|_{y = 0} = \frac{\mu U}{\sqrt{\pi \nu t}}.
-\]
-For comparison, we find that $\frac{\mu}{\sqrt{\nu}}$ is $1$ for water and $10^{-3}$ for air.
+  Similarly, we assume $\mu_{\mathrm{air}} \ll \mu_{\mathrm{liq}}$. So the air exerts no significant tangential stress. This is known as a free surface.
 
-This is significant in, say, the motion of ocean current. When the wind blows, it causes the water in the ocean to move along with it. This is done in a way such that the surface tension between the two fluids match at the boundary. Hence we see that even if the air blows really quickly, the resultant ocean current is much smaller, say a hundredth to a thousandth of it.
+  We first solve the $y$ momentum equation. The force in the $y$ direction is $-g \rho \cos \alpha$. Hence the equation is
+  \[
+    \frac{\partial p}{\partial y} = - gp \cos \alpha.
+  \]
+  Using the fact that $p = p_0$ at the top boundary, we get
+  \[
+    p = p_0 - g\rho \cos \alpha (y - h).
+  \]
+  In particular, $p$ is independent of $x$. In the $x$ component, we get
+  \[
+    \mu \frac{\partial^2 u}{\partial y^2} = - g\rho \sin \alpha.
+  \]
+  The no slip condition gives $u = 0$ when $y = 0$. The other condition is that there is no stress at $y = h$. So we get $\frac{\partial u}{\partial y} = 0$ when $y = h$.
+
+  The solution is thus
+  \[
+    u = \frac{g\rho\sin \alpha}{2 \mu} y(2h - y).
+  \]
+  This is a bit like the Poiseuille flow, with $\frac{gp \sin \alpha}{2\mu}$ as the pressure gradient. But instead of going to zero at $y = h$, we get to zero at $y = 2h$ instead. So this is half a Poiseuille flow. % diagram
+
+  It is an exercise for the reader to calculate the volume flux $q$.
+\end{eg}
+
+For a change, we do a case where we have \emph{unsteady} flow.
+\begin{eg}
+  Consider fluid initially at rest in $y > 0$, resting on a flat surface.
+  \begin{center}
+    \begin{tikzpicture}
+      \fill [gray, path fading=south] (0, 0) rectangle (6, -1);
+      \draw [->] (0, 0) -- (0, 1) node [above] {$y$};
+      \draw [->] (0, 0) -- (1 , 0) node [below] {$x$};
+    \end{tikzpicture}
+  \end{center}
+  At time $t = 0$, the boundary $y = 0$ starts to move at constant speed $U$. There is no force and no pressure gradient.
+
+  We use the $x$-momentum equation to get
+  \[
+    \frac{\partial u}{\partial t} = \nu \frac{\partial^2 u}{\partial y^2},
+  \]
+  where $\nu = \frac{\mu}{\rho}$. This is clearly the diffusion equation, with the diffusivity $\nu$. We can view this as the diffusion coefficient for motion/momentum/vorticity.
+  \begin{defi}[Kinematic viscosity]
+    The \emph{kinematic viscosity} is
+    \[
+      \nu = \frac{\mu}{\rho}.
+    \]
+  \end{defi}
+  The boundary conditions are $u = 0$ for $t = 0$ and $u \to 0$ as $y \to \infty$ for all $t$. The other boundary condition is obviously $u = U$ when $y = 0$, for $t > 0$.
+
+  You should have learnt how to solve this in, say, IB Methods. We will approach this differently here.
+
+  Before we start, we try to do some dimensional analysis, and try to figure out how far we have to go away from the boundary before we don't feel any significant motion.
+
+  We first list all the terms involved. We are already provided with a velocity $U$. We let $T$ be our time scale. We would like to know how fast the movement of fluid propagates up the $y$ axis. We note that in this case, we don't really have an extrinsic length scale --- in the case where we have two boundaries, the distance between them is a natural length scale to compare with, but here the fluid is infinitely thick. So we need to come up with a characteristic intrinsic length scale somewhat arbitrarily. For example, at any time $T$, we can let $\delta$ be the amount of fluid that has reached a speed of at least $\frac{U}{10}$ (that was completely arbitrary).
+
+  Instead of trying to figure out the dimensions of, say, $\nu$ and trying to match them, we just replace terms in the differential equation with these quantities of the right dimension, since we know our differential equation is dimensionally correct. So we obtain
+  \[
+    \frac{U}{T} \sim \nu \frac{U}{\delta^2}.
+  \]
+  Since the $U$ cancels out, we get
+  \[
+    \delta \sim \sqrt{\nu T}.
+  \]
+  We can figure out approximately how big this is, using the table below:
+  \begin{center}
+    \begin{tabular}{cccc}
+      \toprule
+      & $\mu(\SI{}{\kilo\gram\per\meter\per\second})$ & $\rho(\SI{}{\kilo\gram\per\meter\cubed})$ & $\nu(\SI{}{\meter\squared\per\second})$\\
+      \midrule
+      water & $10^{-3}$ & $10^3$ & $10^{-6}$\\
+      air & $10^{-5}$ & $1$ & $10^{-5}$\\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  These are, in general, very tiny. So we expect to feel nothing when we move slightly away from the boundary.
+
+  We now solve the problem properly. In an infinite domain with no extrinsic length scale, the diffusion equation admits a similarity solution. We write
+  \[
+    u(y, t) = U f(\eta),
+  \]
+  where $f(\eta)$ is a dimensionless function of the dimensionless variable $\eta$. To turn $y$ into a dimensionless variable, we have to define
+  \[
+    \eta = \frac{y}{\delta} = \frac{y}{\sqrt{\nu t}}.
+  \]
+  We substitute this form of the solution into the differential equation. Then we get
+  \[
+    -\frac{1}{2} \eta f'(\eta) = f''(\eta),
+  \]
+  with boundary condition $f = 1$ on $\eta = 0$. Then the solution is by definition
+  \[
+    f = \erfc \left(\frac{\eta}{2}\right).
+  \]
+  Hence
+  \[
+    u = U \erfc \left(\frac{y}{2\sqrt{\eta t}}\right).
+  \]
+  \begin{center}
+    \begin{tikzpicture}
+      \fill [gray, path fading=south] (0.5, 0) rectangle (5, -1);
+      \draw [->] (0.5, 0) -- (5, 0) node [right] {$U$};
+      \draw [->] (3.3, 0) -- +(0, 1.2) node [right, pos=0.5] {$\delta \sim \sqrt{\eta t}$};
+
+      \draw (1, 0) -- (1, 1.5);
+      \draw (2.5, 0) parabola (1, 1.5);
+      \foreach \y in {0.3,0.6,0.9,1.2} {
+        \pgfmathsetmacro\x{1.5 - sqrt(1.5 * \y)};
+        \draw [-latex'] (1, \y) -- +(\x, 0);
+      }
+    \end{tikzpicture}
+  \end{center}
+  We can compute the tangential stress of the fluid in the above case to be
+  \[
+    \tau_s = \mu\frac{\partial u}{\partial y} = \left.\mu \frac{U}{\sqrt{\nu t}} \left(\frac{2}{\sqrt{\pi}}\right) e^{-y^{2}}\right|_{y = 0} = \frac{\mu U}{\sqrt{\pi \nu t}}.
+  \]
+  Using our previous calculations of the kinematic viscosities, we find that $\frac{\mu}{\sqrt{\nu}}$ is $1$ for water and $10^{-3}$ for air.
+
+  This is significant in, say, the motion of ocean current. When the wind blows, it causes the water in the ocean to move along with it. This is done in a way such that the surface tension between the two fluids match at the boundary. Hence we see that even if the air blows really quickly, the resultant ocean current is much smaller, say a hundredth to a thousandth of it.
+\end{eg}
 
 \section{Kinematics}
+So far, we have considered a rather specific kind of fluid flow --- parallel flow, and derived the equations of motion from first principles. From now on, we will start to consider more general theory of fluid dynamics. In this section, we are mostly making some definitions and descriptions of flows. In the next chapter, we will take the equations of motion and try to solve them in certain scenarios.
+
 \subsection{Material time derivative}
-In this picture, in order to study fluid motion, we mark (with, say, a dye) a fluid particle, and follow its trajectory. This is a very natural thing to do. For example, if we see smoke coming out of a chimney, we follow the smoke and see how it goes. The problem with this is that trajectories can cross, and this makes writing down differential equations difficult.
-\begin{center}
-  \begin{tikzpicture}
-    \node [circ] at (0, 0) {};
-    \node [circ] at (4, 0) {};
-    \draw [->-=0.13, ->-=0.3, ->-=0.5, ->-=0.9] plot [smooth] coordinates {(0, 0) (1, -0.1) (1.5, 0.3) (2.2, -0.5) (4, 0)};
+We first want to consider the problem of how we can measure the change in a quantity, say $f$. This might be pressure, velocity, temperature, or anything else you can imagine.
 
-    \node [circ] at (1, -1) {};
-    \node [circ] at (3, 1) {};
+The obvious thing to do would be the consider the time derivative
+\[
+  \frac{\partial f}{\partial t}.
+\]
+In physical terms, this would be equivalent to fixing our measurement instrument at a point and measure the quantity over time. This is known as the \emph{Eulerian picture}.
 
-    \draw [->-=0.2, ->-=0.8] plot [smooth] coordinates {(1, -1) (1.4, -0.6) (1.8, 0.1) (3, 1)};
-  \end{tikzpicture}
-\end{center}
-There is an alternative way to do this, known as the Eulerian picture (or lazy person's picture). We sit at one place, and watch the world go by. For example, we stand at the top of a tower and hold an instrument still.
-
-This way, we can formulate equations for observables, such as the velocity $\mathbf{u}(\mathbf{x}, t)$, measured at fixed locations as functions of time $t$.
+However, often we want to consider something else. We pretend we are a fluid particle, and move along with the flow. We then measure the change in $f$ along our trajectory. This is known as the \emph{Lagrangian picture}.
 
 Let's look at these two pictures, and see how they relate to each other. Consider a time-dependent field $f(\mathbf{x}, t)$. For example, it might be the pressure of the system, or the temperature of the fluid. Consider a path $\mathbf{x}(t)$ through the field, and we want to know how the field varies as we move along the path.
 
@@ -626,14 +652,14 @@ Along the path $\mathbf{x}(t)$, the chain rule gives
     \frac{\D f}{\D t} = \mathbf{u}\cdot \nabla f + \frac{\partial f}{\partial t}.
   \]
 \end{defi}
-On the left of this equation, we have the \emph{Lagrangian derivative}, which is the change in $f$ as we follow the path. On the right of this equation, the first term is $\frac{\partial f}{\partial t}$, the \emph{Eulerian time derivative}, which is the change at a fixed point. The last term is the \emph{advective derivative}, which is the change due to change in position.
+On the left of this equation, we have the \emph{Lagrangian derivative}, which is the change in $f$ as we follow the path. On the right of this equation, the first term is the \emph{advective derivative}, which is the change due to change in position. The second term is $\frac{\partial f}{\partial t}$, the \emph{Eulerian time derivative}, which is the change at a fixed point.
 
 For example, consider a river that gets wider as we go downstream. We know (from, say, experience) that the flow is faster upstream than downstream. If the motion is steady, then the Eulerian time derivative vanishes, but the Lagrangian derivative does not, since as the fluid goes down the stream, the fluid slows down, and there is a spacial variation.
 
-In practice, most of the time, we will use the Eulerian formulation, because this allows us to formulate differential equations.
+Often, it is the Lagrangian derivative that is relevant, but the Eulerian time derivative is what we can usually put into differential equations. So we will need both of them, and relate them by the formula above.
 
 \subsection{Conservation of mass}
-The first equation we want to formulate is the conservation of mass.
+We can start formulating equations. The first one is the conservation of mass.
 
 We fix an arbitrary region of space $\mathcal{D}$ with boundary $\partial \mathcal{D}$ and outward normal $\mathbf{n}$. We imagine there is some flow through this volume
 \begin{center}
@@ -662,7 +688,7 @@ Since $\mathcal{D}$ was arbitrary, we must have
 \]
 everywhere in space.
 
-This is the general form of a conservation law --- the rate of change of ``stuff'' density plus the divergence of the ``stuff'' flux is constantly zero. We will later formulate a similar result for, say, the momentum.
+This is the general form of a conservation law --- the rate of change of ``stuff'' density plus the divergence of the ``stuff flux'' is constantly zero. Similar conservation laws appear everywhere in physics.
 
 In the conservation equation, we can expand $\nabla \cdot (\rho \mathbf{u})$ to get
 \[
@@ -672,8 +698,7 @@ We notice the first term is just the material derivative of $\rho$. So we get
 \[
   \frac{\D \rho}{\D t} + \rho \nabla \cdot \mathbf{u} = 0.
 \]
-\subsection{Incompressible flow}
-We have previously handwavily talked about incompressible flows. We now make this notion precise. What exactly happens when we compress a fluid? When we compress mass, in order to conserve mass, we must increase the density. If we don't allow changes in density, then the material derivative $\frac{\D \rho}{\D t}$ must vanish. So we define an incompressible fluid as follows:
+With the conservation of mass, we can now properly say what incompressibility is. What exactly happens when we compress a fluid? When we compress mass, in order to conserve mass, we must increase the density. If we don't allow changes in density, then the material derivative $\frac{\D \rho}{\D t}$ must vanish. So we define an incompressible fluid as follows:
 \begin{defi}[Incompressible fluid]
   A fluid is \emph{incompressible} if the density of a fluid particle does not change. This implies
   \[
@@ -690,7 +715,7 @@ For parallel flow, $\mathbf{u} = (u, 0, 0)$. So if the flow is incompressible, w
 Of course, incompressibility is just an approximation. Since we can hear things, everything must be compressible. So what really matters is whether the slow speed is small compared to the speed of sound. If it is relatively small, then incompressibility is a good approximation. In air, the speed of sound is approximately $\SI{340}{\meter\per\second}$. In water, the speed of sound is approximately $\SI{1500}{\meter\per\second}$.
 
 \subsection{Kinematic boundary conditions}
-Suppose our system has a boundary. There are two possible cases --- either the boundary is rigid, like a wall, or it moves with the fluid. One important property of the boundary is that fluids are not allowed to pass through them.
+Suppose our system has a boundary. There are two possible cases --- either the boundary is rigid, like a wall, or it moves with the fluid. In either case, fluids are not allowed to pass through the boundary.
 
 To deal with boundaries, we first suppose it has a velocity $\mathbf{U}$ (which may vary with position if the boundary extends through space). We define a local reference frame moving with velocity $\mathbf{U}$, so that in this frame of reference, the boundary is stationary.
 
@@ -707,17 +732,16 @@ In terms of the outside frame, we get
   \mathbf{u}\cdot \mathbf{n} = \mathbf{U} \cdot \mathbf{n}.
 \]
 This is the condition we have for the boundary.
-\subsubsection{Stationary rigid boundary}
+
 If we have a stationary rigid boundary, eg. the wall, then $\mathbf{U} = \mathbf{0}$. So our boundary condition is
 \[
   \mathbf{u}\cdot \mathbf{n}= 0.
 \]
-\subsubsection{Free material boundary}
-A good example of a free material body is the surface of a water wave, or interface between two immiscible fluids --- say oil and water.
+Free boundaries are more complicated. A good example of a free material boundary is the surface of a water wave, or interface between two immiscible fluids --- say oil and water.
 \begin{center}
   \begin{tikzpicture}
     \draw (0, 0) sin (1, 0.2) cos (2, 0) sin (3, -0.2) cos (4, 0);
-    \node at (3, 1) {air};
+    \node at (3, 1) {oil};
     \node at (3, -1) {water};
 
     \draw [->] (1, 0.2) -- +(0, 0.7) node [above] {$\mathbf{n}$};
@@ -734,7 +758,7 @@ We can alternatively define the surface as a contour of
 \[
   F(x, y, z, t) = z - \zeta(x, y, t).
 \]
-Then the surface is defined by $F = 0$. By IA vector calculus, the normal is parallel to
+Then the surface is defined by $F = 0$. By IA Vector Calculus, the normal is parallel to
 \[
   \mathbf{n} \parallel \nabla F = (-\zeta_x, -\zeta_y, 1).
 \]
@@ -781,12 +805,11 @@ By IA Vector Calculus, this implies there is a vector potential $\mathbf{A}$ suc
   \]
 \end{defi}
 
-\subsubsection{Two-dimensional flow}
-Imagine we are living in the $x, y$ plane, and hence
+In the special case where the flow is two dimensional, say
 \[
-  \mathbf{u} = (u(x, y, t), v(x, y, t), 0).
+  \mathbf{u} = (u(x, y, t), v(x, y, t), 0),
 \]
-(we can also imagine this as a flow that does not depend on the $z$ dimension). Then we can immediately know $\mathbf{A}$ is of the form
+we can immediately know $\mathbf{A}$ is of the form
 \[
   \mathbf{A} = (0, 0, \psi(x, y, t)),
 \]
@@ -799,11 +822,7 @@ Taking the curl of this, we get
 \end{defi}
 This streamfunction is both physically significant, and mathematically convenient, as we will soon see.
 
-We look at some properties of the streamfunction
-\subsubsection{Properties of the streamfunction}
-This is related to question 7 on the first example sheet.
-
-The first thing we can do is to look at the contours $\psi = c$. These have normal
+We look at some properties of the streamfunction. The first thing we can do is to look at the contours $\psi = c$. These have normal
 \[
   \mathbf{n} = \nabla \psi = \left(\psi_x, \psi_y, 0\right).
 \]
@@ -855,7 +874,7 @@ Note that if the flow is \emph{unsteady}, then the streamlines are \emph{not} pa
   \]
   So the particle paths are parabolas.
 \end{eg}
-Typically, we draw streamlines that are ``evenly spaced'', ie. we pick the streamlines $\psi = c_0$, $\psi = c_1$, $\psi c_2$ etc. such that $c_3 - c_2 = c_2 - c_1$.
+Typically, we draw streamlines that are ``evenly spaced'', ie. we pick the streamlines $\psi = c_0$, $\psi = c_1$, $\psi = c_2$ etc. such that $c_3 - c_2 = c_2 - c_1$.
 
 Then we know the flow is faster where streamlines are closer together:
 \begin{center}
@@ -890,7 +909,6 @@ We can also consider the volume flux (per unit length in the $z$-direction), cro
 
   \end{tikzpicture}
 \end{center}
-% some flow, path from x_0 to x_1 crossing streamlines, label path as $\Gamma$. Label \mathbf{u} and \mathbf{n}
 Then the volume flux is
 \[
   q = \int_{\mathbf{x}_0}^{\mathbf{x}_1} \mathbf{u}\cdot \mathbf{n}\;\d \ell.
@@ -907,8 +925,7 @@ So the flux depends only the difference in the value of $\psi$. Hence, for close
 
 Also, note that $\psi$ is constant on a stationary rigid boundary, ie. the boundary is a streamline, since the flow is tangential at the boundary. This is a consequence of $\mathbf{u}\cdot \mathbf{n} = 0$. We often choose $\psi = 0$ as our boundary.
 
-\subsubsection{Plane polar coordinates}
-We now want to consider two-dimensional flow in plane polars --- we embed these in cylindrical polars $(r, \theta, z)$, with
+Sometimes it is convenient to consider the case when we have plane polars. We embed these in cylindrical polars $(r, \theta, z)$. Then we have
 \[
   \mathbf{u} = \nabla \times (0, 0, \psi) = \frac{1}{r}
   \begin{vmatrix}
@@ -918,30 +935,30 @@ We now want to consider two-dimensional flow in plane polars --- we embed these 
   \end{vmatrix}
   =\left(r \frac{\partial \psi}{\partial \theta}, -\frac{\partial \psi}{\partial r}, 0\right).
 \]
-As an exercise, we can verify that $\nabla \cdot \mathbf{u} = 0$. Note that in plane polars,
+As an exercise, we can verify that $\nabla \cdot \mathbf{u} = 0$. It is convenient to note that in plane polars,
 \[
   \nabla \cdot \mathbf{u} = \frac{1}{r} \frac{\partial}{\partial r} (r \mathbf{u}_r) + \frac{1}{r} \frac{\partial u_\theta}{\partial \theta}.
 \]
+
 \section{Dynamics}
 \subsection{Navier-Stokes equations}
-The Navier-Stokes equation is basically Newton's second law for a fluid particle.
+So far, we haven't done anything useful. We have not yet come up with an equation of motion for fluids, and thus we don't know how fluids actually behave.
+
+Unfortunately, the equation of motion is rather complicated and difficult to derive, and we will not be able to derive it in this course. Instead, it is left for the Part II course. However, we will be able to derive some special cases of it later under certain simplifying assumptions.
 \begin{law}[Navier-Stokes equation]
   \[
     \rho \frac{\D \mathbf{u}}{\D t} = - \nabla p + \mu \nabla^2 \mathbf{u} + \mathbf{f}.
   \]
 \end{law}
-We will just assume this is true.
-
 This is the general equation for fluid motion. The left hand side is mass times acceleration, and the right is the individual forces --- the pressure gradient, viscosity, and the body forces (per unit volume) respectively.
 
-These are very difficult equations to solve because of non-linearity. For example, in the material derivative, we have the term $\mathbf{u} \cdot \nabla \mathbf{u}$.
+In general, these are very difficult equations to solve because of non-linearity. For example, in the material derivative, we have the term $\mathbf{u} \cdot \nabla \mathbf{u}$.
 
 There are a few things to note:
 \begin{enumerate}
   \item The acceleration of a fluid particle is the Lagrangian material derivative of the velocity.
-  \item As we said, the Navier-Stokes equation is per unit volume.
   \item The derivation of the viscous term is complicated, since for each side of the cube, there is one normal direction and two tangential directions. Thus this requires consideration of the \emph{stress tensor}. This is only done in IID Fluid Dynamics.
-  \item In a gravitational field, we just have $\mathbf{f} = \mathbf{g}\rho$. This is the only body force we will consider in this course
+  \item In a gravitational field, we just have $\mathbf{f} = \mathbf{g}\rho$. This is the only body force we will consider in this course.
   \item Note that $\nabla^2 \mathbf{u}$ can be written as
     \[
       \nabla^2 \mathbf{u} = \nabla (\nabla \cdot \mathbf{u}) - \nabla \times (\nabla \times \mathbf{u}).
@@ -961,23 +978,24 @@ There are a few things to note:
   \item The Navier-Stokes equation reduces to the parallel flow equation in the special case of parallel flow, ie. $\mathbf{u} = (u(y, t), 0, 0)$. This verification is left as an exercise for the reader.
 \end{enumerate}
 
-\subsection{Hydrostatic pressure}
-Hydrostatic pressure is the pressure in a fluid at rest (hence ``hydro'' and ``static''). In other words, $\mathbf{u} = 0$. We done the hydrostatic pressure as $p_H$. Then the Navier-Stokes equation reduces to
+\subsection{Pressure}
+In the Navier-Stokes equation, we have a pressure term. In general, we classify the pressure into two categories. If there is gravity, then we will get pressure in the fluid due to the weight of fluid above it. This is what we call \emph{hydrostatic pressure}. Technically, this is the pressure in a fluid at rest, ie. when $\mathbf{u} = \mathbf{0}$.
+
+ We denote the hydrostatic pressure as $p_H$. Then the Navier-Stokes equation reduces to
 \[
   \nabla p_H = \mathbf{f} = \rho \mathbf{g}.
 \]
 We can integrate this to obtain
 \[
-  p_h = p \mathbf{g}\cdot \mathbf{x} + p_0,
+  p_H = p \mathbf{g}\cdot \mathbf{x} + p_0,
 \]
 where $p_0$ is some arbitrary constant. Usually, we have $\mathbf{g} = (0, 0, -g)$. Then
 \[
-  p_h = p_0 - g \rho z.
+  p_H = p_0 - g \rho z.
 \]
-In other words, it is just the weight of the fluid above you (per unit area).
+This exactly says that the hydrostatic pressure is the weight of the fluid above you.
 
-\subsubsection{Force on a submerged body in a fluid at rest}
-Suppose we have a body $\mathcal{D}$ with boundary $\partial \mathcal{D}$ and outward normal $\mathbf{n}$. Then the force is
+What can we infer from this? Suppose we have a body $\mathcal{D}$ with boundary $\partial \mathcal{D}$ and outward normal $\mathbf{n}$. Then the force is
 \begin{align*}
   \mathbf{F} &= - \int_{\partial \mathcal{D}} p_H \mathbf{n}\cdot dS \\
   &= - \int_\mathcal{D} \nabla p_H \;\d V\\
@@ -985,26 +1003,23 @@ Suppose we have a body $\mathcal{D}$ with boundary $\partial \mathcal{D}$ and ou
   &= - \mathbf{g} \int_\mathcal{D} \rho \;\d V\\
   &= - M\mathbf{g},
 \end{align*}
-where $M$ is the mass of fluid displaced. This is Archimedes' principle.
+where $M$ is the mass of fluid displaced. This is known as \emph{Archimedes' principle}.
 
 In particular, if the body is less dense than the fluid, it will float; if the body is denser than the fluid, it will sink; if the density is the same, then it does not move, and we say it is neutrally buoyant.
 
-This is valid only when nothing is moving. So we want to know what happens when things move.
+This is valid only when nothing is moving, since that was our assumption. Things can be very different when things are moving, which is why planes can fly.
 
-\subsection{Dynamic pressure}
-This is what is causing or resulting from fluid flow. For example, in the Poiseuille flow, we have a pressure driving the fluid flow; if we have a flow, this can also create some extra pressure.
-
-In general, we write
+In general, when there is motion, we might expect some other pressure gradient. It can either be some external pressure gradient driving the motion (eg. in the case of Poiseuille flow), or a pressure gradient caused by the flow itself. In either case, we can write
 \[
   p = p_H + p',
 \]
-where $p_H$ is the hydrostatic pressure, and $p'$ caused/results from motion.
+where $p_H$ is the hydrostatic pressure, and $p'$ is what caused/results from motion.
 
 We substitute this into the Navier-Stokes equation to obtain
 \[
   \rho \frac{\D u}{\D t} = -\nabla p' + \mu \nabla^2 \mathbf{u}.
 \]
-What we usually do is drop the ``prime'', and just look at the deviation from hydrostatic pressure. What this means is that gravity no longer plays a role, and we can ignore gravity in any flow in which the density is constant. Then all fluid particles are neutrally buoyant. This is the case in most of the course, except when we consider motion of water waves, since there is a difference in air density and water density.
+So the hydrostatic pressure term cancels with the gravitational term. So what we usually do is drop the ``prime'', and just look at the deviation from hydrostatic pressure. What this means is that gravity no longer plays a role, and we can ignore gravity in any flow in which the density is constant. Then all fluid particles are neutrally buoyant. This is the case in most of the course, except when we consider motion of water waves, since there is a difference in air density and water density.
 
 \subsection{Reynolds number}
 As we mentioned, the Navier-Stokes equation is very difficult to solve. So we want to find some approximations to the equation. We would like to know if we can ignore some terms. For example, if we can neglect the viscous term, then we are left with a first-order equation, not a second-order one.
@@ -1032,19 +1047,18 @@ Dividing by $U^2/L$, we get
   \[
     Re = \frac{UL}{\nu},
   \]
-  which is a dimensionless number.
+  which is a dimensionless number. This is a measure of the magnitude of the inertia to viscous terms.
 \end{defi}
-So if $Re$ is very large, then the viscous term is small, and we can probably neglect it. For example, for an aircraft, we have $U \sim 10^4$, $L \sim 10$ and $\nu \sim 10^{-5}$. So the Reynolds number is small, and we can ignore the viscous term. On the other hand, if we have a small slow-moving object in viscous fluid, then $Re$ will be small, and the viscous term is significant.
+So if $Re$ is very large, then the viscous term is small, and we can probably neglect it. For example, for an aircraft, we have $U \sim 10^4$, $L \sim 10$ and $\nu \sim 10^{-5}$. So the Reynolds number is large, and we can ignore the viscous term. On the other hand, if we have a small slow-moving object in viscous fluid, then $Re$ will be small, and the viscous term is significant.
 
-The Reynolds number $Re$ is a measure of the magnitude of the inertia to viscous terms. The pressure always scales to balance the dominant terms in the equation, so as to impose incompressibility, ie. $\nabla \cdot \mathbf{u} = 0$.
+Note that the pressure always scales to balance the dominant terms in the equation, so as to impose incompressibility, ie. $\nabla \cdot \mathbf{u} = 0$. So we don't have to care about its scale.
 
-The Reynolds number to a large extent determines the behaviour of a flow. For example, even though lava is very very viscous, on a large scale, the flow of lava is just like the flow of water in a river, since they have comparable Reynolds number.
+In practice, it is the Reynolds number, and not the factors $U, L, \nu$ individually, that determines the behaviour of a flow. For example, even though lava is very very viscous, on a large scale, the flow of lava is just like the flow of water in a river, since they have comparable Reynolds number.
 
 \begin{defi}[Dynamic similarity]
   Flows with the same geometry and equal Reynolds numbers are said to be dynamically similar.
 \end{defi}
 
-\subsubsection{Small Reynolds number (\texorpdfstring{$Re \ll 1$}{Re << 1})}
 When $Re \ll 1$, the inertia terms are negligible, and we now have
 \[
   P \sim \frac{\rho\nu U}{L} = \frac{\mu U}{L}.
@@ -1063,7 +1077,6 @@ These are known as \emph{Stokes equations}. This is now a linear equation, with 
 \]
 and so the velocity is proportional to the pressure gradient.
 
-\subsubsection{Large Reynolds number (\texorpdfstring{$Re \gg 1$}{Re >> 1})}
 When $Re \gg 1$, the viscous terms are negligible on extrinsic length scale. Then the pressure scales on the momentum flux,
 \[
   P \sim \rho U^2,
@@ -1077,14 +1090,13 @@ In this case, the acceleration is proportional to the pressure gradient.
 
 Why do we keep saying ``extrinsic scale''? Note that when we make this approximation, the order of the differential equation drops by $1$. So we can no longer satisfy all boundary conditions. The boundary condition we have to give up is the no-slip condition. So when we make this approximation, we will have to allow the fluid at the boundary to have non-zero velocity.
 
-When is this approximation valid? It is obviously wrong when we are \emph{at} the boundary. If the velocity gradient near the boundary is relatively large, then we quickly get significant non-zero velocity when we move away from boundary, and hence obtain the ``correct'' answer. So we get problems only at the length scale where the viscous and inertia effects are comparable, ie. the \emph{intrinsic} length scale.
+So when is this approximation valid? It is obviously wrong when we are \emph{at} the boundary. If the velocity gradient near the boundary is relatively large, then we quickly get significant non-zero velocity when we move away from boundary, and hence obtain the ``correct'' answer. So we get problems only at the length scale where the viscous and inertia effects are comparable, ie. at the \emph{intrinsic} length scale.
 
-\subsubsection{Intrinsic length scale \texorpdfstring{$\delta$}{delta}}
-The \emph{intrinsic length scale} $\delta$ is the scale at which the viscous and inertia terms are comparable. Since we need
+Since the \emph{intrinsic length scale} $\delta$ is the scale at which the viscous and inertia terms are comparable, we need
 \[
-  U^2 \sim \frac{\nu U}{\delta^2},
+  U^2 \sim \frac{\nu U}{\delta^2}.
 \]
-we get
+So we get
 \[
   \delta = \frac{\nu}{U}.
 \]
@@ -1095,173 +1107,183 @@ Alternatively, we have
 Thus, for large Reynolds number, the intrinsic length scale, which is the scale in which the viscous and boundary effects matter, is small, and we can ignore them.
 
 For much of the rest of this course, we will ignore viscosity, and consider \emph{inviscid flow}.
+
 \subsection{A case study: stagnation point flow (\texorpdfstring{$\mathbf{u} = \mathbf{0}$}{u = 0})}
-There is an exact solution to to the Navier-Stokes equation in the half-plane $y \geq 0$, in which $\mathbf{u} \to (Ex, -E y, 0)$, where $E > 0$ is a constant, as $y \to \infty$, and $\mathbf{u} = \mathbf{0}$ on $y = 0$.
-\begin{center}
-  \begin{tikzpicture}
-    \fill [gray, path fading=south] (-3, 0) rectangle (3, -0.5);
-    \draw [->] (-3, 0) -- (3, 0) node [right] {$x$};
-    \draw [->] (0, -0.5) -- (0, 3) node [above] {$y$};
+\begin{eg}[Stagnation point flow]
+  We attempt to find a solution to the Navier-Stokes equation in the half-plane $y \geq 0$, subject to the boundary condition $\mathbf{u} \to (Ex, -E y, 0)$ as $y \to \infty$, where $E > 0$ is a constant, and $\mathbf{u} = \mathbf{0}$ on $y = 0$.
 
-    \draw [->-=0.5, rotate=90](3, 0.2) parabola (0.2, 3);
-    \draw [->-=0.5, xscale=-1, rotate=90](3, 0.2) parabola (0.2, 3);
+  Intuitively, we would expect the flow to look like this:
+  \begin{center}
+    \begin{tikzpicture}
+      \fill [gray, path fading=south] (-3, 0) rectangle (3, -0.5);
+      \draw [->] (-3, 0) -- (3, 0) node [right] {$x$};
+      \draw [->] (0, -0.5) -- (0, 3) node [above] {$y$};
 
-    \clip (-3, 3) rectangle (3, 0);
-    \draw [->-=0.5, rotate=90](3.3, 0.9) parabola (0.9, 3);
-    \draw [->-=0.5, xscale=-1, rotate=90](3.3, 0.9) parabola (0.9, 3);
-  \end{tikzpicture}
-\end{center}
-The boundary conditions as $y \to \infty$ gives us a picture of what is going on at large $y$, as shown in the diagram, but near the boundary, the velocity has to start to vanish. So we would want to solve the equations to see what happens near the boundary.
+      \draw [->-=0.5, rotate=90](3, 0.2) parabola (0.2, 3);
+      \draw [->-=0.5, xscale=-1, rotate=90](3, 0.2) parabola (0.2, 3);
 
-Again, this problem does not have any extrinsic length scale. So we can seek a similarity solution of the form
-\[
-  \mathbf{u} = (u, v, 0) = (Ex g'(\nu), -E \delta g(\eta), 0),
-\]
-where
-\[
-  \eta = \frac{y}{\delta}, \quad \delta = \sqrt{\frac{\nu}{E}}.
-\]
-Hence
-\[
-  \eta = \sqrt{\frac{E}{\nu}} y.
-\]
-We want to solve this exactly, and look at the properties of the solution.
+      \clip (-3, 3) rectangle (3, 0);
+      \draw [->-=0.5, rotate=90](3.3, 0.9) parabola (0.9, 3);
+      \draw [->-=0.5, xscale=-1, rotate=90](3.3, 0.9) parabola (0.9, 3);
+    \end{tikzpicture}
+  \end{center}
+  The boundary conditions as $y \to \infty$ gives us a picture of what is going on at large $y$, as shown in the diagram, but near the boundary, the velocity has to start to vanish. So we would want to solve the equations to see what happens near the boundary.
 
-First of all, we make sure this is the right similarity solution. We show that $\delta$ has dimensions of length:
-\begin{itemize}
-  \item The dimension of $E$ is $[E] = T^{-1}$
-  \item The dimension of $\nu$ is $[\nu] = L^2 T^{-1}$.
-\end{itemize}
-Hence
-\[
-  \left[\frac{E}{\nu}\right] = L^2,
-\]
-and $\delta$ has dimension $L$. Therefore $\eta = \frac{y}{\delta}$ is dimensionless.
+  Again, this problem does not have any extrinsic length scale. So we can seek a similarity solution in terms of
+  \[
+    \eta = \frac{y}{\delta}, \quad \delta = \sqrt{\frac{\nu}{E}}.
+  \]
+  First of all, we make sure this is the right similarity solution. We show that $\delta$ has dimensions of length:
+  \begin{itemize}
+    \item The dimension of $E$ is $[E] = T^{-1}$
+    \item The dimension of $\nu$ is $[\nu] = L^2 T^{-1}$.
+  \end{itemize}
+  Hence
+  \[
+    \left[\frac{E}{\nu}\right] = L^2,
+  \]
+  and $\delta$ has dimension $L$. Therefore $\eta = \frac{y}{\delta}$ is dimensionless.
 
-Next, we need to show that this is incompressible. To do this, we simply have to find the streamfunction. It turns out it is given by
-\[
-  \psi = \sqrt{\nu E} x g(\eta).
-\]
-We then have
-\[
-  u = \frac{\partial \psi}{\partial t} = \sqrt{\nu E} x g'(\eta) \frac{1}{\delta} = Ex g'(\eta),
-\]
-and similarly for the $y$ component. Therefore we must have $\nabla \cdot \mathbf{u} = 0$. Alternatively, we can simply compute $\nabla \cdot \mathbf{u}$ and find it to be zero.
+  Note that we make $\eta$ a function of $y$ instead of a function of $x$ so that we can impose the boundary condition as $y \to \infty$.
 
-Finally, we look at the Navier-Stokes equations. The $x$ and $y$ components are
-\begin{align*}
-  u \frac{\partial u}{\partial x} + v \frac{\partial u}{\partial y} &= -\frac{1}{\rho}\frac{\partial p}{\partial x} + \nu \left(\frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2}\right)\\
-  u \frac{\partial v}{\partial x} + v \frac{\partial v}{\partial y} &= -\frac{1}{\rho}\frac{\partial p}{\partial y} + \nu \left(\frac{\partial^2 v}{\partial x^2} + \frac{\partial^2 v}{\partial y^2}\right).
-\end{align*}
-Substituting our expression for $u$ and $v$, we get
-\[
-  Ex g'E g' - E \delta g E x g'' \frac{1}{\delta} = -\frac{1}{\rho} \frac{\partial p}{\partial x} - \nu E xg''' \frac{1}{\delta^2}.
-\]
-Some tidying up gives
-\[
-  E^2 x(g'^2 - gg'') = -\frac{1}{\rho} \frac{\partial p}{\partial x} - E^2 x g'''.
-\]
-We can do the same thing for the $y$-component, and get
-\[
-  E\sqrt{\nu E}gg' = -\frac{1}{\rho} \frac{\partial p}{\partial y} - E\sqrt{\nu E}g''.
-\]
-So we've got two equations for $g$ and $p$. The trick is to take the $y$ derivative of the first, and $x$ derivative of the second, and we can use that to eliminate the $p$ terms. Then we have
-\[
-  g'g'' - gg''' = g^{(4)}.
-\]
-So we have a single equation for $g$ that we shall solve.
+  What would the similarity solution look like? Applying the incompressibility conditions $\nabla \cdot \mathbf{u} = 0$, it must be of the form
+  \[
+    \mathbf{u} = (u, v, 0) = (Ex g'(\nu), -E \delta g(\eta), 0).
+  \]
+  To check this is really incompressible, we can find the streamfunction. It turns out it is given by
+  \[
+    \psi = \sqrt{\nu E} x g(\eta).
+  \]
+  We can compute
+  \[
+    u = \frac{\partial \psi}{\partial t} = \sqrt{\nu E} x g'(\eta) \frac{1}{\delta} = Ex g'(\eta),
+  \]
+  and similarly for the $y$ component. So this is really the streamfunction. Therefore we must have $\nabla \cdot \mathbf{u} = 0$. Alternatively, we can simply compute $\nabla \cdot \mathbf{u}$ and find it to be zero.
 
-\subsubsection{Boundary conditions}
-We now look at our boundary conditions. The no-slip condition gives $\mathbf{u} = \mathbf{0}$ on $y = 0$. So $g'(0) = g(0) = 0$ when $\eta = 0$.
+  Finally, we look at the Navier-Stokes equations. The $x$ and $y$ components are
+  \begin{align*}
+    u \frac{\partial u}{\partial x} + v \frac{\partial u}{\partial y} &= -\frac{1}{\rho}\frac{\partial p}{\partial x} + \nu \left(\frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2}\right)\\
+    u \frac{\partial v}{\partial x} + v \frac{\partial v}{\partial y} &= -\frac{1}{\rho}\frac{\partial p}{\partial y} + \nu \left(\frac{\partial^2 v}{\partial x^2} + \frac{\partial^2 v}{\partial y^2}\right).
+  \end{align*}
+  Substituting our expression for $u$ and $v$, we get
+  \[
+    Ex g'E g' - E \delta g E x g'' \frac{1}{\delta} = -\frac{1}{\rho} \frac{\partial p}{\partial x} - \nu E xg''' \frac{1}{\delta^2}.
+  \]
+  Some tidying up gives
+  \[
+    E^2 x(g'^2 - gg'') = -\frac{1}{\rho} \frac{\partial p}{\partial x} - E^2 x g'''.
+  \]
+  We can do the same thing for the $y$-component, and get
+  \[
+    E\sqrt{\nu E}gg' = -\frac{1}{\rho} \frac{\partial p}{\partial y} - E\sqrt{\nu E}g''.
+  \]
+  So we've got two equations for $g$ and $p$. The trick is to take the $y$ derivative of the first, and $x$ derivative of the second, and we can use that to eliminate the $p$ terms. Then we have
+  \[
+    g'g'' - gg''' = g^{(4)}.
+  \]
+  So we have a single equation for $g$ that we shall solve.
 
-As as $y \to \infty$, the boundary conditions for $\mathbf{u}$ gives $g'(\eta) \to 1$, $g(\eta) \to \eta$ as $\eta \to \infty$.
+  We now look at our boundary conditions. The no-slip condition gives $\mathbf{u} = \mathbf{0}$ on $y = 0$. So $g'(0) = g(0) = 0$ when $\eta = 0$.
 
-All dimensional variables are absorbed into the scaled variables $g$ and $\eta$. So we only have to solve the ODE once. The far field velocity $\mathbf{u} = (Ex, -E y, 0)$ is reached to a very good approximation when
-\[
-  \eta \lesssim 1,\quad y \lesssim \delta = \frac{\eta}{E}.
-\]
-\begin{center}
-  \begin{tikzpicture}
-    \draw [->] (-0.5, 0) -- (5, 0) node [right] {$\eta$};
-    \draw [->] (0, -0.5) -- (0, 2.5) node [above] {$g'(\eta)$};
-    \draw (0, 0) .. controls (1, 0) and (1, 2) .. (3, 2) -- (5, 2);
-    \draw [dashed] (0, 2) -- (3, 2);
+  As as $y \to \infty$, the boundary conditions for $\mathbf{u}$ gives $g'(\eta) \to 1$, $g(\eta) \to \eta$ as $\eta \to \infty$.
 
-    \draw [<->] (0, 1) -- (3, 1) node [pos=0.5, fill=white] {$\delta = O(1)$};
-  \end{tikzpicture}
-\end{center}
+  All dimensional variables are absorbed into the scaled variables $g$ and $\eta$. So we only have to solve the ODE once. The far field velocity $\mathbf{u} = (Ex, -E y, 0)$ is reached to a very good approximation when
+  \[
+    \eta \gtrsim 1,\quad y \gtrsim \delta = \frac{\eta}{E}.
+  \]
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (-0.5, 0) -- (5, 0) node [right] {$\eta$};
+      \draw [->] (0, -0.5) -- (0, 2.5) node [above] {$g'(\eta)$};
+      \draw (0, 0) .. controls (1, 0) and (1, 2) .. (3, 2) -- (5, 2);
+      \draw [dashed] (0, 2) -- (3, 2);
 
-\subsubsection{Overall picture}
-We get the horizontal velocity profile as follows:
-\begin{center}
-  \begin{tikzpicture}
-    \draw [->] (-0.5, 0) -- (4, 0) node [right] {$x$};
-    \draw [->] (0, -0.5) -- (0, 3) node [above] {$y$};
+      \draw [<->] (0, 1) -- (3, 1) node [pos=0.5, fill=white] {$\delta = O(1)$};
+    \end{tikzpicture}
+  \end{center}
+  We get the horizontal velocity profile as follows:
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (-0.5, 0) -- (4, 0) node [right] {$x$};
+      \draw [->] (0, -0.5) -- (0, 3) node [above] {$y$};
 
-    \draw (1, 0) arc(270:360:1 and 1.5) -- (2, 3) node [pos=0.5, right] {$Ex$};
+      \draw (1, 0) arc(270:360:1 and 1.5) -- (2, 3) node [pos=0.5, right] {$Ex$};
 
-    \draw [dashed] (-1, 1.5) -- (4, 1.5);
+      \draw [dashed] (-1, 1.5) -- (4, 1.5);
 
-    \draw [<->] (3, 0) -- (3, 1.5) node [pos=0.5, fill=white] {$\delta$};
+      \draw [<->] (3, 0) -- (3, 1.5) node [pos=0.5, fill=white] {$\delta$};
 
-    \foreach \x in {0.55, 1.1} {
-      \pgfmathsetmacro\y{sqrt(1 - (1 - \x/1.5)^2)};
-      \draw [-latex'] (1, \x) -- +(\y, 0);
-    }
-  \end{tikzpicture}
-\end{center}
-At the scale $\delta$, we get a Reynolds number of
-\[
-  Re_\delta = \frac{U\delta}{\nu}\sim O(1).
-\]
-This is the \emph{boundary layer}. For a larger extrinsic scale $L \gg \delta$, we get
-\[
-  Re_L = \frac{UL}{2} \gg 1.
-\]
-\subsubsection{Inviscid approximation}
-When interested in flow on scales much larger than $\delta$, we ignore the region $y < \delta$ (since it is small), and we imagine a rigid boundary at $y = \delta$ at which the no-slip condition does not apply.
+      \foreach \x in {0.55, 1.1} {
+        \pgfmathsetmacro\y{sqrt(1 - (1 - \x/1.5)^2)};
+        \draw [-latex'] (1, \x) -- +(\y, 0);
+      }
+    \end{tikzpicture}
+  \end{center}
+  At the scale $\delta$, we get a Reynolds number of
+  \[
+    Re_\delta = \frac{U\delta}{\nu}\sim O(1).
+  \]
+  This is the \emph{boundary layer}. For a larger extrinsic scale $L \gg \delta$, we get
+  \[
+    Re_L = \frac{UL}{2} \gg 1.
+  \]
+  When interested in flow on scales much larger than $\delta$, we ignore the region $y < \delta$ (since it is small), and we imagine a rigid boundary at $y = \delta$ at which the no-slip condition does not apply.
 
-When $Re_L \gg 1$, we solve the Euler equations, namely
-\begin{align*}
-  \rho \frac{\D \mathbf{u}}{\D t} &= - \nabla p + \mathbf{f}\\
-  \nabla \cdot \mathbf{u} &= 0.
-\end{align*}
-We still have a boundary condition --- we don't allow fluid to flow \emph{through} the boundary. So we require
-\[
-  \mathbf{u}\cdot \mathbf{n} = 0\quad\text{at a stationary rigid boundary}.
-\]
-The no-slip condition is no longer satisfied.
+  When $Re_L \gg 1$, we solve the Euler equations, namely
+  \begin{align*}
+    \rho \frac{\D \mathbf{u}}{\D t} &= - \nabla p + \mathbf{f}\\
+    \nabla \cdot \mathbf{u} &= 0.
+  \end{align*}
+  We still have a boundary condition --- we don't allow fluid to flow \emph{through} the boundary. So we require
+  \[
+    \mathbf{u}\cdot \mathbf{n} = 0\quad\text{at a stationary rigid boundary}.
+  \]
+  The no-slip condition is no longer satisfied.
 
-It is an exercise for the reader to show that $\mathbf{u} = (Ex, -Ey, 0)$ satisfies the Euler equations in $y > 0$ with a rigid boundary of $y = 0$, with
-\[
-  p = p_0 - \frac{1}{2} \rho E^2(x^2 + y^2).
-\]
-We can plot the curves of constant pressure, as well as the streamlines:
-\begin{center}
-  \begin{tikzpicture}
-    \draw [->] (-3, 0) -- (3, 0) node [right] {$x$};
-    \draw [->] (0, -1) -- (0, 3) node [above] {$y$};
-    \foreach \r in {0.6, 1.2, 1.8, 2.4} {
-      \draw (\r, 0) arc(0:180:\r);
-    }
-    \node [circ] {};
-    \node [anchor = north west] {$p_0$};
+  It is an exercise for the reader to show that $\mathbf{u} = (Ex, -Ey, 0)$ satisfies the Euler equations in $y > 0$ with a rigid boundary of $y = 0$, with
+  \[
+    p = p_0 - \frac{1}{2} \rho E^2(x^2 + y^2).
+  \]
+  We can plot the curves of constant pressure, as well as the streamlines:
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (-3, 0) -- (3, 0) node [right] {$x$};
+      \draw [->] (0, -1) -- (0, 3) node [above] {$y$};
+      \foreach \r in {0.6, 1.2, 1.8, 2.4} {
+        \draw (\r, 0) arc(0:180:\r);
+      }
+      \node [circ] {};
+      \node [anchor = north west] {$p_0$};
 
-    \draw [mred, ->-=0.5, domain=0.167:3] plot (\x, {0.5/\x});
-    \draw [mred, ->-=0.5, domain=0.5:3] plot (\x, {1.5/\x});
-    \draw [mred, ->-=0.5, domain=0.667:3] plot (\x, {2/\x});
+      \draw [mred, ->-=0.5, domain=0.167:3] plot (\x, {0.5/\x});
+      \draw [mred, ->-=0.5, domain=0.5:3] plot (\x, {1.5/\x});
+      \draw [mred, ->-=0.5, domain=0.667:3] plot (\x, {2/\x});
 
-    \draw [mred, ->-=0.5, domain=0.167:3] plot ({-\x}, {0.5/\x});
-    \draw [mred, ->-=0.5, domain=0.5:3] plot ({-\x}, {1.5/\x});
-    \draw [mred, ->-=0.5, domain=0.667:3] plot ({-\x}, {2/\x});
-  \end{tikzpicture}
-\end{center}
-As a flow enters from the top, the pressure keeps increases, and this slows down the flow. We say the $y$-pressure gradient is \emph{adverse}. As it moves down and flows sideways, the pressure \emph{pushes} the flow. So the $x$-pressure gradient is \emph{favorable}.
+      \draw [mred, ->-=0.5, domain=0.167:3] plot ({-\x}, {0.5/\x});
+      \draw [mred, ->-=0.5, domain=0.5:3] plot ({-\x}, {1.5/\x});
+      \draw [mred, ->-=0.5, domain=0.667:3] plot ({-\x}, {2/\x});
+    \end{tikzpicture}
+  \end{center}
+  As a flow enters from the top, the pressure keeps increases, and this slows down the flow. We say the $y$-pressure gradient is \emph{adverse}. As it moves down and flows sideways, the pressure \emph{pushes} the flow. So the $x$-pressure gradient is \emph{favorable}.
 
-At the origin, the velocity is zero, and this is a \emph{stagnation point}. This is also the point of highest pressure. In general, velocity is high at low pressures and low at high pressures.
+  At the origin, the velocity is zero, and this is a \emph{stagnation point}. This is also the point of highest pressure. In general, velocity is high at low pressures and low at high pressures.
+\end{eg}
 
 \subsection{Momentum equation for inviscid (\texorpdfstring{$\nu = 0$}{nu = 0}) incompressible fluid}
-Consider an arbitrary volume $\mathcal{D}$ with boundary $\partial \mathcal{D}$ and outward pointing normal $\mathbf{n}$. The momentum of the fluid in $\mathcal{D}$ can change owing to four things:
+We are now going to derive the Navier-Stokes equation in the special case where viscosity is assumed to vanish. We will derive this by considering the change in momentum.
+
+Consider an arbitrary volume $\mathcal{D}$ with boundary $\partial \mathcal{D}$ and outward pointing normal $\mathbf{n}$.
+\begin{center}
+  \begin{tikzpicture}
+    \draw [mblue, ->-=0.13, ->-=0.4, ->-=0.9] plot [smooth] coordinates {(-3, 0) (-2, -0.3) (-0.5, 0.5) (0.5, 0.5) (2, 1.5)};
+    \draw [mblue, ->-=0.13, ->-=0.4, ->-=0.9] plot [smooth] coordinates {(-3, -1) (-2, -1) (0, -0.5) (2, -1.5)};
+    \draw plot [smooth cycle] coordinates {(-1.2, -0.7) (0, -0.7) (0.7, -1) (1.3, -0.9) (1.4, 0.4) (0.3, 1) (-1.7, 0.6)};
+    \node at (0, 0) {$\mathcal{D}$};
+    \node [above] at (0.3, 1) {$\partial D$};
+    \draw [->] (1.4, 0.4) -- +(0.4, 0.2666) node [right] {$\mathbf{n}$};
+  \end{tikzpicture}
+\end{center}
+The total momentum of the fluid in $\mathcal{D}$ can change owing to four things:
 \begin{enumerate}
   \item Momentum flux across the boundary $\partial \mathcal{D}$;
   \item Surface pressure forces;
@@ -1292,19 +1314,21 @@ The last term on the left is the gradient of $\mathbf{u}$, which vanishes by inc
 \end{prop}
 This is just the equation we get from the Navier-Stokes equation by ignoring the viscous terms. However, we were able to derive this directly from momentum conservation.
 
+We can further derive some equations from this.
+
 For conservative forces, we can write $\mathbf{f} = -\nabla \chi$, where $\chi$ is a scalar potential. For example, gravity can be given by $\mathbf{f} = \rho \mathbf{g} = \nabla (\rho \mathbf{g}\cdot \mathbf{x})$ (for $\rho$ constant). So $\chi = - \rho \mathbf{g}\cdot \mathbf{x} = g \rho z$ if $\mathbf{g} = (0, 0, -g)$.
 
-\subsection{Momentum integral for steady flow}
 In the case of a steady flow, $\frac{\partial \mathbf{u}}{\partial t}$ vanishes. Then the momentum equation becomes
 \[
   0 = -\int_{\partial \mathcal{D}} \rho \mathbf{u} (\mathbf{u} \cdot \mathbf{n}) \;\d S - \int_{\partial \mathcal{D}}p \mathbf{n} \;\d S - \int_{\mathcal{D}} \nabla \chi \;\d V.
 \]
 We can then convert this to
-\[
-  \int_{\partial \mathcal{D}} (\rho \mathbf{u} (\mathbf{u}\cdot \mathbf{n}) + p \mathbf{n} + \chi \mathbf{n}) \;\d S = 0.
-\]
-\subsection{Bernoulli's equation}
-The first thing to notice is we have a vector identity
+\begin{prop}[Momentum integral for steady flow]
+  \[
+    \int_{\partial \mathcal{D}} (\rho \mathbf{u} (\mathbf{u}\cdot \mathbf{n}) + p \mathbf{n} + \chi \mathbf{n}) \;\d S = 0.
+  \]
+\end{prop}
+Alternatively, we notice the vector identity
 \[
   \mathbf{u}\times (\nabla \times \mathbf{u}) = \nabla\left(\frac{1}{2}|\mathbf{u}|^2\right) - \mathbf{u}\cdot \nabla \mathbf{u}.
 \]
@@ -1318,6 +1342,8 @@ Dotting with $\mathbf{u}$, the last term on the left vanishes, and we get
     \frac{1}{2}\rho \frac{\partial|\mathbf{u}|^2}{\partial t} = -\mathbf{u}\cdot \nabla \left(\frac{1}{2} \rho |\mathbf{u}|^2 + p + \chi\right).
   \]
 \end{prop}
+Note also that this tells us that high velocity goes with low pressure; low pressure goes with high velocity.
+
 In the case where we have a steady flow, we know
 \[
   H = \frac{1}{2}\rho |\mathbf{u}|^2 + p + \chi
@@ -1383,7 +1409,6 @@ So $H$ is the transportable energy of the flow.
   \]
   Therefore we can measure $h$ in order to find out the flow rate. This allows us to measure fluid velocity just by creating a constriction and then putting in some pipes.
 \end{eg}
-Note also that Bernoulli's equation tells us that high velocity goes with low pressure; low pressure goes with high velocity.
 
 \begin{eg}[Force on a fire hose nozzle]
   Suppose we have a fire hose nozzle like this:
@@ -1443,12 +1468,16 @@ Note also that Bernoulli's equation tells us that high velocity goes with low pr
 \end{eg}
 
 \subsection{Linear flows}
-We fix our favorite point $\mathbf{x}_0$, and consider the flow in a neighbourhood of $\mathbf{x}_0$. We expand this in a Taylor series:
+Suppose we have a favorite point $\mathbf{x}_0$. Near the point $\mathbf{x}_0$, it turns out we can break up the flow into three parts --- uniform flow, pure strain, and pure rotation.
+
+To do this, we take the Taylor expansion of $\mathbf{u}$ about $\mathbf{x}_0$:
 \begin{align*}
   \mathbf{u}(\mathbf{x}) &= \mathbf{u}(\mathbf{x}_0) + (\mathbf{x} - \mathbf{x}_0) \cdot \nabla \mathbf{u}(\mathbf{x}_0) + \cdots\\
   &= \mathbf{u}_0 + \mathbf{r}\cdot \nabla \mathbf{u}_0,
 \end{align*}
-with $\mathbf{r} = \mathbf{x} - \mathbf{x}_0$ and $\mathbf{u}_0 = \mathbf{u}(\mathbf{x}_0)$. This is a linear approximation to the flow field. We also write
+with $\mathbf{r} = \mathbf{x} - \mathbf{x}_0$ and $\mathbf{u}_0 = \mathbf{u}(\mathbf{x}_0)$. This is a linear approximation to the flow field.
+
+We can do something more about the $\nabla \mathbf{u}$ term. This is a rank-2 tensor, ie. a matrix, and we can split it into its symmetric and antisymmetric parts:
 \[
   \nabla \mathbf{u} = \frac{\partial u_i}{\partial x_j} = E_{ij} + \Omega_{ij} = E + \Omega,
 \]
@@ -1457,13 +1486,10 @@ where
   E_{ij} &= \frac{1}{2}\left(\frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i}\right),\\
   \Omega_{ij} &=\frac{1}{2}\left(\frac{\partial u_i}{\partial x_j} - \frac{\partial u_j}{\partial x_i}\right),
 \end{align*}
-ie. we break $\nabla \mathbf{u}$ up into symmetric and anti-symmetric parts. These different parts have some physical meaning.
-\begin{defi}[Vorticity]
-  We define the \emph{vorticity} by
-  \[
-    \boldsymbol\omega = \nabla \times \mathbf{u}.
-  \]
-\end{defi}
+We can write the second part in terms of the vorticity. Recall we have defined the vorticity as
+\[
+  \boldsymbol\omega = \nabla \times \mathbf{u}.
+\]
 Then we have
 \[
   \boldsymbol\omega \times \mathbf{r} = (\nabla \times \mathbf{u}) \times \mathbf{r} = r_j \left(\frac{\partial u_i}{\partial x_j} - \frac{\partial u_j}{\partial x_i}\right) = 2 \Omega_{ij}r_j.
@@ -1512,7 +1538,7 @@ Since we have an incompressible fluid, we have $\nabla \cdot \mathbf{u} = 0$. So
 then $E_1 + E_2 + E_3 = 0$. This justifies the picture above.
 
 \subsection{Vorticity equation}
-We now want to derive an equation for the vorticity of a fluid. Consider the Navier-Stokes equation for a viscous fluid,
+The Navier-Stokes equation tells us how the velocity changes with time. Can we obtain a similar equation for the vorticity? Consider the Navier-Stokes equation for a viscous fluid,
 \[
   \rho\left(\frac{\partial \mathbf{u}}{\partial t} + \mathbf{u}\cdot \nabla \mathbf{u}\right) = -\nabla p - \nabla \chi + \mu \nabla^2 \mathbf{u}
 \]
@@ -1540,7 +1566,6 @@ Now we use the definition of the material derivative, and rearrange terms to obt
 \end{prop}
 Hence, the rate of change of vorticity of a fluid particle is caused by $\boldsymbol\omega \cdot \nabla \mathbf{u}$ (amplification by stretching or twisting) and $\nu \nabla^2 \boldsymbol\omega$ (dissipation of vorticity by viscosity). The second term also allows for generation of vorticity at boundaries by the no-slip condition. This will be explained shortly.
 
-\subsubsection{Vorticity amplification by stretching}
 Consider an inviscid fluid, where $\nu = 0$. So we are left with
 \[
   \frac{\D \boldsymbol\omega}{\D t} = \boldsymbol\omega \cdot \nabla \mathbf{u}.
@@ -1555,13 +1580,13 @@ Since $\omega_i \omega_j$ is symmetric, while $\Omega_{ij}$ is antisymmetric, th
 \[
   \frac{\D}{\D t} \left(\frac{1}{2} |\boldsymbol\omega|^2\right) = E_1 \omega_1^2 + E_2 \omega_2^2 + E_3 \omega_3^2.
 \]
-wlog, we assume $E_1 > 0$ (since the $E_i$'s sum to $0$), and imagine $E_2, E_3 < 0$. So the flow is stretched in the $\mathbf{e}_1$ direction and compressed radially. We consider what happens to a flow in the direction of the stretching, $\boldsymbol\omega = (\omega_1, 0, 0)$. We then get
+wlog, we assume $E_1 > 0$ (since the $E_i$'s sum to $0$), and imagine $E_2, E_3 < 0$. So the flow is stretched in the $\mathbf{e}_1$ direction and compressed radially. We consider what happens to a vortex in the direction of the stretching, $\boldsymbol\omega = (\omega_1, 0, 0)$. We then get
 \[
   \frac{\D}{\D t}\left(\frac{1}{2}\omega_1^2\right) = E_1 \omega_1^2.
 \]
 So the vorticity grows exponentially. This is vorticity amplification by stretching. This is not really unexpected --- as the fluid particles have to get closer to the axis of rotation, they have to rotate faster, by the conservation of angular momentum.
 
-We now consider two neighbouring (Lagrangian) fluid particles, $\mathbf{x}_1(t), \mathbf{x}_2(t)$. We let $\delta\boldsymbol\ell(t) = \mathbf{x}_2(t) - \mathbf{x}_1(t)$. Note that
+This is in general true --- vorticity increases as the length of a material line increases. To show this, we consider two neighbouring (Lagrangian) fluid particles, $\mathbf{x}_1(t), \mathbf{x}_2(t)$. We let $\delta\boldsymbol\ell(t) = \mathbf{x}_2(t) - \mathbf{x}_1(t)$. Note that
 \[
   \frac{\D \mathbf{x}_2(t)}{\D t} = \mathbf{u}_2(\mathbf{x}_2),\quad \frac{\D \mathbf{x}_1(t)}{\D t} = \mathbf{u}_1(\mathbf{x}_1).
 \]
@@ -1604,30 +1629,30 @@ This is what happens in convection flow. The difference in density drives a moti
 
     \draw [-latex'] (1, 2) arc(90:-180:0.5);
     \node at (1.5, 1.5) [right] {$\omega$}; % improve
-    \node at (1, 1.5) {$\cdot$};
+    \node at (1, 1.5) {$\times$};
   \end{tikzpicture}
 \end{center}
 
 \section{Inviscid irrotational flow}
+From now on, we are going to make a further simplifying assumption. We are going to assume that our flow is is incompressible, inviscid, \emph{and} irrotational.
 
-\subsection{Laplace's equation}
-It turns out inviscid irrotational flow can be described Laplace's equation. Suppose we have $\nabla \times \mathbf{u} = \mathbf{0}$ at $t = 0$, and the fluid is inviscid and homogeneous (ie. $\rho$ is constant). Then by the vorticity equation
+We first check this is a sensible assumption, in that if we start of with an irrotational flow, then the flow will continue being irrotational. Suppose we have $\nabla \times \mathbf{u} = \mathbf{0}$ at $t = 0$, and the fluid is inviscid and homogeneous (ie. $\rho$ is constant). Then by the vorticity equation
 \[
-  \frac{\D \boldsymbol\omega}{\D t} = \boldsymbol\omega \cdot \nabla \mathbf{u},
+  \frac{\D \boldsymbol\omega}{\D t} = \boldsymbol\omega \cdot \nabla \mathbf{u} = 0.
 \]
-we know that $\nabla \times \mathbf{u} = \mathbf{0}$ for all time.
+So the vorticity will keep on being zero.
 
-Then we can write $\mathbf{u} = \nabla \phi$ for some $\phi$.
+In this case, we can write $\mathbf{u} = \nabla \phi$ for some $\phi$.
 \begin{defi}[Velocity potential]
   The \emph{velocity potential} of a velocity $\mathbf{u}$ is a scalar function $\phi$ such that $\mathbf{u} = \nabla \phi$.
 \end{defi}
-Note that since we are lazy, we don't not have a negative sign in front of $\nabla \phi$, unlike, say, gravity..
+Note that since we are lazy, we don't not have a negative sign in front of $\nabla \phi$, unlike, say, gravity.
 
 If we are incompressible, then $\nabla \cdot \mathbf{u} = 0$ implies
 \[
   \nabla^2 \phi = 0.
 \]
-This is Laplace's equation.
+So the potential satisfies Laplace's equation.
 
 \begin{defi}[Potential flow]
   A \emph{potential flow} is a flow whose velocity potential satisfies Laplace's equation.
@@ -1636,16 +1661,15 @@ This is Laplace's equation.
 A key property of Laplace's equation is that it is linear. So we can add two solutions up to get a third solution.
 
 \subsection{Three-dimensional potential flows}
-We will use spherical coordinates $(r, \theta, \varphi)$. Then
+We will not consider Laplace's equation in full generality. Instead, we will consider some solutions with symmetry. We will thus use spherical coordinates $(r, \theta, \varphi)$. Then
 \[
   \nabla^2 \phi = \frac{1}{r^2} \pd{r} \left(r^2 \frac{\partial \phi}{\partial r}\right) + \frac{1}{r^2 \sin \theta} \pd{\theta} \left(\sin \theta\frac{\partial \phi}{\partial \theta}\right) + \frac{1}{r^2 \sin^2 \theta} \frac{\partial^2 \phi}{\partial \varphi^2}.
 \]
-It is also useful to know what the gradient is. We have
+It is also useful to know what the gradient is. This is given by
 \[
   \mathbf{u} = \nabla \phi = \left(\frac{\partial \phi}{\partial r}, \frac{1}{r} \frac{\partial \phi}{\partial \theta}, \frac{1}{r \sin \theta} \frac{\partial \phi}{\partial \varphi}\right).
 \]
-\subsubsection{Spherically symmetric flow}
-We start off with some simple flows. The simplest thing we can possibly imagine is if $\phi = \phi(r)$ depends only on $r$. So the velocity is purely radial. Then Laplace's equation implies
+We start off with the simplest case. The simplest thing we can possibly imagine is if $\phi = \phi(r)$ depends only on $r$. So the velocity is purely radial. Then Laplace's equation implies
 \[
   \frac{\partial}{\partial r}\left(r^2 \frac{\partial \phi}{\partial r}\right) = 0.
 \]
@@ -1657,13 +1681,13 @@ for some constant $A$. So
 \[
   \phi = -\frac{A}{r} + B,
 \]
-where $B$ is yet another constant. Since we only care about the gradients, we wlog $B = 0$. So the only possible velocity potential is
+where $B$ is yet another constant. Since we only care about the gradient $\nabla \phi$, we can wlog $B = 0$. So the only possible velocity potential is
 \[
   \phi = -\frac{A}{r}.
 \]
-Then the speed, given by $\frac{\partial \phi}{\partial r}$, decreases by $\frac{1}{r^2}$.
+Then the speed, given by $\frac{\partial \phi}{\partial r}$, falls off as $\frac{1}{r^2}$.
 
-Consider the volume flux $q$ across the surface of the sphere $r = a$. Then
+What is the physical significance of the factor $A$? Consider the volume flux $q$ across the surface of the sphere $r = a$. Then
 \[
   q = \int_S \mathbf{u}\cdot \mathbf{n} \;\d S = \int_S u_r \;\d S = \int_S \frac{\partial \phi}{\partial r} \;\d S = \int_S \frac{A}{a^2}\;\d S = 4\pi A.
 \]
@@ -1673,20 +1697,19 @@ So we can write
 \]
 When $q > 0$, this corresponds to a point source of fluid. When $q < 0$, this is a point sink of fluid.
 
-We can also derive this directly, using incompressibility. Since flow is incompressible, the flux through any sphere containing $0$ should be constant. Since the surface area increases as $4\pi r^2$, the velocity must drop as $\frac{1}{r^2}$, in agreement with what we obtained above.
+We can also derive this solution directly, using incompressibility. Since flow is incompressible, the flux through any sphere containing $0$ should be constant. Since the surface area increases as $4\pi r^2$, the velocity must drop as $\frac{1}{r^2}$, in agreement with what we obtained above.
 
-Notice that we can compute
+Notice that we have
 \[
   \nabla^2 \phi = q \delta(x).
 \]
-So $\phi$ is Green's function for the Laplacian.
+So $\phi$ is actually Green's function for the Laplacian.
 
-\subsubsection{Axis-symmetric solutions}
-We are now going to consider a less general solution, where $\phi$ depends on $r$ and $\theta$ but not $\varphi$. Then Laplace's equation becomes
+That was not too interesting. We can consider a less general solution, where $\phi$ depends on $r$ and $\theta$ but not $\varphi$. Then Laplace's equation becomes
 \[
   \nabla^2 \phi = \frac{1}{r^2} \pd{r} \left(r^2 \frac{\partial \phi}{\partial r}\right) + \frac{1}{r^2 \sin \theta} \pd{\theta} \left(\sin \theta\frac{\partial \phi}{\partial \theta}\right) = 0.
 \]
-We can use Legendre polynomials to write the solution as
+As we know from IB Methods, We can use Legendre polynomials to write the solution as
 \[
   \phi = \sum_{n = 0}^\infty (A_n r^n + B_n r^{-n - 1})P_n(\cos \theta).
 \]
@@ -1699,7 +1722,7 @@ We then have
   We can look at uniform flow past a sphere of radius $a$.
   \begin{center}
     \begin{tikzpicture}
-      \draw circle [radius=1];
+      \draw [fill=gray] circle [radius=1];
       \draw [->] (-3, 0.7) -- +(1, 0);
       \draw [->] (-3, 0) node [left] {$U$} -- +(1, 0);
       \draw [->] (-3, -0.7) -- +(1, 0);
@@ -1746,10 +1769,10 @@ We then have
   \[
     u_r = 0,\quad u_\theta = \pm \frac{3U}{2}.
   \]
-  So the velocity is faster at the top than at the infinity boundary.
+  So the velocity is faster at the top than at the infinity boundary. This is why it is windier at the top of a hill than below.
   \begin{center}
     \begin{tikzpicture}
-      \draw circle [radius=1];
+      \draw [fill=gray] circle [radius=1];
       \draw [->-=0.2, ->-=0.85] (-3, 0) -- (3, 0);
       \node [circ] at (-1, 0) {};
       \node [circ] at (1, 0) {};
@@ -1759,11 +1782,14 @@ We then have
       \node [circ] at (0, 1) {};
       \node [above] at (0, -1) {$B$};
       \node [below] at (0, 1) {$B'$};
+
+      \draw [->-=0.23, ->-=0.8] (-3, 0.2) .. controls (-1, 0.2) and (-1, 1.1) .. (0, 1.1) .. controls (1, 1.1) and (1, 0.2) .. (3, 0.2);
+      \draw [->-=0.3, ->-=0.73] (-3, 0.4) .. controls (-1, 0.4) and (-1, 1.2) .. (0, 1.2) .. controls (1, 1.2) and (1, 0.4) .. (3, 0.4);
+      \draw [->-=0.23, ->-=0.8] (-3, -0.2) .. controls (-1, -0.2) and (-1, -1.1) .. (0, -1.1) .. controls (1, -1.1) and (1, -0.2) .. (3, -0.2);
+      \draw [->-=0.3, ->-=0.73] (-3, -0.4) .. controls (-1, -0.4) and (-1, -1.2) .. (0, -1.2) .. controls (1, -1.2) and (1, -0.4) .. (3, -0.4);
     \end{tikzpicture}
   \end{center}
-  % can insert picture of flow, label stagnation points (A, A') and maximum surface speed (B, B')
-  % Note that the streamlines are closer to each other near the top and bottom, since the velocity is faster
-  This is also why it is windier at the top of a hill than below.
+  Note that the streamlines are closer to each other near the top since the velocity is faster.
 
   To obtain the pressure on the surface of the sphere, we apply Bernoulli's equation on a streamline to the surface $(a, \theta)$.
 
@@ -1785,9 +1811,23 @@ We then have
   \]
   Note that the pressure is a function of $\sin^2 \theta$. So the pressure at the back of the sphere is exactly the same as that at the front. Thus, if we integrate the pressure around the whole surface, we get $0$. So the fluid exerts no net force on the sphere! This is d'Alemberts' paradox. This is, of course, because we have ignored viscosity.
 
-  For a solid sphere in a viscous fluid at high Reynolds numbers, the flow looks very similar upstream, but at some point after passing the sphere, the flow separates and forms a \emph{wake} behind the sphere. At the wake, the pressure is approximately $p_\infty$. The separation is caused by the adverse pressure gradient at the rear.
-  % insert picture
+  In practice, for a solid sphere in a viscous fluid at high Reynolds numbers, the flow looks very similar upstream, but at some point after passing the sphere, the flow separates and forms a \emph{wake} behind the sphere. At the wake, the pressure is approximately $p_\infty$. The separation is caused by the adverse pressure gradient at the rear.
+   \begin{center}
+    \begin{tikzpicture}
+      \draw [fill=gray] circle [radius=1];
+      \draw [->-=0.6] (-3, 0) -- (-1, 0);
 
+      \draw (0.707, 0.707) -- +(2, 1);
+      \draw (0.707, -0.707) -- +(2, -1);
+
+      \draw [->-=0.23, ->-=0.8] (-3, 0.2) .. controls (-1, 0.2) and (-1, 1.1) .. (0, 1.1) .. controls (1, 1.1) and (0.707, 0.907) .. (2.707, 1.907);
+      \draw [->-=0.3, ->-=0.73] (-3, 0.4) .. controls (-1, 0.4) and (-1, 1.2) .. (0, 1.2) .. controls (1, 1.2) and (0.707, 1.107) .. (2.707, 2.107);
+      \draw [->-=0.23, ->-=0.8] (-3, -0.2) .. controls (-1, -0.2) and (-1, -1.1) .. (0, -1.1) .. controls (1, -1.1) and (0.707, -0.907) .. (2.707, -1.907);
+      \draw [->-=0.3, ->-=0.73] (-3, -0.4) .. controls (-1, -0.4) and (-1, -1.2) .. (0, -1.2) .. controls (1, -1.2) and (0.707, -1.107) .. (2.707, -2.107);
+
+      \node at (2, 0) {wake};
+    \end{tikzpicture}
+  \end{center}
   Empirically, we find the force is
   \[
     F = C_D \frac{1}{2} \rho U^2\pi \alpha^2,
@@ -1796,7 +1836,9 @@ We then have
 \end{eg}
 
 \begin{eg}[Rising bubble]
-  We assume our bubble is small and spherical, and has a free surface. So the potential flow solution is reasonable. The kinetic energy of the fluid is
+  Suppose we have a rising bubble, rising at speed $U$. We assume our bubble is small and spherical, and has a free surface. In this case, we do not have to re-calculate the velocity of the fluid. We can change our frame of reference, and suppose the bubble is stationary and the fluid is moving past it at $U$. Then this is exactly what we have calculated above. We then steal the solution and then translate the velocities back by $U$ to get the solution.
+
+  Doing all this, we find that the kinetic energy of the fluid is
   \[
     \int_{r > a} \frac{1}{2}\rho |\mathbf{u}|^2 \;\d V = \frac{\pi}{3} a^3 \rho U^2 = \frac{1}{2}M_A U^2,
   \]
@@ -1828,8 +1870,7 @@ We then have
 \end{eg}
 
 \subsection{Potential flow in two dimensions}
-\subsubsection{General solution in plane polars}
-In polar coordinates, we have
+We now consider the case where we have two-dimensional world. We use polar coordinates. Then we have
 \[
   \nabla^2 \phi = \frac{1}{r} \pd{r} \left(r \frac{\partial \phi}{\partial r}\right) + \frac{1}{r^2} \frac{\partial^2 \phi}{\partial \theta^2}.
 \]
@@ -1845,126 +1886,165 @@ The general solution to Laplace's equation is given by
     \sin n\theta
   \end{cases}.
 \]
-\subsubsection{Point source}
-Suppose we have a point source. We can either solve
-\[
-  \nabla^2 \phi = q \delta (r),
-\]
-where $q$ is the volume flux per unit distance, normal to the plane, or use the conservation of mass to obtain
-\[
-  2\pi r u_r = q.
-\]
-So
-\[
-  u_r = \frac{q}{2\pi r}.
-\]
-Hence we get
-\[
-  \phi = \frac{q}{2\pi} \log r.
-\]
-\subsubsection{Point vortex}
-In this case, we have flow that goes around in circles:
-\begin{center}
-  \begin{tikzpicture}
-    \node [circ] {};
-    \draw [->] circle [radius=0.5];
-    \draw [->] circle [radius=1];
-    \draw [->] circle [radius=1.5];
-  \end{tikzpicture}
-\end{center}
-Since there is no radial velocity, we must have $\frac{\partial \phi}{\partial r} = 0$. So $\phi$ only depends on $\theta$. This corresponds to the solution $\phi = B\theta$.
+\begin{eg}[Point source]
+  Suppose we have a point source. We can either solve
+  \[
+    \nabla^2 \phi = q \delta (r),
+  \]
+  where $q$ is the volume flux per unit distance, normal to the plane, or use the conservation of mass to obtain
+  \[
+    2\pi r u_r = q.
+  \]
+  So
+  \[
+    u_r = \frac{q}{2\pi r}.
+  \]
+  Hence we get
+  \[
+    \phi = \frac{q}{2\pi} \log r.
+  \]
+\end{eg}
 
-To find out the value of $B$, consider the circulation around a loop
-\[
-  K = \oint_{r = a} \mathbf{u}\cdot \;\d \ell = \int_0^{2\pi} \frac{B}{a} \cdot a \;\d \theta = 2\pi B.
-\]
-So we get
-\[
-  \phi = \frac{K}{2\pi}\theta,\quad u_\theta = \frac{K}{2\pi r}.
-\]
-It is an exercise for the reader to show that this flow is indeed irrotational, ie. $\nabla \times \mathbf{u} = 0$ for $r \not= 0$, despite it looking rotational, and that for any (simple) loop $c$, we get
-\[
-  \oint_c \mathbf{u}\cdot\;\d \ell =
-  \begin{cases}
-    K & \text{the origin is inside C}\\
-    0 & \text{otherwise}
-  \end{cases}.
-\]
-This is indeed a measure of vorticity, since
-\[
-  \oint_c \mathbf{u}\cdot \d \ell = \int_S \boldsymbol\omega \cdot \mathbf{n} \;\d S,
-\]
-where $S$ is the surface bounded by $c$. Hence we know everywhere the flow is irrotational, except at the singular point at the origin.
+\begin{eg}[Point vertex]
+  In this case, we have flow that goes around in circles:
+  \begin{center}
+    \begin{tikzpicture}
+      \node [circ] {};
+      \draw [->] circle [radius=0.5];
+      \draw [->] circle [radius=1];
+      \draw [->] circle [radius=1.5];
+    \end{tikzpicture}
+  \end{center}
+  Since there is no radial velocity, we must have $\frac{\partial \phi}{\partial r} = 0$. So $\phi$ only depends on $\theta$. This corresponds to the solution $\phi = B\theta$.
 
-\subsubsection{Uniform flow past a cylinder}
-Consider the flow past a cylinder.
-\begin{center}
-  \begin{tikzpicture}
-    \draw circle [radius=1];
-    \draw [->] (-3, 0.7) -- +(1, 0);
-    \draw [->] (-3, 0) node [left] {$U$} -- +(1, 0);
-    \draw [->] (-3, -0.7) -- +(1, 0);
+  To find out the value of $B$, consider the circulation around a loop
+  \[
+    K = \oint_{r = a} \mathbf{u}\cdot \;\d \ell = \int_0^{2\pi} \frac{B}{a} \cdot a \;\d \theta = 2\pi B.
+  \]
+  So we get
+  \[
+    \phi = \frac{K}{2\pi}\theta,\quad u_\theta = \frac{K}{2\pi r}.
+  \]
+  It is an exercise for the reader to show that this flow is indeed irrotational, ie. $\nabla \times \mathbf{u} = 0$ for $r \not= 0$, despite it looking rotational. Moreover, for any (simple) loop $c$, we get
+  \[
+    \oint_c \mathbf{u}\cdot\;\d \ell =
+    \begin{cases}
+      K & \text{the origin is inside C}\\
+      0 & \text{otherwise}
+    \end{cases}.
+  \]
+  We can interpret this as saying there is no vorticity everywhere, except at the singular point at the origin, where we have infinite vorticity. Indeed, we have
+  \[
+    \oint_c \mathbf{u}\cdot \d \ell = \int_S \boldsymbol\omega \cdot \mathbf{n} \;\d S,
+  \]
+  where $S$ is the surface bounded by $c$.
+\end{eg}
 
-    \draw [->] (0, 0) -- (1.5, 0) node [right] {$x$};
-    \draw [->] (0, 0) -- (1, 1) node [right] {$r$};
-    \draw (0.4, 0) arc(0:45:0.4) node [pos=0.7, right] {$\theta$};
-  \end{tikzpicture}
-\end{center}
-We need to solve
-\begin{align*}
-  \nabla^2 \phi &= 0\\
-  \phi &\to U r\cos \theta & r & \to \infty\\
-  \frac{\partial \phi}{\partial r} &= 0 & r &= a.
-\end{align*}
-We already have the general solution above. So we just write it down. We find
-\[
-  \phi = U\left(r + \frac{a^2}{r}\right) \cos \theta + \frac{K}{2\pi}\theta.
-\]
-The last term allows for a net circulation $K$ around the cylinder, to account for vorticity in the viscous boundary layer on the surface of the cylinder. We have
-\begin{align*}
-  u_r &= U\left(1 - \frac{a^2}{r^2}\right) \cos \theta\\
-  u_\theta &= -U \left(1 + \frac{a^2}{r^2}\right) \sin \theta + \frac{K}{2 \pi r}.
-\end{align*}
-We can find the streamfunction for this as
-\[
-  \psi = Ur\sin \theta\left(1 - \frac{a^2}{r^2}\right) - \frac{K}{2\pi} \log r.
-\]
-If there is no circulation, ie. $K = 0$, then we get a flow similar to the flow around a sphere. Again, there is no net force on the cylinder, since flow is symmetric fore and aft, above and below. Again, we get two stagnation points at $A, A'$.
+\begin{eg}[Uniform flow past a cylinder]
+  Consider the flow past a cylinder.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [fill=gray] circle [radius=1];
+      \draw [->] (-3, 0.7) -- +(1, 0);
+      \draw [->] (-3, 0) node [left] {$U$} -- +(1, 0);
+      \draw [->] (-3, -0.7) -- +(1, 0);
 
- % insert old picture
+      \draw [->] (0, 0) -- (1.5, 0) node [right] {$x$};
+      \draw [->] (0, 0) -- (1, 1) node [right] {$r$};
+      \draw (0.4, 0) arc(0:45:0.4) node [pos=0.7, right] {$\theta$};
+    \end{tikzpicture}
+  \end{center}
+  We need to solve
+  \begin{align*}
+    \nabla^2 \phi &= 0 & r &> a\\
+    \phi &\to U r\cos \theta & r & \to \infty\\
+    \frac{\partial \phi}{\partial r} &= 0 & r &= a.
+  \end{align*}
+  We already have the general solution above. So we just write it down. We find
+  \[
+    \phi = U\left(r + \frac{a^2}{r}\right) \cos \theta + \frac{K}{2\pi}\theta.
+  \]
+  The last term allows for a net circulation $K$ around the cylinder, to account for vorticity in the viscous boundary layer on the surface of the cylinder. We have
+  \begin{align*}
+    u_r &= U\left(1 - \frac{a^2}{r^2}\right) \cos \theta\\
+    u_\theta &= -U \left(1 + \frac{a^2}{r^2}\right) \sin \theta + \frac{K}{2 \pi r}.
+  \end{align*}
+  We can find the streamfunction for this as
+  \[
+    \psi = Ur\sin \theta\left(1 - \frac{a^2}{r^2}\right) - \frac{K}{2\pi} \log r.
+  \]
+  If there is no circulation, ie. $K = 0$, then we get a flow similar to the flow around a sphere. Again, there is no net force on the cylinder, since flow is symmetric fore and aft, above and below. Again, we get two stagnation points at $A, A'$.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->-=0.2, ->-=0.85] (-3, 0) -- (3, 0);
+      \draw [fill=gray] circle [radius=1];
+      \node [circ] at (-1, 0) {};
+      \node [circ] at (1, 0) {};
+      \node [anchor = south west] at (-1, 0) {$A'$};
+      \node [anchor = south east] at (1, 0) {$A$};
 
-What happens when $K \not= 0$ is more interesting. We first look at the stagnation points. We get $u_r = 0$ if and only if $r = a$ or $\cos \theta = 0$. For $u_\theta = 0$, when $r = a$, we require
-\[
-  K = 4 \pi a U \sin \theta.
-\]
-So provided $K \leq 4 \pi a U$, there is a solution to this problem, and we get stagnation points on the boundary.
+      \draw [->-=0.23, ->-=0.8] (-3, 0.2) .. controls (-1, 0.2) and (-1, 1.1) .. (0, 1.1) .. controls (1, 1.1) and (1, 0.2) .. (3, 0.2);
+      \draw [->-=0.3, ->-=0.73] (-3, 0.4) .. controls (-1, 0.4) and (-1, 1.2) .. (0, 1.2) .. controls (1, 1.2) and (1, 0.4) .. (3, 0.4);
+      \draw [->-=0.23, ->-=0.8] (-3, -0.2) .. controls (-1, -0.2) and (-1, -1.1) .. (0, -1.1) .. controls (1, -1.1) and (1, -0.2) .. (3, -0.2);
+      \draw [->-=0.3, ->-=0.73] (-3, -0.4) .. controls (-1, -0.4) and (-1, -1.2) .. (0, -1.2) .. controls (1, -1.2) and (1, -0.4) .. (3, -0.4);
+    \end{tikzpicture}
+  \end{center}
+  What happens when $K \not= 0$ is more interesting. We first look at the stagnation points. We get $u_r = 0$ if and only if $r = a$ or $\cos \theta = 0$. For $u_\theta = 0$, when $r = a$, we require
+  \[
+    K = 4 \pi a U \sin \theta.
+  \]
+  So provided $|K| \leq 4 \pi a U$, there is a solution to this problem, and we get stagnation points on the boundary.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [fill=gray] circle [radius=1];
+      \node [circ] at (-0.707, 0.707) {};
+      \node [circ] at (0.707, 0.707) {};
 
-% insert more pictures
+      \draw [->-=0.5] (-3, 1.1) .. controls (-2, 1.1) .. (-0.707, 0.707);
+      \draw [->-=0.5] (0.707, 0.707) .. controls (2, 1.1) .. (3, 1.1);
+      \draw [->-=0.2, ->-=0.8] (-3, 0.8) .. controls (-1, 0.8) and (-1.5, -1.1) .. (0, -1.1) .. controls (1.5, -1.1) and (1, 0.8) .. (3, 0.8);
+      \draw [->-=0.3, ->-=0.7] (-3, 0.5) .. controls (-1, 0.5) and (-1.5, -1.2) .. (0, -1.2) .. controls (1.5, -1.2) and (1, 0.5) .. (3, 0.5);
 
-For $K > 4 \pi a U$, we do not get a stagnation point on the boundary. However, we still have the stagnation point where $\cos \theta = 0$, ie. $\theta = \pm \frac{\pi}{2}$. Looking at the equation for $u_\theta = 0$, only $\theta = \frac{\pi}{2}$ works.
+      \draw [->-=0.5] (-3, 1.4) .. controls (-2, 1.4) and (-1, 1.15) .. (0, 1.15) .. controls (1, 1.15) and (2, 1.4) .. (3, 1.4);
+    \end{tikzpicture}
+  \end{center}
+  For $|K| > 4 \pi a U$, we do not get a stagnation point on the boundary. However, we still have the stagnation point where $\cos \theta = 0$, ie. $\theta = \pm \frac{\pi}{2}$. Looking at the equation for $u_\theta = 0$, only $\theta = \frac{\pi}{2}$ works.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [fill=gray] circle [radius=1];
+      \node [circ] at (0, 1.8) {};
 
-% insert more pictures
+      \draw [->-=0.1, ->-=0.95] (0, 1.8) .. controls (-2, 0.8) and (-1.3, -1.2) .. (0, -1.2) .. controls (1.3, -1.2) and (2, 0.8) .. (0, 1.8);
 
-Let's now look at the effect on the sphere. For steady potential flow, Bernoulli works (ie. $H$ is constant) everywhere, not just along each streamline (see later). So we can calculate the pressure on the surface. Let $p$ be the pressure on the surface. Then we get
-\[
-  p_\infty + \frac{1}{2} \rho U^2 = p + \frac{1}{2} \rho \left(\frac{K}{2\pi a} - 2U \sin \theta\right)^2.
-\]
-So we find
-\[
-  p = p_\infty + \frac{1}{2} \rho U^2 - \frac{\rho K^2}{8 \pi^2 a^2} + \frac{\rho KU \sin \theta}{\pi a} - 2\rho U^2 \sin^2 \theta.
-\]
-We see the pressure is symmetrical fore and aft. So there is no force in the $x$ direction.
+      \draw [->-=0.1, ->-=0.95] (0, 1.4) .. controls (-1.3, 1.4) and (-1.6, -1.1) .. (0, -1.1) .. controls (1.6, -1.1) and (1.3, 1.4) .. (0, 1.4);
 
-However, we get a transverse force (per unit length) in the $y$-direction. We have
-\[
-  F_y = -\int_0^{2\pi} p \sin \theta (a \;\d \theta) = -\int_0^{2\pi} \frac{\rho K U}{\pi a} \sin^2 \theta a \;\d \theta = - \rho UK.
-\]
-where we have dropped all the odd terms. So there is a sideways force in the direction perpendicular to the flow, and is directly proportional to the circulation of the system.
+      \draw [->-=0.3, ->-=0.8] (-3, 2.3) .. controls (-1.5, 2.3) .. (0, 1.8) .. controls (1.5, 2.3) .. (3, 2.3);
 
-In general, the \emph{magnus force} (lift force) resulting from interaction between the flow $\mathbf{U}$ and the vortex $\mathbf{K}$ is
-\[
-  \mathbf{F} = \rho \mathbf{U}\times \mathbf{K}.
-\]
+      \draw [->-=0.1, ->-=0.95] (-3, 2) .. controls (-2, 2) and (-1, 1.8) .. (-1, 1.5) .. controls (-1, 1.2) and (-1.4, 0.8) .. (-1.4, 0) arc (180:360:1.4) .. controls (1.4, 0.8) and (1, 1.2) .. (1, 1.5) .. controls (1, 1.8) and (2, 2) .. (3, 2);
+      \draw [->-=0.5] (-3, 2.6) .. controls (-2, 2.6) .. (0, 2.2) .. controls (2, 2.6) and (2, 2.6) .. (3, 2.6);
+    \end{tikzpicture}
+  \end{center}
+  Let's now look at the effect on the sphere. For steady potential flow, Bernoulli works (ie. $H$ is constant) everywhere, not just along each streamline (see later). So we can calculate the pressure on the surface. Let $p$ be the pressure on the surface. Then we get
+  \[
+    p_\infty + \frac{1}{2} \rho U^2 = p + \frac{1}{2} \rho \left(\frac{K}{2\pi a} - 2U \sin \theta\right)^2.
+  \]
+  So we find
+  \[
+    p = p_\infty + \frac{1}{2} \rho U^2 - \frac{\rho K^2}{8 \pi^2 a^2} + \frac{\rho KU \sin \theta}{\pi a} - 2\rho U^2 \sin^2 \theta.
+  \]
+  We see the pressure is symmetrical fore and aft. So there is no force in the $x$ direction.
+
+  However, we get a transverse force (per unit length) in the $y$-direction. We have
+  \[
+    F_y = -\int_0^{2\pi} p \sin \theta (a \;\d \theta) = -\int_0^{2\pi} \frac{\rho K U}{\pi a} \sin^2 \theta a \;\d \theta = - \rho UK.
+  \]
+  where we have dropped all the odd terms. So there is a sideways force in the direction perpendicular to the flow, and is directly proportional to the circulation of the system.
+
+  In general, the \emph{magnus force} (lift force) resulting from interaction between the flow $\mathbf{U}$ and the vortex $\mathbf{K}$ is
+  \[
+    \mathbf{F} = \rho \mathbf{U}\times \mathbf{K}.
+  \]
+\end{eg}
 \subsection{Time dependent potential flows}
 Consider the time-dependent Euler equation
 \[
@@ -1997,7 +2077,7 @@ where $f(t)$ is a function independent of space. This equation allows us to corr
   \end{center}
   We use some magic to set it up such that the water level in the left tube is $h$ above the equilibrium position $H$. Then when we release the system, the water levels on both side would oscillate.
 
-  We can get quite far just by doing dimensional analysis. There are only two parameters $g, H$. Hence the frequency must be proportional to $\sqrt{\frac{g}{H}}$.
+  We can get quite far just by doing dimensional analysis. There are only two parameters $g, H$. Hence the frequency must be proportional to $\sqrt{\frac{g}{H}}$. To get the constant of proportionality, we have to do proper calculations.
 
   We are going to assume the reservoir at the bottom is large, so velocities are negligible. So $\phi$ is constant in the reservoir, say $\phi = 0$. We want to figure out the velocity on the left. This only moves vertically. So we have
   \[
@@ -2013,7 +2093,7 @@ where $f(t)$ is a function independent of space. This equation allows us to corr
   \]
   We now apply the equation from one tube to the other --- we get
   \begin{multline*}
-    \rho \ddot{h} (H + h) + \frac{1}{2}p \dot{h}^2 + p_{\mathrm{atm}} + g\rho(H + h) = f(t) \\
+    \rho \ddot{h} (H + h) + \frac{1}{2}\rho \dot{h}^2 + p_{\mathrm{atm}} + g\rho(H + h) = f(t) \\
     = -\rho\ddot{h}(H - h) + \frac{1}{2}\rho \dot{h}^2 + p_{\mathrm{atm}} + g\rho(H - h).
   \end{multline*}
   Quite a lot of these terms cancel, and we are left with
@@ -2032,7 +2112,7 @@ where $f(t)$ is a function independent of space. This equation allows us to corr
   \begin{align*}
     \nabla^2 \phi &= 0 & r & > a\\
     \phi&\to 0 & r &\to \infty\\
-    \frac{\partial \phi}{\partial r} = \dot{a} & r &= a.
+    \frac{\partial \phi}{\partial r} &= \dot{a} & r &= a.
   \end{align*}
   In spherical polars, we write Laplace's equation as
   \[
@@ -2068,7 +2148,7 @@ where $f(t)$ is a function independent of space. This equation allows us to corr
   \[
     \rho\left(a\ddot{a} + \frac{3}{2}\dot{a}^2\right) = p(a, t) - p_\infty.
   \]
-  This is a difficult equation to solve, because it is non-linear. So we assume we have small oscillations, and write
+  This is a difficult equation to solve, because it is non-linear. So we assume we have small oscillations about equilibrium, and write
   \[
     a = a_0 + \eta(t),
   \]
@@ -2080,13 +2160,31 @@ where $f(t)$ is a function independent of space. This equation allows us to corr
   \[
     \rho a_0 \ddot{\eta} = p(a, t) - p_\infty.
   \]
-  Now the trick is to figure out how the pressure varies. We have this bubble, and the pressure inside changes according to the gas law. Assuming the oscillations are adiabtic, ie. does not involve any heat exchange, then
+  We also know that $p_\infty$ is the pressure when we are in equilibrium. So $p(a, t) - p_\infty$ is the small change in pressure $\delta p$ caused by the change in volume.
+
+  To relate the change in pressure with the change in volume, we need to know some thermodynamics. We suppose the oscillation is adiabatic, ie. it does not involve any heat exchange. This is valid if the oscillation is fast, since there isn't much time for heat transfer. Then it is a \emph{fact} from thermodynamics that the motion obeys
   \[
     PV^\gamma =\text{ constant},
   \]
-  where $\gamma$ is the ratio of specific heat of constant pressure versus constant volume. Differentiating and dropping higher order terms, we get
+  where
   \[
-    \frac{\delta p}{p} = -\gamma \frac{\delta V}{V} = -3\gamma \frac{\eta}{a_0}.
+    \gamma = \frac{\text{specific heat under constant pressure}}{\text{specific heat under constant volume}}.
+  \]
+  We can take logs to obtain
+  \[
+    \log p + \gamma \log V = \text{ constant}.
+  \]
+  Then taking small variations of $p$ and $V$ about $p_\infty$ and $V_0 = \frac{4}{3} \pi a_0^3$ gives
+  \[
+    \delta (\log p) + \gamma \delta(\log V) = 0.
+  \]
+  In other words, we have
+  \[
+    \frac{\delta p}{p_\infty} = -\gamma \frac{\delta V}{V_0}
+  \]
+  Thus we find
+  \[
+    p(a, t) - p_\infty = \delta p = -p_\infty \gamma \frac{\delta V}{V_0} = -3p_\infty\gamma \frac{\eta}{a_0}.
   \]
   Thus we get
   \[
@@ -2096,11 +2194,11 @@ where $f(t)$ is a function independent of space. This equation allows us to corr
   \[
     \omega = \left(\frac{3\gamma p_0}{\rho a_0}\right)^{1/2}.
   \]
-  We know all these numbers, so we can put them in. For a $\SI{1}{\centi\meter}$, we get $\omega \approx \SI{2e3}{\per\second}$. For reference, the human audible range is $20 - \SI{20000}{\per\second}$. This is why we can hear, say, waves breaking.
+  We know all these numbers, so we can put them in. For a $\SI{1}{\centi\meter}$ bubble, we get $\omega \approx \SI{2e3}{\per\second}$. For reference, the human audible range is $20 - \SI{20000}{\per\second}$. This is why we can hear, say, waves breaking.
 \end{eg}
 
 \section{Water waves}
-Consider some water.
+We now consider water waves. We are first going to use dimensional analysis to understand the qualitative behaviour of water waves in deep and shallow water respectively. Afterwards, we will try to solve it properly, and see how we can recover the results from the dimensional analysis.
 \begin{center}
   \begin{tikzpicture}
     \fill [gray, path fading=south] (-3, 0) rectangle (3, -1);
@@ -2121,7 +2219,7 @@ Consider some water.
   \end{tikzpicture}
 \end{center}
 \subsection{Dimensional analysis}
-Consider waves with wavenumber $k = \frac{2\pi}{\lambda}$, where $\lambda$ is the wavelength, on a layer of water of depth $H$. We suppose the fluid is inviscid. Then the wave speed $c$ depends on $k$, $g$ and $H$. Dimensionally, we can write the answer as
+Consider waves with wave number $k = \frac{2\pi}{\lambda}$, where $\lambda$ is the wavelength, on a layer of water of depth $H$. We suppose the fluid is inviscid. Then the wave speed $c$ depends on $k$, $g$ and $H$. Dimensionally, we can write the answer as
 \[
   c = \sqrt{gH} f(kH).
 \]
@@ -2201,11 +2299,11 @@ We assume the fluid is inviscid, and the motion starts from rest. Thus the vorti
 \]
 We have some \emph{kinematic boundary conditions}. First of all, there can be no flow through the bottom. So we have
 \[
-  \frac{\partial \phi}{\partial z} = 0
+  u_z = \frac{\partial \phi}{\partial z} = 0
 \]
 when $z = -H$. At the free surface, we have
 \[
-  \frac{\partial \phi}{\partial z} = \frac{\D h}{\D t} = \frac{\partial h}{\partial t} + u \frac{\partial h}{\partial x} + v \frac{\partial h}{\partial y}
+  u_z = \frac{\partial \phi}{\partial z} = \frac{\D h}{\D t} = \frac{\partial h}{\partial t} + u \frac{\partial h}{\partial x} + v \frac{\partial h}{\partial y}
 \]
 when $z = h$.
 
@@ -2219,14 +2317,13 @@ We need to relate this to the flow. So we apply the time-dependent Bernoulli equ
 \]
 The equation is not hard, but the boundary conditions are. Apart from them being non-linear, there is this surface $h$ that we know nothing about.
 
-\subsection{Linearization}
 It is impossible to solve these equations just as they are. So we want to make some approximations. We assume that the waves amplitudes are small, ie. that
 \[
   h \ll H.
 \]
 Moreover, we assume that the waves are relatively flat, so that
 \[
-  \frac{\partial h}{\partial x},\frac{\partial h}{\partial x} \ll 1,
+  \frac{\partial h}{\partial x},\frac{\partial h}{\partial y} \ll 1,
 \]
 We then ignore quadratic terms in small quantities. For example, since the waves are small, the velocities $u$ and $v$ also are. So we ignore $u \frac{\partial h}{\partial x}$ and $v\frac{\partial h}{\partial y}$. Similarly, we ignore the whole of $|\nabla \phi|^2$ in Bernoulli's equations since it is small.
 
@@ -2243,7 +2340,7 @@ We are then left with linear water waves. The equations are then
   \nabla^2 \phi &= 0 & -H < z &\leq 0\\
   \frac{\partial \phi}{\partial z} &= 0 & z &= -H\\
   \frac{\partial \phi}{\partial z} &= \frac{\partial h}{\partial t} & z &= 0\\
-  \frac{\partial \phi}{\partial t} + gh &= f(t) & z &= 0.
+  \frac{\partial \phi}{\partial t} + gh &= f(t) & z &= h.
 \end{align*}
 Note that the last equation is just Bernoulli equations, after removing the small terms and throwing our constants and factors in to the function $f$.
 
@@ -2268,7 +2365,7 @@ We notice that the solutions are then of the form
 \]
 where the constants are chosen so that $\frac{\partial \phi}{\partial z} = 0$ at $z = -H$.
 
-We now have three unknowns, namely $h_0, \phi_0$ and $\omega$ (we assume $k$ is given, and we want to find waves of this wavenumber). We use the boundary condition
+We now have three unknowns, namely $h_0, \phi_0$ and $\omega$ (we assume $k$ is given, and we want to find waves of this wave number). We use the boundary condition
 \[
   \frac{\partial \phi}{\partial z} = \frac{\partial h}{\partial t}\text{ at }z = 0.
 \]
@@ -2278,7 +2375,7 @@ We then get
 \]
 We put in Bernoulli's equation to get
 \[
-  -\omega \hat{\phi}(z) e^{i(kx - \omega t)} + g h_0 e^{i(kx - \omega t)} = f(t).
+  -i\omega \hat{\phi}(z) e^{i(kx - \omega t)} + g h_0 e^{i(kx - \omega t)} = f(t).
 \]
 For this not to depend on $x$, we must have
 \[
@@ -2290,7 +2387,6 @@ The trivial solution is of course $h_0 = \phi_0 = 0$. Otherwise, we can solve to
 \]
 This is the \emph{dispersion relation}, and relates the frequency to the wavelengths of the wave.
 
-\subsubsection{Phase speed}
 We can use the dispersion relation to find the speed of the wave. This is just
 \[
   c = \frac{\omega}{k} = \sqrt{\frac{g}{k}\tanh kH}.
@@ -2317,9 +2413,9 @@ We can now plot how the wave speed varies with $k$.
     \node [left] at (0, 2) {$1$};
 
     \draw [domain=0:8] plot [smooth] (\x, {2/(1 + \x^2/(3 + \x^2/(5 + \x^2/(7 + \x^2/(9 + \x^2/11)))))});
-    % continued fraction approximation to tanh x. Cannot use built in tanh x
-    % because (1) it does not work for large x; and (2) this avoids division by
-    % zero error when evaluating tanh x / x at x = 0 directly.
+% continued fraction approximation to tanh x. Cannot use built in tanh x
+% because (1) it does not work for large x; and (2) this avoids division by
+% zero error when evaluating tanh x / x at x = 0 directly.
   \end{tikzpicture}
 \end{center}
 We see that wave speed decreases monotonically with $k$, and long waves travel faster than short waves.
@@ -2348,8 +2444,6 @@ Now suppose we have two waves travelling closely together with similar wave numb
   \sin k_1 x + \sin k_2 x = 2 \sin \left(\frac{k_1 + k_2}{2} x\right) \cos\left(\frac{k_1 - k_2}{2}x\right),
 \]
 since $k_1$ and $k_2$ are very similar, we know $\frac{k_1 + k_2}{2} \approx k_1$, and $\frac{k_1 - k_2}{2}$ is small, hence the cosine term has long period. We would then expect waves to look like this
-
-So the amplitudes of the waves would fluctuate.
 \begin{center}
   \begin{tikzpicture}[xscale=1.5]
     \draw [semithick, mblue, domain=0:6,samples=600] plot(\x, {0.5 * cos(2000 * \x) * sin (90 * \x)});
@@ -2357,7 +2451,7 @@ So the amplitudes of the waves would fluctuate.
     \draw [semithick, mgreen] (0, 0) sin (1, -0.5) cos (2, 0) sin (3, 0.5) cos (4, 0) sin (5, -0.5) cos (6, 0);
   \end{tikzpicture}
 \end{center}
-We say the wave travels in \emph{groups}. For more details, see IID Fluid Dynamics or IID Asymptotic methods % check
+So the amplitudes of the waves would fluctuate. We say the wave travels in \emph{groups}. For more details, see IID Fluid Dynamics or IID Asymptotic methods.
 
 It turns out the ``packets'' don't travel at the same velocity as the waves themselves. The group velocity is given by
 \[
@@ -2393,10 +2487,10 @@ Thus we get
 \[
   h \propto A e^{\sqrt{gk} t} + B e^{-\sqrt{gk}t}.
 \]
-We thus have an exponentially growing solution. So the system is unstable. This very interesting fact is known as \emph{Rayleigh-Taylor instability}.
+We thus have an exponentially growing solution. So the system is unstable, and water will fall down. This very interesting fact is known as \emph{Rayleigh-Taylor instability}.
 
 \section{Fluid dynamics on a rotating frame}
-We would like to study fluid dynamics in a rotating frame, because the Earth is rotating (hopefully).
+We would like to study fluid dynamics in a rotating frame, because the Earth is rotating (hopefully). So this is particularly relevant if we want to study ocean currents or atmospheric flow.
 
 \subsection{Equations of motion in a rotating frame}
 
@@ -2410,7 +2504,7 @@ as you might recall from IA Dynamics and Relativity. So we have the equation of 
 \]
 This is complicated, so we want to simplify this. We will first compare the centrifugal force compared to gravity. We have
 \[
-  |\boldsymbol\Omega| = \frac{2\pi}{1\text{ day}} s^{-1} \approx \frac{2\pi}{10^{-5}}s^{-1}.
+  |\boldsymbol\Omega| = \frac{2\pi}{1\text{ day}} s^{-1} \approx \SI{2\pi e-5}{\per\second}.
 \]
 The largest scales are $\SI{10e4}{\kilo\meter}$. Compared to gravity $\mathbf{g}$, we have
 \[
@@ -2447,7 +2541,7 @@ Note that since we take the cross product of $\mathbf{f}$ with $\mathbf{u}$, onl
 \]
 where $\theta$ is the angle from the equator.
 \subsection{Shallow water equations}
-We are now going to derive the shallow water equations, where we have some water shallow relative to its horizontal extent. This is actually quite a good approximation for the ocean --- while the Atlantic is around $\SI{4}{\kilo\meter}$ deep, it is several thousand kilometers across. So the ratio is just like a piece of paper. Similar, this is also a good approximation for the atmosphere.
+We are now going to derive the shallow water equations, where we have some water shallow relative to its horizontal extent. This is actually quite a good approximation for the ocean --- while the Atlantic is around $\SI{4}{\kilo\meter}$ deep, it is several thousand kilometers across. So the ratio is just like a piece of paper. Similarly, this is also a good approximation for the atmosphere.
 
 Suppose we have a shallow layer of depth $z = h(x, y)$ with $p = p_0$ on $z = h$.
 \begin{center}
@@ -2551,12 +2645,11 @@ Since this was an arbitrary surface, we can take the integral away, and we have 
 \]
 So if there is water flowing into a point (ie. a vertical line), then the height of the surface falls, and vice versa.
 
-We can write this out in full In Cartesian coordinates:
+We can write this out in full. In Cartesian coordinates:
 \[
   \frac{\partial h}{\partial t} + \frac{\partial}{\partial x}(uh) + \pd{y}(uh) = 0.
 \]
-\subsection{Linearized equation of motion}
-We suppose $h = h_0 + \eta(x, y, t)$, where $\eta \ll h_0$, and write
+To simplify the situation, we suppose we have small oscillations, so we have $h = h_0 + \eta(x, y, t)$, where $\eta \ll h_0$, and write
 \[
   \mathbf{u} = (u(x, y), v(x, y)).
 \]
@@ -2591,14 +2684,13 @@ where
 \end{defi}
 and this is conserved.
 
-Hence we can obtain
+Hence given any initial condition, we can compute $\mathbf{Q}(x, y, 0) = \mathbf{Q}_0$. Then we have
 \[
-  \mathbf{Q}(x, y, t) = \mathbf{Q}(x, y, 0) = \mathbf{Q}_0
+  \mathbf{Q}(x, y, t) = \mathbf{Q}_0
 \]
-from the initial conditions.
+for all time.
 
-\subsection{Geostrophic adjustment}
-We start by taking the divergence of $(*)$ above to get
+How can we make use of this? We start by taking the divergence of $(*)$ above to get
 \[
   \frac{\partial}{\partial t}(\nabla \cdot \mathbf{u}) - \mathbf{f} \cdot \nabla \times \mathbf{u} = - g \nabla^2 \eta,
 \]
@@ -2608,7 +2700,7 @@ and use $(\dagger)$ to substitute
 \]
 We then get
 \[
-  -\frac{1}{h_0} \frac{\partial^2 \eta}{\partial t^2} - \mathbf{f}\cdot \boldsymbol\zeta = -\nabla^2 \eta.
+  -\frac{1}{h_0} \frac{\partial^2 \eta}{\partial t^2} - \mathbf{f}\cdot \boldsymbol\zeta = -g\nabla^2 \eta.
 \]
 We now use the conservation of potential vorticity, namely
 \[
@@ -2637,9 +2729,9 @@ Note that the right hand side is just a constant (in time). So we have a nice di
   \end{center}
   Due to the differences in height, we have higher pressure on the right and lower pressure on the left.
 
-  If there is no rotation, then the final state is a flat surface with no flow. What happens if there is rotation?
+  If there is no rotation, then the final state is a flat surface with no flow. However, this cannot be the case if there is rotation, since this violates the conservation of $\mathbf{Q}$. So what happens if there is rotation?
 
-  At the beginning, there is no movement. So we have $\boldsymbol\zeta(t = 0) = 0$.. Thus we have
+  At the beginning, there is no movement. So we have $\boldsymbol\zeta(t = 0) = 0$. Thus we have
   \[
     Q_0 =
     \begin{cases}
@@ -2657,7 +2749,7 @@ Note that the right hand side is just a constant (in time). So we have a nice di
   \]
   So $\eta = \eta(x)$ is just a function of $x$. Our equation then says
   \[
-    \frac{\partial^2 \eta}{\partial x^2} = \frac{f^2}{gh_0} \eta = \frac{f}{g}Q_0 = \mp \frac{f^2}{gh_0}\eta_0.
+    \frac{\partial^2 \eta}{\partial x^2} - \frac{f^2}{gh_0} \eta = \frac{f}{g}Q_0 = \mp \frac{f^2}{gh_0}\eta_0.
   \]
   It is convenient to define a new variable
   \[
@@ -2734,7 +2826,7 @@ So the scales of cyclones are approximately $\SI{1000}{\kilo\meter}$.
 
 On the other hand, in the ocean, we have
 \[
-  R \approx \frac{\sqrt{10 \cdot 10}}{10^{-4}} = 10^5 = \SI{1000}{\kilo\meter}.
+  R \approx \frac{\sqrt{10 \cdot 10}}{10^{-4}} = 10^5 = \SI{100}{\kilo\meter}.
 \]
-So ocean scales are much smaller than atomospheric scales.
+So ocean scales are much smaller than atmospheric scales.
 \end{document}
