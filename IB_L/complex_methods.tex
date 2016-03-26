@@ -5,7 +5,6 @@
 \def\nyear {2016}
 \def\nlecturer {R. E. Hunt}
 \def\ncourse {Complex Methods}
-\def\nnotready {}
 
 \input{header}
 
@@ -32,6 +31,12 @@ Laplace transform: definition and basic properties; inversion theorem (proof not
 
 \setcounter{section}{-1}
 \section{Introduction}
+In Part IA, we learnt quite a lot about differentiating and integrating real functions. Differentiation was fine, but integration was tedious. Integrals were \emph{very} difficult to evaluate.
+
+In this course, we will study differentiating and integrating complex functions. Here differentiation is nice, and integration is easy. We will show that complex differentiable functions satisfy many things we hoped were true --- a complex differentiable function is automatically infinitely differentiable. Moreover, an everywhere differentiable function must be constant if it is bounded.
+
+On the integration side, we will show that integrals of complex functions can be performed by computing things known as \emph{residues}, which are much easier to compute. We are not actually interested in performing complex integrals. Instead, we will take some difficult real integrals, and pretend they are complex ones.
+
 This is a methods course. By this, we mean we will not focus too much on proofs. We will at best just skim over the proofs. Instead, we focus on \emph{doing things}. We will not waste time proving things people have proved 300 years ago. If you like proofs, you can go to the IB Complex Analysis course, or look them up in relevant books.
 
 \section{Analytic functions}
@@ -42,13 +47,17 @@ We begin with a review of complex numbers. Any complex number $z \in \C$ can be 
   \[
     r = |z| = \sqrt{x^2 + y^2}, \quad \theta = \arg z,
   \]
-  where $x \tan \theta = y$.
+  where $x = r \cos \theta, y = r \sin \theta$.
 \end{defi}
 The argument is defined only up to multiples of $2\pi$. So we define the following:
 \begin{defi}[Principal value of argument]
   The \emph{principal value} of the argument is the value of $\theta$ in the range $(-\pi, \pi]$.
 \end{defi}
-Note that the formula $\tan^{-1} \left(\frac{y}{x}\right)$ does not always give the right answer --- it is correct only if $x > 0$. If $x \leq 0$, then it might be out by $\pm \pi$ (eg. consider $z = 1 + i$ and $z = -1 - i$).
+We might be tempted to write down the formula
+\[
+  \theta = \tan^{-1} \left(\frac{y}{x}\right),
+\]
+but this does not always give the right answer --- it is correct only if $x > 0$. If $x \leq 0$, then it might be out by $\pm \pi$ (eg. consider $z = 1 + i$ and $z = -1 - i$).
 
 \begin{defi}[Open set]
   An \emph{open set} $\mathcal{D}$ is one which does not include its boundary. More technically, $\mathcal{D} \subseteq \C$ is open if for all $z_0 \in \mathcal{D}$, there is some $\delta > 0$ such that the disc $|z - z_0| < \delta$ is contained in $\mathcal{D}$.
@@ -59,12 +68,13 @@ Note that the formula $\tan^{-1} \left(\frac{y}{x}\right)$ does not always give 
 \end{defi}
 
 \subsubsection*{The extended complex plane}
+Often, the complex plane $\C$ itself is not enough. We want to consider the point $\infty$ as well. This forms the extended complex plane.
 \begin{defi}[The extended complex plane]
   The \emph{extended complex plane} is $\C^* = \C \cup \{\infty\}$. We can reach the ``point at infinity'' by going off in any direction in the plane, and all are equivalent. In particular, there is no concept of $-\infty$. All infinities are the same. Operations with $\infty$ are done in the obvious way.
 \end{defi}
 Sometimes, we \emph{do} write down things like $-\infty$. This does not refer to a different point. Instead, this indicates a \emph{limiting process}. We mean we are approaching this infinity from the direction of the negative real axis. However, we still end up in the same place.
 
-Conceptually, we can use the \emph{Riemann sphere}, which is a sphere resting on the complex plane with its ``South Pole'' $S$ at $z = 0$.
+Conceptually, we can visualize this using the \emph{Riemann sphere}, which is a sphere resting on the complex plane with its ``South Pole'' $S$ at $z = 0$.
 \begin{center}
   \begin{tikzpicture}
     \draw (0, 0) -- (8, 0) -- (10, 3) -- (2, 3) -- (0, 0);
@@ -84,10 +94,9 @@ Conceptually, we can use the \emph{Riemann sphere}, which is a sphere resting on
     \draw (5, 3.5) -- (7, 0.7) node [circ] {} node [right] {$z$};
   \end{tikzpicture}
 \end{center}
- % improve
 For any point $z \in \C$, drawing a line through the ``North Pole'' $N$ of the sphere to $z$, and noting where this intersects the sphere. This specifies an equivalent point $P$ on the sphere. Then $\infty$ is equivalent to the North Pole of the sphere itself. So the extended complex plane is mapped bijectively to the sphere.
 
-To investigate properties of $\infty$, we use the substitution $\zeta = \frac{1}{z}$. A function $f(z)$ is said to have a particular property \emph{at $\infty$} if $f(\frac{1}{\zeta})$ has that same property at $\zeta = 0$. This vague notion will be made precise when we have specific examples to play with.
+This is a useful way to visualize things, but is not as useful when we actually want to do computations. To investigate properties of $\infty$, we use the substitution $\zeta = \frac{1}{z}$. A function $f(z)$ is said to have a particular property \emph{at $\infty$} if $f(\frac{1}{\zeta})$ has that same property at $\zeta = 0$. This vague notion will be made precise when we have specific examples to play with.
 
 \subsection{Complex differentiation}
 Recall the definition of differentiation for a real function $f(x)$:
@@ -104,11 +113,11 @@ This is obvious and we already know that, but for complex differentiation, this 
   \]
   exists (and is therefore independent of the direction of approach --- but now there are infinitely many possible directions).
 \end{defi}
+This is the same definition as that for a real function. Often, we are not interested in functions that are differentiable at a \emph{point}, since this might allow some rather exotic functions we do not want to consider. Instead, we want the function to be differentiable near the point.
 
 \begin{defi}[Analytic function]
   We say $f$ is \emph{analytic} at a point $z$ if there exists a neighbourhood of $z$ throughout which $f'$ exists. The terms \emph{regular} and \emph{holomorphic} are also used.
 \end{defi}
-In complex analysis, this sentence might be a few paragraphs long instead. Usually ``holomorphic'' is defined to mean the function has a Taylor series, but then we go on to prove that having a Taylor series is the same as being differentiable in a neighbourhood, ie. being holomorphic and analytic are the same.
 
 \begin{defi}[Entire function]
   A complex function is \emph{entire} if it is analytic throughout $\C$.
@@ -121,11 +130,11 @@ The property of analyticity is in fact a surprisingly strong one! For example, t
 \end{enumerate}
 There are many more interesting properties, but these are sufficient to show us that complex differentiation is very different from real differentiation.
 \subsubsection*{The Cauchy-Riemann equations}
-We start by separating $f$ and $z$ into real and imaginary parts, ie.
+We already know well how to differentiate real functions. Can we use this to determine whether certain complex functions are differentiable? For example is the function $f(x + iy) = \cos x + i\sin y$ differentiable? In general, given a complex function
 \[
   f(z) = u(x, y) + iv(x, y),
 \]
-where $z = x + iy$ are $u, v$ are real functions.
+where $z = x + iy$ are $u, v$ are real functions, is there an easy criterion to determine whether $f$ is differentiable?
 
 We suppose that $f$ is differentiable at $z$. We may take $\delta z$ in any direction we like. First, we take it to be real, with $\delta z = \delta x$. Then
 \begin{align*}
@@ -152,7 +161,15 @@ Taking the real and imaginary components, we get
     \frac{\partial u}{\partial x} = \frac{\partial v}{\partial y},\quad \frac{\partial u}{\partial y} = -\frac{\partial v}{\partial x}.
   \]
 \end{prop}
-Is the converse true? If these equations hold, does it follow that $f$ is differentiable? This is not always true. This holds only if $u$ and $v$ themselves are differentiable, which is a stronger condition that the partial derivatives exist, as you may have learnt from IB Analysis II. In particular, this holds if the partial derivatives $u_x, u_y, v_x, v_y$ are continuous (which implies differentiability).
+Is the converse true? If these equations hold, does it follow that $f$ is differentiable? This is not always true. This holds only if $u$ and $v$ themselves are differentiable, which is a stronger condition that the partial derivatives exist, as you may have learnt from IB Analysis II. In particular, this holds if the partial derivatives $u_x, u_y, v_x, v_y$ are continuous (which implies differentiability). So
+\begin{prop}
+  Given a complex function $f = u + iv$, if $u$ and $v$ are real differentiable at a point $z$ and
+  \[
+    \frac{\partial u}{\partial x} = \frac{\partial v}{\partial y},\quad \frac{\partial u}{\partial y} = -\frac{\partial v}{\partial x},
+  \]
+  then $f$ is differentiable at $z$.
+\end{prop}
+We will not prove this --- proofs are for IB Complex Analysis.
 
 \subsubsection*{Examples of analytic functions}
 \begin{eg}\leavevmode
@@ -187,8 +204,9 @@ Is the converse true? If these equations hold, does it follow that $f$ is differ
           \begin{align*}
             \sin z &= \sin (x + iy) \\
             &= \sin x \cos iy + \cos x \sin iy \\
-            &= \sin x \cosh y + i \cos x \sinh y.
+            &= \sin x \cosh y + i \cos x \sinh y,
           \end{align*}
+          which is sometimes convenient.
         \item Similarly $\cos z, \sinh z, \cosh z$ etc. differentiate to what we expect them to differentiate to.
         \item $\log z = \log|z| + i \arg z$ has derivative $\frac{1}{z}$.
         \item The product rule, quotient rule and chain rule hold in exactly the same way, which allows us to prove (iii) and (iv) easily.
@@ -204,10 +222,10 @@ Is the converse true? If these equations hold, does it follow that $f$ is differ
         \frac{\partial u}{\partial x} = 1\not= 0 = \frac{\partial v}{\partial y}.
       \]
       So $\Re z$ is nowhere analytic.
-    \item Consider $f(z) = |z|$. This has $u = \sqrt{x^2 + y^2} = 0, v = 0$. This is thus nowhere analytic.
+    \item Consider $f(z) = |z|$. This has $u = \sqrt{x^2 + y^2}, v = 0$. This is thus nowhere analytic.
     \item The complex conjugate $f(z) = \bar z = z^* = x - iy$ has $u = x, v = -y$. So the Cauchy-Riemann equations don't hold. Hence this is nowhere analytic.
 
-      We could have deduced (ii) from this --- if $|z|$ were analytic, then so would $|z|^2$, and hence $\bar{z} = \frac{|z|^2}{z}$ also has to be analytic.
+      We could have deduced (ii) from this --- if $|z|$ were analytic, then so would $|z|^2$, and hence $\bar{z} = \frac{|z|^2}{z}$ also has to be analytic, which is not true.
     \item We have to be a bit more careful with $f(z) = |z|^2 = x^2 + y^2$. The Cauchy-Riemann equations are satisfied only at the origin. So $f$ is only differentiable at $z = 0$. However, it is not analytic since there is no neighbourhood of $0$ throughout which $f$ is differentiable.
   \end{enumerate}
 \end{eg}
@@ -233,7 +251,7 @@ This tells us $g'(x) = 0$. So $g$ must be a genuine constant, say $\alpha$. The 
 \]
 Note that in an exam, if we were asked to find the analytic function $f$ with real part $u$ (where $u$ is given), then we \emph{must} express it in terms of $z$, and not $x$ and $y$, or else it is not clear this is indeed analytic.
 
-On the other hand, if $f(z) = u + iv$ is analytic, then we can compute
+On the other hand, if we are given that $f(z) = u + iv$ is analytic, then we can compute
 \begin{align*}
   \frac{\partial^2 u}{\partial x^2} &= \frac{\partial }{\partial x}\left(\frac{\partial u}{\partial x}\right)\\
   &= \frac{\partial }{\partial x} \left(\frac{\partial v}{\partial y}\right)\\
@@ -324,7 +342,7 @@ Note that a \emph{branch cut} is the squiggly line, while a \emph{branch} is a p
 
 The cut described above is the \emph{canonical} (ie. standard) branch cut for $\log z$. The resulting value of $\log z$ is called the principal value of the logarithm.
 
-What are the values of $\log z$ just above and just below the branch cut? Consider a point on the negative real axis, $z = x < 0$. Just above the cut, at $z = x + i 0^+$, we have $\theta = \pi$. So $\log z = \log |x| + i \pi$. Just below it, at $z = x + i0^-$, we have $\log z = \log |x| - i \pi$. Hence we have a discontinuity of $2\pi i$, as well.
+What are the values of $\log z$ just above and just below the branch cut? Consider a point on the negative real axis, $z = x < 0$. Just above the cut, at $z = x + i 0^+$, we have $\theta = \pi$. So $\log z = \log |x| + i \pi$. Just below it, at $z = x + i0^-$, we have $\log z = \log |x| - i \pi$. Hence we have a discontinuity of $2\pi i$.
 
 We have picked an arbitrary branch cut and branch. We can pick other branch cuts or branches. Even with the same branch cut, we can still have a different branch --- we can instead require $\theta$ to fall in $(\pi, 3\pi]$. Of course, we can also pick other branch cuts, eg. the non-negative imaginary axis. Any cut that stops curves wrapping around the branch point will do.
 \begin{center}
@@ -355,12 +373,12 @@ In practice, whenever a problem requires the use of a branch, it is important to
     \[
       \log z = \log|z| + i \arg z, \quad \arg z \in (-\pi, \pi].
     \]
-  \item Specify the location of the branch cut and give the value of the required branch at a single point not on the cut. The values everywhere else are then defined uniquely by continuity. For example, we have $\log z$ with a branch cut along $\R^{\leq 0}$ and $\log 1 = 0$. Of course, we could have defined $\log 1 = 2\pi i$. This would correspond to picking $\arg z \in (\pi, 3 \pi]$.
+  \item Specify the location of the branch cut and give the value of the required branch at a single point not on the cut. The values everywhere else are then defined uniquely by continuity. For example, we have $\log z$ with a branch cut along $\R^{\leq 0}$ and $\log 1 = 0$. Of course, we could have defined $\log 1 = 2\pi i$ as well, and this would correspond to picking $\arg z \in (\pi, 3 \pi]$.
 \end{enumerate}
 Either way can be used, but it must be done properly.
 
 \subsubsection*{Riemann surfaces*}
-Riemann imagined different branches as separate copies of $\C$, all stacked on top of each other but each one joined to the next at the branch cut. This structure is a \emph{Riemann surface}.
+Instead of this brutal way of introducing a cut and forbidding crossing, Riemann imagined different branches as separate copies of $\C$, all stacked on top of each other but each one joined to the next at the branch cut. This structure is a \emph{Riemann surface}.
 \begin{center}
   \begin{tikzpicture}
     \begin{scope}[shift={(0, -0.6)}]
@@ -388,12 +406,12 @@ The idea is that traditionally, we are not allowed to cross branch cuts. Here, w
 
 We will not say any more about this --- there is a whole Part II course devoted to these, uncreatively named IID Riemann Surfaces.
 
-\subsubsection{Multiple branch cuts}
+\subsubsection*{Multiple branch cuts}
 When there is more than one branch point, we may need more than one branch cut. For
 \[
   f(z) = (z(z - 1))^{\frac{1}{3}},
 \]
-there are two branch points, at $0$ and $1$. So we need to branch cuts. A possibility is shown below. Then no curve can wrap around either $0$ or $1$.
+there are two branch points, at $0$ and $1$. So we need two branch cuts. A possibility is shown below. Then no curve can wrap around either $0$ or $1$.
 \begin{center}
   \begin{tikzpicture}[scale=1.5]
     \draw [->] (-2, 0) -- (2, 0);
@@ -458,7 +476,9 @@ Suppose that we are unlawful and cross the branch cut. Then the value of $\theta
 The interesting part is when we pass through the positive real axis on the right of branch cut. When we do this, \emph{both} $\theta$ and $\theta_1$ jump by $2\pi$. However, this does not induce a discontinuity in $f(z)$, since $f(z)$ depends on the difference $\theta_1 - \theta$, which has not experienced a jump.
 
 \subsection{M\"obius map}
-The M\"obius map
+We are now going to consider a special class of maps, namely the \emph{M\"obius maps}, as defined in IA Groups. While these maps have many many different applications, the most important thing we are going to use it for is to define some nice conformal mappings in the next section.
+
+We know from general theory that the M\"obius map
 \[
   z \mapsto w = \frac{az + b}{cz + d}
 \]
@@ -470,7 +490,7 @@ It is then a bijective map between $\C^*$ and itself, with the inverse being
 \[
   w \mapsto \frac{-d w + b}{cw - a},
 \]
-another M\"obius map.
+another M\"obius map. These are all analytic everywhere when considered as a map $\C^* \to \C^*$.
 
 \begin{defi}[Circline]
   A \emph{circline} is either a circle or a line.
@@ -525,15 +545,15 @@ Also,
   This clearly sends $\alpha' \to 0, \beta' \to 1$ and $\gamma' \to \infty$. Then $f_2^{-1} \circ f_1$ is the required mapping. It is a M\"obius map since M\"obius maps form a group.
 \end{proof}
 
-Therefore, we can therefore find a M\"obius map taking any given circline to any other.
+Therefore, we can therefore find a M\"obius map taking any given circline to any other, which is convenient.
 
 \subsection{Conformal maps}
-We've been doing quite a lot of stuff in this chapter. They are all going to magically come together in this section. But we first of all know what a conformal map is.
+Sometimes, we might be asked to solve a problem on some complicated subspace $U \subseteq \C$. For example, we might need to solve Laplace's equation subject to some boundary conditions. In such cases, it is often convenient to transform our space $U$ into some nicer space $V$, such as the open disk. To do so, we will need a complex function $f$ that sends $U$ to $V$. For this function to preserve our properties such that the solution on $V$ can be transferred back to a solution on $U$, we would of course want $f$ to be differentiable. Moreover, we would like it to have non-vanishing derivative, so that it is at least locally invertible.
 
 \begin{defi}[Conformal map]
   A \emph{conformal map} $f: U \to V$, where $U, V$ are \emph{open} subsets of $\C$, is one which is analytic with non-zero derivative.
 \end{defi}
-Although not part of the definition, it is usual (and helpful) to require that $f$ be one-to-one from $U$ to $V$.
+In reality, we would often want the map to be a bijection. We sometimes call these \emph{conformal equivalences}.
 
 Unfortunately, after many hundred years, we still haven't managed to agree on what being conformal means. An alternative definition is that a conformal map is one that preserves the angle (in both magnitude and orientation) between intersecting curves.
 
@@ -765,9 +785,10 @@ In practice, complicated conformal maps are usually built up from individual bui
   \end{center}
 \end{eg}
 
-
 \subsection{Solving Laplace's equation using conformal maps}
-The following algorithm can be used to solve Laplace's Equation $\nabla^2 \phi(x, y) = 0$ on a tricky domain $U \subseteq \R^2$ with given Dirichlet boundary conditions on $\partial U$. We now pretend $\R^2$ is actually $\C$, and identify subsets of $\R^2$ with subsets of $\C$ in the obvious manner.
+As we have mentioned, conformal maps are useful for transferring problems from a complicated domain to a simple domain. For example, we can use it to solve Laplace's equation, since solutions to Laplace's equations are given by real and imaginary parts of holomorphic functions.
+
+More concretely, the following algorithm can be used to solve Laplace's Equation $\nabla^2 \phi(x, y) = 0$ on a tricky domain $U \subseteq \R^2$ with given Dirichlet boundary conditions on $\partial U$. We now pretend $\R^2$ is actually $\C$, and identify subsets of $\R^2$ with subsets of $\C$ in the obvious manner.
 \begin{enumerate}
   \item Find a conformal map $f: U \to V$, where $U$ is now considered a subset of $\C$, and $V$ is a ``nice'' domain of our choice. Our aim is to find a harmonic function $\Phi$ in $V$ that satisfies the same boundary conditions as $\phi$.
   \item Map the boundary conditions on $\partial U$ directly to the equivalent points on $\partial V$.
@@ -783,7 +804,7 @@ Alternatively, we perform magic. Note that since $\Phi$ is harmonic, it is the r
 
 Let's do an example. In this case, you might be able to solve this directly just by looking at it, using what you've learnt from IB Methods. However, we will do it with this complex methods magic.
 \begin{eg}
-  Find a bounded solution of $\nabla^2 \phi = 0$ on the first quadrant of $\R^2$ subject to $\phi(x, 0) = 0$ and $\phi(0, y) = 1$ when, $x, y > 0$.
+  We want to find a bounded solution of $\nabla^2 \phi = 0$ on the first quadrant of $\R^2$ subject to $\phi(x, 0) = 0$ and $\phi(0, y) = 1$ when, $x, y > 0$.
 
   This is a bit silly, since our $U$ is supposed to be a nasty region, but our $U$ is actually quite nice. Nevertheless, we still do this since this is a good example.
 
@@ -835,11 +856,14 @@ Let's do an example. In this case, you might be able to solve this directly just
     &= \frac{2}{\pi} \Im \log z\\
     &= \frac{2}{\pi} \tan^{-1}\left(\frac{y}{x}\right).
   \end{align*}
+  Notice this is just the argument $\theta$.
 \end{eg}
 
 \section{Contour integration and Cauchy's theorem}
+In the remaining of the course, we will spend all our time studying integration of complex functions, and see what we can do with it. At first, you might think this is just an obvious generalization of integration of real functions. This is not true. Complex integrals have many many nice properties, and it turns out there are some really convenient tricks for evaluating complex integrals. In fact, we will learn how to evaluate certain real integrals by pretending they are complex.
+
 \subsection{Contour and integrals}
-Most of this section will be definitions and stuff like that. Got to be done some time.
+With real functions, we can just integrate a function, say, from $0$ to $1$, since there is just one possible way we can get from $0$ to $1$ along the real line. However, in the complex plane, there are many paths we can take to get from a point to another. Integrating along different paths may produce different results. So we have to carefully specify our path of integration.
 
 \begin{defi}[Curve]
   A \emph{curve} $\gamma(t)$ is a (continuous) map $\gamma: [0, 1] \to \C$.
@@ -924,9 +948,11 @@ The result of a contour integral between two points in $\C$ may depend on the ch
     I_1 &= \int_{\pi}^0 \frac{ie^{i\theta}\;\d \theta}{e^{i\theta}} = -i\pi\\
     I_2 &= \int_{-\pi}^0 \frac{ie^{i\theta}\;\d \theta}{e^{i\theta}} = i\pi.
   \end{align*}
+  So they can in fact differ.
 \end{eg}
 
 \subsubsection*{Elementary properties of the integral}
+Contour integrals behave as we would expect them to.
 \begin{prop}\leavevmode
   \begin{enumerate}
     \item We write $\gamma_1 + \gamma_2$ for the path obtained by joining $\gamma_1$ and $\gamma_2$. We have
@@ -963,7 +989,7 @@ The result of a contour integral between two points in $\C$ may depend on the ch
       We will be using this result a lot later on.
   \end{enumerate}
 \end{prop}
-We will not prove this. Again, if you like proofs, go to IB Complex Analysis.
+We will not prove these. Again, if you like proofs, go to IB Complex Analysis.
 
 \subsubsection*{Integrals on closed contours}
 If $\gamma$ is a closed contour, then it doesn't matter where we start from on $\gamma$; $\oint_\gamma f(z)\;\d z$ means the same thing in any case, so long as we go all the way round ($\oint$ denotes an integral around a closed contour).
@@ -984,14 +1010,15 @@ In other words, it does not have holes. For example, this is not simply-connecte
 These ``holes'' need not be big holes like this, but just individual points at which a function under consider consideration is singular.
 
 \subsection{Cauchy's theorem}
-This theorem is the highlight of the course:
+We now come to the highlight of the course --- Cauchy's theorem. Most of the things we do will be based upon this single important result.
+
 \begin{thm}[Cauchy's theorem]
   If $f(z)$ is analytic in a simply-connected domain $\mathcal{D}$, then for every simple closed contour $\gamma$ in $\mathcal{D}$, we have
   \[
     \oint_\gamma f(z)\;\d z = 0.
   \]
 \end{thm}
-This is quite a powerful statement, and will allow us to do a lot! This also means we will be working with non-analytic functions quite a lot in the course, since analytic ones are boring.
+This is quite a powerful statement, and will allow us to do a lot! On the other hand, this tells us functions that are analytic everywhere are not too interesting. Instead, we will later look at functions like $\frac{1}{z}$ that have singularities.
 
 \begin{proof}(non-examinable)
   The proof of this remarkable theorem is simple (with a catch), and follows from the Cauchy-Riemann equations and Green's theorem. Recall that Green's theorem says
@@ -1000,15 +1027,18 @@ This is quite a powerful statement, and will allow us to do a lot! This also mea
   \]
   Let $u, v$ be the real and imaginary parts of $f$. Then
   \begin{align*}
-    \oint \gamma f(z) \;\d z &= \oint_\gamma (u + iv) (\d x + i\;\d y)\\
+    \oint_\gamma f(z) \;\d z &= \oint_\gamma (u + iv) (\d x + i\;\d y)\\
     &= \oint_\gamma (u\;\d x - v\;\d y) + i \oint_\gamma (v \;\d x + u \;\d y)\\
     &= \iint_S \left(-\frac{\partial v}{\partial x} - \frac{\partial u}{\partial y}\right)\;\d x\;\d y + i\iint_S \left(\frac{\partial u}{\partial x} - \frac{\partial v}{\partial y}\right)\;\d x \;\d y
   \end{align*}
   But both integrands vanish by the Cauchy-Riemann equations, since $f$ is differentiable throughout $S$. So the result follows.
 \end{proof}
-In fact, this proof requires $u$ and $v$ to have continuous partial derivatives in $S$ (otherwise Green's theorem does not apply). We shall see later that in fact $f$ is differentiable infinitely many time, so actually $u$ and $v$ \emph{do} have continuous partial derivatives. However, our proof of that will utilize Cauchy's theorem! So a completely different proof (and a very elegant one!) is required if we do not wish to make assumptions about $u$ and $v$. However, we shall not worry about this in this course since it is easy to verify that the functions we use do have continuous partial derivatives. And we are not doing Complex Analysis.
+Actually, this proof requires $u$ and $v$ to have continuous partial derivatives in $S$, otherwise Green's theorem does not apply. We shall see later that in fact $f$ is differentiable infinitely many time, so actually $u$ and $v$ \emph{do} have continuous partial derivatives. However, our proof of that will utilize Cauchy's theorem! So we are trapped.
+
+Thus a completely different proof (and a very elegant one!) is required if we do not wish to make assumptions about $u$ and $v$. However, we shall not worry about this in this course since it is easy to verify that the functions we use do have continuous partial derivatives. And we are not doing Complex Analysis.
 
 \subsection{Contour deformation}
+One useful consequence of Cauchy's theorem is that we can freely deform contours along regions where $f$ is defined without changing the value of the integral.
 \begin{prop}
   Suppose that $\gamma_1$ and $\gamma_2$ are contours from $a$ to $b$, and that $f$ is analytic on the contours \emph{and} between the contours. Then
   \[
@@ -1168,7 +1198,7 @@ If $f$ is analytic at $z_0$, then it has a Taylor series
 \[
   f(z) = \sum_{n = 0}^\infty a_n (z - z_0)^n
 \]
-in a neighbourhood of $z_0$. Exactly which neighbourhood it applies in depends on the function. Of course, we know the coefficients are given by
+in a neighbourhood of $z_0$. We will prove this as a special case of the coming proposition. Exactly which neighbourhood it applies in depends on the function. Of course, we know the coefficients are given by
 \[
   a_n = \frac{f^{(n)}(z_0)}{n!},
 \]
@@ -1182,7 +1212,8 @@ and this converges for all $z$. Also, we have
 \]
 This converges for $|z| < 1$.
 
-But if $f$ has a singularity at $z_0$, we cannot expect such a Taylor series. Fortunately, we have a different series, the Laurent series.
+But if $f$ has a singularity at $z_0$, we cannot expect such a Taylor series, since it would imply $f$ is non-singular at $z_0$. However, it turns out we can get a series expansion if we allow ourselves to have negative powers of $z$.
+
 \begin{prop}[Laurent series]
   If $f$ is analytic in an \emph{annulus} $R_1 < |z - z_0| < R_2$, then it has a \emph{Laurent series}
   \[
@@ -1256,7 +1287,9 @@ But if $f$ has a singularity at $z_0$, we cannot expect such a Taylor series. Fo
 \end{proof}
 It can be shown that Laurent series are unique. Then not only is there a unique Laurent series for each annulus, but if we pick two different annuli on which $f$ is analytic (assuming they overlap), they must have the same coefficient. This is since we can restrict the two series to their common intersection, and then uniqueness requires the coefficients to be must be the same.
 
-Note that the Taylor series is just a special case of Laurent series.
+Note that the Taylor series is just a special case of Laurent series, and if $f$ is holomorphic at $z_0$, then our explicit formula for the coefficients plus Cauchy's theorem tells us we have $a_n = 0$ for $n < 0$.
+
+Note, however, that we needed the Taylor series of $\frac{1}{1 - z}$ in order to prove Taylor's theorem.
 
 \begin{eg}
   Consider $\frac{e^z}{z^3}$. What is its Laurent series about $z_0 = 0$? We already have a Taylor series for $e^z$, and all we need to do is to divide it by $z^3$. So
@@ -1313,11 +1346,13 @@ Note that the Taylor series is just a special case of Laurent series.
 
 The radius of convergence of a Laurent series is at least the size of the annulus, as we that's how we have constructed it. So how large is it?
 
-It turns out the radius of convergence of a Laurent series is always the distance from $z_0$ to the closest singularity of $f(z)$, for we may always choose $R_2$ to be that distance, and obtain a Laurent series valid all the way to $R_2$ (not inclusive). This Laurent series must be the same series as we would have obtained with a smaller $R_2$, because Laurent series are unique.
+It turns out the radius of convergence of a Laurent series is always the distance from $z_0$ to the closest singularity of $f(z)$, for we may always choose $R_2$ to be that distance, and obtain a Laurent series valid all the way to $R_2$ (not inclusive). This Laurent series must be the same series as we would have obtained with a smaller radius, because Laurent series are unique.
 
 While this sounds just like some technicalities, this is actually quite useful. When deriving a Laurent series, we can make any assumptions we like about $z - z_0$ being small. Then even if we have derived a Laurent series for a really small neighbourhood, we automatically know the series is valid up to the other point where $f$ is singular.
 
 \subsection{Zeros}
+Recall that for a polynomial $p(z)$, we can talk about the \emph{order} of its zero at $z = a$ by looking at the largest power of $(z - a)$ dividing $p$. \emph{A priori}, it is not clear how we can do this for general functions. However, given that everything is a Taylor series, we know how to do this for holomorphic functions.
+
 \begin{defi}[Zeros]
   The \emph{zeros} of an analytic function $f(Z)$ are the points $z_0$ where $f(z_0) = 0$. A zero is of \emph{order $N$} if in its Taylor series $\sum_{n = 0}^\infty a_n (z - z_0)^n$, the first non-zero coefficient is $a_N$.
 
@@ -1349,7 +1384,7 @@ While this sounds just like some technicalities, this is actually quite useful. 
   \end{align*}
 \end{eg}
 \subsection{Classification of singularities}
-The previous section was rather boring --- you've probably seen all of that before. It is just there as a buildup for our study of singularities.
+The previous section was rather boring --- you've probably seen all of that before. It is just there as a buildup for our study of singularities. These are in some sense the ``opposites'' of zeros.
 
 \begin{defi}[Isolated singularity]
   Suppose that $f$ has a singularity at $z_0 = z$. If there is a neighbourhood of $z_0$ within which $f$ is analytic, except at $z_0$ itself, then $f$ has an \emph{isolated singularity} at $z_0$. If there is no such neighbourhood, then $f$ has an \emph{essential (non-isolated) singularity} at $z_0$.
@@ -1421,10 +1456,10 @@ Let's look at some examples. In fact, we have 10 examples here.
   \end{enumerate}
 \end{eg}
 
-Near an essential isolated singularity of a function $f(z)$, it can be shown that $f$ takes \emph{all} possible complex values (except at most one) in any neighbourhood, however small. For example, $e^{\frac{1}{z}}$ takes all values except zero.
+Near an essential isolated singularity of a function $f(z)$, it can be shown that $f$ takes \emph{all} possible complex values (except at most one) in any neighbourhood, however small. For example, $e^{\frac{1}{z}}$ takes all values except zero. We will not prove this. Even in IB Complex Analysis.
 
 \subsection{Residues}
-The other high point of the course is the Residue theorem. First, we need to know what the residue is.
+So far, we've mostly been making lots of definitions. We haven't actually used them to do much useful things. We are almost there. It turns out we can easily evaluate integrals of analytic functions by looking at their Laurent series. Moreover, we don't need the \emph{whole} Laurent series. We just need one of the coefficients.
 
 \begin{defi}[Residue]
   The \emph{residue} of a function $f$ at an isolated singularity $z_0$ is the coefficient $a_{-1}$ in its Laurent expansion about $z_0$. There is no standard notation, but shall denote the residue by $\res\limits_{z = z_0}f(z)$.
@@ -1566,6 +1601,8 @@ Hence we have
 Nowadays, we use ``calculus'' to mean differentiation and integration. However, historically, the word ``calculus'' just means doing calculations. The word ``calculus'' in the calculus of residues does not refer to differentiation and integration, even though in this case they \emph{are} related, but this is just a coincidence.
 
 \subsection{The residue theorem}
+We are now going to massively generalize the last result we had in the previous chapter. We are going consider a function $f$ with \emph{many} singularities, and obtain an analogous formula.
+
 \begin{thm}[Residue theorem]
   Suppose $f$ is analytic in a simply-connected region except at a finite number of isolated singularities $z_1, \cdots, z_n$, and that a simple closed contour $\gamma$ encircles the singularities anticlockwise. Then
   \[
@@ -1634,6 +1671,7 @@ Note that we have already proved the case $n = 1$ in the previous section. To pr
 This is the key practical result of this course. We are going to be using this very extensively to compute integrals.
 
 \subsection{Applications of the residue theorem}
+We now use the residue theorem to evaluate lots of real integrals.
 \begin{eg}
   We shall evaluate
   \[
@@ -1956,6 +1994,21 @@ Let's do more examples.
   \]
   Note that we we labeled the poles as $e^{3\pi i/4}$ and $e^{5 \pi i/4}$. The second point is the same point as $e^{-3\pi i/4}$, but it would be wrong to label it like that. We have decided at the beginning to pick the branch such that $0 \leq \theta < 2\pi$, and $-3\pi i/4$ is \emph{not} in that range. If we wrote it as $e^{-3\pi i/4}$ instead, we might have got the residue as $e^{-3 \alpha \pi i/4}/(-\sqrt{2}i)$, which is not the same as $e^{5 \alpha \pi i/4}/(-\sqrt{2}i)$.
 \end{eg}
+Note that the need of a branch cut does \emph{not} mean we must use a keyhole contour. Sometimes, we can get away with the branch cut and contour chosen as follows:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-3, 0) -- (3, 0);
+    \draw [->] (0, -3) -- (0, 3);
+    \draw [thick, decorate, decoration=zigzag] (0, 0) -- (0, -3);
+
+    \node [circ] at (0, 0) {};
+
+    \draw [mred, thick, ->-=0.1, ->-=0.4, ->-=0.7] (-2, 0) node [below] {$-R$} -- (-0.4, 0) node [below] {$\varepsilon$} arc(180:0:0.4) node [below] {$\varepsilon$} -- (2, 0) node [below] {$R$} arc(0:180:2);
+
+    \node at (0, 1) {$\times$};
+    \node [right] at (0, 1) {$i$};
+  \end{tikzpicture}
+\end{center}
 
 \subsection{Further applications of the residue theorem using rectangular contours}
 \begin{eg}
@@ -1963,9 +2016,9 @@ Let's do more examples.
   \[
     I = \int_{-\infty}^\infty \frac{e^{\alpha x}}{\cosh x}\;\d x,
   \]
-  where $a\alpha \in (-1, 1)$.
+  where $\alpha \in (-1, 1)$. We notice this has singularities at $x = \left(n + \frac{1}{2}\right)\pi i$ for all $n$. So if we used our good, old semi-circular contours, then we would run into infinitely many singularities as $R \to \infty$.
 
-  We consider the following rectangular contour:
+  Instead, we abuse the periodic nature of $\cosh$, and consider the following rectangular contour:
   \begin{center}
     \begin{tikzpicture}
       \draw [->] (-3, 0) -- (3, 0);
@@ -2020,7 +2073,7 @@ Let's do more examples.
   \[
     I ( 1 + e^{\alpha \pi i}) = 2\pi i (-i e^{\alpha \pi i/2}) = 2\pi ie^{\alpha \pi i/2}.
   \]
-  Hence, we get
+  So we find
   \[
     I = \frac{\pi}{\cos(\alpha \pi/2)}.
   \]
@@ -2079,6 +2132,11 @@ These rectangular contours tend to be useful for trigonometric and hyperbolic fu
 \end{eg}
 
 \subsection{Jordan's lemma}
+So far, we have bounded the semi-circular integral in a rather crude way, with 
+\[
+  \left|\int_{\gamma_R} f(z) e^{i\lambda z} \;\d z\right| \leq R \sup_{|z| = R} |f(z)|.
+\]
+This works for most cases. However, sometimes we need a more subtle argument.
 \begin{lemma}[Jordan's lemma]
   Suppose that $f$ is an analytic function, except for a finite number of singularities, and that $f(z) \to 0$ as $|z| \to \infty$.
   \begin{center}
@@ -2217,9 +2275,11 @@ Note that we are not allowed to use the Jordan's lemma in the Tripos exam. If we
 \end{eg}
 
 \section{Transform theory}
-\subsection{Fourier transforms}
-We have already done Fourier transforms in IB Methods. What's new in this course is that we have a new way of calculating them --- contour integrals.
+We are now going to consider two different types of ``transforms''. The first is the Fourier transform, which we already met in IB methods. The second is the Laplace transform. While the formula of a Laplace transform is completely real, the \emph{inverse} Laplace transform involves a more complicated contour integral, which is why we did not do it in IB Methods. In either case, the new tool of contour integrals allows us to compute \emph{more} transforms.
 
+Apart from that, the two transforms are pretty similar, and most properties of the Fourier transform also carry over to the Laplace transform.
+
+\subsection{Fourier transforms}
 \begin{defi}[Fourier transform]
   The \emph{Fourier transform} of a function $f(x)$ that decays sufficiently as $|x| \to \infty$ is defined as
   \[
@@ -2230,9 +2290,9 @@ We have already done Fourier transforms in IB Methods. What's new in this course
     f(x) = \frac{1}{2\pi} \int_{-\infty}^\infty \tilde{f}(k) e^{ikx}\;\d k.
   \]
 \end{defi}
-It is common for the terms $e^{-ikx}$ and $e^{ikx}$ to be swapped around in these definitions. It might even be swapped around by the same author in the same paper --- for some reason, if we have a function in two variables, then it is traditional to transform one variable with $e^{-ikx}$ and the other with $e^{ikx}$, just to confuse people. More rarely, factors of $2\pi$ or $\sqrt{2\pi}$ rearranged.
+It is common for the terms $e^{-ikx}$ and $e^{ikx}$ to be swapped around in these definitions. It might even be swapped around by the same author in the same paper --- for some reason, if we have a function in two variables, then it is traditional to transform one variable with $e^{-ikx}$ and the other with $e^{ikx}$, just to confuse people. More rarely, factors of $2\pi$ or $\sqrt{2\pi}$ are rearranged.
 
-Traditionally, if $f$ is a function of position $x$, then the transform variable is called $k$; while if $f$ is a function of time $t$, then it is called $\omega$.
+Traditionally, if $f$ is a function of position $x$, then the transform variable is called $k$; while if $f$ is a function of time $t$, then it is called $\omega$. You don't have to stick to this notation, if you like being confusing.
 
 In fact, a more precise version of the inverse transform is
 \[
@@ -2365,7 +2425,7 @@ We've already done Fourier transforms in IB Methods, so we will no spend any mor
 The Fourier transform is a powerful tool for solving differential equations and investigating physical systems, but it has two key restrictions:
 \begin{enumerate}
   \item Many functions of interest grow exponentially (eg. $e^x$), and so do not have Fourier transforms;
-  \item There is no way of incorporating initial or boundary conditions in the transform variable. When used to solve an ODE, the Fourier transform merely gives a particular integral: there are no arbitrary constance produced by the method.
+  \item There is no way of incorporating initial or boundary conditions in the transform variable. When used to solve an ODE, the Fourier transform merely gives a particular integral: there are no arbitrary constants produced by the method.
 \end{enumerate}
 So for solving differential equations, the Fourier transform is pretty limited. Right into our rescue is the \emph{Laplace transform}, which gets around these two restrictions. However, we have to pay the price with a different restriction --- it is only defined for functions $f(t)$ which vanishes for $t < 0$ (by convention).
 
@@ -2530,7 +2590,7 @@ It's no good trying to find the Laplace transforms of functions if we can't inve
   \]
   decays at infinity (and is zero for $t < 0$, of course). So $g$ has a Fourier transform, and
   \[
-    jtilde{g}(\omega) = \int_{-\infty}^\infty f(t) e^{-ct} e^{-i\omega t}\;\d t= \hat{f}(c + i\omega).
+    \tilde{g}(\omega) = \int_{-\infty}^\infty f(t) e^{-ct} e^{-i\omega t}\;\d t= \hat{f}(c + i\omega).
   \]
   Then we use the Fourier inversion formula to obtain
   \[
@@ -2540,7 +2600,7 @@ It's no good trying to find the Laplace transforms of functions if we can't inve
   \[
     f(t) e^{-ct} = \frac{1}{2 \pi i} \int_{c - i\infty}^{c + i\infty} \hat{f}(p) e^{(p - c)t}\;\d p.
   \]
-  Multiplying both sides by $e^{ct}$, we get the result we were looking for (the requirement that $c$ lies to the right of all singularities arises from the requirement that $f(t) = 0$ for all $t < 0$).
+  Multiplying both sides by $e^{ct}$, we get the result we were looking for (the requirement that $c$ lies to the right of all singularities is to fix the ``constant of integration'' so that $f(t) = 0$ for all $t < 0$, as we will soon see).
 \end{proof}
 In most cases, we don't have to use the full inversion formula. Instead, we use the following special case:
 \begin{prop}
@@ -2665,7 +2725,7 @@ In most cases, we don't have to use the full inversion formula. Instead, we use 
 \end{eg}
 
 \subsection{Solution of differential equations using the Laplace transform}
-The Laplace transform converts ODEs to algebraic equations, and PDEs to ODEs.
+The Laplace transform converts ODEs to algebraic equations, and PDEs to ODEs. We will illustrate this by an example.
  % include worked example
 
 \begin{eg}
@@ -2713,6 +2773,8 @@ The Laplace transform converts ODEs to algebraic equations, and PDEs to ODEs.
 \end{eg}
 
 \subsection{The convolution theorem for Laplace transforms}
+Finally, we recall from IB Methods that the Fourier transforms turn convolutions into products, and vice versa. We will now prove an analogous result for Laplace transforms.
+
 \begin{defi}[Convolution]
   The \emph{convolution} of two functions $f$ and $g$ is defined as
   \[
