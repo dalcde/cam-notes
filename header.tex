@@ -77,6 +77,34 @@
     \frac{\partial^{#1}}{\partial #2^{#1}}
   \fi
 }
+\ifx \nhtml \undefined
+\else
+  \makeatletter
+  \DisableLigatures[f]{family = *}
+  \let\Contentsline\contentsline
+  \renewcommand\contentsline[3]{\Contentsline{#1}{#2}{}}
+  \renewcommand{\@dotsep}{10000}
+  \newlength\currentparindent
+  \setlength\currentparindent\parindent
+
+  \newcommand\@minipagerestore{\setlength{\parindent}{\currentparindent}}
+  \usepackage[active,tightpage,pdftex]{preview}
+  \renewcommand{\PreviewBorder}{0.1cm}
+
+  \newenvironment{stretchpage}%
+  {\begin{preview}\begin{minipage}{\hsize}}%
+    {\end{minipage}\end{preview}}
+  \AtBeginDocument{\begin{stretchpage}}
+  \AtEndDocument{\end{stretchpage}}
+
+  \newcommand{\@@newpage}{\end{stretchpage}\begin{stretchpage}}
+
+  \let\@real@section\section
+  \renewcommand{\section}{\@@newpage\@real@section}
+  \let\@real@subsection\subsection
+  \renewcommand{\subsection}{\@@newpage\@real@subsection}
+  \makeatother
+\fi
 
 % Theorems
 \theoremstyle{definition}
