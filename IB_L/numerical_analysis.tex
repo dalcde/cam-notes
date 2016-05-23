@@ -119,17 +119,17 @@ for some $A_k$ yet to be found out. Then we can write
 \[
   p(x) = p_n(x) = A_0 + \sum_{k = 1}^n A_k \prod_{i = 0}^{k - 1} (x - x_i).
 \]
-This formula has the advantage that it is built up gradually from the interpolation points one-by-one. If we stop the sum at any point, we have obtained the polynomial that interpolates the data for the first $k$ points (for some $k$), which is a good thing.
+This formula has the advantage that it is built up gradually from the interpolation points one-by-one. If we stop the sum at any point, we have obtained the polynomial that interpolates the data for the first $k$ points (for some $k$). Conversely, if we have a new data point, we just need to add a new term, instead of re-computing everything.
 
 All that remains is to find the coefficients $A_k$. For $k = 0$, we know $A_0$ is the unique constant polynomial that interpolates the point at $x_0$, ie. $A_0 = f_0$.
 
-For the others, we note that in the formula for $p_k - p_{k - 1}$, we find that $A_k$ is the leading coefficient of $x^k$. But $p_{k - 1}(x)$ has no degree $k$ term. So $A_k$ must be the leading coefficient of $p_k$.
+For the others, we note that in the formula for $p_k - p_{k - 1}$, we find that $A_k$ is the leading coefficient of $x^k$. But $p_{k - 1}(x)$ has no degree $k$ term. So $A_k$ must be the leading coefficient of $p_k$. So we have reduced our problem to finding the leading coefficients of $p_k$.
 
-This is still not helpful. We need a good way of computing these coefficients, known as the \emph{Newton divided differences}.
+The solution to this is known as the \emph{Newton divided differences}. We first invent a new notation:
 \[
   A_k = f[x_0, \cdots, x_k].
 \]
-Note in particular that these coefficients depend only on the first $k$ interpolation points. Note that we don't have to start with $x_0$ (since the labels are arbitrary). In general, the coefficient
+Note that these coefficients depend only on the first $k$ interpolation points. Moreover, since the labelling of the points $x_0, \cdots, x_k$ is arbitrary, we don't have to start with $x_0$. In general, the coefficient
 \[
   f[x_j, \cdots, x_k]
 \]
@@ -155,7 +155,7 @@ While we do not have an explicit formula for what these coefficients are, we can
   \[
     q_2(x) = \frac{x - x_j}{x_k - x_j} q_1(x) + \frac{x_k - x}{x_k - x_j} q_0(x).
   \]
-  We can check that the expression on the right correctly interpolates the points $x_i$ for $i = j, \cdots, k$. By uniqueness, the two expressions agree. Since $f[x_j, \cdots, x_k$], $f[x_{j + 1}, \cdots, x_k]$ and $f[x_j, \cdots, x_{k - 1}]$ are the leading coefficients of $q_2, q_1, q_0$ respectively, the result follows.
+  We can check directly that the expression on the right correctly interpolates the points $x_i$ for $i = j, \cdots, k$. By uniqueness, the two expressions agree. Since $f[x_j, \cdots, x_k$], $f[x_{j + 1}, \cdots, x_k]$ and $f[x_j, \cdots, x_{k - 1}]$ are the leading coefficients of $q_2, q_1, q_0$ respectively, the result follows.
 \end{proof}
 Thus the famous Newton divided difference table can be constructed
 \begin{center}
@@ -177,15 +177,15 @@ Thus the famous Newton divided difference table can be constructed
 \end{center} % beautify
 From the first $n$ columns, we can find the $n + 1$th column using the recurrence relation above. The values of $A_k$ can then be found at the top diagonal, and this is all we really need. However, to compute this diagonal, we will need to compute everything in the table.
 
-\begin{enumerate}
-  \item An efficient algorithm ($O(n)$ operations) for evaluating $p(\hat{x})$ at some new value $\hat{x}$ using the above divided difference table is known as \emph{Horner's scheme}:
-    \begin{alltt}
-      S <- f[\(\mathtt{x\sb{0}}\),..., \(\mathtt{x\sb{n}}\)]
-      for k = n - 1,..., 0
-          S <- (\(\mathtt{\hat{x}}\) - \(\mathtt{x\sb{k}}\))S + f[\(\mathtt{x\sb{0}}\),..., \(\mathtt{x\sb{k}}\)]
-      end\end{alltt}
-  \item If an extra data point $\{x_{n + 1}, f_{n + 1}\}$ is added, then we only have to compute an extra diagonal $f[x_k, \cdots, x_{n + 1}]$ for $k =n, \cdots, 0$ in the divided difference table to obtain the new coefficient, and the old results can be reused. This requires $O(n)$ operations. This is less straightforward for Lagrange's method.
-\end{enumerate}
+In practice, we often need not find the actual interpolating polynomial. If we just want to evaluate $p(\hat{x})$ at some new point $\hat{x}$ using the divided table, we can use \emph{Horner's scheme}, given by
+\begin{alltt}
+  S <- f[\(\mathtt{x\sb{0}}\),..., \(\mathtt{x\sb{n}}\)]
+  for k = n - 1,..., 0
+      S <- (\(\mathtt{\hat{x}}\) - \(\mathtt{x\sb{k}}\))S + f[\(\mathtt{x\sb{0}}\),..., \(\mathtt{x\sb{k}}\)]
+  end\end{alltt}
+This only takes $O(n)$ operations.
+
+If an extra data point $\{x_{n + 1}, f_{n + 1}\}$ is added, then we only have to compute an extra diagonal $f[x_k, \cdots, x_{n + 1}]$ for $k =n, \cdots, 0$ in the divided difference table to obtain the new coefficient, and the old results can be reused. This requires $O(n)$ operations. This is less straightforward for Lagrange's method.
 
 \subsection{A useful property of divided differences}
 In the next couple of sections, we are interested in the error of polynomial interpolation. Suppose the data points come from $f_i = f(x_i)$ for some complicated $f$ we want to approximate, and we interpolate $f$ at $n$ data points $\{x_i\}_{i = 1}^n$ with $p_n$. How does the error $e_n(x) = f(x) - p_n(x)$ depend on $n$ and the choice of interpolation points?
@@ -253,12 +253,12 @@ This is an exact result, which is not too useful, since there is no easy constru
   \|g\|_{\infty} = \max_{t \in [a, b]} |g(t)|.
 \]
 This gives the more useful bound
-\begin{prop}
+\begin{cor}
   For all $x \in [a, b]$, we have
   \[
     |f(x) - p_n(x)| \leq \frac{1}{(n + 1)!} \|f^{(n + 1)}\|_{\infty} |\omega(x)|
   \]
-\end{prop}
+\end{cor}
 
 Assuming our function $f$ is fixed, this error bound depends only on $\omega(x)$, which depends on our choice of interpolation points. So can we minimize $\omega(x)$ in some sense by picking some clever interpolation points $\Delta = \{x_i\}_{i = 0}^n$? Here we will have $n$ fixed. So instead, we put $\Delta$ as the subscript. We can write our bound as
 \[
@@ -268,7 +268,7 @@ So the objective is to find a $\Delta$ that minimizes $\|\omega_{\Delta}\|_{\inf
 
 For the moment, we focus on the special case where the interval is $[-1, 1]$. The general solution can be obtained by an easy change of variable.
 
-For some magical reasons, the optimal choice of $\Delta$ comes from the \emph{Chebyshev polynomials}.
+For some magical reasons that hopefully will become clear soon, the optimal choice of $\Delta$ comes from the \emph{Chebyshev polynomials}.
 \begin{defi}[Chebyshev polynomial]
   The \emph{Chebyshev polynomial} of degree $n$ on $[-1, 1]$ is defined by
   \[
@@ -294,6 +294,7 @@ Two key properties of $T_n$ on $[-1, 1]$ are
     \]
     for $k = 1, \cdots, n$.
 \end{enumerate}
+When plotted out, the polynomials look like this:
 \begin{center}
   \begin{tikzpicture}[scale=2]
     \draw [->] (-1.5, 0) -- (1.5, 0) node [right] {$x$};
@@ -328,7 +329,7 @@ We first prove a convenient recurrence relation for the Chebyshev polynomials:
     \cos((n + 1) \theta) + \cos((n - 1)\theta) = 2\cos \theta \cos(n\theta).
   \]
 \end{proof}
-In particular, we know the leading coefficient of $T_n$ is $2^{n - 1}$ (for $n \geq 1$).
+This recurrence relation can be useful for many things, but for our purposes, we only use it to show that the leading coefficient of $T_n$ is $2^{n - 1}$ (for $n \geq 1$).
 
 \begin{thm}[Minimal property for $n \geq 1$]
   On $[-1, 1]$, among all polynomials $p \in P_n[x]$ with leading coefficient $1$, $\frac{1}{2^{n - 1}} \|T_n\|$ minimizes $\|p\|_{\infty}$. Thus, the minimum value is $\frac{1}{2^{n - 1}}$.
@@ -417,7 +418,7 @@ We said \emph{the} orthogonal polynomial, but we need to make sure such a polyno
 \begin{defi}[Monic polynomial]
   A polynomial $p \in P_n[x]$ is \emph{monic} if the coefficient of $x^n$ is $1$.
 \end{defi}
-However, most famous traditional polynomials are not monic. They have a different scaling imposed. Still, as long as we have \emph{some} scaling, we will have uniqueness.
+In practice, most famous traditional polynomials are not monic. They have a different scaling imposed. Still, as long as we have \emph{some} scaling, we will have uniqueness.
 
 We will not mess with other scalings, and stick to requiring them to be monic since this is useful for proving things.
 
@@ -458,7 +459,7 @@ We will not mess with other scalings, and stick to requiring them to be monic si
 In practice, following the proof naively is not the best way of producing the new $p_{n + 1}$. Instead, we can reduce a lot of our work by making a clever choice of $q_{n + 1}$.
 
 \subsection{Three-term recurrence relation}
-Recall that for the Chebyshev polynomials, we obtained a three-term recurrence relation for them. It turns out these recurrence relations exist in general.
+Recall that for the Chebyshev polynomials, we obtained a three-term recurrence relation for them using special properties of the cosine. It turns out these recurrence relations exist in general for orthogonal polynomials.
 
 We start by picking $q_{n + 1} = xp_n$ in the previous proof. We now use the fact that
 \[
@@ -492,7 +493,9 @@ Assuming this, we obtain the following theorem.
   Using $q_{n + 1} = x p_n$ in the Gram-Schmidt process gives
   \begin{align*}
     p_{n + 1} &= xp_n - \sum_{k = 0}^n \frac{\bra x p_n, p_k\ket}{\bra p_k, p_k\ket} p_k\\
-    \intertext{We have $\bra xp_n, p_k\ket = \bra p_n, xp_k\ket$, and vanishes whenever $x p_k$ has degree less than $n$. So we are left with}
+    p_{n + 1} &= xp_n - \sum_{k = 0}^n \frac{\bra p_n, x p_k\ket}{\bra p_k, p_k\ket} p_k\\
+    \intertext{We notice that $\bra p_n, xp_k\ket$ and vanishes whenever $x p_k$ has degree less than $n$. So we are left with}
+    &= xp_n - \frac{\bra x p_n, p_n\ket}{\bra p_n, p_n\ket}p_n - \frac{\bra p_n, xp_{n - 1}\ket}{\bra p_{n - 1}, p_{n - 1}\ket} p_{n - 1}\\
     &= (x - \alpha_n) p_n - \frac{\bra p_n, xp_{n - 1}\ket}{\bra p_{n - 1}, p_{n - 1}\ket} p_{n - 1}.
   \end{align*}
   Now we notice that $xp_{n - 1}$ is a monic polynomial of degree $n$ so we can write this as $x p_{n - 1} = p_n + q$. Thus
@@ -572,7 +575,7 @@ Unsurprisingly, the solution involves the use of the orthogonal polynomials with
 \end{thm}
 Note that the solution decouples, in the sense that $c_k$ depends only on $f$ and $p_k$. If we want to take one more term, we just need to compute an extra term, and not redo our previous work.
 
-Also, we notice that the formula for the error is a positive term $\|f\|^2$ subtracting a lot of squares. As we increase $n$, we subtract more squares, and the error decreases. If we are lucky, the error tends to $0$ as we take $n \to \infty$. Even though we might not know how many terms we need in order to get the error to be sufficiently small, we can just keep adding terms until the computed error small enough (which is something we have to do anyway even if we know what $n$ to take).
+Also, we notice that the formula for the error is a positive term $\|f\|^2$ subtracting a lot of squares. As we increase $n$, we subtract more squares, and the error decreases. If we are lucky, the error tends to $0$ as we take $n \to \infty$. Even though we might not know how many terms we need in order to get the error to be sufficiently small, we can just keep adding terms until the computed error small enough (which is something we have to do anyway even if we knew what $n$ to take).
 
 \begin{proof}
   We consider a general polynomial
@@ -612,6 +615,7 @@ In this chapter, we are going to study approximations of linear functions. Befor
 \end{defi}
 In generally, a linear functional is a linear mapping from a vector space to its underlying field of scalars, but for the purposes of this course, we will restrict to this special case.
 
+We usually don't put so much emphasis on the actual vector space $V$. Instead, we provide a formula for $L$, and take $V$ to be the vector space of functions for which the formula makes sense.
 \begin{eg}\leavevmode
   \begin{enumerate}
     \item We can choose some fixed $\xi \in \R$, and define a linear functional by
@@ -654,13 +658,11 @@ Then using linearity, we can approximate
 \[
   L(f) \approx L\left(\sum_{i = 0}^N f(x_i) \ell_i(x)\right) = \sum_{i = 0}^N L(\ell_i) f(x_i).
 \]
-So we have
+So we can pick
 \[
   a_i = L(\ell_i).
 \]
-Similar to polynomial interpolation, this formula is exact for $f \in P_N[x]$.
-
-In general, suppose we can freely choose $\{a_i\}_{i = 0}^N$ \emph{and} $\{x_i\}_{i = 0}^N$. Then since we now have $2n + 2$ free parameters, we might expect to find an approximation that is exact for $f \in P_{2N + 1}[x]$. This is not always possible, but there are cases when we can. The most famous example is Gaussian quadrature.
+Similar to polynomial interpolation, this formula is exact for $f \in P_N[x]$. But we could do better. If we can freely choose $\{a_i\}_{i = 0}^N$ \emph{and} $\{x_i\}_{i = 0}^N$, then since we now have $2n + 2$ free parameters, we might expect to find an approximation that is exact for $f \in P_{2N + 1}[x]$. This is not always possible, but there are cases when we can. The most famous example is Gaussian quadrature.
 
 \subsection{Gaussian quadrature}
 The objective of Gaussian quadrature is to approximate integrals of the form
@@ -726,7 +728,7 @@ We have in fact proved this for a particular case in IB Methods, and the same ar
 \begin{proof}
   First we show there is at least one root. Notice that $p_0 = 1$. Thus for $\nu \geq 1$, by orthogonality, we know
   \[
-    \int_a^b w(x) p_\nu(x) p_1(x)\;\d x = \int_a^b p_\nu(x)\;\d x = 0.
+    \int_a^b w(x) p_\nu(x) p_1(x)\;\d x = \int_a^b w(x) p_\nu(x)\;\d x = 0.
   \]
   So there is at least one sign change in $(a, b)$. We have already got the result we need for $\nu = 1$, since we only need one zero in $(a, b)$.
 
@@ -768,13 +770,6 @@ We have in fact proved this for a particular case in IB Methods, and the same ar
   \]
   Since this is true for all $k = 1, \cdots, \nu$, we get the desired result.
 \end{proof}
-
-\begin{eg}
-  Any of the famous four (Legendre, Chebyshev, Laguerre and Hermite) orthogonal polynomials generate corresponding famous quadrature rules that approximate the corresponding integrals
-  \[
-    \int_a^b w(x) f(x)\;\d x.
-  \]
-\end{eg}
 
 \section{Expressing errors in terms of derivatives}
 As before, we approximate a linear functional $L$ by
@@ -1008,7 +1003,7 @@ We want to show that this method ``converges''. First of all, we need to make pr
   \[
     \mathbf{y}_n \to \mathbf{y}(t),
   \]
-  where $\mathbf{y}$ is the true solution to the differential equation. Moreover, we require $\mathbf{y}_n$ to converge uniformly to $\mathbf{y}(t)$.
+  where $\mathbf{y}$ is the true solution to the differential equation. Moreover, we require the convergence to be uniform in $t$.
 \end{defi}
 
 We now prove that Euler's method converges. We will only do this properly for Euler's method, since the algebra quickly becomes tedious and incomprehensible. However, the proof strategy is sufficiently general that it can be adapted to most other methods.
@@ -1106,9 +1101,9 @@ Let's try to get a little bit beyond Euler's method.
 \end{defi}
 If we put $\theta = 1$, then we just get Euler's method. The other two most common choices of $\theta$ are $\theta = 0$ (backward Euler) and $\theta = \frac{1}2$ (trapezoidal rule).
 
-Note that for $\theta \not= 1$, we get an \emph{implicit method}. This is since $\mathbf{y}_{n + 1}$ doesn't just appear simply on the left hand side of the equality. Our formula for $y_{n + 1}$ involves $\mathbf{y}_{n + 1}$ itself! This means, in general, unlike the Euler method, we can't just write down the value of $\mathbf{y}_{n + 1}$ given the value of $\mathbf{y}_n$. Instead, we have to treat the formula as $N$ (in general) non-linear equations, and solve them to find $\mathbf{y}_{n + 1}$!
+Note that for $\theta \not= 1$, we get an \emph{implicit method}. This is since $\mathbf{y}_{n + 1}$ doesn't just appear simply on the left hand side of the equality. Our formula for $\mathbf{y}_{n + 1}$ involves $\mathbf{y}_{n + 1}$ itself! This means, in general, unlike the Euler method, we can't just write down the value of $\mathbf{y}_{n + 1}$ given the value of $\mathbf{y}_n$. Instead, we have to treat the formula as $N$ (in general) non-linear equations, and solve them to find $\mathbf{y}_{n + 1}$!
 
-In the past, people did not like to use this, because they didn't have computers, or computers were too slow. It is tedious to have to solve these equations in every step of the method. Nowadays, these are becoming more and more popular because it is getting easier to solve equations, and $\theta$-methods have some huge theoretical advantages.
+In the past, people did not like to use this, because they didn't have computers, or computers were too slow. It is tedious to have to solve these equations in every step of the method. Nowadays, these are becoming more and more popular because it is getting easier to solve equations, and $\theta$-methods have some huge theoretical advantages (which we do not have time to get into).
 
 We now look at the error of the $\theta$-method. We have
 \begin{align*}
@@ -2232,6 +2227,8 @@ This is just done in the usual Gram-Schmidt way.
 
 In practice, a slightly different algorithm (modified Gram-Schmidt process) is used, which is (much) superior with inexact arithmetic. The modified Gram-Schmidt process is in fact the same algorithm, but performed in a different order in order to minimize errors.
 
+However, this is often not an ideal algorithm for large matrices, since there are many divisions and normalizations involved in computing the $\mathbf{q}_i$, and the accumulation of errors will cause the resulting matrix $Q$ to lose orthogonality.
+
 \subsubsection*{Givens rotations}
 This works with the full QR factorization.
 
@@ -2381,7 +2378,7 @@ We can obtain a QR factorization by inverting to get
 \[
   A = Q_1^T \cdots Q_s^T R.
 \]
-However, we don't really need to do this if we just want to do use this to solve the least squares problem, since to do so, we need to multiply by $Q^T$, not $Q$, which is exactly $Q_s \cdots \Q_1$.
+However, we don't really need to do this if we just want to do use this to solve the least squares problem, since to do so, we need to multiply by $Q^T$, not $Q$, which is exactly $Q_s \cdots Q_1$.
 
 \subsubsection*{Householder reflections}
 \begin{defi}[Householder reflection]
