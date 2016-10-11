@@ -3,8 +3,9 @@
 \def\npart {III}
 \def\nterm {Michaelmas}
 \def\nyear {2016}
-\def\nlecturer {Richard Jozsa}
-\def\ncourse {Quantum Computation}
+\def\nlecturer {Oscar Randal-Williams}
+\def\ncourse {Algebraic Topology}
+\def\nlectures {MWF.12}
 
 \input{header}
 
@@ -24,4 +25,322 @@ Hatcher's book is especially recommended for the course, but there are many othe
 }
 \tableofcontents
 
+\section{Homotopy}
+In this course, ``map'' means ``continuous function''.
+
+\begin{defi}[Homotopy]\index{homotopy}
+  Let $X, Y$ be a topological space. A \emph{homotopy} between $f_0, f_1: X \to Y$ is a map $F: [0, 1] \times X \to Y$ such that $F(0, x) = f_0(x)$ and $F(1, x) = f_1(x)$. If such an $F$ exists, we say $f_0$ is \emph{homotopic} to $f_1$, and write $f_0 \simeq f_1$.
+
+  This $\simeq$ defines an equivalence relation on the set of maps from $X$ to $Y$.
+\end{defi}
+This should be thought of as a continuous deformation from $f_0$ to $f_1$. Note that two homotopic functions can be homotopic in several ways.
+
+If we view homotopic functions as ``the same'', then we have to change our respective notion of isomorphism. To do so, we just write down the usual definition of bijection, but with equality replaced with homotopy.
+
+\begin{defi}[Homotopy equivalence]\index{homotopy equivalence}
+  A map $f: X \to Y$ is a \emph{homotopy equivalence} if there is some $g: Y \to X$ such that $f \circ g \simeq \id_X$ and $g \circ f \simeq \id_Y$. We call $g$ the \emph{homotopy inverse}\index{homotopy inverse} to $f$.
+\end{defi}
+
+\begin{eg}[Stupid example]
+  If $f: X \to Y$ is a homeomorphism, then it is a homotopy equivalence --- we take the actual inverse for the homotopy inverse, since equal functions are homotopic.
+\end{eg}
+
+\begin{eg}[Interesting example]
+  Let $i: \{0\} \to \R^n$ be the inclusion map. To show this is a homotopy equivalence, we have to find a homotopy inverse. Fortunately, there is only one map $\R^n \to \{0\}$, namely the constant function $0$. We call this $r: \R^n \to \{0\}$. The composition $r \circ i: \{0\} \to \{0\}$ is exactly the identity. So this is good.
+
+  In the other direction, the map $r \circ i: \R^n \to \R^n$ sends everything to $0$. We need to produce a homotopy to the identity. We let $F: [0, 1] \to \R^n \to \R^n$ be
+  \[
+    F(t, \mathbf{v}) = t\mathbf{v}.
+  \]
+  We have $F(0, \mathbf{v}) = 0$ and $F(1, \mathbf{v}) = \mathbf{v}$. So this is indeed a homotopy from $r \circ i$ to $\id_{\R^n}$.
+\end{eg}
+
+So from the point of view of homotopy, the one-point space $\{0\}$ is the same as $\R^n$. So dimension, or even cardinality, is now a meaningless concept. So what is left?
+
+\begin{eg}[Also interesting example]
+  Let $S^n \subseteq \R^{n + 1}$ be the unit sphere, and $i: S^n \hookrightarrow \R^{n + 1} \setminus \{0\}$. We show that this is a homotopy equivalence. We define $r: \R^{n + 1} \setminus \{0\} \to S^n$ by
+  \[
+    r(\mathbf{v}) = \frac{\mathbf{v}}{\|\mathbf{v}\|}.
+  \]
+  Again, we have $r \circ i = \id_{S^n}$. In the other direction, we need to construct a path from each $\mathbf{v}$ to $\frac{\mathbf{v}}{\|\mathbf{v}\|}$ in a continuous way. We could do so by
+  \begin{align*}
+    H: [0, 1] \times (\R^{n + 1} \setminus \{0\}) &\to \R^{n + 1} \setminus \{0\}\\
+    (t, \mathbf{v}) &\mapsto (1 - t) \mathbf{v} + t \frac{\mathbf{v}}{\|\mathbf{v}\|}.
+  \end{align*}
+  We can easily check that this is a homotopy from $\id_{\R^{n + 1}\setminus \{0\}}$ to $i \circ r$.
+\end{eg}
+
+While dimension is not a meaningful concept in the homotopy world, we can still say something useful about dimensions using homotopies. Suppose we are given that $\R^n \cong \R^m$. Then we know that $\R^n \setminus \{0\} \cong \R^m \{0\}$. Since these are homotopy equivalent to $S^{n - 1}$ and $S^{m - 1}$, this implies that $S^{n - 1} \sim S^{m - 1}$ are homotopy equivalent. We will later show (by calculating homology of both spheres) that this can only happen if $m \not= n$. So by doing some homotopies, we show that dimension is a meaningful concept if we talk about homeomorphism.
+
+We now see a problem in homotopy theory. If we want to show that two spaces are homotopy equivalent, then we just produce a pair of homotopy inverses. The idea is to assign algebraic objects to each topological space that is homotopy invariant. Thus if two spaces are assigned different algebraic objects, then they cannot be homotopy equivalent.
+
+\section{Chain complex}
+The first bit of algebra we need is the notion of a chain complex.
+\begin{defi}[Chain complex]\index{chain complex}
+  A \emph{chain complex} is a sequence of abelian groups and homomorphisms
+  \[
+    \begin{tikzcd}
+      \cdots \ar[r] & C_3 \ar[r, "d_3"] & C_2 \ar[r, "d_2"] & C_1 \ar[r, "d_1"] & C_0 \ar[r, "d_0"] & 0
+    \end{tikzcd}
+  \]
+  such that
+  \[
+    d_i \circ d_{i + 1} = 0
+  \]
+  for all $i$.
+\end{defi}
+
+Very related to the notion of a chain complex is a \emph{co}chain complex, which is the same thing with the maps the other way.
+
+\begin{defi}[Cochain complex]\index{cochain complex}
+  A \emph{cochain complex} is a sequence of abelian groups and homomorphisms
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & C^0 \ar[r, "d^0"] & C^1 \ar[r, "d^1"] & C^2 \ar[r, "d^2"] & C^3 \ar[r] & \cdots
+    \end{tikzcd}
+  \]
+  such that
+  \[
+    d^{i + 1} \circ d^i = 0
+  \]
+  for all $i$.
+\end{defi}
+
+\begin{defi}[Differentials]\index{differentials}
+  The maps $d^i$ and $d_i$ are known as \emph{differentials}.
+\end{defi}
+Eventually, we will get lazy and just write all the differentials as $d$.
+
+Given a chain complex, the only thing we know is that the composition of any two maps is zero. In other words, we have $\im d_i \subseteq \ker d_{i + 1}$. We can then ask how good this containment is. Is it that $\im d_i = \ker d_{i + 1}$, or perhaps that $\ker d_{i + 1}$ is huge but $\im d_i$ is trivial? The homology or cohomology measures what happens.
+
+\begin{defi}[Homology]\index{homology}
+  The \emph{homology} of a chain complex $C_{\Cdot}$ is
+  \[
+    H_i(C_{\Cdot}) = \frac{\ker (d_i: C_i \to C_{i - 1})}{\im (d_{i + 1}: C_{i + 1} \to C_i)}.
+  \]
+  An element of $H_i(C_{\Cdot})$ is known as a \term{homology class}.
+\end{defi}
+
+Dually, we have
+\begin{defi}[Cohomology]\index{cohomology}
+  The \emph{cohomology} of a cochain complex $C^{\Cdot}$ is
+  \[
+    H^i(C^{\Cdot}) = \frac{\ker (d^i: C^i \to C^{i + 1})}{\im (d^{i - 1}: C^{i - 1} \to C^i)}.
+  \]
+  An element of $H^i(C^{\Cdot})$ is known as a \term{cohomology class}.
+\end{defi}
+
+\begin{defi}[Cycles and cocycles]\index{cycle}\index{cocycle}
+  The elements of $\ker d_i$ are the \emph{cycles}, and the elements of $\ker d^i$ are the \emph{cocycles}.
+\end{defi}
+
+\begin{defi}[Boundaries and coboundaries]\index{boundary}\index{coboundary}
+  The elements of $\im d_i$ are the \emph{boundaries}, and the elements of $\im d^i$ are the \emph{coboundaries}.
+\end{defi}
+
+So far, this is just algebraic gadgets. We are going to construct chain complexes from topological spaces, and study their (co)homology.
+
+We will define two versions of chain complexes --- one is a really ``big'' one, known as singular (co)chains, which are easy to study formally, but difficult to compute. We will then introduce ``smaller'' ones, which are easy to compute. We will then do some magic to show that they are actually equivalent, which makes us happy.
+
+\section{Singular (co)chains}
+\begin{defi}[Standard $n$-simplex]\index{standard $n$-simplex}
+  The standard $n$-simplex is
+  \[
+    \Delta^n = \{(t_0, \cdots, t_n) \in \R^{n + 1} : t_i \geq 0, \sum t_i = 1\}.
+  \]
+\end{defi}
+% insert picture
+
+We notice that $\Delta^n$ has $n + 1$ ``faces''.
+\begin{defi}[Face of standard simplex]\index{face of standard simplex}
+  The \emph{$i$th face} of $\Delta^n$ is
+  \[
+    \Delta_i^n = \Delta^n \{(t_0, \cdots, t_n): t_i = 0\}.
+  \]
+\end{defi}
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-1, 0) -- (3, 0) node [right] {$t_0$};
+    \draw [->] (0, -1) -- (0, 3) node [above] {$t_1$};
+
+    \draw (2, 0) -- (0, 2) node [pos=0.5, anchor = south west] {$\Delta_1$};
+    \node [circ] at (2, 0) {};
+    \node [circ] at (0, 2) {};
+    \node at (2, 0) [below] {$\Delta_1^1$};
+    \node at (0, 2) [left] {$\Delta_0^1$};
+  \end{tikzpicture}
+\end{center}
+
+We see that the $i$th face of $\Delta^n$ looks like the standard $n-1$ simplex. Of course, it is just homeomorphic to it, with the map given by
+\begin{align*}
+  \delta_i: \Delta^{n - 1} &\to \Delta^n\\
+  (t_0, \cdots, t_{n - 1}) &\to (t_0, \cdots, t_{i - 1}, 0, t_i, \cdots, t_{n - 1})
+\end{align*}
+This is a homeomorphism onto $\Delta_i^n$.
+
+\begin{defi}[Singular $n$-simplex]\index{singular $n$-simplex}
+  Let $X$ is a space. Then a \emph{singular $n$-simplex} in $X$ is a map $\sigma: \Delta^n \to X$.
+\end{defi}
+
+\begin{eg}
+  The inclusion of the standard $n$-simplex into $\R^n$ is a singular simplex, but so is the constant map to any point in $X$. So the singular $n$-simplices can be stupid.
+\end{eg}
+
+We let $C_n(X)$ be the free abelian group on the set of singular $n$-simplices in $X$. More explicitly, we have
+\[
+  C_n(X) = \left\{\sum n_\sigma \sigma: \sigma: \Delta^n \to X, n_\sigma \in \Z, \text{only finitely many $n_\sigma$ non-zero}\right\}.
+\]
+We define $d_n: C_n(X) \to C_{n - 1}(X)$ by
+\[
+  \sigma \mapsto \sum_{I = 0}^n (-1)^i \sigma \circ \delta_i,
+\]
+and then extending linearly.
+
+To show this indeed gives a chain complex, we first show the following:
+\begin{lemma}
+  If $i < j$, then $\delta_j \circ \delta_i = \delta_i \circ \delta_{j - 1} : \Delta^{n - 2} \to \Delta^n$.
+\end{lemma}
+
+\begin{proof}
+  Both send $(t_0, \cdots, t_{n - 2})$ to $(t_0, \cdots, t_{i - 1}, 0, t_i, \cdots, t_{j - 2}, 0, t_{j - 1}, \cdots, t_{n - 2})$.
+\end{proof}
+
+\begin{cor}
+  The homomorphism $d_{n - 1} \circ d_n: C_n(X) \to C_{n - 2}(X)$ vanishes.
+\end{cor}
+
+\begin{proof}
+  It suffices to check this on each basis element $\sigma: \sigma^n \to X$. We have
+  \begin{align*}
+    d_{n - 1} \circ d_n (\sigma) &= \sum_{i = 0}^{n - 1}(-1)^i \sum_{j = 0}^n (-1)^j \sigma \circ \delta_j \circ \delta_i.
+    \intertext{We use the previous lemma to split the sum up into $i < j$ and $i \geq j$:}
+    &= \sum_{i < j} (-1)^{i + j} \sigma \circ \delta_j \delta_i + \sum_{i \geq j} (-1)^{i + j} \sigma \circ \delta_j \circ \delta_i\\
+    &= \sum_{i < j} (-1)^{i + j} \sigma \circ \delta_i \delta_{j - 1} + \sum_{i \geq j} (-1)^{i + j} \sigma \circ \delta_j \circ \delta_i\\
+    &= \sum_{i \leq j} (-1)^{i + j + 1} \sigma \circ \delta_i \circ \delta_j + \sum_{i \geq j} (-1)^{i + j} \sigma \circ \delta_j \circ \delta_i\\
+    &= 0.
+  \end{align*}
+\end{proof}
+So the data $d_i: C_n (X) \to d_{i - 1}(X)$ is indeed a chain complex. The only thing we can do to a chain complex is to take its homology!
+
+\begin{defi}[Singular homology]\index{singular homology}
+  The \emph{singular homology} of a chain complex $X$ is the homology of the chain complex
+  \[
+    H_i(X) = H_i(C_{\Cdot}(X), d_{\Cdot}) = \frac{\ker (d_i: C_i(X) \to C_{i - 1}(X))}{ \im(d_{I + 1}: C_{i + 1}(X) \to C_i(X))}.
+  \]
+\end{defi}
+As one might expect, this would be rather hard to compute. Before we do some computations, we construct a ``dual'' version of this as follows:
+\begin{defi}[Singular cohomology]\index{singular cohomology}
+  We define the dual cochain complex by
+  \[
+    C^n(X) = \Hom(C_n(X), \Z).
+  \]
+  We let
+  \[
+    d^n: C^n(X) \to C^{n + 1}(X)
+  \]
+  be the adjoint to $d_{n + 1}$, ie.
+  \[
+    (\varphi: C_n(X) \to \Z) \mapsto (\varphi \circ d_{n + 1}: C_{n + 1}(X) \to \Z).
+  \]
+  We observe that
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & C^0(X) \ar[r, "d^0"] & C^1(X) \ar[r] & \cdots
+    \end{tikzcd}
+  \]
+  is indeed a cochain complex, since
+  \[
+    d^{n + 1}(d^n(\varphi)) = \varphi \circ d_{n + 1} \circ d_{n + 2} = \varphi \circ 0 = 0.
+  \]
+  The \emph{singular cohomology} of $X$ is the cohomology of this cohain complex, ie.
+  \[
+    H^i(X) = H^i(C^{\Cdot}, d^{\Cdot}) = \frac{\ker(d^i: C^i(X) \to C^{i + 1}(X))}{\im(d^{i - 1}: C^{i - 1}(X) \to C^i (X))}.
+  \]
+\end{defi}
+
+If we have a space, then we obtain a chain complex like this, which gives us homology groups. What happens to maps between spaces? The object we get is a chain map.
+
+\begin{defi}[Chain map]\index{chain map}
+  If $(C_{\Cdot}, d_{\Cdot}^C)$ and $(D_{\Cdot}, d_{\Cdot}^D)$ are chain complexes, then a \emph{chain map} $C_{\Cdot} \to D_{\Cdot}$ is a collection of homomorphism $f_n: C_n \to D_n$ such that $d_n^D \circ f_n = f_{n - 1} \circ d_n^C$. In other words, the following diagram has to commute for all $n$:
+  \[
+    \begin{tikzcd}
+      C_n \ar[r, "f_n"] \ar[d, "d_n^C"] & D_n \ar[d, "d_n^D"]\\
+      C_{n - 1} \ar[r, "f_{n - 1}"] & D_{n - 1}
+    \end{tikzcd}
+  \]
+\end{defi}
+There is an obvious analogous definition for \term{cochain maps} between cochain complexes.
+
+\begin{lemma}
+  If $f_{\Cdot}: C_{\Cdot} \to D_{\Cdot}$ is a chain map, then $f_*: H_n(C_{\Cdot}) \to H_n(D_{\Cdot})$ given by $[x] \mapsto [f_n(x)]$ is a well-defined homomorphism , where $x \in C_n$ is any element representing the homology class $[x] \in H_n(C_{\Cdot})$.
+\end{lemma}
+
+\begin{proof}
+  Before we check if it is well-defined, we first need to check if it is defined at all! In other words, we need to check if $f_n(x)$ is a cycle. Suppose $x \in C_n$ is a cycle, ie. $d_n^C(x) = 0$. Then we have
+  \[
+    d_n^D(f_n(x)) = f_{n - 1}(d_n^C(x)) = f_{n - 1}(x) = 0.
+  \]
+  So $f_n(x)$ is a cycle, and it does represent a homology class.
+
+  To check this is well-defined, if $[x] = [y] \in H_n(C_{\Cdot})$, then $x - y = d_{n + 1}^C(z)$ for some $z$. So $f_n(x) - f_n(y) = f_n d_{n + 1}^C(z) = d_{n + 1}^D (f_{n + 1}(z))$ is a boundary. So we have $[f_n(x)] = [f_n(y)] \in H_n(D_{\Cdot})$.
+\end{proof}
+
+\begin{prop}
+  If $f: X \to Y$ is a continuous map of topological spaces, then the maps
+  \begin{align*}
+    f_n: C_n(X) &\to C_n(Y)\\
+    (\sigma: \Delta^n \to X) &\mapsto (f \circ \sigma: \Delta^n \to Y)
+  \end{align*}
+  give a chain map. This induces a map on the homology (and cohomology).
+\end{prop}
+To see that the $f_n$ and $d_n$ commute, we just notice that $f_n$ acts by composing on the left, and $d_n$ acts by composing on the right, and these two operations commute by the associativity of cuntional composition.
+
+Now if in addition we ahve a map $g: Y \to Z$, then we obtain two maps $H_n(X) \to H_n(Z)$ by
+\[
+  \begin{tikzcd}
+    H_n(X) \ar[rr, "(g \circ f)_*"] \ar[rd, "f_*"] & & H_n(Z)\\
+    & H_n(Y) \ar[ru, "g_*"]
+  \end{tikzcd}.
+\]
+By direct inspection of the formula, we see that this diagram commutes. In equation form, we have $(g \circ f)_* = g_* \circ f_*$. Moreover, we have $(\id_X)_* = \id_{H_n(X)}: H_n(X) \to H_n(X)$. Thus we have
+\begin{prop}
+  If $f: X \to Y$ is a homomeorphism, then $f_*: H_n(X) \to H_n(Y)$ is an isomorphism of abelian groups.
+\end{prop}
+
+\begin{proof}
+  If $g: Y \to X$ is an inverse to $f$, then $g_*$ is an inverse to $f_*$, as $f_* \circ g_* = (f \circ g)_* = (\id)_* = \id$, and similarly the other way round.
+\end{proof}
+This is not too exciting. We will later show that \emph{homotopy equivalences} induce isomorphisms of homology groups, which is much harder.
+
+Similarly, applying $\Hom(\ph, \Z)$ to $f_{\Cdot}: C_{\Cdot}(X) \to C_{\Cdot}(Y)$ gives homomorphisms $f^n: C^n(Y) \to C^n(X)$ by mapping $\phi: C_n(Y) \to \Z$ to $\varphi \circ f_n: C_n(X) \to \Z$. Note that this goes the other way!
+\[
+  \begin{tikzcd}
+     C_n(X) \ar[r, "f_n"] & C_n(Y) \ar[r, "\varphi"] & \Z
+  \end{tikzcd}
+\]
+Again, this is a cochain map, and induces maps $f^*: H^n(Y) \to H^n(X)$.
+
+\begin{fact}
+  In general, it is \emph{not} true that $H^n(X) = \Hom(H_n(X), \Z)$. Thus, dualizing and taking homology do not commute with each other. However, we will later (hopefully) come up with a relation between the two objects.
+\end{fact}
+
+So what does singular homology measure? There are two notions here --- cycles and boundaries.
+
+Suppose we have have a single chain complex $\sigma: \Delta^1 \to X$. Then its boundary $d_1(\sigma) = \sigma(1) - \sigma(0)$. This is in general non-zero, unless we have $\sigma(0) = \sigma(1)$. In other words, this has to be a loop!
+
+% draw diagram with one edge
+
+There can be more ways to obtain cycles. We could have, say, four $1$-simplices $\sigma_1, \sigma_2, \sigma_3, \sigma_4$. In this case we have
+\begin{align*}
+  \sigma_1(1) &= \sigma_2(0)\\
+  \sigma_2(1) &= \sigma_3(0)\\
+  \sigma_3(1) &= \sigma_4(0)\\
+  \sigma_4(1) &= \sigma_1(0)
+\end{align*}
+Thus, we have $\sigma_1 + \sigma_2 + \sigma_3 + \sigma_4 \in C_1(X)$. We can view these cycles as detecting the holes by surrounding them. But there are some stupid cycles. % include picture
+These are the boundaries. The boundaries also allow us to identify two cycles that surround the same hole, so that we don't double count.
+% draw diagram with four edges
+
+\printindex
 \end{document}

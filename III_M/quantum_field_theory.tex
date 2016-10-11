@@ -5,6 +5,7 @@
 \def\nyear {2016}
 \def\nlecturer {B. Allanach}
 \def\ncourse {Quantum Field Theory}
+\def\nlectures {TTS.12}
 
 \input{header}
 
@@ -13,6 +14,8 @@
 {\small
 \setlength{\parindent}{0em}
 \setlength{\parskip}{1em}
+\emph{The following description is the official description, but is totally wrong.}
+
 Quantum Field Theory is the language in which modern particle physics is formulated. It represents the marriage of quantum mechanics with special relativity and provides the mathematical framework in which to describe the interactions of elementary particles.
 
 This first Quantum Field Theory course introduces the basic types of fields which play an important role in high energy physics: scalar, spinor (Dirac), and vector (gauge) fields. The relativistic invariance and symmetry properties of these fields are discussed using Lagrangian language and Noether's theorem.
@@ -24,10 +27,463 @@ Next, we introduce the path integral which is an alternative way of describing q
 Finally, the idea of loops in Feynman diagrams are explored and the question of the consequent infinities looked at. Ways of dealing with the infinities will be explored in the Advanced Quantum Field Theory course which follows on directly from this one.
 
 \subsubsection*{Pre-requisites}
-You will need to be comfortable with the Lagrangian and Hamiltonian formulations of classical
-mechanics and with special relativity. You will also need to have taken an advanced course on
-quantum mechanics.
+You will need to be comfortable with the Lagrangian and Hamiltonian formulations of classical mechanics and with special relativity. You will also need to have taken an advanced course on quantum mechanics.
 }
 \tableofcontents
 
+\setcounter{section}{-1}
+\section{Introduction}
+\emph{The greyed out parts are my own attempts to make more sense of the theory from a more mathematical/differential-geometric point of view}
+
+The idea of quantum mechanics is that photons and electrons behave similarly. We can make a photon interfere with itself in double-slit experiments, and similarly an electron can interfere with itself. However, as we know, lights are ripples in an electromagnetic field. So photons should arise from the quantization of the electromagnetic field. If electrons are like photons, should we then have an electron field? The answer is yes!
+
+Quantum field theory is a quantization of a classical field. Recall that in quantum mechanics, we promote degrees of freedom to operators. Basic degrees of freedom of a quantum field theory are operator-valued functions of spacetime. Since there are infinitely many points in spacetime, there is an infinite number of degrees of freedom. This infinity will come back and bite us as we try to develop quantum field theory.
+
+Quantum field theory describes creation and annihilation of particles. The interactions are governed by several basic principles --- locality, symmetry and \emph{renormalization group flow}. What the renormalization group flow describes is the decoupling of low and high energy processes.
+
+\subsubsection*{Why quantum field theory?}
+It appears that all particles of the same type are indistinguishable, eg. all electrons are the same. It is difficult to justify why this is the case if each particle is considered individually, but if we view all electrons as excitations of the same field, this is (almost) automatic.
+
+Secondly, if we want to combine special relativity and quantum mechanics, then the number of particles is not conserved. Indeed, consider a particle trapped in a box of size $L$. By the Heisenberg uncertainty principle, we have $\Delta p \gtrsim \bar{h}/L$. We choose a particle with small rest mass so that $m \ll E$. Then we have
+\[
+  \Delta E = \Delta p \cdot c \gtrsim \frac{\hbar c}{L}.
+\]
+When $\Delta E \gtrsim 2 mc^2$, then we can pop a particle-antiparticle pair out of the vacuum. So when $L \lesssim \frac{\hbar}{2mc}$, we can't say for sure that there is only one particle.
+
+We say $\lambda = \hbar/(mc)$ is the ``compton wavelength'' --- the minimum distance at which it makes sense to localize a particle. This is also the scale at which quantum kick in.
+
+This is argument is somewhat circular, since we just assumed that if we have enough energy, then particle-antiparticle pairs would just pop out of existence. This is in fact something we can prove in quantum field theory.
+
+To reconcile quantum mechanics and special relativity, we can try to write a relativistic version of Schr\"odinger's equation for a single particle, but something goes wrong. Either the energy is unbounded from below, or we end up with some causality violation. This is bad. These are all fixed by quantum field theory by the introduction of particle creation and annihilation.
+
+\subsubsection*{What is quantum field theory good for?}
+Quantum field theory is used in (non-relativistic) condensed matter systems. It describes simple phenomena such as phonons, superconductivity, and the fractional quantum hall effect.
+
+Quantum field theory is also used in high energy physics. The standard model of particle physics consists of electromagnetism (quantum electrodynamics), quantum chromodynamics and the weak forces. The standard model is tested to very high precision by experiments, sometimes up to $1$ part in $10^{10}$. So it is good. While there are many attempts to go beyond the standard model, eg. Grand Unified Theories, they are mostly also quantum field theories.
+
+In cosmology, quantum field theory is used in cosmology to explain the density perturbations. In quantum gravity, string theory is also primarily a quantum field theory in some aspects. It is even used in pure mathematics, with applications in topology and geometry.
+
+\subsubsection*{History of quantum field theory}
+In the 1930's, the basics of quantum field theory were laid down by Jordan, Pauli, Heisenberg, Dirac, Weisskopf etc. They encountered all sorts of infinities, which scared them. Back then, these sorts of infinities seemed impossible to work with.
+
+Fortunately, in the 1940's, renormalization and quantum electrodynamics were invented by Tomonaga, Schwinger, Feynman, Dyson, which managed to deal with the infinities. It was a sloppy process, and there was no understanding of why we can subtract infinities and get a sensible finite result. Yet, they managed to make experimental predictions, which were subsequently verified by actual experiments.
+
+In the 1960's, quantum field theory fell out of favour as new particles such as mesons and baryons were discovered. But in the 1970's, it had a golden age when the renormalization group was developed by Kadanoff and Wilson, which was really when the infinities became understood. At the same time, the standard model was invented, and a connection between quantum field theory and geometry was developed.
+
+\subsubsection*{Units and scales}
+We are going to do a lot of computations in the course, which are reasonably long. We do not want to have loads of $\hbar$ and $c$'s all over the place when we do the calculations. So we pick convenient units so that they all vanish.
+
+The nature presents us with three fundamental dimensionful constants that are relevant to us:
+\begin{enumerate}
+  \item The speed of light $c$ with dimensions $LT^{-1}$;
+  \item Planck's constant $\hbar$ with dimensions $L^2 MT^{-1}$;
+  \item The gravitational constant $G$ with dimensions $L^3 M^{-1} T^{-2}$.
+\end{enumerate}
+We see that these dimensions are independent. So we define units such that $c = \hbar = 1$. So we can express everything in terms of a mass, or an energy, as we now have $E = m$. For example, instead of $\lambda = \hbar/(mc)$, we just write $\lambda = m^{-1}$. We will work with electron volts $eV$. To convert back to the conventional SI units, we must insert the relevant powers of $c$ and $\hbar$. For example, for a mass of $m_e = \SI{e6}\electronvolt$, we have $\lambda_e = \SI{2e-12}{\meter}$.
+
+After getting rid of all factors of $\hbar$ and $c$, if a quantity $X$ has a mass dimension $d$, we write $[x] = d$. For example, we have $[G] = 2$, since we have
+\[
+  G = \frac{\hbar c}{M_p^2} = \frac{1}{M_p^2},
+\]
+where $M_p \sim \SI{e19}{\giga\electronvolt}$ is the \emph{Planck scale}.
+
+\section{Classical field theory}
+\begin{own}
+  We suppose the universe is given by a spacetime manifold $\mathcal{M}$ with a pseudo-Riemannian metric of signature $(+1, -1, -1 ,-1)$. All maps are assumed to be smooth.
+\end{own}
+
+\begin{defi}[Field]\index{field}
+  A \emph{field} is a physical quantity defined at every point of spacetime $(\mathbf{x}, t)$.
+\end{defi}
+
+\begin{own}
+  Mathematically, this a field is a function $\mathcal{M} \to V$, where $V$ is some vector space. This is, of course, equivalent to a section of the trivial bundle $V \times \mathcal{M} \to \mathcal{M}$. We will consider more general bundles later when we do gauge theory.
+\end{own}
+
+In classical point mechanics, we have a finite number of generalized coordinates $q_a(t)$. In field theory, we are interested in the dynamics of $\phi_a(\mathbf{x}, t)$, where $a$ and $\mathbf{x}$ are \emph{both} labels. Since $\mathbf{x}$ is a continuous variable, we now have an infinite number of degrees of freedom! Note that here position has been relegated from a dynamical variable (ie. one of the $q_a$) to a mere label.
+
+\begin{eg}
+  The \term{electric field} $E_i(\mathbf{x}, t)$ and \term{magnetic field} $B_i(\mathbf{x}, t)$, for $i = 1, 2, 3$, are examples of fields. These six fields can in fact be derived from 4 fields $A_\mu(\mathbf{x}, t)$, for $\mu = 0, 1, 2, 3$, where
+  \[
+    E_i = \frac{\partial A_i}{\partial t} - \frac{\partial A_0}{\partial x_i},\quad B_i = \frac{1}{2} \varepsilon_{ijk}\frac{\partial A_k}{\partial x^j}.
+  \]
+  Often, we write
+  \[
+    A^\mu = (\phi, \mathbf{A}).
+  \]
+\end{eg}
+
+\begin{defi}[Lagrangian density]\index{Lagrangian density}
+  Given a field $\phi (\mathbf{x}, t)$, a \emph{Lagrangian density} is a function $\mathcal{L}(\phi, \partial_\mu \phi)$ of $\phi$ and its derivative.
+\end{defi}
+
+\begin{own}
+  Mathematically, a (local) Lagrangian density is given by a function from the $n$th jet bundle $\mathcal{L}: j^n(\mathcal{M}, V) \to \R$ ($n$ can be taken to be infinite if one is not taunted by the horrors of infinite-dimensional spaces). Given a field $\phi: \mathcal{M} \to V$, we write $\mathcal{L}(\phi)$ for the composition $\mathcal{L} \circ j^n \phi$, where $j^n$ is the $n$th jet prolongation of $\phi$.
+
+  It happens that nature seems to prefer Lagrangians with $n = 1$, and this is the only case we will consider.
+\end{own}
+
+\begin{defi}[Lagrangian]\index{Lagrangian}
+  Given a Lagrangian density, the \emph{Lagrangian} is defined by
+  \[
+    L = \int \d^3 x\; \mathcal{L}(\phi, \partial_\mu \phi).
+  \]
+  \begin{own}
+    Mathematically, given a preferred time axis $T$, we obtain a projection $\mathcal{M} \to T$. Given a field $\phi: \mathcal{M} \to V$, integrating $\mathcal{L}(\phi)$ along fibers gives a function $L: T \to V$.
+  \end{own}
+\end{defi}
+For most of the course, we will only care about the Lagrangian density, and call it the Lagrangian.
+
+\begin{defi}[Action]\index{action}
+  Given a Lagrangian and a time interval $[t_1, t_2]$, the \emph{action} is defined by
+  \[
+    S = \int_{t_1}^{t_2} \;\d t\; L(t) = \int \d^4 x\; \mathcal{L}.
+  \]
+\end{defi}
+In particle mechanics, $\mathcal{L}$ depends on $\dot{q}$ and not $\ddot{q}$. In field theory, $\mathcal{L}$ should depend on $\dot{\phi}$ but could depend on $\nabla \ph, \nabla^2\phi$ etc. However, with an eye to Lorentz invariance, we should not treat space and time differently. So we'll only consider $\mathcal{L}$ depending on $\nabla \phi$.
+
+In general, we would want $[S] = 0$. Since we have $[\d^4 x] = -4$, we must have $[\mathcal{L}] = 4$.
+
+The equations of motion is given by the principle of least action.
+\begin{defi}[Principle of least action]\index{principle of least action}
+  The equation of motion of a Lagrangian system is given by the \emph{principle of least action} --- we vary the path of integration, keeping the end points fixed, and require the first-order change $\delta S = 0$.
+
+  \begin{own}
+    More formally, We say $\phi:\mathcal{M} \to V$ is a solution if for any (measurable) compact region $C \subseteq \mathcal{M}$ and any $F: C \times (-\varepsilon, \varepsilon) \to V$ such that $F(\mathbf{x}, 0) = \phi(\mathbf{x})$ for all $\mathbf{x} \in C$, and $F(\mathbf{x}, s) = \phi(\mathbf{x})$ for all $\mathbf{x} \in \partial C$, we have
+    \[
+      0 = \left.\frac{\d}{\d s}\right|_{s = 0} \int_C \d^4 x\; \mathcal{L}(F(\mathbf{x}, s)).
+    \]
+  \end{own}
+\end{defi}
+
+We can compute
+\begin{align*}
+  \delta S &= \int d^4 x\left(\frac{\partial \mathcal{L}}{\partial \phi_a} \delta \phi_a + \frac{\partial \mathcal{L}}{\partial (\partial_\mu \phi_a)} \delta(\partial_\mu\phi_a)\right)\\
+  &= \int \d^4 x \left\{\left(\frac{\partial \mathcal{L}}{\partial \phi_a} - \partial_\mu\left(\frac{\partial \mathcal{L}}{\partial (\partial_\mu\phi_a)}\right)\right) \delta \phi_a + \partial_\mu \left(\frac{\partial \mathcal{L}}{\partial (\partial_\mu\phi_a)} \delta\phi_a\right)\right\}.
+\end{align*}
+We see that the last term vanishes for any term that decays at spatial infinity, and obeys $\delta \phi_a(\mathbf{x}, t_1) = \delta\phi_a(\mathbf{x}, t_2) = 0$.
+
+Requiring $\delta S = 0$ means that we need
+\begin{prop}[Euler-Lagrange equation]
+  The equations of motion for a field are given by the \term{Euler-Lagrange equations}:
+  \[
+    \partial_\mu\left(\frac{\partial \mathcal{L}}{\partial (\partial_\mu \phi_a)}\right) - \frac{\partial \mathcal{L}}{\partial \phi_a} = 0.
+  \]
+\end{prop}
+
+\begin{eg}
+  Consider the \term{Klein-Gordon equation} for a real scalar field $\phi(\mathbf{x}, t)$ is given by the Lagrangian
+  \[
+    \mathcal{L} = \frac{1}{2} \partial_\mu \phi \partial^\mu \phi - \frac{1}{2}m^2 \phi^2 = \frac{1}{2} \dot{\phi}^2 - \frac{1}{2} (\nabla \phi)^2 - \frac{1}{2} m^2 \phi^2,
+  \]
+  where $\eta^{\mu\nu}$ is the \term{Minkowski metric} given by
+  \[
+    \eta^{\mu\nu} =
+    \begin{pmatrix}
+      1 & 0 & 0 & 0\\
+      0 & -1 & 0 & 0\\
+      0 & 0 & -1 & 0\\
+      0 & 0 & 0 & -1
+    \end{pmatrix}.
+  \]
+  We can view this as $\mathcal{L} = T - V$, where
+  \[
+    T = \frac{1}{2} \dot{\phi}^2
+  \]
+  is the kinetic energy, and
+  \[
+    V = \frac{1}{2} (\nabla \phi)^2 + \frac{1}{2}m^2 \phi^2
+  \]
+  is the potential energy.
+
+  To find the Euler-Lagrange equations, we can compute
+  \[
+    \frac{\partial \mathcal{L}}{\partial(\partial_\mu \phi)} = \partial^\mu \phi = (\dot{\phi}, -\nabla \phi)
+  \]
+  and
+  \[
+    \frac{\partial \mathcal{L}}{\partial \phi} = -m^2 \phi.
+  \]
+  So the Euler-Lagrange equation says
+  \[
+    \partial_\mu \partial^\mu \phi + m^2 \phi = 0.
+  \]
+  More explicitly, this says
+  \[
+    \ddot{\phi} - \nabla^2 \phi + m^2 \phi = 0.
+  \]
+\end{eg}
+We could generalize this and add more terms to the Lagrangian. An obvious generalization would be
+\[
+  \mathcal{L} = \frac{1}{2} \partial_\mu \phi \partial^\mu \phi - V(\phi),
+\]
+where $V(\phi)$ is an arbitrary potential function. Then we similarly obtain the equation
+\[
+  \partial_\mu \partial^\mu \phi + \frac{V}{\partial \phi} = 0.
+\]
+
+\begin{eg}
+  \term{Maxwell's equations} in vacuum is given by the Lagrangian
+  \[
+    \mathcal{L} = -\frac{1}{2} (\partial_\mu A_\nu)(\partial^\mu A^\nu) + \frac{1}{2}(\partial_\mu A^\mu)^2.
+  \]
+  To find out the Euler-Lagrange equation, we need to figure out the derivatives with respect to each component of the $A$ field. We obtain
+  \[
+    \frac{\partial \mathcal{L}}{\partial(\partial_\mu A_\nu)} = -\partial^\mu A^\nu + (\partial_\rho A^\rho) \eta^{\mu\nu}.
+  \]
+  So we obtain
+  \[
+    \partial_\mu \left(\frac{\partial \mathcal{L}}{\partial(\partial_\mu A_\nu)}\right) = - \partial_\mu\partial^\mu + \partial^\nu (\partial_\rho A^\rho) = - \partial_\mu (\partial^\mu A^\nu - \partial^\nu A^\mu).
+  \]
+  We write
+  \[
+    F^{\mu\nu} = \partial^\mu A^\nu - \partial^\nu A^\mu.
+  \]
+  So we are left with
+  \[
+    \partial_\mu \left(\frac{\partial \mathcal{L}}{\partial(\partial_\mu A_\nu)}\right) -\partial_\mu F^{\mu\nu}.
+  \]
+  It is an exercise to check that these Euler-Lagrange equations reproduce
+  \[
+    \partial_i E_i = 0,\quad \dot{E}_i = \varepsilon_{ijk} \partial_j B_k.
+  \]
+  Using our $F^{\mu\nu}$, we can rewrite the Lagrangian as
+  \[
+    \mathcal{L} = -\frac{1}{4} F_{\mu\nu}F^{\mu\nu}.
+  \]
+\end{eg}
+How did we come up with these Lagrangians? In general, it is guided by two principles --- one is symmetry, and the other is renormalizability. We will discuss symmetries shortly, and renormalizaility would be done in the III Advanced Quantum Field Theory course.
+
+In all of these examples, the Lagrangian is local. In other words, the terms don't couple $\phi(\mathbf{x}, t)$ to $\phi(\mathbf{y}, t)$ if $\mathbf{x} \not= \mathbf{y}$.
+\begin{eg}
+  An example of a non-local Lagrangian would be
+  \[
+    \int \d^3 x \int \d^3 y \phi(\mathbf{x}) \phi(\mathbf{x} - \mathbf{y})
+  \]
+\end{eg}
+A priori, there is no reason for this --- $x$ is merely a label, and we do couple other indices together, eg. in $\partial_3 A_0$, we mix the labels $3$ and $0$. However, it happens that nature seems to be local. So we shall only consider local Lagrangian.
+
+Note that locality does \emph{not} mean that the Lagrangian at a point only depends on the value at the point. Indeed, it also depends on the derivatives at $\mathbf{x}$. So we can view this as saying the value of $\mathcal{L}$ at $\mathbf{x}$ only depends on the value of $\phi$ at an infinitesimal neighbourhood of $\mathbf{x}$ (formally, the jet at $\mathbf{x}$).
+
+\subsection{Lorentz invariance}
+if we wish to construct relativistic field theories such that $\mathbf{x}$ and $t$ are on an equal footing, the Lagrangian should be invariant under \term{Lorentz transformations} $x^\mu \mapsto x'^\mu = \Lambda^\mu\!_\nu x^\nu$, where
+\[
+  \Lambda^\mu\!_\sigma \eta^{\sigma\tau} \Lambda^\nu\!_\tau = \eta^{\mu\nu}.
+\]
+\begin{eg}
+  The transformation
+  \[
+    \Lambda^\mu\!_\sigma =
+    \begin{pmatrix}
+      1 & 0 & 0 & 0\\
+      0 & 1 & 0 & 0\\
+      0 & 0 & \cos \theta & -\sin \theta\\
+      0 & 0 & \sin \theta & \cos \theta
+    \end{pmatrix}
+  \]
+  describes a rotation by an angle around the $x$-axis.
+\end{eg}
+
+\begin{eg}
+  The transformation
+  \[
+    \Lambda^\mu\!_\sigma =
+    \begin{pmatrix}
+      \gamma & -\gamma v & 0 & 0\\
+      -\gamma v & \gamma & 0 & 0\\
+      0 & 0 & 1 & 0\\
+      0 & 0 & 0 & 1
+    \end{pmatrix}
+  \]
+  describes a \term{boost} by $v$ along the $x$-axis.
+\end{eg}
+The Lorentz transformations form a Lie group under matrix multiplication --- see III Symmetries Field and Particles.
+
+The Lorentz transformations have a representation on the fields. For a scalar field, this is given by
+\[
+  \phi(x) \mapsto \phi'(x) = \phi(\Lambda^{-1}x),
+\]
+where the indices are suppressed. This is an active transformation --- say $\mathbf{x}_0$ is the point at which, say, the field is a maximum. Then after applying the Lorentz transformation, the position of the new maximum is $\Lambda x_0$. We could alternatively have used passive transformations, where we just relabel the points. In this case, we have
+\[
+  \phi(x) \mapsto \phi(\Lambda (x)).
+\]
+However, this doesn't really matter, since if $\Lambda$ is a Lorentz transformation, then so is $\Lambda^{-1}$.
+
+A Lorentz invariant theory should have equations of motions such that if $\phi(x)$ is a solution, then so is $\phi(\Lambda^{-1} x)$. This can be achieved by requiring that the action $S$ is invariant under Lorentz transformations.
+
+\begin{eg}
+  In the Klein-Gordon field, we have
+  \[
+    \mathcal{L} = \frac{1}{2} \partial_\mu \phi \partial^\mu \phi - \frac{1}{2}m^2 \phi^2.
+  \]
+  The Lorentz transformation is given by
+  \[
+    \phi(x) \mapsto \phi'(x) = \phi(\Lambda^{-1}x) = \phi(y),
+  \]
+  where
+  \[
+    y^\mu = (\Lambda^{-1})^\mu\!_\nu x^\nu.
+  \]
+  We then check that
+  \begin{align*}
+    \partial_\mu \phi(x) &\mapsto \frac{\partial}{\partial x^\mu}(\phi(\Lambda^{-1}x)) \\
+    &= \frac{\partial}{\partial x^\mu} (\phi(y))\\
+    &= \frac{\partial y^\nu}{\partial x^\mu} \frac{\partial}{\partial y^\nu} (\phi(y))\\
+    &= (\Lambda^{-1})^\nu\!_\mu(\partial_\nu \phi)(y).
+  \end{align*}
+  Since $\Lambda^{-1}$ is a Lorentz transformation, we have
+  \[
+    \partial_\mu \phi \partial^\mu \phi = \partial_\mu \phi' \partial^\mu \phi'.
+  \]
+\end{eg}
+In general, as long as we write everything in terms of tensors, we get a Lorentz invariant theories.
+
+Symmetries play an important role in QFT. Different kinds of symmetries include Lorentz symmetries, gauge symmetries, global symmetries and supersymmetries (SUSY).
+
+\begin{eg}
+  Protons and neutrons are made up of quarks. Each type of quark comes in three flavors, which are called red, blue and green (these are arbitrary names). If we swap around red and blue everywhere in the universe, then the laws don't change. This is known as a global symmetry.
+
+  But if we make this change differently at different points, the equations don't a priori remain invariant, unless we introduce a \emph{gauge boson}. More of this will be explored in the AQFT course.
+\end{eg}
+
+\subsection{Noether's theorem for field theories}
+\begin{own}
+  \begin{defi}[Continuous symmetry]\index{continuous symmetry}
+    A \emph{continuous symmetry} of the Lagrangian is an action of a Lie group $G$ on $j^n(\mathcal{M}, V)$ such that for every $g \in G$ and every measurable, compact set $C \subseteq \mathcal{M}$, we have
+    \[
+      \int_C \mathcal{L}(j^1\phi(\mathbf{x})) \;\d g = \int_C \mathcal{L}(g \cdot (j^1\phi(\mathbf{x})))\;\d g.
+    \]
+    In particular, if $L(g \cdot a) = L(a)$ for all $a \in j^n(\mathcal{M}, V)$, then this is a symmetry.
+
+    A \emph{one-parameter symmetry} is one where the Lie algebra of $G$ is $\R$.
+  \end{defi}
+\end{own}
+\begin{thm}[Noether's theorem]\index{Noether's theorem}
+  Every continuous symmetry of $\mathcal{L}$ gives rise to a \term{conserved current} $j^\mu(x)$ such that the equation of motion implies that
+  \[
+    \partial_\mu j^\mu = 0.
+  \]
+  More explicitly, this gives
+  \[
+    \partial_0 j^0 + \nabla \cdot \mathbf{j} = 0.
+  \]
+  A conserved current gives rise to a \emph{conserved charge}
+  \[
+    Q = \int_{\R^3} j^0 \d^3 \mathbf{x},
+  \]
+  since
+  \begin{align*}
+    \frac{\d Q}{\d t} &= \int_{\R^3} \frac{\d j^0}{\d t} \;\d^3 \mathbf{x}\\
+    &= -\int_{\R^3} \nabla \cdot \mathbf{j} \;\d ^3 \mathbf{x}\\
+    &= 0,
+  \end{align*}
+  assuming that $j^i \to 0$ as $\mathbf{x} \to \infty$.
+\end{thm}
+
+\begin{proof}
+  Consider making an arbitrary transformation of the field $\phi_a \mapsto \phi_a + \delta \phi_a$. We then have
+  \begin{align*}
+    \delta \mathcal{L} &= \frac{\partial \mathcal{L}}{\partial \phi_a} \delta \phi_a + \frac{\partial \mathcal{L}}{\partial(\partial_\mu \phi_a)} \delta(\partial_\mu \phi_a)\\
+    &= \left[\frac{\partial \mathcal{L}}{\partial \phi_a} - \partial_\mu \frac{\partial \mathcal{L}}{\partial(\partial_\mu \phi_a)}\right] \delta \phi_a + \partial_\mu \left(\frac{\partial \mathcal{L}}{\partial(\partial_\mu \phi_a)} \delta \phi_a\right).
+  \end{align*}
+  When the equations of motion are satisfied, we know the first term always vanishes. So we are left with
+  \[
+    \delta \mathcal{L} = \partial_\mu \left(\frac{\partial \mathcal{L}}{\partial(\partial_\mu \phi_a)} \delta \phi_a\right).
+  \]
+  If the specific transformation $\delta \phi_a = X_a$ we are considering is a \term{symmetry}, then $\delta\mathcal{L} = 0$ (this is the definition of a symmetry). In this case, we can define a conserved current by
+  \[
+    j^\mu = \frac{\partial \mathcal{L}}{\partial (\partial_\mu \phi_a)}X_a,
+  \]
+  and by the equations above, this is actually conserved.
+\end{proof}
+We can have a slight generalization where we relax the condition for a symmetry and still get a conserved current. We say that $X_a$ is a symmetry if $\delta \mathcal{L} = \partial_\mu F^\mu(\phi)$ for some $F^\mu(\phi)$, ie. a total derivative. Replaying the calculations, we get
+\[
+  j^\mu = \frac{\partial \mathcal{L}}{\partial (\partial_\mu \phi_a)} X_a - F^\mu.
+\]
+\begin{eg}[Space-time]
+  Recall that in classical dynamics, spatial invariance implies the conservation of momentum, and invariance wrt to time translation implies the conservation of energy. We'll see something similar in field theory. Consider $x^\mu \mapsto x^\mu + \varepsilon^\mu$. Then we obtain
+  \[
+    \phi_a(x) \mapsto \phi_a(x) + \varepsilon^\nu \partial_\nu \phi_a(x).
+  \]
+  A Lagrangian that has no explicit $x^\mu$ dependence transforms as
+  \[
+    \mathcal{L}(x) \mapsto \mathcal{L}(x) + \varepsilon^\nu \partial_\nu \mathcal{L}(x),
+  \]
+  giving rise to 4 currents --- one for each $\nu = 0, 1, 2, 3$. We have
+  \[
+    (j^\mu)_\nu = \frac{\partial \mathcal{L}}{\partial (\partial_\mu \phi_a)} \partial_\nu \phi_a - \delta^\mu\!_\nu \mathcal{L},
+  \]
+  This particular current is called $T^\mu\!_\nu$, the \term{energy-momentum tensor}\index{$T^\mu_\nu$}. This satisfies
+  \[
+    \partial_\mu T^\mu\!_\nu = 0,
+  \]
+  We obtain conserved quantities, namely the \term{energy}
+  \[
+    E = \int \d^3 x\;T^{00},
+  \]
+  and the total \term{momentum}
+  \[
+    \mathbf{P}^i = \int \d^3 x\; T^{0i}.
+  \]
+\end{eg}
+
+\begin{eg}
+  Consider the Klein-Gordon field, with 
+  \[
+    \mathcal{L} = \frac{1}{2} \partial_\mu \phi \partial^\mu \phi - \frac{1}{2}m^2 \phi^2.
+  \]
+  We then obtain
+  \[
+    T^{\mu\nu} = \partial^\mu \partial^\nu \phi - \eta^{\mu\nu} \mathcal{L}.
+  \]
+  So we have
+  \[
+    E = \int \d^3 \mathbf{x} \left(\frac{1}{2}\dot{\phi}^2 + \frac{1}{2}(\nabla \phi)^2 + \frac{1}{2}m^2 \phi^2\right).
+  \]
+  The momentum is given by
+  \[
+    \mathbf{P}^i = \int\d^3 x\; \dot{\phi} \partial^i \phi.
+  \]
+\end{eg}
+In this example, $T^{\mu\nu}$ comes out symmetric in $\mu$ and $\nu$. In general, it would not be, but we can always massage it into a symmetric form by adding
+\[
+  \sigma^{\mu\nu} = T^{\mu\nu} + \partial_\rho \Gamma^{\rho\mu\nu}
+\]
+with $\Gamma^{\rho\mu\nu}$ a tensor antisymmetric in $\rho$ and $\mu$. Then we have
+\[
+  \partial_\mu \partial_\rho T^{\rho\mu\nu} = 0.
+\]
+So this $\sigma^{\mu\nu}$ is also invariant.
+
+A symmetric energy-momentum tensor of this form on the RHS of Einstein's field equation.
+
+\begin{eg}[internal symmetries]
+  Consider a complex scalar field
+  \[
+    \psi(x) = \frac{1}{\sqrt{2}} (\phi_1 + i \phi_2).
+  \]
+  We put
+  \[
+    \mathcal{L} = \partial_\mu \psi^* \partial^\mu \psi - V(\psi^*\psi),
+  \]
+  where
+  \[
+    V (\psi^*\psi) + m^2 \psi^* \psi + \frac{\lambda}{2}(\psi^*\psi)^2 + \cdots
+  \]
+  is some potential term.
+
+  To find the equations of motions, if we do all the complex analysis required, we will figure that we will obtain the same equations as the real case if we treat $\psi$ and $\psi^*$ as independent variables. In this case, we obtain
+  \[
+    \partial_\mu \partial^\mu \psi + m^2 \psi + \lambda (\psi^*\psi) \psi + \cdots = 0.
+  \]
+  The $\mathcal{L}$ has a symmetry given by $\psi \mapsto e^{i\alpha} \psi$. Infinitesimally, we have $\delta \psi = i\alpha \psi$, and $\delta \psi^* = -i\alpha \psi^*$.
+
+  This gives a current
+  \[
+    j^\mu = i(\partial^\mu \psi^*) \psi - i (\partial^\mu \psi)\psi^*.
+  \]
+  We will later see that associated charges of this type has an interpretation of electric charge (or particle number, eg. baryon number or lepton number).
+\end{eg}
+
+\printindex
 \end{document}

@@ -5,6 +5,7 @@
 \def\nyear {2016}
 \def\nlecturer {Christian Johansson}
 \def\ncourse {Local Fields}
+\def\nlectures {MWF.10}
 
 \input{header}
 
@@ -20,8 +21,8 @@ Topics likely to be covered include:
 \begin{itemize}[label={}]
   \item The $p$-adic numbers. Local fields and their structure.
   \item Finite extensions, Galois theory and basic ramification theory.
-  \item Polynomial equations; Hensel’s Lemma, Newton polygons.
-  \item Continuous functions on the $p$-adic integers, Mahler’s Theorem.
+  \item Polynomial equations; Hensel's Lemma, Newton polygons.
+  \item Continuous functions on the $p$-adic integers, Mahler's Theorem.
   \item Local class field theory (time permitting).
 \end{itemize}
 
@@ -29,5 +30,284 @@ Topics likely to be covered include:
 Basic algebra, including Galois theory, and basic concepts from point set topology and metric spaces. Some prior exposure to number fields might be useful, but is not essential.
 }
 \tableofcontents
+\setcounter{section}{-1}
+\section{Introduction}
+What are local fields? Suppose we are interested in some basic number theoretic problem. Say we have a polynomial $f(x_1, \cdots, x_n) \in \Z[x_1, \cdots, x_n]$. We want to look for solutions $\mathbf{a} \in \Z^n$, or show that there are no solutions at all. We might try to view this polynomial as a real polynomial, look at its roots, and see if they are integers. In lucky cases, we might be able to show that there are no real solutions at all, and conclude that there cannot be any solutions at all.
 
+On the other hand, we can try to look at it modulo some prime $p$. If there are no solutions mod $p$, then there cannot be any solution. But sometimes $p$ is not enough. We might want to look at it mod $p^2$, or $p^3$, or \ldots. One important application of local fields is that we can package all these information together. In this course, we are not going to study the number theoretic problems, but just look at the properties of the local fields for their own sake.
+
+\section{Basic theory}
+We are going to start with some generalities.
+\begin{defi}[Absolute value]\index{absolute value}
+  Let $K$ be a field. An \emph{absolute value} on $K$ is a function $|\ph|: K \to \R_{\geq 0}$ such that
+  \begin{enumerate}
+    \item $|x| = 0$ iff $x = 0$;
+    \item $|xy| = |x||y|$ for all $x, y \in K$;
+    \item $|x + y| \leq |x| + |y|$.\index{triangle inequality}
+  \end{enumerate}
+\end{defi}
+
+\begin{defi}[Valued field]\index{valued field}
+  A \emph{valued field} is a field with an absolute value.
+\end{defi}
+
+\begin{eg}
+  The rationals, reals and complex numbers with the usual absolute values are absolute values.
+\end{eg}
+
+\begin{eg}[Trivial absolute value]
+  The \emph{trivial absolute value}\index{trivial absolute value} on a field $K$ is the absolute value given by
+  \[
+    |x| =
+    \begin{cases}
+      1 & x \not= 0\\
+      0 & x = 0
+    \end{cases}.
+  \]
+\end{eg}
+From now on, we assume our absolute values are non-trivial.
+
+There are some familiar basic properties of the absolute value such as
+\begin{prop}
+  $||x| - |y|| \leq |x - y|$. Here the outer absolute value on the left hand side is the usual absolute value of $\R$, while the others are the absolute values off the relevant field.
+\end{prop}
+
+An absolute value defines a metric $d(x, y) = |x - y|$ on $K$.
+
+\begin{defi}[Equivalence of absolute values]\index{absolute values, equivalence}\index{equivalent absolute values}
+  Let $K$ be a field, and let $|\ph|, |\ph|'$ be absolute values. We say they are \emph{equivalent} if they induce the same topology.
+\end{defi}
+
+\begin{ex}
+  Using the same notation as above, show that the following are equivalent:
+  \begin{enumerate}
+    \item $|\ph|$ and $|\ph|'$ are equivalent
+    \item $|x| < 1$ implies $|x|' < 1$ for all $x \in K$
+    \item There is some $s \in \R_{> 0}$ such that $|x|^s = |x|'$ for all $x \in K$.
+  \end{enumerate}
+\end{ex}
+
+\begin{ex}
+  Let $K$ be a valued field. Then equivalent absolute values induce the same the \emph{completion} $\hat{K}$ of $K$, and $\hat{K}$ is a valued field with an absolute value extending $|\ph|$.
+\end{ex}
+
+\begin{defi}[Non-archimedean absolute value]\index{non-archimedean absolute value}\index{absolute value, non-archimedean}\index{archimedean absolute value}\index{absolute value, archimedean}
+  An absolute value $|\ph|$ on a field $K$ is called \emph{non-archimedean} if $|x + y| \leq \max(|x|, |y|)$. This condition is called the \emph{strong triangle inequality}\index{strong triangle inequality}.
+
+  An absolute value which isn't non-archimedean is called \emph{archimedean}.
+\end{defi}
+Metrics satisfying $d(x, z) \leq \max(d(x, y), d(y, z))$ are often known as \emph{ultrametrics}\index{ultrametric}.
+
+\begin{eg}
+  $\Q$, $\R$ and $\C$ under the usual absolute values are archimedean.
+\end{eg}
+
+However, in this course, we will only consider non-archimedean absolute values. Thus, from now on, unless otherwise mentioned, an absolute value is assumed to be non-archimedean. The metric is weird!
+
+\begin{eg}
+  Let $(K, |\ph|)$ be a non-archimedean valued field. let $x \in K$ and $r \in \R_{> 0}$. Let
+  \[
+    B(x, r) = \{y: |x - y| \leq r\}.
+  \]
+  We pick $z \in B(x, r)$, and suppose $y$ is such that $|y - z| \leq r$, ie. $y \in B(z, r)$. Then
+  \[
+    |x - y| = |(x - z) + (z - y)| \leq \max(|x - z|, |z - y|) \leq r.
+  \]
+  So $y \in B(x, r)$. So we conclude that $B(z, r) \subseteq B(x, r)$. By symmetry, we have $B(x, r) = B(z, r)$! Thus, closed balls do not have unique ``centers''. Every point can be viewed as the center.
+
+  In particular, we have
+  \[
+    \{y: |y - z| < r\} \subseteq B(z, r) = B(x, r)
+  \]
+  for all $z \in B(x, r)$. So the closed ball $B(x, r)$ is open as well! (In the other direction, open balls are also closed!)
+\end{eg}
+
+\begin{prop}
+  Let $K$ be a valued field. Then
+  \[
+    \mathcal{O} = \{x: |x| \leq 1\}
+  \]
+  is an open subring of $K$, called the \emph{valuation ring of K}. Moreover, for each $r \in (0, 1]$, we have $\{x : |x| < r\}$ and $\{x: |x| \leq r\}$ are open ideals of $\mathcal{O}$. Moreover, $\mathcal{O}^\times = \{x : |x| = 1\}$.
+\end{prop}
+
+\begin{proof}
+  We know that these sets are open by the previous example.
+
+  To see $\mathcal{O}$ is a subring, we have $|1| = |-1| = 1$. So $1, -1 \in \mathcal{O}$. If $x, y \in \mathcal{O}$, then $|x + y| \leq \max(|x|, |y|) \leq 1$. So $x + y \in \mathcal{O}$. Also, $|xy| = |x||y| \leq 1 \cdot 1 = 1$. So $xy \in \mathcal{O}$.
+
+  That the other sets are ideals of $\mathcal{O}$ is checked in the same way.
+
+  To check the units, we have $x \in \mathcal{O}^\times \Leftrightarrow |x|, |x^{-1}| \leq 1 \Leftrightarrow |x| = |x|^{-1} = 1$.
+\end{proof}
+
+\begin{defi}[Valuation ring]\index{valuation ring}
+   Let $K$ be a valued field. Then the \emph{valuation ring of K}\index{valuation ring} is the open subring
+  \[
+    \mathcal{O} = \{x: |x| \leq 1\}.
+  \]
+\end{defi}
+We start to see how these non-archimedean fields have more interesting algebraic properties than our usual fields.
+
+\begin{prop}
+  Let $K$ be a valued field.
+  \begin{enumerate}
+    \item Let $(x_n)$ be a sequence in $K$. If $x_n - x_{n + 1} \to 0$, then $x_n$ is Cauchy.
+  \end{enumerate}
+  If we assume further that $K$ is complete, then
+  \begin{enumerate}[resume]
+    \item Let $(x_n)$ be a sequence in $K$. If $x_n - x_{n + 1} \to 0$, then a sequence $(x_n)$ in $K$ converges.
+    \item Let $\sum_{n = 0}^\infty y_n$ be a series in $K$. If $y_n \to 0$, then $\sum_{n = 0}^\infty y_n$ converges.
+  \end{enumerate}
+\end{prop}
+The converses to all these are of course also true, with the usual proofs.
+
+\begin{proof}
+  \begin{enumerate}
+    \item Pick $\varepsilon > 0$ and $N$ such that $|x_n - x_{n + 1}| < \varepsilon$ for all $n \geq N$. Then given $m\geq n \geq N$, we have
+      \begin{align*}
+        |x_m - x_n| &= |x_m - x_{m - 1} + x_{m - 1} - x_{m - 2} + \cdots - x_n| \\
+        &\leq \max(|x_m - x_{m - 1}|, \cdots, |x_{n + 1} - x_n|) \\
+        &< \varepsilon.
+      \end{align*}
+      So the sequence is Cauchy.
+    \item Follows from (1) and the definition of completeness.
+    \item Follows from the definition of convergence of a series and (2).
+  \end{enumerate}
+\end{proof}
+
+\begin{defi}[Integral element]\index{integral element}
+  Let $R \subseteq S$ be rings and $s \in S$. We say $s$ is \emph{integral over $R$} if there is some monic $f \in R[x]$ such that $f(s) = 0$.
+\end{defi}
+
+\begin{eg}
+  Any $r \in R$ is integral (take $f(x) = x - r$).
+\end{eg}
+
+\begin{eg}
+  Take $\Z \subseteq \C$. Then $z \in \C$ is integral over $\Z$ if it is an \term{algebraic integer} (by definition of algebraic integer).
+\end{eg}
+
+\begin{defi}[Adjoint/Adjugate matrix]
+  Let $A = (a_{ij})$ be an $n \times n$ matrix with coefficients in a ring $R$. The \term{adjugate matrix} or \term{adjoint matrix} $A^* = (a_{ij}^*)$ of $A$ is defined by
+  \[
+    a_{ij}^* = (-1)^{i + j} \det (A_{ij}),
+  \]
+  where $A_{ij}$ is an $(n-1)\times (n-1)$ matrix obtained from $A$ by deleting the $i$th column and the $j$th row.
+\end{defi}
+
+\begin{prop}
+  For any $A$, we have $A^*A = AA* = \det(A) I$, where $I$ is the identity matrix.
+\end{prop}
+
+\begin{prop}
+  Let $R \subseteq S$ be rings. Then $s_1, \cdots, s_n \in S$ are all integral iff $R[s_1, \cdots, s_n] \subseteq S$ is a finitely-generated $R$-module.
+\end{prop}
+Note that $R[s_1, \cdots, s_n]$ is by definition a finitely-generated $R$-algebra, but requiring it to be finitely-generated as a module is stronger.
+
+\begin{proof}
+  Note that we can construct $R[s_1, \cdots, s_n]$ by a sequence
+  \[
+    R \subseteq R[s_1] \subseteq R[s_1, s_2] \subseteq \cdots \subseteq R[s_1, \cdots, s_n] \subseteq S,
+  \]
+  and each $s_i$ is integral over $R[s_1, \cdots, s_{n - 1}]$. Since the finite extension of a finite extension is still finite, it suffices to prove it for the case $n = 1$, and we write $s$ for $s_1$.
+
+  Suppose $f(x) \in R[[x]$ is monic such that $f(s) = 0$. If $g(x) \in R[x]$, then there is some $q, r \in R[x]$ such that $g(x) = f(x)q(x) + r(x)$ with $\deg r < \deg f$. Then $g(s) = r(s)$. So any polynomial expression in $s$ can be written as a polynomial expression with degree less than $\deg f$. So $R[s]$ is generated by $1, s, \cdots, s^{\deg f - 1}$.
+
+  In the other direction, let $t_1, \cdots, t_d$ be $R$-module generators of $R[s_1, \cdots, s_n]$. Now let $b \in R[s_1, \cdots, s_n]$. Then there is some $a_{ij} \in R$ such that
+  \[
+    b t_i = \sum_{j = 1}^d a_{ij} t_j.
+  \]
+  In matrix form, this says
+  \[
+    (bI - A)t = 0.
+  \]
+  We now multiply by $(bI - A)^*$ to obtain
+  \[
+    \det(bI - A) t_j = 0
+  \]
+  for all $j$. Now we know $1 \in R$. So $1 = \sum c_j t_j$ for some $c_j \in R$. Then we have
+  \[
+    \det(bI - A) = \det(bI - A) \sum c_j t_j = \sum c_j (\det (bI - A) t_j) = 0.
+  \]
+  Since $\det(bI - A)$ is a monic polynomial in $b$, it follows that $b$ is integral. In particular, the generators $s_i$ are integral.
+\end{proof}
+
+\begin{cor}
+  Let $R \subseteq S$ be rings. If $s_1, s_2 \in S$ are integral over $R$, then $s_1 + s_2$ and $s_1s_2$ are integral over $R$. In particular, the set $\tilde{R} \subseteq S$ of all elements in $S$ integral over $R$ is a ring, known as the integral closure of $R$ in $S$.
+\end{cor}
+
+\begin{proof}
+  If $s_1, s_2$ are integral, then $R[s_1, s_2]$ is a finite extension over $R$. Since $s_1 + s_2$ and $s_1s_2$ are elements of $R[s_1, s_2]$, they are also integral over $R$.
+\end{proof}
+
+
+\begin{defi}[Integrally closed]
+  Given a ring extension $R \subseteq S$, we say $R$ is \term{integrally closed} in $S$ if $\tilde{R} = R$.
+\end{defi}
+
+\begin{defi}[Topological ring]\index{topological ring}\index{ring topology}
+  Let $R$ be a ring. A topology on $R$ is called a \emph{ring topology} if addition and multiplication are continuous maps $R \times R \to R$. A ring with a ring topology is a \emph{topological ring}.
+\end{defi}
+
+\begin{eg}
+  $\R$ and $\C$ with the usual topologies and usual ring structures are topological rings.
+\end{eg}
+
+\begin{ex}
+  Let $K$ be a valued field. Then $K$ is a topological ring. We can see this from the fact that the product topology on $K \times K$ is induced by the metric $d((x_0, y_0), (x_1, y_1)) = \max(|x_0 - x_1|, |y_0 - y_1|)$.
+\end{ex}
+
+\begin{defi}[$i$-adically open]\index{$I$-adically open}
+  Let $R$ be a ring and $I \subseteq R$ an ideal. A subset $U \subseteq R$ is called \emph{$I$-adically open} if for all $x \in U$, there is some $n \geq 1$ such that $x + I^n \subseteq U$.
+\end{defi}
+
+\begin{prop}
+  The set of all $I$-adically open sets form a topology on $R$, called the $I$-adic topology.
+\end{prop}
+
+\begin{proof}
+  By definition, we have $\emptyset$ and $R$ are open, and arbitrary unions are clearly open. if $U, V$ are $I$-adically open, and $x \in U \cap V$, then there are $n, m$ such that $x + I^n \subseteq U$ and $x + I^m \subseteq V$. Then $x + I^{\max(m, n)} \subseteq U \cap V$.
+\end{proof}
+
+\begin{ex}
+  Check that the $I$-adic topology is a ring topology.
+\end{ex}
+
+\begin{defi}[Inverse/projective limit]\index{inverse limit}\index{projective limit}
+  Let $R_1, R_2,, \cdots$ be topological rings, with continuous homomorphisms $f_n: R_{n + 1} \to R_n$.
+  \[
+    \begin{tikzcd}
+      R_1 & R_2 \ar[l, "f_1"] & R_3 \ar[l, "f_2"] & R_4 \ar[l, "f_3"] & \ar[l] \cdots
+    \end{tikzcd}
+  \]
+  The \emph{inverse limit} or \emph{projective limit} of the $R_i$ is the ring
+  \[
+    \varprojlim R_n = \left\{(x_n) \in \prod_n R_n : f_n(x_{n + 1}) = x_n\right\},
+  \]
+  with coordinatewise addition and multiplication, together with the subspace topology coming from the product topology of $\prod R_n$. This topology is known as the \term{inverse limit topology}.
+\end{defi}
+
+\begin{prop}
+  The inverse limit topology is a ring topology.
+\end{prop}
+
+\begin{proof}[sketch]
+  We can fit the addition and multiplication maps into diagrams
+  \[
+    \begin{tikzcd}
+      \varprojlim R_n \times \varprojlim R_n \ar[r] & \varprojlim R_n\\
+      \prod R_n \times \prod R_n \ar[u, hook] \ar[r] & \prod R_n \ar[u, hook]
+    \end{tikzcd}
+  \]
+  By the definition of the subspace topology, it suffices to show that the corresponding maps on $\prod R_n$ are continuous. By the universal property of the product, it suffices to show that the projects $\prod R_n \times \prod R_n \to R_m$ is continuous for all $m$. But this map can alternatively be obtained by first projecting to $R_m$, then doing multiplication in $R_m$, and projection is continuous. So the result follows.
+\end{proof}
+
+\begin{defi}[$I$-adic completion]
+  Let $R$ be a ring and $I$ be an ideal. The \term{$I$-adic completion} of $R$ is the topological ring
+  \[
+    \varprojlim R/I^n,
+  \]
+  where $R/I^n$ has the discrete topology, and $R/I^{n + 1} \to R/I^n$ is the obvious map.
+\end{defi}<++>
+\printindex
 \end{document}

@@ -1,0 +1,219 @@
+\documentclass[a4paper]{article}
+
+\def\npart {III}
+\def\nterm {Michaelmas}
+\def\nyear {2016}
+\def\nlecturer {Richard Jozsa}
+\def\ncourse {Quantum Computation}
+\def\nofficial {https://www.qi.damtp.cam.ac.uk/node/261}
+\def\nlectures {TT.9}
+
+\input{header}
+
+\begin{document}
+\maketitle
+{\small
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+Quantum mechanical processes can be exploited to provide new modes of information processing that are beyond the capabilities of any classical computer. This leads to remarkable new kinds of algorithms (so-called quantum algorithms) that can offer a dramatically increased efficiency for the execution of some computational tasks. Notable examples include integer factorisation (and consequent efficient breaking of commonly used public key crypto systems) and database searching. In addition to such potential practical benefits, the study of quantum computation has great theoretical interest, combining concepts from computational complexity theory and quantum physics to provide striking fundamental insights into the nature of both disciplines.
+
+The course will cover the following topics:
+
+Notion of qubits, quantum logic gates, circuit model of quantum computation. Basic notions of quantum computational complexity, oracles, query complexity.
+
+The quantum Fourier transform. Exposition of fundamental quantum algorithms including the Deutsch-Jozsa algorithm, Shors factoring algorithm, Grovers searching algorithm.
+
+A selection from the following further topics (and possibly others):
+\begin{enumerate}
+  \item Quantum teleportation and the measurement-based model of quantum computation;
+  \item Lower bounds on quantum query complexity;
+  \item Phase estimation and applications in quantum algorithms;
+  \item Quantum simulation for local hamiltonians.
+\end{enumerate}
+
+\subsubsection*{Pre-requisites}
+It is desirable to have familiarity with the basic formalism of quantum mechanics especially in the simple context of finite dimensional state spaces (state vectors, Dirac notation, composite systems, unitary matrices, Born rule for quantum measurements). Prerequisite notes will be provided on the course webpage giving an account of the necessary material including exercises on the use of notations and relevant calculational techniques of linear algebra. It would be desirable for you to look through this material at (or slightly before) the start of the course. Any encounter with basic ideas of classical theoretical computer science (complexity theory) would be helpful but is not essential.
+}
+\tableofcontents
+
+\setcounter{section}{-1}
+\section{Introduction}
+% Significance and Context
+Quantum computation is currently a highly significant and important subject, and is very active in international research.
+
+First of all, it is a fundamental connection between physics and computing. We can think of physics as computing, where in physics, we label states with parameters (ie. numbers), and physical evolution changes these parameters. So we can think of these parameters as encoding information, and physical evolution changes the information. Thus, this evolution can be thought of as a computational process.
+
+More strikingly, we can also view computing as physics! We all have computers, and usually represent information as bits, 0 or 1. We often think of computation as manipulation of these bits, ie. as discrete maths. However, there is no actual discrete bits --- when we build a computer, we need physical devices to represent these bits. When we run a computation on a computer, it has to obey the laws of physics. So we arrive at the idea that the limits of computation are not a part of mathematics, but depend on the laws of physics. Thus, we can associate a ``computing power'' with any theory of physics!
+
+On the other hand, there is also a technology/engineering aspect of quantum computation. Historically, we have been trying to reduce the size of computers. Eventually, we will want to try to achieve miniaturization of computer components to essentially the subatomic scale. The usual boolean operations we base our computations on do not work so well on this small scale, since quantum effects start to kick in. We could try to mitigate these quantum issues and somehow force the bits to act classically, but we can also embrace the quantum effects, and build a quantum computer! There is a lot of recent progress in quantum technology. We are now expecting a 50-qubit quantum computer in full coherent control soon. However, we are not going to talk about implementation in this course.
+
+Finally, apart from the practical problem of building quantum computers, we also have theoretical quantum computer science, where we try to understand how quantum algorithms behave. This is about how we can actually exploit quantum physical facts for computational possibilities beyond classical computers. This will be the focus of the course.
+
+\section{Computational complexity theory}
+To appreciate the difference between quantum and classical computing, we need to know how to evaluate an algorithm. This involves understanding some basic complexity theory. But before we could do that, we need to know about computability versus uncomputability.
+
+We will not provide a proper definition of ``computable''. To do so, one comes up with a sensible mathematical model of a computer, and ``computable'' means that theoretical computer can compute it. By the Church-Turing thesis, any two sensible definitions of computability should be equivalent, so we will not spend too much time working out the details.
+
+\begin{eg}
+  Let $N$ be an integer. We want to figure out if $N$ a prime. This is clearly computable, since we can try all numbers less than $N$ and see if it divides $N$.
+\end{eg}
+
+This is not too surprising, but it turns out there are some problems that are not computable! Most famously, we have the Halting problem.
+\begin{eg}[Halting problem]\index{Halting problem}
+  Given the code of a computer program, we want to figure out if the computer will eventually halt. In 1936, Turing proved that this problem is uncomputable! So we cannot have a program that determines if an arbitrary program halts!
+\end{eg}
+
+For a less arbitrary problem, we have
+\begin{eg}
+  Given a polynomial with integer coefficients with many variables, eg. $2x^2 y - 17 zw^{19} + x^5 w^3 + 1$, does this have a root in the integers? It was shown in 1976 that this problem is uncomputable as well!
+\end{eg}
+
+These results are all for classical computing. If quantum computing is somehow different, can we get around this problems? This turns out not to be the case, for the very reason that all the laws of quantum physics (eg. state descriptions, evolution equations) are all computable on a classical computer (in principle). So it follows that quantum computing, being a quantum process, cannot compute any classical uncomputable problem.
+
+Despite this limitation, quantum computation is still interesting! In practice, there is also the problem of complexity --- the complexity (ie. how hard, how much effort is needed to do the computation) of a quantum computation might be much simpler than the classical counterpart.
+
+To formalize this, we make precise the notion of a computational task.
+
+\begin{defi}[Input string]\index{input string}
+  An \emph{input bit string} is a sequence of bits $x = i_1i_2 \cdots i_n$, where each $i_k$ is either $0$ or $1$. We write $B_n$ for the set of all $n$-bit string, and $B = \bigcup_{n \in \N} B_n$. The \emph{input size} is the length $n$. So in particular, if the input is regarded as an actual number, the size is not the number itself, but its logarithm.
+\end{defi}
+
+\begin{defi}[Language]
+  A \term{language} is a subset $L\subseteq B$.
+\end{defi}
+
+\begin{defi}[Decision problem]
+  Given a language $L$, the \term{decision problem} is to determine whether an arbitrary $x \in B$ is a member of $L$. The output is thus 1 bit of information, namely yes or no.
+\end{defi}
+Of course, we can have a more general task with multiple outputs, but for simplicity, we will not consider that case here.
+
+\begin{eg}
+  If $L$ is the set of all prime numbers, then the corresponding decision problem is determining whether a number is prime.
+\end{eg}
+
+We also have to talk about models of computations. We will only give an intuitive and classical description of it.
+\begin{defi}[Computational model]
+  A \term{computational model} is a process with discrete steps (elementary computational steps), where each step requires a constant amount of effort/resources to implement.
+\end{defi}
+If we think about actual computers that works with bits, we can imagine a step as an operation such as ``and'' or ``or''. Note that addition and multiplication are \emph{not} considered a single step --- as the number gets larger, it takes more effort to add or multiply them.
+
+\begin{defi}[Randomized/probabilistic computation]
+  This is the same as a usual computational model, but the process also has access to a string $r_1, r_2, r_3, \cdots$ of independent, uniform random bits. In this case, we will often require the answer/output to be correct with ``suitably good'' probability.
+\end{defi}
+
+In computer science, there is a separate notion of ``non-deterministic'' computation, which is \emph{different} from probabilistic computation. In probabilistic computation, every time we ask for a random number, we just pick one of the possible output and follows that. With a non-deterministic computer, we simultaneously consider \emph{all} possible paths you can take.
+
+\begin{defi}[Complexity of a computational task (or an algorithm)]
+  The \term{complexity} of a computational task or algorithm is the ``consumption of resources as a function of input size $n$''. The resources are usually the time
+  \[
+    T(n) = \text{number of computational steps needed},
+  \]
+  and space
+  \[
+    Sp(n) = \text{number of memory/work space needed}.
+  \]
+  In each case, we take the worse case input of a given size $n$.
+\end{defi}
+We usually consider the worst-case scenario, since, eg. for primality testing, there are always some numbers which we can easily rule out as being not prime (eg. even numbers). Sometimes, we will also want to study the average complexity.
+
+In the course, we will mostly focus on the time complexity, and not work with the space complexity itself.
+
+As one would imagine, the actual time or space taken would vary a lot on the actual computational model. Thus, the main question we ask will be whether $T(n)$ grows polynomially or super-polynomially (``exponentially'') with $n$.
+\begin{defi}[Polynomial growth]\index{polynomial growth}
+  We say $T(n)$ \emph{grows polynomially}, and write
+  \[
+    T(n) = O(\poly(n)) = O(n^k)
+  \]
+  for some $k$, if there is some constant $c$, and some integer $k$ and some integer $n_0$ such that $T(n) < c n^k$ for all $n > n_0$.
+\end{defi}
+
+The other possible cases are exponential growth, eg. $T(n) = c_1 2^{c_2 n}$, or super-polynomial and sub-exponential growth such as $T(n) = 2^{\sqrt{n}}$ or $n^{\log n}$.
+
+We will usually regard polynomial time processes as ``feasible in practice'', while super-polynomial ones are considered ``infeasible''. Of course, this is not always actually true. For example, we might have a polynomial time of $n^{10^{10^10}}$, or an exponential time of $2^{0.0000\ldots0001 n}$. However, this distinction of polynomial vs non-polynomial is robust, since any computational model can ``simulate'' other computational models in polynomial time. So if something is polynomial in one computational model, it is polynomial in all models.
+
+In general, we can have a more refined complexity classes of decision problems:
+\begin{enumerate}
+  \item \term{\textbf{P}} (\term{polynomial time}): The class of decision problems having \emph{deterministic} polynomial-time algorithm.
+  \item \term{\textbf{BPP}} (\term{bounded error, probabilistic polynomial time}): The class of decision problems having \emph{probabilistic} polynomial time algorithms such that for every input,
+    \[
+      \mathrm{Prob}(\text{answer is correct}) \geq \frac{2}{3}.
+    \]
+    The number $\frac{2}{3}$ is sort of arbitrary --- we see that we cannot put $\frac{1}{2}$, or else we can just randomly guess a number. So we need something greater than $\frac{1}{}$, and ``bounded'' refers to it being bounded away from $\frac{1}{2}$. We could replace $\frac{2}{3}$ with any other constant $\frac{1}{2} + \delta$ with $0 < \delta < \frac{1}{2}$, and \textbf{BPP} is the same. This is because if we have a $\frac{1}{2} + \delta$ algorithm, we simply repeat the algorithm $K$ times, and take the majority vote. By the Chernoff bound (a result in probability), the probability that the majority vote is correct is $> 1 - e^{-2 \delta^2 K}$. So as we do more and more runs, the probability of getting a right answer grows exponentially. This can be bigger than an $1 - \varepsilon$ by a suitably large $K$. Since $K$ times a polynomial time is still polynomial time, we still have a polynomial time algorithm.
+
+    These are often considered as ``classically feasible computations'', or ``computable in practice''. In this case, we tolerate small errors, but that is fine in practice, since in genuine computers, random cosmic rays and memory failures can also cause small errors in the result, even for a deterministic algorithm.
+\end{enumerate}
+It is not known whether \textbf{P} and \textbf{BPP} are the same --- in general, not much is known about whether two complexity classes are the same.
+
+\begin{eg}[Primality testing]
+  Let $N$ be an integer. We want to determine if it is prime. The input size is $\log_2 N$. The naive method of primality testing is to test all numbers and see if it divides $N$. We only need to test up to $\sqrt{N}$, since if $N$ has a factor, there must be one below $\sqrt{N}$. The is \emph{not} polynomial time, since we need $\sqrt{N} = 2^{\frac{1}{2} \log N}$ operations, we see that this is exponential time.
+
+  How about a probabilistic algorithm? We can choose a random $k < N$, and see if $k$ divides $N$. This is a probabilistic, polynomial time algorithm, but it is not bounded, since the probability of getting a correct answer is not $> \frac{1}{2}$.
+
+  In reality, primality testing is known to be in \textbf{BPP} (1976), and it is also known to be in \textbf{P} (2004).
+\end{eg}
+
+The most famous model for computation is probably a \emph{Turing machine}. However, for our purposes, it is much simpler to work with the \emph{circuit model}.
+
+Classically, for each size $n$, we have a prescribed circuit of Boolean $\AND$, $\OR$ and $\NOT$ gates. We have a \term{circuit family} $\mathcal{C}_1, \mathcal{C}_2, \cdots$, with one for each input size.
+% insert diagram
+
+We can think of this as a ``program in machine language''. The computational steps are the gates. The time $T(n)$ is the size of the circuit $\mathcal{C}_n$, ie. the total number of gates in the circuit. A polynomial time computation is one where the size of $\mathcal{C}_n$ grows polynomially in $n$.
+
+We have chosen or primitive gates to be $\AND$, $\OR$ and $\NOT$. It is a fact that this is a \emph{universal set} of gates --- we can make any boolean function $f: B_m \to B_n$ as a circuit of gates from $G$.
+
+Now we go on to quantum stuff!
+\section{Quantum computation}
+We are again going to introduce our quantum computational model with the circuit model. A single qubit is an element of $\C^2$, with basis vectors
+\[
+  \bket{0} =
+  \begin{pmatrix}
+    1 \\ 0
+  \end{pmatrix},\quad
+  \bket{1} =
+  \begin{pmatrix}
+    0 \\ 1
+  \end{pmatrix}.
+\]
+For an input $x = i_1i_2\cdots i_n$, we encode this as a qubit $\bket{i_1} \bket{i_2}\cdots\bket{i_n}\bket{0}\cdots\bket{0}$. Now the computational steps are quantum gates, namely unitary operations on designated (few) qubits. For a single qubit, namely an element of $\C^2$, a unitary operation is a $2 \times 2$ matrix. Basic unitary gates commonly used include
+\[
+  \qX =
+  \begin{pmatrix}
+    0 & 1\\
+    1 & 0
+  \end{pmatrix},\quad
+  \qZ =
+  \begin{pmatrix}
+    1 & 0\\
+    0 & -1
+  \end{pmatrix},\quad
+  \qH = \frac{1}{\sqrt{2}}
+  \begin{pmatrix}
+    1 & 1\\
+    1 & -1
+  \end{pmatrix},\quad
+  \qP_\varphi =
+  \begin{pmatrix}1 & 0\\0 & e^{\varphi}\end{pmatrix}
+\]
+We also have two-qubit gates
+\[
+  \qCX\bket{i}\bket{j} = \bket{i} X^i\bket{j},\quad CZ
+\]
+More explicitly, we have
+\[
+  \qCX = 
+  \begin{pmatrix}
+    1 & 0 & 0 & 0\\
+    0 & 1 & 0 & 0\\
+    0 & 0 & 0 & 1\\
+    0 & 0 & 1 & 0
+  \end{pmatrix},\quad
+  \qCZ = 
+  \begin{pmatrix}
+    1 & 0 & 0 & 0\\
+    0 & 1 & 0 & 0\\
+    0 & 0 & 1 & 0\\
+    0 & 0 & 0 & -1
+  \end{pmatrix},
+\]
+\end{document}
