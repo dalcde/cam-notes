@@ -13,9 +13,8 @@
 \maketitle
 {\small
 \noindent\emph{Part IB Methods, and Complex Methods or Complex Analysis are essential; Part II Classical Dynamics is desirable.}
+
 \vspace{10pt}
-
-
 \noindent Integrability of ordinary differential equations: Hamiltonian systems and the Arnol'd--Liouville Theorem (sketch of proof). Examples.\hspace*{\fill}[3]
 
 \vspace{5pt}
@@ -109,7 +108,7 @@ We are now going to define a \emph{Poisson bracket}.
   \]
 \end{defi}
 
-This has some obvious and not-so-obvious properties: 
+This has some obvious and not-so-obvious properties:
 \begin{prop}\leavevmode
   \begin{enumerate}
     \item This is linear in each argument.
@@ -188,7 +187,7 @@ So the Hamiltonian is constant!
 \end{eg}
 
 \begin{defi}[Hamiltonian vector field]\index{Hamiltonian vector field}
-  Given a Hamiltonian function $H$, the \emph{Hamiltonian vector field} is given by 
+  Given a Hamiltonian function $H$, the \emph{Hamiltonian vector field} is given by
   \[
     \mathbf{V}_H = J \frac{\partial H}{\partial \mathbf{x}}.
   \]
@@ -317,7 +316,7 @@ What about more general cases? Recall from IB Analysis II that a map is differen
 \begin{prop}
   A map $\mathbf{x} \mapsto \mathbf{y}(\mathbf{x})$ is canonical iff $D\mathbf{y}$ is symplectic, ie.
   \[
-    D\mathbf{y} J (D\mathbf{y})^T  = J.
+    D\mathbf{y} J (D\mathbf{y})^T = J.
   \]
 \end{prop}
 
@@ -330,4 +329,119 @@ So $\mathbf{P}(t) = \mathbf{P}_0$ is a constant. Since the right hand side of th
   \Omega = \frac{\partial \tilde{H}}{\partial \mathbf{P}} (\mathbf{P}_0).
 \]
 So if we could find a good canonical transformation, the solution falls out easily! It turns out that if a system is integrable, then we can indeed find such coordinates.
+
+We are now going to prove the Arnold-Liouville theorem. Before we do that in full generality, we first do it in a specific case, and see how the proof actually works out.
+
+\begin{eg}
+  Consider the harmonic oscillator with Hamiltonian
+  \[
+    H(q, p) = \frac{1}{2}p^2 + \frac{1}{2}\omega^2 q^2.
+  \]
+  Since is a 2-dimensional system, so we only need a single first integral. Since $H$ is a first integral for trivial reasons, this is an integrable Hamiltonian system.
+
+  We can actually draw the lines on which $H$ is constant --- they are just ellipses:
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->] (-3, 0) -- (3, 0) node [right] {$q$};
+      \draw [->] (0, -2) -- (0, 2) node [above] {$q$};
+
+      \foreach \x in {0.6, 0.8, 1, 1.2} {
+        \begin{scope}[scale=\x]
+          \draw ellipse (1.5 and 1);
+        \end{scope}
+      }
+    \end{tikzpicture}
+  \end{center}
+  We note that the ellipses are homeomorphic to $S^1$. Now we introduce the coordinate transformation $(q, p) \mapsto (\phi, I)$, defined by
+  \[
+    q = \sqrt{\frac{2I}{\omega}} \sin \phi,\quad p = \sqrt{2I\omega} \cos \phi,
+  \]
+  For the purpose of this example, we can suppose we obtained this formula through divine inspiration. However, in the Arnold-Liouville theorem, we will provide a general way of coming up with these formulas.
+
+  We can manually show that this transformation is canonical (it is actually easier to show that the inverse map $(\phi, I) \mapsto (q, p)$ is canonical). We also have that
+  \[
+    \tilde{H}(\phi, I) = H(q(\phi, I), p(\phi, I)) = \omega I.
+  \]
+  This is really nice. There is no $\phi$! Now Hamilton's equations become
+  \[
+    \dot\phi = \frac{\partial \tilde{H}}{ \partial I} = \omega,\quad \dot{I} = -\frac{\partial \tilde{H}}{\partial \phi} = 0.
+  \]
+  We can integrate up to obtain
+  \[
+    \phi(t) = \phi_0 + \omega t,\quad I(t) = I_0.
+  \]
+  It is fun to consider the integral along paths of constant $H$:
+  \begin{align*}
+    \frac{1}{2\pi}\oint p \;\d q &= \frac{1}{2\pi} \int_0^{2\pi}p(\phi, I) \left(\frac{\partial q}{\partial \phi} \;\d \phi + \frac{\partial q}{\partial I} \;\d I\right)\\
+    &= \frac{1}{2\pi} \int_0^{2\pi}p(\phi, I) \left(\frac{\partial q}{\partial \phi} \;\d \phi\right)\\
+    &= \frac{1}{2\pi} \int_0^{2\pi} \sqrt{\frac{2I}{\omega}}\sqrt{2I\omega} \cos^2 \phi \;\d \phi\\
+    &= I
+  \end{align*}
+  This is interesting. We didn't know how we obtained $I$, but in fact we can obtain it by performing an integral like this.
+\end{eg}
+There are two things to take away from this.
+\begin{enumerate}
+  \item The motion takes place in $S^1$
+  \item We got $I$ by performing $\frac{1}{2\pi}\oint p \;\d q$.
+\end{enumerate}
+These two ideas are essentially what we are going to prove for general Hamiltonian system.
+
+\begin{thm}[Arnold-Liouville theorem]\index{Arnold-Liouville theorem}
+  We let $(M, H)$ be an integrable $2n$-dimensional Hamiltonian system with independent, involutive first integrals $f_1, \cdots, f_n$, where $f_1 = H$. For any fixed $\mathbf{c} \in \R^n$, we set
+  \[
+    M_\mathbf{c} = \{(\mathbf{q}, \mathbf{p}) \in M: f_i(\mathbf{q}, \mathbf{p}) = c_i, i =1 , \cdots, n\}.
+  \]
+  Then
+  \begin{enumerate}
+    \item $M_\mathbf{c}$ is a smooth $n$-dimensional surface in $M$. If $M_\mathbf{c}$ is compact and connected, then it is diffeomorphic to
+      \[
+        T^n = S^1 \times \cdots \times S^1.
+      \]
+    \item (\ldots)
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}[Proof sketch]
+  We first show that $M_\mathbf{c}$ is smooth and $n$-dimensional. We will handwave through this part. The proper proof follows easily from techniques found in IID Differential geometry using the implicit function theorem. We know $M_\mathbf{c}$ is a surface defined by $n$ constraints, while the whole phase space $M$ has $2n$ degrees of freedom. So the remaining number of degrees of freedom on $M_\mathbf{c}$ is $n$. The key that makes this work is that the constraints are independent, which is the condition that allows us to apply the implicit function theorem.
+
+  We now show that $M_\mathbf{c}$ is diffeomorphic to the torus if it is compact and connected. Consider the Hamiltonian vector fields defined by
+  \[
+    \mathbf{V}_{f_i} = J \frac{\partial f_i}{\partial \mathbf{x}}.
+  \]
+  We claim that these are \emph{tangent} to the surface $M_\mathbf{c}$. Indeed, we want to see if any of the $\{f_j\}$ change in the direction of $\mathbf{V}_{f_i}$. We can compute
+  \[
+    \left(\mathbf{V}_{f_i} \cdot \frac{\partial}{\partial \mathbf{x}}\right)f_j = \frac{\partial f_j}{\partial \mathbf{x}} J \frac{\partial f_i}{\partial \mathbf{x}} = \{f_j, f_i\} = 0.
+  \]
+  Since this vanishes, we know that $\mathbf{V}_{f_i}$ is a tangent a tangent to the surface. So the flow maps $\{g_i\}$ map $M_\mathbf{c}$ to itself. Also, we know that the flow maps commute. Indeed, we can compute
+  \[
+    [\mathbf{V}_{f_i}, \mathbf{V}_{f_j}] = -\mathbf{V}_{\{f_i, f_j\}} = -\mathbf{V}_{0} = 0.
+  \]
+  So we have a whole bunch of commuting flow maps from $M_\mathbf{c}$ to itself. We set
+  \[
+    g^\mathbf{t} = g_1^{t_1} g_2^{t_2} \cdots g_n^{t_n},
+  \]
+  where $\mathbf{t} \in \R^n$. Then because of commutativity, we have
+  \[
+    g^{\mathbf{t}_1 + \mathbf{t}_2} = g^{\mathbf{t}_1}g^{\mathbf{t}_2}.
+  \]
+  So this is gives a group action of $\R^n$ on the surface $M_\mathbf{c}$. We fix $\mathbf{x} \in M_\mathbf{c}$. We define
+  \[
+    \stab(\mathbf{x}) = \{\mathbf{t} \in \R^n: g^\mathbf{t}\mathbf{x} = \mathbf{x}\}.
+  \]
+  We introduce the map
+  \[
+    \phi: \frac{\R^n}{\stab(\mathbf{x})} \to M_\mathbf{c}
+  \]
+  given by $\phi(\mathbf{t}) = g^{\mathbf{t}}\mathbf{x}$. By the orbit-stabilizer theorem, this gives a bijection between $\R^n/\stab(\mathbf{x})$ and the orbit of $\mathbf{x}$. It can be shown that the orbit of $\mathbf{x}$ is exactly the connected component of $\mathbf{x}$. Now if $M_\mathbf{c}$ is connected, then this must be the whole of $\mathbf{x}$! By general differential geometry theory, we get that this map is indeed a diffeomorphism.
+
+  We know that $\stab(\mathbf{x})$ is a subgroup of $\R^n$, and if the $g_i$ are non-trivial, it can be seen (at least intuitively) that this is discrete. Thus, it must be isomorphic to something of the form $\Z^k$ with $1 \leq k \leq n$.
+
+  So we have
+  \[
+    M_\mathbf{c} \cong \R^n / \stab(\mathbf{x}) \cong \R^n/\Z^k \cong \cong \R^k/\Z^k \times \R^{n - k} \cong T^k \times \R^{n - k}.
+  \]
+  Now if $M_\mathbf{c}$ is compact, we must have $n - k = 0$, ie. $n = k$, so that we have no factors of $\R$. So $M_\mathbf{c} \cong T^n$.
+\end{proof}
 \end{document}
+
+
