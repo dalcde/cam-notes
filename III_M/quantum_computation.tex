@@ -328,4 +328,278 @@ So for an $n$-qubit state, we have
 \]
 and the result is exactly the starting state we were looking for.
 
+\section{Query complexity}
+We are going to come to our first quantum algorithm. Here the input to the computational task is slightly different from what we've got before. Instead of an input $i_1, \cdots, i_n \in B_n$, we have a \emph{black box}/\term{oracle} that computes some $f: B_m \to B_n$. We may have some \emph{a priori} promise on $f$, and we want to determine some property of the function $f$. The only access to $f$ is querying the oracle with its inputs.
+
+The use of $f$ (classical) or $U_f$ (quantum) counts as one step of computation. The \term{query complexity} of this task is the least number of times the oracle needs to be queried. Usually, we do not care much about how many times the other gates are used.
+
+Obviously, if we just query all the values of the function, then we can determine anything about the function, since we have complete information. But we want to see if we can use fewer queries.
+
+\begin{eg}[Balanced vs constant problem]\index{balanced vs constant problem}
+  The input black box is a function $f: B_n \to B_1$. The promise is that $f$ is either
+  \begin{enumerate}
+    \item a \emph{constant} function, ie. $f(x) = 0$ for all $x$, or $f(0) = 1$ for all $x$; or
+    \item a \emph{balanced} function, ie. exactly half of its values in $B_n$ are sent to $1$.
+  \end{enumerate}
+  We want to determine if $f$ is (i) or (ii) with certainty.
+
+  Classically, if we want to find the answer, in the worst case scenario, we will have to perform $2^n/2 + 1$ queries --- if you are really unlucky, you might query a balanced function $2^n/2$ times and get $0$ results.
+
+  Quantumly, we have the \term{Deutsch-Jozsa algorithm}, that answers the question in 1 query!
+
+  A trick we are going to use is something known as ``\term{phase kickback}''. Instead of encoding the result as a single bit, we encode them as $\pm$ signs, ie. as phases of the quantum bits. The ``kickback'' part is about using the fact that we have
+  \[
+    \bket{a} (e^{i\theta}\bket{b}) = (e^{i\theta}\bket{a})\bket{b},
+  \]
+  So we might do something to $\bket{b}$ to give it a phase, and then we ``kick back'' the phase on $\bket{a}$, and hopefully obtain something when we measure $\bket{a}$.
+
+  Recall that we have
+  \[
+    U_f \bket{x}\bket{y} = \bket{x} \bket{y \oplus f(x)}.
+  \]
+  Here $\bket{x}$ has $n$ qubits, and $\bket{y}$ has 1 qubit.
+
+  The non-obvious thing to do is to set the output register to
+  \[
+    \bket{\alpha} = \frac{\bket{0} - \bket{1}}{2} = \qH\bket{1} = \qH \qX \bket{0}.
+  \]
+  We then note that $U_f$ acts by
+  \begin{align*}
+    \bket{x}\left(\frac{\bket{0} - \bket{1}}{2}\right) &\mapsto \bket{x} \frac{\bket{f(x)} - \bket{1 \oplus f(x)}}{\sqrt{2}}\\
+    &=
+    \begin{cases}
+      \bket{x}\frac{\bket{0} - \bket{1}}{\sqrt{2}}& f(x) = 0\\
+      \bket{x}\frac{\bket{1} - \bket{0}}{\sqrt{2}}& f(x) = 1\\
+    \end{cases}\\
+    &= (-1)^{f(x)}\bket{x}\bket{\alpha}.
+  \end{align*}
+  Now we do this to the superposition over all possible $x$:
+  \[
+    \frac{1}{\sqrt{2^n}} \sum \bket{x}\bket{\alpha} \mapsto \left(\frac{1}{\sqrt{2^n}} \sum (-1)^{f(x)}\bket{x}\right) \bket{\alpha}.
+  \]
+  So one query gives us
+  \[
+    \bket{\xi_f} = \frac{1}{\sqrt{2^n}} \sum (-1)^{f(x)}\bket{x}.
+  \]
+  The key observation now is simply that if $f$ is constant, then all the signs are the same. If $x$ is balanced, then exactly half of the signs are $+$ and $-$. The crucial thing is that $\bket{\xi_{f_\text{const}}}$ is orthogonal to $\bket{\xi_{f_\text{balanced}}}$. This is a good thing, since orthogonality is something we can perfectly distinguish with a quantum measurement.
+
+  There is a slight technical problem here. We allow only measurements in the standard $\bket{0}$, $\bket{1}$ basis. So we need want to ``rotate'' our states to the standard basis. Fortunately, recall that
+  \[
+    \begin{tikzcd}
+      \bket{0}\cdots\bket{0} \ar[r, "\qH\otimes \cdots\otimes \qH"] &\frac{1}{\sqrt{2^n}}\sum \bket{x}
+    \end{tikzcd},
+  \]
+  Now recall that $\qH$ is self-inverse, so $H^2 = I$. Thus, if we apply $\qH \otimes\cdots \otimes \qH$ to $\frac{1}{\sqrt{2^n}}\sum \bket{x}$, then we obtain $\bket{0}\cdots\bket{0}$.
+
+  We write
+  \[
+    \bket{\eta_f} = \qH \otimes \cdots \otimes \qH \bket{\xi_f}.
+  \]
+  Since $\qH$ is unitary, we still have
+  \[
+    \bket{\eta_{f_\mathrm{const}}} \perp \bket{\eta_{f_\mathrm{balanced}}}.
+  \]
+  Now we note that if $f$ is constant, then
+  \[
+    \eta_{f_\mathrm{const}} = \pm \bket{0}\cdots\bket{0}.
+  \]
+  If we look at what $\bket{\eta_{f_\mathrm{balanced}}}$ is, it will be a huge mess, but it doesn't really matter --- all that matters is that it is perpendicular to $\bket{0}\cdots\bket{0}$.
+
+  Now when we measure $\eta_f$, if $f$ is a constant function, then we obtain $0\cdots0$ with probability $1$. If it is balanced, then we obtain something that is not $0$ with probability $1$. So we can determine the result with probability $1$.
+
+  \makeatletter
+  \DeclareRobustCommand{\rvdots}{%
+    \vbox{
+      \baselineskip4\p@\lineskiplimit\z@
+      \kern-\p@
+      \hbox{.}\hbox{.}\hbox{.}
+    }}
+  \newcommand\addstate[3]{
+    \pgfmathsetmacro{\y@y}{-#2 * 0.7};
+    \pgfmathsetmacro{\x@x}{#3};
+    \node [left] at (0, \y@y) {#1};
+    \draw (0, \y@y) -- (\x@x, \y@y);
+  }
+  \newcommand\addoperator[3]{
+    \node [draw, rectangle, fill=white] at (#3, -#2 * 0.7) {#1};
+  }
+  \newcommand\addbigoperator[5]{
+    \pgfmathsetmacro{\y@s}{-#2 * 0.7 + 0.2};
+    \pgfmathsetmacro{\y@t}{-#3 * 0.7 - 0.2};
+    \pgfmathsetmacro{\x@s}{#4};
+    \pgfmathsetmacro{\x@t}{#5};
+    \pgfmathsetmacro{\x@c}{(\x@s + \x@t)/2};
+    \pgfmathsetmacro{\y@c}{(\y@s + \y@t)/2};
+
+    \draw [fill=white] (\x@s, \y@s) rectangle (\x@t, \y@t);
+    \node at (\x@c, \y@c) {#1};
+  }
+  \makeatother
+  \begin{center}
+    \begin{tikzpicture}
+      \addstate{$\bket{0}$}{0}{5};
+      \addstate{$\rvdots\;$}{1}{5};
+      \addstate{$\bket{0}$}{2}{5};
+      \addstate{$\bket{0}$}{3}{5};
+      \addoperator{$\qH$}{0}{1};
+      \addoperator{$\qH$}{1}{1};
+      \addoperator{$\qH$}{2}{1};
+      \addoperator{$\qX$}{3}{0.6};
+      \addoperator{$\qH$}{3}{1.4};
+      \addbigoperator{$U_f$}{0}{3}{2}{3};
+      \addoperator{$\qH$}{0}{4};
+      \addoperator{$\qH$}{1}{4};
+      \addoperator{$\qH$}{2}{4};
+
+      \draw [decorate, decoration={brace, amplitude=6pt}] (-0.8, -1.7) -- (-0.8, 0.2) node [pos=0.5, left] {input\;\;};
+
+      \node [left] at (-0.8, -2.1) {output};
+
+      \draw [decorate, decoration={brace, amplitude=6pt}] (5.2, 0.2) -- (5.2, -1.7) node [pos=0.5, right] {\;\;measure};
+
+      \node [right] at (5.2, -2.1) {discard};
+    \end{tikzpicture}
+  \end{center}
+  This uses exactly one query, with $1 + (n + 1) + n + n = O(n)$ elementary gates.
+
+  Note that for each $a \in B_n$, we can find a special balanced function $f_a$ such that
+  \[
+    \bket{\eta_{f_a}} = \bket{a}.
+  \]
+  This is the so-called BV-problem, on the first example sheet. In fact, these are given by
+  \[
+    f_a(x) = \sum a_i x_i.
+  \]
+  What if we tolerate error in the balanced vs constant problem? In other words, we only require that the answer is correct with probability $1 - \varepsilon$ with $0 < \varepsilon < \frac{1}{2}$.
+
+  In the quantum case, nothing much changes, since we are probably not going to do better than $1$ query. However, we no longer have a huge benefit over classical algorithms. There is a classical randomized algorithm with $O(\log(1/\varepsilon))$ queries, and in particular does not depend on $n$.
+
+  Indeed, we do it the obvious way --- we choose some $K$ $x$-values uniformly at random from $B_n$, say $x_1, \cdots, x_n$ (where $K$ is fixed and determined later). We then evaluate $f(x_1), \cdots, f(x_n)$.
+
+  If all the outputs are the same, then we say $f$ is constant. If they are not the same, then we say $f$ is balanced.
+
+  If $f$ actually is constant, then the answer is correct with probability $1$. If $f$ is balanced, then each $f(x_i)$ is $0$ or $1$ with equal probability. So the probability of getting the same values for all $x_i$ is
+  \[
+    \frac{2}{2^K} = 2^{1 - K}.
+  \]
+  This is our failure probability. So if we pick
+  \[
+    K > \log_2 (\varepsilon^{-1}) + 1,
+  \]
+  then we have a failure probability of less than $\varepsilon$.
+\end{eg}
+
+Can we decide \emph{every} yes/no question about $f: B_n \to B_1$'s by quantum algorithms with ``a few'' queries? The answer is no. One prominent example is the \term{SAT problem} (\term{satisfiability problem}) --- given $f$, is there an $x$ such that $f(x) = 1$? This is an NP-complete problem. It can be shown that any quantum algorithm (even with a probability $1 - \varepsilon$) needs at least $O(\sqrt{2^n})$, which is achieved by Grover's algorithm. Classically, we need $O(2^n)$ queries, so we have achieved a square root speedup, but not as good as the Deutsch-Jozsa algorithm.
+
+In any case, the Deutsch-Jozsa algorithm demonstrates how we can achieve an exponential benefit with quantum algorithms, but it happens only when we have no error tolerance. In real life scenario, external factors will lead to potential errors anyway, and requiring that we are always correct is not a sensible requirement.
+
+\begin{eg}[Simon's algorithm]\index{Simon's algorithm}
+  The \term{Simon's problem} is a promise problem about $f: B_n \to B_n$ with provably exponential separation between claissical ($O(2^{n/4})$) and quantum ($O(n)$) query complexity. The details are on the first example sheet.
+\end{eg}
+
+So these are nice examples of benefits of quantum algorithms. However, oracles are rather unnatural problems --- it is rare to just have a black-box access to a function without knowing anything else about the function.
+
+How about more ``normal'' problems? The issue with trying to compare quantum and classical algorithms for ``normal'' problems is that we don't actually have any method to find the lower bound for the computation complexity. For example, while we have not managed to find polynomial prime factorization algorithms, we cannot prove for sure that there isn't any classical algorithm that is polynomial time. However, for the prime factorization problem, we \emph{do} have a quantum algorithm that does much better than all known classical algorithms. This is \emph{Shor's algorithm}, which relies on the toolkit of the quantum Fourier transform.
+
+\section{Quantum Fourier transform and periodicities}
+
+\begin{defi}[Quantum Fourier transform mod $N$]\index{quantum Fourier transform}
+  Suppose we have an $N$-dimensional state space with basis $\bket{0}, \bket{1}, \cdots, \bket{N - 1}$ labelled by $\Z/N\Z$. The \emph{quantum Fourier transform mod $N$} is defined by
+  \[
+    \qQFT: \bket{a} \mapsto \frac{1}{\sqrt{N}} \sum_{b = 0}^{N - 1} e^{2\pi i ab/N} \bket{b}.
+  \]
+  The matrix entries are
+  \[
+    [\qQFT]_{ab} = \frac{1}{\sqrt{N}} \omega^{ab},\quad \omega = e^{2\pi i/N},
+  \]
+  where $a, b = 0, 1, \cdots, N - 1$. We write \term{$\qQFT_n$} for the quantum Fourier transform mod $n$.
+\end{defi}
+Note that we start counting at $0$, not $1$.
+
+We observe that the matrix $\sqrt{N}\qQFT$ is
+\begin{enumerate}
+  \item Symmetric
+  \item The first (ie. $0$th) row and column are all $1$'s.
+  \item Each row and column is a geometric progression $1, r, r^2, \cdots, r^{n - 1}$, where $r = \omega^k$ for the $k$th row or column.
+\end{enumerate}
+
+\begin{eg}
+  If we look at $\qQFT_2$, then we get our good old $\qH$. However, $\qQFT_4$ is not $H \otimes H$.
+\end{eg}
+
+\begin{prop}
+  $\qQFT$ is unitary.
+\end{prop}
+
+\begin{proof}
+  We use the fact that
+  \[
+    1 + r + \cdots + r^{N - 1} =
+    \begin{cases}
+      \frac{1 - r^N}{1 - r} & r \not= 1\\
+      N & r = 1
+    \end{cases}.
+  \]
+  So if $r = \omega^k$, then we get
+  \[
+    1 + r + \cdots + r^{N - 1} =
+    \begin{cases}
+      0 & k \not\equiv 0 \mod N\\
+      N & k \equiv 0 \mod N
+    \end{cases}.
+  \]
+  Then we have
+  \[
+    (\qQFT^\dagger \qQFT)_{ij} = \frac{1}{\sqrt{N}^2} \sum_k \omega^{-ik} \omega^{jk} =\frac{1}{N} \sum_k \omega^{(j-i)k} =
+    \begin{cases}
+      1 & i = j\\
+      0 & i \not= j
+    \end{cases}.
+  \]
+\end{proof}
+
+Now let's consider the periodicity problem.
+\begin{eg}\index{Periodicity problem}
+  Suppose we are given $f: \Z/N\Z \to Y$. We are promised that $f$ is periodic with some period $r \mid N$, so that
+  \[
+    f(x + r) = f(x)
+  \]
+  for all $x$. We also assume that $f$ is injective in each period, so that
+  \[
+    0 \leq x_1 \not= x_2 \leq r - 1\quad\text{ implies }\quad f(x_1) \not= f(x_2).
+  \]
+  The problem is to find $r$, with any constant level of error $1 - \varepsilon$ independent of $N$. Since this is not a decision problem, we can allow $\varepsilon > \frac{1}{2}$.
+
+  In the classical setting, if $f$ is viewed as an oracle, then $O(\sqrt{N})$ queries are necessary and sufficient. We are going to show that quantumly, $O(\log \log N)$ queries with $O(\mathrm{poly}(\log N))$ processing steps suffice. In later applications, we will see that the relevant input size is $\log N$, not $N$. So the classical algorithm is exponential time, while the quantum algorithm is polynomial time.
+
+  Note that even if $f$ is given by a simple number-theoretic formula, we still often do not have good classical algorithms to find the period.
+
+  The quantum algorithm is given as follows:
+  \begin{enumerate}
+    \item Make $\frac{1}{\sqrt{N}} \sum_{x = 0}^{N - 1} \bket{x}$. For example, if $N = 2^n$, then we can make this using $\qH \otimes \cdots \otimes \qH$. If $N$ is not a power of $2$, it is not immediately obvious how we can make this state, but we will discuss this problem later.
+
+    \item We make one query to get
+      \[
+        \bket{f} = \frac{1}{\sqrt{N}} \sum \bket{x} \bket{f(x)}.
+      \]
+
+    \item We now recall that $r \mid N$, Write $N = Ar$, so that $A$ is the number of periods. We measure the second register, and we will see some $y = f(x_0)$ with $x_0$ being the \emph{least} $x$ with $f(x) = y$, ie. it is in the first period. Note that we don't know what $x_0$ is. We just know what $y$ is.
+
+      By periodicity, we know there are exactly $A$ values of $x$ such that $f(x) = y$, namely
+      \[
+        x_0, x_0 + r, x_0 + 2r, \cdots, x_0 + (A - 1)r.
+      \]
+      By the Born rule, the first register is collapsed to
+      \[
+        \bket{\mathrm{per}} = \left(\frac{1}{\sqrt{A}} \sum_{j = 0}^{A - 1} \bket{x_0 + jr}\right) \bket{f(x_0)}.
+      \]
+      We throw the second register away. Note that $x_0$ is chosen randomly from the first period $0, 1, \cdots, r - 1$.
+
+      What do we do next? If we measure $\bket{\mathrm{per}}$, we obtain a random $j$-value, so what we actually get is a random element ($x_0$th) of a random period ($j$th), namely a uniformly chosen random number in $0, 1, \cdots, N$. This is not too useful.
+
+      The solution is the use the quantum Fourier transform, which is not surprising, since Fourier transforms are classically used to extract periodicity information.
+  \end{enumerate}
+\end{eg}
+
+
 \end{document}
