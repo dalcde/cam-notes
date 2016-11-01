@@ -8,6 +8,9 @@
 \def\nlectures {TTS.12}
 
 \input{header}
+\usepackage{simplewick}
+\usepackage[compat=1.1.0]{tikz-feynman}
+\tikzfeynmanset{/tikzfeynman/momentum/arrow shorten = 0.3}
 
 \begin{document}
 \maketitle
@@ -1287,6 +1290,730 @@ We are now going to introduce one of the most important propagators in quantum f
   \[
     \Delta_F(x - y) = \int \frac{\d^4 p}{(2\pi)^4} \frac{i e^{-ip\cdot(x - y)}}{p^2 - m^2 + i \varepsilon},
   \]
-  where $\varepsilon$ is taken to be small, or infinitesimal. This is known about the ``$i\varepsilon$-prescription''.
+  where $\varepsilon$ is taken to be small, or infinitesimal. This is known about the ``$i\varepsilon$-prescription''. Then the poles are shifted slightly away from the real axis, and we can just integrate along the real axis.
 \end{prop}
+The propagator is in fact the Green's function of the Klein-Gordon operator:
+\begin{align*}
+  (\partial_t^2 - \nabla^2 + m^2) \Delta_F(x - y) &= \int \frac{\d^4 p}{(2\pi)^4} \frac{i}{p^2 - m^2}(-p^2 + m^2) e^{-ip\cdot(x - y)}\\
+  &= -i \int \frac{\d^4 p}{(2\pi)^4} e^{-ip\cdot(x - y)}\\
+  &= -i \delta^4(x - y).
+\end{align*}
+Note that this didn't use the contour!
+
+\subsection{Other propagators}
+For some purposes, it's useful to pick other contours, eg. the \term{retarded Green's function} defined as follows:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-4, 0) -- (4, 0);
+    \draw [->] (0, -2) -- (0, 2);
+
+    \node [circ] at (-2, 0) {};
+    \node [below] at (-2, 0) {$-E_\mathbf{p}$};
+    \node [circ] at (2, 0) {};
+    \node [below] at (2, 0) {$E_\mathbf{p}$};
+
+    \draw [thick, blue] (-4, 0) -- (-2.5, 0) arc (180:0:0.5) -- (1.5, 0) arc(180:0:0.5) -- (4, 0);
+  \end{tikzpicture}
+\end{center}
+This can be given in terms of operators by
+\begin{defi}[Retarded Green's function]
+  The \emph{retarded Green's function} is given by
+  \[
+    \Delta_R(x - y) =
+    \begin{cases}
+      [\phi(x), \phi(y)]& x^0 > y^0\\
+      0 & y^0 > x^0
+    \end{cases}
+  \]
+\end{defi}
+This is useful if we have some initial field configuration, and we want to see how it evolves in the presence of some source. This solves the ``inhomogeneous Klein-Gordon equation'', ie. an equation of the form
+\[
+  \partial_\mu \partial^\mu + m^2 \phi = J(x),
+\]
+where $J(x)$ is some background function.
+
+One also defines the \term{advanced Green's function} which vanishes when $y^0 < x^0$ instead. This is useful if we know the end-point of a field configuration and want to know where it came from. However, in general, the Feynman propagator is the most useful in quantum field theory.
+
+\section{Interacting fields}
+Free theories are special --- we can determine the exact spectrum, but nothing interacts. These facts are related. Free theories have at most quadratic terms in the Lagrangian. So the equations of motion are linear. So we get exact quantization, and we get multi-particle states with no interactions by superposition.
+
+Let's add interaction terms to the Lagrangian --- higher powers of the fields. We want to apply perturbation theory to the system, so we will consider cases where the interactions are \emph{small}. For example, for a real scalar field $\phi$, we can have a Lagrangian
+\[
+  \mathcal{L} = \frac{1}{2} \partial_\mu \phi \partial^\mu \phi - \frac{1}{2}m^2 \phi^2 - \sum_{n = 3}^\infty \frac{\lambda_n}{n!} \phi^n.
+\]
+The constants $\lambda_n$ are the \term{coupling constants}. Recall that $[S] = 0$, and $S = \int \d^4 x \mathcal{L}$. Since $[d^4 x] = -4$, we have $[\mathcal{L}] = 4$.
+Since $[\partial_\mu] = 1$, we know from the $\partial_\mu \phi \partial^\mu \phi$ term that $[\phi] = 1$. Finally, from the $m^2 \phi^2$ term, we have $[m] = 1$, as expected. From this, we deduce that $[\lambda_n] = 4 - n$.
+
+Now which terms are ``small''? We would like to say that $\lambda_n \ll 1$, but this only makes sense if our quantities are dimensionless.
+
+Here there are three classes of terms:
+\begin{enumerate}
+  \item $[\lambda_3] = 1$. If we have some energy scale $E$ for what is going on around us, then we have a dimensionless parameter $\frac{\lambda_3}{E}$. So $\lambda^3 \phi^3/3!$ is a small perturbation at high energies, and large perturbations at low energies.
+
+    This in fact happens in reality, as we have a term like this in the standard model for couplings of the Higgs boson.
+
+    Such perturbations are called \term{relevant perturbation}\emph{s} at low energies. In a relativistic theory, we have $E > m$. So we can always make the perturbation small by picking $\lambda_3 \ll m$, at least when we are working with general theory.
+
+  \item $[\lambda_4] = 0$. This is dimensionless. So this is small $\lambda_4 \ll 1$. This is known as \term{marginal perturbation}.
+
+  \item For all $n > 4$, this has dimensionless parameter $\lambda_n E^{n - 4}$. This is small at low energies, and high at large energies. These operators are called \term{irrelevant perturbation}\emph{s}.
+\end{enumerate}
+While we call them ``irrelevant'', they are indeed relevant, as it is typically difficult to avoid high energies in quantum field theory. Indeed, we have seen that we can have arbitrarily large vacuum fluctuations. We might then expect problems with these irrelevant operators. These are technically non-renormalizable theories. See Advanced Quantum Field Theory for more.
+
+In this course, we will consider only weakly coupled field theories --- one that can truly be considered as small perturbations of the free theory at all energies.
+
+\begin{eg}[$\phi^4$ theory]\index{$\phi^4$ theory}
+  Consider the $\phi^4$ theory
+  \[
+    \mathcal{L} = \frac{1}{2} \partial_\mu \phi \partial^\mu \phi - \frac{1}{2}m^2 \phi^2 - \frac{\lambda}{4!}\phi^4,
+  \]
+  where $\lambda \ll 1$. We can already guess the effects of the final term by noting that here we have
+  \[
+    [H, N] \not= 0.
+  \]
+  So particle number is \emph{not} conserved. Expanding the last term in the Lagrangian in terms of $a_\mathbf{p}, a_\mathbf{p}^\dagger$, we get terms involving things like $a_\mathbf{p} a_\mathbf{p} a_\mathbf{p} a_\mathbf{p}$ or $a_\mathbf{p}^\dagger a_\mathbf{p}^\dagger a_\mathbf{p}^\dagger a_\mathbf{p}^\dagger$ or $a_\mathbf{p}^\dagger a_\mathbf{p}^\dagger a_\mathbf{p}^\dagger a_\mathbf{p}$, and all other combinations you can think of. These will create or destroy particles.
+\end{eg}
+
+\begin{eg}[Scalar Yukawa theory]\index{scalar Yukawa theory}
+  In the early days, we found things called \emph{pions} that seemed to mediate nuclear reactions. At that time, people did not know that things are made up of quarks. So they modelled these pions in terms of scalar field, and we have
+  \[
+    \mathcal{L} = \partial_\mu \psi^* \partial^\mu \psi + \frac{1}{2} \partial_\mu \phi \partial^\mu \phi - M^2 \psi^* \psi - \frac{1}{2} m^2 \phi^2 - g \psi^* \psi \phi.
+  \]
+  Here we have $g \ll m, M$. Here we still have $[Q, H] = 0$, as all terms are at most quadratic in the $\psi$'s. So the number of $\psi$-particles minus the number of $\psi$-antiparticles is still conserved. However, there is no particle conservation for $\phi$.
+
+  A wary --- the potential
+  \[
+    V = M^2 \psi^* \psi + \frac{1}{2} m \phi^2 + g \psi^*\psi \phi
+  \]
+  has a stable local minimum when the fields are zero, but it is unbounded below for large $-g \phi$. So we can't push the theory too far.
+\end{eg}
+The study of strongly coupled field theories is a major research topic in quantum field theory. In some particular solids, we can get charge fractionalization --- Solids contain electrons, and each has $\pm 1$ charges. However, in complicated systems, we can get excitations with fractional charges, and this gives the fractional quantum hall effect. Another topic people study is confinement. We want to figure out what quarks and gluons are always stuck together in mesons and baryons at lower energies. Another issue is emergent gravity --- there are some theories in four dimensions that are somehow equivalent to 10-dimensional quantum gravity. This is known as the \term{AdS/CFT correspondence}, standing for anti-de Sitter space and conformal field theory.
+
+\section{Interaction picture}
+The \emph{interaction picture} is a mixture of the Schr\"odinger picture and the Heisenberg picture, where the simple time evolutions remain in the states, whereas the complicated interactions live in the operators. This is a very useful trick if we want to deal with small interactions.
+
+Recall that in the Schr\"odinger picture, the states evolve with $t$, satisfying
+\[
+  i \frac{\partial}{\partial t}\bket{\psi}_S = H \bket{\psi}_S,
+\]
+while the operators $O_s$ are time independent.
+
+In the Heisenberg picture, the states are fixed but the operators evolve in time, and the operators are rleated by
+\[
+  O_H(t) = e^{iHt}O_s e^{-iHt},
+\]
+while
+\[
+  \bket{\psi}_H = e^{iHt}\bket{\psi}_S.
+\]
+The interaction picture is a hybrid of the two. We split the Hamiltonian up as
+\[
+  H = H_0 + H_{int}.
+\]
+The time dependence of operators is governed by $H_0$, whereas the time dependence of states is controlled by $H_{int}$. Of course, at this moment, this split is arbitrary, but it is useful if we make the right choices. We will choose $H_0$ to be very simple (eg. a free field theory), and this will make our life easy.
+\[
+  \bket{\psi}_I = e^{iH_0 t} \bket{\psi(t)}_S, \quad O_I(T) = e^{iH_0 t} O_S e^{-iH_0 t}.
+\]
+Then we have
+\[
+  H_I = (H_{int})_I = e^{iH_0 t} H_{int} e^{iH_0 t}.
+\]
+What is the right equation of motion? The Schr\"odinger equation is
+\[
+  i \frac{\d \bket{\psi}_S}{\d t} = H_S \bket{\psi}_S.
+\]
+Putting in our definitions, we have
+\[
+  i \frac{\d}{\d t}(e^{-iH_0 t}\bket{\psi}_i) = (H_0 + H_{int})_S e^{-iH_0 t} \bket{\psi}_I.
+\]
+Writing this out and using the chain rule, we are left with
+\[
+  i \frac{\d \bket{\psi}_I}{\d t} = e^{iH_0 t} H_{int} e^{-iH_0 t} \bket{\psi}_I.\tag{$*$}
+\]
+We write
+\[
+  H_I(t) = e^{iH_0 t} H_{int} e^{-iH_0 t} \bket{\psi}_I.
+\]
+\emph{Dyson's formula} tells us to do this: Let's try a solution to $(*)$ given by
+\[
+  \bket{\psi(t)}_I = U(t, t_0) \bket{\psi(t_0)}_I,
+\]
+where $U(t, t_0)$ is the unitary time evolution operator satisfying
+\[
+  U(t_1, t_2) U(t_2, t_3) = U(t_1, t_3),\quad U(t, t) = 1.
+\]
+Then we have
+\[
+  i \frac{\d U}{\d t} = H_I(t) U.
+\]
+If $H_I$ were an ordinary function, we could solve this by
+\[
+  U(t, t_0) = \exp\left(-i \int_{t_0}^t H_I(t') \;\d t'\right).
+\]
+But the trouble is that $H_I$ is an operator, and we have ordering ambiguities, since
+\[
+  [H_I(t'), H_I(t'')] \not= 0
+\]
+for $t' \not= t''$. So what we do is to take that solution as an idea, and order them appropriately.
+\begin{prop}[Dyson's formula]\index{Dyson's formula}
+  The solution to the Schr\"odinger equation in the interaction picture is given by
+  \[
+    U(t, t_0) = T\exp\left(-i \int_{t_0}^t H_I(t') dt'\right),
+  \]
+  where $T$ stands for \term{time ordering}: operators evaluated at earlier times appear on the RHS when we write out the power series. More explicitly,
+  \[
+    T\{O_1(t_1) O(t_2)\} =
+    \begin{cases}
+      O_1(t_1) O_2(t_2) & t_1 > t_2\\
+      O_2(t_2) O_1(t_1) & t_2 > t_1
+    \end{cases}.
+  \]
+  We do not specify what happens when $t_1 = t_2$, but it doesn't matter in our case since the operators are then equal.
+
+  Thus, we have
+  \begin{multline*}
+    U(t, t_0) = 1 - i \int_{t_0}^t H_I (t') \d t' + \frac{(-i)^2}{2} \left\{\int_{t_0}^t \d t' \int_{t'}^t H_I(t'') H_I(t')\right.\\
+    \left.+ \int_{t_0}^t \d t' \int_{t_0}^{t'} \d t''\; H_I(t') + H_I(t'')\right\} + \cdots.
+  \end{multline*}
+  We now notice that a simple relabelling shows that the last two terms are actually the same thing. So we have
+  \[
+    U(t, t_0) = 1 - i \int_{t_0}^t H_I (t') \d t' + (-i)^2 \int_{t_0}^t \d t' \int_{t'}^t \d t'' \; H_I(t'') H_I(t') + \cdots.
+  \]
+\end{prop}
+
+\begin{proof}
+  Under this time ordering, all operators commute, since their order is already fixed. So we have
+  \begin{align*}
+    i\frac{\d}{\d t}\left(T\exp\left(-i \int_{t_0}^t \d t'\; H_I (t')\right)\right) &= T\left(H_I(t) \exp\left(-i \int_{t_0}^t \d t' H_I(t')\right)\right)\\
+    &= H_I(t_0) T \exp\left(-i \int_{t_0}^t H_I(t')\right).
+  \end{align*}
+  This works because $t$ is on the upper limit of the integral is the latest time, so we can pull $H_I(t)$ to the LHS.
+\end{proof}
+This result isn't too practically useful, since the time-ordered exponential is typically very difficult to compute. However, if we work with small perturbations, we can just use the power series and take the first few terms.
+
+\subsection{A first look at scattering}
+We are now going to apply the interaction picture to QFT, starting with
+\[
+  H_{int} = g\psi^* \psi \phi
+\]
+We can expand $\phi$ in terms of the creation and annihilation operators $a$ and $a^\dagger$. We will use this to describe the creation and destruction of mesons.
+
+Similarly, we can expand $\psi$ in terms $b$ and $c^\dagger$, which destroys a particle, or creates an antiparticle, and $\psi^*$ can be expanded in terms of $b^\dagger$ and $c$. We imagine that the particles represented by $\psi$ are nucleons.
+
+Recall that the particle number is not conserved, but the charge $Q = N_c - N_b$ is.
+
+At first order in perturbation theory, we have terms like $b^\dagger c^\dagger a$. This destroys a meson and produces a $\psi \bar{\psi}$ pair (where $\bar{\psi}$ is the anti-$\psi$). This contributes to meson decay $\phi \to \psi + \bar{\psi}$.
+
+We can draw a picture of this:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->-=0.6] (0, 0) node [left] {$\phi$} -- (1.5, 0);
+    \draw [->-=0.6] (1.5, 0) -- (3, 1) node [right] {$\psi$};
+    \draw [->-=0.6] (1.5, 0) -- (3, -1) node [right] {$\bar{\psi}$};
+  \end{tikzpicture}
+\end{center}
+At second order in perturbation theory, we have more complicated terms like $(c^\dagger b^\dagger a)(cba^\dagger)$. This gives rise to a scattering process
+\[
+  \psi + \bar{\psi} \to \phi \to \psi + \bar{\psi}.
+\]
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->-=0.6] (-1.5, 1) node [left] {$\psi$} -- (0, 0);
+    \draw [->-=0.6] (-1.5, -1) node [left] {$\bar{\psi}$} -- (0, 0);
+    \draw [->-=0.6] (0, 0) -- (1.5, 0) node [pos=0.5, above] {$\phi$};
+    \draw [->-=0.6] (1.5, 0) -- (3, 1) node [right] {$\psi$};
+    \draw [->-=0.6] (1.5, 0) -- (3, -1) node [right] {$\bar{\psi}$};
+  \end{tikzpicture}
+\end{center}
+To calculate the amplitudes, we will make an important assumption that the particles do not interact before and after the scattering, and they behave like free particles. This means the initial state $\bket{i}$ at $t \to -\infty$ and the final state $\bket{f}$ at $t \to \infty$ are eigenstates of the free Hamiltonian $H_0$ and the particle number $N$. It's plausible since at $t = \pm \infty$, the states are well-separated in space, and they don't feel the effect of each other.
+
+As the paths approach each other, they interact before departing again, each going on its own way. The amplitude to go from $\bket{i} \to \bket{f}$ is
+\[
+  \lim_{t_{\pm} \to \pm \infty} \brak{f} O(t_+, t_-) \bket{i} \equiv \brak{f}S\bket{i}.
+\]
+The operator $S$ is a unitary operator known as the \term{$S$-matrix}, for ``scattering''.
+
+There are some caveats with the assumption that they initial and final states do not interact, and sometimes we have to deal with these separately. For example, if we want to break up a proton to see what is going on in there, we certainly do not have an initial free state.
+
+The bound states show up as poles in the $S$-matrix.
+
+\begin{eg}
+  We want to find the probability of
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->-=0.6] (0, 0) node [left] {$\phi$} -- (1.5, 0);
+      \draw [->-=0.6] (1.5, 0) -- (3, 1) node [right] {$\psi$};
+      \draw [->-=0.6] (1.5, 0) -- (3, -1) node [right] {$\bar{\psi}$};
+    \end{tikzpicture}
+  \end{center}
+  happening. We have
+  \begin{align*}
+    \bket{i} = \sqrt{2E_\mathbf{p}} a_\mathbf{p}^\dagger \bket{0}\\
+    \bket{f} = \sqrt{4E_{\mathbf{q}_1} E_{\mathbf{q}_2}} b_{\mathbf{q}_1}^\dagger c_{\mathbf{q}_2}^{\dagger} \bket{0}.
+  \end{align*}
+  The transition corresponds to the $c^\dagger b^\dagger a$ term. We then have
+  \begin{align*}
+    \brak{f}S\bket{i} ={}& -ig \brak{f} \int \d^4 x \psi^\dagger(x) \psi(x) \phi(x)\bket{i}\\
+    ={}& -ig \brak{f} \int \d^4 x \psi^\dagger(x) \psi(x) \int \frac{\d^3 k}{(2\pi)^3} \sqrt{\frac{2E_\mathbf{p}}{2 E_\mathbf{k}}}a_\mathbf{k}a_\mathbf{p}^\dagger e^{-ik\cdot x}\bket{0}\\
+    \intertext{Since $a_\mathbf{k}$ and $a_\mathbf{p}$ commute for $\mathbf{k} \not= \mathbf{p}$, we get}
+    ={}& -ig \brak{f} \int \d^4 x \psi^\dagger(x) \psi(x) e^{-ip\cdot x} \bket{0}\\
+    ={}& -ig \brak{0} \int \d^4 x \int \frac{\d^3 k_1}{(2\pi)^3} \frac{\d^3 k_2}{(2\pi)^3} \frac{\sqrt{4E_{\mathbf{q}_1} E_{\mathbf{q}_2}}}{\sqrt{4 E_{\mathbf{k}_1} e_{\mathbf{k}_2}}}\\
+    &\hphantom{-ig \brak{0} \int \d^4 x \int \frac{\d^3 k_1}{(2\pi)^3} \frac{\d^3 k_2}{(2\pi)^3}}( c_{\mathbf{q}_2} b_{\mathbf{q}_1} c_{\mathbf{k}_1}^\dagger b_{\mathbf{k}_2}^\dagger - \cdots) e^{i(k_1 + k_2 - p)\cdot x}\bket{0}\\
+    ={}& -ig \brak{0} \int \d^4 x e^{i(q_1 + q_2 - p) \cdot x} \bket{0}\\
+    ={}& -ig \delta^4 (q_1 + q_2 - p) (2\pi)^4
+  \end{align*}
+  We see that the transition probability is proportional to $g$, and also that the $\delta^4$ function imposes momentum conservation.
+\end{eg}
+
+\subsection{Wick's theorem}
+We want to compute
+\[
+  \bket{f}T\{H_I(x_1) \cdots H(x_N)\}\brak{i},
+\]
+where $\bket{i}$ and $\bket{f}$ are eigenstates of the free theory. The $H_I$'s contain creation and annihilation operators, so life will be made easier if we arrange the annihilation ones on the RHS so that things just die. This is where normal ordering comes in. So we want to figure out how we can get from normal-ordered products to time-ordered products.
+
+Consider a real scalar field $\phi = \phi^+ + \phi^-$, where
+\[
+  \phi^+ = \int \frac{\d^3 \mathbf{p}}{(2\pi)^3} \frac{1}{\sqrt{2 E_\mathbf{p}}} a_\mathbf{p} e^{-i\mathbf{p}\cdot \mathbf{x}},\quad \phi^-(x) = \int \frac{\d^3 \mathbf{p}}{(2\pi)^3} \frac{1}{\sqrt{2 E_\mathbf{p}}} a_\mathbf{p}^\dagger e^{ip\cdot x}.
+\]
+Then when $x^0 > y^0$, then we have
+\begin{align*}
+  T\phi(x) \phi(y) ={}& \phi(x) \phi(y)\\
+  ={}& (\phi^+(x) + \phi^-(x))(\phi^+(y) + \phi^-(y))\\
+  ={}& \phi^+(x)\phi^+(y) + \phi^-(x) \phi^+(y) + [\phi^+(x), \phi^-(y)] \\
+  &\hphantom{\phi^+(x)\phi^+(y) + \phi^-(x) \phi^+(y) + [}+ \phi^-(y) \phi^+(x) + \phi^-(x) \phi^-(y).
+\end{align*}
+So we have
+\[
+  T\phi(x) \phi(y) = :\phi(x) \phi(y): + D(x - y).
+\]
+Meanwhile, for $y^0 > x^0$, we have
+\[
+  T\phi(x) \phi(y) = :\phi(x)\phi(y): + D(y - x).
+\]
+Recalling the definition of the Feynman propagator, we have
+\[
+  T(\phi(x)\phi(y)) = :\phi(x) \phi(y): + \Delta_F(x - y).
+\]
+Note that $T \phi(x) \phi(y)$ and $:\phi(x) \phi(y):$ are both operators, but the difference between them $\Delta_F$ is just a c-number-valued function.
+
+We have just proved the Wick's theorem in this special case. We are now going to state the general case. Before that, we need a definition.
+\begin{defi}[Contraction of fields]\index{contraction of fields}\index{field!contraction}
+  A \emph{contraction} of a pair of real fields in a string of operators
+  \[
+    \cdots\phi_1(x_1) \cdots \phi_2(x_2) \cdots
+  \]
+  is written as
+  \[
+    \contraction{\cdots}{\phi}{(x_1) \cdots}{\phi}\cdots\phi(x_1) \cdots \phi(x_2) \cdots
+  \]
+  and is performed by replacing the two operators with some c-function. In the case of real scalar fields with $\phi_1 = \phi_2$, this is given by
+  \[
+    \contraction{}{\phi}{(x_1)}{\phi}\phi(x_1)\phi(x_2) = \Delta_F(x_1 - x_2).
+  \]
+  Note that the two fields don't have to be adjacent, and we don't have to worry where to place the $c$-function, since it commutes with everything.
+
+  For a complex scalar field, we define
+  \[
+    \contraction{}{\psi}{(x)}{\psi^\dagger}\psi(x) \psi^\dagger(y) = \Delta_F(x - y) = \contraction{}{\psi^\dagger}{(u)}{\psi}\psi^\dagger(y) \psi(x),
+  \]
+  whereas
+  \[
+    \contraction{}{\psi}{(x)}{\psi} \psi(x) \psi(y) = 0 =\contraction{}{\psi^\dagger}{(x)}{\psi^\dagger} \psi^\dagger(x) \psi^\dagger(y).
+  \]
+\end{defi}
+
+\begin{thm}[Wick's theorem]\index{Wick's theorem}
+  For any collection of fields $\phi_1 = \phi_1(x_1), \phi_2 = \phi_2(x_2), \cdots$, we have
+  \[
+    T(\phi_1 \cdots \phi_n) = :\phi_1 \phi_2 \cdots \phi_n: + \text{ all possible contractions}
+  \]
+\end{thm}
+
+\begin{eg}
+  We have
+  \[
+    T(\phi_1 \phi_2 \phi_3 \phi_4) = :\phi_1 \phi_2 \phi_3 \phi_4: + \contraction{}{\phi_1}{}{\phi_2}\phi_1 \phi_2 : \phi_3 \phi_4: + \contraction{}{\phi_1}{}{\phi_3}\phi_1 \phi_3:\phi_2 \phi_4: + \cdots + \contraction{}{\phi_1}{\phi_2}{\phi_3}\contraction[1.5ex]{\phi_1}{\phi_2}{\phi_3}{\phi_4}\phi_1\phi_2\phi_3\phi_4\cdots
+  \]
+\end{eg}
+
+\begin{proof}
+  We have already shown that this is true for $n = 2$. Suppose this is true for $\phi_2 \cdots \phi_{n - 1}$, and now add $\phi_1$ with
+  \[
+    x_1^0 > x_k^0 \text{ for all }k \in \{2, \cdots, n\}.
+  \]
+  Then we have
+  \[
+    T(\phi_1 \cdots \phi_n) = (\phi_1^+ + \phi_1^-)(:\phi_2 \cdots \phi_n: + \text{ other contractions}).
+  \]
+  The $\phi^-$ term stays where it is, as that already gives normal ordering, and the $\phi_1^+$ term has to make its way past the $\phi_k^-$ operators. So we can write the RHS as a normal-ordered product. Each time we move past the $\phi_k^-$, we pick up a contraction $\contraction{}{\phi_1}{}{\phi_n}\phi_1\phi_n$.
+\end{proof}
+
+\begin{eg}
+  We now consider the more complicated problem of nucleon scattering
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [->-=0.6] (-1.5, 1) node [left] {$p_1$} -- (0, 0);
+      \draw [->-=0.6] (-1.5, -1) node [left] {$p_2$} -- (0, 0);
+      \draw [fill=mblue, opacity=0.5] (1.5, 0) ellipse (1.5 and 0.4);
+      \node at (1.5, 0) {something happens};
+      \draw [->-=0.6] (3, 0) -- (4.5, 1) node [right] {$p_1'$};
+      \draw [->-=0.6] (3, 0) -- (4.5, -1) node [right] {$p_2'$};
+    \end{tikzpicture}
+  \end{center}
+  Then we have initial and final states
+  \begin{align*}
+    \bket{i} &= \sqrt{4 E_{\mathbf{p}_1} E_{\mathbf{p}_2}} b_{\mathbf{p}_1}^\dagger b_{\mathbf{p}_2}^\dagger\bket{0}\\
+    \bket{i} &= \sqrt{4 E_{\mathbf{p}_1'} E_{\mathbf{p}_2'}} b_{\mathbf{p}_1'}^\dagger b_{\mathbf{p}_2'}^\dagger\bket{0}
+  \end{align*}
+  We look at the order $g^2$ term in $\brak{f}(S - I)\bket{i}$. We remove that $I$ as we are not interested in the case with no scattering, and we look at order $g^2$ because there is no order $g$ term.
+
+  The second order term is given by
+  \[
+    \frac{(-ig)^2}{2}\int \d^4 x_1 \d^4 x_2 T\left[\psi^+(x_1) \psi(x_1) \phi(x_1) \psi^+(x_2) \psi(x_2) \phi(x_2)\right].
+  \]
+  Using Wick's theorem, there is a term in the string which is
+  \[
+    :\psi^\dagger(x_1) \psi(x_1) \psi^\dagger(x_2) \psi(x_2): \contraction{}{\phi}{(x_1)}{\phi}\phi(x_1)\phi(x_2).
+  \]
+  This contributes to the scattering because the two $\psi$ fields annihilate the initial $\psi$'s, whereas the $\psi^\dagger$'s create the final $\psi$'s. We can compute
+  \begin{align*}
+    &\brak{p_1', p_2'} ;\psi^\dagger(x_1) \psi(x_1) \psi^\dagger(x_2) \psi(x_2):\bket{p_1, p_2}\\
+    \intertext{After some dreadful expansion in terms of creation and annihilation operators, we find that this is equal to}
+    ={}&\brak{p_1', p_2'}:\psi^\dagger(x_1) \psi^\dagger(x_2):\bket{0} \brak{0}:\psi(x_1) \psi(x_2):\bket{p_1, p_2}\\
+    ={}& (e^{ip_1' \cdot x_1 + i p_2' \cdot x_2} + e^{i p_1' \cdot x_2} + e^{ip_1' \cdot x_2 + p_2' \cdot x_1})(e^{-ip_1 \cdot x_1 - i p_2 \cdot x_2} + e^{-i p_1 \cdot x_2} - e^{-ip_2 \cdot x_1})\\
+    ={}& e^{ix_1 \cdot (p_1' - p_1) + i x_2 \cdot (p_2' - p_2)} + e^{ix_1(p_2' - p_1) + i x_1 (p_1' - p_1)}
+  \end{align*}
+  Plus what we obtain by swapping $x_1$ and $x_2$.
+
+  Putting this into the integral, we get
+  \[
+    \frac{(-ig)^2}{2}\int \d^4 x_1 \d^4 x_2 (\text{things}) + \int \frac{\d^4 k}{(2\pi)^4} \frac{e^{ik\cdot(x_1 - x_2)}}{k^2 - m^2 + i \varepsilon}.
+  \]
+  The $x_1x_2$ integrals give us delta functions. So we get
+  \begin{align*}
+    &(-ig)^2 \int \frac{\d^4 k}{(2\pi)^4} \frac{i (2\pi)^8}{k^2 - m^2 + i \varepsilon} \\
+    &\hphantom{(-ig)^2 \int}(\delta^4(p_1' - p_1 + k) \delta^4(p_2' - p_2 - k) + \delta^4(p_2' - p_1 + k) \delta^4(p_1' - p_2 - k))\\
+    ={}& (-ig)^2 \left(\frac{i}{(p_1 - p_1')^2 - m^2} + \frac{i}{(p_1 - p_2')^2 - m^2} - m^2\right)\\
+    &\hphantom{(-ig)^2 \frac{i}{(p_1 - p_1')^2 - m^2} + \frac{i}{(p_1 - p_2')^2 - m^2}}(2\pi)^4 \delta^4(p_1 + p_2 - p_1' - p_2').
+  \end{align*}
+  What we see again is a $\delta$-function that enforces momentum conservation.
+\end{eg}
+As we've seen, this is tedious. We will see that there is an equivalent and easier to do this using Feynman diagrams. We draw diagrams to represent the expansion of $\brak{f}S\bket{i}$, and learn to associate numbers (or integrals) to them.
+
+\subsection{Feynman diagrams}
+We first describe the \term{Feynman diagrams} in words, then look at some examples.
+
+The terms in the expansion can be represented pictorially as
+\begin{itemize}
+  \item Draw an external line for all particles in the initial and final states.
+  \item Assign a directed momentum $p$ to each line, ie. an arrow into or out of the diagram to each line.
+
+    We add an arrow for each $\psi$-particle to denote its charge: we chosen an incoming (outgoing) arrow in the initial state in the initial state for $\psi$ ($\bar{\psi}$ resp), and the reverse for the final state.
+  \item Join the lines together with vertices to denote interactions
+    \begin{center}
+      \begin{tikzpicture}
+        \begin{feynman}
+          \vertex (i) {$\psi$};
+          \vertex [right=of i] (a);
+          \vertex [above right=of a] (f1) {$\psi$};
+          \vertex [below right=of a] (f2) {$\bar{\psi}$};
+
+          \diagram* {
+            (i) -- [scalar] (a),
+            (f1) -- [fermion] (a) -- [fermion] (f2),
+          };
+        \end{feynman}
+      \end{tikzpicture}
+    \end{center}
+    Here the left dashed line represents $\phi$, the bottom-right arrow denotes $\psi^\dagger$, and the top-right arrow denotes $\psi$. Here the arrows matching up show that charge is conserved.
+
+    We can add arrows to denote the momentum:
+    \begin{center}
+      \begin{tikzpicture}
+        \begin{feynman}
+          \vertex (i) {$\psi$};
+          \vertex [right=of i] (a);
+          \vertex [above right=of a] (f1) {$\psi$};
+          \vertex [below right=of a] (f2) {$\bar{\psi}$};
+
+          \diagram* {
+            (i) -- [scalar, momentum=$p$] (a),
+            (f2) -- [fermion, reversed momentum=$p_2$] (a) -- [fermion, momentum=$p_1$] (f1),
+          };
+        \end{feynman}
+      \end{tikzpicture}
+    \end{center}
+\end{itemize}
+The allowed interactions are the terms present in the Lagrangian. For example, since we have a $\psi^\dagger\psi \phi$ term, we allow interactions that look like this:
+\begin{center}
+  \begin{tikzpicture}
+    \begin{feynman}
+      \vertex (i) {$\psi$};
+      \vertex [right=of i] (a);
+      \vertex [above right=of a] (f1) {$\psi$};
+      \vertex [below right=of a] (f2) {$\bar{\psi}$};
+
+      \diagram* {
+        (i) -- [scalar] (a),
+        (f1) -- [fermion] (a) -- [fermion] (f2),
+      };
+    \end{feynman}
+  \end{tikzpicture}
+\end{center}
+The idea is that each such diagram is in one-to-one correspondence with a term in $\brak{f}(S - 1)\bket{i}$.
+
+For example, if we look at $\psi + \psi \to \psi + \psi$, the simplest diagram is
+\begin{center}
+  \begin{tikzpicture}
+    \begin{feynman}
+      \vertex (i1) {$\phi$};
+      \vertex [below=of i1] (i2) {$\phi$};
+
+      \vertex [right=of i1] (m1);
+      \vertex [right=of m1] (f1) {$\phi$};
+      \vertex [right=of i2] (m2);
+      \vertex [right=of m2] (f2) {$\phi$};
+
+      \diagram* {
+        (i1) -- [fermion] (m1) -- [fermion] (f1),
+        (i2) -- [fermion] (m2) -- [fermion] (f2),
+        (m1) -- [scalar] (m2),
+      };
+    \end{feynman}
+  \end{tikzpicture}
+\end{center}
+On the other hand, to enforce Bose statistics, we should also swap the directions:
+\begin{center}
+  \begin{tikzpicture}
+    \begin{feynman}
+      \vertex (i1) {$\phi$};
+      \vertex [below=of i1] (i2) {$\phi$};
+
+      \vertex [right=of i1] (m1);
+      \vertex [right=of m1] (f1) {$\phi$};
+      \vertex [right=of i2] (m2);
+      \vertex [right=of m2] (f2) {$\phi$};
+
+      \diagram* {
+        (i1) -- [fermion] (m1) -- [fermion] (f2),
+        (i2) -- [fermion] (m2) -- [fermion] (f1),
+        (m1) -- [scalar] (m2),
+      };
+    \end{feynman}
+  \end{tikzpicture}
+\end{center}
+These are the ones that correspond to second-order terms. They are called the \term{Bom approximation}.
+
+There are also more complicated ones such as
+\begin{center}
+  \begin{tikzpicture}
+    \begin{feynman}
+      \vertex (i1) {$\phi$};
+      \vertex [below=1.8cm of i1] (i2) {$\phi$};
+
+      \vertex [right=of i1] (m1);
+      \vertex [right=of m1] (f1) {$\phi$};
+      \vertex [right=of i2] (m2);
+      \vertex [right=of m2] (f2) {$\phi$};
+
+      \vertex [below=0.5cm of m1] (c1);
+      \vertex [below=0.8cm of c1] (c2);
+
+      \diagram* {
+        (i1) -- [fermion] (m1) -- [fermion] (f1),
+        (i2) -- [fermion] (m2) -- [fermion] (f2),
+        (m1) -- [scalar] (c1) -- [fermion, half left] (c2) -- [fermion, half left] (c1),
+        (c2) -- [scalar] (m2),
+      };
+    \end{feynman}
+  \end{tikzpicture}
+\end{center}
+This is a \term{1-loop diagram}. We can also have a \term{2-loop diagram}:
+\begin{center}
+  \begin{tikzpicture}
+    \begin{feynman}
+      \vertex (i1) {$\phi$};
+      \vertex [below=1.8cm of i1] (i2) {$\phi$};
+
+      \vertex [right=of i1] (m1);
+      \vertex [right=of m1] (f1) {$\phi$};
+      \vertex [right=of i2] (m2);
+      \vertex [right=of m2] (f2) {$\phi$};
+
+      \vertex [below=0.5cm of m1] (c1);
+      \vertex [below=0.8cm of c1] (c2);
+
+      \vertex [below right=0.4cm and 0.4cm of c1] (r);
+      \vertex [below left=0.4cm and 0.4cm of c1] (l);
+      \diagram* {
+        (i1) -- [fermion] (m1) -- [fermion] (f1),
+        (i2) -- [fermion] (m2) -- [fermion] (f2),
+        (m1) -- [scalar] (c1) -- [fermion, half left] (c2) -- [fermion, half left] (c1),
+        (c2) -- [scalar] (m2),
+        (r) -- [scalar] (l),
+      };
+    \end{feynman}
+  \end{tikzpicture}
+\end{center}
+
+If we ignore the loops, we say we are looking at the \term{tree level}.
+
+To each such diagram, we associate a number using the \term{Feynman rules}.
+\begin{enumerate}
+  \item To each internal line $i$, we assign a momentum $k_i$.
+  \item To each vertex $x$, we write a factor $(-ig)(2\pi)^4 \delta^4(\sum_i k_i)$, where the sum goes through all lines going into the vertex (and put a negative sign for those going out).
+  \item For each internal line with momentum $k$, we have a factor
+    \[
+      \int \frac{\d^4 k}{(2\pi)^4} D(k^2),
+    \]
+    where
+    \begin{align*}
+      D(k^2) &= \frac{i}{k^2 - m^2 + i\varepsilon}\text{ for }\phi\\
+      D(k^2) &= \frac{i}{k^2 - \mu^2 + i\varepsilon}\text{ for }\psi
+    \end{align*}
+\end{enumerate}
+
+\begin{eg}
+  We again look at
+  We consider the case where $g$ is small. Then only the simple diagrams with very few vertices matter.
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{feynman}
+        \vertex (i1) {$\phi$};
+        \vertex [below=of i1] (i2) {$\phi$};
+
+        \vertex [right=of i1] (m1);
+        \vertex [right=of m1] (f1) {$\phi$};
+        \vertex [right=of i2] (m2);
+        \vertex [right=of m2] (f2) {$\phi$};
+
+        \diagram* {
+          (i1) -- [fermion, momentum=$p_1$] (m1) -- [fermion, momentum=$p_1'$] (f1),
+          (i2) -- [fermion, momentum'=$p_2$] (m2) -- [fermion, momentum'=$p_2'$] (f2),
+          (m1) -- [scalar, momentum'=$k$] (m2),
+        };
+      \end{feynman}
+    \end{tikzpicture}
+    \quad
+    \begin{tikzpicture}
+      \begin{feynman}
+        \vertex (i1) {$\phi$};
+        \vertex [below=of i1] (i2) {$\phi$};
+
+        \vertex [right=of i1] (m1);
+        \vertex [right=of m1] (f1) {$\phi$};
+        \vertex [right=of i2] (m2);
+        \vertex [right=of m2] (f2) {$\phi$};
+
+        \diagram* {
+          (i1) -- [fermion, momentum=$p_1$] (m1) -- [fermion, momentum=$p_1'$] (f2),
+          (i2) -- [fermion, momentum'=$p_1'$] (m2) -- [fermion, momentum'=$p_2'$] (f1),
+          (m1) -- [scalar, momentum'=$k$] (m2),
+        };
+      \end{feynman}
+    \end{tikzpicture}
+  \end{center}
+  As promised by the Feynman rules, the two diagrams give us
+  \[
+    (-ig)^2 (2\pi)^8(\delta^4(p_1 - p_1' - k) \delta^4(p_2 + k - p_2') + \delta^4(p_1 - p_2' - k)\delta^4(p_2 + k - p_1').
+  \]
+  Now integrating gives us the formula
+  \begin{multline*}
+    (-ig)^2 \int \frac{\d^4 k}{(2\pi)^4} \frac{(2\pi)^8 i}{k^2 - m^2 + i \varepsilon} (\delta^4(p_1 - p_1' - k) \delta^4(p_2 + k - p_2') \\
+    + \delta^4(p_1 - p_2' - k)\delta^4(p_2 + k - p_1')).
+  \end{multline*}
+  Doing the integral gives us the desired result.
+\end{eg}
+There is a nice physical interpretation of the diagrams. We can interpret the first diagram as saying that the nucleons exchange a meson of momentum $k = p_1 - p_1' = p_2 - p_2'$. This meson doesn't necessarily satisfy the relation $k^2 = m^2$. When this happens, we say it is \term{off-shell}, or that it is a \term{virtual meson}. Heuristically, it can't live long enough for its energy to be measured accurately. In contrast, the external legs are \term{on-shell}, so they satisfy $p_i^2 = m^2$.
+
+\subsection{Amplitudes}
+It is easy to perform the integral in the $\psi + \psi \to \psi + \psi$ at order $g^2$. We define the \term{amplitude} $\mathcal{A}_{f,i}$ as what we get by stripping off all the $4$-momentum conserving $\delta$-functions (this $\delta$-function follows from translational invariance, and is common to all $S$-matrix elements). So we have
+\[
+  \brak{f}S - I\bket{i} = i \mathcal{A}_{f,i}a (2\pi)^4 \delta^4 (p_F - p_I),
+\]
+where $p_F$ is the sum of final state $4$-momenta, and $F_I$ is the sum of initial state $4$-momenta. The factor of $i$ sticking out is by convention, to match with non-relativistic quantum mechanics.
+
+We can now define our Feynman rules to compute $\mathcal{A}_{f, i}$.
+
+\begin{itemize}
+  \item Draw all possible diagrams with the appropriate external legs and impose $4$-momentum conservation at each vertex.
+  \item Write a factor $(-ig)$ for each vertex.
+  \item For each internal line, factor in the propagator.
+  \item Integrate over $4$-momentum $k$ flowing in each loop.
+\end{itemize}
+
+\begin{eg}[Nucleon-antinucleon scattering]
+  Consider another tree-level process
+  \[
+    \psi + \bar{\psi} \to \phi + \phi.
+  \]
+  We have a diagram of the form
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{feynman}
+        \vertex (i1) {$\psi$};
+        \vertex [below=of i1] (i2) {$\bar{\psi}$};
+
+        \vertex [right=of i1] (m1);
+        \vertex [right=of m1] (f1) {$\phi$};
+        \vertex [right=of i2] (m2);
+        \vertex [right=of m2] (f2) {$\phi$};
+
+        \diagram* {
+          (i1) -- [fermion, momentum=$p_1$] (m1) -- [scalar, momentum=$p_1'$] (f1),
+          (f2) -- [scalar, rmomentum=$p_2'$] (m2) -- [fermion, rmomentum=$p_2$] (i2),
+          (m1) -- [fermion] (m2),
+        };
+      \end{feynman}
+    \end{tikzpicture}
+  \end{center}
+  and a similar one with the two $\phi$ particles crossing.
+
+  The two diagrams then say
+  \[
+    \mathcal{A} = (-ig)^2 \left(\frac{1}{(p_1 - p_1')^2 - \mu^2} + \frac{1}{(p_2 - p_2')^2 - \mu^2}\right).
+  \]
+  Note that we dropped the $i\varepsilon$ terms in the denominator because the denominator never vanishes.
+\end{eg}
+
+\begin{eg}[Meson scattering]
+  Consider
+  \[
+    \phi + \phi \to \phi + \phi.
+  \]
+  This is a bit more tricky. There is no tree-level diagram we can draw. The best we can get is a box diagram like this:
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{feynman}
+        \vertex (i1) {$\psi$};
+        \vertex [below=of i1] (i2) {$\bar{\psi}$};
+
+        \vertex [right=of i1] (m1);
+        \vertex [right=of m1] (n1);
+        \vertex [right=of n1] (f1) {$\phi$};
+        \vertex [right=of i2] (m2);
+        \vertex [right=of m2] (n2);
+        \vertex [right=of n2] (f2) {$\phi$};
+
+        \diagram* {
+          (i1) -- [scalar, momentum=$p_1$] (m1),
+          (i2) -- [scalar, momentum'=$p_2$] (m2),
+          (n1) -- [scalar, momentum=$p_1'$] (f1),
+          (n2) -- [scalar, momentum'=$p_2'$] (f2),
+
+          (n1) -- [anti fermion, momentum=$k$] (n2) -- [anti fermion, momentum=$k - p_2'$] (m2) -- [anti fermion, momentum=$k + p_1' - p_1$] (m1) -- [anti fermion, momentum=$k + p_1'$] (n1);
+        };
+      \end{feynman}
+    \end{tikzpicture}
+  \end{center}
+  We then integrate through all possible $k$.
+
+  This particular graph we've written down gives
+  \begin{multline*}
+    i\mathcal{A} = (-ig)^4 \int \frac{\d^4 k}{(2\pi)^4}\\\frac{i^4}{(k^2 - \mu^2 + i\varepsilon)((k + p_1')^2 + \mu^2 + i\varepsilon)((k + p_1' - p_1)^2 - \mu^2 + i \varepsilon)((k - p_2)^2 - \mu^2 + i \varepsilon)}.
+  \end{multline*}
+  For large $k$, this asymptotically tends to $\int \frac{\d^4 k}{k^8}$, which fortunately converges. However, this is usually not the case. For example, we might have $\frac{\d^4k}{k^4}$, which diverges, or even $\int \frac{\d^4 k}{k^2}$. This is when we need to do renormalization.
+\end{eg}
+\printindex
 \end{document}

@@ -837,6 +837,10 @@ Making some simple coordinate scaling, this becomes
 \]
 There is also another motivation for this from differential geometry. It turns out solutions to the sine-Gordon equation correspond to pseudospherical surfaces in $\R^3$, namely the surfaces that have constant zero curvature.
 
+If we pick ``light cone coordinates'' $\xi = \frac{1}{2}(x - t)$ and $\tau = \frac{1}{2}(x + t)$, then the sine-Gordon equations become
+\[
+  \frac{\partial^2}{\partial \xi \partial\tau}u = \sin u.
+\]
 This also admits solitons solutions
 \[
   u(x, t) = 4 \tan^{-1} \left(\exp\left(\frac{x - vt}{\sqrt{1 - v^2}}\right)\right).
@@ -853,10 +857,586 @@ It turns out these solutions look like
 
     \draw [dashed] (-8, 2) -- +(16, 0);
     \node [anchor = north east] at (-4, 2) {$2\pi$};
-% \draw [domain=0.01:0.99, thick, blue] plot [smooth] (\x, {2 * (exp(- 1 / (\x * \x)))/((exp(- 1 / (\x * \x))) + (exp(- 1 / ((1 - \x) * (1 - \x)))))});
-  \end{tikzpicture} % max is 2pi
+  \end{tikzpicture}
 \end{center}
 Now remember that $\theta$ was an angle. So $2\pi$ is just the same as $0$! If we think of $u$ as living in $S^1$, then this satisfies the boundary condition $u \to 0$ as $x \to \pm \infty$, and we also know that no matter how this evolves, we will never get rid of this ``loop''. So the soliton is stable.
 
+\subsection{\texorpdfstring{B\"acklund}{Backlund} transformations}
+In linear partial differential equations, we have the principle of superposition --- if we have two solutions, then we can add them to get a third solution. This is no longer true in non-linear PDE's, and we don't know what to do. So we need to come up with some clever tricks to find solutions.
 
+One solution is the \emph{B\"acklund transformation}, which originally came from geometry, where we wanted to transform a surface to another, but we will only consider the applications to PDE's.
+
+The actual definition of the B\"acklund transformation is complicated. So we start with an example.
+\begin{eg}
+  Consider the Cauchy-Riemann equation
+  \[
+    u_x = v_u,\quad u_y = -v_x.
+  \]
+  If $u, v$ satisfy the Cauchy-Riemann equations, then $u, v$ are harmonic, ie. $u_{xx} + u_{yy} = 0$ etc. Suppose we already know $v = v(x, y)$ is harmonic. Then solving the Cauchy-Riemann equations gives \emph{another} harmonic function $u = u(x, y)$.
+
+  For example, if $v = 2xy$, then we get the partial differential equations
+  \[
+    u_x = 2x,\quad u_y = -2y.
+  \]
+  So we obtain
+  \[
+    u(x, y) = x^2 - y^2 + C
+  \]
+  for some constant $C$, and this function $u$ is guaranteed to be a solution to Laplace's equations.
+
+  So the Cauchy-Riemann equation generates new solutions to Laplace's equation from old ones. This is an example of an (auto-)B\"acklund transformation for Laplace's equation.
+\end{eg}
+
+In general, we have the following definition:
+\begin{defi}[B\"acklund transformation]\index{B\"acklund transformation}
+  A \emph{B\"acklund transformation} is a system of equations that relate the solutions of some PDE's to
+  \begin{enumerate}
+    \item A solution to some other PDE; or
+    \item Another solution to the same PDE.
+  \end{enumerate}
+  In the second case, we call it an \term{auto-B\"acklund transformation}.
+\end{defi}
+
+Of course, the case of the Cauchy-Riemann equation is not too exciting. However, we have the following:
+\begin{eg}
+  Consider
+  \begin{align*}
+    \frac{\partial}{\partial \xi}(\varphi_1 - \varphi_2) &= 2 \varepsilon \sin \left(\frac{\varphi_1 + \varphi_2}{2}\right)\\
+    \frac{\partial}{\partial \tau}(\varphi_1 + \varphi_2) &= \frac{2}{\varepsilon} \sin\left(\frac{\varphi_1 - \varphi_2}{2}\right).
+  \end{align*}
+  These equations come from geometry, and we will not go into details motivating these.
+
+  We now look at the equation
+  \begin{align*}
+    \frac{\partial^2}{\partial \xi\partial \tau} (\varphi_1 - \varphi_2) &= \frac{\partial}{\partial \tau}\left(2\varepsilon \sin \left(\frac{\varphi_1 + \varphi_2}{2}\right)\right)\\
+    &= 2\varepsilon \cos \left(\frac{\varphi_1 + \varphi_2}{2}\right)\frac{\partial}{\partial \tau}\left(\frac{\varphi_1 + \varphi_2}{2}\right)\\
+    &= 2 \varepsilon \cos \left(\frac{\varphi_1 + \varphi_2}{2}\right) \frac{1}{2} \cdot \frac{2}{\varepsilon} \sin \left(\frac{\varphi_1 - \varphi_2}{2}\right)\\
+    &= 2 \cos \left(\frac{\varphi_1 + \varphi_2}{2}\right)\sin \left(\frac{\varphi_1 - \varphi_2}{2}\right)\\
+    &= \sin \varphi_1 - \sin \varphi_2.
+  \end{align*}
+  Now if $\varphi_1$ solves the sine-Gordon equations, then we have
+  \[
+    \frac{\partial^2 \varphi_1}{\partial \xi \partial \tau} = \sin \varphi_1.
+  \]
+  Then it follows that $\varphi_2$ is \emph{also} a solution to the sine-Gordon equation. So this gives an auto-B\"acklund transformation for the sine-Gordon equation.
+\end{eg}
+
+\section{Inverse scattering transform}
+The inverse scattering transform is a method that allows us to integrate up equations like the sine-Gordon equations step by step, where each step involves solving a \emph{linear} equation.
+
+\subsection{Forward scattering problem}\index{forward scattering problem}
+Throughout this section, $L$ is the Schr\"odinger operator
+\[
+  L = -\frac{\partial^2}{\partial x^2} + u(x),
+\]
+where the ``potential'' $u$ has compact support, ie. $u = 0$ for $|x|$ sufficiently large. What we actually need is just that $u$ decays quickly enough as $|x| \to \infty$, but to make our life easy, we do not figure out the precise conditions to make things work, and just assume that $u$ actually vanishes for large $|x|$. We are interested in an eigenvalue (or ``spectral'') problem, ie. we want to find solutions to
+\[
+  L \psi = \lambda \psi.
+\]
+This is a ``forward'' problem, ie. given a $u$, we want to find solutions. The \emph{inverse} problem is given some sort of solutions like this, we want to find out what $u$ is.
+\subsubsection{Continuous spectrum}\label{sssec:continuous-spectrum}
+Here we consider solutions to $L\psi = k^2 \psi$. Since $u = 0$ for $|x|$ large, we must have
+\[
+  \psi_{xx} + k^2 \psi = 0
+\]
+for large $|x|$.
+
+So solutions as $|x| \to \infty$ are linear combinations of $e^{\pm i k x}$. We look for specific solutions for $\psi = \varphi(x, k)$ defined by the condition
+\[
+  \varphi = e^{-ikx}\text{ as } x \to -\infty.
+\]
+Then there must be coefficients $a = a(k)$ and $b = b(k)$ such that
+\[
+  \phi(x, k) = a(k) e^{-ikx} + b(k) e^{ikx}\text{ as }x \to +\infty.
+\]
+Now, we define
+\[
+  \Phi(x, k) = \frac{\varphi(x, k)}{a},\quad R(k) = \frac{b(k)}{a(k)},\quad T(k) = \frac{1}{a(k)}.
+\]
+Here $R(k)$ is called the ``reflection'' coefficient\index{reflection coefficient}, and $A(k)$ is the ``transmission'' coefficient\index{transmission coefficient}. You may have seen these terms from IB Quantum Mechanics. We can write
+\[
+  \Phi(x, k) =
+  \begin{cases}
+    T(k) e^{-ikx} & x \to -\infty\\
+    e^{-ikx} + R(k) e^{kx} & x \to +\infty
+  \end{cases}.
+\]
+We can view the $e^{-ikx}$ term as waves travelling to the left, and $e^{ikx}$ as waves travelling to the right. When we have an incident $e^{-ikx}$ wave coming from the right, the potential reflects some portion of the wave namely $R(k) e^{ikx}$, and transmits the remaining $T(k)$. It will be shown on the first example sheet that $|T(k)|^2 + |R(k)|^2 = 1$.
+
+What would happen when we change $k$? Since $k$ is the ``frequency'' of the wave, which is proportional to the energy we would expect that the larger $k$ is, the more of the wave is transmitted. Thus we might expect that $T(k) \to 1$, and $R(k) \to 0$. This is indeed true.
+
+However, even if we have this, it isn't good enough. We don't just want to know what $\Phi$ looks like for large $x$. We want to know its value \emph{everywhere}.
+
+We consider the integral equation for $f = f(x, k)$ given by
+\[
+  f(x, k) = f_0(x, k) + \int_{-\infty}^\infty G(x - y, k) u(y) f(y, k) \;\d y,
+\]
+where $f_0$ is any solution to $(\partial^2_x + k^2) f_0 = 0$, and $G$ is the Green's function $\partial^2_x + k^2$, ie. we have
+\[
+  (\partial_x^2 + k^2) G = \delta(x).
+\]
+What we want to show is that if we can find an $f$ that satisfies this integral equation, then it also satisfies the eigenvalue equation. We simply compute
+\begin{align*}
+  (\partial_x^2 + k^2) f &= (\partial_x^2 + k^2)f_0 + \int_{-\infty}^\infty (\partial_x^2 + k^2) G(x - y, k) u(y) f(y, k) \;\d y\\\
+  &= 0 + \int_{-\infty}^\infty \delta(x - y) u(y) f(y, k)\;\d y\\
+  &= u(x) f(x, k).
+\end{align*}
+In other words, we have
+\[
+  Lf = k^2 f.
+\]
+So it remains to prove that solutions to the integral equation exists.
+
+This happens all of the time in mathematics. Differential equations are bad. If we differentiate a function, it might no longer be differentiable. So our operators map our functions out of the relevant function space. Integration makes functions \emph{better}. The more times we integrate, the smoother it becomes. So integral equations are always better than differential equations from a mathematical point of view.
+
+We pick $f_0 = e^{-ikx}$ and
+\[
+  G(x, k) =
+  \begin{cases}
+    0 & x < 0\\
+    \frac{1}{k} \sin (kx) & x \geq 0
+  \end{cases}.
+\]
+Then our integral equation implies
+\[
+  f(x, k) = e^{-ikx}
+\]
+as $x \to-\infty$.
+
+To solve the integral equation, we write this in abstract form
+\[
+  (I - K) f = f_0,
+\]
+where $I$ is the identity, and
+\[
+  (Kf)(x) = \int_{-\infty}^\infty G(x - y, k) u(y) f(y, k) \;\d y.
+\]
+So we can ``invert''
+\[
+  f = (I - K)^{-1} f_0.
+\]
+We can ``guess'' a solution to the inverse. If we don't care about rigour and just expand this, we get
+\[
+  f = (I + K + K^2 + \cdots)f_0.
+\]
+The first question to ask is if this question converges. On the second example sheet, we will show that this thing actually converges. So if this holds, then we have
+\[
+  (I - K)f = If_0 + K f_0 + K^2 f_0 + \cdots - (K + K^2 f_0 + K^3 f_0 + \cdots) = f_0.
+\]
+So this is a solution!
+
+While we might have troubles actually evaluating this infinite sum, we can actually write the solution down in an infinite series explicitly. So the forward problem is ``trivial''.
+
+What is the inverse problem? Suppose someone came and told us there is some potential that gives
+\[
+  T(k) = \frac{k}{k - i},\quad R(k) = \frac{i}{k - i}.
+\]
+Can we figure out what $u$ is? The answer is yes!
+
+In fact, our brain does that all the time. When we look at things, the photons we see tell us about what photons are reflected by the wall, and our brain reconstructs the potential $u$ based on which photons are reflected, and then reconstructs $u$ and decides there is a wall! In fact, all we need to know is $R$ itself, and we can determine everything else.
+
+This is old theory, and not too exciting. The real exciting thing is that if we have an equation
+\[
+  u_t + u_{xxx} - 6uu_x = 0,
+\]
+then we view this as a potential evolving over time, and have a starting potential $u(x, 0) = u_0(x)$. We then compute the scattering data $T$ and $R$, and then obtain the corresponding equations of evolution of the scattering data $T$ and $R$. It turns out the equations give us
+\begin{align*}
+  R(k, t) &= e^{8ik^3 t}R(k, 0)\\
+  T(k, t) &= T(k, 0).
+\end{align*}
+After solving for these, we compute the inverse scattering transform to obtain $u$!
+
+\subsection{Discrete spacetime and bound states}
+So now suppose $\lambda = - \kappa^2 < 0$, where we wlog $\lambda > 0$. We are going to seek solutions to
+\[
+  L \psi_\kappa = - \kappa^2 \psi_\kappa.
+\]
+We are going to ask that
+\[
+  \|\psi_\lambda\|^2 = \int_{-\infty}^\infty \psi_\kappa(x)^2 \;\d x = 1.
+\]
+We will wlog $\psi_\kappa \in \R$. We will call these things \term{bound states}.
+
+Since $u$ has compact support, any solution
+\[
+  L \varphi = - \kappa^2 \varphi
+\]
+must obey
+\[
+  \varphi_{xx} - \kappa^2 \phi = 0
+\]
+for $|x| \to \infty$. Then the solutions are linear combinations of $e^{\pm \kappa x}$ as $|x| \to \infty$. We now fix $\varphi_\kappa$, defined by
+\[
+  \varphi_\kappa(x) = e^{-\kappa x} \text{ as } x \to +\infty
+\]
+Then as $x \to -\infty$, there must exist coefficients $\alpha = \alpha(\kappa), \beta = \beta(\kappa)$ such that
+\[
+  \varphi_\kappa(x) = \alpha(\kappa) e^{\kappa x} + \beta(\kappa) e^{-\kappa x}\text{ as }x \to -\infty.
+\]
+We now impose the condition that $\|\psi_\kappa\|^2 = 1$, and in particular is finite. So we must have $\beta(\kappa) = 0$. It can be shown that the function $\beta = \beta(\kappa)$ has only finitely many zeroes
+\[
+  \chi_1 > \chi_2 > \cdots > \chi_N > 0.
+\]
+To show this, we will have to find out an explicit expression for the solution of $\varphi_\kappa$, just as we did for the continuous spectrum, and then explicitly find a formula of $\beta$. We can then find that it has finitely many zeros.
+
+We now defined bound-states $\{\psi_n\}_{n= 1}^N$ by
+\[
+  \psi_n(x) = c_n \varphi_{\chi_{n - 1}}(x),
+\]
+where $c_n$ are normalization constants chosen so that $\|\psi_n\| = 1$.
+
+\subsection{Summary of forward scattering problem}
+For the spectral problem
+\[
+  L\psi = \lambda \psi,
+\]
+where
+\[
+  L = -\frac{\partial^2}{\partial x^2} + u,
+\]
+where $u$ has compact support.
+
+In the continuous spectrum, we have $\lambda = k^2 > 0$. Then we can find some $T(k)$ and $R(k)$ such that
+\[
+  \Phi(x, k) =
+  \begin{cases}
+    T(k) e^{-ikx} & x \to -\infty\\
+    e^{-ikx} + R(k) e^{kx} & x \to +\infty
+  \end{cases}.
+\]
+In the discrete spectrum, we have $\lambda = - \kappa^2 < 0$. We can construct \emph{bound states} $\{\psi_n\}_{n = 1}^N$ such that $L\psi_n = - \chi_n^2 \psi_n$ with
+\[
+  \chi_1 > \chi_2 > \cdots > \chi_N > 0,
+\]
+and $\|\psi_n\| = 1$.
+
+Bound states are characterized by large, positive $x$ behaviour
+\[
+  \psi_n(x) = c_n e^{-\chi_n x}\text{ as }x \to +\infty,
+\]
+where $\{c_n\}_{n = 1}^N$ are normalization constants.
+
+Putting all these together, the scattering data for $L$ is
+\[
+  S = \left\{\{\chi_n, c_n\}_{n = 1}^N, R(k), T(k)\right\}.
+\]
+\begin{eg}
+  Consider the Dirac potential $u(x) = - 2 \alpha \delta(x)$, where $\alpha > 0$. Let's try to compute the scattering data.
+
+  We do the continuous spectrum first. Since $u(x) = 0$ for $x \not= 0$, we must have
+  \[
+    \Phi(x, k) =
+    \begin{cases}
+      T(k) e^{-ikx} & x < 0\\
+      e^{-ikx} + R(k) e^{ikx} & x > 0
+    \end{cases}
+  \]
+  Also, we want $\Phi(x, k)$ to be continuous at $x = 0$. So we must have
+  \[
+    T(k) = 1 + R(k).
+  \]
+  By integrating $L\Phi = k^2 \Phi$ over $(-\varepsilon, \varepsilon)$, taking $\varepsilon \to 0$, we find that $\frac{\partial \Phi}{\partial x}$ has a jump discontinuity at $x = 0$ given by
+  \[
+    ik(R - 1) + ikT = -2 \alpha T.
+  \]
+  We now have two equations and two unknowns, and we can solve to obtain
+  \[
+    R(k) = \frac{i\alpha}{k - i\alpha},\quad T(k) = \frac{k}{k - i \alpha}.
+  \]
+  So we have
+  \[
+    |R|^2 + |T|^2 = 1.
+  \]
+  Note that as $k$ increases, we find that $R(k) \to 0$ and $T(k) \to 1$. This makes sense, since we can think of $k$ as the energy of the wave, and the larger the energy, the more likely we are to pass through.
+
+  Now let's do the discrete part of the spectrum, and we jump through the same hoops. Since $\delta(x) = 0$ for $x \not= 0$, we must have
+  \[
+    -\frac{\partial^2 \psi_n}{\partial x^2} + \chi_n^2 \psi_n = 0
+  \]
+  for $x \not= 0$. So we have
+  \[
+    \psi_n(x) = c_n e^{- \chi_n |x|}.
+  \]
+  Integrating $L\psi_n = - \chi_n^2 \psi_n$ over $(-\varepsilon, \varepsilon)$, we similarly find that
+  \[
+    c_n \chi_n = c_n \alpha.
+  \]
+  So there is just one bound state, with $\chi_1 = \alpha$. We finally find $c_n$ by requiring $\norm{\psi_1} = 1$. We have
+  \[
+    1 = \int_{-\infty}^\infty \psi_1(x)^2 \;\d x = c_1^2 \int_{-\infty}^\infty e^{-2 \chi_1|x|}\;\d x = \frac{c_1^2}{\alpha}.
+  \]
+  So we have
+  \[
+    c_1 = \sqrt{\alpha}.
+  \]
+  In summary, we have the following scattering data:
+  \[
+    S = \left\{\{\alpha, \sqrt{\alpha}\}, \frac{i\alpha}{k - i \alpha},\quad \frac{k}{k - i\alpha}\right\}.
+  \]
+\end{eg}
+\subsection{Inverse scattering problem}
+It is natural to ask: given scattering data
+\[
+  S = \left\{\{\chi_n, c_n\}_{n = 1}^N, R(k), T(k)\right\},
+\]
+can we reconstruct the potential $u = u(x)$ such that
+\[
+  L = -\frac{\partial^2}{\partial x^2} + u(x)
+\]
+has scattering data $S$? The answer is yes! Moreover, it turns out that $T(k)$ is not needed.
+
+\begin{thm}[GLM inverse scattering theorem]\index{GLM inverse scattering theorem}
+  A potential $u = u(x)$ that decays rapidly to $0$ as $|x| \to \infty$ is completely determined by its scattering data
+  \[
+    S = \left\{\{\chi_n, c_n\}_{n = 1}^N, R(k)\right\}.
+  \]
+  Given such a scattering data, if we set
+  \[
+    F(x) = \sum_{n = 1}^N c_n^2 e^{-\chi_n x} + \frac{1}{2\pi} \int_{-\infty}^\infty e^{ikx} R(k) \;\d k,
+  \]
+  and define $k(x, y)$ to be the \emph{unique} solution to
+  \[
+    k(x, y) + F(x + y) + \int_{x}^\infty k(x, z) f(z + y) \;\d z = 0,
+  \]
+  then
+  \[
+    u(x) = -2 \frac{\d}{\d x} k(x, x).
+  \]
+\end{thm}
+
+\begin{proof}
+  Too hard.
+\end{proof}
+Note that this equation
+\[
+  k(x, y) + F(x + y) + \int_{x}^\infty k(x, z) f(z + y) \;\d z = 0
+\]
+is not too hard to solve. We can view it as a linear equation of the form
+\[
+  \mathbf{x} + \mathbf{b} +A \mathbf{x} = 0
+\]
+for some linear operator $A$, then use our familiar linear algebra techniques to guess a solution. We can then verify that it works.
+
+Now that we've got this result, we understand how scattering problems work. We know how to go forwards \emph{and} backwards.
+
+\subsection{Lax pairs}
+\begin{defi}[Lax pair]\index{Lax pair}
+  Consider a self-adjoint linear operator
+  \[
+    K = a_m (x, t) \frac{\partial^m}{\partial x^m} + \cdots + a_1 (x, t) \frac{\partial}{\partial x} + a_0(x, t),
+  \]
+  where the $\{a_i\}$ (possibly matrix-valued) functions of $(x, t)$. If there is a second operator $A$ such that
+  \[
+    L_t = LA - AL = [L, A],
+  \]
+  where
+  \[
+    L_t = \dot{a}_m \frac{\partial^m}{\partial x^m} + \cdots + \dot{a}_0,
+  \]
+  denotes the derivative of $L$ with respect to $t$, then we call $(L, A)$ a \emph{Lax pair}.
+\end{defi}
+
+We will soon see that the existence of a Lax pair is what allows all the magic of the inverse scattering transform to work.
+
+\begin{thm}[Isospectral flow theorem]\index{isospectral flow theorem}
+  Let $(L, A)$ be a Lax pair. Then the discrete eigenvalues of $L$ are $t$-independent. Also, if $L\psi = \lambda \psi$, where $\lambda$ is a discrete eigenvalue, then
+  \[
+    L \tilde{\psi} = \lambda \tilde{\psi},
+  \]
+  where
+  \[
+    \tilde{\psi} = \psi_t + A \psi.
+  \]
+\end{thm}
+The word ``isospectral'' means that we have an evolving system, but the eigenvalues are time-independent.
+
+\begin{proof}
+  Suppose we have solved the eigenvalue problem and found some
+  \[
+    L \psi = \lambda \psi,
+  \]
+  where $\lambda$ may depend on time. Then (after some rearranging) we get
+  \begin{align*}
+    \lambda_t \psi &= L_t \psi + L \psi_t - \lambda \psi_t\\
+    &= LA \psi - AL \psi + L \psi_t - \lambda \psi_t\\
+    &= LA \psi - \lambda A \psi + L \psi_t - \lambda \psi_t\\
+    &= (L - \lambda)(\psi_t + A \psi)
+  \end{align*}
+  We now take the inner product $\psi$, and use that $\|\psi\| = 1$. We then have
+  \begin{align*}
+    \lambda_t &= \bra \psi, \lambda_t \psi\ket\\
+    &= \bra \psi, (L - \lambda)(\psi_t + A_\psi)\ket\\
+    &= \bra (L - \lambda)\psi, \psi_t + A_\psi\ket\\
+    &= 0,
+  \end{align*}
+  using the fact that $L$, hence $L - \lambda$ is self-adjoint.
+
+  So we know that $\lambda_t = 0$, ie. that $\lambda$ is time-independent. Then our above equation gives
+  \[
+    L \tilde{\psi} = \lambda \tilde{\psi},
+  \]
+  where
+  \[
+    \tilde{\psi} = \psi_t + A\psi.
+  \]
+\end{proof}
+
+\begin{eg}
+  Consider
+  \begin{align*}
+    L =- \frac{\partial^2}{\partial x^2} + u(x, t)\\
+    A = 4 \partial_x^3 - 3 (u \partial_x + \partial_x u).
+  \end{align*}
+  Then $(L, A)$ is a Lax pair iff $u = u(x, t)$ satisfies KdV. In other words, we find that
+  \[
+    L_t - [L, A] = 0 \Leftrightarrow u_t + u_{xxx} - 6uu_x =0 .
+  \]
+\end{eg}
+
+\subsection{Evolution of scattering data}
+Now we do the clever bit: we allow the potential $u = u(x, t)$ to evolve via KdV
+\[
+  u_t + u_{xxx} - 6 u u_x = 0.
+\]
+We see how the scattering data for $L = -\partial_x^2 + u(x, t)$ evolves. Again, we will assume that $u$ has compact support. Note that this implies that we have
+\[
+  A = 4 \partial_x^3\text{ as }|x| \to \infty.
+\]
+\subsubsection{Continuous spectrum (\texorpdfstring{$\lambda = k^2 > 0$}{lambda = k^2 > 0})}
+As in Section \ref{sssec:continuous-spectrum}, for each $t$, we can construct a solution $\varphi$ to $L \varphi = \kappa^2 \varphi$ such that
+\[
+  \varphi(x, t) =
+  \begin{cases}
+    e^{-ikx} & x \to -\infty\\
+    a(k, t) e^{-ikx} + b(k, t) e^{ikx} & x \to \infty
+  \end{cases}.
+\]
+As with the proof of the isospectral flow theorem, we can differentiate the equation
+\[
+  L^2 = k^2 \varphi
+\]
+with $k^2 > 0$ fixed to get
+\[
+  0 = (L - k^2)(\varphi_t + A_\varphi).
+\]
+This tells us that
+\[
+  \tilde{\varphi} = \varphi_t + A \varphi
+\]
+solves
+\[
+  L \tilde{\varphi} = k^2 \tilde{\varphi}.
+\]
+We can try to figure out what $\tilde{\varphi}$ is for large $|x|$. We recall that for large $|x|$, we simply have $A = 4 \partial_x^3$. Then we can write
+\[
+  \tilde{\varphi}(x, t) =
+  \begin{cases}
+    4 ik^3 e^{-ikx} & x \to -\infty\\
+    (a_t + 4 ik^3 a)e^{-ikx} + (b_t - 4ik^3 b) e^{ikx} & x \to \infty
+  \end{cases}
+\]
+We now consider the function
+\[
+  \theta = 4ik^3 \varphi - \tilde{\varphi}.
+\]
+By linearity of $L$, we have
+\[
+  L \theta = k^2 \theta.
+\]
+Note now that by construction, we had $\theta(x, t) \to 0$ as $x \to -\infty$.
+
+Recall that the solution to $Lf = k^2 f$ for $f = f_0$ as $x \to -\infty$ is just
+\begin{align*}
+  f &= (I - K)^{-1} f_0\\
+  &= (I + K + K^2 + \cdots)f_0
+\end{align*}
+So we obtain
+\[
+  \theta = (1 + K + K^2 + \cdots) 0 = 0.
+\]
+So we must have
+\[
+  \tilde{\varphi} = 4ik^3 \varphi.
+\]
+Looking at the $x \to +\infty$ behaviour, we figure that
+\begin{align*}
+  a_t + 4ik^3 a &= 4 ik^3 a\\
+  b_t - 4ik^3 b &= 4ik^3 b
+\end{align*}
+Of course, these are equations we can solve. We have
+\begin{align*}
+  a(k, t) &= a(k, 0)\\
+  b(k, t) &= b(k, 0) e^{8ik^3 t}
+\end{align*}.
+In terms of the reflection and transmission coefficients, we have
+\begin{align*}
+  R(k, t) &= R(k, 0) e^{8ik^3 t}\\
+  T(k, t) &= T(k, 0)
+\end{align*}
+Recall that we started with the \emph{really} complicated KdV equation. And the scattering data evolves in such a simple way. This is \emph{AMAZING}.
+
+\subsubsection{Discrete spectrum (\texorpdfstring{$\lambda= -\kappa^2 < 0$}{lambda = -kappa^2 < 0})}
+For each $t$, we can construct bound states $\{\psi_n(x, t)\}_{n = 1}^N$ such that $L\psi_n = - \chi_n^3 \psi_n$ and $\|\psi_n\| = 1$. Moreover, we have
+\[
+  \psi_n(x, t) = c_n(t) e^{-\chi_n|x|}.
+\]
+From the isospectral theorem, we know that the $\chi_n$'s are constant, and we have
+\[
+  \tilde{\psi}_n = \partial_t \psi_n + A\psi_n
+\]
+satisfies
+\[
+  L\tilde{\psi}_n = - \chi_n^2 \tilde{\psi}_n
+\]
+It is an exercise to show that these solutions must actually be proportional to one another. Looking at Wronskians, we can show that $\tilde{\psi}_n \propto \psi_n$. Also, we have
+\[
+  \bra \psi_n, \tilde{\psi}_n\ket = \int_{-\infty}^\infty \psi_n(x, t) \tilde{\psi}_n(x, t) \;\d x = 0.
+\]
+\begin{align*}
+  \bra \psi_n, \tilde{\psi}_n\ket &= \bra \psi_n \partial_t \psi_n\ket + \bra\psi_n, A \psi_n\ket\\
+  &= \frac{1}{2} \frac{\partial}{\partial t} \bra \psi_n, \psi_n\ket + \bra \psi_n, A \psi_n\ket
+\end{align*}
+using the fact that $A$ is antisymmetric and $\|\psi_n\|$ is constant. We thus deduce that $\tilde{\psi}_n = 0$.
+
+By large $x$-behaviour, we have
+\[
+  \tilde{\psi}_n(x, t) = (\dot{c}_n - 4 \chi_n^3 c_n) e^{- \chi_n x}
+\]
+as $x \to +\infty$. Since $\tilde{\psi}_n \equiv = 0$, we must have
+\[
+  \dot{c}_n - 4 \chi_n^3 c_n = 0.
+\]
+So we have
+\[
+  c_n(t) = c_n(0) e^{4 \chi_n^3 t}.
+\]
+This is again \emph{AMAZING}.
+
+So in summary, if $u = u(x, t)$ evolves according to KdV, namely
+\[
+  u_t + u_{xxx} - 6uu_x = 0,
+\]
+then the scattering data for $L = -\partial_x^2 + u$ is
+\[
+  S(t) = \left\{\{\chi_n, c_n(0)e^{4\chi_n^3 t}\}_{n = 1}^N, R(k, 0)e^{8ik^3 t}\right\}.
+\]
+So if we have an initial value problem, we do the forward transform problem to find the initial scattering data $S(0)$. We then do the trivial steps above to find the scattering data $S(t)$ for all time $t$. We then apply GLM to obtain $u(x, t)$ for all time $t$.
+\[
+  \begin{tikzcd}[row sep=5em, column sep=8em]
+    u_0(x) \ar[r, "\text{Construct scattering data}", "L = -\partial_x^2 + u_0(x)"'] \ar[d, "\text{KdV equation}"] & S(0) = \left\{\{\chi_n, c_n(0)\}_{n = 1}^N, R(k, 0)\right\} \ar[d, "\text{Evolve scattering data}"', "{L_t = [L, A]}"]\\
+    u(x, t) & S(t) = \left\{\{\chi_n, c_n(0)e^{4\chi_n^3 t}\}_{n = 1}^N, R(k, 0)e^{8ik^3 t}\right\} \ar[l, "\text{Solve GLM equation}"]
+  \end{tikzcd}
+\]
+The key thing that makes this work is that $u_t + u_{xxx} - 6 uu_x$ holds if and only if $L_t = [L, A]$.
+
+For comparison, this is what we would do if we had to solve $u_t + u_{xxx} = 0$: we take the Fourier transform:
+\[
+  \begin{tikzcd}[row sep=5em, column sep=8em]
+    u_0(x) \ar[r, "\text{Fourier transform}"] \ar[d, "u_t + u_{xxx} = 0"] & \hat{u}_0(k) \ar[d, "\hat{u}_t - ik^3 \hat{u} = 0"]\\
+    u(x, t) & \hat{u}(u, t) = \hat{u}_0(k) e^{ik^3 t} \ar[l, "\text{Inverse Fourier}"', "\text{Transform}"]
+  \end{tikzcd}
+\]
+It is just the same steps, but with a simpler transform!
+
+\printindex
 \end{document}

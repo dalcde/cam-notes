@@ -22,7 +22,7 @@ The course will cover the following topics:
 
 Notion of qubits, quantum logic gates, circuit model of quantum computation. Basic notions of quantum computational complexity, oracles, query complexity.
 
-The quantum Fourier transform. Exposition of fundamental quantum algorithms including the Deutsch-Jozsa algorithm, Shors factoring algorithm, Grovers searching algorithm.
+The quantum Fourier transform. Exposition of fundamental quantum algorithms including the Deutsch-Jozsa algorithm, Shor's factoring algorithm, Grovers searching algorithm.
 
 A selection from the following further topics (and possibly others):
 \begin{enumerate}
@@ -597,9 +597,256 @@ Now let's consider the periodicity problem.
 
       What do we do next? If we measure $\bket{\mathrm{per}}$, we obtain a random $j$-value, so what we actually get is a random element ($x_0$th) of a random period ($j$th), namely a uniformly chosen random number in $0, 1, \cdots, N$. This is not too useful.
 
-      The solution is the use the quantum Fourier transform, which is not surprising, since Fourier transforms are classically used to extract periodicity information.
+    \item The solution is the use the quantum Fourier transform, which is not surprising, since Fourier transforms are classically used to extract periodicity information.
+
+      Apply $\qQFT_N$ to $\bket{\mathrm{per})}$ now gives
+      \begin{align*}
+        \qQFT_N \bket{\mathrm{per}} &= \frac{1}{\sqrt{NA}} \sum_{j = 0}^{n - 1} \sum_{y = 0}^{N - 1} \omega^{(x_0 + jr) y} \bket{y}\\
+        &= \frac{1}{\sqrt{NA}} \sum_{y = 0}^{N - 1} \omega^{x_0 y}\left(\sum_{j = 0}^{n - 1}\omega^{jry}\right) \bket{y}
+      \end{align*}
+      We now see the inner sum is a geometric series. If $\omega^{ry} = 1$, then this sum is just $A$. Otherwise, we have
+      \[
+        \sum_{j = 0}^{A - 1} \omega^{jry} = \frac{1 - \omega^{rA}}{1 - \omega^{ry}} = \frac{1 - 1}{1 - \omega^{ry}} = 0.
+      \]
+      So we are left with
+      \[
+        \qQFT_n \bket{\mathrm{per}} = \sqrt{\frac{A}{N}} \sum_{k = 0}^{r - 1}\omega ^{x_0 k N/r} \bket{k\frac{N}{r}}.
+      \]
+      Note that before the Fourier transform, the random shift of $x_0$ lied in the label $\bket{x_0 + jr}$. After the Fourier transform, it is not encoded in the phase instead.
+
+    \item Now we can measure the label, and we will some $C$ which is a multiple $k_0 \frac{N}{r}$, where $0 \leq k_0 \leq r - 1$ is chosen uniformly at random. We rewrite this as
+      \[
+        \frac{k_0}{r} = \frac{C}{N}.
+      \]
+      We know $C$, because we just measured it, and $N$ is a given in the question. Also, $k_0$ is randomly chosen, and $r$ is what we want. So how do we extract that out?
+
+      If by good chance, we have $k_0$ coprime to $r$, then we can cancel $C/N$ to lowest terms and read off $r$ as the resulting denominator $\tilde{r}$. Note that cancelling $C/N$ to lowest terms can be done quickly by Euclidean algorithm. But how likely are we to be so lucky? We can just find some number theory books, and figure out that the number of natural numbers $< r$ that are coprime to $r$ grows as $O(r/\log \log r)$. More precisely, it is $\sim e^{-\gamma} r/\log \log r$, where $\gamma$ is the other Euler's constant. We note that
+      \[
+        O\left(\frac{r}{\log \log r}\right) > O\left(\frac{1}{\log \log N}\right).
+      \]
+      So if $k_0$ is chosen uniformly and randomly, the probability that $k_0$ is coprime to $r$ is at least $O(1/\log \log N)$.
+
+      Note that if $k_0$ is \emph{not} coprime with $r$, then we have $\tilde{r} \mid r$, and in particular $\tilde{r} < r$. So we can check if $\tilde{r}$ is a true period --- we check if $f(0)$ and $f(\tilde{r}$ and see if they are the same. If $\tilde{r}$ is wrong, then they cannot be equal as $f$ is injective in the period.
+
+      While the probability of getting a right answer decreases as $N \to \infty$, we just have to do the experiment many times. From elementary probability, if an event has some (small) success probability $p$, then given any $0 < 1 - \varepsilon < 1$, for $M = - \frac{\log \varepsilon}{p}$ trials, the probability that there is at least one success is $ > 1 - \varepsilon$. So if we repeat the quantum algorithm $O(\log \log N)$ times, and check $\tilde{r}$ each time, then we can get a true $r$ with any constant level of probability.
+    \item We can further improve this process --- if we have obtained two attempts $\tilde{r}, \tilde{r}'$, then we know $r$ is at least their least common multiple. So we can in fact achieve this in constant time, if we do a bit more number theory. However, the other parts of the algorithm (eg. cancelling $C/N$ down to lowest terms) still use time polynomial in $\log N$. So we have a polynomial time algorithm.
   \end{enumerate}
 \end{eg}
 
+There is one thing we swept under the carpet. We need to find an efficient way of computing the quantum Fourire transform, or else we just hid all our complexity in the quantum Fourier transform.
 
+In general, we would expect that a general unitary operations on $n$ qubits needs $\exp(n)$ elementary circuits. However, the quantum Fourier transform is special.
+
+\begin{fact}
+  $\qQFT_{2^n}$ can be implemented by a quantum circuit of size $O(n^2)$.
+\end{fact}
+The idea of the construction is to mimic the classical fast Fourier transform. An important ingredient of it is:
+\begin{fact}
+  The state
+  \[
+    \qQFT_{2^n} \bket{x} = \frac{1}{2^{n/2}} \sum_{y = 0}^{2^n - 1} \omega^{xy}\bket{y}
+  \]
+  is in fact a product state.
+\end{fact}
+We can generalize the periodicity problem to arbitrary groups, known as the \emph{hidden subgroup problem}. We are given some oracle for $f: G \to Y$, and we are promised that there is a subgroup $H < G$ such that $f$ is constant and distinct on cosets of $H$ in $G$. We want to find $H$ (we can make ``find'' more precise in two ways --- we can either ask for a set of generators, or provide a way of sampling uniformly from $H$).
+
+In our case, we had $G = (\Z/N\Z, +)$, and $N = Ar$. Our subgroup is then
+\[
+  H = \{0, r, 2r, \cdots, (A - 1) r\}.
+\]
+However, we do not know how to efficiently for a group in general.
+
+\subsection{Shor's algorithm}
+Given an integer $N$ with $n = \log N$ digits, we will find a factor $1 < K < N$ with constant probability $(1 - \varepsilon)$ in $O(n^3)$ time. The best know classical algorithm is $e^{O(n^{1/3} (\log n)^{2/3})}$.
+
+To do this, we will use the periodicity algorithm. However, there is one subtlety involved. Instead of working in $\Z/n\Z$, to do this algorithm, we need to work in $\Z$. Since computers cannot work with infinitely many numbers, we will have to truncate it somehow.
+
+We now start turning factorization into a periodicity problem. Here are the steps:
+Choose a random $1 < a < N$ uniformly randomly, and compute $\hcf(a, N)$. If it is not equal to $1$, then we are finished. Otherwise, by Euler's theorem, there is a least power $r$ of $a$ such that $a^r \equiv 1 \bmod N$. The number $r$ is called the \emph{order} of $a$ mod $N$. It follows that the function $f: \Z \to \Z/N\Z$ given by $f(k) = a^k \bmod N$ has period $r$, and is injective in each period.
+
+Note that $f(k)$ can be efficiently computed in $\poly(\log k)$ time, by repeated squaring. Also note that classically, it is hard to find $r$, even though $f$ has a simple formula!
+
+It was known to Legendre in 1800 that knowing $r$ means we can factor $n$. Suppose we can find $r$, and further suppose $r$ is even. Then we have
+\[
+  a^r - 1 \equiv (a^{r/2} + 1)(a^{r/2} - 1) \equiv 0 \pmod N.
+\]
+So $N$ exactly divides the product. By minimality of $r$, we know $N$ does not divide $a^{r/2} - 1$. So if $N$ does not divide $a^{r/2} + 1$ as well, then $\hcf(N, a^{r/2} \pm 1)$ are non-trivial factors of $N$.
+
+For this to work, we needed two assumptions -- $r$ is even, and $a^{r/2} \not\equiv 1 \pmod N$. Fortunately, there is a theorem in number theory that says if $N$ is odd and not a prime power, and $a$ is chosen uniformly at random, then the probability that these two things happen is at least $\frac{1}{2}$. In fact, it is $\geq 1 - \frac{1}{2^{m - 1}}$, where $m$ is the number of prime factors of $N$.
+
+So if we repeat this $K$ times, the probability that they all fail to give a factor is less than $\frac{1}{2^k}$. So this can be as small as we wish.
+
+What about the other possibilities? If $N$ is even, then we would have noticed by looking at the last digit, and we can just write down $2$. If $N = c^\ell$ for $c, \ell > 2$, then there is a classical polynomial time algorithm that outputs $c$, which is a factor.
+
+Everything we've done so far is classical! The quantum part comes in when we want to compute $r$. We know that $f(k) = a^k$ is periodic on $\Z$, which is an infinite domain. So we cannot just apply our periodicity algorithm.
+
+We will work on the domain $D = \{0, 1, \cdots, 2^m - 1\} = \Z/2^m \Z$, where $2^m$ is the least power of $2$ that is $>N^2$. The idea is that we can only have an approximation to what the actual period is. If we pick $2^m$ to be approximately $N$, then it could be that the first $3N/4$ is a single period, and the remaining $N/$ is ``corrupt'' random noise, and it would be difficult to separate out the periodicity information from the corrupt noise. If we take $2^m$ to be at least $N^2$, then we are guaranteed that there will at least be $N$ periods in our data, together with some hopefully minor corruption. Of course, there is no \emph{a priori} reason why we are taking $N^2$ and not, say, $N^3$, but it happens to work.
+
+If $r$ is the true period, then by the division algorithm, there are some $B \geq N$ and $0 \leq b < r$ such that
+\[
+  2^m = Br + b.
+\]
+So we have $B$ full periods and one ``corrupt'' one of length $b$.
+
+We now study the effect of corruption on the periodicity algorithm. We again make
+\[
+  \bket{f} = \frac{1}{\sqrt{2^m}} \sum \bket{x} \bket{f(x)}.
+\]
+and measure the value of $f$. We then get
+\[
+  \bket{\mathrm{per}} = \frac{1}{\sqrt{A}} \sum_{k = 0}^{A - 1} \bket{x_0 + kr},
+\]
+where $A = B$ or $B + 1$, depending on whether $x_0 \leq b$ or not. As before, we apply $\qQFT_{2^m}$ to obtain
+\[
+  \qQFT_{2^m}\bket{\mathrm{per}} = \sum_{c = 0}^{2^n - 1} \tilde{f}(c) \bket{c}.
+\]
+When we did this before, with an exact period, most of the $\hat{f}(c)$ is zero. However, this time things are a bit more messy. As before, we have
+\[
+  \tilde{f}(c) = \frac{\omega^{c x_0}}{\sqrt{A}\sqrt{2^m}} [1 + \alpha + \cdots + \alpha^{A - 1}],\quad \alpha = e^{2\pi i cr/2^m}.
+\]
+The important question is, when we measure this, which $c$'s will we see with ``good probability''? With exact periodicity, we knew that $\frac{2^m}{r} = A$ is an exact integer. So $\tilde{f}(c) = 0$ except when $c$ is a multiple of $A$. Intuitively, we can think of this as interference, and we had totally destructive and totally constructive interference respectively.
+
+In the inexact case, we will get constructive interference for those $c$ such that the phase $\alpha$ is close to $1$, ie. these are the $c$'s with $\frac{cr}{2^m}$ nearest to integers $k$, and the powers up to $\alpha^{A - 1}$ don't spread too far around the circle. So we avoid cancellations.
+
+So we look at those special $c$'s having this particular property. As $c$ increases from $0$ to $2^m - 1$, the angle $\frac{cr}{2^m}$ increments by $\frac{r}{2^m}$ each time from $0$ up to $r$. So we have $c_k$'s for each $k = 0, 1, \cdots, -r - 1$ such that
+\[
+  \left|\frac{c_k r}{2^m} - k\right| < \frac{1}{2} \cdot \frac{r}{2^m}.
+\]
+In other words, we have
+\[
+  \left|c_k - k\frac{2^m}{r}\right| < \frac{1}{2}.
+\]
+So the $c_k$ are the integers nearest to the multiples of $2^m/r$.
+
+In $\tilde{f}(c)$, the $\alpha$'s corresponding to the $c_k$'s have the smallest phases, ie. nearest to the positive real axis. We write
+\[
+  \frac{c_k r}{2^m} = k + \xi,
+\]
+where
+\[
+  k \in \Z,\quad |\xi| < \frac{1}{2} \frac{r}{2^m}.
+\]
+Then we have
+\[
+  \alpha^n = \exp\left(2\pi i \frac{c_k r}{2^m}n\right) = \exp\left(e\pi i(k + \xi)n\right) = \exp(2 \pi i \xi n)
+\]
+Now for $n < A$, we know that $|2 \xi n| < \pi$, and thus $1, \alpha, \alpha^2, \cdots, \alpha^{A - 1}$ all lie in the lower half plane or upper half plane.
+
+Doing all the algebra, we find that if $\qQFT\brak{\mathrm{per}}$ is measured, then for any $c_k$ as above, we have
+\[
+  \mathrm{Prob}(c_k) > \frac{\gamma}{r},
+\]
+where
+\[
+  \gamma = \frac{4}{\pi^2} \approx 0.4.
+\]
+Recall that in the exact periodicity case, the points $c_k$ hit the integers exactly, and instead of $\gamma$ we had $1$. The distribution of the $c$'s then look like:
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (0, 0) -- (4, 0);
+    \draw [->] (0, 0) -- (0, 3);
+
+    \foreach \x in {0, 1, 2, 3} {
+      \draw [thick] (\x, 0) -- (\x, 2);
+    }
+    \draw [thick] (0, 0) -- (4, 0);
+  \end{tikzpicture}
+\end{center}
+With inexact periods, we obtain something like
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (0, 0) -- (4, 0);
+    \draw [->] (0, 0) -- (0, 3);
+
+    \foreach \x/\y in {0/2.2, 1/2.1, 2/2.3, 3/2.25} {
+      \draw [thick] (\x, 0) -- (\x, \y);
+    }
+    \foreach \x\y in {0.2/0.1,0.4/0.15,0.6/0.13,0.8/0.2,1.2/0.12,1.4/0.16,1.6/0.22,1.8/0.09,2.2/0.11,2.4/0.13,2.6/0.2,2.8/0.18} {
+      \draw [thick] (\x, 0) -- (\x, \y);
+    }
+  \end{tikzpicture}
+\end{center}
+Now how do we get $r$ from a $c_k$? We know
+\[
+  \left| \frac{c_k}{2^m} - \frac{k}{r}\right| < \frac{1}{2^{m + 1}} < \frac{1}{2N^2}.
+\]
+We claim that there is at most 1 fraction $\frac{k}{r}$ with denominator $< N$ such that this inequality holds. So this inequality does uniquely determine $k/r$.
+
+Indeed, suppose $\frac{k}{r}$ and $\frac{k'}{r'}$ both work. Then we have
+\[
+  \left|\frac{k'}{r'} - \frac{k}{r}\right| = \frac{|k'r - r'k|}{rr'} > \frac{1}{rr'} > \frac{1}{N^2}.
+\]
+However, we also have
+\[
+  \left|\frac{k'}{r'} - \frac{k}{r}r\right| \leq \left|\frac{k'}{r'} - \frac{c_k}{2^m}\right| + \left|\frac{c_k}{2^m} - \frac{k}{r}\right| < \frac{1}{2N^2} + \frac{1}{2N^2} = \frac{1}{N^2}.
+\]
+We introduce the notion of a ``good'' $c_k$ value, which is when $k$ is coprime to $r$. The probability of getting a good $c_k$ is again
+\[
+  O(1/\log \log r) > O(1/\log \log N).
+\]
+Note that this is the same rate as the case of exact periodicity, since we have only lost a constant factor of $\gamma$! If we did have such a $c_k$, then now $r$ is uniquely determined.
+
+However, there is still the problem of finding $r$ from a good $c_k$ value. At this point, this is just classical number theory.
+
+We can certainly try all $\frac{k'}{r'}$ with $k' < r' < N$ and find the closets one to $c_k/2^m$, but there are $O(N^2)$ fractions to try, but we want a $O(\mathrm{poly}(\log N))$ algorithm. Indeed, if we were to do it this way, we might as well try all numbers less than $N$ and see if they divide $N$. And this is just $O(N)$!
+
+The answer comes from the nice theory of continued fractions. Any rational number $\frac{s}{t} < 1$ has a continued fraction expansion
+\[
+  \frac{s}{t} = \cfrac{1}{a_1 + \cfrac{1}{a_2 + \cfrac{1}{a_3 + \cdots}}}.
+\]
+Indeed to do this, we simply write
+\[
+  \frac{s}{t} = \cfrac{1}{\cfrac{t}{s}} = \cfrac{1}{a_1 + \cfrac{s_1}{t_1}},
+\]
+where we divide $t$ by $s$ to get $t = a_1s + s_1$, and then put $t_1 = s$. We then keep going on with $\frac{s_1}{t_1}$. Since the numbers $s_i, t_i$ keep getting smaller, it follows that this process will eventually terminate.
+
+We often write the continued fraction as
+\[
+  \frac{s}{t} = [a_1, a_2, a_3, \cdots, \cdots, n].
+\]
+We define the $k$th convergent of $\frac{s}{t}$ to be
+\[
+  \frac{p_k}{q_k} = [a_1, a_2, \cdots, a_k].
+\]
+There are some magic results from number theory that gives us a simple recurrence relation for the convergents.
+\begin{lemma}
+  For $a_1, a_2, \cdots, a_\ell$ any positive reals, we set
+  \begin{align*}
+    p_0 &= 0 & q_0 &= 1\\
+    p_1 &= 1 & q_1 &= a_1
+  \end{align*}
+  We then define
+  \begin{align*}
+    p_k &= a_k p_{k - 1} + p_{k - 2}\\
+    q_k &= a_k q_{k - 1} + q_{k - 2}
+  \end{align*}
+  Then we have
+  \begin{enumerate}
+    \item We have
+      \[
+        [a_1, \cdots, a_k] = \frac{p_k}{q_k}.
+      \]
+    \item We also have
+      \[
+        q_k p_{k - 1} - p_k q_{k - 1} = (-1)^k.
+      \]
+      In particular, $p_k$ and $q_k$ are coprime.
+  \end{enumerate}
+\end{lemma}
+
+\begin{thm}
+  If $s < t$ are $m$-bit integers, then the continued fraction has length $O(m)$, and all convergents $\frac{p_k}{q_k}$ can be computed in $O(m^3)$ time.
+\end{thm}
+
+We can now get to the main useful theorem.
+\begin{thm}
+  Let $0 < x < 1$ be rational, and suppose $\frac{p}{q}$ is rational with
+  \[
+    \left|x - \frac{p}{q}\right| < \frac{1}{2q^2}.
+  \]
+  Then $\frac{p}{q}$ is a convergent of the continued fraction of $x$.
+\end{thm}
+
+
+\printindex
 \end{document}

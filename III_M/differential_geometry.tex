@@ -450,7 +450,17 @@ As before, we have a basis
 Recall that there is one thing we swept under the carpet --- to define the tangent space, we needed to pick an open set $U$. Ways to deal with this can be found in the example sheet, but there are two general approaches --- one is to talk about germs of functions, where we consider all open neighbourhoods, and identify two functions if they agree on some open neighbourhood of the point. The other way is to realize that we can ``extend'' any function on $U \subseteq M$ to a function on the whole of $M$, using bump functions.
 
 In general, we want a function that looks like this:
-% insert picture
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-3, 0) -- (3, 0);
+    \draw [->] (0, -0.5) -- (0, 3);
+    \draw [thick, blue] (-1.01, 2) -- (1.01, 2);
+    \draw [thick, blue] (-3, 0) -- (-1.99, 0);
+    \draw [thick, blue] (1.99, 0) -- (3, 0);
+    \draw [domain=-1.99:-1.01, thick, blue] plot [smooth] (\x, {2 * (exp(- 1 / ((2 + \x) * (2 + \x))))/((exp(- 1 / ((2 + \x) * (2 + \x)))) + (exp(- 1 / ((-1 - \x) * (-1 - \x)))))});
+    \draw [domain=1.01:1.99, thick, blue] plot [smooth] (\x, {2 * (exp(- 1 / ((2 - \x) * (2 - \x))))/((exp(- 1 / ((2 - \x) * (2 - \x)))) + (exp(- 1 / ((-1 + \x) * (-1 + \x)))))});
+  \end{tikzpicture}
+\end{center}
 
 \begin{lemma}
   Suppose $W \subseteq M$ is a coordinate chart with $p \in W$. then there is an open neighbourhood $V$ of $p$ such that $\bar{V} \subseteq W$ and an $X \in C^\infty(M, \R)$ such that $x = 1$ on $V$ and $W = 0$ on $M \setminus W$.
@@ -1237,6 +1247,677 @@ So in particular, knowing how the Lie group behaves locally (or even infinitesim
 \end{defi}
 
 Let $\Vect^L(G)$ be the collection of all left invariant vector field. If $X, Y \in \Vect^L(G)$, then so is $[X, Y]$. So $\Vect^L(G)$ is a Lie subalgebra of $\Vect(G)$.
+
+\begin{lemma}
+  Given $\zeta \in T_e G$, we let $X_\zeta(g) = \D L_g(\zeta) \in T_g(G)$. Then the map $T_e G \to \Vect^L(G)$ by $X \mapsto X_\zeta$ is an isomorphism of vector spaces.
+\end{lemma}
+
+\begin{proof}
+  The inverse is given by $X \mapsto X|_e$. The only thing to check is that $X_\zeta$ actually is a left invariant vector field. The left invariant part follows from
+  \[
+    \D L|_h (X_\zeta|_g) = \D L_h \D L_g (\zeta) = \D L_{hg}(\zeta) = X_\zeta |_{hg}.
+  \]
+  To check that $X_\zeta$ is smooth, suppose $f \in C^\infty(U, \R)$, where $U$ is open and contains $e$. We let $\gamma: (-\varepsilon, \varepsilon) \to U$ be smooth with $\dot{\gamma}(0) = \zeta$. So
+  \[
+    X_\zeta f|_g = \D L_g (\zeta)(f) = \zeta(f \circ L_g) = \left.\frac{\d}{\d t}\right|_{t = 0} (f \circ L_g \circ \gamma)
+  \]
+  But as $(t, g) \mapsto f \circ L_g \circ \gamma(t)$ is smooth, it follows that $X_\zeta f$ is smooth. So $X_\zeta \in \Vect^L(G)$.
+\end{proof}
+
+\begin{defi}[Lie algebra of Llie group]\index{Lie algebra of Lie group}
+  let $G$ be a lie group. The \emph{Lie algebra} $\mathfrak{g}$ of $G$ is the Lie algebra $T_eG$ whose Lie bracket is induced by that of the isomorphism with $\Vect^L(G)$. So
+  \[
+    [\zeta, \eta] = [X_\zeta, X_\eta]|_e.
+  \]
+  We also write $\Lie(G)$ for $\mathfrak{g}$.
+\end{defi}
+
+Note that $\dim \mathfrak{g} = \dim G$ is finite.
+
+\begin{eg}
+  For any vector space $V$ and $v \in V$, we have $T_v V \cong V$.
+\end{eg}
+
+\begin{eg}
+  In particular, if $M_{n, n}$ is the $n \times n$ matrices under addition. Then $T_A M_n \cong M_n$ if $A \in M_n$.
+
+  Now note that $G = \GL_n(\R)$ is an open subset of $M_n$. Then
+  \[
+    \gl_n(\R) = \Lie(\GL_n(\R)) = T_I \GL_n = T_I M_n \cong M_n.
+  \]
+  If $A, B \in \GL_n$, then
+  \[
+    L_A(B) = AB.
+  \]
+  So
+  \[
+    \D L_A|_B(H) = AH
+  \]
+  as $L_A$ is linear.
+
+  We claim that under the identification, if $\zeta, \eta \in \gl_n(\R) = M_n$, then
+  \[
+    [\zeta, \eta] = \zeta \eta - \eta \zeta.
+  \]
+  Indeed, on $G$, we have global coordinates $U_i^j: \GL_n \to \R$ where
+  \[
+    U_i^j(A) = A_i^j,
+  \]
+  where $A = (A_i^j) \in \GL_n$.
+
+  Under this chart, we have
+  \[
+    X_\zeta|_A = L_A(\zeta) = \sum_{ij} (A \zeta)_j^i \left.\frac{\partial}{\partial U_j^i}\right|_A = \sum A_k^i \zeta_j^k \left.\frac{\partial}{\partial U_j^i} \right|_A
+  \]
+  So we have
+  \[
+    X_\zeta = \sum_{i,j,k} U^i_k \zeta^k_j \frac{\partial}{\partial U_j^i}.
+  \]
+  So we have
+  \[
+    [X_\zeta, X_\eta] = \left[\sum_{i,j,k} U_k^i \zeta_j^k \frac{\partial}{\partial U_j^i},\sum_{p, q, r} U_q^p \eta_r^p \frac{\partial}{\partial U_r^p}\right].
+  \]
+  We now use the fact that
+  \[
+    \frac{\partial}{\partial U^i_j} U^p_q = \delta_{ip}\delta_{jq}.
+  \]
+  We then expand
+  \[
+    [X_\zeta, X_\eta] = \sum_{i,j,k,r} (U_j^i \zeta_k^j \eta^k_r - U^i_j \zeta^j_k \zeta^k_r) \frac{\partial}{\partial U_r^i}.
+  \]
+  So we have
+  \[
+    [X_\zeta, X_\eta] = X_{\zeta\eta - \eta\zeta}.
+  \]
+\end{eg}
+
+\begin{defi}[Lie group homomorphisms]\index{Lie group!homomorphism}
+  Let $G, H$ be Lie groups. A \emph{Lie group homomorphism} is a smooth map that is also a homomorphism.
+\end{defi}
+
+\begin{defi}[Lie algebra homomorphism]\index{Lie algebra!homomorphism}
+  Let $\mathfrak{g}, \mathfrak{h}$ be Lie group homomorphisms. Then a \emph{Lie algebra homomorphism} is a linear map $\beta: \mathfrak{g} \to \mathfrak{h}$ such that
+  \[
+    \beta[\zeta,\eta] = [\beta(\zeta), \beta(\eta)].
+  \]
+\end{defi}
+
+\begin{prop}
+  Let $G$ be a Lie group and $\zeta \in \mathfrak{g}$. Then the integral curve $\gamma$ for $X_\zeta$ through $e \in G$ exists for all time, and $\gamma: \R \to G$ is a Lie group homomorphism.
+\end{prop}
+
+The idea is that once we have a small integral curve, we can use the Lie group structure to copy the curve to patch together a long integral curve.
+\begin{proof}
+  Let $\gamma: I \to G$ be a maximal integral curve of $X_\zeta$, say $(-\varepsilon, \varepsilon) \in I$. We fix a $t_0$ with $|t_0| < \varepsilon$. Consider $g_0 = \gamma(t_0)$.
+
+  We let
+  \[
+    \tilde{\gamma}(t) = L_{g_0}(\gamma(t))
+  \]
+  for $|t| < \varepsilon$.
+
+  We claim that $\tilde{\gamma}$ is an integral curve of $X_\zeta$ with $\tilde{\gamma}(0) = g_0$. Indeed, we have
+  \[
+    \dot{\tilde{\gamma}}|_t = \frac{\d}{\d t} L_{g_0}\gamma(t) = \D L_{g_0} \dot{\gamma}(t) = \D L_{g_0} X_\zeta|_{\gamma(t)} = X_\zeta|_{\gamma_0 \cdot \gamma(t)} = X_\zeta|_{\tilde{\gamma}(t)}.
+  \]
+  By patching these together, we know $(t_0 - \varepsilon, t_0 + \varepsilon) \subseteq I$. Since we have a fixed $\varepsilon$ that works for all $t_0$, it follows that $I = \R$.
+
+  The fact that this is a Lie group homomorphism follows from general properties of flow maps.
+\end{proof}
+
+\begin{eg}
+  Let $G = \GL_n$. If $\zeta \in \gl_n$, we set
+  \[
+    e^\zeta = \sum_{k \geq 0} \frac{1}{k!} \zeta^k.
+  \]
+  We set $F(t) = e^{t \zeta}$. We observe that this is in $\GL_n$ since $e^{t\zeta}$ has an inverse $e^{-t\zeta}$ (alternatively, $\det (e^{t\zeta}) = e^{\tr (t\zeta)} \not= 0$). Then
+  \[
+    F'(t) = \frac{\d}{\d t} \sum_k \frac{1}{k!} t^k \zeta^k = e^{t\zeta} \zeta = L_{e^{t\zeta}}\zeta = L_{F(t)}\zeta.
+  \]
+  Also, $F(0) = I$. So $F(t)$ is an integral curve.
+\end{eg}
+
+\begin{defi}[Exponential map]\index{exponential map}
+  The \emph{exponential map} of a Lie group $G$ is $\exp: \mathfrak{g} \to G$ given by
+  \[
+    \exp(\zeta) = \gamma_\zeta(1),
+  \]
+  where $\zeta$ is the integral curve of $X_\zeta$ through $e \in G$.
+\end{defi}
+So in the case of $G = \GL_n$, the exponential map is the exponential map.
+
+\begin{prop}\leavevmode
+  \begin{enumerate}
+    \item $\exp$ is a smooth map.
+    \item If $F(t) = \exp(t\zeta)$, then $F: \R \to G$ is a Lie group homomorphism and $\D F|_0 \left(\frac{\d}{\d t}\right) = \zeta$.
+    \item The derivative
+      \[
+        \D \exp: T_0 \mathfrak{g} \cong \mathfrak{g} \to T_e G \cong \mathfrak{g}
+      \]
+      is the identity map.
+    \item $\exp$ is a local diffeomorphism around $0 \in \mathfrak{g}$, ie. there exists an open $U \subseteq \mathfrak{g}$ containing $0$ such that $\exp: U \to \exp(U)$ is a diffeomorphism.
+    \item $\exp$ is natural, ie. if $f: G \to H$ is a Lie group homomorphism, then the diagram
+      \[
+        \begin{tikzcd}
+          \mathfrak{g} \ar[r, "\exp"] \ar[d, "\D f|_e"]& G \ar[d, "f"]\\
+          \mathfrak{h} \ar[r, "\exp"] & H
+        \end{tikzcd}
+      \]
+      commutes.
+  \end{enumerate}
+\end{prop}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item This is the smoothness of ODE's with respect to parameters
+    \item Exercise.
+    \item If $\zeta \in \mathfrak{g}$, we let $\sigma(t) = t \zeta$. So $\dot{\sigma}(0) = \zeta \in T_0 \mathfrak{g} \cong \mathfrak{g}$. So
+      \[
+        \D \exp|_0 (\zeta) = \D \exp|_0(\dot{\sigma}(0)) = \left.\frac{\d}{\d t}\right|_{t = 0} \exp(\sigma(t)) = \left.\frac{\d}{\d t}\right|_{t = 0} \exp(t \zeta) = X_\zeta|_e = \zeta.
+      \]
+    \item Follows from above by inverse function theorem.
+    \item Exercise.
+  \end{enumerate}
+\end{proof}
+
+\begin{defi}[Lie subgroup]\index{Lie subgroup}\index{Lie group!subgroup}
+  A \emph{Lie subgroup} of $G$ is a subgroup $H$ with a smooth structure on $H$ making $H$ an \emph{immersed} submanifold.
+\end{defi}
+
+Certainly, if $H \subseteq G$ is a Lie subgroup, then $\mathfrak{h} \subseteq \mathfrak{g}$ is a Lie subalgebra.
+
+\begin{thm}
+  If $\mathfrak{h} \subseteq \mathfrak{g}$ is a subalgebra, then there exists a unique connected Lie subgroup $H \subseteq G$ such that $\Lie(H) = \mathfrak{h}$.
+\end{thm}
+
+\section{Tensors}
+We are going to do linear algebra! In all of maths, we eventually get to the point where we simplified everything and took linear approximations, and then we have to do linear algebra. So let's learn linear algebra.
+
+We are going to talk about things like bilinear maps. A bilinear maps is a function that takes in two vectors and returns a number, and this is linear in both variables. An example is the inner product, and another example is the volume form, which tells us the volume of a parallelopiped spanned by the two vectors.
+
+\begin{defi}[Bilinear map]\index{bilinear map}
+  Let $U, V, W$ be vector spaces. We define $\Bilin(V\times W, U)$ to be the functions $V \times W \to U$ that are bilinear, ie.
+  \begin{align*}
+    \alpha(\lambda_1 v_1 + \lambda_2 v_2, w) &= \lambda_1 \alpha(v_1, w) + \lambda_2 \alpha(v_2, w)\\
+    \alpha(v, \lambda_1 w_1 + \lambda_2 w_2) &= \lambda_1 \alpha(v, w_1) + \lambda_2 \alpha(v, w_2).
+  \end{align*}
+\end{defi}
+It is important that a bilinear map is not a linear map. This is bad. We spent so much time studying linear maps, and we now have to go back to our linear algebra book and rewrite everything to talk about bilinear maps as well. But bilinear maps are not enough. We want to do them for multi-linear maps! Linear maps were already complicated enough, and we now have many other dimensions to talk about. We want to die.
+
+Tensors are a trick to turn the study of bilinear maps to linear maps (from a different space).
+
+\begin{defi}[Tensor product]\index{tensor product}
+  A \emph{tensor product} of two vector spaces $V, W$ is a vector space $V \otimes W$ and a bilinear map $\pi: V \times W \to V \otimes W$ such that a bilinear map from $V \times W$ is ``the same as'' a linear map from $V \times W$. More precisely, given any bilinear map $\alpha: V \times W \to U$, we can find a unique linear map $\tilde{\alpha}: V \otimes W \to U$ such that the following diagram commutes:
+  \[
+    \begin{tikzcd}
+      V \times W \ar[rd, "\alpha"] \ar[d, "\pi"] \\
+      V \otimes W \ar[r, "\tilde\alpha"'] & U
+    \end{tikzcd}
+  \]
+  So we have
+  \[
+    \Bilin(V \times W, U) \cong \Hom(V \otimes W, U).
+  \]
+  Given $v \in V$ and $w \in W$, we obtain $\pi(v, w) \in V \otimes W$, called the \emph{tensor product} of $v$ and $w$, written $v \otimes w$.
+\end{defi}
+We say $V \otimes W$ \emph{represents} bilinear maps from $V \times W$.
+
+It is important to note that not all elements of $V \otimes W$ are of the form $v \otimes w$.
+
+\begin{prop}
+  Given maps $f: V \to W$ and $g: V' \to W'$, then we obtain a map $f \otimes g: V \otimes V' \to W \otimes W'$ given by the bilinear map
+  \[
+    (f \otimes g)(v, w) = f(v) \otimes g(w).
+  \]
+\end{prop}
+
+\begin{lemma}
+  Tensor products exist (and are unique up to isomorphism) for all pairs of vector spaces.
+\end{lemma}
+
+\begin{proof}
+  Exercise
+\end{proof}
+
+\begin{lemma}
+  Given $v, v_i \in V$ and $w, w_i \in V$ and $\lambda_i \in \F$, we have
+  \begin{align*}
+    (\lambda_1 v_1 + \lambda_2 v_2) \otimes w &= \lambda_1 (v_1 \otimes w) + \lambda_2 (v_2 \otimes w)\\
+    v \otimes (\lambda_1 w_1 + \lambda_2 w_2) &= \lambda_1 (v \otimes w_1) + \lambda_2 (v \otimes w_2).
+  \end{align*}
+\end{lemma}
+
+\begin{proof}
+  Immediate from definition of bilinear map.
+\end{proof}
+
+\begin{lemma}
+  If $v_1,\cdots, v_n$ is a basis of $V_1$, and $w_1, \cdots, w_m$ are a basis for $W$, then
+  \[
+    \{v_i \otimes w_j: i = 1, \cdots, n; j = 1, \cdots, m\}
+  \]
+  is a basis for $V \otimes W$. In particular, $\dim V \otimes W = \dim V \times \dim W$.
+\end{lemma}
+
+\begin{proof}
+  We have $V \otimes W = \Bilin(V \times W, \R)^*$. We let $\alpha_{pq}:V \times W \to \R$ be given by
+  \[
+    \alpha_{pq}\left(\sum a_i v_i, \sum b_j w_j\right) = a_p b_q.
+  \]
+  Then $\alpha_{pq} \in \Bilin(V\times W, \R)$, and $(v_i \otimes w_j)$ are dual to $\alpha_{pq}$. So it suffices to show that $\alpha_{pq}$ are a basis. It is clear that they are independent, and any bilinear map can be written as
+  \[
+    \alpha = \sum c_{pq}\alpha_{pq},
+  \]
+  where
+  \[
+    c_{pq} = \alpha(v_p, w_q).
+  \]
+  So done.
+\end{proof}
+
+\begin{prop}
+  For any vector spaces $V, W, U$, we have (natural) isomorphisms
+  \begin{enumerate}
+    \item $V \otimes W \cong W \otimes W$
+    \item $(V \otimes W) \otimes U \cong V \otimes (W \otimes U)$
+    \item $(V \otimes W)^* \cong V^* \otimes W^*$
+  \end{enumerate}
+\end{prop}
+
+\begin{defi}[Covariant tensor]\index{covariant tensor}
+  A \emph{covariant tensor} of rank $k$ on $V$ is an element of
+  \[
+    \alpha \in \underbrace{V^* \otimes \cdots \otimes V^*}_{k\text{ times}},
+  \]
+  ie. $\alpha$ is a multilinear map $V \times \cdots \times V \to \R$.
+\end{defi}
+
+\begin{eg}
+  A covariant $1$-tensor is an $\alpha \in V^*$, ie. a linear map $\alpha: V \to \R$.
+
+  A covariant $2$-tensor is a $\beta \in V^* \otimes V^*$, ie. a bilinear map $V \times V \to \R$, eg. an inner product.
+\end{eg}
+
+\begin{eg}
+  If $\alpha, \beta \in V^*$, then $\alpha \otimes \beta \in V^* \otimes V^*$ is the covariant $2$-tensor given by
+  \[
+    (\alpha \otimes b)(v, w) = \alpha(v) \beta(w).
+  \]
+  More generally, if $\alpha$ is a rank $k$ tensor and $\beta$ is a rank $\ell$ tensor, then $\alpha \otimes \beta$ is a rank $k + \ell$ tensor.
+\end{eg}
+
+\begin{defi}[Tensor]\index{tensor}
+  A \emph{tensor} of type $(k, \ell)$ is an element in
+  \[
+    T^k_\ell(V) = \underbrace{V^* \otimes \cdots \otimes V^*}_{k\text{ times}} \otimes \underbrace{V \otimes \cdots \otimes V}_{\ell\text{ times}}.
+  \]
+\end{defi}
+We are interested in alternating bilinear maps, ie. $\alpha(v, w) = - \alpha(w, v)$, or equivalently, $\alpha(v, v) = 0$ (if the characteristic is not $2$).
+
+\begin{defi}[Exterior product]\index{exterior product}\index{exterior algebra}.
+  Consider
+  \[
+    T(V) = \otimes_{k \geq 0} V^{\otimes k}
+  \]
+  as an algebra (with multiplication given by the tensor product) (with $V^{\otimes 0} = \R$). We let $I(V)$ be the ideal (as algebras!) generated by $\{v \otimes v: v \in V\} \subseteq T(V)$. We define
+  \[
+    \Lambda V = T(V)/I(V),
+  \]
+  with a projection map $\pi: T(V) \to \Lambda(V)$. This is known as the \emph{exterior algebra}. We let
+  \[
+    \Lambda^k(V) = \pi(V^{\otimes k}),
+  \]
+  the \emph{$k$-th exterior product} of $V$.
+
+  We write $a \wedge b$ for $\pi(\alpha \otimes \beta)$.
+\end{defi}
+
+The idea is that $\Lambda^p V$ is the dual of the space of alternating multilinear maps $V \times V\to \R$.
+
+\begin{lemma}\leavevmode
+  \begin{enumerate}
+    \item If $\alpha \in \Lambda^p V$ and $\beta \in \Lambda^q V$, then $\alpha \wedge \beta = (-1)^{pq} \beta \wedge \alpha$.
+    \item If $\dim V = n$, then we have
+      \[
+        \dim \Lambda^0 V = 1,\quad \dim \Lambda^n V = 1,\quad \Lambda^p V = \{0\}.
+      \]
+    \item The multilinear map $\det: V \times \cdots \times V \to \R$ spans $\Lambda^n V$.
+    \item If $v_1, \cdots, v_n$ is a basis for $V$, then
+      \[
+        \{v_{i_1} \wedge \cdots \wedge v_{i_p}: i_1 < \cdots < i_p\}
+      \]
+      is a basis for $\Lambda^p v$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item We clearly have $v \wedge v = 0$. So
+      \[
+        v \wedge w = - w \wedge v
+      \]
+      Then
+      \[
+        (v_1 \wedge \cdots \wedge v_p) \wedge (w_1 \wedge \cdots \wedge w_q) = (-1)^{pq} w_1 \wedge \cdots \wedge w_q \wedge v_1 \wedge \cdots \wedge v_p
+      \]
+      since we have $pq$ swaps. Since
+      \[
+        \{v_{i_1} \wedge \cdots \wedge v_{i_n}: i_1, \cdots, i_p \in \{1,\cdots, n\}\} \subseteq \Lambda^p V
+      \]
+      spans $\Lambda^p V$ (by the corresponding result for tensor products), the result follows from linearity.
+    \item Exercise.
+    \item The $\det$ map is non-zero. So it follows from the above.
+    \item We know that
+      \[
+        \{v_{i_1} \wedge \cdots \wedge v_{i_n}: i_1, \cdots, i_p \in \{1,\cdots, n\}\} \subseteq \Lambda^p V
+      \]
+      spans, but they are not independent since there is a lot of redundancy (eg. $v_1 \wedge v_2 = - v_2 \wedge v_1$). By requiring $i_1 < \cdots < i_p$, then we obtain a unique copy for combination.
+
+      To check independence, we write $I = (v_{i_1}, \cdots, v_{i_p})$ and let $v_I = v_{i_1} \wedge \cdots \wedge v_{i_p}$. Then suppose
+      \[
+        \sum_I a_I v_I = 0
+      \]
+      for $a_i \in R$. For each $I$, we let $J$ be the multi-index $J = \{1, \cdots, n\} \setminus I$. So if $I \not= I'$, then $v_{I'} \wedge v_J = 0$. So wedging with $v_J$ gives
+      \[
+        \sum_{I'} \alpha_{I'} v_{I'} \wedge v_J = a_I v_I \wedge v_J = 0.
+      \]
+      So $a_I = 0$. So done by (ii).
+  \end{enumerate}
+\end{proof}
+
+If $F: V \to W$ is a linear map, then we get an induced linear map $\Lambda^p F: \Lambda^p V \to \Lambda^p W$ in the obvious way, making the following diagram commute:
+\[
+  \begin{tikzcd}
+    V^{\otimes k} \ar[r, "F^{\otimes k}"] \ar[d] & W^{\otimes k}\ar[d]\\
+    \Lambda^p V \ar[r, "\Lambda^p F"] & \Lambda^p W
+  \end{tikzcd}
+\]
+More concretely, we have
+\[
+  \Lambda^p F (v_1 \wedge \cdots \wedge v_p) = F(v_1) \wedge \cdots \wedge F(v_p).
+\]
+\begin{lemma}
+  Let $F: V \to V$ be a linear map. Then $\Lambda^n F: \Lambda^n V \to \Lambda^n V$ is multiplication by $\det F$.
+\end{lemma}
+
+\begin{proof}
+  Let $v_1, \cdots, v_n$ be a basis. Then $\Lambda^n V$ is spanned by $v_1 \wedge \cdots \wedge v_n$ So we have
+  \[
+    (\Lambda^n F)(v_1\wedge \cdots \wedge v_n) = \lambda v_1 \wedge \cdots \wedge v_n
+  \]
+  for some $\lambda$. Write
+  \[
+    F(v_i) = \sum_j A_{ji} v_j
+  \]
+  for some $A_{ji} \in \R$, ie. $A$ is the matrix representation of $F$. Then we have
+  \[
+    (\Lambda^n F)(v_1 \wedge \cdots \wedge v_n) \left(\sum_j A_j v_j\right) \wedge \cdots \wedge \left(\sum_j A_{ji} v_j\right).
+  \]
+  If we expand the thing in the right, a lot of things die. The only things that live are those where we get each of $v_i$ once in the wedges in some order. Then this becomes
+  \[
+    \sum_{\sigma \in S_n} \varepsilon(\sigma) (A_{\sigma(1), 1} \cdots A_{\sigma(n), n}) v_1 \wedge \cdots \wedge v_n = \det(F) v_1 \wedge \cdots \wedge v_n,
+  \]
+  where $\varepsilon(\sigma)$ is the sign of the permutation, which comes from rearranging the $v_i$ to the right order.
+\end{proof}
+
+\section{Vector bundles}
+Our aim is to consider spaces $T_p M \otimes T_p M, \ldots, \Lambda^p T_p M$ etc as $p$ varies. We want to understand what it means for these vector spaces to vary smoothly with respect to $p$.
+
+As before, our strategy is to take the union of all of them, and put some smooth structure on them.
+
+To do so, we come up with the general notion of a vector bundle.
+\begin{defi}[Vector bundle]\index{vector bundle}
+  A \emph{vector bundle} of rank $r$ on $M$ is a smooth manifold $E$ with a smooth $\pi: E \to M$ such that
+  \begin{enumerate}
+    \item For each $p \in M$, the fibre $\pi^{-1}(p) = E_p$ is an $r$-dimensional vector space,
+    \item For all $p \in M$, there is an open $U \subseteq M$ containing $p$ and a diffeomorphism
+      \[
+        t: E_U = \pi^{-1}(U) \to U \times \R^r
+      \]
+      such that
+      \[
+        \begin{tikzcd}
+          E_U \ar[r, "t"] \ar[d, "\pi"] & U \times \R^r \ar[dl, "p_1"]\\
+          U
+        \end{tikzcd}
+      \]
+      commutes, and the induced maps $E_q \to \{q\} \times \R^r$ is a linear isomorphism for all $q \in U$.
+
+      We call $t$ a \term{trivialization} of $E$ over $U$; call $E$ the \term{total space}; call $M$ the \term{base space}; and call $\pi$ the \term{projection}. Also, for each $q \in M$, the vector space $E_q = \pi^{-1}(\{q\})$ is called the \term{fiber} over $q$.
+  \end{enumerate}
+  Note that the vector space structure on $E_p$ is part of the data of a vector bundle.
+\end{defi}
+
+Alternatively, $t$ can be given by collections of smooth maps $s_1, \cdots, s_r: U \to E$ with the property that for each $q \in U$, the vectors $s_1(q), \cdots, s_r(q)$ is a basis for $E_q$. Indeed, given such $s_1, \cdots, s_r$, we can define $t$ by
+\[
+  t(v_q) = (q, \alpha_1, \cdots, \alpha_n),
+\]
+where $v_q \in E_q$ and the $\alpha_i$ are chosen such that
+\[
+  v_q = \sum_{i = 1}^r \alpha_i s_i(q).
+\]
+The $s_1, \cdots, s_r$ are known as a \term{frame} for $E$ over $U$.
+
+\begin{eg}[Tangent bundle]
+  The bundle $TM \to M$ is a vector bundle. Given any point $p$, find some coordinate charts around $p$ with coordinates $x_1, \cdots, x_n$. Then we get a frame $\frac{\partial}{\partial x_i}$, giving trivializations of $TM$ over $U$. So $TM$ is a vector bundle.
+\end{eg}
+
+\begin{defi}[Section]\index{section}\index{$C^\infty(U, E)$}
+  A \emph{(smooth) section} of a vector bundle $E \to M$ over some open $U \subseteq M$ is a smooth $s: U \to E$ such that $s(p) \in E_p$ for all $p \in U$. We write $C^\infty(U, E)$ for the set of smooth sections of $E$ over $U$.
+\end{defi}
+
+\begin{eg}
+  $\Vect(M) = C^\infty (M, TM)$.
+\end{eg}
+
+\begin{defi}[Transition function]\index{transition function}
+  Suppose that $t_\alpha: E|_{U_\alpha} \to U_\alpha \times \R^r$ and $t_\beta: E|_{U_\beta} \to U_\beta \times \R^r$ are trivializations of $e$. Then
+  \[
+    t_\alpha \circ t_\beta^{-1} : (U_\alpha \cap U_\beta) \times \R^r \to (U_\alpha \cap U_\beta) \times \R^r
+  \]
+  is a fiberwise linear, ie.
+  \[
+    t_\alpha \circ t_\beta^{-1}(q, v) = (q, \varphi_{\alpha\beta}(q) v),
+  \]
+  where $\varphi_{\alpha\beta}(q)$ is in $\GL(r, \R)$.
+
+  In fact, $\varphi_{\alpha\beta}: U_\alpha \cap U_\beta \to \GL_r(\R)$ is smooth. Then $\varphi_{\alpha\beta}$ is known as the \term{transition function} from $\beta$ to $\alpha$.
+\end{defi}
+
+\begin{prop}
+  We have the following equalities whenever everything is defined:
+  \begin{enumerate}
+    \item $\varphi_{\alpha\alpha} = \id$
+    \item $\varphi_{\alpha\beta} = \varphi_{\beta\alpha}^{-1}$
+    \item $\varphi_{\alpha\beta}\varphi_{\beta\gamma} = \varphi_{\alpha\gamma}$, where $\varphi_{\alpha\beta} \varphi_{\beta\gamma}$ is pointwise matrix multiplication.
+  \end{enumerate}
+  These are known as the \term{cocycle conditions}.
+\end{prop}
+We now consider general constructions that allow us to construct new vector bundles from old.
+
+We want the converse, namely that we can construct vector bundles given transition maps with these cocycle conditions.
+
+\begin{prop}[Vector bunlde construction]
+  Suppose that for each $p \in M$, we have a vector space $E_p$. We set
+  \[
+    E = \bigcup_p E_p
+  \]
+  We let $\pi: E \to M$ be given by $\pi(v_p) = p$ for $v_p \in E_p$. Suppose there is an open cover $\{U_\alpha\}$ of open sets of $M$ such that for each $\alpha$, we have maps
+  \[
+    t_\alpha: E|_{U_\alpha} = \pi^{-1}(U_\alpha) \to U_\alpha \times \R^n
+  \]
+  over $U_\alpha$ that induce fiberwise linear isomorphisms. Suppose the transition functions $\varphi_{\alpha\beta}$ are smooth. Then there exists a unique smooth structure on $E$ making $\pi: E \to M$ a vector bundle such that the $t_\alpha$ are trivializations for $E$.
+\end{prop}
+
+\begin{proof}
+  The same as the case for the tangent bundle.
+\end{proof}
+
+We let $\varphi_{\alpha\varsigma}$ be transition functions for $\{t_\alpha\}$ and $\tilde{\varphi}_{\alpha\beta}$ be transition functions for $\{\tilde{t}_\alpha\}$.
+
+\begin{defi}[Direct sum of vector bundles]\index{direct sum!vector bundles}\index{vector bundle!direct sum}
+  Let $E, \tilde{E}$ be vector bundles on $M$. Suppose $t_\alpha: E|_{U_\alpha} \cong U_\alpha \times \R^r$ is a trivialization for $E$ over $U_\alpha$, and $\tilde{t}_\alpha: E|_{U_\alpha} \cong U_\alpha \times \R^{\tilde{r}}$ is a trivialization for $E$ over $U_\alpha$.
+
+  We let $\varphi_{\alpha\varsigma}$ be transition functions for $\{t_\alpha\}$ and $\tilde{\varphi}_{\alpha\beta}$ be transition functions for $\{\tilde{t}_\alpha\}$.
+
+  Define
+  \[
+    E \oplus \tilde{E} = \bigcup_p E_p \oplus \tilde{E}_p,
+  \]
+  and define
+  \[
+    T_\alpha: (E \oplus \tilde{E})|_{U_\alpha} = E|_{U_\alpha} \otimes \tilde{E}|_{U_\alpha} \to U_\alpha \times (\R^n \oplus \R^{\tilde{r}} = U_\alpha \times \R^{r + \tilde{r}}
+  \]
+  be the fiberwise direct sum of the two trivializations. Then $T_\alpha$ clearly gives a linear isomorphism $(E \oplus \tilde{E})_p \cong \R^{r + \tilde{r}}$, and the transition function for $T_\alpha$ is
+  \[
+    T_\alpha \circ T_\beta^{-1} = \varphi_{\alpha\beta} \oplus \tilde{\varphi}_{\alpha\beta},
+  \]
+  which is clearly smooth. So this makes $E \oplus \tilde{E}$ into a vector bundle.
+\end{defi}
+
+In terms of frames, if $\{s_1, \cdots, s_r\}$ is a frame for $E$ and $\{\tilde{s}_1, \cdots, \tilde{s}_{\tilde{r}}\}$ is a frame for $\tilde{E}$ over some $U\subseteq M$ , then $\{s_i \oplus 0, 0 \oplus \tilde{j}: i = 1, \cdots, r; j = 1, \cdots, \tilde{r}\}$ is a frame for $E \oplus \tilde{E}$.
+
+\begin{defi}[Tensor product of vector bundles]\index{tensor product!vector bundle}\index{vector bundle!tensor product}
+  Given two vector bundles $E, \tilde{E}$ over $M$, we can construct $E \otimes \tilde{E}$ similarly with fibers $(E \otimes \tilde{E})|_p = E|_p \otimes \tilde{E}|_p$.
+\end{defi}
+
+Similarly, we can construct the alternating product of vector bundles $\Lambda^n E$. Finally, we have the \emph{dual} vector bundle.
+
+\begin{defi}[Dual vector bundle]\index{vector bundle!dual}\index{dual!vector bundle}
+  Given a vector bundle $E \to M$, we define the \emph{dual vector bundle} by
+  \[
+    E^* = \bigcup_{p \in M} (E_p)^*.
+  \]
+  Suppose again that $t_\alpha: E|_{U_\alpha} \to U_\alpha \times \R^n$ is a local trivialization. Taking the dual of this map gives
+  \[
+    t_\alpha^*: U_\alpha \times (\R^n)^* \to E|_{U_\alpha}^*.
+  \]
+  since taking the dual reverses the direction of the map. We pick an isomorphism $(\R^n)^* \to \R$ once and for all, and then reverse the above isomorphism to get a map
+  \[
+    E|_{U_\alpha}^* \to U_\alpha \times \R^n.
+  \]
+  This gives a local trivialization.
+\end{defi}
+
+If $\{s_1, \cdots, s_r\}$ is a frame for $E$ over $U$, then $\{s_1^*, \cdots, s_r^*\}$ is a frame for $E^*$ for $U$, where $\{s_1^{*}(p), \cdots, s_r^*(p)\}$ is a dual basis to $\{s_1(p), \cdots, s_r(p)\}$.
+
+\begin{defi}[Cotangent bundle]\index{cotangent bundle}\index{$T^*M$}\index{$\d x_i$}
+  The \emph{cotangent bundle} of a manifold $M$ is
+  \[
+    T^*M = (TM)^*.
+  \]
+  In local coordinate charts, we have a frame $\frac{\partial}{\partial x_1}, \cdots, \frac{\partial}{\partial x_n}$ of $TM$ over $U$. The dual frame is written as $\d x_1, \cdots, \d x_n$. In other words, we have
+  \[
+    \d x_i|p \in (T_p M)^*
+  \]
+  and
+  \[
+    \d x_i|_p\left(\left.\frac{\partial}{\partial x_i}\right|_p\right) = \delta_{ij}.
+  \]
+\end{defi}
+
+Recall the previously, given a function $f \in C^\infty(U, \R)$, we defined $\d f$ as the differential of $f$ given by
+\[
+  \d f|_p = \D f|_p: T_p M \to T_{f(p)} \R = \R.
+\]
+Thinking of $x_i$ as a function on a coordinate chart $U$, we have
+\[
+  \D x_i|_p \left(\left.\frac{\partial}{\partial x_j}\right|_p\right) = \frac{\partial}{\partial x_j}(x_i) = \delta_{ij}
+\]
+for all $i, j$. So the two definitions of $\d x_i$ agree.
+
+We can now take powers of this to get more interesting things.
+\begin{defi}[$p$-form]\index{$p$-form}
+  A $p$-form on a manifold $M$ over $U$ is a smooth section of $\Lambda^p T^*M$, ie. as an element in $C^\infty (U, \Lambda^p T^*M)$.
+\end{defi}
+
+\begin{eg}
+  A $1$-form is an element of $T^* M$. It is locally of the form
+  \[
+    \alpha_1 \d x_1 + \cdots + \alpha_n \d x_n
+  \]
+  for some smooth functions $\alpha_1, \cdots, \alpha_n$.
+
+  Similarly, if $\omega$ is a $p$-form, then locally, it is of the form
+  \[
+    \omega = \sum_I \omega_I \d x_I,
+  \]
+  where $I = (i_1, \cdots, i_p)$ with $i_1 < \cdots < i_p$, and $\d x_I = \d x_{i_1} \wedge \cdots \wedge \d x_{i_p}$.
+\end{eg}
+It is important to note that these representations only work locally.
+
+\begin{defi}[Tensors on manifolds]\index{tensors!on manifolds}\index{$T_\ell^k M$}
+  Let $M$ be a manifold. We define
+  \[
+    T_{\ell}^k M = \underbrace{T^*M \otimes \cdots \otimes T^* M}_{k \text{ times}} \otimes \underbrace{TM \otimes \cdots \otimes TM}_{\ell \text{ times}}.
+  \]
+  A \emph{tensor of type $(k, \ell)$} is an element of
+  \[
+    C^\infty (M, T_\ell^k M).
+  \]
+  The convention when $k = \ell = 0$ is to set $T_0^0 M = M \times \R$.
+\end{defi}
+
+In local coordinates, we can write a $(k, \ell)$ tensor $\omega$ as
+\[
+  \omega = \sum \alpha_{i_1, \ldots, i_\ell}^{j_1, \ldots, j_k} \d x_{j_1} \otimes \cdots \otimes \d x_{j_k} \otimes \frac{\partial}{\partial x_{i_1}} \otimes \cdots \otimes \frac{\partial}{\partial x_{i_\ell}},
+\]
+where the $\alpha$ are smooth functions.
+
+\begin{eg}
+  A tensor of type $(0, 1)$ is a vector field.
+
+  A tensor of type $(1, 0)$ is a $1$-form.
+
+  A tensor of type $(0, 0)$ is a real-valued function.
+\end{eg}
+
+\begin{defi}[Riemannian metric]\index{Riemannian metric}
+  A \emph{Riemannian metric} on $M$ is a $(2, 0)$-tensor $g$ such that for all $p$, the bilinear map $g_p: T M \times T M \to \R$ is symmetric and positive definite, ie. an inner product.
+
+  Given such a $g$ and $v_p \in T_p M$, we write $\norm{v_p}$ for $\sqrt{g(v_p, v_p)}$.
+\end{defi}
+
+Using these, we can work with things like length:
+
+\begin{defi}[Length of curve]\index{length!curve}\index{curve!length}
+  Let $\Gamma: I \to M$ be a curve $\gamma$. The \emph{length} is
+  \[
+    \ell(\gamma)= \int_I |\dot{\gamma}(t)| \;\d t.
+  \]
+\end{defi}
+
+We will come back to these later on.
+
+Finally, we will talk about morphisms between vector bundles.
+
+\begin{defi}[Vector bundle morphisms]\index{vector bundle!morphism}\index{morphism!vector bundle}\index{bundle morphism}
+  Let $E \to M$ and $E' \to M'$ be vector bundles. A \emph{bundle morphism} from $E$ to $E'$ is a pair of smooth maps $(F: E \to E', f: M \to M')$ such that the following diagram commutes:
+  \[
+    \begin{tikzcd}
+      E \ar[d] \ar[r, "F"] & E' \ar[d]\\
+      M \ar[r, "f"] & M'
+    \end{tikzcd}.
+  \]
+  such that $F_p: E_p \to E'_{f(p)}$ is linear for each $p$.
+\end{defi}
+
+\begin{eg}
+  Let $E = TM$ and $E' = TM'$. If $f: M \to M'$ is smooth, then $(\D f, f)$ is a bundle morphism.
+\end{eg}
+
+\begin{defi}[Bundle morphism over $M$]\index{bundle morphism!over $M$}
+  Given two bundles $E, E'$ over the same base $M$, a \emph{bundle morphism over $M$} is a bundle morphism $E \to E'$ of the form $(F, \id_M)$.
+\end{defi}
+
+\begin{eg}
+  Given a Riemannian metric $g$, we get a bundle morphism $TM \to T^*M$ over $M$ by
+  \[
+    v \mapsto F(v) = g(v, -).
+  \]
+  Since each $g(v, -)$ is an isomorphism, we have a canonical bundle isomorphism $TM \cong T^*M$.
+\end{eg}
+Note that the isomorphism between $TM$ and $T^*M$ requires the existence of a Riemannian metric.
 
 \printindex
 \end{document}

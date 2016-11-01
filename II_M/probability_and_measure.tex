@@ -66,6 +66,8 @@ We can make an analogy with bankers --- If a Riemann banker is given a stack of 
 
 Why would we want to do so? It turns out this leads to a much more general theory of interaction on a much more general spaces. In the context of $\R$, this theory of integration is much much more powerful than the Riemann sum, and can integrate a much wider class of functions. Theorems for interchanging limits and integration also become much stronger.
 
+We will write $f_n \nearrow f$ for ``$f_n$ converges to $f$ monotonically increasingly'', and $f_n \searrow f$ similarly.
+
 \section{Measures}
 The starting point of all these is to come up with a function that determines the ``size'' of a given set, known as a \emph{measure}. It turns out we cannot sensibly define a size for \emph{all} subsets of $[0, 1]$. Thus, we need to restrict our attention to a collection of ``nice'' subsets.
 
@@ -606,7 +608,7 @@ More generally, we can talk about independence of $\sigma$-algebras.
   A sequence of $\sigma$-algebras $(\mathcal{A}_n)$ with $\mathcal{A}_n \subseteq \mathcal{F}$ for all $n$ is said to be independent if the following is true: If $(A_n)$ is a sequence where $A_n \in \mathcal{A}_n$ for all $n$, them $(A_n)$ is independent.
 \end{defi}
 
-\begin{thm}
+\begin{thm}\index{$\pi$-system}
   Suppose $\mathcal{A}_1$ and $\mathcal{A}_2$ are $\pi$-systems in $\mathcal{F}$. If
   \[
     \P[A_1 \cap A_2] = \P[A_1] \P[A_2]
@@ -1097,7 +1099,7 @@ We want to talk about the convergence of random variables, and later see how the
   \[
     \mu(\{x \in E: f_n(x) \not\to f(x)\}) = 0.
   \]
-  If $(E, \mathcal{E}, \mu)$ is a probability space, this is called almost sure convergence.
+  If $(E, \mathcal{E}, \mu)$ is a probability space, this is called \emph{almost sure convergence}.
 \end{defi}
 To see this makes sense note that
 \[
@@ -1115,6 +1117,721 @@ On the example sheet, we will see that $\limsup |f_n - f|$ is non-negative measu
   If $(E, \mathcal{E}, \mu)$ is a probability space, then this is called \emph{convergence in probability}
 \end{defi}
 
-In general, neither of these notions imply each other. However, if the space is finite, we will see that almost everywhere convergence implies convergence in measure, but this is no longer true in general.
+In general, neither of these notions imply each other. However, we have the following result:
+
+\begin{thm}\leavevmode
+  \begin{enumerate}
+    \item If $\mu(E) < \infty$, then $f_n \to f$ a.e. implies $f_n \to f$ in measure.
+    \item For any $E$, if $f_n \to f$ in measure, then there exists a subsequence $(f_{n_k})$ such that $f_{n_k} \to f$ a.e.
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}
+  First suppose $\mu(E) < \infty$, and fix $\varepsilon > 0$. Consider
+  \[
+    \mu(\{x \in E: |f_n(x) - f(x)|\leq \varepsilon\}).
+  \]
+  We show that as $n \to \infty$, this tends to $\mu(E)$. First of all, we know
+  \[
+    \mu(\{x \in E: |f_n(x) - f(x)|\leq \varepsilon\}) \geq \mu\left(\bigcap_{m \geq n} \{x \in E: |f_m(x) - f(x)| \leq \varepsilon\}\right).
+  \]
+  Taking the limit as $n \to \infty$, we have
+  \begin{align*}
+    \mu(\{x \in E: |f_n(x) - f(x)|\leq \varepsilon\}) &\geq \mu\left(\bigcap_{m \geq n} \{x \in E: |f_m(x) - f(x)| \leq \varepsilon\}\right)\\
+    &\geq \mu\left(\bigcup_n \bigcap_{m \geq n} \{x \in E: |f_m(x) - f(x)| \leq \varepsilon\}\right)\\
+    &= \mu(\{x \in E: |f_m(x) - f(x)| \leq \varepsilon \text{ eventually}\})\\
+    &\geq \mu(\{x \in E: |f_m(x) -f(x)| \to 0\})\\
+    &= \mu(E).
+  \end{align*}
+  As $\mu(E) < \infty$, we have $\mu(\{x \in E: |f_n(x) - f(x)| > \varepsilon\}) \to 0$ as $n \to \infty$.
+
+  For the second part, suppose that $f_n \to f$ in measure. We pick a subsequence $(n_k)$ such that
+  \[
+    \mu\left(\left\{x \in E: |f_{n_k}(x) - f(x)| > \frac{1}{k}\right\}\right) \leq 2^{-k}.
+  \]
+  Then we have
+  \[
+    \sum_{k = 1}^\infty \mu\left(\left\{x \in E: f_{n_k}(x) - f(x)|> \frac{1}{k}\right\}\right) \leq \sum_{k = 1}^\infty 2^{-k} = 1 < \infty.
+  \]
+  By the first Borel--Cantelli lemma, we know
+  \[
+    \mu\left(\left\{x \in E: |f_{n_k}(x) - f(x)| > \frac{1}{k} \text{ i.o.}\right\}\right) = 0.
+  \]
+  So $f_{n_k} \to f$ a.e.
+\end{proof}
+It is important that we assume that $\mu(E) < \infty$ for the first part.
+\begin{eg}
+  Consider $(E, \mathcal{E}, \mu) = (\R, \mathcal{B}, \text{Lebesgue})$. Take $f_n(x) = \mathbf{1}_{[n, \infty)}(x)$. Then $f_n(x) \to 0$ for all $x$, and in particular almost everywhere. However, we have
+  \[
+    \mu\left(\left\{x \in \R: |f_n(x)| > \frac{1}{2}\right\}\right) = \mu([n, \infty)) = \infty
+  \]
+  for all $n$.
+\end{eg}
+
+There is one last type of convergence we are interested in. We will only first formulate it in the probability setting, but there is an analogous notion in measure theory known as \emph{weak convergence}, which we will discuss much later on in the course.
+\begin{defi}[Convergence in distribution]\index{convergence!in distribution}
+  Let $(X_n), X$ be random variables with distribution functions $F_{X_n}$ and $F_X$, then we say $X_n \to X$ \emph{in distribution} if $F_{X_n}(x) \to F_X(x)$ for all $x \in \R$ at which $F_X$ is continuous.
+\end{defi}
+Note that here we do not need that $(X_n)$ and $X$ live on the same probability space, since we only talk about the distribution functions.
+
+But why do we have the condition with continuity points? The idea is that if the resulting distribution has a ``jump'' at $x$, it doesn't matter which side of the jump $F_X(x)$ is at. Here is a simple example that tells us why this is very important:
+
+\begin{eg}
+  Let $X_n$ to be uniform on $[0, 1/n]$. Intuitively, this should converge to the random variable that is always zero.
+
+  We can compute
+  \[
+    F_{X_n} (x) =
+    \begin{cases}
+      0 & x \leq 0\\
+      nx & 0 < x< 1/n\\
+      1 & x \geq 1/n
+    \end{cases}.
+  \]
+  We can also compute the distribution of the zero random variable as
+  \[
+    F_0 =
+    \begin{cases}
+      0 & x < 0\\
+      1 & x \geq 0
+    \end{cases}.
+  \]
+  But $F_{X_n}(0) = 0 $ for all $n$, while $F_X(0) = 1$.
+\end{eg}
+
+\begin{thm}[Skorokhod representation theorem of weak convergence]\index{Skorokhod representation theorem of weak convergence}\leavevmode
+  \begin{enumerate}
+    \item If $(X_n), X$ are defined on the same probability space, and $X_n \to X$ in probability. Then $X_n \to X$ in distribution.
+    \item If $X_n \to X$ in distribution, then there exists random variables $(\tilde{X}_n)$ and $\tilde{X}$ defined on a common probability space with $F_{\tilde{X}_n} = F_{X_n}$ and $F_{\tilde{X}} = F_X$ such that $\tilde{X}_n \to \tilde{X}$ a.s.
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}
+  Let $S = \{x \in \R: F_X\text{ is continuous}\}$.
+  \begin{enumerate}
+    \item Assume that $X_n \to X$ in probability. Fix $x \in S$. We need to show that $F_{X_n}(x) \to F_X(x)$ as $n \to \infty$.
+
+      We fix $\varepsilon > 0$. Since $x \in S$, this implies that there is some $\delta > 0$ such that
+      \begin{align*}
+        F_X(x - \delta) &\geq F_X(x) - \frac{\varepsilon}{2}\\
+        F_X(x + \delta) & \leq F_X(x) + \frac{\varepsilon}{2}.
+      \end{align*}
+      We fix $N$ large such that $n \geq N$ such that $\P[|X_n - X| \geq \delta] \leq \frac{\varepsilon}{2}$. Then
+      \begin{align*}
+        F_{X_n}(x) &= \P[X_n \leq x] \\
+        &= \P[(X_n - X) + X \leq x] \\
+        \intertext{We now notice that $\{(X_n - x) + X \leq x\} \subseteq \{X \leq x + \delta\} \cup \{|X_n - X| > \delta\}$. So we have}
+        &\leq \P[X \leq x + \delta] + \P[|x_n - X| > \delta]\\
+        &\leq F_X(x + \delta) + \frac{\varepsilon}{2}\\
+        &\leq F_X(x) + \varepsilon.
+       \end{align*}
+       Also, we have
+       \begin{align*}
+         F_{X_n}(x) &= \P[X_n \leq x] \\
+         &\geq \P[X \leq x - \delta] - \P[|X_n - X| > \delta]\\
+         &\geq F_X(x - \delta) - \frac{\varepsilon}{2}\\
+         &\geq F_X(x) - \varepsilon.
+       \end{align*}
+       Combining, we have that $n \geq N$ implying $|F_{x_n}(x) - F_X(x)| \leq \varepsilon$. Since $\varepsilon$ was arbitrary, we are done.
+     \item Suppose $X_n \to X$ in distribution. We again let
+       \[
+         (\Omega, \mathcal{F}, \mathcal{B}) = ((0, 1), \mathcal{B}((0, 1)), \text{Lebesgue}).
+       \]
+       We let
+       \begin{align*}
+         \tilde{X}_n(\omega) &= \inf\{x : \omega \leq F_{X_n}(x)\},\\
+         \tilde{X}(\omega) &= \int \{x : \omega \leq F_X(x)\}.
+       \end{align*}
+       Recall from before that $\tilde{X}_n$ has the same distribution function as $X_n$ for all $n$, and $\tilde{X}$ has the same distribution as $X$. We are now going to show that with this particular choice, we have $\tilde{X}_n \to \tilde{X}$ a.s.
+
+       Note that $\tilde{X}$ is a non-decreasing function $(0, 1) \to \R$. Then by general analysis, $\tilde{X}$ has at most countably many discontinuities. We write
+       \[
+         \Omega_0 = \{\omega \in (0, 1): \tilde{X}\text{ is continuous at }\omega_0\}.
+       \]
+       Then $(0, 1) \setminus \Omega$ is countable, and hence has Lebesgue measure $0$. So
+       \[
+         \P[\Omega_0] = 1.
+       \]
+       We are now going to show that $\tilde{X}_n (\omega) \to \tilde{X}(\omega)$ for all $\omega \in \Omega_0$.
+
+       Note that $F_X$ is a non-decreasing function, and hence the points of discontinuity $\R \setminus S$ is also countable. So $S$ is dense in $\R$. Fix $\omega \in \Omega_0$ and $\varepsilon > 0$. We want to show that $|\tilde{X}_n(\omega) - \tilde{W}_\omega| \leq \varepsilon$ for all $n$ large enough.
+
+       Since $S$ is dense in $\R$, we can find $x^-, x^+$ in $S$ such that $x^- < \tilde{X}(\omega) < x^+$ and $x^+ - x^- < \varepsilon$. We can also find $\omega^+\in (\omega, 1)$ such that $\tilde{X}(\omega^+) \leq x^+$ since $\tilde{X}$ is continuous at $\omega^+$. Then we have
+       \[
+         F_X(x^-) < \varepsilon
+       \]
+       and
+       \[
+         F-X(x^+) \geq \omega^+ > \omega.
+       \]
+       Then convergence in distribution implies that there is $N$ such that $n \geq N$ implies $F_{X_n}(x^- < \varepsilon)$, and $F_{X_n}(x^+) \geq \omega$. So we have $x^- < \tilde{X}_n(\omega) \leq x^+$. So $|\tilde{X}_n(\omega)- \tilde{X}(\omega)| < x^+ - x^- = \varepsilon$. So done.
+  \end{enumerate}
+\end{proof}
+
+\begin{defi}[Tail $\sigma$-algebra]\index{tail $\sigma$-algebra}\index{$\sigma$-algebra!tail}
+  Let $(X_n)$ be a sequence of random variables. We let
+  \[
+    \mathcal{T}_n = \sigma(X_{n + 1}, X_{n + 2}, \cdots),
+  \]
+  and
+  \[
+    \mathcal{T} = \bigcap_n \mathcal{T}_n.
+  \]
+  Then $\mathcal{T}$ is the \emph{tail $\sigma$-algebra}
+\end{defi}
+$\mathcal{T}$-measurable \index{$\mathcal{T}$-measurable} events and random variables only depend on the asymptotic behaviour of the $X_n$'s.
+
+\begin{eg}
+  Let $(X_n)$ be a sequence of real-valued random variables. Then
+  \[
+    \limsup_{n \to \infty} \frac{1}{n} \sum_{j = 1}^n X_j,\quad \liminf_{n \to \infty} \frac{1}{n} \sum_{j = 1}^n X_j
+  \]
+  are $\mathcal{T}$-measurable random variables. Finally,
+  \[
+    \left\{\lim_{n \to \infty} \frac{1}{n} \sum_{j = 1}^n X_j\text{ exists }\right\} \in \mathcal{T},
+  \]
+  since this is just the set of all points where the previous two things agree.
+\end{eg}
+
+\begin{thm}[Kolmogorov 0-1 law]\index{Kolmogorov 0-1 law}
+  Let $(X_n)$ be a sequence of independent (real-valued) random variables. If $A \in \mathcal{T}$, then $\P[A] = 0$ or $1$.
+
+  Moreover, if $X$ is a $\mathcal{T}$-measurable random variable, then there exists a constant $c$ such that
+  \[
+    \P[X = c] = 1.
+  \]
+\end{thm}
+
+\begin{proof}
+  The proof is very funny the first time we see it. We are going to prove the theorem by checking something that seems very strange. We are going to show that if $A \in \mathcal{T}$, then $A$ is independent of $A$. It then follows that
+  \[
+    \P[A] = \P[A \cap A] = \P[A] \P[A],
+  \]
+  so $\P[A] = 0$ or $1$. In fact, we are going to prove that $\mathcal{T}$ is independent of $\mathcal{T}$.
+
+  Let
+  \[
+    \mathcal{F}_n = \sigma(X_1, \cdots, X_n).
+  \]
+  This $\sigma$-algebra is generated by the $\pi$-system of events of the form
+  \[
+    A = \{X_1 \leq x_1, \cdots, X_n \leq x_n\}.
+  \]
+  Similarly, $\mathcal{T}_n = \sigma(X_{n + 1}, X_{n + 2}, \cdots)$ is generated by the $\pi$-system of events of the form
+  \[
+    B = \{X_{n + 1} \leq x_{n + 1}, \cdots, X_{n + k} \leq x_{n + k}\},
+  \]
+  where $k$ is any natural number.
+
+  Since the $X_n$ are independent, we know for any such $A$ and $B$, we have
+  \[
+    \P[A \cap B] = \P[A]\P[B].
+  \]
+  Since this is true for all $A$ and $B$, it follows that $\mathcal{F}_n$ is independent of $\mathcal{T}_n$.
+
+  Since $\mathcal{T} = \bigcap_k \mathcal{T}_k \subseteq \mathcal{T}_n$ for each $n$, we know $\mathcal{F}_n$ is independent of $\mathcal{T}$.
+
+  Now $\bigcup_k \mathcal{F}_k$ is a $\pi$-system, which generates the $\sigma$-algebra $\mathcal{F}_\infty = \sigma(X_1, X_2, \cdots)$. We know that if $A \in \bigcup_n \mathcal{F}_n$, then there has to exist an index $n$ such that $A \in \mathcal{F}_n$. So $A$ is independent of $\mathcal{T}$. So $\mathcal{F}_\infty$ is independent of $\mathcal{T}$.
+
+  Finally, note that $\mathcal{T} \subseteq \mathcal{F}_\infty$. So $\mathcal{T}$ is independent of $\mathcal{T}$.
+
+  Finally, suppose that $X$ is $\mathcal{T}$-measurable. Then
+  \[
+    \P[X \leq x] \in \{0, 1\}
+  \]
+  for all $x \in \R$ since $\{X \leq x\} \in \mathcal{T}$.
+
+  Now take
+  \[
+    c = \inf\{x \in \R: \P[X \leq x] = 1\}.
+  \]
+  Then with this particular choice of $c$, it is easy to see that $\P[X = c] = 1$. This completes the proof of the theorem.
+\end{proof}
+
+We are now going to prove the monotone class theorem, which is a ``Dynkin's lemma'' for measurable functions.
+\begin{thm}[Monotone class theorem]\index{monotone class theorem}
+  Let $(E, \mathcal{E})$ be a measurable space, and $\mathcal{A} \subseteq \mathcal{E}$ be a $\pi$-system with $\sigma(\mathcal{A}) = \mathcal{E}$. Let $\mathcal{V}$ be a vector space of functions such that
+  \begin{enumerate}
+    \item The constant function $1 = \mathbf{1}_E$ is in $\mathcal{V}$.
+    \item The indicator functions $\mathbf{1}_A \in \mathcal{V}$ for all $A \in \mathcal{A}$
+    \item $\mathcal{V}$ is closed under bounded, monotone limits. More explicitly, if $(f_n)$ is a bounded, non-negative, increasing sequence in $\mathcal{V}$ and $f_n \to f$ is bounded, then $f \in \mathcal{V}$.
+  \end{enumerate}
+  Then $\mathcal{V}$ contains all bounded measurable functions.
+\end{thm}
+
+\begin{proof}
+  Note that the conditions for $\mathcal{V}$ is pretty like the conditions for a d-system, where taking a bounded, monotone limit is something like taking increasing unions.
+
+  In fact, let
+  \[
+    \mathcal{D} = \{A \in \mathcal{E}: \mathbf{1}_A \in \mathcal{V}\}.
+  \]
+  We want to show that $\mathcal{D} = \mathcal{E}$. To do this, we have to show that $\mathcal{D}$ is a $d$-system.
+  \begin{enumerate}
+    \item Since $\mathbf{1}_E \in \mathcal{V}$, we know $E \in \mathcal{D}$.
+    \item If $\mathbf{1}_A \in V$, then $1 - \mathbf{1}_A = \mathbf{1}_{E \setminus A} \in \mathcal{V}$. So $E \setminus A \in \mathcal{D}$.
+    \item If $(A_n)$ is an increasing sequence in $\mathcal{D}$, then $\mathbf{1}_{A_n} \to \mathbf{1}_{\bigcup A_n}$ monotonically increasingly. So $\mathbf{1}_{\bigcup A_n}$ is in $\mathcal{D}$.
+  \end{enumerate}
+  So, by Dynkin's lemma, we know $\mathcal{D} = \mathcal{E}$. So $\mathcal{V}$ contains indicators of all measurable sets. We will now try to obtain any measurable function by approximating.
+
+  Suppose that $f$ is bounded and non-negative measurable. We want to show that $f \in \mathcal{V}$. To do this, we approximate it by letting
+  \[
+    f_n = 2^{-n} \lfloor 2^n f\rfloor = \sum_{k = 0}^\infty k 2^{-n} \mathbf{1}_{\{k 2^{-n} \leq f < (k + 1) 2^{-n}\}}.
+  \]
+  Note that since $f$ is bounded, this is a finite sum. So it is a finite linear combination of indicators of elements in $\mathcal{E}$. So $f_n \in \mathcal{V}$, and $0 \leq f_n \to f$ monotonically. So $f \in \mathcal{V}$.
+
+  More generally, if $f$ is bounded and measurable, then we can write
+  \[
+    f = f^+ - f^- = \max(f, 0) - \max(-f, 0) = (f \vee 0) - ((-f) \vee 0),
+  \]
+  where $f \vee g = \max(f, g)$.
+  Then $f^+$ and $f^-$ are bounded and non-negative measurable.
+\end{proof}
+These results are important, but we will not get to use them until quite later on in the course.
+
+\section{Integration}
+We are now going to work towards defining the integral of a measurable function on a measure space $(E, \mathcal{E}, \mu)$. Different sources use different notations for the integral. The following notations are all commonly used:
+\[
+  \mu(f) = \int_E f \;\d \mu = \int_E f(x) \;\d \mu(x) = \int_E f(x) \mu(\d x).
+\]
+In the case where $(E, \mathcal{E}, \mu) = (\R, \mathcal{B}, \mathrm{Lebesgue})$, people often just write this as
+\[
+  \mu(f) = \int_\R f(x)\;\d x.
+\]
+On the other hand, if $(E, \mathcal{E}, \mu) = (\Omega, \F, \P)$ is a probability space, and $X$ is a random variable, then people write the integral as $\E[X]$, the \emph{expectation} of $X$.
+
+So how are we going to define the integral? There are two steps to defining the integral. The idea is that we first define the integral on \emph{simple functions}, and then extend the definition to more general measurable functions by taking the limit. When we do the definition for simple functions, it will be obvious that the definition satisfies the nice properties, and we will have to check that they are preserved when we take the limit.
+
+\begin{defi}[Simple function]\index{simple function}
+  A \emph{simple function} is a measurable function that can be written as a finite non-negative linear combination of indicator functions of measurable sets, ie.
+  \[
+    f = \sum_{k = 1}^n a_k \mathbf{1}_{A_k}
+  \]
+  for some $A_k \in \mathcal{E}$ and $a_k \geq 0$.
+\end{defi}
+Note that some sources do not assume that $a_k \geq 0$, but assuming this makes our life easier.
+
+It is obvious that
+\begin{prop}
+  A function is simple iff it is measurable, non-negative, and takes on only finitely-many values.
+\end{prop}
+
+\begin{defi}[Integral of simple function]\index{integral!simple function}\index{simple function!integral}
+  The integral of a simple function
+  \[
+    f = \sum_{k = 1}^n a_k \mathbf{1}_{A_k}
+  \]
+  is given by
+  \[
+    \mu(f) = \sum_{k = 1}^n a_k \mu(A_k).
+  \]
+\end{defi}
+Note that it can be that $\mu(A_k) = \infty$, but $a_k = 0$. When this happens, we are just going to declare that $0 \cdot \infty = 0$ (this makes sense because this means we are ignoring all $0 \cdot\mathbf{1}_A$ terms for any $A$). After we do this, we can check the integral is well-defined.
+
+We are now going to extend this definition to non-negative measurable functions by a limiting procedure. Once we've done this, we are going to extend the definition to measurable functions by linearity of the integral. Then we would have a definition of the integral, and we are going to deduce properties of the integral using approximation.
+
+\begin{defi}[Integral]\index{integral}
+  Let $f$ be a non-negative measurable function. We set
+  \[
+    \mu(f) = \sup\{\mu(g): g \leq f, g\text{ is simple}\}.
+  \]
+  For arbitrary $f$, we write
+  \[
+    f = f^+ - f^- = (f \vee 0) - ((-f) \vee 0).
+  \]
+  We put $|f| = f^+ + f^-$. We say $f$ is \emph{integrable}\index{integrable function} if $\mu(|f|) < \infty$. In this case, set
+  \[
+    \mu(f) = \mu(f^+) - \mu(f^-).
+  \]
+  If only one of $\mu(f^+), \mu(f_-) < \infty$, then we can still make the above definition, and the result will be infinite.
+\end{defi}
+
+We are now going to study some basic properties of the integral. We will first look at the properties of integrals of simple functions, and then extend them to general integrable functions.
+
+For $f, g$ simple, and $\alpha, \beta \geq 0$, we have that
+\[
+  \mu(\alpha f + \beta g) = \alpha \mu(f) + \beta\mu(g).
+\]
+So the integral is linear.
+
+Another important property is monotonicity --- if $f \leq g$, then $\mu(f) \leq \mu(g)$.
+
+Finally, we have $f = 0$ a.e. iff $\mu(f) = 0$. It is absolutely crucial here that we are talking about non-negative functions.
+
+Our goal is to show that these three properties are also satisfied for arbitrary non-negative measurable functions, and the first two hold for integrable functions.
+
+In order to achieve this, we prove a very important tool --- the monotone convergence theorem. Later, we will also learn about the dominated convergence theorem, and Fatou's lemma. These are the main and very important results about exchanging limits and integration.
+
+\begin{thm}[Monotone convergence theorem]\index{monotone convergence theorem}
+  Suppose that $(f_n), f$ are non-negative measurable with $f_n \nearrow f$. Then $\mu(f_n) \nearrow \mu(f)$.
+\end{thm}
+
+In the proof we will use the fact that the integral is monotonic, which we shall prove later.
+\begin{proof}
+  We will prove the theorem step by step to work towards the case of $(f_n), f$ non-negative measurable.
+
+  We first consider the case where $f_n = \mathbf{1}_{A_n}$ and $f = \mathbf{1}_A$. Then $f_n \nearrow f$ is true iff $A_n \nearrow A$. On the other hand, $\mu(f_n) \nearrow \mu(f)$ iff $\mu(A_n) \nearrow \mu(A)$.
+
+  For convenience, we let $A_0 = \emptyset$. We can write
+  \begin{align*}
+    \mu(A) &= \mu\left(\bigcup_n (A_n) \setminus A_{n - 1}\right) \\
+    &= \sum_{n = 1}^\infty \mu(A_n \setminus A_{n - 1}) \\
+    &= \lim_{N \to \infty} \sum_{n = 1}^N \mu(A_n \setminus A_{n - 1}) \\
+    &= \lim_{N \to \infty}\mu (A_N).
+  \end{align*}
+  So done.
+
+  \separator
+
+  We next consider the case where $f_n$ is simple, and $f = \mathbf{1}_A$ for some $A$. Fix $\varepsilon > 0$, and set
+  \[
+    A_n = \{f_n > 1 - \varepsilon\} \in \mathcal{E}.
+  \]
+  Then we know that $A_n \nearrow A$, as $f_n \nearrow f$. Moreover, by definition, we have
+  \[
+    (1 - \varepsilon) \mathbf{1}_{A_n} \leq f_n \leq f = \mathbf{1}_A.
+  \]
+  As $A_n \nearrow A$, we have that
+  \[
+    (1 - \varepsilon) \mu(f) = (1 - \varepsilon) \lim_{n \to \infty} \mu(A_n) \leq \lim_{n \to \infty} \mu(f_n) \leq \mu(f)
+  \]
+  since $f_n \leq f$. Since $\varepsilon$ is arbitrary, we know that
+  \[
+    \lim_{n \to \infty} \mu(f_n) = \mu(f).
+  \]
+
+  \separator
+
+  Next, we consider the case where $f_n, f$ are both simple. We write
+  \[
+    f = \sum_{k = 1}^m a_k \mathbf{1}_{A_k},
+  \]
+  where $a_k > 0$ and $A_k$ are pairwise disjoint. Since $f_n \nearrow f$, we know
+  \[
+    a_k^{-1} f_n \mathbf{1}_{A_k} \nearrow \mathbf{1}_{A_k}.
+  \]
+  So we have
+  \[
+    \mu(f_n) = \sum_{k = 1}^m \mu(f_n \mathbf{1}_{A_k}) = \sum_{k = 1}^m a_k \mu(a_k^{-1} f_n \mathbf{1}_{A_k}) \to \sum_{k = 1}^m a_k \mu(A_k) = \mu(f).
+  \]
+
+  \separator
+
+  Suppose $f_n$ are simple, and $f$ is non-negative measurable. Suppose $g \leq f$ is a simple function. Then $f_n \wedge g = \min(f_n, g)$ is a simple function. As $f_n \nearrow f$, we know $f_n \wedge g \nearrow f \wedge g = g$. So by the previous case, we know that
+  \[
+    \mu(f_n \wedge g) \to \mu(g).
+  \]
+  We also know that
+  \[
+    \mu(f_n) \geq \mu(f_n\wedge g).
+  \]
+  So we have
+  \[
+    \lim_{n \to \infty} \mu(f_n) \geq \mu(g)
+  \]
+  for all $g \leq f$. This is possible only if
+  \[
+    \lim_{n \to \infty} \mu(f_n) \geq \mu(f)
+  \]
+  by definition of the integral. However, we also know that $\mu(f_n) \leq \mu(f)$ for all $n$, again by definition of the integral. So we must have equality. So we have
+  \[
+    \mu(f) = \lim_{n \to \infty} \mu(f_n).
+  \]
+
+  \separator
+
+  Suppose $f_n$ and $f$ are all non-negative measurable functions. Let
+  \[
+    g_n = 2^{-n} \lfloor 2^n f_n\rfloor \wedge n.
+  \]
+  Since this is non-negative, bounded and finite-valued, this is a simple function. Also, we have
+  \[
+    g_n \leq f_n \leq f.
+  \]
+  So
+  \[
+    \mu(g_n) \leq \mu(f_n) \leq \mu(f).
+  \]
+  Since $f_n \nearrow f$, we know $g_n \nearrow f$. So $\mu(g_n) \nearrow \mu(f)$ by the previous case. Therefore $\mu(f_n) \nearrow \mu(f)$.
+\end{proof}
+
+\begin{thm}
+  Let $f, g$ be non-negative measurable, and $\alpha, \beta \geq 0$. We have that
+  \begin{enumerate}
+    \item $\mu(\alpha f + \beta g) = \alpha \mu(f) + \beta \mu(g)$.
+    \item $f \leq g$ implies $\mu(f) \leq \mu(g)$.
+    \item $f = 0$ a.e. iff $\mu(f) = 0$.
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item Let
+      \begin{align*}
+        f_n = 2^{-n}\lfloor 2^n f\rfloor \wedge n\\
+        g_n = 2^{-n}\lfloor 2^n g\rfloor \wedge n.
+      \end{align*}
+      Then $f_n, g_n$ are simple with $f_n \nearrow f$ and $g_n \nearrow g$. Hence $\mu(f_n) \nearrow \mu(f)$ and $\mu(g_n \nearrow g$ and $\mu(\alpha f_n + \beta g_n) \nearrow \mu(\alpha f + \beta g)$, by the monotone convergence theorem. As $f_n, g_n$ are simple, we have that
+      \[
+        \mu(\alpha f_n + \beta g_n) = \alpha \mu(f_n) + \beta \mu(g_n).
+      \]
+      Taking the limit as $n \to \infty$, we get
+      \[
+        \mu(\alpha f + \beta g) = \alpha \mu(f) + \beta \mu(g).
+      \]
+    \item We shall be careful not to use the monotone convergence theorem. We have
+      \begin{align*}
+        \mu(g) &= \sup\{\mu(h): h \leq g\text{ simple}\}\\
+        &\geq \sup \{\mu(h): h \leq f\text{ simple}\}\\
+        &= \mu(f).
+      \end{align*}
+    \item Suppose $f \not= 0$ a.e. Let
+      \[
+        A_n = \left\{x: f(x) > \frac{1}{n}\right\}.
+      \]
+      Then
+      \[
+        \{x: f(x) \not= 0\} = \bigcup_n A_n.
+      \]
+      Since the left hand set has non-negative measure, it follows that there is some $A_n$ with non-negative measure. For that $n$, we define
+      \[
+        h = \frac{1}{n} \mathbf{1}_{A_n}.
+      \]
+      Then $\mu(f) \geq \mu(h) > 0$. So $\mu(f) \not= 0$.
+
+      Conversely, suppose $f = 0$ a.e. We let
+      \[
+        f_n = 2^{-n} \lfloor 2^n f\rfloor \wedge n
+      \]
+      be a simple function. Then $f_n \nearrow f$ and $f_n = 0$ a.e. So
+      \[
+        \mu(f) = \lim_{n \to \infty}\mu(f_n) = 0.
+      \]
+  \end{enumerate}
+\end{proof}
+
+We now prove the analogous statement for general integrable functions.
+\begin{thm}
+  Let $f, g$ be integrable, and $\alpha, \beta \geq 0$. We have that
+  \begin{enumerate}
+    \item $\mu(\alpha f + \beta g) = \alpha \mu(f) + \beta \mu(g)$.
+    \item $f \leq g$ implies $\mu(f) \leq \mu(g)$.
+    \item $f = 0$ a.e. implies $\mu(f) = 0$.
+  \end{enumerate}
+\end{thm}
+Note that in the last case, the converse is no longer true, as one can easily see from the sign function $\sgn: [-1, 1] -> \R$.
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item We are going to prove these by applying the previous theorem.
+
+      By definition of the integral, we have $\mu(-f) = - \mu(f)$. Also, if $\alpha \geq 0$, then
+      \[
+        \mu(\alpha f) = \mu(\alpha f^+) - \mu(\alpha f^-) = \alpha \mu(f^+) - \alpha \mu(f^-) = \alpha \mu(f).
+      \]
+      Combining these two properties, it then follows that if $\alpha$ is a real number, then
+      \[
+        \mu(\alpha f) = \alpha \mu(f).
+      \]
+      To finish the proof of (i), we have to show that $\mu(f + g) = \mu(f) + \mu(g)$. We know that this is true for non-negative functions, so we need to employ a little trick to make this a statement about the non-negative version. If we let $h = f + g$, then we can write this as
+      \[
+        h^+ - h^- = (f^+ - f^-) + (g^+ - g^-).
+      \]
+      We now rearrange this as
+      \[
+        h^ + f^- + g^- = f^+ + g^+ + h^-.
+      \]
+      Now everything is non-negative measurable. So applying $\mu$ gives
+      \[
+        \mu(f^+) + \mu(f^-) + \mu(g^-) = \mu(f^+) + \mu(g^+) + \mu(h^-).
+      \]
+      Rearranging, we obtain
+      \[
+        \mu(h^+) - \mu (h^-) = \mu(f^+) - \mu(f^-) + \mu(g^+) - \mu(g^-).
+      \]
+      This is exactly the same thing as saying
+      \[
+        \mu(f + g) = \mu(h) = \mu(f) = \mu(g).
+      \]
+    \item If $f \leq g$, then $g - f \geq 0$. So $\mu(g - f) \geq 0$. By (i), we know $\mu(g) - \mu(f) \geq 0$. So $\mu(g) \geq \mu(f)$.
+
+    \item If $f = 0$ a.e., then $f^+, f^- = 0$ a.e. So $\mu(f^+) = \mu(f^-) = 0$. So $\mu(f) = \mu(f^+) - \mu(f^-) = 0$.
+  \end{enumerate}
+\end{proof}
+As mentioned, the converse to (iii) is no longer true. However, we do have the following partial converse:
+\begin{prop}
+  If $\mathcal{A}$ is a $\pi$-system with $E \in \mathcal{A}$ and $\sigma(\mathcal{A}) = \mathcal{E}$, and $f$ is an integrable function that
+  \[
+    \mu(f\mathbf{1}_A) =0
+  \]
+  for all $A \in \mathcal{A}$. Then $\mu(f) = 0$ a.e.
+\end{prop}
+
+\begin{proof}
+  On example sheet 2.
+\end{proof}
+
+\begin{prop}
+  Suppose that $(g_n)$ is a sequence of non-negative measurable functions. Then we have
+  \[
+    \mu\left(\sum_{n = 1}^\infty g_n\right) = \sum_{n = 1}^\infty \mu(g_n).
+  \]
+\end{prop}
+
+\begin{proof}
+  We know
+  \[
+    \left(\sum_{n = 1}^N g_n\right) \nearrow \left(\sum_{n = 1}^\infty g_n\right)
+  \]
+  as $N \to \infty$. So by the monotone convergence theorem, we have
+  \[
+    \sum_{n = 1}^N \mu(g_n) \mu \left(\sum_{n = 1}^\infty g_n\right) \nearrow \mu\left(\sum_{n = 1}^\infty g_n\right).
+  \]
+  But we also know that
+  \[
+    \sum_{n = 1}^\infty \mu(g_n) \nearrow \sum_{n = 1}^\infty
+  \]
+  by definition. So we are done.
+\end{proof}
+
+So for non-negative measurable functions, we can alweays switch the order of integration and summation.
+
+Note that we can consider summation as integration. We let $E = \N$ and $\mathcal{E} = \{\text{all subsets of $\N$}\}$. We let $\mu$ be the counting measure, so that $\mu(A)$ is the size of $A$. Then integrability (and having a finite integral) is the same as absolute convergence. Then if it converges, then we have
+\[
+  \int f \;\d \mu = \sum_{n = 1}^\infty f(n).
+\]
+So we can just view our proposition as proving that we can swap the order of two integrals. The general statement is known as Fubini's theorem.
+
+\subsection{Integrals and limits}
+We are now going to prove more things about exchanging limits and integrals.
+\begin{thm}[Fatou's lemma]\index{Fatou's lemma}
+  Let $(f_n)$ be a sequence of non-negative measurable functions. Then
+  \[
+    \mu(\lim\inf f_n) \leq \lim\inf \mu(f_n).
+  \]
+\end{thm}
+Note that a special case was proven in the first example sheet, where we did it for the case where $f_n$ are indicator functions.
+
+\begin{proof}
+  We start with the trivial observation that if $k\geq n$, then we always have that
+  \[
+    \inf_{m \geq n} f_m \leq f_k.
+  \]
+  By the monotonicity of the integral, we know that
+  \[
+    \mu\left(\inf_{m \geq n} f_m\right) \leq \mu(f_k).
+  \]
+  for all $k \geq n$.
+
+  So we have
+  \[
+    \mu(\inf_{m \geq n} f_m) \leq \inf_{k \geq n} \mu(f_k) \leq \liminf_m \mu(f_m).
+  \]
+  It remains to show that the left hand side converges to $\mu(\liminf f_m)$. Indeed, we know that
+  \[
+    \inf_{m \geq n} f_m \nearrow \liminf_m f_m.
+  \]
+  Then by monotone convergence, we have
+  \[
+    \mu\left(\inf_{m \geq n} f_m\right) \nearrow \mu\left(\liminf_m f_m\right).
+  \]
+  So we have
+  \[
+    \mu\left(\liminf_m f_m\right) \leq \liminf_m \mu(f_m).
+  \]
+\end{proof}
+No one ever remembers which direction Fatou's lemma goes, and this leads to many incorrect proofs and results.
+
+How do we remember which way the inequality goes in Fatou's lemma? We let $(E, \mathcal{E}, \mu) = (\R, \mathcal{B}, \text{Lebesgue})$. We let
+\[
+  f_n = \mathbf{1}_{[n, n + 1]}.
+\]
+Then we have
+\[
+  \liminf_n f_n = 0.
+\]
+So we have
+\[
+  \mu(f_n) = 1\text{ for all }n.
+\]
+So we have
+\[
+  \liminf \mu(f_n) = 1,\quad \mu(\liminf f_n) = 0.
+\]
+So we have
+\[
+  \mu\left(\liminf_m f_m\right) \leq \liminf_m \mu(f_m).
+\]
+The next result we want to prove is the dominated convergence theorem. This is like the monotone convergence theorem, but we are going to remove the increasing and non-negative measurable condition, and add in something else.
+\begin{thm}[Dominated convergence theorem]\index{dominated convergence theorem}
+  Let $(f_n), f$ be measurable with $f_n(x) \to f(x)$ for all $x \in E$. Suppose that there is an integrable function $g$ such that
+  \[
+    |f_n| \leq g
+  \]
+  for all $n$, then we have
+  \[
+    \mu(f_n) \to \mu(f)
+  \]
+  as $n \to \infty$.
+\end{thm}
+
+\begin{proof}
+  Note that
+  \[
+    |f| = \lim_n |f|_n \leq g.
+  \]
+  So we know that
+  \[
+    \mu(|f|) \leq \mu(g) < \infty.
+  \]
+  So we know that $f$, $f_n$ is integrable.
+
+  Now note also that
+  \[
+    0 \leq g + f_n,\quad 0 \leq g - f_n
+  \]
+  for all $n$. We are now going to apply Fatou's lemma twice with these series. We have that
+  \begin{align*}
+    \mu(g) + \mu(f) &= \mu(g + f) \\
+    &= \mu\left(\liminf_n (g + f_n)\right) \\
+    &\leq \liminf_n \mu(g + f_n)\\
+    &= \liminf_n (\mu(g) + \mu(f_n))\\
+    &= \mu(g) + \liminf_n \mu(f_n).
+  \end{align*}
+  Since $\mu(g)$ is finite, we know that
+  \[
+    \mu(f) \leq \liminf_n \mu(f_n).
+  \]
+  We now do the same thing with $g - f_n$. We have
+  \begin{align*}
+    \mu(g) - \mu(f) &= \mu(g - f) \\
+    &= \mu\left(\liminf_n (g - f_n)\right) \\
+    &\leq \liminf_n \mu(g - f_n)\\
+    &= \liminf_n (\mu(g) - \mu(f_n))\\
+    &= \mu(g) - \limsup_n \mu(f_n).
+  \end{align*}
+  Again, since $\mu(g)$ is finite, we know that
+  \[
+    \mu(f) \geq \limsup_n \mu(f_n).
+  \]
+  These combine to tell us that
+  \[
+    \mu(f) \leq \liminf_n \mu(f_n) \leq \limsup_n \mu(f_n) \leq \mu(f).
+  \]
+  So they must be all equal, and thus $\mu(f_n) \to \mu(f)$.
+\end{proof}
+
+\subsection{Relationship between the Riemann and Lebesgue integrals}
+Suppose that $f: [0, 1] \to \R$ is a continuous function. Then $f$ is measurable, and is integrable as it is bounded. It is an exercise to show that the Lebesgue integral of $f$ is equal to the Riemann integral of $f$. More generally, every Riemann integrable function is Lebesgue integrable.% fill in?
+
+However, a lot of functions are Lebesgue integrable but not Riemann integrable. Indeed, take the standard non-Riemann integrable function
+\[
+  f = \mathbf{1}_{[0, 1]\setminus \Q}.
+\]
+Then $f$ is not Riemann integrable, but it is Lebesgue integrable, since
+\[
+  \mu(f) = \mu([0, 1] \setminus \Q) = 1.
+\]
+
 \printindex
 \end{document}
