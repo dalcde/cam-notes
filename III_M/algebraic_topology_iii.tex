@@ -1050,7 +1050,7 @@ We are now going to prove the theorems!
 Let $A \subseteq X$ , and let $C_{\Cdot}(X, A) = C_{\Cdot}(X)/C_{\Cdot}(A)$. The long exact sequence on homology relates $H_{\Cdot}(A), H_{\Cdot}(X)$ and $H_{\Cdot}(X, A)$.
 
 This is in fact a completely general theorem.
-\begin{thm}[Snake lemma]
+\begin{thm}[Snake lemma]\index{snake lemma}
   Suppose we have a short exact sequence of complexes
   \[
     \begin{tikzcd}
@@ -1987,5 +1987,844 @@ This is easier in practice that in sounds. In practice, the map is given by ``th
     \end{cases}.
   \]
 \end{eg}
-\printindex
+
+\section{(Co)homology with coefficients}
+Recall that when we defined (co)homology, we constructed these free $\Z$-modules from our spaces. However, we did not actually use the fact that it was $\Z$, we might as well replace it with any abelian group $A$.
+
+\begin{defi}[(Co)homology with coefficients]\index{homology!with coefficients}\index{cohomology!with coefficients}
+  Let $A$ be an abelian group, and $X$ be a topological space. We let
+  \[
+    C_{\Cdot}(X, A) = C_\Cdot(X) \otimes A
+  \]
+  with differentials $d \otimes \id_A$. We let
+  \[
+    H_n(X; A) = H_n(C_{\Cdot}(X, A), d \otimes \id_A).
+  \]
+  We can also define
+  \[
+    H_n^{\mathrm{cell}}(X, A) = H_n(C_{\Cdot}^{\mathrm{cell}}(X) \otimes A),
+  \]
+  and the same proof shows that $H_n^{\mathrm{cell}}(X; A) = H_n(X; A)$.
+
+  Similarly, we let
+  \[
+    C^{\Cdot}(X; A) = \Hom(C_{\Cdot}(X), A),
+  \]
+  with the usual (dual) differential. We again set
+  \[
+    H^n(X; A) = H^n(C^\Cdot(X; A)).
+  \]
+  We similarly define cellular cohomology.
+\end{defi}
+We will usually take $A = \Z, \Z/n\Z$ or $\Q$.
+
+\begin{eg}
+  In the case of $C_{\Cdot}^{\mathrm{cell}}(\RP^n)$, the differentials are all $0$ or $2$. So in $C_\Cdot^{\mathrm{cell}}(\RP^n, \Z/2)$, all the differentials are $0$. So we have
+  \[
+    H_i(\RP^n, \Z/2) =
+    \begin{cases}
+      \Z/2 & 0 \leq i \leq n\\
+      0 & i > n
+    \end{cases}
+  \]
+  Similarly, the cohomology groups are the same.
+
+  On the other hand, if we take the coefficients to be $\Q$, then multiplication by $2$ is now an isomorphism. Then we get
+  \[
+    C_{\Cdot}^\mathrm{cell}(\RP^n, \Q)
+    \begin{cases}
+      \Q & n \text{ odd}\\
+      0 & n\text{ even}
+    \end{cases}
+  \]
+  for $n$ not too large.
+\end{eg}
+
+\subsection{Euler characteristic}
+There are many ways to define the Euler characteristic, and they are all equivalent. So to define it, we pick a definition that makes it obvious it is a number.
+\begin{defi}[Euler characteristic]\index{Euler characteristic}
+  Let $X$ be a cell complex. We let
+  \[
+    \chi(X) = \sum_n (-1)^n \text{number of $n$-cells of $X$} \in \Z.
+  \]
+\end{defi}
+From this definition, it is not clear that this is a property of $X$ itself, rather than something about its cell decomposition.
+
+We similarly define
+\[
+  \chi_{\Z}(X) = \sum_n (-1)^n \rank H_n(X; \Z).
+\]
+For any field $\F$, we define
+\[
+  \chi_{\F}(X) = \sum_n (-1)^n \dim_\F H_n(X; \F).
+\]
+\begin{thm}
+  We have
+  \[
+    \chi = \chi_\Z = \chi_\F.
+  \]
+\end{thm}
+
+\begin{proof}
+  First note that the number of $n$ cells of $X$ is the rank of $C_n^{\mathrm{cell}}(X)$, which we will just write as $C_n$. Let
+  \begin{align*}
+    Z_n &= \ker (d_n: C_n \to C_{n - 1})\\
+    B_n &= \im (d_{n + 1}: C_{n + 1} \to C_n).
+  \end{align*}
+  We are now going to write down two short exact sequences. By definition of homology, we have
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & B_n \ar[r] & Z_n \ar[r] & H_n(X; \Z) \ar[r] & 0
+    \end{tikzcd}.
+  \]
+  Also, the definition of $Z_n$ and $B_n$ give us
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & Z_n \ar[r] C_n \ar[r] & B_{n - 1} \ar[r] & 0
+    \end{tikzcd}.
+  \]
+  We will now use the first isomorphism theorem to know that the rank of the middle term is the sum of ranks of the outer terms. So we have
+  \[
+    \chi_\Z(X) = \sum (-1)^n \rank H_n(X) = \sum(-1)^n (\rank Z_n - \rank B_n).
+  \]
+  We also have
+  \[
+    \rank B_n = \rank C_{n + 1} - \rank Z_{n + 1}.
+  \]
+  So we have
+  \begin{align*}
+    \chi_\Z(X) &= \sum_n (-1)^n (\rank Z_n - \rank C_{n + 1} + \rank Z_{n + 1}) \\
+    &= \sum_n (-1)^{n + 1} \rank C_{n + 1} \chi(X).
+  \end{align*}
+  For $\chi_\F$, we use the fact that
+  \[
+    \rank C_n = \dim_{\F} C_n \otimes \F.
+  \]
+\end{proof}
+\section{Cup product}
+So far, homology and cohomology are somewhat similar. We computed them, saw they are not the same, but they seem to contain the same information nevertheless. However, cohomology is 10 times better, because we can define a ring structure on them, and rings are better than groups.
+
+Just like the case of homology and cohomology, we will be able to write down the definition easily, but will struggle to compute it.
+
+\begin{defi}[Cup product]\index{cup product}\index{$\smile$}
+  Let $R$ be a commutative ring, and $\phi \in C^k(X, R)$, $\psi \in C^\ell(X, R)$. Then $\phi \smile \psi \in C^{k + \ell}(X; R)$ is given by
+  \[
+    (\phi \smile \psi)(\sigma: \Delta^{k + \ell} \to X) = \phi(\sigma|_{[v_1, \ldots, v_k]}) \cdot \psi(\sigma|_{[v_k, \ldots, v_{k + \ell}]}).
+  \]
+  Here the multiplication is multiplication in $R$, and $v_0, \cdots, v_\ell$ are the vertices of $\Delta^{k + \ell} \subseteq \R^{k + \ell + 1}$, and the restriction is given by
+  \[
+    \sigma|_{[x_0, \ldots, x_i]} (t_0, \ldots, t_i) = \sigma\left(\sum t_j x_j\right).
+  \]
+  This is a bilinear map.
+\end{defi}
+
+\begin{notation}
+  We write
+  \[
+    H^*(X; R) = \bigoplus_{n \geq 0} H^n(X, R).
+  \]
+\end{notation}
+This is the definition. We can try to establish some of its basic properties. We want to know how this interacts with the differential $d$ with the cochains. The obvious answer $d(\phi \smile \psi) = (\d \phi) \smile (\d \psi)$ doesn't work, because the degrees are wrong. What we have is:
+
+\begin{lemma}
+  If $\phi \in C^k(X; R)$ and $\psi \in C^\ell(X, R)$, then
+  \[
+    d (\phi \smile \psi) = (d \phi)\smile \psi + (-1)^k \phi\smile(d \psi).
+  \]
+\end{lemma}
+
+\begin{proof}
+  Let $\sigma: \Delta^{k + \ell + 1} \to X$ be a simplex. Then we have
+  \begin{align*}
+    ((\d \phi)\smile \psi)(\sigma) &= (\d \phi)(\sigma|_{[v_0, \ldots, v_{k + 1}]}) \cdot \psi(\sigma|_{[v_{k + 1}, \ldots, v_{k + \ell + 1}]})\\
+    &= \phi\left(\sum_{i = 0}^{n + 1} (-1)^i \sigma|_{[v_0, \ldots, \hat{v}_i, \ldots, v_{k + 1}]}\right) \cdot \psi(\sigma|_{[v_{k + 1}, \ldots, v_{k + \ell + 1}]})\\
+    (\phi \smile (\d \psi))(\sigma) &= \phi(\sigma|_{[v_0, \ldots, v_k]}) \cdot (\d \psi)(\sigma|_{v_k,\ldots, v_{k + \ell + 1}]})\\
+    &=\phi(\sigma|_{[v_0, \ldots, v_k]}) \cdot \psi\left(\sum_{i = k}^{k + \ell + 1} (-1)^{i - k} \sigma|_{[v_k, \ldots, \hat{v}_i, \ldots, v_{k + \ell + 1}]}\right)\\
+    &=(-1)^k \phi(\sigma|_{[v_0, \ldots, v_k]}) \cdot \psi\left(\sum_{i = k}^{k + \ell + 1} (-1)^{i} \sigma|_{[v_k, \ldots, \hat{v}_i, \ldots, v_{k + \ell + 1}]}\right).
+  \end{align*}
+  We notice that the last term of the first expression, and the first term of the second expression are exactly the same, except the signs differ by $-1$. Then the remaining terms overlap in exactly 1 vertex, so the expression is equal to
+  \[
+    (\phi \smile \psi)(\d \sigma) = (\d (\phi \smile \psi))(\sigma)
+  \]
+  as required.
+\end{proof}
+This is the most interesting thing about these things, because it tells us this gives a well-defined map on cohomology.
+
+\begin{cor}
+  The cup product induces a well-defined map
+  \[
+    \begin{tikzcd}[row sep = 0ex
+        ,/tikz/column 1/.append style={anchor=base east}
+        ,/tikz/column 2/.append style={anchor=base west}
+      ]
+      \smile: H^k(X; R) \times H^k(X; R) \ar[r] & H^{k + \ell}(X; R)\\
+      ([\phi], [\psi] ) \ar[r, maps to] & \lbrack\phi \cup \psi\rbrack
+    \end{tikzcd}
+  \]
+\end{cor}
+
+\begin{proof}
+  To see this is defined at all, as $\d \phi = 0 = \d \psi$, we have
+  \[
+    \d (\phi \smile \psi) = (\d \phi) \smile \psi \pm \phi \smile (\d \psi) = 0.
+  \]
+  So $\phi \smile \psi$ is a cocycle, and represents the cohomology class. To see this is well-defined
+
+  If $\phi' = \phi + \d\tau$, then
+  \[
+    \phi' \smile \psi = \phi \smile \psi + d \tau \smile \psi = \phi \smile \psi + d(\tau \smile \psi) \pm \tau \smile (\d \psi).
+  \]
+  Using the fact that $\d \psi = 0$, we know that $\phi' \smile \psi$ and $\phi \smile \psi$ differ by a boundary, so $[\phi' \smile \psi] = [\phi \smile \psi]$. The case where we change $\psi$ is similar.
+\end{proof}
+
+Note that the operation $\smile$ is associative on cochains, so associative on $H^*$ too.
+
+Also, there is a map $1: C_0(X) \to R$ sending $\sigma \mapsto 1$ for all $\sigma$. Then we have
+\[
+  [1] \smile [\phi] = [\phi].
+\]
+So we have
+\begin{prop}
+  $(H^*(X; R), \smile, [1])$ is a unital ring.
+\end{prop}
+Note that this is not commutative!
+
+Moreover, we have
+\begin{prop}
+  If $f: X \to Y$ is a cup product, and $x, y \in H^*(Y; R)$, then
+  \[
+    f^*(a \smile b) = f^*(a) \smile f^*(b).
+  \]
+  So $f^*$ is a homomorphism of unital rings.
+\end{prop}
+
+\begin{defi}[Cross product]\index{cross product}
+  If we let $\pi_X: X \times Y \to X$, $\pi_Y: X \times Y\to Y$ be the projection maps, then we have a \emph{cross product}
+  \[
+    \begin{tikzcd}[row sep = 0ex
+        ,/tikz/column 1/.append style={anchor=base east}
+        ,/tikz/column 2/.append style={anchor=base west}
+      ]
+      \times: H^k(X; R) \otimes_R H^\ell(Y; R) \ar[r] & H^{k + \ell}(X \times Y; R)\\
+      a \otimes b \ar[r, maps to] & (\pi_X^* a) \smile (\pi_Y^* b)
+    \end{tikzcd}.
+  \]
+\end{defi}
+Note that the diagonal map $\Delta: X \to X \times X$ given by $\Delta(x) = (x, x)$ satisfies.
+\[
+  \Delta^*(a \times b) = a \smile b
+\]
+for all $a, b \in H^*(X; R)$. So these two products determine each other.
+
+\begin{prop}
+  Let $R$ be a commutative ring. If $\alpha \in H^k(X, R)$ and $\beta \in H^\ell(X, R)$, then we have
+  \[
+    \alpha \smile \beta = (-1)^{k\ell}\beta \smile \alpha
+  \]
+\end{prop}
+We say $R$ is \term{graded commutative}.
+
+Note that this is only true for the cohomology classes. It is not true in general for the cochains. So we would expect that this is rather annoying to prove.
+
+\begin{proof}
+  Let $\rho_n: C_n(X) \to C_n(x)$ be given by
+  \[
+    \sigma \mapsto (-1)^{n(n + 1)/2} \sigma|_{[v_n, v_{n - 1}, \ldots, v_0]}
+  \]
+  The $\sigma|_{[v_n, v_{n - 1}, \ldots, v_0]}$ tells us that we reverse the order of the vertices, and the factor of $(-1)^{n(n + 1)/2}$ is the sign of the permutation that reverses $0, \cdots, n$. For convenience, we write
+  \[
+    \varepsilon_n = (-1)^{n (n + 1)/2}.
+  \]
+  \begin{claim}
+    We claim that $\rho_{\Cdot}$ is a chain map, and is chain homotopic to the identity.
+  \end{claim}
+  Suppose the claim holds. We let $\phi \in C^k(X, R)$ represent $\alpha$ and $\psi \in C^\ell(X, R)$ represent $\beta$. Then we have
+  \begin{align*}
+    (\rho^* \phi \smile \rho^* \psi)(\sigma) &= (\rho^* \phi)(\sigma|_{[v_0, \ldots, v_k]} (\rho^* \psi)(\sigma|_{[v_k, \ldots, v_{k + \ell}]})\\
+    &= \phi(\varepsilon_k \cdot \sigma|_{[v_k, \ldots, v_0]}) \psi(\varepsilon_\ell \sigma|_{[v_{k + \ell}, \ldots, v_k]}).
+  \end{align*}
+  Similarly, we can compute
+  \begin{align*}
+    \rho^*(\psi \smile \phi)(\sigma) &= (\psi \smile \phi)(\varepsilon_{k + \ell} \sigma|_{[v_{k + \ell}, \ldots, v_0]}\\
+    &= \varepsilon_{k + \ell} \psi(\sigma|_{[v_{k + \ell}, \ldots, v_k}]) \phi(\sigma|_{[v_k, \ldots, v_0]})\\
+    &= \varepsilon_{k + \ell}\varepsilon_k \varepsilon_\ell (\rho^* \phi) \smile (\rho^* \psi)(\sigma).
+  \end{align*}
+  By checking it directly, we can see that $\varepsilon_{n + \ell}\varepsilon_k \varepsilon_\ell = (-1)^{k\ell}$. So we have
+  \begin{align*}
+    \alpha \smile \beta &= [\phi \smile \psi] \\
+    &= [\rho^* \phi \smile \rho^* \psi] \\
+    &= (-1)^{k\ell}[\rho^*(\psi \smile \phi)] \\
+    &= (-1)^{k\ell}[\psi \smile \phi] \\
+    &= (-1)^{kl} \beta \smile \alpha.
+  \end{align*}
+  Now it remains to prove the claim. We have
+  \begin{align*}
+    \d \rho(\sigma) &= \varepsilon_n \sum_{i = 0}^n (-1)^j \sigma|_{[v_n, \ldots, \hat{v}_{n - i}, \ldots, v_0]}\\
+    \rho(\d \sigma) &= \rho(\sum_{i = 0}^n (-1)^i \sigma|_{[v_0, \ldots, \hat{v}_i, \ldots., v_n]}\\
+    &= \varepsilon_{n - 1} \sum_{j = 0}^n (-1)^j \sigma|_{[v_n, \ldots, \hat{v}_j, v_0]}.
+  \end{align*}
+  We now notice that $\varepsilon_{n - 1}(-1)^{n - i} = \varepsilon_n (-1)^i$. So this is a chain map!
+
+  We now define a chain map. We let
+  \[
+    P_n = \sum_i (-1)^i \varepsilon_{n - i} [v_0, \cdots, v_i, w_n, \cdots, w_i] \in C_{n + 1}([0, 1] \times \Delta^n),
+  \]
+  where $v_0, \cdots, v_n$ are the vertices of $\{0\} \times \Delta^n$ and $w_0, \cdots, w_n$ are the vertices of $\{1\} \times \Delta^n$.
+
+  We let $\pi: [0, 1] \times \Delta^n \to \Delta^n$ be the projection, and let $F_n^X: C_n(X) \to C_{n + 1}(X)$ be given by
+  \[
+    \sigma \mapsto (\sigma \circ \pi)_\#(P_n).
+  \]
+  We calculate
+  \begin{align*}
+    \d F_n^X(\sigma) &= (\sigma \circ \pi)_\#(\d P_n) \\
+    &= (\sigma \circ \pi_\#)\left(\sum_i \left(\sum_{j \leq i}(-1)^j (-1)^i \varepsilon_{n - i}[v_0, \cdots, \hat{v}_j, \cdots, v_i, w_0, \cdots, w_i]\right)\right.\\
+    &\quad +\left.\left(\sum_{j \geq i} (-1)^{n + i + 1 - j}(-1)^i \varepsilon_{n - i}[v_0, \cdots, v_i, w_n, \cdots, \hat{w}_j, \cdots, v_i]\right)\right).
+  \end{align*}
+  The terms with $j = i$ give
+  \begin{align*}
+    &(\sigma \circ \pi)_\#\left(\sum_i \varepsilon_{n - i}[v_0, \cdots, v_{i - 1}, w_n, \cdots, w_i]\right. \\
+    &\quad+ \left.\sum_i (-1)^{n + 1}(-1)^i \varepsilon_{n - i}[v_0, \cdots, v_i, w_n,\cdots, w_{i + 1}]\right)\\
+    ={}& (\sigma \circ \pi)_\#(\varepsilon_n[w_n,\cdots, w_0] - [v_0, \cdots, v_n])\\
+    ={}& \rho(\sigma) - \sigma
+  \end{align*}
+  The terms with $j \not= i$ are precisely $-F_{n - 1}^\times (\d \sigma)$ as required. It is easy to see that the terms are indeed the right terms, and we just have to check that the signs are right. I'm not doing that.
+\end{proof}
+There is also a \emph{relative cup} product
+\[
+  \smile: H^k(X, A; R) \otimes H^k(X, R) \to H^{k + \ell}(X, A; R)
+\]
+given by the same formula. Indeed, to see this is properly defined, note that if $\phi \in C^k(X, A; R)$, then $\phi$ is a map
+\[
+  \phi:C_k(X, A) = \frac{C-k(X)}{C_k(A)} \to R.
+\]
+In other words, it is a map $C_K(X) \to R$ that vanishes on $C_k(A)$. Then if $\sigma \in C_{n + \ell}(A)$ and $\psi \in C^\ell(X; R)$, then
+\[
+  (\phi \smile \psi)(\sigma) = \phi(\sigma|_{[v_0, \ldots, v_k]}) \cdot \psi(\sigma|_{[v_k, \ldots, v_{k + \ell}]}.
+\]
+We now notice that $[v_0, \cdots, v_k] \in C_k(A)$. So $\phi$ kills it, and this vanishes. So this is a term in $H^{k + \ell}(X, A; R)$.
+
+You might find it weird that the two factors of the cup product are in different things, but note that a relative cohomology class is in particular a cohomology class. So this restricts to a map
+\[
+  \smile: H^k(X, A; R) \otimes H^k(X, A, R) \to H^{k + \ell}(X, A; R)
+\]
+but the result we gave is more general.
+
+\begin{eg}
+  Suppose $X$ is a space such that the cohomology classes are given by
+  \begin{center}
+    \begin{tabular}{cccccccc}
+      $k$ & 0 & 1 & 2 & 3 & 4 & 5 & 6\\
+      $H^k(X, \Z)$ & $\Z$ & 0 & 0 & $\Z = \bra x\ket$ & 0 & 0 & $\Z = \bra y\ket$
+    \end{tabular}
+  \end{center}
+  What can $x \smile x$ be? By the graded commutativity property, we have
+  \[
+    x\smile x = - x \smile x.
+  \]
+  So we know $2(x \smile x) = 0 \in H^6(X, \Z) \cong \Z$. So we must have $x \smile x = 0$.
+\end{eg}
+
+\subsection{\texorpdfstring{K\"unneth}{Kunneth} theorem}
+We are going to prove a weaker version of the actual K\"unneth's theorem, since the full one requires some homological algebra which we do not wish to go into.
+
+\begin{thm}[K\"unneth's theorem]\index{K\"unneth's theorem}
+  Let $R$ be a commutative ring, and suppose that $H^n(Y, R)$ is a free $R$-module for each $n$. Then the cross product map
+  \[
+    \begin{tikzcd}
+      \bigoplus_{k + \ell = n}H^k(X; R) \otimes H^\ell(Y; R) \ar[r, "\times"] & H^n(X \times Y, R)
+    \end{tikzcd}
+  \]
+  is an isomorphism for every $n$, for every finite cell complex $X$.
+\end{thm}
+This is in fact true much more generally, but will require more tools to use.
+
+When would we be able to apply this? We get to choose our favorite $R$. So if we pick $R$ to be a field, then the cohomology groups are always free!
+
+For convenience, we will write $H^*(X, R) \otimes H^*(Y, R)$ for the graded $R$-module which in grade $n$ is given by
+\[
+  \bigoplus_{k + \ell = n} H^k(X, R) \otimes H^\ell (Y, R).
+\]
+Then K\"unneth says the map given by
+\[
+  \begin{tikzcd}
+    H^*(X, R) \otimes H^*(Y, R) \ar[r, "\times"] & H^*(X \times Y; R)
+  \end{tikzcd}
+\]
+is an isomorphism of graded rings.
+
+\begin{proof}
+  Let
+  \[
+    F^n(-) = \bigoplus_{k + \ell = n} H^k(-, R) \otimes H^\ell(Y, R).
+  \]
+  We similarly define
+  \[
+    G^n(-) = H^n(-\times Y, R).
+  \]
+  We observe that for each $X$, the cross product gives a map $\eta: F^n(X) \to G^n(X)$, and, crucially, we know $\eta_*: F^n(*) \to G^n(*)$ is an isomorphism, since $F^n(*) \cong G^n(*) \cong H^n(Y, R)$.
+
+  The strategy is to show that $F^n(-)$ and $G^n(-)$ have the same formal structure as cohomology and agree on a point, so must agree on all finite cell complexes, since we proved the cohomology of cell complexes using just the formal properties.
+
+  It is clear that both $F^n$ and $G^n$ are homotopy invariant, because they are built out of homotopy invariant things.
+
+  We now want to define the cohomology of pairs. This is easy. We define
+  \begin{align*}
+    F^n(X, A) &= \bigoplus_{i + j = n} H^i(X, A, R) \otimes H^i(Y, R)\\
+    G^n(X, A) &= H^n(X \times Y, A \times Y).
+  \end{align*}
+  Again, the relative cup product gives us a relative cross product, which gives us a map $F^n(X, A) \to G^n(X, A)$. Then $G^n$ has a long exact sequence associated to $(X, A)$ of the form
+  \[
+    \begin{tikzcd}
+      \cdots \ar[r] & H^n(A \times Y, R) \ar[r, "\partial"] & H^n(X \times Y, A \times Y, R) \ar[r] & H^n(X \times Y, R) \ar[r] & H^n(A \times Y, R) \ar[r] & \cdots
+    \end{tikzcd}
+  \]
+  So $G$ has a long exact sequence. We would like to say $F$ has a long exact sequence as well, and this is where our hypothesis comes in.
+
+  If $H^*(Y, R)$ is a free $R$-module, then we can take the long exact sequence of $(X, A)$
+  \[
+    \begin{tikzcd}
+      \cdots \ar[r] & H^n(A, R) \ar[r, "\partial"] & H^n(X , A , R) \ar[r] & H^n(X , R) \ar[r] & H^n(A , R) \ar[r] & \cdots
+    \end{tikzcd},
+  \]
+  and then tensor with $H^j(Y, R)$. This preserves exactness, since $H^j(Y, R) \cong R^k$ for some $k$, so tensoring with $H^j(Y, R)$ just takes $k$ copies of this long exact sequence. By adding the different long exact sequences for different $j$ (with appropriate translations), we get a long exact sequence for $F$.
+
+  We now want to prove K\"unneth by induction on the number of cells and the dimension at the same time.
+
+  Suppose $X = X' \cup_f D^n$ for some $f:S^{n - 1} \to X'$. We get long exact sequences
+  \[
+    \begin{tikzcd}
+      F^{n - 1}(X') \ar[r] \ar[d, "\times", "\sim"'] & F^n(X, X') \ar[r] \ar[d, "\times"] & F^n(X) \ar[r] \ar[d, "\times"] & F^n(X') \ar[r] \ar[d, "\times", "\sim"'] & F^{n + 1}(X, X') \ar[d, "\times"]\\
+      G^{n - 1}(X') \ar[r] & G^n(X, X') \ar[r] & G^n(X) \ar[r] & G^n(X') \ar[r] & G^{n + 1}(X, X')
+    \end{tikzcd}
+  \]
+  Note that we need to manually check that the boundary maps $\partial$ commute with the cross product, since this is not induced by maps of spaces.
+
+  Assuming we have done that, by the five lemma, it suffices to show that the maps on the relative cohomology $\times: F^n(X, X') \to G^n(X, X')$ is an isomorphism.
+
+  We now notice that $F^n(-)$ and $G^n(-)$ have excision. Since $(X, X')$ is a good pair, we have a commutative square
+  \[
+    \begin{tikzcd}
+      F^*(D^n, \partial D^n) \ar[d, "\times"] & F^*(X, X') \ar[l, "\sim"] \ar[d, "\times"] \\
+      G^*(D^n, \partial D^n) & G^*(X, X') \ar[l, "\sim"]
+    \end{tikzcd}
+  \]
+  So we now only need the left-hand map to be an isomorphism. We look at the long exact sequence for $(D^n, \partial D^n)$!
+  \[
+    \begin{tikzcd}
+      F^{n - 1}(\partial D^n) \ar[r] \ar[d, "\times", "\sim"'] & F^n(D^n, \partial D^n) \ar[r] \ar[d, "\times", "\sim"'] & F^n(D^n) \ar[r] \ar[d, "\times"] & F^n(\partial D^n) \ar[r] \ar[d, "\times", "\sim"'] & F^{n + 1}(D^n, \partial D^n) \ar[d, "\times", "\times"']\\
+      G^{n - 1}(\partial D^n) \ar[r] & G^n(D^n, \partial D^n) \ar[r] & G^n(D^n) \ar[r] & G^n(\partial D^n) \ar[r] & G^{n + 1}(D^n, \partial D^n)
+    \end{tikzcd}
+  \]
+  But now we know the vertical maps for $D^n$ and $\partial D^n$ are isomorphisms --- the ones for $D^n$ are because they are contractible, and we have seen the result of $*$ already; whereas the result for $\partial D^n$ follows by induction.
+
+  So we are done.
+\end{proof}
+
+\begin{eg}
+  Consider $H^*(S^1, \Z)$. We know it is $\Z$ in $* = 0, 1$, and $0$ elsewhere. Let's call the generator of $H^0(S^1, \Z)$ ``$1$'', and the generator of $H^1(S^1, \Z)$ as $x$. Then we know that $x \smile x = 0$ since there isn't anything in degree $2$. So we know
+  \[
+    H^*(S^1, \Z) = \Z[x]/(x^2).
+  \]
+  Then K\"unneth's theorem tells us that
+  \[
+    H^*(T^n, \Z) \cong H^*(S^1; \Z)^{\otimes n},
+  \]
+  where $T^n = (S^1)^n$ is the $n$-torus, and this is an isomorphism of rings. So this is
+  \[
+    H^*(T^n, \Z) \cong \Z[x_1, \cdots, x_n]/(x_i^2, x_i x_j + x_j x_i),
+  \]
+  using the fact that $x_i, x_j$ have degree $1$ so anti-commute. Note that this has an interesting cup product! This is known as the \emph{exterior algebra in $n$ generators}.
+\end{eg}
+
+\begin{eg}
+  Let $f: S^ \to T^n$ be a map for $n > 1$. We claim that this induces the zeroth map on the $n$th cohomology.
+
+  We look at the induced map on cohomology:
+  \[
+    \begin{tikzcd}
+      f^*: H^n(T^n; \Z) \ar[r] & H^n(S^n, \Z)
+    \end{tikzcd}
+  \]
+  Looking at the presentation above, we know that $H^n(T^n, \Z)$ is generated by $x_1 \smile \cdots \smile x_n$, and $f^*$ sends it to $(f^* x_1) \smile \cdots \smile (f^* x_n)$. But $f^*(x_i) \in H^1(S^n, \Z) = 0$ for all $n > 1$. So $f^* (x_1 \cdots x_n) = 0$.
+\end{eg}
+
+We are now going to prove another useful result.
+\begin{thm}[Universal coefficients theorem for (co)homology]\index{universal coefficient theorem for (co)homology}
+  Let $R$ be a PID and $M$ an $R$-module. Then there is a natural map
+  \[
+    H_*(X, R)\otimes M \to H_*(X, M).
+  \]
+  If $H_*X, R)$ is a free module for each $n$, then this is an isomorphism. Similarly, there is a natural map
+  \[
+    H^*(X, M) \to \Hom_R(H_*(X, R), M),,
+  \]
+  which is an isomorphism again if $H^*(X, R)$ is free.
+\end{thm}
+
+\begin{proof}
+  Let $C_n$ be $C_n(X, R)$ and $Z_n \subseteq C_n$ be the cycles and $B_n \subseteq Z_n$ the boundaries. Then there is a short exact sequence
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & Z_n \ar[r] & C_n \ar[r] & B_{n - 1} \ar[r] & 0
+    \end{tikzcd},
+  \]
+  and $B_n \leq C_{n - 1}$ is a submodule of a free $R$-module, and is free, since $R$ is a PID. So by picking a basis, we can find a basis $s: B_{n - 1} \to C_n$ such that $g \circ s = \id_{B_{n - 1}}$. This induces an isomorphism
+  \[
+    \begin{tikzcd}
+      i \oplus s: Z_n \oplus B_{n - 1} \ar[r, "\sim"] & C_n.
+    \end{tikzcd}
+  \]
+  Now tensoring with $M$, we obtain
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & Z_n \otimes M \ar[r] & C_n \otimes M \ar[r] & B_{n - 1} \otimes M \ar[r] & 0
+    \end{tikzcd},
+  \]
+  which is exact because we have
+  \[
+    C_n \otimes M \cong (Z_n \oplus B_{n - 1}) \otimes M \cong Z_n \otimes M \oplus B_{n - 1} \otimes M.
+  \]
+  So we obtain a short exact sequence of chain complexes
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & (Z_{\Cdot} \otimes M, 0) \ar[r] & (C_{\Cdot} \otimes M, d \otimes \id) \ar[r] & (B_{n - 1} \otimes M) \ar[r] & 0
+    \end{tikzcd}.
+  \]
+  We now get a long exact sequence of homology
+  \[
+    \begin{tikzcd}
+      \cdots \ar[r] & B_n \otimes M \ar[r] & Z_n \otimes M \ar[r] & H_n(X, M) \ar[r] & B_{n - 1} \otimes M \ar[r] & \cdots
+    \end{tikzcd}
+  \]
+  However, if we look at what happens in the definition of the boundary map, we see that the map $B_n \times M \to Z_n \otimes M$ is the inclusion. We'll leave this for a while, and look at another short exact sequence.
+
+  By definition of homology, we have a long exact sequence
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & B_n \ar[r] & Z_n \ar[r] & H_n(X, R) \ar[r] & 0
+    \end{tikzcd}.
+  \]
+  As $H_n(X, R)$ is free, we have a splitting $t: H_n(X, R) \to Z_n$, so as above, tensoring with $M$ preserves exactness, so we have
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & B_n\otimes M \ar[r] & Z_n\otimes M \ar[r] & H_n(X, R)\otimes M \ar[r] & 0
+    \end{tikzcd}.
+  \]
+  Hence we know that $B_n \otimes M \to Z_n \otimes M$ is injective. So our previous long exact sequence breaks up to
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & B_n \otimes M \ar[r] & Z_n \otimes M \ar[r] & H_n(X, M) \ar[r] & 0.
+    \end{tikzcd}
+  \]
+  Since we have two short exact sequence with first two terms equal, the last terms have to be equal as well.
+
+  The cohomology version is similar.
+\end{proof}
+
+\section{Vector bundles}
+Intuitively, a vector bundle over a space $X$ is a continuous assignment of a vector space to each point in $X$.
+\begin{defi}[Vector bundle]\index{vector bundle}
+  Let $X$ be a space. A (real) \emph{vector bundle} of dimension $d$ over $X$ is a map $\pi:E \to X$, with a (real) vector space structure on each \term{fiber} $E_x = \pi^{-1}(\{x\})$, subject to the local triviality condition: for each $x \in X$, there is a neighbourhood $U$ of $x$ and a homeomorphism $\varphi:E|_U = \pi^{-1}(U) \to U \times \R^d$ such that the following diagram commutes
+  \[
+    \begin{tikzcd}[column sep=0em]
+      E|_U \ar[rr, "\varphi"] \ar[rd, "\pi"] & & U \times \R^d \ar[dl, "\pi_1"]\\
+      & U
+    \end{tikzcd},
+  \]
+  and for each $y \in U$, the restriction $\varphi|_{E_y}: E_y \to \{y\} \times \R^d$ is a \emph{linear} isomorphism for each $y \in U$. This maps is known as a \term{local trivialization}.
+\end{defi}
+We have an analogous definition for complex vector bundles.
+
+\begin{defi}[Section]\index{section}
+  A \emph{section} of a vector bundle $\pi: E \to X$ is a map $s: X \to E$ such that $\pi \circ s = \id$. In other words, $s(x) \in E_x$ for each $x$.
+\end{defi}
+
+\begin{defi}[Zero section]\index{zero section}\index{section!zero}
+  The \emph{zero section} of a vector bundle is $s_0: X \to E$ given by $s_0(x) = 0 \in E_x$.
+\end{defi}
+
+Note that the composition
+\[
+  \begin{tikzcd}
+    E \ar[r, "\pi"] & X \ar[r, "s_0"] & E
+  \end{tikzcd}
+\]
+is homotopic to the identity map on $\id_E$, since each $E_x$ is contractible.
+
+So $E$ is always homotopy equivalent to $X$.
+
+\begin{defi}[Pullback of vector bundles]\index{pullback!vector bundle}\index{vector bundle!pullback}
+  Let $\pi: E \to X$ be a vector bundle, and $f: Y \to X$ a map. We define the \emph{pullback}
+  \[
+    f^* E = \{(y, e) \in Y \times E: f(y) = \pi(e)\}.
+  \]
+  This has a map $f^*\pi: f^*E \to Y$ given by projecting to the first coordinate. The vector space structure on each fiber is given by the identification $(f^*E)_y = E_{f(y)}$. It is a little exercise in topology to show that the local trivializations of $\pi: E \to X$ induce local trivializations of $f^*\pi: f^* E \to Y$.
+\end{defi}
+
+Everything we can do on vector spaces can be done on vector bundles, by doing it on each fiber.
+\begin{defi}[Whitney sum of vector bundles]\index{vector bundle!Whitney sum}\index{Whitney sum of vector bundles}
+  Let $\pi: E \to F$ and $\rho: F \to X$ be vector bundles. The \emph{Whitney sum} is given by
+  \[
+    E \oplus F = \{(e, f)\in E \times F: \pi(e) = \rho(f)\}.
+  \]
+  This has a natural map $\pi \oplus \rho: E \oplus F \to X$ given by $(\pi \oplus \rho)(e, f) = \pi(e) = \rho(f)$. This is again a vector bundle, with $(E \oplus F)_x = E_x \oplus F_x$ and again local trivializations of $E$ and $F$ induce one for $E \oplus F$.
+\end{defi}
+
+Tensor products can be defined similarly.
+
+\begin{defi}[Vector subbundle]\index{vector sub-bundle}\index{vector bundle!subbundle}
+  Let $\pi: E \to X$ be a vector bundle, and $F \subseteq E$ a subspace such that for each $x \in X$ there is a local trivialization $(U, \varphi)$
+  \[
+    \begin{tikzcd}[column sep=0em]
+      E|_U \ar[rr, "\varphi"] \ar[rd, "\pi"] & & U \times \R^d \ar[dl, "\pi_1"]\\
+      & U
+    \end{tikzcd},
+  \]
+  such that $\varphi$ takes $F|_U$ to $U \times \R^k$, where $\R^k \subseteq \R^d$. Then we say $FF$ is a \emph{vector sub-bundle}.
+\end{defi}
+
+\begin{defi}[Quotient bundle]\index{quotient bundle}\index{vector bundle!quotient}
+  Let $F$ be a sub-bundle of $E$. Then $E/F$, given by the fiberwise quotient, is a vector bundle and is given by the \emph{quotient bundle}.
+\end{defi}
+
+\begin{eg}[Grassmannian manifold]\index{Grassmannian manifold}\index{$\Gr_k(\R^n)$}
+  We let
+  \[
+    X = \Gr_k(\R^n) = \{k\text{-dimensional linear subgroups of $\R^n$}\}.
+  \]
+  To topologize this space, we pick a fixed $V \in \Gr_k(\R^n)$. Then we obtain a surjection
+  \begin{align*}
+    \GL_n(\R) &\to \Gr_k(\R^n)\\
+    M &\mapsto M(V).
+  \end{align*}
+  So we can given $\Gr_k(\R^n)$ the quotient (final) topology. For example,
+  \[
+    \Gr_1(\R^{n + 1}) = \RP^n.
+  \]
+  Now to construct a vector bundle, we need to assign a vector space to each point in $X$. But a point in $\Gr_k(\R^n)$ \emph{is} a vector space, so we have an obvious definition
+  \[
+    E = \{(V, v) \in \Gr_k(\R^n) \times \R^n: v \in V\}.
+  \]
+  This has the evident projection $\pi: E \to X$ given by the first projection. We then have
+  \[
+    E_V = V.
+  \]
+  To see that this is a vector bundle, we have to check local triviality. We fix a $V \in \Gr_k(\R^n)$, and let
+  \[
+    U = \{W \in\Gr_k(\R^n): W \cap V^\perp = \{0\}\}.
+  \]
+  We now construct a map $\varphi: E|_U \to U \times V \cong U \times \R^k$ by mapping $(W, w)$ to $(W, \pr_V(w))$, where $\pr_V: \R^n \to V$ is the orthogonal projection.
+
+  Now if $w \in U$, then $\pr_V(w) \not= 0$ since $W \cap V^\perp = \{0\}$. So $\varphi$ is a homeomorphism.
+
+  We call this bundle $\gamma_{k, n}^\R \to \Gr_k(\R^n)$.\index{$\gamma_{k, n}^\R$}.
+\end{eg}
+
+In the same way, we can get a canonical complex vector bundle $\gamma_{k, n}^\C \to \Gr_k(\C^n)$.
+
+\begin{eg}
+  Let $M$ be a smooth $d$-dimensional manifold, then it naturally has a $d$-dimensional \term{tangent bundle} $\pi: TM \to M$ with $(TM)|_x = T_x M$.
+
+  If $M \subseteq N$ is a smooth submanifold, with $i$ the inclusion map, then $TM$ is a subbundle of $i^* TN$. Note that we cannot say $TM$ is a smooth subbundle of $TN$, since they have different base space, and thus cannot be compared without pulling back..
+  The \term{normal bundle} of $M$ in $N$ is
+  \[
+    \mathcal{V}_{M \subseteq N} = \frac{TM}{i^*TN}.
+  \]
+\end{eg}
+
+Here is a theorem we have to take on faith, because proving it will require some differential geometry.
+\begin{thm}[Tubular neighbourhood theorem]\index{tubular neighbourhood theorem}
+  Let $M \subseteq N$ be a smooth submanifold. Then there is an open neighbourhood $U$ of $M$ and a homeomorphism $\mathcal{V}_{M \subseteq N} \to U$, and moreover, this homeomorphism is the identity on $M$ (where we view $M$ as a submanifold of $\mathcal{V}_{M \subseteq N}$ by the image of the zero section).
+\end{thm}
+This tells us that locally, the neighbourhood of $M$ in $N$ looks like $\mathcal{V}_{M \subseteq N}$.
+
+We will need some results from point set topology:
+\begin{defi}[Partition of unity]\index{partition of unity}
+  Let $X$ be a compact Hausdorff space, and $\{U_\alpha\}_{\alpha \in I}$ be an open cover. A \emph{partition of unity subordinate to $\{U_\alpha\}$} is a collection of functions $\lambda_\alpha: X \to [0, \infty)$ such that
+  \begin{enumerate}
+    \item $\supp(\lambda_\alpha) = \overline{\{x \in X: \lambda_\alpha(x) > 0\}} \subseteq U_\alpha$.
+    \item Each $x \in X$ lies in finitely many of these $\supp (\lambda_\alpha)$.
+    \item For each $x$, we have
+      \[
+        \sum_{\alpha \in I}\lambda_\alpha(x) = 1.
+      \]
+  \end{enumerate}
+\end{defi}
+
+\begin{prop}
+  Partitions of unity exist for any open cover.
+\end{prop}
+
+You might have seen this in differential geometry, but this is easier, since we do not require the partitions of unity to be smooth.
+
+\begin{lemma}
+  Let $\pi: E \to X$ be a vector bundle over a compact Hausdorff space. Then there is a continuous family of inner products on $E$. In other words, there is a map $E \otimes E \to \R$ which restricts to an inner product on $E$.
+\end{lemma}
+\begin{proof}
+  We notice that every trivial bundle has an inner product, and since every bundle is locally trivial, we can patch these up using partitions of unity.
+
+  Let $\{U_\alpha\}_{\alpha \in I}$ be an open cover of $X$ with local trivializations
+  \[
+    \varphi_\alpha: E|_{U_\alpha} \to U_\alpha \times \R^d.
+  \]
+  The inner product on $\R^d$ then gives us an inner product on $E|_{U_\alpha}$, say $\bra \ph, \ph\ket_\alpha$. We let $\lambda_\alpha$ be a partition of unity associated to $\{U_\alpha\}$. Then for $u\otimes v \in E \otimes E$, we define
+  \[
+    \bra u, v\ket = \sum_{\alpha \in I} \lambda_\alpha(\pi(u)) \bra u, v\ket_\alpha.
+  \]
+  Now if $\pi(u) = \pi(v)$ is not in $U_\alpha$, then we don't know what we mean by $\bra u, v\ket_\alpha$, but it doesn't matter, because $\lambda_\alpha(\pi(u)) = 0$. Also, since the partition of unity is locally finite, we know this is a finite sum.
+
+  It is then straightforward to see that this is indeed an inner product, since a positive linear combination of inner products is an inner product.
+\end{proof}
+
+\begin{lemma}
+  Let $\pi: E \to X$ be a vector bundle over a compact Hausdorff space. Then there is some $p: F \to X$ such that $E \oplus F \cong X \times \R^n$. In particular, $E$ embeds as a subbundle of a trivial bundle.
+\end{lemma}
+
+How are going to going to do this? We are just going to prove that $E$ is a subbundle of a trivial bundle $X \times \R^N$ for some big $N$. Then we just let
+\[
+  F = E^\perp
+\]
+using the inner product on $X \times \R^N$.
+
+\begin{proof}
+  Let $\{U_\alpha\}$ be a trivializing cover of $X$. Since $X$ is compact, we may wlog the cover is finite. Call them $U_1, \cdots, U_n$. We let
+  \[
+    \varphi_i: E|_{U_i} \to U_i \times \R^d.
+  \]
+  We note that on each patch, $E|_{U_i}$ embeds into a trivial bundle, because it \emph{is} a trivial bundle. So we can add all of these together. The trick is to use a partition of unity, again.
+
+  We define $f_i$ to be the composition
+  \[
+    \begin{tikzcd}
+      E|_{U_i} \ar[r, "\varphi_i"] & U_i \times \R^d \ar[r, "\pi_2"] & \R^d
+    \end{tikzcd}.
+  \]
+  So we can define
+  \begin{align*}
+    f: E &\to X \times (\R^d)^n\\
+    v&\mapsto  (\pi(v), \lambda_1(\pi(v)) f_1(v), \lambda_2(\pi(v)) f_2(v), \cdots, \lambda_n(\pi(v)) f_n(v).
+  \end{align*}
+  We see that this is injective. If $v, w$ belong to different fibers, then the first coordinate distinguishes them. If they are in the same fiber, then there is some $U_i$ with $\lambda_i(\pi(u)) \not= 0$. Then looking at the $i$th coordinate gives us distinguishes them. This then exhibits $E$ as a subbundle of $X \times \R^n$, and its (fiberwise) orthogonal complement is the desired $F$.
+\end{proof}
+
+\begin{cor}
+  Let $\pi: E\to X$ be a vector bundle over a compact Hausdorff $X$. We choose an embedding $E \subseteq X \times \R^N$, and then we get a map $f_\pi: X \to \Gr_d (\R^n)$ sending $x$ to $E_x \subseteq \R^N$. Moreover, if we pull back the tautological bundle along $f_\pi$, then we have
+  \[
+    f_{\pi}^* \gamma_{k, N}^\R \cong E.
+  \]
+  In fact, it is true that vector bundles on $X$ biject with homotopy classes of maps to the Grassmannian. This will be shown in the third example sheet. % talk something more about this!
+\end{cor}
+
+\subsection{Thom isomorphism}
+Let $\pi: E \to X$ be a vector bundle of dimension $d$. We let $E^\# = E \setminus s_0(X)$. Then we can consider
+\[
+  H^i(E_x, E_x^\#; R)
+\]
+We know $E_x$ is a $d$-dimensional. So we can choose an isomorphism $E_x \to \R^d$. So after making this choice, we know that
+\[
+  H^i(E_x, E_x^\#; R) \cong H^i(\R^d, \R^d \setminus \{0\}; R) =
+  \begin{cases}
+    R & i = d\\
+    0 & \text{otherwise}
+  \end{cases}
+\]
+However, there is no canonical generator of $H^d(E_x, E_x^\#; R)$ as an $R$-module, as we had to pick an isomorphism $E_x \cong \R^d$. A \term{local $R$-orientation} of $E$ at $x \in X$ is a choice of $R$-module generator $\varepsilon_x \in H^d(D_x, E_x^\#; R)$. An \term{$R$-orientation} is a choice of local $R$-orientation $\{\varepsilon_x\}_{x \in X}$ which are compatible in the following way: if $U\subseteq X$ is open on which $E$ is trivial, then under the homeomorphisms (and in fact linear isomorphisms):
+\[
+  \begin{tikzcd}
+    E_x \ar[rd, hook] \ar[rrrd, bend left, "h_x"'] \\
+    & E|_U \ar[r, "\varphi_\alpha", "\cong"']& U \times \R^d \ar[r, "\pi_2"] & \R^d\\
+    E_y \ar[ru, hook] \ar[rrru, bend right, "h_y"]
+  \end{tikzcd}
+\]
+the map
+\[
+  h_y^* \circ (h_x^{-1})^*: H^d(E_x, E_x^\#, R) \to H^d(E_y, E_y^\#, R)
+\]
+sends $\varepsilon_x$ to $\varepsilon_y$. Note that this definition does not depend on the choice of $\varphi_U$, because we used it twice, and they cancel out.
+
+It seems pretty horrific to construct an orientation. However, the following lemmas help:
+\begin{lemma}
+  Every vector bundle is $\F_2$-orientable.
+\end{lemma}
+
+\begin{proof}
+  There is only one possible choice of generator.
+\end{proof}
+
+\begin{lemma}
+  If $\{U_\alpha\}_{\alpha \in I}$ is a family of covers such that for each $\alpha, \beta \in I$, the homeomorphism
+  \[
+    \begin{tikzcd}
+      (U_\alpha \cap U_\beta) \times \R^d & E|_{U_\alpha \cap U_\beta} \ar[l, "\cong", "\varphi_\alpha"'] \ar[r, "\cong", "\varphi_\beta"'] & (U_\alpha \cap U_\beta) \times \R^d
+    \end{tikzcd}
+  \]
+  gives an orientation preserving map from $(U_\alpha \cap U_\beta) \times \R^d$ to itself, ie. has a positive determinant on each fiber, then $E$ is orientable for any $R$.
+\end{lemma}
+Note that we don't have to check the determinant at each point on $U_\alpha \cap U_\beta$. By continuity, we only have to check it for one point.
+
+\begin{proof}
+  Choose a generator $u \in H^d(\R^d, \R^d \setminus \{0\}; R)$. Then for $x \in U_\alpha$, we define $\varepsilon_x$ by pulling back $u$ along
+  \[
+    \begin{tikzcd}
+      E_x \ar[r, hook] & E|_{U_\alpha} \ar[r, "\varphi_\alpha"] & U_\alpha \times \R^d \ar[r, "\pi_2"] & \R^d
+    \end{tikzcd}.\tag{$\dagger_\alpha$}
+  \]
+  If $x \in U_\beta$ as well, then the analogous linear isomorphism $\dagger_\alpha$ differs from $\dagger_\beta$ by post-composition with a linear map $L: \R^d \to \R^d$ of \emph{positive} determinant. But $L, \id$ lies in $\GL_d^+(\R)$, a connected group. So $L$ is homotopic to $\id$, so $(\dagger_\alpha)$ is homotopic to $(\dagger_\beta)$. So they induce the same maps on cohomology classes.
+\end{proof}
+Now if we don't know that the maps have positive determinant, then $(\dagger_\alpha)$ and $(\dagger_\beta)$ might differ by a sign. So in any ring $R$ where $2 = 0$, we know every vector bundle is $R$-orientable.
+
+\begin{thm}[Thom isomorphism theorem]
+  Let $\pi: E \to X$ be a $d$-dimensional vector bundle, and $\{\varepsilon_x\}_{x \in X}$ be an $R$-orientation of $E$. Then
+  \begin{enumerate}
+    \item $H^i(E, E^\#; R) = 0$ for $i < d$
+    \item There is a unique class $u_E \in H^d(E, E^\#; R)$ which restricts to $\varepsilon_x$ on each fiber. This is known as the \term{Thom class}.
+    \item The map $\Phi$ given by the composition
+      \[
+        \begin{tikzcd}
+          H^i(X, R) \ar[r, "\pi^*"] & H^i(E, R) \ar[r, "-\smile u_E"] & H^{i + d}(E, E^\#, R)
+        \end{tikzcd}
+      \]
+      is an isomorphism. This tells us exactly how we can compute the cohomology of $(E, E^\#)$.
+  \end{enumerate}
+\end{thm}
+Note that (i) follows from (iii), since $H^i(X, R) = 0$ for $i < 0$.
+
+Before we go on and prove this, we talk about why it is useful.
+
+We can use it to define the \emph{Euler class}.
+\begin{defi}[Euler class]
+  Let $\pi: E \to X$ be a vector bundle. We define the \term{Euler class} $e(E) \in H^d(X, R)$ by the image of $u_E$ under the composition
+  \[
+    \begin{tikzcd}
+      H^d(E, E^\#; R) \ar[r] & H^d(E, R) \ar[r, "s_0^*"] & H^d(x, R)
+    \end{tikzcd}.
+  \]
+\end{defi}
+This is an example of a \term{characteristic class}, which is a cohomology class related to an oriented vector bundle that behaves nicely under pullback. More precisely, given a vector bundle $\pi: E \to X$ and a map $f: Y \to X$, we can form a pullback
+\[
+  \begin{tikzcd}
+    f^*E \ar[r, "\hat{f}"] \ar[d, "f^*\pi"] & E \ar[d, "\pi"]\\
+    Y \ar[r, "f"] & X
+  \end{tikzcd}.
+\]
+Since we have a fiberwise isomorphism $(f^*E)_y \cong E_{f(y)}$, an $R$-orientation for $E$ induces one for $f^* E$, and we know $f^*(u_E) = u_{f^* E}$ by uniqueness of the Thom class. So we know
+\[
+  e(f^*(E)) = f^* e(E) \in H^d(Y; R).
+\]
+Why is this useful? This gives us an obstruction to the vector bundle having a non-zero section.
+\begin{thm}
+  If there is a section $s: X \to E$ which is nowhere zero, then $e(E) = 0 \in H^d(X; R)$.
+\end{thm}
+
+\begin{proof}
+  We look at the long exact sequence for the pair $(E, E^\#)$. We then have a diagram:
+  \[
+    \begin{tikzcd}
+      H^d(E, E^\#, R) \ar[r] & H^d(E, R) \ar[r] \ar[d, "s_0^*"] & H^d(E^\#, R) \ar[dl, "s^*"]\\
+      & H^d(X, R)
+    \end{tikzcd}
+  \]
+  Since $s$ and $s_0$ are homotopic, the diagram commutes. Also, the top row is exact. So $u_E \in H^d(E, E^\#, R)$ gets sent to $0 \in H^d(E^\#, R)$, and thus $s^*$ sends it to $0 \in H^d(X, R)$. But the image in $H^d(X, R)$ is exactly the Euler class.
+\end{proof}
 \end{document}

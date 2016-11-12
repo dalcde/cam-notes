@@ -1919,5 +1919,943 @@ Finally, we will talk about morphisms between vector bundles.
 \end{eg}
 Note that the isomorphism between $TM$ and $T^*M$ requires the existence of a Riemannian metric.
 
+\section{Differential forms}
+
+The most important kinds of tensors are \emph{differential forms}.
+\begin{defi}[Differential form]\index{differential form}\index{$p$-form}\index{$\Omega^p(M)$}
+  We write
+  \[
+    \Omega^p (M) = C^\infty(M, \Lambda^p T^*M) = \{\text{$p$-forms on $M$}\}.
+  \]
+  In particular, we have
+  \[
+    \Omega^0(M) = C^\infty(M, \R).
+  \]
+  In local coordinates $x_1, \cdots, x_n$ on $U$ and $\omega \in \Omega^p(M)$, we can write it as
+  \[
+    \omega = \sum_{i_1 < \ldots < i_p} \omega_{i_1, \ldots, i_p} \d x_{i_1} \wedge \cdots \wedge \d x_{i_p}
+  \]
+  for some smooth functions $\omega_{i_1, \ldots, i_p}$.
+\end{defi}
+We are usually lazy and just write
+\[
+  \omega = \sum_I \omega_I \d x_I.
+\]
+\begin{eg}
+  A $0$-form is a smooth function.
+\end{eg}
+
+\begin{eg}
+  A $1$-form is a section of $T^* M$. If $\omega \in \Omega^1(M)$ and $X \in \Vect(M)$, then $\omega(X) \in C^\infty(M, \R)$.
+
+  For example, if $f$ is a smooth function on $M$, then $\d f \in \Omega^1(M)$ with
+  \[
+    \d f(X) = X(f)
+  \]
+  for all $X \in \Vect(M)$.
+
+  Locally, we can write
+  \[
+    \d f = \sum_{i = 1}^n a_i \;\d x_i.
+  \]
+  To work out what the $a_i$'s are, we just hit this with the $\frac{\partial}{\partial x_j}$. So we have
+  \[
+    a_j = \d f\left(\frac{\partial}{\partial x_j}\right) = \frac{\partial f}{\partial x_j}.
+  \]
+  So we have
+  \[
+    \d f = \sum_{i = 1}^n \frac{\partial f}{\partial x_i}\; \d x_i.
+  \]
+  This is essentially just the gradient of a function!
+\end{eg}
+
+\begin{eg}
+  If $\dim M = n$, and $\omega \in \Omega^n(M)$, then locally we can write
+  \[
+    \omega = g \;\d x_1 \wedge \cdots \wedge \d x_n.
+  \]
+  for some smooth function $g$. This is an alternating form that assigns a real number to $n$ tangent vectors. So it measures volume!
+
+  If $y_1, \cdots, y_n$ is any other coordinates, then
+  \[
+    \d x_i = \sum \frac{\partial x_i}{\partial y_j}\; \d y_j.
+  \]
+  So we have
+  \[
+    \omega = g \det\left(\frac{\partial x_i}{\partial y_j}\right)_{i, j} \;\d y_1 \wedge \cdots \wedge y_n.
+  \]
+\end{eg}
+
+Now a motivating question is this --- given an $\omega \in \Omega^1(M)$, can we find some $f \in \Omega^0(M)$ such that $\omega = \d f$?
+
+More concretely, let $U \subseteq \R^2$ be open, and let $x, y$ be the coordinates. Let
+\[
+  \omega = a \;\d x + b\;\d y
+\]
+If we have $w = \;\d f$ for some $f$, then we have
+\[
+  a = \frac{\partial f}{\partial x},\quad b = \frac{\partial f}{\partial y}.
+\]
+So the symmetry of partial derivatives tells us that
+\[
+  \frac{\partial a}{\partial y} = \frac{\partial b}{\partial x}.\tag{$*$}
+\]
+So this equation $(*)$ is a necessary condition to solve $\omega = \d f$. Is it sufficient?
+
+To begin with, we want to find a better way to express $(*)$ without resorting to local coordinates, and it turns out this construction will be very useful later on.
+\begin{thm}[Exterior derivative]
+  There exists a unique linear map
+  \[
+    \d = \d_{M, p}: \Omega^p(M) \to \Omega^{p + 1}(M)
+  \]
+  such that
+  \begin{enumerate}
+    \item On $\Omega^0(M)$ this is as previously defined, ie.
+      \[
+        \d f (X) = X(f)\text{ for all }X \in \Vect(M).
+      \]
+    \item We have
+      \[
+        \d \circ \d = 0: \Omega^p(M) \to \Omega^{p + 2}(M).
+      \]
+    \item It satisfies the \term{Leibnitz rule}
+      \[
+        \d (\omega \wedge \sigma) = \d \omega \wedge \sigma + (-1)^p \omega \wedge \d \sigma.
+      \]
+  \end{enumerate}
+  It follows from these assumptions that
+  \begin{enumerate}[resume]
+    \item $\d$ acts locally, ie. if $\omega, \omega' \in \Omega^p(M)$ satisfy $\omega|_U = \omega_U'$ for some $U \subseteq M$ open, then $\d \omega|_U = \d \omega'|_U$.
+    \item We have
+      \[
+        \d (\omega|_U) = (\d \omega)|_U
+      \]
+      for all $U \subseteq M$.
+  \end{enumerate}
+\end{thm}
+What do the three rules tell us? The first rule tells us this is a generalization of what we previously had. The second rule will turn out to be a fancy way of saying partial derivatives commute. The final Leibnitz rule tells us this $\d$ is some sort of derivatives.
+
+\begin{eg}
+  If we have
+  \[
+    \omega = a\;\d x + b\;\d y,
+  \]
+  then we have
+  \begin{align*}
+    \d \omega &= \d a\wedge \d x + a\; \d(\d x) + \d b \wedge \d y+ b\; \d(\d y)\\
+    &= \d a\wedge \d x + \d b \wedge \d y\\
+    &= \left(\frac{\partial a}{\partial x}\;\d x + \frac{\partial a}{\partial y}\;\d y\right)\;\d x + \left(\frac{\partial b}{\partial x}\;\d x + \frac{\partial b}{\partial y}\right)\wedge \d y\\
+    &= \left(\frac{\partial a}{\partial x} - \frac{\partial b}{\partial y}\right)\;\d x.
+  \end{align*}
+  So the condition $(*)$ says $\d \omega = 0$.
+\end{eg}
+We now rephrase our motivating question --- if $\omega \in \Omega^1(M)$ satisfies $\d \omega = 0$, can we find some $f$ such that $\omega = \d f$ for some $f \in \Omega^0(M)$? Now this has the obvious generalization --- given any $p$-form $\omega$, if $\d \omega = 0$, can we find some $\sigma$ such that $\omega = \d \sigma$?
+
+\begin{eg}
+  In $\R^3$, we have coordinates $x, y, z$. We have seen that for $f \in \Omega^0(\R^3)$, we have
+  \[
+    \d f = \frac{\partial f}{\partial x}\;\d x + \frac{\partial f}{\partial y}\;\d y + \frac{\partial f}{\partial z}\;\d z.
+  \]
+  Now if
+  \[
+    \omega = P\;\d x + Q\;\d y+ R \;\d z \in \Omega^1(\R^3),
+  \]
+  then we have
+  \begin{align*}
+    \d(P \;\d x) &= \d P \wedge \d x + P\; \d \d x\\
+    &= \left(\frac{\partial P}{\partial x}\;\d x + \frac{\partial P}{\partial y} \;\d y + \frac{\partial P}{\partial z} \;\d z\right)\wedge \d x\\
+    &= -\frac{\partial P}{\partial y} \;\d x \wedge \d y - \frac{\partial P}{\partial z}\;\d x \wedge \d z.
+  \end{align*}
+  So we have
+  \[
+    \d \omega = \left(\frac{\partial Q}{\partial x} - \frac{\partial P}{\partial y}\right)\;\d x \wedge \d y + \left(\frac{\partial P}{\partial x} - \frac{\partial P}{\partial z}\right)\;\d x \wedge \;\d z + \left(\frac{\partial P}{\partial y} - \frac{\partial Q}{\partial z}\right)\;\d y \wedge \d z.
+  \]
+  This is just the curl! So $\d^2 = 0$ just says that $\mathrm{curl} \circ \mathrm{grad} = 0$.
+\end{eg}
+
+\begin{proof}
+  The above computations suggest that in local coordinates, the axioms already tell use completely how $\d$ works. So we just work locally and see they match up globally.
+
+  Suppose $M$ is covered by a single chart with coordinates $x_1, \cdots, x_n$. We define $d: \Omega^0(M) \to \Omega^(M)$ as required by (i). For $p > 0$, we define
+  \[
+    \d\left(\sum_{i_1 < \ldots < i_p} \omega_{i_1, \ldots, i_p}\;\d x_{i_1} \wedge \cdots \d x_{i_p}\right) = \sum \d \omega_{i_1, \ldots, i_p}\wedge \d x_{i_1} \wedge \cdots \wedge \d_{x_p}.
+  \]
+  Then (i) is clear. For (iii), we suppose
+  \begin{align*}
+    \omega &= f\;\d x_I \in \Omega^p(M)\\
+    \sigma &= g\;\d x_J \in \Omega^q(M).
+  \end{align*}
+  We then have
+  \begin{align*}
+    \d(\omega \wedge \sigma) &= \d (fg\; \d x_I \wedge \d x_J)\\
+    &= \d (fg) \wedge \d x_I \wedge \d x_J\\
+    &= g \;\d f \wedge \d x_I \wedge \d x_J + f \;\d g \wedge \d x_I \wedge \d x_J\\
+    &= g \;\d f \wedge \d x_I \wedge \d x_J + f(-1)^p \;\d x_I \wedge (\d g \wedge\d x_J)\\
+    &= (\d \omega) \wedge \sigma + (-1)^p \omega \wedge \d \sigma.
+  \end{align*}
+  So done. Finally, for (ii), if $f \in \Omega^0(M)$, then
+  \[
+    \d^2 f = \d\left(\sum_i \frac{\partial f}{\partial x_i}\;\d x_i\right) = \sum_{i, j} \frac{\partial^2 f}{\partial x_i \partial x_j} \;\d x_j \wedge \;\d x_i = 0,
+  \]
+  since partial derivatives commute. Then for general forms, we have
+  \begin{align*}
+    \d^2 \omega \left(\sum \omega_I \;\d x_I\right) &= \d\left(\sum \d \omega_I \wedge \d y_I\right)\\
+    &= \d \left(\sum \d \omega_I \wedge \d x_{i_1} \wedge \cdots \d x_{i_p}\right)\\
+    &= 0
+  \end{align*}
+  using Leibnitz rule. So this works.
+
+  Certainly this has the extra properties. To claim uniqueness, if $\partial: \Omega^p(M) \to \Omega^{p + 1}$ satisfies the above properties, then
+  \begin{align*}
+    \partial \omega &= \partial \left(\sum \omega_I \d x_I\right) \\
+    &= \sum \partial \omega_I \wedge \d x_I + \omega_I \wedge\partial \d x_I \\
+    j= \sum \d \omega_I \wedge \d x_I,
+  \end{align*}
+  using the fact that $\partial = \d$ on $\Omega^0(M)$ and induction.
+
+  Finally, if $M$ is covered by charts, we can define $\d: \Omega^p(M) \to \Omega^{p + 1}(M)$ by defining it to be the $\d$ above on any single chart. Then uniqueness implies this is well-defined. This gives existence of $\d$, but doesn't immediately give uniqueness, since we only proved local uniqueness.
+
+  So suppose $\partial: \Omega^p(M) \to \Omega^{p + 1}(M)$ again satisfy the three properties. We claim that $\partial$ is local. We let $\omega, \omega' \in \Omega^p(M)$ be such that $\omega|_U = \omega'|_U$ for some $U \subseteq M$ open. Let $x \in U$, and pick a bump function $\chi \in C^\infty(M)$ such that $\chi \equiv 1$ on some neighbourhood $W$ of $x$, and $\supp(X) \subseteq U$. Then we have
+  \[
+    \chi \cdot (\omega - \omega') = 0.
+  \]
+  We then apply $\partial$ to get
+  \[
+    0 = \partial(\chi \cdot(\omega - \omega')) = \d \chi \wedge (\omega - \omega') + \chi(\partial \omega - \partial\omega').
+  \]
+  But $\chi \equiv 1$ on $W$. So $\d \chi$ vanishes on $W$. So we must have
+  \[
+    \partial \omega|_W - \partial \omega'|_W = 0.
+  \]
+  So $\partial \omega = \partial \omega'$ on $W$.
+
+  Finally, to show that $\partial = d$, if $\omega \in \Omega^p(M)$, we take the same $\chi$ as before, and then on $x$, we have
+  \begin{align*}
+    \partial \omega &= \partial\left(\chi\sum \omega_I \;\d x_I\right) \\
+    &= \partial \chi \sum \omega_I \;\d x_I + \chi \sum \partial \omega_I \wedge \d x_I \\
+    &= \chi \sum \d \omega_I \wedge \d x_I\\
+    &= \d \omega.
+  \end{align*}
+  So we get uniqueness. Since $x$ was arbitrary, we have $\partial = \d$.
+\end{proof}
+
+One useful example of a differential form is a \emph{symplectic form}.
+\begin{defi}[Non-degenerate form]\index{non-degenerate form}
+  A $2$-form $\omega \in \Omega^2(M)$ is \emph{non-degenerate}, ie. $\omega(X_p, X_p) = 0$ implies $X_p = 0$.
+\end{defi}
+As in the case of an inner product, such an $\omega$ gives us an isomorphism $T_p M \to T^*_p M$ by
+\[
+  \alpha(X_p)(Y_p) = \omega(X_p, Y_p).
+\]
+\begin{defi}[Symplectic form]\index{symplectic form}
+  A symplectic form is a non-degenerate $2$-form $\omega$ such that $\d \omega = 0$.
+\end{defi}
+
+Why did we work with covectors rather than vectors when defining differential forms? It happens that differential forms have nicer properties. If we have some $F \in C^\infty(M, N)$ and $g \in \Omega^0(N) = C^{\infty}(N, \R)$, then we can form the pullback
+\[
+  F^*g = g \circ F \in \Omega^0(M).
+\]
+More genearlly, for $x \in M$, we have a map
+\[
+  \D F|_x : T_x M \to T_{F(x)}N.
+\]
+This does \emph{not} alllow us to pushforward a vector field on $M$ to a vector field of $N$, as the map $F$ might not be injective. However, we can use its dual
+\[
+  (\D F|_x)^*: T_{F(x)}^* N \to T_x^* M
+\]
+to pull forms back. Given $\theta \in \Omega^p(N)$, we can define
+\[
+  F^* \omega|_x = \Lambda^p(\D F|-_)^*(\omega|_{F(x)}).
+\]
+In other words, for $v_1, \cdots, v_p \in T_x M$, we have
+\[
+  (F^*\omega|_x)(v_1, \cdots, v_p) = \omega|_{F(x)} (\D F|_x(v_1), \cdots, \D F|_x(v_p)).
+\]
+This is known as the \emph{pullback}\index{pullback!differential forms}\index{differential form!pullback} of the differential form.
+\begin{lemma}
+  Let $F \in C^\infty(M, N)$. Let $F^*$ be the associated pullback map. Then
+  \begin{enumerate}
+    \item $F^*$ is a linear map $\Omega^p(N) \to \Omega^p(M)$.
+    \item $F^*(\omega \wedge \sigma) = F^*\omega \wedge F^*\omega$.
+    \item If $G \in C^\infty (N, P)$, then $(G \circ F)^* = F^* \circ G^*$.
+    \item We have $\d F^* = F^* d$.
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}
+  All but (iv) are clear. We first check that this holds for $0$ forms. If $g \in \Omega^0(N)$, then we have
+  \begin{align*}
+    (F^* \d g)|_x(v) &= \d g|_{F(x)} (\D F|_x (v)) \\
+    &= \D F|_x(v)(g) \\
+    &= v(g \circ F) \\
+    &= \d (g \circ F)(v) \\
+    &= \d (F^* g)(v).
+  \end{align*}
+  So we are done.
+
+  Then the general result follows from (i) and (ii). Indeed, in local coordinates $y_1, \cdots, y_n$, if
+  \[
+    \omega = \sum\omega_{i_1, \ldots, i_p}\; \d y_{i_1} \wedge \cdots \wedge \d y_{i_p},
+  \]
+  then we have
+  \[
+    F^* \omega = \sum (F^* \omega_{i_1, \ldots, i_p}) (F^* \d y_{i_1} \wedge \cdots \wedge \d y_{i_p}).
+  \]
+  Then we have
+  \[
+    \d F^* \omega = F^* \d \omega = \sum (F^* \d \omega_{i_1, \ldots, i_p}) (F^* \d y_{i_1} \wedge \cdots \wedge \d y_{i_p}).
+  \]
+\end{proof}
+
+\subsection{de Rham cohomology}
+Recall that our motivating question was given an $\omega \in \Omega^p(M)$ with $\d \omega = 0$, does it follow that there is some $\sigma \in \Omega^{p - 1}(M)$ such that $\omega = \d \sigma$?
+
+\begin{defi}[Closed form]\index{closed form}
+  A $p$-form $\omega \in \Omega^p(M)$ is \emph{closed} if $\d \omega = 0$.
+\end{defi}
+
+\begin{defi}[Exact form]\index{exact form}
+  A $p$-form $\omega \in \Omega^p(M)$ is \emph{exact} if there is some $\sigma \in \Omega^{p - 1}(M)$ such that $\omega = \d \sigma$.
+\end{defi}
+
+We know that every exact form is closed. We then want to know if every closed form is exact. In general, this does not have to be true, and we make the following definition to measure the failure for that to happen:
+
+\begin{defi}[de Rham cohomology]\index{de Rham cohomology}
+  The \emph{$p$th de Rham cohomology} is given by
+  \[
+    H^p_\dR (M) = \frac{\ker d: \Omega^p(M) \to \Omega^{p + 1}(M)}{\im d: \Omega^{p - 1}(M) \to \Omega^p(M)} = \frac{\text{closed forms}}{\text{exact forms}}.
+  \]
+  In particular, we have
+  \[
+    H^0_{\dR}(M) = \ker d: \Omega^0(M) \to \Omega^1(M).
+  \]
+\end{defi}
+
+We could tautologically say that if $\d \omega = 0$, then it is exact iff it vanishes in $H^p_{\dR}(M)$. But this is as useful as saying ``Let $S$ be the set of solutions to this differential equation. Then the differential equation has a solution iff $S$ is non-empty''. However, we will later find other ways to compute $H^p_{\dR}(M)$ and thus get an answer without doing it directly.
+
+\begin{prop}\leavevmode
+  \begin{enumerate}
+    \item We have
+      \[
+        H_{\dR}^0(M) = \R^{\text{number of connected components}}.
+      \]
+    \item if $p > \dim M$, then $H^p_{\dR}(M) = 0$.
+    \item If $F \in C^\infty(M, N)$, Then this induces a map $F^*: H^p_\dR(N) \to H^p_\dR(M)$ given by
+      \[
+        F^*[\omega] = [F^* \omega].
+      \]
+    \item $(F \circ G)^* = G^* \circ F^*$.
+    \item If $F: M \to N$ is a diffeomorphism, then $F^*: H^p_{\dR}(N) \to H^p_{\dR}(M)$ is a diffeomorphism.
+  \end{enumerate}
+\end{prop}
+
+\begin{proof}
+  For (i), we have
+  \begin{align*}
+    H_{\dR}^0(M) &= \{f \in C^\infty(M, \R): \d f = 0\} \\
+    &= \{\text{locally constant functions $f$}\}\\
+    &= \R^{\text{number of connected components}}.
+  \end{align*}
+  For (iii), we notice that if $[\omega] \in H^p_{\dR}(N)$, then $\d \omega = 0$. So $\d (F^* \omega) = F^*(\d \omega) = 0$. So $F^* \omega \in H^p_\dR(M)$. So this map makes sense. To see it is well-defined, if $[\omega] = [\omega']$, then $\omega - \omega' = \d \sigma$ for some $\sigma$. So $F^* \omega - F^* \omega' = \d (F^* \sigma)$. So $[F^* \omega] = [F^* \omega']$.
+\end{proof}
+
+It turns out that de Rham cohomology is a \emph{homotopy} invariant. To make sense of that, we need the following definition:
+\begin{defi}[Smooth homotopy]\index{smooth homotopy}\index{homotopic maps}
+  Let $F_0, F_1: M \to N$ be smooth maps. A \emph{smooth homotopy} from $F_0$ to $F_1$ is a smooth map $F: [0, 1] \times M \to N$ (ie. $F$ is the restriction of some smooth $I \times M \to N$ for some $I \supseteq [0, 1]$ open) such that
+  \[
+    F_0(x) = F(0, x),\quad F_1(x) = F(1, x).
+  \]
+  If such a map exists, we say $F_0$ and $F_1$ are \emph{homotopic}.
+\end{defi}
+
+\begin{thm}[Deformation invariance]\index{de Rham cohomology!deformation invariance}\index{deformation invariance of de Rham cohomology}
+  Let $F_0, F_1$ be homotopic maps. Then $F_0^* = F_1^*: \H^p_{\d R}(N) \to H_{\dR}^p(M)$.
+\end{thm}
+
+\begin{proof}
+  Let $F: [0, 1] \times M \to N$ be the homotopy, and
+  \[
+    F_t(x) = F(t, x).
+  \]
+  We denote the exterior derivative on $M$ by $\d_M$ (and similarly $\d_N$), and that on $[0, 1] \times M$ by $d$.
+
+  Let $\omega \in \Omega^p(N)$ be such that $\d_N \omega = 0$. We let $t$ be the coordinate on $[00, 1]$. We write
+  \[
+    F^* \omega = \sigma + \d t \wedge \gamma,
+  \]
+  where $\sigma = \sigma(t) \in \Omega^p(M)$ and $\gamma = \gamma(t) \in \Omega^{p - 1}(M)$. We claim that
+  \[
+    \sigma(t) = F_t^* \omega.
+  \]
+  Indeed, we let $\iota: \{t\} \times M \to [0, 1] \times M$ be the inclusion. Then we have
+  \begin{align*}
+    F_t^* \omega |_{\{t\} \times M} &= (F \circ \iota)^* \omega = \iota^* F^* \omega \\
+    &= \iota^* (\sigma + \d t \wedge \gamma)\\
+    &= \iota^* \sigma + \iota^* \d t \wedge \iota^* \gamma\\
+    &= \iota^* \sigma,
+  \end{align*}
+  using the fact that $\iota^* \d t = 0$. As $\d_N \omega = 0$, we have
+  \begin{align*}
+    0 &= F^* \d_N \omega \\
+    &= d F^* \omega \\
+    &= \d(\sigma + \d t \wedge \gamma)\\
+    &= \d_M(\sigma) + (-1)^p\frac{\partial \sigma}{\partial t} \wedge \d t + \d t \wedge \d_M \gamma\\
+    &= \d_M \sigma + (-1)^p \frac{\partial \sigma}{\partial t} \wedge \d t + (-1)^{p - 1} \d_M \gamma \wedge \d t.
+  \end{align*}
+  Looking at the $\d t$ components, we have
+  \[
+    \frac{\partial \sigma}{\partial t}(\sigma) = F_1^* \omega - F_0^* \omega.
+  \]
+  So we have
+  \[
+    F_1^* \omega - F_0^* \omega = \sigma(1) - \sigma(0) = \int_0^1 \frac{\partial \sigma}{\partial t} \;\d t = \int_0^1 \d_M \gamma \d t = \d_M \int_0^1 \gamma(t).
+  \]
+  So we know that
+  \[
+    [F_1^* \omega] = [F_0^* \omega].
+  \]
+  So done.
+\end{proof}
+
+\begin{eg}
+  Suppose $U \subseteq \R^n$ is an open ``\term{star-shaped}'' subset, ie. there is some $x_0 \in U$ such that for any $x \in U$ and $t \in [0, 1]$, we have
+  \[
+    tx + (1 - t)x_0 \in U.
+  \]
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (1, 0) -- (2, 2) -- (0, 1) -- (-2, 2) -- (-1, 0) -- (-2, -2) -- (0, -1) -- (2, -2) -- (1, 0);
+      \node [circ] {};
+      \node [below] {$x_0$};
+      \draw (0, 0) -- (1, 1.1) node [circ] {} node [right] {$x$};
+    \end{tikzpicture}
+  \end{center}
+  We define $F_t: U \to U$ by
+  \[
+    F_t(x) = tx + (1 - t) x_0.
+  \]
+  Then $F$ is a smooth homotopy from the identity map to $F_0$, the constant map to $x_0$. We clearly have $F_1^*$ being the identity map, and $F_0^*$ is the zero map on $H^p_{\dR}(U)$ for all $p \geq 1$. So we have
+  \[
+    H_{\dR}^p(U) =
+    \begin{cases}
+      0 & p \geq 1\\
+      \R & p = 0
+    \end{cases}.
+  \]
+\end{eg}
+
+\begin{cor}[Poincar\'e lemma]\index{Poincar\'e lemma}
+  Let $U \subseteq \R^n$ be open and star-shaped. Suppose $\omega \in \Omega^p(U)$ is such that $\d \omega = 0$. Then there is some $\sigma \in \Omega^{p - 1}(M)$ such that $\omega = \d \sigma$.
+\end{cor}
+
+\begin{proof}
+  $H^p_{\dR}(U) = 0$ for $p \geq 1$.
+\end{proof}
+
+More generally, we have the following notion.
+
+\begin{defi}[Smooth homotopy equivalence]\index{smooth homotopy equivalence}
+  We say two manifolds $M, N$ are \emph{smoothly homotopy equivalent} if there are smooth maps $F: M \to N$ and $G: N \to M$ such that both $F \circ G$ and $G \circ F$ are homotopic to the identity.
+\end{defi}
+
+\begin{cor}
+  If $M$ and $N$ are smoothly homotopy equivalent, then $H_{\dR}^p(M) \cong H_{\dR}^p(N)$.
+\end{cor}
+
+Note that by approximation, it can be shown that if $M$ and $N$ are homotopy equivalent as topological spaces (ie. the same definition where we drop the word ``smooth''), then they are in fact smoothly homotopy equivalent. So the de Rham cohomology depends only on the homotopy type of the underlying topological space.
+
+We now want to state the Mayer-Vietoris theorem. This will allow us to compute de Rham cohomology groups by looking at the de Rhaml cohomology of open submanifolds. To do so, we need the language of chain complexes and exact sequences.
+
+\begin{defi}[Cochain complex and exact sequence]\index{cochain complex}\index{exact sequence}
+  A sequence
+  \[
+    \begin{tikzcd}
+      \cdots \ar[r] & V_{p - 1} \ar[r, "\d_{p - 1}"] & V_p \ar[r, "\d_p"] & V_{p + 1} \ar[r] & \cdots
+    \end{tikzcd}
+  \]
+  is a \emph{cochain complex} if $\d_p \circ \d_p{p - 1} = 0$ for all $p$.
+
+  It is \emph{exact at $p$} if $\ker \d_p = \im \d_{p - 1}$, and \emph{exact} if it is exact at every $p$.
+\end{defi}
+
+\begin{eg}
+  The \term{de Rhan complex}
+  \[
+    \begin{tikzcd}
+      \Omega^0(M) \ar[r, "\d"] & \Omega^1(M) \ar[r, "\d"] & \Omega^2(M) \ar[r] & \cdots
+    \end{tikzcd}
+  \]
+  is a cochain complex as $\d^2 = 0$. It is exact at $p$ iff $H_{\dR}^p(M) = \{0\}$.
+\end{eg}
+
+\begin{defi}[Cohomology]\index{cohomology}
+  Let
+  \[
+    \begin{tikzcd}
+      \cdots \ar[r] & V_{p - 1} \ar[r, "\d_{p - 1}"] & V_p \ar[r, "\d_p"] & V_{p + 1} \ar[r] & \cdots
+    \end{tikzcd}
+  \]
+  be a cochain complex. The \emph{cohomology} is given by
+  \[
+    H^p(V_{\Cdot}) = \frac{\ker \alpha_p}{\im \alpha_{p - 1}}.
+  \]
+\end{defi}
+
+\begin{eg}
+  The cohomology of the de Rham complex is de Rham cohomology.
+\end{eg}
+
+\begin{defi}[Cochain map]\index{cochain map}
+  Let $V_{\Cdot}$ and $W_\Cdot$ be cochain complexes. A \emph{cochain map} $V_{\Cdot} \to W_{\Cdot}$ is a map $f_p: V_p \to W_p$ such that the following diagram commutes for all $p$:
+   \[
+     \begin{tikzcd}
+       V_p \ar[r, "f_p"] \ar[d, "\d_p"] & W_n \ar[d, "\d_p"]\\
+       V_{p + 1} \ar[r, "f_{p + 1}"] & W_{p + 1}
+     \end{tikzcd}
+   \]
+\end{defi}
+
+\begin{prop}
+  A cochain map induces a well-defined homomorphism on the cohomology groups.
+\end{prop}
+
+\begin{defi}[Short exact sequence]
+  A \term{short exact sequence} is an exact sequence of the form
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & V_1 \ar[r, "\alpha"] & V_2 \ar[r, "\beta"] & V_3 \ar[r] & 0
+    \end{tikzcd}.
+  \]
+  This implies that $\alpha$ is injective, $\beta$ is surjective, and $\im (\alpha) = \ker(\beta)$. By the rank-nullity theorem, we know
+  \[
+    \dim V_2 = \rank(\beta) + \mathrm{null}(\beta) = \dim V_3 + \dim V_1.
+  \]
+\end{defi}
+
+\begin{eg}
+  If we have an exact sequence such that $\dim V_p < \infty$ for all $p$ and are zero for all but finitely many $p$, then
+  \[
+    \sum_p (-1)^p \dim V_p = 0.
+  \]
+\end{eg}
+
+\begin{thm}[Mayer-Vietoris theorem]\index{Mayer-Vietoris sequence}
+  Let $M$ be a manifold, and $M = U \cup V$, where $U, V$ are open. We denote the inclusion maps as follows:
+  \[
+    \begin{tikzcd}
+      U \cup V \ar[r, "i_1", hook] \ar[d, "i_2", hook] & U \ar[d, hook, "j_1"]\\
+      V \ar[r, hook, "j_2"] & M
+    \end{tikzcd}.
+  \]
+  Then there exists a natural linear map
+  \[
+    \delta^p_\dR (U \cap V) \to H_{\dR}^{p + 1}(M)
+  \]
+  such that the following sequence is exact:
+  \[
+    \begin{tikzcd}
+      H^p_{\dR}(M) \ar[r, "j_1^* \oplus j_2^*"] & H^p_{\dR}(U) \oplus H^p_{\dR}(V) \ar[r, "i_1^* - i_2^*"] & H_\dR^p(U \cap V)\ar[out=0, in=180, looseness=2, overlay, lld, "\delta"]\\
+      H_\dR^{p+1}(M) \ar[r, "j_1^* \oplus j_2^*"] & H_\dR^{p+1}(U) \oplus H_\dR^{p+1}(V) \ar[r, "i_1^* - i_2^*"] & \cdots
+    \end{tikzcd}
+  \]
+  Here the sequence ends with at $0$ at the left end.
+\end{thm}
+
+\begin{eg}
+  Consider $M = S^1$. We can cut the circle up :
+  \begin{center}
+    \begin{tikzpicture}
+      \draw circle [radius=1];
+      \draw [red] (1.105, -0.4673) arc(-22.9:202.9:1.2);
+      \node [red, above] at (0, 1.2) {$U$};
+
+      \draw [blue] (1.279, 0.545) arc(22.9:-202.9:1.4);
+      \node [blue, below] at (0, -1.4) {$V$};
+
+      \node [circ] at (1, 0) {};
+      \node [circ] at (-1, 0) {};
+    \end{tikzpicture}
+  \end{center}
+  Here we have
+  \begin{align*}
+    S^1 &= \{(x, y): x^2 + y^2 = 1\}\\
+    U &= S^1 \cap \{y > -\varepsilon\}\\
+    V &= S^1 \cap \{y < \varepsilon\}.
+  \end{align*}
+  As $U, V$ are diffeomorphic to intervals, hence contractible, and $U \cap V$ is diffeomorphic to the disjoint union of two intervals, we know their de Rham cohomology.
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & H^0_{\dR}(S^1) \ar[r] & H^0_{\dR}(U) \oplus H^0_{\dR}(V) \ar[r] & H_\dR^0(U \cap V)\ar[out=0, in=180, looseness=2, overlay, lld]\\
+      & H_\dR^1(S^1) \ar[r] & H_\dR^1(U) \oplus H_\dR^1(V) \ar[r] & \cdots
+    \end{tikzcd}
+  \]
+  We can fill in the things we already know to get
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & \R \ar[r] & \R \oplus \R \ar[r] & \R \oplus \R\ar[out=0, in=180, looseness=2, overlay, lld]\\
+      & H_\dR^1(S^1) \ar[r] & 0 \ar[r] & \cdots
+    \end{tikzcd}
+  \]
+  By adding the degrees alternatingly, we know that
+  \[
+    \dim H^1_{\dR}(S^1) = 1.
+  \]
+  So
+  \[
+    H^1_{\dR}(S^1) \cong \R.
+  \]
+\end{eg}
+
+Now we prove Mayer-Vietoris. The proof splits into two parts --- one differential geometric part, and another algebraic part. The geometric part is the following lemma, and the algebraic part is purely formal, via the snake lemma.
+
+\begin{lemma}
+  The following sequence is exact for all $p$:
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & \Omega^p(U \cup V) \ar[r, "j_1^* \oplus j_2^*"] & \Omega^p(U) \oplus \Omega^p(V) \ar[r, "i_1^* - i_2^*"] & \Omega^p(U \cap V) \ar[r] & 0
+    \end{tikzcd}
+  \]
+\end{lemma}
+The only non-trivial part is the surjectivity of $i_1^* - i_2^*$. To do so, we need to use the idea of a partition of unity.
+
+\begin{defi}[Partition of unity]\index{partition of unity}
+  Let $\{U_\alpha\}$ be an open cover of a manifold $M$. A \emph{partition of unity} subordinate to $\{U_\alpha\}$ is a collection $\varphi_\alpha \in C^\infty(M, \R)$ such that
+  \begin{enumerate}
+    \item $0 \leq \varphi_\alpha \leq 1$
+    \item $\supp(\varphi_\alpha) \subseteq U_\alpha$
+    \item For all $p \in M$, all but finitely many $\varphi_\alpha(p)$ are non-zero.
+    \item $\sum_\alpha \varphi_\alpha = 1$.
+  \end{enumerate}
+\end{defi}
+This allows us to write any differential form as a sum of forms supported on each $U_\alpha$.
+
+\begin{thm}
+  Given any $\{U_\alpha\}$ open cover, there exists a partition of unity subordinate to $\{U_\alpha\}$.
+\end{thm}
+
+\begin{proof}
+  We will only do the case where $M$ is compact. Given $p \in M$, there exists a coordiante chart $p \in V_p$ and $\alpha(p)$ such that $V_p \subseteq U_{\alpha(p)}$. We pick a bump function $\chi_p \in C^\infty(M, \R)$ such that $\chi_P = 1$ on a neighbourhood $W_p \subseteq V_p$ of $p$. Then $\supp(\chi_p) \subseteq U_{\alpha(p)}$.
+
+  Now by compactness, there are some $p_1, \cdots, p_N$ such that $M$ is covered by $W_{p_1}p \cup \cdots \cup W_{p_N}$. Now let
+  \[
+    \tilde{\varphi}_\alpha = \sum_{i: \alpha(p_i) = \alpha} \chi_{p_i}.
+  \]
+  Then by construction, we have
+  \[
+    \supp(\tilde{\varphi}_\alpha) \subseteq U_\alpha.
+  \]
+  Also, by construction, we know $\sum_\alpha \tilde{\varphi}_\alpha > 0$. Finally, we let
+  \[
+    \varphi_\alpha = \frac{\tilde{\varphi}\alpha}{\sum_\beta \tilde{\varphi}_\beta}.
+  \]
+\end{proof}
+The general proof will need the fact that the space is second-countable.
+
+Now we prove our lemma
+\begin{proof}[Proof of lemma]
+  Let $\{\varphi_U, \varphi_V\}$ be partitions of unity subordinate to $\{U, V\}$. Let $\omega \in \Omega^p(U \cap V)$. We set $\sigma_U \in \Omega^p(U)$ be
+  \[
+    \sigma_U =
+    \begin{cases}
+      \varphi_v \omega & \text{on }U \cap V\\
+      0 & \text{on }U \setminus \supp \varphi_V
+    \end{cases}.
+  \]
+  Similarly, we define $\sigma_V \in \Omega^p(V)$ by
+  \[
+    \sigma_V =
+    \begin{cases}
+      -\varphi_U \omega & \text{on }U \cap V\\
+      0 & \text{on }V \setminus \supp \varphi_U
+    \end{cases}.
+  \]
+  Then we have
+  \[
+    \iota_1^* \sigma_U - \iota_2^* \sigma_V = (\varphi_V \omega + \varphi_U \omega)|_{U \cap V} = \omega.
+  \]
+  So $\iota_1^* - \iota_2^*$ is surjective.
+\end{proof}
+
+We next get to the algebraic part, known as the snake lemma:
+\begin{thm}[Snake lemma]\index{snake lemma}
+  Suppose we have a short exact sequence of complexes
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & A_{\Cdot} \ar [r, "i"] & B_{\Cdot} \ar [r, "q"] & C_{\Cdot} \ar[r] & 0
+    \end{tikzcd},
+  \]
+  ie. the $i, q$ are chain maps and we have a short exact sequence
+  \[
+    \begin{tikzcd}
+      0 \ar[r] & A_p \ar [r, "i_p"] & B_p \ar [r, "q_p"] & C_p \ar[r] & 0
+    \end{tikzcd},
+  \]
+  for each $p$.
+
+  Then there are maps
+  \[
+    \delta: H_n(C_{\Cdot}) \to H_{n + 1}(A_{\Cdot})
+  \]
+  such that there is a long exact sequence
+  \[
+    \begin{tikzcd}
+      \cdots \ar [r] & H_n(A) \ar[r, "i_*"] & H_n(B) \ar[r, "q_*"] & H_n(C) \ar[out=0, in=180, looseness=2, overlay, dll, "\delta"']\\
+      & H_{n + 1}(A) \ar[r, "i_*"] & H_{n + 1}(B) \ar[r, "q_*"] & H_{n + 1}(C) \ar [r] & \cdots
+    \end{tikzcd}.
+  \]
+\end{thm}
+
+\begin{proof}
+  Omitted (it can be found in the Algebraic topology notes). % maybe do copy and paste.
+\end{proof}
+
+\section{Integration}
+\subsection{Orientation}
+Before we can talk about integration, we need to have the notion of an orientation.
+
+Informally, an orientation on a vector space $V$ is a choice of collection of ordered basis that we declare to be ``oriented''. If $(e_1, \cdots, e_n)$ is an oriented bases, then changing the sign of one of the $e_i$ changes orientation, while scaling by a positive multiple does not.
+\begin{defi}[Orientation of vector space]\index{orientation!vector space}
+  Let $V$ be a vector space with $\dim V = n$. An \emph{orientation} is an element $\omega \in\Lambda^n (V^*)$, up to equivalence $\omega \sim \omega'$ iff $\omega = \lambda \omega'$. A basis $\{e_1, \cdots, e_n\}$ is \emph{oriented} if
+  \[
+    \omega(e_1, \cdots, e_n) > 0.
+  \]
+  By convention, if $V = \{0\}$, an orientation is just a choice of number in $\{\pm\}$.
+\end{defi}
+
+Suppose we have picked an oriented basis $e_1, \cdots, e_n$. If we have any other basis $\tilde{e}_1, \cdots, \tilde{e}_n$, we write
+\[
+  e_i = \sum_j B_{ij} \tilde{e}_j.
+\]
+Then we have
+\[
+  \omega (\tilde{e}_1, \cdots, \tilde{e}_n) = \det B \omega(e_1, \cdots, e_n).
+\]
+So $\tilde{e}_1, \cdots, \tilde{e}_n$ is oriented iff $\det B > 0$.
+
+We now generalize this to manifolds, where we try to orient the tangent bundle smoothly.
+
+\begin{defi}[Orientation of manifold]\index{orientation!manifold}\index{manifold!orientation}
+  An \emph{orientation} of a manifold is defined to be an element $\omega \in \Omega^n(M)$ that is nowhere vanishing, up to equivalence given by $ \omega \sim \omega'$ if there is some smooth $f: M \to \R_{> 0}$ such that $\omega = f \omega'$.
+\end{defi}
+
+\begin{defi}[Orientable manifold]\index{orientable manifold}\index{manifold!orientable}
+  A manifold is \emph{orientable} if it has some orientation.
+\end{defi}
+
+If $M$ is a connected, orientable manifold, then it has precisely two possible orientations.
+
+\begin{defi}[Oriented manifold]\index{oriented manifold}
+  An \emph{oriented manifold} is a manifold with a choice of orientation.
+\end{defi}
+
+\begin{defi}[Oriented coordinates]\index{oriented coordinates}
+  Let $M$ be an oriented manifold. We say coordinates $x_1, \cdots, x_n$ on a chart $U$ are \emph{oriented coordinates} if
+  \[
+    \left.\frac{\partial}{\partial x_1}\right|_p, \cdots, \left.\frac{\partial}{\partial x_n}\right|_p
+  \]
+  is an oriented basis for $T_p M$ for all $p \in U$.
+\end{defi}
+Note that we can always find enough oriented coordinates. Given any connected chart, either the chart is oriented, or $-x_1, \cdots, x_n$ is oriented. So any oriented $M$ is covered by oriented charts.
+
+Now by the previous discussion, we know that if $x_1, \cdots, x_n$ and $y_1, \cdots, y_n$ are oriented bases, then the transition maps for the tangent space all have positive determinant.
+
+\begin{eg}
+  $\R^n$ is always assumed to have the standard orientation given by $\d x_1 \wedge \cdots \d x_n$.
+\end{eg}
+
+\begin{defi}[Orientation-preserving diffeomorphism]\index{orientation!-preserving diffeomorphism}\index{diffeomorphism!orientation preserving}
+  Let $M, N$ be oriented manifolds, and $F \in C^\infty(M, N)$ be a diffeomorphism. We say $F$ \emph{preserves orientation} if $\D F|_p: T_p M \to T_{F(p)}N$ takes an oriented basis to an oriented basis.
+
+  Alternatively, this says the pullback of the orientation on $N$ is the orientation on $M$ (up to equivalence).
+\end{defi}
+
+\subsection{Integration on \texorpdfstring{$\R^n$}{Rn}}
+We are going to start by stating some facts about integration on $\R^n$.
+
+\begin{defi}[Domain of integration]\index{domain of integration}
+  Let $D \subseteq \R^n$. We say $D$ is a \emph{domain of integration} if $D$ is bounded and $\partial D$ has measure zero.
+\end{defi}
+
+Since $D$ can be an arbitrary subset, we define an $n$-form on $D$ to be some $\omega \in \Omega^n(U)$ for some open $U$ containing $D$.
+
+\begin{defi}[Integration on $R^n$]\index{integration!on $R^n$}
+  Let $D$ be a compact domain of integration, and
+  \[
+    \omega = f\; \d x_1 \wedge \cdots \wedge \d x_n
+  \]
+  be an $n$-form on $D$. Then we define
+  \[
+    \int_D \omega = \int_D f(x_1, \cdots, x_n) \;\d x_1 \cdots \d x_n.
+  \]
+  In general, let $U \subseteq \R^n$ and let $\omega \in \Omega^n(M)$ have compact support. We define
+  \[
+    \int_U \omega = \int_D \omega
+  \]
+  for some $D\subseteq U$ containing the support of $\supp \omega$.
+\end{defi}
+Note that we do not directly say we integrate it on the $\supp \omega$, since $\supp \omega$ need not have a nice boundary.
+
+What happens to integration when we change variables?
+
+\begin{defi}[Smooth function]\index{smooth function}
+  Let $D \subseteq \R^n$ and $F: D \to \R^m$. We say $f$ is smooth if it is a restriction of some smooth function $\tilde{f}: U \to \R^m$ where $U \supseteq D$.
+\end{defi}
+
+\begin{lemma}
+  Let $f: D \to E$ be a smooth map between domains of integration in $\R^n$, and assume that $F|_{\mathring{D}}: \mathring{D} \to \mathring{E}$ is an orientation-preserving diffeomorphism. Then
+  \[
+    \int_E \omega = \int_D F^* \omega.
+  \]
+\end{lemma}
+This is exactly what we want. To define integration on a manifold, we want to do it locally on charts, and then patch them up together. This tells us it doesn't matter which chart we choose!
+
+\begin{proof}
+  Suppose we have coordinates $x_1, \cdots, x_n$ on $D$ and $y_1, \cdots, y_n$ on $E$. Write
+  \[
+    \omega = f\;\d y_1 \wedge \cdots \wedge \d y_n.
+  \]
+  Then we have
+  \begin{align*}
+    \int_E \omega &= \int_E f\;\d y_1, \cdots, \d y_n\\
+    &= \int_D (f \circ F)|\det \D F|\;\d x_1, \cdots, x_n\\
+    &= \int_D (f \circ F) \det \D f \; \d x_1, \cdots, \d x_n\\
+    &= \int_D F^* \omega.
+  \end{align*}
+  Here we used the fact that $|\det \D F| = \det \D F$ because $F$ is orientation-preserving.
+\end{proof}
+
+We can now define integration over manifolds.
+
+\begin{defi}[Integration on manifolds]\index{integration!manifolds}
+  Let $M$ be an oriented manifold. Let $\omega \in \Omega^n(M)$. Suppose that $\supp(\omega)$ is a compact subset of some oriented chart $(U, \varphi)$. We set
+  \[
+    \int_M \omega = \int_{\varphi(U)} (\varphi^{-1})^* \omega.
+  \]
+  By the previous lemma, this does not depend on the oriented chart $(U, \varphi)$.
+
+  If $\omega \in \Omega^n(M)$ is a general form with compact support, we do the following: cover $K$ by finitely many oriented charts $\{U_\alpha\}_{\alpha = 1, \ldots, m}$. Let $\{\chi_\alpha\}$ be a partition of unity subordinate to $\{U_\alpha\}$. We then set
+  \[
+    \int_M \omega = \sum_\alpha \int_{U_\alpha} \chi_\alpha \omega.
+  \]
+\end{defi}
+
+\begin{lemma}
+  This is well-defined, ie. it is independent of cover and partition of unity.
+\end{lemma}
+
+Note that it is possible to define this for non-smooth forms, or not-everywhere-defined form, or with non-compact support etc, but we will not do it here.
+
+Also, note that this is purely a theoretical definition. It is absolutely useless for computations, and there is no hope you can evaluate that directly. However, it does give a good definition of integration with the expected properties, eg. linearity.
+
+To actually integrate things, we want to cut up our manifolds into \emph{disjoint} pieces, integrate them up in each piece, and add them up together. It would, in general, not be possible to cover the manifold by disjoint open subsets, but we can try to cover it by some domains of integration.
+
+\begin{defi}[Parametrization]\index{parametrization}
+  Let $M$ be either an oriented manifold of dimension $n$, or a domain of integration in $\R^n$. By a \emph{parametrization} of $M$ we mean a decomposition
+  \[
+    M = S_1 \cup \cdots \cup S_n,
+  \]
+  with smooth maps $F_i: D_i \to S_i$, where $D_i$ is a compact domain of integration, such that
+  \begin{enumerate}
+    \item $F_i|_{\mathring{D}_i}: \mathring{D}_i \to \mathring{S}_i$ is an orientation-preserving diffeomorphism
+    \item $\partial S_i$ has measure zero (if $M$ is a manifold, this means $\varphi(\partial S_i \cap U)$ for all charts $(U, \varphi)$).
+    \item For $i \not= j$, $S_i$ intersects $S_j$ only in their common boundary.
+  \end{enumerate}
+\end{defi}
+
+\begin{thm}
+  Given a parametrization of $M$ and an $o\omega \in \Omega^n(M)$ with compact support, we have
+  \[
+    \int_M \omega = \sum_i \int_{D_i} F_i^* \omega.
+  \]
+\end{thm}
+
+\begin{proof}
+%  We know $M$ is covered by oriented charts $(U_\alpha, \varphi_\alpha)$ such that $\varphi$ gives a smooth map $\varphi: \bar{U}_\alpha \to \overline{B_1(0)}$. We can then pick this cover and a partition of unity subordinate to this cover. Then if we define $\int_M \omega$ this way, it suffices to deal with the case where $\supp(\omega)$ lies in a single chart $(U, \varphi)$. Then identifying $\bar{U}$ with $\overline{B_1(0)}$, it suffices to consider the case where $M = \overline{B_1(0)}$. Then the result is obvious. 
+
+  By using partitions of unity, we may consider the case where $\omega$ has support in a single chart, and thus we may wlog we are working on $\R^n$, and then the result is obvious.
+\end{proof}
+
+There is a problem --- in all our lives, we've been integrating functions, not forms. If we have a function $f: \R \to \R$, then we can take the integral
+\[
+  \int f\;\d x.
+\]
+Now of course, we are not actually integrating $f$. We are integrating the differential form $f\;\d x$. Why we seem like we are integrating functions is because we have a background form $\d x$. So if we have a manifold $M$ with a ``background'' $n$-form $\omega \in \Omega^n (M)$, then we can integrate $f \in C^\infty(M, \R)$ by
+\[
+  \int_M f \omega.
+\]
+However, a manifold doesn't usually come with such a canonical form. Fortunately, we do when we have a Riemannian metric.
+\begin{lemma}
+  Let $M$ be an oriented manifold, and $g$ a Riemannian metric on $M$. Then there is a unique $\omega \in \Omega^n(M)$ such that for all $p$, if $e_1, \cdots, e_n$ is an oriented orthonormal basis of $T_pM$, then
+  \[
+    \omega(e_1, \cdots, e_n) = 1.
+  \]
+  We call this the \term{Riemannian volume form}, written \term{$\d V_g$}.
+\end{lemma}
+Note that $\d V_g$ is a notation. It is not the exterior derivative of some mysterious object $V_g$.
+
+\begin{proof}
+  Uniqueness is clear, since if $\omega'$ is another, then $\omega_p = \lambda \omega'_p$ for some $\lambda$, and evaluating on an orthonormal basis shows that $\lambda = 1$.
+
+  To see existence, let $\sigma$ be any nowhere vanishing $n$-form giving the orientation of $M$. On a small set $U$, pick a frame $s_1, \cdots, s_n$ for $TM|_U$ and apply the Gram-Schmidt process to obtain an orthonormal frame $e_1, \cdots, e_n$, which we may wlog is oriented. Then we set
+  \[
+    g = \sigma(e_1, \cdots, e_n),
+  \]
+  which is non-vanishing because $\sigma$ is nowhere vanishing. Then set
+  \[
+    \omega = \frac{\sigma}{g}.
+  \]
+  This proves existence locally, and can be patched together globally by uniqueness.
+\end{proof}
+
+\section{Stokes Theorem}
+Recall from, say, IA Vector Calculus that Stoke's theorem relates an integral on a manifold to a integral on its boundary. However, our manifolds do not have boundaries! So we can't talk about Stoke's theorem! So we now want to define what it means to be a manifold with boundary.
+
+\begin{defi}[Manifold with boundary]\index{manifold!with boundary}\index{chart!with boundary}\index{atlas!with boundary}
+  Let
+  \[
+    H^n = \{(x_1, \cdots, x_n): \R^n: x_n \geq 0\}.
+  \]
+  A \emph{chart-with-boundary} on a set $M$ is a bijection $\varphi: U \to \varphi(U)$ for some $U \subseteq M$ such that $\varphi(U) \subseteq H^n$ is open. Note that this image may or may not hit the boundary of $H^n$. So a ``normal'' chart is also a chart with boundary.
+
+  An \emph{atlas-with-boundary} on $M$ is a cover by charts-with-boundary $(U_\alpha, \varphi_\alpha)$ such that the transition maps
+  \[
+    \varphi_\beta \circ \varphi_\alpha^{-1}: \varphi_\alpha(U_\alpha \cap U_\beta) \to \varphi_\beta(U_\alpha \cap U_\beta)
+  \]
+  is smooth (in the usual sense) for all $\alpha, \beta$.
+
+  A \emph{manifold-with-boundary} us a set $M$ with an (equivalence class of) atlas with boundary whose induced topology is Hausdorff and second-countable.
+\end{defi}
+
+Note that a manifold with boundary is not a manifold, but a manifold is a manifold with boundary. We will often be lazy and drop the ``with boundary'' descriptions.
+
+\begin{defi}[Boundary point]\index{boundary point}\index{$\partial M$}
+  If $M$ is a manifold with boundary and $p \in M$, then we say $p$ is a boundary point if $\varphi(p) \in \partial H^n$ for some (hence any) chart-with-boundary $(U, \varphi)$ containing $p$. We let $\partial M$ be the set of boundary points and $\Int(M) = M \setminus \partial M$.
+\end{defi}
+
+Note that these are not the topological notions of boundary and interior.
+
+\begin{prop}
+  Let $M$ be a manifold with boundary. Then $\Int(M)$ and $\partial M$ are naturally manifolds, with
+  \[
+    \dim \partial M = \dim \Int M - 1.
+  \]
+\end{prop}
+
+\begin{eg}
+  The solid ball $\overline{B_1(0)}$ is a manifold with boundary, whose interior is $B_1(0)$ and boundary is $S^{n - 1}$.
+\end{eg}
+
+Note that the product of manifolds with boundary is not a manifold with boundary. For example, the interval $[0, 1]$ is a manifold with boundary, but $[0, 1]^2$ has \emph{corners}. This is bad. We can develop the theory of manifolds with corners, but that is more subtle. We will not talk about them.
+
+Everything we did for manifolds can be done for manifolds with boundary, eg. smooth functions, tangent spaces, tangent bundles etc. Note in particular the definition of the vector space as derivations still work word-for-word.
+
+\begin{lemma}
+  Let $p \in \partial M$, say $p \in U \subseteq M$ where $(U, \varphi)$ is a chart (with boundary). Then
+  \[
+    \left.\frac{\partial }{\partial x_1}\right|_p, \cdots, \left.\frac{\partial}{\partial x_n}\right|_p
+  \]
+  is a basis for $T_p M$. In particular, $\dim T_p M = n$.
+\end{lemma}
+
 \printindex
 \end{document}

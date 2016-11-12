@@ -10,6 +10,43 @@
 
 \input{header}
 
+\makeatletter
+\DeclareRobustCommand{\rvdots}{%
+  \vbox{
+    \baselineskip4\p@\lineskiplimit\z@
+    \kern-\p@
+    \hbox{.}\hbox{.}\hbox{.}
+  }}
+  \newcommand\addstate[3]{
+    \pgfmathsetmacro{\y@y}{-#2 * 0.7};
+    \pgfmathsetmacro{\x@x}{#3};
+    \node [left] at (0, \y@y) {#1};
+    \draw (0, \y@y) -- (\x@x, \y@y);
+  }
+  \newcommand\addstateend[4]{
+    \pgfmathsetmacro{\y@y}{-#2 * 0.7};
+    \pgfmathsetmacro{\x@x}{#3};
+    \node [left] at (0, \y@y) {#1};
+    \node [right] at (\x@x, \y@y) {#4};
+    \draw (0, \y@y) -- (\x@x, \y@y);
+  }
+
+  \newcommand\addoperator[3]{
+    \node [draw, rectangle, fill=white] at (#3, -#2 * 0.7) {#1};
+  }
+  \newcommand\addbigoperator[5]{
+    \pgfmathsetmacro{\y@s}{-#2 * 0.7 + 0.2};
+    \pgfmathsetmacro{\y@t}{-#3 * 0.7 - 0.2};
+    \pgfmathsetmacro{\x@s}{#4};
+    \pgfmathsetmacro{\x@t}{#5};
+    \pgfmathsetmacro{\x@c}{(\x@s + \x@t)/2};
+    \pgfmathsetmacro{\y@c}{(\y@s + \y@t)/2};
+
+    \draw [fill=white] (\x@s, \y@s) rectangle (\x@t, \y@t);
+    \node at (\x@c, \y@c) {#1};
+  }
+  \makeatother
+
 \begin{document}
 \maketitle
 {\small
@@ -39,7 +76,6 @@ It is desirable to have familiarity with the basic formalism of quantum mechanic
 
 \setcounter{section}{-1}
 \section{Introduction}
-% Significance and Context
 Quantum computation is currently a highly significant and important subject, and is very active in international research.
 
 First of all, it is a fundamental connection between physics and computing. We can think of physics as computing, where in physics, we label states with parameters (ie. numbers), and physical evolution changes these parameters. So we can think of these parameters as encoding information, and physical evolution changes the information. Thus, this evolution can be thought of as a computational process.
@@ -406,35 +442,6 @@ Obviously, if we just query all the values of the function, then we can determin
   If we look at what $\bket{\eta_{f_\mathrm{balanced}}}$ is, it will be a huge mess, but it doesn't really matter --- all that matters is that it is perpendicular to $\bket{0}\cdots\bket{0}$.
 
   Now when we measure $\eta_f$, if $f$ is a constant function, then we obtain $0\cdots0$ with probability $1$. If it is balanced, then we obtain something that is not $0$ with probability $1$. So we can determine the result with probability $1$.
-
-  \makeatletter
-  \DeclareRobustCommand{\rvdots}{%
-    \vbox{
-      \baselineskip4\p@\lineskiplimit\z@
-      \kern-\p@
-      \hbox{.}\hbox{.}\hbox{.}
-    }}
-  \newcommand\addstate[3]{
-    \pgfmathsetmacro{\y@y}{-#2 * 0.7};
-    \pgfmathsetmacro{\x@x}{#3};
-    \node [left] at (0, \y@y) {#1};
-    \draw (0, \y@y) -- (\x@x, \y@y);
-  }
-  \newcommand\addoperator[3]{
-    \node [draw, rectangle, fill=white] at (#3, -#2 * 0.7) {#1};
-  }
-  \newcommand\addbigoperator[5]{
-    \pgfmathsetmacro{\y@s}{-#2 * 0.7 + 0.2};
-    \pgfmathsetmacro{\y@t}{-#3 * 0.7 - 0.2};
-    \pgfmathsetmacro{\x@s}{#4};
-    \pgfmathsetmacro{\x@t}{#5};
-    \pgfmathsetmacro{\x@c}{(\x@s + \x@t)/2};
-    \pgfmathsetmacro{\y@c}{(\y@s + \y@t)/2};
-
-    \draw [fill=white] (\x@s, \y@s) rectangle (\x@t, \y@t);
-    \node at (\x@c, \y@c) {#1};
-  }
-  \makeatother
   \begin{center}
     \begin{tikzpicture}
       \addstate{$\bket{0}$}{0}{5};
@@ -674,7 +681,7 @@ So $N$ exactly divides the product. By minimality of $r$, we know $N$ does not d
 
 For this to work, we needed two assumptions -- $r$ is even, and $a^{r/2} \not\equiv 1 \pmod N$. Fortunately, there is a theorem in number theory that says if $N$ is odd and not a prime power, and $a$ is chosen uniformly at random, then the probability that these two things happen is at least $\frac{1}{2}$. In fact, it is $\geq 1 - \frac{1}{2^{m - 1}}$, where $m$ is the number of prime factors of $N$.
 
-So if we repeat this $K$ times, the probability that they all fail to give a factor is less than $\frac{1}{2^k}$. So this can be as small as we wish.
+So if we repeat this $k$ times, the probability that they all fail to give a factor is less than $\frac{1}{2^k}$. So this can be as small as we wish.
 
 What about the other possibilities? If $N$ is even, then we would have noticed by looking at the last digit, and we can just write down $2$. If $N = c^\ell$ for $c, \ell > 2$, then there is a classical polynomial time algorithm that outputs $c$, which is a factor.
 
@@ -846,6 +853,340 @@ We can now get to the main useful theorem.
   \]
   Then $\frac{p}{q}$ is a convergent of the continued fraction of $x$.
 \end{thm}
+
+Then by this theorem, for a good $c$, we know $\frac{k}{r}$ must be a convergent of $\frac{c}{2^m}$. So we compute all convergents find a (unique) one which is within $\frac{1}{2N^2}$ of $\frac{c}{2^m}$. This gives us the value of $r$.
+
+In fact, this last classical part is the slowest part of the algorithm.
+
+\begin{eg}
+  Suppose we want to factor $N = 39$. Suppose the random $A$ we chose is $a = 7 < 39$, which is coporime to $N$. Let $r$ be the period of $f(x) = 7^x \bmod 39$.
+
+  We notice
+  \[
+    1024 = 2^{10} < N^2 = 1621 < 2^{11} = 2048.
+  \]
+  So we pick $m = 11$. Suppose the measurement of $\qQFT_{2^m}\bket{\mathrm{per}}$ yeilds $c = 853$.
+
+  By the theory, this has a constant probability (approximately $0.4$) to satisfy
+  \[
+    \left|\frac{853}{2^m} - \frac{k}{r}\right| < \frac{1}{2^{m + 1}} = \frac{1}{2^{12}} < \frac{1}{2N^2}.
+  \]
+  We also have a probability of $O(1/\log \log r)$ to have $k$ and $r$ coprime. In this case, $c$ is indeed ``good''. So there is a unique $\frac{k}{r}$ satisfying
+  \[
+    \left|\frac{853}{2048} - \frac{k}{r}\right| < \frac{1}{2^{12}}.
+  \]
+  So to find $\frac{k}{r}$, we do the continued fraction expansion of $\frac{853}{2048}$. We have
+  \[
+    \frac{853}{2048} = \cfrac{1}{\cfrac{2048}{853}} = \cfrac{1}{2 + \cfrac{342}{853}} = \cfrac{1}{2 + \cfrac{1}{\cfrac{853}{342}}} = \cfrac{1}{2 + \cfrac{1}{2 + \cfrac{169}{342}}} = \cdots = [2, 2, 2, 42, 4].
+  \]
+  We can then compute the convergents
+  \begin{align*}
+    [2] &= \frac{1}{2}\\
+    [2, 2] &= \frac{2}{5}\\
+    [2, 2, 2] &= \frac{5}{12}\\
+    [2, 2, 2, 42] &= \frac{212}{509}\\
+    [2, 2, 2, 42, 4] &= \frac{853}{2048}
+  \end{align*}
+  Of all these numbers, only $\frac{5}{12}$ is within $\frac{1}{2^{12}}$ of $\frac{853}{2048}$ and whose denominator is less than $N = 39$.
+
+  If we do not assume $k$ and $r$ are coprime, then the possible $\frac{k}{r}$ are
+  \[
+    \frac{5}{12}, \frac{10}{24}, \frac{15}{36}.
+  \]
+  If we assume that $\frac{k}{r}$ are coprime, then $r = 12$. Indeed, we can try that
+  \[
+    7^{12} \equiv 1 \pmod {39}.
+  \]
+  So we now know that
+  \[
+    39 \mid (7^6 + 1)(7^6 - 1).
+  \]
+  We now hope/expect with probability $>\frac{1}{2}$ exactly that it goes partly into each factor. We can compute
+  \begin{align*}
+    7^6 + 1 &= 117650 \equiv 26 \pmod {39}\\
+    7^6 - 1 &= 117648 \equiv 24 \pmod {39}
+  \end{align*}
+  We can then compute
+  \[
+    \hcf(26, 39) = 13,\quad \hcf(24, 39) = 3 \pmod {39}.
+  \]
+  We see that $3$ and $13$ are factors of $39$.
+\end{eg}
+
+\section{Quantum algorithm for search problems}
+Search problems are important in computing. Almost all problems are search problems of some kind.
+
+One important problem is simultaneous constraint satisfaction. For example, when designing a lecture timetable for Part III courses, we need to schedule the courses so that we don't clash two popular courses in the same area, and the courses need to have big enough lecture halls, and you have to make sure a lecturer doesn't have to simultaneously lecture two courses at the same time. This is complicated.
+
+These problems have some common features;
+\begin{enumerate}
+  \item Given any instance of solution attempt, it is easy to check if it is good or not.
+  \item There are exponentially many possible instances to try out.
+\end{enumerate}
+
+The fundamental example is the \term{Boolean satisfiability problem} (\term{SAT}). Given a Boolean formula $f: B_n \to B$, we want to know if there is a ``satisfying argument'', ie. if there is an $x$ with $f(x) = 1$.
+
+This has complexity class \textbf{NP}, standing for \emph{non-deterministic polynomial time}. Our definition of \textbf{NP} will involve the notion of a verifier:
+
+\begin{defi}[Verifier]
+  We can formulate this as follows: suppose we have a language $L \subseteq B^*$, where
+  \[
+    B^* = \bigcup_{n \in \N} B_n
+  \]
+  is the set of all bit strings.
+
+  A \term{verifier} for $L$ is a computation $V(w, c)$ with two inputs $w, c$ such that
+  \begin{enumerate}
+    \item $V$ halts on all inputs.
+    \item If $w \in L$, then for \emph{some} $c$, $V(w, c)$ halts with ``accept''.
+    \item If $w \not\in L$, then for \emph{all} $c$, $V(w, c)$ halts with ``reject''.
+  \end{enumerate}
+  A \term{polynomial time verifier} is a $V$ that runs in polynomial time in $|w|$ (not $|w| + |c|!$).
+\end{defi}
+We can think of $c$ as ``certificate of membership''. So if you are a member, you can exhibit a certificate of membership that you are in there, and we can check if the certification is valid. However, if you are not a member, you cannot ``fake'' a certificate.
+
+\begin{defi}[Non-deterministic polynomial time problem]\index{\textbf{NP}}\index{non-deterministic polynomial time}
+  \textbf{NP} is the class of languages that have polynomial time verifiers.
+\end{defi}
+
+\begin{eg}
+  The SAT problem is in \textbf{NP}. Here $c$ is the satisfying argument, and $V(f, c)$ just computes $f(c)$ and checks whether it is $1$.
+\end{eg}
+
+\begin{eg}
+  Determining if a number is composite is in \textbf{NP}, where a certificate is a factor of the number.
+\end{eg}
+However, it is not immediately obvious that testing if a number is prime is in \textbf{NP}. It is an old result that it indeed is, and recent progress shows that it is in fact in \textbf{P}.
+
+It is rather clear that $\mathbf{P} \subseteq \mathbf{NP}$. Indeed, if we can check membership in polynomial time, then we can also construct a verifier in polynomial time that just throws the certificate away and check directly.
+
+There is another model of \textbf{NP}, via \term{non-deterministic computation}. Recall that in probabilistic computation, in some steps, we had to pick a random number, and picking a different number would lead to a different ``branch''. In the case of non-deterministic computation, we are allowed to take \emph{all} paths at the same time. If \emph{some} of the paths end up being accepting, then we accept the input. If \emph{all} paths reject, then we reject the input.
+
+It is not difficult to see that these definitions of \textbf{NP} are equivalent. Suppose we have a non-deterministic machine that checks if a string is in the language. Then we can construct a verifier whose certificate is a prescription of which particular branch we should follow. Then the verifier just takes the prescription, follows the path described and see if we end up being accepted.
+
+Conversely, if we have a verifier, we can construct a non-deterministic machine by testing a string on \emph{all} possible certificates, and check if any of them accepts.
+
+Unfortunately, we don't know anything about how these different complexity classes compare. We clearly have $\mathbf{P} \subseteq \mathbf{BPP} \subseteq \mathbf{BQP}$ and $\mathbf{P} \subseteq \mathbf{NP}$. However, we do not know if these inclusions are strict, or how $\mathbf{NP}$ compares to the others.
+
+\subsection{Unstructured search problem}
+Usually, when we want to search something, the search space we have is structured in some way, and this greatly helps our searching problem. For example, if we have a linearly ordered list of $2^n$, we only need $n$ lookups to find any item with certainty by binary search.
+
+For example, if we have a phone book, then the names are ordered alphabetically. If we want to find someone's phone number, we don't have to look through the whole book. We just open to the middle of the book, and see if the person's name is before or after the names on the page. By one lookup like this, we have already eliminated half of the phone book we have to search through, and we can usually very quickly locate the name.
+
+However, if we know someone's phone number and want to figure out their name, it is pretty much hopeless! This is the problem with unstructured data!
+
+So the problem is as follows: we are given an unstructured database with $N = 2^n$ items and a \emph{unique} good item (or no good items). We can query any item for good or bad-ness. The problem is to find the good item, or determine if one exists.
+
+Classically, $O(N)$ queries are necessary and sufficient. Even if we are asking for a right result with fixed probability $c$, if we pick items randomly to check, then the probability of seeing the ``good'' one in $k$ queries is given by $k/N$. So we still need $O(n)$ queries for any fixed probability.
+
+Quantumly, we have \term{Grover's algorithm}. This needs $O(\sqrt{N}$ queries, and this is both necessary and sufficient.
+
+The database of $N = 2^n$ items will be considered as an oracle $f: B_n \to B_1$. it is promised that there is a unique $x_0 \in B_n$ with $f(x_0) = 1$. The problem is to find $x_0$. Again, we have the quantum oracle
+\[
+  U_f \bket{x}\bket{y} = \bket{x} \bket{y \otimes f(x)}.
+\]
+However, we'll use instead $I_{x_0}$ on $n$ qubits given by
+\[
+  I_{x_0}\bket{x} =
+  \begin{cases}
+    \bket{x} & x \not= x_0\\
+    -\bket{x} & x \not= x_0
+  \end{cases}.
+\]
+This can be constructed from $U_f$ as before, and one use of $I_{x_0}$ can be done with one use of $U_f$.
+\begin{center}
+  \begin{tikzpicture}
+    \addstateend{$\bket{s}$}{0}{3} {$I_{x_0}\bket{s}$};
+    \addstateend{$\frac{\bket{0} - \bket{1}}{2}$}{1}{3}{$\frac{\bket{0} - \bket{1}}{2}$};
+    \addbigoperator{$U_f$}{0}{1}{1}{2};
+  \end{tikzpicture}
+\end{center}
+We can write $I_{x_0}$ as
+\[
+  I_{x_0} = I - 2 \bket{x_0} \brak{x_0},
+\]
+where $I$ is the identity operator.
+
+We are now going to state the \term{Grover's algorithm}, and then later prove that it works.
+
+For convenience, we write
+\[
+  \qH_n = \underbrace{\qH \otimes \cdots \otimes \qH}_{n\text{ times}}
+\]
+We start with a uniform superposition
+\[
+  \bket{\psi_0} = \qH_n \bket{0\cdots0} = \frac{1}{\sqrt{n}} \sum_{\text{all }x} \bket{x}.
+\]
+We consider the \term{Grover iteration operator} on $n$ qubits given by
+\[
+  \mathcal{Q} = -\qH_n I_0 \qH_n I_{x_0}.
+\]
+Here running $I_{x_0}$ requires one query (whereas $I_0$ is ``free'' because it is just $I - 2 \bket{0}\brak{0}$).
+
+Note that all these operators are all real. So we can pretend we are living in the real world and have nice geometric pictures of what is going on. We let $\mathcal{P}(x_0)$ be the (real) plane spanned by $\bket{x_0}$ and $\bket{\psi_0}$. We claim that
+\begin{enumerate}
+  \item In this plane $\mathcal{P}(x_0)$, this operator $\mathcal{Q}$ is a rotation by $2\alpha$, where
+    \[
+      \sin\alpha = \frac{1}{\sqrt{N}} = \braket{x_0}{\psi_0}.
+    \]
+  \item In the orthogonal complement $\mathcal{P}(x_0)^\perp$, we have $\mathcal{Q} = -I$.
+\end{enumerate}
+We will prove these later on. But if we know this, then we can repeatedly apply $\mathcal{Q}$ to $\bket{\psi_0}$ to rotate it near to $\bket{x_0}$, and then measure. Then we can read on $\bket{x_0}$ with very high probability:
+\begin{center}
+  \begin{tikzpicture}
+    \draw (0, 0) rectangle (5, 5);
+    \node at (5, 5) [right] {$\mathcal{P}(x_0)$};
+    \draw [->] (1, 1) -- (4, 1) node [right] {$\bket{\psi_0}$};
+    \draw [dashed] (1, 1) -- (1, 4);
+    \draw [->] (1, 1) -- (2, 4) node [above] {$\bket{x_0}$};
+
+    \draw (1.4, 1) arc(0:71.57:0.4) node [pos=0.5, right] {$\beta$};
+    \draw (1, 1.6) arc (90:71.57:0.6) node [pos=0.5, above] {$\alpha$};
+  \end{tikzpicture}
+\end{center}
+The initial angle is
+\[
+  \cos \beta = \braket{x_0}{\psi_0} = \frac{1}{\sqrt{N}}.
+\]
+So the number of iterations needed is
+\[
+  \frac{\cos^{-1}(1/\sqrt{N})}{2 \sin^{-1}(1/\sqrt{N}} = \frac{\beta}{2\alpha}.
+\]
+In general, this is not an integer, but it will give us $x_0$ with high probability. For large $n$, the number of iterations is approximately
+\[
+  \frac{\pi/2}{2/\sqrt{N}} = \frac{\pi}{4} \sqrt{N}.
+\]
+\begin{eg}
+  Let's do a boring example with $N = 4$. The initial angle satisfies
+  \[
+    \cos \beta = \frac{1}{\sqrt{4}} = \frac{1}{2}.
+  \]
+  So we know
+  \[
+    \beta = \frac{\pi}{3}.
+  \]
+  Similarly, we have
+  \[
+    2\alpha = 2 \sin^{-1}\frac{1}{2} = \frac{\pi}{3}.
+  \]
+  So $1$ iteration of $\mathcal{Q}$ will rotate $\bket{\psi_0}$ \emph{exactly} to $\bket{x_0}$, so we can find it with \emph{certainty} with 1 lookup.
+\end{eg}
+Now we prove that this thing actually works. In general, for any unitary $U$ and $I_{\bket{\psi}} = I - 2 \bket{\psi}\brak{\psi}$, we have
+\[
+  UI_{\bket{\psi}}U^\dagger = UIU^\dagger - 2U \bket{\psi} \brak{\psi} U^\dagger = U_{U \bket{\psi}}.
+\]
+In particular, since $H_n$ is self-adjoint, ie. $H_n^\dagger H_n$, and that by definition $H_n \bket{0} = \bket{\psi_0}$, we know
+\[
+  \mathcal{Q} = -H_n I_0 H_n I_{x_0} = I_{\bket{\psi_0}} I_{x_0}.
+\]
+Next we note that for any $\bket{\psi}$ and $\bket{\xi}$, we know
+\[
+  I_{\bket{\psi}}\bket{\xi} = \bket{\psi} - 2 \bket{\psi} \braket{\psi}{\xi}.
+\]
+So this modifies $\bket{\xi}$ by some multiple of $\bket{\psi}$. So we know
+\[
+  \mathcal{Q}\bket{\psi} = -I_{\bket{\psi_0}} I_{x_0}\bket{\psi}
+\]
+modifies $\bket{\psi}$ first by some multiple of $\bket{x_0}$, then by some multiple of $\psi_0$. So if $\bket{\xi} \in \mathcal{P}(x_0)$, then $\mathcal{Q} \bket{\psi} \in \mathcal{P}(x_0)$ too! So $\mathcal{Q}$ preserves $\mathcal{P}(x_0)$.
+
+We know that $\mathcal{Q}$ is a unitary, and it is ``real''. So it must be a rotation or a reflection, since these are the only things in $\Or(2)$. We can explicitly figure out what it is. In the plane $\mathcal{P}(x_0)$, we know $I_{\bket{x_0}}$ is reflection in the mirror line perpendicular to $\bket{x_0}$. Similarly, $I_{\bket{\psi_0}}$ is reflection in the mirror line perpendicular to $\bket{\psi_0}$.
+
+We now use the following facts about 2D Euclidean geometry:
+\begin{enumerate}
+  \item If $R$ is a reflection in mirror $M$ along $\bket{M}$, then $-R$ is reflection in mirror $M^\perp$ along $\bket{M^\perp}$.
+
+    To see this, we know any vector can be written as $a\bket{M} + b \bket{M^\perp}$. Then $R$ sends this to $a \bket{M} - b\bket{M^\perp}$, while $-R$ sends it to $-a \bket{M} + b \bket{M^\perp}$, and this is reflection in $\bket{M^\perp}$.
+
+  \item Suppose we have mirrors $M_1$ and $M_2$ making an angle of $\theta$:
+    \begin{center}
+      \begin{tikzpicture}
+        \draw (-2, 1) -- (2, -1) node [right] {$M_1$};
+        \draw (-2, -1) -- (2, 1) node [right] {$M_2$};
+        \draw (0.4, -0.2) arc(-26.57:26.57:0.447) node [pos=0.5, right] {$\theta$};
+      \end{tikzpicture}
+    \end{center}
+    Then reflection in $M_1$ then reflection in $M_2$ is the same as rotating counterclockwise by $2\theta$.
+\end{enumerate}
+So we know
+\[
+  \mathcal{Q} = -I_{\bket{\psi_0}} I_{\bket{x_0}}
+\]
+is reflection in $x_0^\perp$ then reflection in $\bket{\psi_0^{\perp\perp}} = \bket{\perp}$. So this is a rotation by $2\alpha$, where $\alpha$ is the angle between $\bket{x_0^\perp}\bket{\psi_0}$, ie.
+\[
+  \sin \alpha = \cos \beta = \braket{x_0}{\psi_0}.
+\]
+To prove our second claim that $\mathcal{Q}$ acts as $-\mathbf{1}$ in $\mathcal{P}(x_0)^\perp$, we simply note that if $\bket{\xi} \in \mathcal{P}(x_0)^\perp$, then $\bket{\xi} \perp \bket\psi_0$ and $\xi \perp\bket{x_0}$. So both $I_{\bket{x_0}}$ and $I_{\bket{\psi_0}}$ fix $\bket{\xi}$.
+
+\subsection{Further generalizations}
+Suppose we have multiple good items instead, say $r$ of them. We then replace $I_{x_0}$ with $I_f$, where
+\[
+  I_f \bket{x} =
+  \begin{cases}
+    -\bket{x} & x\text{ good}\\
+    \bket{x} & x\text{ bad}
+  \end{cases}
+\]
+We run the same algorithm as before. We let
+\[
+  \bket{\psi_{\mathrm{good}}} = \frac{1}{\sqrt{r}} \sum_{x\text{ good}} \bket{x}.
+\]
+Then now $\mathcal{Q}$ is a rotation through $2\alpha$ with
+\[
+  \sin \alpha = \braket{\psi_{\mathrm{good}}}{\psi_0} = \sqrt{\frac{r}{N}}.
+\]
+So for large $N$, we need
+\[
+  \frac{\pi/2}{2\sqrt{r/N}} = \frac{\pi}{4} \sqrt{\frac{N}{r}},
+\]
+ie. we have a $\sqrt{r}$ reduction over the unique case.
+
+What if we don't know what $r$ is? The above algorithm would not work, because we will not know when to stop the rotation. However, there are some tricks we can do to fix it.
+
+\subsection{Optimality of Grover's algorithm}
+We have the following theorem:
+\begin{thm}
+  Let $A$ be any quantum algorithm that solves the unique search problem with probability $1 - \varepsilon$ (for any constant $\varepsilon$), with $T$ queries. Then $T$ is at least $O(\sqrt{N})$. In fact, we have
+  \[
+    T \geq \left(\frac{1}{2} - \varepsilon\right) \sqrt{N}
+  \]
+  for $\varepsilon < \frac{1}{2}$. In fact, we can prove that
+  \[
+    T \geq \frac{\pi}{4}(1 - \varepsilon) \sqrt{N}.
+  \]
+\end{thm}
+So Grover's algorithm is not only optimal in the growth rate, but in the constant as well, asymptotically.
+
+Proof is omitted.
+
+\subsection{Amplitude amplification}
+Let $G$ be any subspace (``good'' subspace) of the state space $\mathcal{H}$, and $G^\perp$ be its orthogonal complement (``bad'' subspace). Then $\mathcal{H} = G \oplus G^\perp$.
+
+Given any normalized vector $\bket{\psi} \in \mathcal{H}$, we have a unique decomposition with real, non-negative coefficients
+\[
+  \bket{\psi} = \sin \theta \bket{\psi_g} + \cos \theta \bket{\psi_b}
+\]
+such that
+\[
+  \bket{\psi_g} \in G,\quad \bket{\psi_b} \in G^\perp
+\]
+are normalized.
+
+We introduce reflections that flips $\bket{\psi}$, or any good components, ie.
+\[
+  I_{\bket{\psi}} = -2\bket{\psi}\brak{\psi},\quad I_g = I - 2P,
+\]
+where $P$ is the projection onto $G$ given by
+\[
+  P = \sum_b \bket{b}\brak{b}
+\]
+for any orthonormal basis $\{\bket{b}\}$ of $G$. This $P$ satisfies
+\[
+  P \bket{\psi} =
+  \begin{cases}
+    \bket{\psi} & \bket{\psi} \in G\\
+    0 & \bket{\psi} \in G^\perp
+  \end{cases}.
+\]
 
 
 \printindex
