@@ -774,7 +774,7 @@ What happens if we combine both of these effects?
 \begin{defi}[KdV equation]\index{KdV equation}
   The \emph{KdV equation} is given by
   \[
-    u_t + u_{xx} - 6 u u_x = 0.
+    u_t + u_{xxx} - 6 u u_x = 0.
   \]
 \end{defi}
 It turns out that this has a perfect balance between dispersion and non-linearity. This admits very special solutions known as \term{solitons}. For example, a $1$-solution solution is
@@ -1437,6 +1437,753 @@ For comparison, this is what we would do if we had to solve $u_t + u_{xxx} = 0$:
   \end{tikzcd}
 \]
 It is just the same steps, but with a simpler transform!
+
+\subsection{Reflectionless potentials}
+We are now going to actually solve the KdV equation for a special kind of potential --- reflectionless potential.
+
+\begin{defi}[Reflectionless potential]\index{reflectionless potential}\index{potential!reflectionless}
+  A \emph{reflectionless potential} is a potential $u(x, 0)$ if $R(k, 0) = 0$.
+\end{defi}
+
+Now if $u$ evolves according to the KdV equation, then
+\[
+  R(k, t) = R(k, 0) e^{8ik^3 t} = 0.
+\]
+So if a potential starts off reflectionless, then it remains reflectionless.
+
+We now want to solve the GLM equation in this case. Using the notation when we wrote down the GLM equation, we simply have
+\[
+  F(x) = \sum_{n = 1}^N c_n^2 e^{-\chi_n x}.
+\]
+We will mostly not write out the $t$ when we do this, and only put it back in at the very end. We now guess that the GLM equation has a solution of the form
+\[
+  K(x, y) = \sum_{m = 1}^N K_m(x) e^{-\chi_m y}
+\]
+for some unknown functions $\{K_m\}$. We substitute this into the GLM equation and find that
+\[
+  \sum_{n = 1}^N \left[c_n^2 e^{-\chi_n x}+ K_n(x) + \sum_{m = 1}^N c_n^2 K_m(x) \int_x^\infty e^{-(\chi_n + \chi_m)z}\;\d z\right] e^{-\chi_n y} = 0.
+\]
+Now notice that the $e^{-\chi_n y}$ for $n = 1, \cdots, N$ are linearly independent. So we actually have $N$ equations, one for each $n$. So we know that
+\[
+  c_n^2 e^{-\chi_n x} + K_n(x) + \sum_{m = 1}^N \frac{c_n^2 K_m(x)}{\chi_n + \chi_m} e^{-(\chi_n + \chi_m)x} = 0\tag{$*$}
+\]
+for all $n = 1, \cdots, N$. Now if our goal is to solve the $K_n(x)$, then this is just a linear equation for each $x$!. We set
+\begin{align*}
+  \mathbf{c} &= (c_1^2 e^{-\chi_1 x}, \cdots, c_N^2 e^{-\chi_N x})^T\\
+  \mathbf{K} &= (K_1(x), \cdots, K_N(x))^T\\
+  A_{nm} &= \delta_{nm} + \frac{c_n^2 e^{-(\chi_n - \chi_m)x}}{\chi_n + \chi_m}.
+\end{align*}
+Then $(*)$ becomes
+\[
+  A\mathbf{K} = -\mathbf{c}.
+\]
+This really is a linear algebra problem. But we don't really have to solve this. The thing we really want to know is
+\begin{align*}
+  K(x, x) &= \sum_{m = 1}^N K_m(x) e^{-\chi_m x}\\
+  &= \sum_{m = 1}^N \sum_{m = 1}^N (A^{-1})_{mn} (-\mathbf{c})_n e^{-\chi_m x}
+\end{align*}
+Now note that
+\[
+  \frac{\d}{\d x}A_{nm}(x) = A_{nm}'(x) = - c_n^2 e^{-\chi_n x} e^{-\chi_m x} = (-\mathbf{c})_n e^{-\chi_m x}.
+\]
+So we can replace the above thing by
+\[
+  K(x, x) = \sum_{m = 1}^N \sum_{n = 1}^N (A^{-1})_{mn} A'_{nm} = \tr(A^{-1}A').
+\]
+It is an exercise on the second example sheet to show that this is equal to
+\[
+  K(x, x) = \frac{1}{\det A} \frac{\d}{\d x} (\det A) = \frac{\d}{\d x} \log (\det A).
+\]
+So we have
+\[
+  u(x) = - 2 \frac{\d^2}{\d x^2} \log(\det A).
+\]
+We now put back the $t$-dependence we didn't bother to write all along. Then we have
+\[
+  u(x, t) = -2 \frac{\partial^2}{\partial x^2} \log(\det A(x, t)),
+\]
+where
+\[
+  A_{nm}(x, t) = \delta_{nnm} + \frac{c_n(0)^2 e^{8\chi_n^3 t}e^{-(\chi_n + \chi_m)x}}{\chi_n + \chi_m}.
+\]
+It turns out these are soliton solutions, and the number of discrete eigenstates $N$ is just the number of solitons!
+\subsection{Infinitely many first integrals}
+As we've previously mentioned, we are expecting our integrable PDE's to have infinitely many first integrals. Recall we can construct $\varphi = \varphi(x, k, t)$ such that
+\[
+  L\varphi = k^2 \varphi,
+\]
+and we had
+\[
+  \varphi(x, k, t) =
+  \begin{cases}
+    e^{-ikx} & x \to -\infty\\
+    a(k, t) e^{-ikx} + b(k, t) e^{ikx} & x \to \infty
+  \end{cases}.
+\]
+But when we looked at the evolution of the scattering data, we can actually write down what $a$ and $b$ are. In particular, $a(k, t) = a(k)$ is independent of $t$. So we might be able to extract some first integrals from it. We have
+\[
+  e^{ikx} \varphi(x, k, t) = a(k) + b(k, t) e^{2ikx} \text{ as }x \to \infty.
+\]
+We now take the average over $[R, 2R]$ for $R \to \infty$, we have
+\[
+  \frac{1}{R} \int_R^{2R} a(k) \;\d x = a(k).
+\]
+For the $b(k, t)$ term, we have
+\[
+  \frac{1}{R} \int_R^{2R} b(k, t) e^{2ikx} \;\d x = O\left(\frac{1}{R}\right),
+\]
+So we have
+\begin{align*}
+  a(k) &= \lim_{R \to \infty} \frac{1}{R} \int_R^{2R} e^{ikx} \varphi(x, k, t) \;\d x\\
+  &= \lim_{R \to \infty} \int_1^2 e^{ikRx} \varphi(Rx, k, t) \;\d x.
+\end{align*}
+So can we figure out what this thing is? Since $\varphi = e^{-ikx}$ as $x \to -\infty$, it is ``reasonable'' to write
+\[
+  \varphi(x, k, t) = \exp\left(-ikx + \int_{-\infty}^x S(y, k, t)\;\d y\right)
+\]
+for some function $S$. Then after some dubious manipulations, we would get
+\begin{align*}
+  a(k) &= \lim_{R \to \infty} \int_1^2 \exp\left(\int_{-\infty}^{Rx} S(y, k, t)\;\d y\right)\;\d x\\
+  &= \exp\left(\int_{-\infty}^\infty S(y, k, t)\;\d y\right).\tag{$\dagger$}
+\end{align*}
+Now this is interesting, since the left hand side $a(k)$ has no $t$-dependence, but the right-hand formula does. So this is where we get our first integrals from.
+
+Now we need to figure out what $S$ is. To find $S$, recall that $\varphi$ satisfies
+\[
+  L\varphi = k^2 \varphi.
+\]
+So we just try to shove our formula of $\varphi$ into this equation. Notice that
+\[
+  \varphi_x = (S - ik) \varphi,\quad \varphi_{xx} = S_x \varphi + (S - ik)^2 \varphi.
+\]
+We then put these into the Schr\"odinger equation to find
+\[
+  S_x - (2ik)S + S^2 = -u.
+\]
+We have got no $\varphi$'s left. This is a famous type of equation --- a \term{Ricatti-type equation}. We can make a guess
+\[
+  S(x, k, t) = \sum_{n = 1}^\infty \frac{S_n(x, t)}{(2ik)^n}.
+\]
+This seems like a strange thing to guess, but there are indeed some good reasons for this we will not get into. Putting this into the equation and comparing coefficients of $k^{-n}$, we obtain a recurrence relation
+\begin{align*}
+  S_1 &= -u\\
+  S_{n + 1} &= \frac{\d S_n}{x} + \sum_{m = 1}^{n - 1} S_m S_{n - m}.
+\end{align*}
+This is a straightforward recurrence relation to compute. We can make a computer do this, and get
+\[
+  S_2 = -u_x,\quad S_3 = -u_{xx} + u^2,\quad S_4 = \cdots
+\]
+Using the expression for $S$ in $(\dagger)$, we find that
+\begin{align*}
+  \log a(k) &= \int_{-\infty}^\infty S(x, k, t) \;\d t\\
+  &= \int_{-\infty}^\infty \frac{1}{(2ik)^n} \int_{-\infty}^\infty S_n(x, t)\;\d x.
+\end{align*}
+Since the LHS is time-independent, so is the RHS. By comparing coefficients of $k$, we know that each
+\[
+  \int_{-\infty}^\infty S_n (x, t)\;\d t
+\]
+must be constant with time!
+
+Looking at the first few terms, for $n = 1$, we find a first integral
+\[
+  \int_{-\infty}^\infty u(x, t)\;\d x
+\]
+We can view this as a conservation of mass.
+
+For $n = 2$, we obtain a first integral
+\[
+  \int_{-\infty}^\infty u_x(x, t)\;\d x.
+\]
+This is actually boring, since we assumed that $u$ vanishes at infinity. So we knew this is always zero anyway.
+
+For $n = 3$, we have
+\[
+  \int_{-\infty}^\infty (-u_{xx}(x, t) + u(x, t)^2) \;\d x = \int_{-\infty}^\infty u(x, t)^2 \;\d x.
+\]
+This is in some sense a conservation of momentum.
+
+It is an exercise to show that $S_n$ is a total derivative for all even $n$, so we don't get any interesting conserved quantity.
+
+\section{Structure of integrable PDEs}
+\subsection{Infinite dimensional Hamiltonian system}
+Recall that a (finite-dimensional) Hamiltonian system is governed by
+\[
+  \frac{\d \mathbf{x}}{\d t} = J \frac{\partial H}{\partial \mathbf{x}},
+\]
+where $\mathbf{x}(t)$ is a vector of length $2n$, $J$ is an anti-symmetric matrix, and $H = H(\mathbf{x})$ is the Hamiltonian. What do we do if we want to promote this to infinite-dimensional systems?
+
+When we want to describe an infinite-dimensional system, we rarely write down a vector of infinite length. Instead, we think of it as a function $u(x, t)$ depending not only on $t$, but also some ``$x$'', where $x$ belongs to some infinite set $\Omega$. We will usually just take $\Omega = \R$.
+
+What would be the natural generalization of a Hamiltonian system? We now see how we can generalize certain concepts from the finite-dimensional case to the infinite-dimensional phase space. These are just heuristics, and we will make proper definitions later on.
+\begin{center}
+  \begin{tabular}{cc}
+    \toprule
+    $2n$-dimensional phase space & infinite dimensional phase space\\
+    \midrule
+    $(\mathbf{x})_i(t): i = 1, \cdots, 2n$ & $u(x, t): x \in \Omega$\\
+    $\mathbf{x}\cdot\mathbf{y} = \sum_i x_i y_i$ & $\bra u, v \ket = \int_\omega u(x, t) v(x, t) \;\d x$\\
+    $\frac{\d}{\d t}$ & $\frac{\partial}{\partial t}$\\
+    $\frac{\partial}{\partial \mathbf{x}}$ & ``$\frac{\delta}{\delta u}$''\\
+    $J$ anti-symmetric matrix & $\mathcal{J}$ anti-symmetric linear operator\\
+    $f = f(\mathbf{x})$ (functions) & $F = F[u]$ (functionals)\\
+    \bottomrule
+  \end{tabular}
+\end{center}
+Here the $\frac{\delta}{\delta u}$, is the ``functional derivative'' we've seen in variational calculus.
+
+Now let's try to go through these things, starting with the definition of a functional:
+\begin{defi}[Functional]\index{functional}
+  A \emph{functional} $F$ is a real-valued function (on some function space) of the form
+  \[
+    F[u] = \int_\Omega f(x, u, u_x, u_{xx}, \cdots)\;\d x.
+  \]
+\end{defi}
+Because we are lazy, we will just write $\int \d x$ for $\int_{-\infty}^\infty \d x$.
+
+We next talk about the idea of a functional derivative.
+\begin{defi}[Functional derivative/Euler-Lagrange derivative]\index{functional derivative}\index{Euler-Lagrange derivative}
+  The \emph{functional derivative} of $F = F[u]$ at $u$ is the unique function $\delta F$ satisfying
+  \[
+    \bra \delta F, \eta\ket = \lim_{\varepsilon \to 0} \frac{F[u + \varepsilon \eta] - F[u]}{\varepsilon}
+  \]
+  for all smooth $\eta$ with compact support.
+
+  Alternatively, we have
+  \[
+    F[u, \varepsilon \eta] = F[u] + \varepsilon \bra \delta F, \eta\ket + o (\varepsilon).
+  \]
+  Note that $\delta F$ is a function, depending on $u$.
+\end{defi}
+
+\begin{eg}
+  Set
+  \[
+    F[u] = \frac{1}{2} \int u_x^s \;\d x.
+  \]
+  We then have
+  \begin{align*}
+    F[u + \varepsilon \eta] &= \frac{1}{2}\int (u_x + \varepsilon \eta_x)^2 \;\d x\\
+    &= \frac{1}{2} u_x^2 \;\d x + \varepsilon \int u_x \eta_x \;\d x + o(\varepsilon)\\
+    &= F[u] + \varepsilon \bra u_x, \eta_x\ket + o(\varepsilon)\\
+    \intertext{This is no good, because we want something of the form $\bra \delta F, \eta\ket$, not an inner product with $\eta_x$. When in doubt, integrate by parts!}
+    &= F[u] + \varepsilon \bra -u_{xx}, \eta\ket + o(\varepsilon).
+  \end{align*}
+  Note that when integrating by parts, we don't have to mess with the boundary terms, because $\eta$ is assumed to have compact support. So we have
+  \[
+    \delta F = - u_{xx}.
+  \]
+\end{eg}
+in general, from IB Variational Principles, we know that if
+\[
+  F[u] = \int f(x, u, u_x, u_{xx}, \cdots)\;\d x,
+\]
+then we have
+\[
+  \delta F = \frac{\partial f}{\partial u} - \D_x\left(\frac{\partial f}{\partial u_x}\right) + \D_x^2 \left(\frac{\partial f}{\partial u_{xx}}\right) - \cdots.
+\]
+Here $D_x$ is the total derivative.
+\begin{eg}
+  We have
+  \[
+    \frac{\partial}{\partial x}(xu) = u,\quad \D_x (xu) = u + x u_x.
+  \]
+\end{eg}
+Recall that for finite-dimensional Hamiltonian systems, we were able to define a Poisson bracket for $f = f(\mathbf{x}), g = g(\mathbf{x})$, given by
+\[
+  \{f, g\} = \frac{\partial f}{\partial \mathbf{x}} \cdot J \frac{\partial g}{\partial \mathbf{x}}.
+\]
+We knew that this is bilinear, antisymmetric and satisfies the Jacobi identity.
+
+How do we promote this to infinite-dimensional Hamiltonian systems? We can just replace $\frac{\partial f}{\partial \mathbf{x}}$ with the functional derivative, the dot with the inner product, and the $J$ with our funny $\mathcal{J}$. We have not yet figured out what $\mathcal{J}$ really should be, but assuming we have found a reasonable linear and antisymmetric candidate, we can make the following definition:
+
+\begin{defi}[Poisson bracket for infinite-dimensional Hamiltonian systems]\index{Poisson bracket!infinite-dimensional}
+  We define the \emph{Poisson bracket} for two functionals to be
+  \[
+    \{F, G\} = \bra \delta F, \mathcal{J} \delta G\ket = \int \delta F(x) \mathcal{J} \delta G(x)\;\d x.
+  \]
+\end{defi}
+Since $\mathcal{J}$ is linear and antisymmetric, we know that this Poisson bracket is bilinear and antisymmetric. The annoying part is the Jacobi identity
+\[
+  \{F, \{G, H\}\} + \{G, \{H, F\}\} + \{H, \{F, G\}\} = 0.
+\]
+This is \emph{not} automatically satisfied. We need conditions on $\mathcal{J}$. The simplest antisymmetric linear map we can think of would be $\mathcal{J} = \partial_x$, and this works, ie. the Jacobi identity is satisfied. Proving that is easy, but painful.
+
+Recall that for finite-dimensional systems, our equation of evolution is given by
+\[
+  \frac{\d}{\d t} \mathbf{x} = J \frac{\partial H}{\partial \mathbf{x}}.
+\]
+We make the obvious analogues here:
+\begin{defi}[Hamiltonian form]\index{Hamiltonian form}
+  An evolution equation for $u = u(x, t)$ is in \emph{Hamiltonian form} if it can be written as
+  \[
+    u_t = \mathcal{J} \frac{\delta H}{\delta u}.
+  \]
+  for some functional $H = H[u]$ and some linear, antisymmetric $\mathcal{J}$ such that the Poisson bracket
+  \[
+    \{F, G\} = \bra \delta F, \mathcal{J} \delta G\ket
+  \]
+  obeys the Jacobi identity.
+\end{defi}
+
+Such a $\mathcal{J}$ is known as a Hamiltonian operator.
+\begin{defi}[Hamiltonian operator]\index{Hamiltonian operator}
+  A \emph{Hamiltonian operator} is linear antisymmetric function $\mathcal{J}$ on the space of functions such that the induced Poisson bracket obeys the Jacobi identity.
+\end{defi}
+
+Now a natural question to ask is when the results for finite-dimensional cases hold for infinite-dimensional cases. Often in mathematics, life is not so fortunate. Things that hold for finite-dimensional systems need not hold for infinite-dimensional cases. It turns out that for us, many do carry over, but we do not have time to cover all of them.
+
+Note that it is possible that the same PDE might be able to be put into Hamiltonian form for \emph{different} $\mathcal{J}$'s. These are known as \emph{bihamiltonian systems}.
+\begin{defi}[Bihamiltonian system]\index{bihamiltonian system}
+  A PDE is \emph{bihamiltonian} if it can be written in Hamiltonian form for differen $\mathcal{J}$.
+\end{defi}
+It turns out that when this happens, then the system has infinitely many first integrals in involution! We will prove this later on.
+
+We now try to derive some results we had in the finite-dimensional case. Recall that for $f = f(\mathbf{x})$, we had
+\[
+  \frac{\d f}{\d t} = \{f, H\}.
+\]
+This generalizes to the infinite-dimensional case.
+\begin{prop}
+  If $u_t = \mathcal{J} \delta H$ and $i = I[u]$, then
+  \[
+    \frac{\d I}{\d t} = \{I, H\}.
+  \]
+  In particular $I[u]$ is a first integral of $u_t = \mathcal{J} \delta H$ iff $\{I, H\} = 0$.
+\end{prop}
+
+\begin{proof}
+  If
+  \[
+    I[u] = \int i(x, u, u_x, u_{xx}, \cdots)\;\d x,
+  \]
+  then we have
+  \begin{align*}
+    \frac{\d I}{\d t} &= \frac{\d}{\d t} \int i(x, u, u_x, \cdots) \;\d x\\
+    &= \int \frac{\partial }{\partial t}i(x, u, u_x, \cdots)\;\d x\\
+    &= \int \left(u_t \frac{\partial i}{\partial u} + u_{tx} \frac{\partial i}{\partial u_x} + u_{txx} \frac{\partial i}{\partial u_{xx}} + \cdots\right)\;\d x\\
+    \intertext{These terms look horrible. We don't want $u_{tx}$ terms. We just what $u_t$. So we again integrate by parts:}
+    &= \int \left(\frac{\partial i}{\partial u} - D_x\left(\frac{\partial i}{\partial u_x}\right) + \D_x^2 \left(\frac{\partial i}{\partial u_{xx}}\right) + \cdots\right)u_t \;\d x\\
+    &= \int \delta I u_t \;\d x\\
+    &= \bra \delta I, u_t\ket\\
+    &= \bra \delta I, \mathcal{J} \delta H\ket\\
+    &= \{I, H\}.
+  \end{align*}
+\end{proof}
+
+One can show that the KdV equation is Hamiltonian, and each of the first integrals we found would Poisson-commute with $H$.
+
+\subsection{KdV Hierarchy}
+We are going to write down a hierarchy of KdV equations. The KdV equation can be written in Hamiltonian form
+\begin{align*}
+  u_t &= \mathcal{J}_1 \delta H_1,\\
+  \mathcal{J} &= \frac{\partial}{\partial x},\\
+  H_1[u] &=\int \frac{1}{2}u_x^2 + u^3 \;\d x.
+\end{align*}
+We can check that this says
+\begin{align*}
+  u_t &= \frac{\partial}{\partial x}\left(\frac{\partial}{\partial u} - D_x \left(\frac{\partial}{\partial u_x}\right)\right)\left(\frac{1}{2}u_x^2 + u^3\right)\\
+  &= 6uu_x- u_{xxx},
+\end{align*}
+and this is the KdV equation.
+
+More interestingly, we can write this in Hamiltonian form in two distinct ways. We also have
+\[
+  u_t = \mathcal{J}_0 \delta H_0,\quad \mathcal{J}_0 = - \frac{\partial^3}{\partial x^3} + 4u \partial_x + 2 u_x,\quad H_0[u] = \int \frac{1}{2}u^2 \;\d x.
+\]
+So KdV is bi-Hamiltonian. We then know that
+\[
+  \mathcal{J}_1 \delta H_1 = \mathcal{J}_0 \delta H_0.
+\]
+For ease of notation, we set $\mathcal{J}_1 = \partial_x$ and $\mathcal{J}_0 = \mathcal{J}$. We can then define a sequence of Hamiltonians $\{H_n\}_{n \geq 0}$ via
+\[
+  \partial_x\delta H_{n + 1} = \mathcal{J} \delta H_n.
+\]
+We will assume that we can always solve for $H_{n + 1}$ given $H_n$. This can be proven, but we shall not. We can then start investigating what this sequence of Hamiltonians are like.
+
+\begin{thm}
+  Let $\{H_n\}_{n \geq 0}$ and $\mathcal{J}$ be as above. Then if $u_t = \partial_x \delta H_1$, then $\{H_n\}_{n \geq 0}$ are all first integrals of KdV in involution, ie.
+  \[
+    \{H_n, H_n\} = 0.
+  \]
+\end{thm}
+
+\begin{proof}
+  We notice the following interesting fact:
+  \begin{align*}
+    \{H_n, H_m\} &= \bra \delta H_n, \partial_x \delta H_m\ket\\
+    &= \bra \delta H_n, \mathcal{J} \delta H_{m - 1}\ket\\
+    &= - \bra \mathcal{J} \delta H_n, \delta H_{m - 1}\ket\\
+    &= - \bra \partial_x \delta H_{n + 1}, \delta H_{m - 1}\ket\\
+    &= \bra \delta H_{n + 1}, \partial_x \delta H_{m - 1}\ket\\
+    &= \{H_{n + 1}, H_{m - 1}\}.
+  \end{align*}
+  Iterating this many times, we find that
+  \[
+    \{H_n, H_m\} = \{H_m, H_n\}.
+  \]
+  Then by antisymmetry, they must both vanish. So done.
+% We already know $H_0$ is a first integral, We want to show that
+% \[
+% \frac{\d}{\d t} = \{H_1, H_m\} = \bra \delta H_1, \partial_x \delta H_m\ket = 0.
+% \]
+% We have
+\end{proof}
+
+\subsection{Zero curvature representation}
+Let $U = U(\lambda)$ and $V = V(\lambda)$ be $N \times N$ matrices that depend on $(x, t; \lambda)$. The $\lambda$ will be thought of as a ``\term{spectral parameter}'', like the $\lambda$ in the eigenvalue problem $L \varphi = \lambda \varphi$. Usually, the $U$ and $V$ will not depend on $x$ and $t$ implicitly, but will instead depend on some function $u(x, t)$ and its derivative.
+
+Consider the PDE's
+\[
+  \frac{\partial}{\partial x}\mathbf{v} = U(\lambda) \mathbf{v},\quad \frac{\partial}{\partial t} \mathbf{v} = V(\lambda) \mathbf{v},\tag{$\dagger$}
+\]
+where $\mathbf{v} = \mathbf{v}(x, t; \lambda)$ is an $N$-dimensional vector. This is a two-way problem --- we could be given the $U, V$, and we want to find some $\mathbf{v}$ that works. On the other hand, we might also be given a $\mathbf{v}$ that works, and we want to find the $U, V$.
+
+Now notice that here we have twice as many equations as there are unknowns. So we need some compatibility conditions. We use the fact that $\mathbf{v}_{xt} = \mathbf{v}_{tx}$. So we need
+\begin{align*}
+  0 &= \frac{\partial}{\partial t} U(\lambda) \mathbf{v} - \frac{\partial}{\partial x}V(\lambda) \mathbf{v}\\
+  &= \frac{\partial U}{\partial t} \mathbf{v} + U \frac{\partial \mathbf{v}}{\partial t} - \frac{\partial V}{\partial x}\mathbf{v} - V \frac{\partial \mathbf{v}}{\partial x}\\
+  &= \frac{\partial U}{\partial t}\mathbf{v} + UV \mathbf{x} - \frac{\partial V}{\partial x}\mathbf{v} - VU \mathbf{v}\\
+  &= \left(\frac{\partial U}{\partial t} - \frac{\partial V}{\partial x} + [U, V]\right) \mathbf{v}.
+\end{align*}
+There is a beautiful theorem by Frobenius that if this equation holds, then there is always a solution.
+
+If we want the equation to always have a solution for any initial $\mathbf{v}_0$, we know the above equation must hold for any $\mathbf{v}$. So we must have
+\[
+  \frac{\partial U}{\partial t} - \frac{\partial V}{\partial x} + [U, V] = 0
+\]
+These are known as the \term{zero curvature equations}.
+
+Why are these called the zero curvature equations. In geometry, a connection $A$ on a tangent bundle has zero curvature if
+\[
+  \frac{\partial A_j}{\partial x_i} - \frac{\partial A_i}{\partial x_j} + [A_i, A_j] = 0.
+\]
+In General Relativity, we use covariant derivatives
+\[
+  \nabla = \partial + \Gamma.
+\]
+(with loads of indices everywhere which we omit) We can show that the Riemann curvature tensor is
+\[
+  R = \partial \Gamma - \partial \Gamma + \Gamma \Gamma - \Gamma \Gamma,
+\]
+where we have indices everywhere, and in particular, the terms that look the same aren't because they have indices. Then spacetime has zero curvature iff $R = 0$.
+
+\begin{eg}
+  Consider
+  \[
+    U(\lambda) = \frac{i}{2}
+    \begin{pmatrix}
+      2\lambda & u_x\\
+      u_x & -2\lambda
+    \end{pmatrix},\quad
+    V(\lambda) =
+    \frac{1}{4i\lambda}
+    \begin{pmatrix}
+      \cos u & -i \sin u\\
+      i \sin u & -\cos u
+    \end{pmatrix}.
+  \]
+  Then the zero curvature equation is equivalent to the sine-Gordon equation
+  \[
+    u_{xt} = \sin u.
+  \]
+\end{eg}
+%In geometry, curvature is an intrinsic property of our geometric object, say a surface. If we want to to compute the curvature, we usually pick some coordinate systems, take the above expression, interpret it in that coordinate system, and evaluate it. However, we could pick a different coordinate system, and we get different expressions for each of, say, $\frac{\partial A_j}{\partial x_i}$. However, if the curvature vanishes in one coordinate system, then it should also vanish in any coordinate system. So by picking a new coordinate system, we have found \emph{new} things that satisfies the curvature equation.
+%
+%In general, we can give a gauge transformation that takes some solution $(U, V)$ to a new $(\tilde{U}, \tilde{V})$ that preserves the zero curvature equation. So we can use gauge transformations to obtain a lot of new solutions!
+
+We can use this to do some inverse scattering-type things. In the above formulation of the sine-Gordon equation. If $u_x \to 0$ as $|x| \to \infty$, we write
+\[
+  \mathbf{v} =
+  \begin{pmatrix}
+    \psi_1\\
+    \psi_2
+  \end{pmatrix}.
+\]
+Then we have
+\[
+  \frac{\partial}{\partial x}
+  \begin{pmatrix}
+    \psi_1\\
+    \psi_2
+  \end{pmatrix}
+  = \frac{i}{2}
+  \begin{pmatrix}
+    2\lambda & u_x\\
+    u_x & -2\lambda
+  \end{pmatrix}
+  \begin{pmatrix}
+    \psi_1\\
+    \psi_2
+  \end{pmatrix} = i\lambda
+  \begin{pmatrix}
+    \psi_1\\
+    -\psi_2
+  \end{pmatrix}.
+\]
+So we know
+\[
+  \begin{pmatrix}
+    \psi_1\\
+    \psi_2
+  \end{pmatrix} =
+  A
+  \begin{pmatrix}
+    1\\0
+  \end{pmatrix}
+  e^{i\lambda x} + B
+  \begin{pmatrix}
+    0 \\1
+  \end{pmatrix}
+  e^{-i\lambda x}
+\]
+as $|x| \to \infty$. So with any $\mathbf{v}$ satisfying the first equation in $(\dagger)$, we can associate to it some ``scattering data'' $A, B$. Then the second equation in $(\dagger)$ tells us how $\mathbf{v}$, and thus $A, B$ evolves in time, and using this we can develop some inverse scattering-type way of solving the equation.
+
+\subsection{From Lax pairs to zero curvature}
+Recall that we had this isospectral flow theorem --- if Lax's equation
+\[
+  L_t = [L, A],
+\]
+is satisfied, then the eigenvalues of $L$ are time-independent. Also, we found that our solutions satisfied
+\[
+  \tilde{\psi} = \psi_t + A \psi = 0.
+\]
+So we had two equations:
+\begin{align*}
+  L \psi &= \lambda \psi\\
+  \psi_t + A \psi &= 0.
+\end{align*}
+Now suppose we reverse this --- we \emph{enforce} that $\lambda_t = 0$. Then differentiating the first equation and substituting in the second gives
+\[
+  L_t = [L, A].
+\]
+So we can see Lax's equation as a compatibility condition for the two equations above. We will see that given any equations of this form, we can transform it into a zero curvature form.
+
+Note that if we have
+\begin{align*}
+  L &= \left(\frac{\partial}{\partial x}\right)^n + \sum_{j = 0}^{n - 1}u_j(x, t) \left(\frac{\partial}{\partial x}\right)^j\\
+  A &= \left(\frac{\partial}{\partial x}\right)^n + \sum_{j = 0}^{n - 1}v_j(x, t) \left(\frac{\partial}{\partial x}\right)^j
+\end{align*}
+then
+\[
+  L \psi = \lambda \psi
+\]
+means that derivatives of order $\geq n$ can be expressed as linear combinations of derivatives $< n$. Indeed, we just have
+\[
+  \partial^n_x \psi = \lambda\psi - \sum_{j = 0}^{n - 1} u_j(x, t) \partial_x^j \psi.
+\]
+Then differentiating this equation will give us an expression for the higher derivatives in terms of the lower ones.
+
+Now by introducing the vector
+\[
+  \boldsymbol\Psi = (\psi, \partial_x \psi, \cdots, \partial^{n - 1}_x \psi),
+\]
+The equation $L \psi = \lambda \psi$ can be written as
+\[
+  \frac{\partial}{\partial x} \boldsymbol\Psi = U(\lambda) \boldsymbol\Psi,
+\]
+where
+\[
+  U(\lambda) =
+  \begin{pmatrix}
+    0 & 1 & 0 & \cdots & 0\\
+    0 & 0 & 1 & \cdots & 0\\
+    \vdots & \vdots & \vdots &\ddots & \vdots\\
+    0 & 0 & 0 & \cdots & 1\\
+    \lambda - u_0 & - u_1 & -u_2 & \cdots & - u_{n - 1}
+  \end{pmatrix}
+\]
+Now differentiate ``$\psi_t + A\psi = 0$'' $i$ times with respect to $x$ to obtain
+\[
+  (\partial_x^{i - 1} \psi)_t + \underbrace{\partial_x^{i - 1} \left(\sum_{j = 0}^{m - 1} v_j(x, t) \left(\frac{\partial}{\partial x}\right)^j \psi\right)}_{\sum_{j = 1}^n V_{ij}(x, t) \partial^{j - 1}_x \psi} = 0
+\]
+for some $V_{ij}(x, t)$ depending on $v_j, u_i$ and their derivatives. We see that this equation then just says
+\[
+  \frac{\partial}{\partial t}\boldsymbol\Psi = V \boldsymbol\Psi.
+\]
+So we have shown that
+\[
+  L_t = [L, A] \Leftrightarrow
+  \begin{cases}
+    L\psi = \lambda \psi\\
+    \psi_t + A\psi = 0
+  \end{cases} \Leftrightarrow
+  \begin{cases}
+    \boldsymbol\Psi_x = U(\lambda) \boldsymbol\Psi\\
+    \boldsymbol\Psi_t = V(\lambda) \boldsymbol\Psi
+  \end{cases} \Leftrightarrow
+  \frac{\partial U}{\partial t} - \frac{\partial V}{\partial x} + [U, V] = 0.
+\]
+So we know that if something can be written in the form of Lax's equation, then we can come up with an equivalent equation in zero curvature form.
+
+\section{Symmetry methods in PDEs}
+\subsection{Lie groups and Lie algebras}
+This story might be entirely made up, but it is a good motivation for studying Lie groups.
+
+Back in the 60's, Gell-Mann was trying to understand the strong force and put it alongside the weak force. So what he did was that he plotted out fundamental particles according to their isospin and hypercharge, whatever those might be. He then figured that they looked like this:
+\begin{center}
+  \begin{tikzpicture}[scale=0.7]
+    \draw [->] (-3, 0) -- (3, 0);
+    \draw [->] (0, -2.5) -- (0, 2.5);
+    \node [circ] at (2, 0) {};
+    \node [circ] at (1, 1.732) {};
+    \node [circ] at (1, -1.732) {};
+    \node [circ] at (-2, 0) {};
+    \node [circ] at (-1, 1.732) {};
+    \node [circ] at (-1, -1.732) {};
+    \node [circ] at (-0.2, 0) {};
+    \node [circ] at (0.2, 0) {};
+  \end{tikzpicture}
+\end{center}
+Then he told himself, ``this is a nice picture, but there probably isn't much more to it''.
+
+Now a pure mathematician happened to got lost, and was somehow walking in the physics department and saw that picture. He asked ``so you are also interested in the eight-dimensional adjoint representations of $\su(3)$?'', and the physicist was like, ``no\ldots?''. It turns out the weight diagram (whatever that might be) of the eight-dimensional adjoint representation of $\su(3)$ (whatever that might be), looked exactly like that, and a deep connection between theories of physics and representations of Lie algebras was discovered.
+
+So to begin with, we remind ourselves with what a group is!
+
+\begin{defi}[Group]\index{group}
+  A \emph{group} is a set $G$ with a binary operation
+  \[
+    (g_1, g_2) \mapsto g_1 g_2
+  \]
+  called ``group multiplication'', satisfying the axioms
+  \begin{enumerate}
+    \item \term{Associativity}: $(g_1 g_2)g_3 = g_1 (g_2 g_3)$ for all $g_1, g_2, g_3$
+    \item Existence of identity: there is a (unique) identity element $e \in G$ such that
+      \[
+        ge = eg = g
+      \]
+      for all $g \in G$
+    \item Inverses exist: for each $g \in G$, there is $g^{-1} \in G$ such that
+      \[
+        gg^{-1} = g^{-1}g = e.
+      \]
+  \end{enumerate}
+\end{defi}
+
+\begin{eg}
+   $(\Z, +)$ is a group.
+\end{eg}
+
+What we are really interested in is how groups act on certain sets.
+
+\begin{defi}[Group action]\index{group action}
+  A group $G$ acts on a set $X$ if there is a map $G \times X \to X$ sending $(g, x) \mapsto g(x)$ such that
+  \[
+    g(h(x)) = (gh)(x),\quad e(x) = x
+  \]
+  for all $g, h \in G$ and $x \in X$.
+\end{defi}
+
+\begin{eg}
+  The rotation matrices $\SO(2)$ acts on $\R^2$ via matrix multiplication.
+\end{eg}
+
+We are not going to consider groups in general, but we will only talk about (local) Lie groups, and coordinate changes born of them. We are not going to use the ``real'' definition of Lie group, but use an easier version that really looks more like the definition of a local Lie group than a Lie group. The definition will probably be slightly confusing, but it will become clearer with examples.
+
+\begin{defi}[Lie group]\index{Lie group}
+  An \emph{$m$-dimensional Lie group} is a group such that all the elements depend continuously on $m$ parameters, in such a way that the maps $(g_1, g_2) \mapsto g_1 g_2$ and $g \mapsto g^{-1}$ correspond to a smooth function of those parameters.
+\end{defi}
+In practice, it suffices to check that the map $(g_1, g_2) \mapsto g_1 g_2^{-1}$ is smooth.
+
+So elements of an ($m$-dimensional) Lie group can be written as $g(\mathbf{t})$, where $\mathbf{t} \in \R^m$. We make the convention that $g(0) = e$. For those who are doing differential geometry, this is a manifold with a group structure such that the group operations are smooth maps. For those who are doing category theory, this is a group object in the category of smooth manifolds.
+
+\begin{eg}
+  Any element of $G = \SO(2)$ can be written as
+  \[
+    g(t) =
+    \begin{pmatrix}
+      \cos t & -\sin t\\
+      \sin t & \cos t
+    \end{pmatrix}
+  \]
+  for $t \in \R$. So this is a candidate for a 1-dimensional Lie group that depends on a single parameter $t$. We now have to check that the map $(g_1, g_2) \mapsto g_1 g_2^{-1}$ is smooth. We note that
+  \[
+    g(t_1)^{-1} = g(-t_1).
+  \]
+  So we have
+  \[
+    g(t_1) g(t_2)^{-1} = g(t_1) g(-t_2) = g(t_1 - t_2).
+  \]
+  So the map
+  \[
+    (g_1, g_2) \mapsto g_1 g_2^{-1}
+  \]
+  corresponds to
+  \[
+    (t_1, t_2) \mapsto t_1 - t_2.
+  \]
+  Since this map is smooth, we conclude that $\SO(2)$ is a $1$-dimensional Lie group.
+\end{eg}
+
+\begin{eg}
+  Consider matrices of the form
+  \[
+    g(\mathbf{t}) =
+    \begin{pmatrix}
+      1 & t_1 & t_3\\
+      0 & 1 & t_2\\
+      0 & 0 & 1
+    \end{pmatrix},\quad \mathbf{t} \in \R^3
+  \]
+  It is easy to see that this is a group under matrix multiplication. This is known as the \term{Heisenberg group}. We now check that it is in fact a Lie group, ie. we have to check the smoothness criterion. We have
+  \[
+    g(\mathbf{a}) g(\mathbf{b}) =
+    \begin{pmatrix}
+      1 & a_1 & a_3\\
+      0 & 1 & a_2\\
+      0 & 0 & 1
+    \end{pmatrix}
+    \begin{pmatrix}
+      1 & b_1 & b_3\\
+      0 & 1 & b_2\\
+      0 & 0 & 1
+    \end{pmatrix} =
+    \begin{pmatrix}
+      1 & a_1 + b_1 & a_3 + b_3 + a_1 b_2\\
+      0 & 1 & a_2 + b_2\\
+      0 & 0 & 1
+    \end{pmatrix}.
+  \]
+  We can then write down the inverse
+  \[
+    g(\mathbf{b})^{-1}=
+    \begin{pmatrix}
+      1 & - b_1 & b_1 b_2 - b_3
+      0 & 1 & & -b_2\\
+      0 & 0 & 1
+    \end{pmatrix}
+  \]
+  So we have
+  \begin{align*}
+    g(\mathbf{a}) g(\mathbf{b})^{-1} &=
+    \begin{pmatrix}
+      1 & a_1 & a_3\\
+      0 & 1 & a_2\\
+      0 & 0 & 1
+    \end{pmatrix}
+    \begin{pmatrix}
+      1 & - b_1 & b_1 b_2 - b_3\\
+      0 & 1 & -b_2\\
+      0 & 0 & 1
+    \end{pmatrix} \\
+    &=
+    \begin{pmatrix}
+      1 & a_1 - b_1 & b_1 b_2 - b_3 - a_1 b_2 + a_3\\
+      0 & 1 & a_2 - b_2\\
+      0 & 0 & 1
+    \end{pmatrix}
+  \end{align*}
+  This then corresponds to
+  \[
+    (\mathbf{a}, \mathbf{b}) \mapsto
+    \begin{pmatrix}
+      a_1 - b_1\\
+      a_2 -b_2\\
+      b_1 b_2 - b_3 - a_1 b_2 + a_3
+    \end{pmatrix},
+  \]
+  which is a smooth map! So we conclude that the Heisenberg group is a three-dimensional Lie group.
+\end{eg}
 
 \printindex
 \end{document}

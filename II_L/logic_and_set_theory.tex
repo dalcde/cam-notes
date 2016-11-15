@@ -1484,7 +1484,7 @@ Recall that in the proof of Zorn's, we picked $x$, then picked $x'$, then picked
 We did the same in IA Numbers and Sets, when proving a countable union of countable sets is countable, because we chose, for each $A_n$, a listing of $A_n$, and then count them diagonally. We needed to make a choice because each $A_n$ has a lot of possible listings, and we have to pick exactly one.
 
 In terms of ``rules for producing sets'', we are appealing to the axiom of choice, which states that you can pick an element of each $A_i$ whenever $\{A_i: i\in I\}$ is a family of non-empty sets. Formally,
-\begin{axiom}[Axiom of choice]\index{axiom of choice}
+\begin{axiom}[Axiom of choice]\index{axiom!of choice}
   Given any family $\{A_i: i\in I\}$ of non-empty sets, there is a \emph{choice function} $f: i \to \bigcup A_i$ such that $f(i)\in A_i$.
 \end{axiom}
 This is of a different character from the other set-building rules (eg. unions and power sets exist). The difference is that the other rules are concrete. We know exactly what $A\cup B$ is, and there is only one possible candidate for what $A\cup B$ might be. ``Union'' uniquely specifies what it produces. However, the choice function is not. $\{A_i:i\in I\}$ can have many choice functions, and the axiom of choice does not give us a solid, explicit choice function. We say the axiom of choice is \emph{non-constructive}.
@@ -1921,7 +1921,7 @@ This is equivalent to the contrapositive:
   S\cup \{\neg p\} \not\vdash \bot \Rightarrow S\cup \{\neg p\}\not\models \bot.
 \]
 
-\begin{thm}[Model existence lemmapleteness theorem]\index{model existence theorem}
+\begin{thm}[Model existence lemma]\index{model existence theorem}
   Let $S$ be a consistent set of sentences. Then $S$ has a model.
 \end{thm}
 
@@ -2107,6 +2107,88 @@ Hence, there is a $p$ that is true in $\N$, but PA $\not\vdash p$.
 
 Note that this does not contradict G\"odel's completeness theorem. The completeness theorem tells us that if $p$ holds in \emph{every} model of PA (not just in $\N$), then $PA\vdash p$.
 
+\subsection{Completeness and categoricity*}
+\begin{own}
+  We now study some ``completeness'' property of theories. For convenience, we will assume that the language is countable.
+
+  \begin{defi}[Complete theory]\index{complete theory}\index{theory!complete}
+    A theory $T$ is \emph{complete} if for all propositions $p$ in the language, either $T \vdash p$ or $T \vdash \neg p$.
+  \end{defi}
+  Complete theories are rather hard to find. So for the moment, we will content ourselves by just looking at theories that are not complete.
+  \begin{eg}
+    The theory of groups is not complete, since the proposition
+    \[
+      (\forall g)(\forall h)(gh = hg)
+    \]
+    can neither be proven or disproven (there are abelian groups and non-abelian groups).
+  \end{eg}
+  Another ``completeness'' notion we might be interested in is \emph{categoricity}. We will need to use the notion of a cardinal, which will be introduced later in the course. Roughly, a cardinal is a mathematical object that denotes the sizes of sets, and a set ``has cardinality $\kappa$'' if it bijects with $\kappa$.
+  \begin{defi}[$\kappa$-categorical]\index{$\kappa$-categorical}
+    Let $\kappa$ be an infinite cardinal. Then a theory $T$ is \emph{$\kappa$-categorical} if there is a unique model of the theory of cardinality $\kappa$ up to isomorphism.
+  \end{defi}
+
+  Here the notion of ``isomorphism'' is the obvious one --- a homomorphism of models is a function between the structures that preserves everything, and an isomorphism is a homomorphism with an inverse (that is also a homomorphism).
+
+  \begin{eg}[Pure identity theory]\index{pure identity theory}
+    The \emph{pure identity theory} has an empty language and no axioms. Then this theory is $\kappa$-categorical for any $\kappa$, since if two models have the same cardinality, then by definition there is a bijection between them, and any such bijection is an isomorphism because there are no properties to be preserve.
+  \end{eg}
+
+  One nice thing about categorical theories is that they are complete!
+  \begin{prop}
+    Let $T$ be a theory that is $\kappa$ categorical for some $\kappa$. Then $T$ is complete.
+  \end{prop}
+
+  \begin{proof}
+    Let $p$ be a proposition. Suppose $T \not\vdash p$ and $T \not\vdash \neg p$. Then there are models of $T \cup \{p\}$ and $T \cup \{\neg p\}$ of cardinality $\kappa$, by the L\"owenheim-Skolem theorem. But since one satisfies $p$ and the other does not, they cannot be isomorphic. This contradicts $\kappa$-categoricity.
+  \end{proof}
+
+  We are now going to use this idea to prove the \term{Ax-Grothendieck theorem}
+  \begin{thm}[Ax-Grothendieck theorem]
+    Let $f: \C^n \to \C^n$ be a complex polynomial. If $f$ is injective, then it is in fact a bijection.
+  \end{thm}
+
+  We will use the following result from field theory without proof:
+  \begin{lemma}
+    Any two uncountable algebraically closed fields with the same dimension and same characteristic are isomorphic. In other words, the theory of algebraically closed fields of characteristic $p$ (for $p$ a prime or $0$) is $\kappa$-categorical for all uncountable cardinals $\kappa$, and in particular complete.
+  \end{lemma}
+  The rough idea (for the field theorists) is that an algebraically closed field is uniquely determined by its transcendence degree over the base field $\Q$ or $\F_p$.
+
+  In the following proof, we will also use some (very) elementary results about field theory that can be found in IID Galois Theory.
+
+  \begin{proof}[Proof of Ax-Grothendieck]
+    We will use compactness and completeness to show that we only have to prove this for fields of positive characteristic, and the result can be easily proven since we end up dealing with finite fields.
+
+    Let $\mathrm{ACF}$ be the theory of algebraically closed fields. The language is the language of rings, and the axioms are the usual axioms of a field, plus the following axiom for each $n > 0$:
+    \[
+      (\forall a_0, a_1, \cdots, a_{n - 1})(\exists x)(x^n + a_{n - 1}x^{n - 1} + \cdots + a_1 x + a_0 = 0).
+    \]
+    Let $\mathrm{ACF}_0$ denote the theory of algebraically closed fields of characteristic $0$, where we add the axiom
+    \[
+      \underbrace{1 + 1 + \cdots + 1}_{n\text{ times}} \not= 0\tag{$*$}
+    \]
+    for all $n$ to $\mathrm{ACF}_n$.
+
+    Let $\mathrm{ACF}_p$ denote the theory of algebraically closed fields of characteristic $p$, where we add the axiom
+    \[
+      \underbrace{1 + 1 + \cdots + 1}_{p\text{ times}} = 0
+    \]
+    to $\mathrm{ACF}$.
+
+    We now notice the following fact: if $r$ is a proposition that is a theorem of $\mathrm{ACF}_p$ for all $p$, then it is true of $\mathrm{ACF}_0$. Indeed, we know that $\mathrm{ACF}_0$ is complete. So if $r$ is not a theorem in $\mathrm{ACF}_0$, then $\neg r$ is a theorem. But the proof is finite, so it can only use finitely many instances of $(*)$. So there is some large $p$ where $\neg r$ can be proven in $\mathrm{ACF}_p$, which is a contradiction.
+
+    Now the statement ``If $f$ is a polynomial of degree $d$ and $f$ is injective, then $f$ is surjective'' can be expressed as a first-order statement. So we just have to prove it for all fields of characteristic $p > 0$. Moreover, by completeness, for each $p$, we only need to prove it for \emph{some} algebraically complete field of characteristic $p$.
+
+    Fix a prime $p$, and consider $F = \bar{\F}_p$, the algebraic closure of $\F_p$. This is an algebraically closed field with the property that every element is algebraic over $\F_p$, ie. the field generated by any finite subset of elements is finite.
+
+    Let $f: F^n \to F^n$ be a polynomial function involving coefficients $a_1, \cdots, a_K$. Let $b = (b_1, \cdots, b_n) \in F^n$ be a point. Then $F$ restricts to a function from the field $\tilde{F}$ generated by $\{b_1, \cdots, b_n, a_1, \cdots, a_K\}$ to itself. But $\tilde{F}$ is finite, so any function $f|_{\tilde{F}}: \tilde{F} \to \tilde{F}$ that is injective must also be surjective. So $b$ is in the image of $f$. So $f$ is surjective. So done.
+  \end{proof}
+
+  We conclude the section by stating, without proof, a theorem by Morely:
+  \begin{thm}[Morley's categoricity theorem]\index{Morley's categoricity theorem}
+    Let $T$ be a theory with a countable language. If $T$ is $\kappa$-categorical for \emph{some} uncountable cardinal $\kappa$, then it is $\mu$-categorical for \emph{all} uncountable cardinals $\mu$.
+  \end{thm}
+  Hence we often just say a theory is uncountably categorical when the theory is categorical for some (hence all) uncountable cardinals.
+\end{own}
 \section{Set theory}
 Here we'll axiomatize set theory as ``just another first-order theory'', with signatures, structures etc. There are many possible formulations, but the most common one is \emph{Zermelo Fraenkel set theory} (with the axiom of choice), which is what we will study.
 
@@ -2118,7 +2200,7 @@ Then a ``universe of sets'' will simply mean a model of these axioms, a pair $(V
 
 ZF will have 2 axioms to get started with, 4 to build things, and 3 more weird ones one might not realize are needed.
 
-\begin{axiom}[Axiom of extension]\index{axiom of extension}
+\begin{axiom}[Axiom of extension]\index{axiom!of extension}
   ``If two sets have the same elements, they are the same set''.
   \[
     (\forall x)(\forall y)((\forall z)(z\in x\Leftrightarrow z\in y) \Rightarrow x = y).
@@ -2126,7 +2208,7 @@ ZF will have 2 axioms to get started with, 4 to build things, and 3 more weird o
 \end{axiom}
 We could replace the $\Rightarrow $ with an $\Leftrightarrow$, but the converse statement $x = y \Rightarrow (z\in x \Leftrightarrow z\in y)$ is an instance of a logical axiom, and we don't have to explicitly state it.
 
-\begin{axiom}[Axiom of separation]\index{axiom of separation}
+\begin{axiom}[Axiom of separation]\index{axiom!of separation}
   ``Can form subsets of sets''. More precisely, for any set $x$ and a formula $p$, we can form $\{z\in x: p(z)\}$.
   \[
     {\color{gray}{(\forall t_1)\cdots(\forall t_n)}}(\forall x)(\exists y)(\forall z)(z\in y \Leftrightarrow (z\in x\wedge p)).
@@ -2137,14 +2219,14 @@ We could replace the $\Rightarrow $ with an $\Leftrightarrow$, but the converse 
 
   This is sometimes known as Axiom of comprehension.
 \end{axiom}
-\begin{axiom}[Axiom of empty set]\index{axiom of empty set}
+\begin{axiom}[Axiom of empty set]\index{axiom!of empty set}
   ``The empty-set exists''
   \[
     (\exists x)(\forall y)(y\not\in x).
   \]
   We write $\emptyset$ for the (unique, by extension) set with no members. This is an abbreviation: $p(\emptyset)$ means $(\exists x)(x\text{ has no members}\wedge p(x))$. Similarly, we tend to write $\{z\in x: p(z)\}$ for the set given by separation.
 \end{axiom}
-\begin{axiom}[Axiom of pair set]\index{axiom of pair set}
+\begin{axiom}[Axiom of pair set]\index{axiom!of pair set}
   ``Can form $\{x, y\}$''.
   \[
     (\forall x)(\forall y)(\exists z)(\forall t)(t\in z \Leftrightarrow (t= x\vee t = y)).
@@ -2175,7 +2257,7 @@ We can show that $(a, b) = (c, d) \Leftrightarrow (a = c) \wedge (b = d)$.
 \end{defi}
 Once we've defined them formally, let's totally forget about the definition and move on with life.
 
-\begin{axiom}[Axiom of union]\index{axiom of union}
+\begin{axiom}[Axiom of union]\index{axiom!of union}
   ``We can form unions'' Intuitively, we have $a\cup b\cup c = \{x: x\in a \text{ or }x\in b\text{ or }x\in c\}$. but instead of $a\cup b\cup c$, we write $\bigcup\{a, b, c\}$ so that we can express infinite unions as well.
   \[
     (\forall x)(\exists y)(\forall z)(z\in y \Leftrightarrow (\exists t)(t\in x \wedge z\in t)).
@@ -2184,7 +2266,7 @@ Once we've defined them formally, let's totally forget about the definition and 
 \end{axiom}
 
 Note that we can define intersection $\bigcap x$ as a subset of $y$ (for any $y\in x$) by separation, so we don't need an axiom for that.
-\begin{axiom}[Axiom of power set]\index{axiom of power set}
+\begin{axiom}[Axiom of power set]\index{axiom!of power set}
   ``Can form power sets''.
   \[
     (\forall x)(\exists y)(\forall z)(z\in y \Leftrightarrow z\subseteq x),
@@ -2199,7 +2281,7 @@ Similarly, we can form the set of all functions from $x$ to $y$ as a subset of $
 
 Now we've got the easy axioms. Time for the weird ones.
 
-\subsubsection*{Axiom of infinity}\index{axiom of infinity}
+\subsubsection*{Axiom of infinity}\index{axiom!of infinity}
 From the axioms so far, we cannot prove that there is an infinite set! We start from the empty set, and all the operations above can only produce finite sets. So we need an axiom to say that the natural numbers exists.
 
 But how could we do so in finitely many words? So far, we do have infinitely many sets. For example, if we write $x^+$ for $x\cup \{x\}$, it is easy to check that $\empty, \emptyset^+, \emptyset^{++}, \cdots$ are all distinct.
@@ -2244,7 +2326,7 @@ We can now write, eg. ``$x$ is finite'' for $(\exists y)(\exists f)(y\in x \wedg
 Similarly, we define ``$x$ is countable'' to mean ``$x$ is finite or $x$ bijects with $\omega$''.
 
 That's about it for this axiom. Time for the next one:
-\subsubsection*{Axiom of foundation}\index{axiom of foundation}
+\subsubsection*{Axiom of foundation}\index{axiom!of foundation}
 ``Sets are built out of simpler sets''. We want to ban weird things like $x\in x$, or $x\in y\wedge y\in x$, or similarly for longer chains. We also don't want infinite descending chains like $\cdots x_3 \in x_2 \in x_1 \in x_0$.
 
 How can we capture the ``wrongness'' of these weird things all together? In the first case $x\in x$, we see that $\{x\}$ has no $\in$-minimal element (we say $y$ is $\in$-minimal in $x$ if $(\forall z\in x)(y\not\in z)$). In the second case, $\{x, y\}$ has no minimal element. In the last case, $\{x_0, x_1, x_2, \cdots\}$ has no $\in$-minimal element.
@@ -2308,7 +2390,7 @@ Similarly, we can have
   $x\mapsto \{x\}$ is a function-class: take $p$ to be $y = \{x\}$.
 \end{eg}
 
-\subsubsection*{Back to replacement}\index{axiom of replacement}
+\subsubsection*{Back to replacement}\index{axiom!of replacement}
 How do we talk about function-classes? We cannot refer to classes inside $V$. Instead, we must refer to the first-order formula $p$.
 
 \begin{axiom}[Axiom of replacement]
@@ -2327,7 +2409,7 @@ How do we talk about function-classes? We cannot refer to classes inside $V$. In
 
 So that's all the axioms of ZF. Note that we did not include the Axiom of choice!
 
-\subsubsection*{Axiom of choice}\index{axiom of choice}
+\subsubsection*{Axiom of choice}\index{axiom!of choice}
 \begin{defi}[ZFC]\index{ZFC}
   ZFC is the axioms ZF + AC, where AC is the axiom of choice, ``every family of non-empty sets has a choice function''.
   \begin{align*}

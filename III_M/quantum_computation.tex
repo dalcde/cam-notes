@@ -1187,7 +1187,205 @@ for any orthonormal basis $\{\bket{b}\}$ of $G$. This $P$ satisfies
     0 & \bket{\psi} \in G^\perp
   \end{cases}.
 \]
+We now define the \term{Grover operator}
+\[
+  \mathcal{Q} = - I_\psi I_G.
+\]
+\begin{thm}[Amplitude amplification thoerem]\index{amplitude amplification theorem}
+  In the $2$-dimensional subspace spanned by $\bket{\psi_g}$ and $\bket{\psi}$ (or equivalently by $\bket{\psi_g}$ and $\bket{\psi_b}$), where
+  \[
+    \bket{\psi} = \sin \theta \bket{\psi_g} + \cos \theta \bket{\psi_b},
+  \]
+  we have that $\mathcal{Q}$ is rotation by $2 \theta$.
+\end{thm}
 
+\begin{proof}
+  We have
+  \[
+    I_G \bket{\psi_g} = - \bket{\psi_g},\quad I_G \bket{\psi_b} = \bket{\psi_b}.
+  \]
+  So
+  \[
+    \mathcal{Q} \bket{\psi_g} = I_\psi \bket{\psi_g}, \quad \mathcal{Q} \bket{\psi_b} = - I_\psi \bket{\psi_b}.
+  \]
+  We know that
+  \[
+    I_\psi = I - 2\bket{\psi}\brak{\psi}.
+  \]
+  So we have
+  \begin{align*}
+    \mathcal{Q} \bket{\psi_g} &= I_\psi \bket{\psi_g}\\
+    &= \bket{\psi_g} - 2(\sin \theta \bket{\psi_g} + \cos \theta \bket{\psi_b})(\sin \theta)\\
+    &= (1 - 2 \sin^2 \theta) \bket{\psi_g} - 2 \sin \theta \cos \theta \bket{\psi_b}\\
+    &= \cos 2\theta \bket{\psi_g} - \sin 2\theta \bket{\psi_b}\\
+    \mathcal{Q} \bket{\psi_b} &= - I_\psi \bket{\psi_b}\\
+    &= -\bket{\psi_b} + 2(\sin \theta \bket{\psi_g} + \cos \theta \bket{\psi_b})(\cos \theta)\\
+    &= 2 \sin \theta \cos \theta \bket{\psi_g} + (2\cos^2 \theta - 1) \bket{\psi_b}\\
+    &= \sin 2 \theta \bket{\psi_g} + \cos 2 \theta \bket{\psi_b}.
+  \end{align*}
+  So this is rotation by $2 \theta$.
+
+  If we iterate this $n$ times, then we have rotated by $2n \theta$, but we started at $\theta$ from the $\bket{\psi_b}$ direction. So we have
+  \[
+    \mathcal{Q}^n \bket{\psi} = \sin (2n + 1) \theta \bket{\psi_g} + \cos (2n + 1) \theta \bket{\psi_b}.
+  \]
+  If we measure $\mathcal{Q}^n\bket{\psi}$ for good versus bad, we know
+  \[
+    \P(\text{good}) = \sin^2 (2n + 1)\theta,
+  \]
+  and this is a maximum, when $(2n + 1) \theta = \frac{\pi}{2}$, ie.
+  \[
+    n = \frac{\pi}{4 \theta} - \frac{1}{2}.
+  \]
+  For $\theta = \frac{\pi}{b}$ for some integer $b$, then $n$ will be an exact integer. However, for general $\theta$, we know that $n$ is not a n integer. So we use $n$ the nearest integer to $\frac{\pi}{4 \theta} - \frac{1}{2}$, which is approximately
+  \[
+    \frac{\pi}{4 \theta} = O(\theta^{-1}) = O(1/\sin \theta) = O\left(\frac{1}{\|\text{good projection of }\bket{\psi}\|}\right).
+  \]
+\end{proof}
+
+\begin{eg}
+  Suppose we want to do a Grover search for $r$ good items in $N$ objects. We start with
+  \[
+    \bket{\psi} = \frac{1}{\sqrt{N}} \sum_{\text{all }x} \bket{x} = \sqrt{\frac{r}{N}}\left(\frac{1}{\sqrt{r}} \sum_{\text{good }x} \bket{x}\right) + \sqrt{\frac{N - r}{N}}\left(\frac{1}{\sqrt{N - r}} \sum_{\text{bad }x} \bket{x}\right).
+  \]
+  Then $G$ is the subspace spanned by the good $x$'s, and
+  \[
+    \sin \theta =\sqrt{\frac{r}{N}},
+  \]
+  So $\mathcal{Q}$ is a rotation by $2\theta$, where
+  \[
+    \theta = \sin^{-1}\sqrt{\frac{r}{N}} \approx \sqrt{\frac{r}{N}}
+  \]
+  for $r \ll N$. So we will use $O(\sqrt{r/N})$ operations.
+\end{eg}
+
+\begin{eg}
+  Let $A$ be any quantum circuit on start state $\bket{0\cdots0}$. Then the final state is $A \bket{0\cdots0}$. The good states are the desired computational outcomes. For example, if $A$ is Shor's algorithm, then the desired outcomes might be the good $c$-values. We can write
+  \[
+    A\bket{0\cdots0} = a \bket{\psi_g} + b \bket{\psi_b}.
+  \]
+  The probability of a success in $1$ run is $|a|^2$. So we normally need $O(1/|a|^2)$ repetitions of $A$ to succeed with a given constant probability $1 - \varepsilon$.
+
+  Instead of just measuring the result and hoping for the best, we can use amplitude amplification. We assume we can check if $x$ is good or bad, so we can implement $I_G$. We consider
+  \[
+    \bket{\psi} = A \bket{0\cdots0}.
+  \]
+  Then we define
+  \[
+    \mathcal{Q} = - I_{A\bket{0\cdots0}} I_G = - A I_{\bket{0\cdots0}} A^\dagger I_G.
+  \]
+  Here we can construct $A^\dagger$ just by reversing the gates in $A$. So all parts are implementable.
+
+  By amplitude amplification, $\mathcal{Q}$ is rotation by $2 \theta$, where $\sin \theta = |a|$. So after
+  \[
+    n \approx \frac{\pi}{4 \theta} = O(|a|^{-1})
+  \]
+  repetitions, $A \bket{0\cdots 0}$ will be rotated to very near to $\bket{\psi_g}$, and this will succeed with high probability. This gives us a square root speedup over the naive method.
+\end{eg}
+
+\section{Measurement-based quantum computing}
+Measurement-based quantum computing is a weird way of doing quantum computation, where instead of using unitary gates, we just keep doing measurements.
+
+\begin{notation}\index{$\bket{\pm_\alpha}$}\index{$\mathcal{B}(\alpha)$}
+  We write
+  \[
+    \bket{\pm_\alpha} = \frac{1}{\sqrt{2}} (\bket{0} \pm e^{-i\alpha} \bket{1}).
+  \]
+  In particular, we have
+  \[
+    \bket{\pm_0} = \bket{\pm} = \frac{1}{\sqrt{2}}(\bket{0} \pm \bket{1})
+  \]
+  Then
+  \[
+    \mathcal{B}(\alpha) = \{\bket{+_\alpha}, \bket{-_\alpha}\}
+  \]
+  is an orthonormal basis. We have $1$-qubit gates
+  \[
+    J(\alpha) = \frac{1}{\sqrt{2}}
+    \begin{pmatrix}
+      1 & e^{i\alpha}\\
+      1 & -e^{i\alpha}
+    \end{pmatrix} = H P(\alpha),
+  \]
+  where
+  \[
+    \qH = \frac{1}{\sqrt{2}}
+    \begin{pmatrix}
+      1 & 1\\
+      1 & -1
+    \end{pmatrix},\quad \qP(\alpha) =
+    \begin{pmatrix}
+      1 & 0\\
+      0 & e^{i\alpha}
+    \end{pmatrix}.
+  \]
+  We also have the ``Pauli gates''
+  \[
+    \qX=
+    \begin{pmatrix}
+      0 & 1\\
+      1 & 0
+    \end{pmatrix},\quad
+    \qZ =
+    \begin{pmatrix}
+      1 & 0\\
+      0 & -1
+    \end{pmatrix} = P(\pi)
+  \]
+  We also have the 2-qubit gates
+  \[
+    \qE = \qCZ = \diag(1, 1, 1, -1).
+  \]
+  We also have $1$-qubit measurements
+  \[
+    M_i(\alpha) = \text{measurement of qubit $i$ in basis $\mathcal{B}(\alpha)$}.
+  \]
+  The outcome $\bket{+_\alpha}$ is denoted $0$ and the outcome corresponding to $\bket{-_\alpha}$ is denoted $1$.
+
+  We also have $M_i(Z)$, which is measurement of qubit $i$ in the standard basis $\{\bket{0}, \bket{1}\}$.
+
+  Suppose we have an undirected graph $G = (V, E)$ with vertices $V$ and edges $E$ with no self-loops and at most one edge between two vertices, we can define the \term{graph state} $\bket{\psi_G}$ that is a state of $|V|$ qubits as follows: for each vertex $i \in V$, introduce a qubit $\bket{+}_i$. For each edge $e: i \to j$, we apply $E_{ij}$ (ie. $E$ operating on the qubits $i$ and $j$). Since all these $E_{ij}$ commute, the order does not matter.
+
+\begin{eg}
+  If $G_1$ is
+  \begin{center}
+    \begin{tikzpicture}
+      \node [circ] {};
+      \node [above] {$0$};
+      \draw (0, 0) -- (1, 0) node [circ] {} node [above] {$1$};
+    \end{tikzpicture}
+  \end{center}
+  then we have
+  \[
+    \bket{\psi_{G_1}} = E_{12} \bket{+}_1 \bket{+}_2 = \frac{1}{2} [ \bket{00} + \bket{01} + \bket{10} - \bket{11}],
+  \]
+  and this is an entangled stated.
+
+  If $G_2$ is
+  \begin{center}
+    \begin{tikzpicture}
+      \node [circ] {};
+      \node [above] {$0$};
+      \draw (0, 0) -- (1, 0) node [circ] {} node [above] {$1$} -- (2, 0) node [circ] {} node [above] {$2$};
+    \end{tikzpicture}
+  \end{center}
+  then we have
+  \[
+    \bket{\psi_{G_2}} = E_{12}E_{23} \bket{+}_1 \bket{+}_2 \bket{+}_3.
+  \]
+\end{eg}
+
+A \emph{cluster state} is a graph state $\bket{\psi_G}$ for $G$ being a rectangular $2D$ grid.
+\begin{center}
+  \begin{tikzpicture}
+    \draw [step=1cm] (0, 0) grid (4, 3);
+    \foreach \x in {0,1,2,3,4} {
+      \foreach \y in {0,1,2,3} { \node [circ] at (\x, \y) {};
+      }
+    }
+  \end{tikzpicture}
+\end{center}
+\end{notation}
 
 \printindex
 \end{document}
