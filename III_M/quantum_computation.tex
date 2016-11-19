@@ -16,36 +16,44 @@
     \baselineskip4\p@\lineskiplimit\z@
     \kern-\p@
     \hbox{.}\hbox{.}\hbox{.}
-  }}
-  \newcommand\addstate[3]{
-    \pgfmathsetmacro{\y@y}{-#2 * 0.7};
-    \pgfmathsetmacro{\x@x}{#3};
-    \node [left] at (0, \y@y) {#1};
-    \draw (0, \y@y) -- (\x@x, \y@y);
   }
-  \newcommand\addstateend[4]{
-    \pgfmathsetmacro{\y@y}{-#2 * 0.7};
-    \pgfmathsetmacro{\x@x}{#3};
-    \node [left] at (0, \y@y) {#1};
-    \node [right] at (\x@x, \y@y) {#4};
-    \draw (0, \y@y) -- (\x@x, \y@y);
-  }
+}
+\newcommand\addstate[3]{
+  \pgfmathsetmacro{\y@y}{-#2 * 0.7};
+  \pgfmathsetmacro{\x@x}{#3};
+  \node [left] at (0, \y@y) {#1};
+  \draw (0, \y@y) -- (\x@x, \y@y);
+}
+\newcommand\addstateend[4]{
+  \pgfmathsetmacro{\y@y}{-#2 * 0.7};
+  \pgfmathsetmacro{\x@x}{#3};
+  \node [left] at (0, \y@y) {#1};
+  \node [right] at (\x@x, \y@y) {#4};
+  \draw (0, \y@y) -- (\x@x, \y@y);
+}
 
-  \newcommand\addoperator[3]{
-    \node [draw, rectangle, fill=white] at (#3, -#2 * 0.7) {#1};
-  }
-  \newcommand\addbigoperator[5]{
-    \pgfmathsetmacro{\y@s}{-#2 * 0.7 + 0.2};
-    \pgfmathsetmacro{\y@t}{-#3 * 0.7 - 0.2};
-    \pgfmathsetmacro{\x@s}{#4};
-    \pgfmathsetmacro{\x@t}{#5};
-    \pgfmathsetmacro{\x@c}{(\x@s + \x@t)/2};
-    \pgfmathsetmacro{\y@c}{(\y@s + \y@t)/2};
+\newcommand\addoperator[3]{
+  \node [draw, rectangle, fill=white] at (#3, -#2 * 0.7) {#1};
+}
+\newcommand\addbigoperator[5]{
+  \pgfmathsetmacro{\y@s}{-#2 * 0.7 + 0.2};
+  \pgfmathsetmacro{\y@t}{-#3 * 0.7 - 0.2};
+  \pgfmathsetmacro{\x@s}{#4};
+  \pgfmathsetmacro{\x@t}{#5};
+  \pgfmathsetmacro{\x@c}{(\x@s + \x@t)/2};
+  \pgfmathsetmacro{\y@c}{(\y@s + \y@t)/2};
 
-    \draw [fill=white] (\x@s, \y@s) rectangle (\x@t, \y@t);
-    \node at (\x@c, \y@c) {#1};
-  }
-  \makeatother
+  \draw [fill=white] (\x@s, \y@s) rectangle (\x@t, \y@t);
+  \node at (\x@c, \y@c) {#1};
+}
+\newcommand\drawvert[3]{
+  \pgfmathsetmacro{\y@y}{-#1 * 0.7};
+  \pgfmathsetmacro{\y@yy}{-#2 * 0.7};
+  \pgfmathsetmacro{\x@x}{#3};
+  \draw (\x@x, \y@y) node [circ] {} -- (\x@x, \y@yy) node [circ] {};
+}
+
+\makeatother
 
 \begin{document}
 \maketitle
@@ -1301,7 +1309,7 @@ Measurement-based quantum computing is a weird way of doing quantum computation,
   \]
   is an orthonormal basis. We have $1$-qubit gates
   \[
-    J(\alpha) = \frac{1}{\sqrt{2}}
+    \qJ(\alpha) = \frac{1}{\sqrt{2}}
     \begin{pmatrix}
       1 & e^{i\alpha}\\
       1 & -e^{i\alpha}
@@ -1330,7 +1338,7 @@ Measurement-based quantum computing is a weird way of doing quantum computation,
     \begin{pmatrix}
       1 & 0\\
       0 & -1
-    \end{pmatrix} = P(\pi)
+    \end{pmatrix} = \qP(\pi)
   \]
   We also have the 2-qubit gates
   \[
@@ -1338,54 +1346,247 @@ Measurement-based quantum computing is a weird way of doing quantum computation,
   \]
   We also have $1$-qubit measurements
   \[
-    M_i(\alpha) = \text{measurement of qubit $i$ in basis $\mathcal{B}(\alpha)$}.
+    \qM_i(\alpha) = \text{measurement of qubit $i$ in basis $\mathcal{B}(\alpha)$}.
   \]
   The outcome $\bket{+_\alpha}$ is denoted $0$ and the outcome corresponding to $\bket{-_\alpha}$ is denoted $1$.
 
-  We also have $M_i(Z)$, which is measurement of qubit $i$ in the standard basis $\{\bket{0}, \bket{1}\}$.
+  We also have $\qM_i(Z)$, which is measurement of qubit $i$ in the standard basis $\{\bket{0}, \bket{1}\}$.
 
   Suppose we have an undirected graph $G = (V, E)$ with vertices $V$ and edges $E$ with no self-loops and at most one edge between two vertices, we can define the \term{graph state} $\bket{\psi_G}$ that is a state of $|V|$ qubits as follows: for each vertex $i \in V$, introduce a qubit $\bket{+}_i$. For each edge $e: i \to j$, we apply $E_{ij}$ (ie. $E$ operating on the qubits $i$ and $j$). Since all these $E_{ij}$ commute, the order does not matter.
 
-\begin{eg}
-  If $G_1$ is
-  \begin{center}
-    \begin{tikzpicture}
-      \node [circ] {};
-      \node [above] {$0$};
-      \draw (0, 0) -- (1, 0) node [circ] {} node [above] {$1$};
-    \end{tikzpicture}
-  \end{center}
-  then we have
-  \[
-    \bket{\psi_{G_1}} = E_{12} \bket{+}_1 \bket{+}_2 = \frac{1}{2} [ \bket{00} + \bket{01} + \bket{10} - \bket{11}],
-  \]
-  and this is an entangled stated.
+  \begin{eg}
+    If $G_1$ is
+    \begin{center}
+      \begin{tikzpicture}
+        \node [circ] {};
+        \node [above] {$0$};
+        \draw (0, 0) -- (1, 0) node [circ] {} node [above] {$1$};
+      \end{tikzpicture}
+    \end{center}
+    then we have
+    \[
+      \bket{\psi_{G_1}} = E_{12} \bket{+}_1 \bket{+}_2 = \frac{1}{2} [ \bket{00} + \bket{01} + \bket{10} - \bket{11}],
+    \]
+    and this is an entangled stated.
 
-  If $G_2$ is
+    If $G_2$ is
+    \begin{center}
+      \begin{tikzpicture}
+        \node [circ] {};
+        \node [above] {$0$};
+        \draw (0, 0) -- (1, 0) node [circ] {} node [above] {$1$} -- (2, 0) node [circ] {} node [above] {$2$};
+      \end{tikzpicture}
+    \end{center}
+    then we have
+    \[
+      \bket{\psi_{G_2}} = E_{12}E_{23} \bket{+}_1 \bket{+}_2 \bket{+}_3.
+    \]
+  \end{eg}
+
+  A \emph{cluster state} is a graph state $\bket{\psi_G}$ for $G$ being a rectangular $2D$ grid.
   \begin{center}
     \begin{tikzpicture}
-      \node [circ] {};
-      \node [above] {$0$};
-      \draw (0, 0) -- (1, 0) node [circ] {} node [above] {$1$} -- (2, 0) node [circ] {} node [above] {$2$};
+      \draw [step=1cm] (0, 0) grid (4, 3);
+      \foreach \x in {0,1,2,3,4} {
+        \foreach \y in {0,1,2,3} { \node [circ] at (\x, \y) {}; };
+      };
     \end{tikzpicture}
   \end{center}
-  then we have
+\end{notation}
+
+\subsection{Main result}
+\begin{thm}
+  Let $C$ be any quantum circuit on $n$ qubits with a sequence of gates $U_1, \cdots, U_K$ (in order). We have an input state $\bra{\psi_{\mathrm{in}}}$, and we perform $\Z$-measurements on the output states on specified qubits $j = i_1, \cdots, i_k$ to obtain a $k$-bit string.
+
+  We can always simulate the process as follows:
+  \begin{enumerate}
+    \item Starting resource is a graph state $\bket{\psi_G}$, where $G$ is chosen depending on the connectivity structure of $C$. 
+    \item The computational steps are $1$-qubit measurements of the form $\qM_i(\alpha)$, ie. measurement in the basis $\mathcal{B}(\alpha)$. This is adaptive --- $\alpha$ may depend on the (random) outcomes $s_1, s_2, \cdots$ of previous measurements.
+    \item The computational process is a prescribed (adaptive) sequence $\qM_{i_1}(\alpha_1)$, $\qM_{i_2}(\alpha_2)$, $\cdots$, $\qM_{i_N}(\alpha_N)$, where the qubit labels $i_1, i_2, \cdots, i_N$ all distinct.
+    \item To obtain the output of the process, we perform further measurements $\qM(\qZ)$ on $k$ specified qubits not previously measured, and we get results $s_{i_1}, \cdots, s_{i_k}$, and finally the output is obtained by further (simple) \emph{classical} computations on $s_{i_1}, \cdots, s_{i_k}$ as well as the previous $\qM_i(\alpha)$ outcomes.
+  \end{enumerate}
+\end{thm}
+The idea of the last part is that the final measurement $s_{i_1}, \cdots, s_{i_k}$ has to be re-interpret them in light of the $M_i(\alpha_i)$.
+
+This is a funny process, because each measurement $M_i(\alpha)$ is uniformly random, with probability $\frac{1}{2}$ for each outcome, but somehow this is compensated for by the adaptive measurement.
+
+How and why does this work?
+\begin{fact}
+  The $1$-qubit gates $\qJ(\alpha)$ with  $\qE_{i, i\pm 1}$ is a universal set of gate.
+
+  In particular, any $1$-qubit $U$ is a product of $3$ $\qJ$'s. 
+\end{fact}
+
+We call these $E_{i, i \pm 1}$ \term{nearest neighbour $E_{ij}$'s}.
+\begin{proof}
+  This is just some boring algebra.
+\end{proof}
+
+Note that the restriction that we only have $\qE_{i, i\pm 1}$ is not a really significant restriction, because we can easily implement swaps with them.
+
+So we can assume that our circuit $C$'s gates are all of the form $\qJ(\alpha)$'s or $\qE_{ij}'s$. So it suffices to try to implement these gates in our weird system.
+
+To prove this, we need to prove a lemma, which we will call the $\qJ$-lemma:
+\begin{lemma}[$\qJ$-lemma]\index{$\qJ$-lemma}
+  For any $1$-qubit state, we have
   \[
-    \bket{\psi_{G_2}} = E_{12}E_{23} \bket{+}_1 \bket{+}_2 \bket{+}_3.
+    \bket{\psi} = a\bket{0} + b \bket{1}.
+  \]
+  We consider
+  \[
+    \qE_{12} (\bket{\psi}_1 \bket{+}_2).
+  \]
+  Then suppose we measure $\qM_1(\alpha)$. Suppose the outcome is $s_1 \in \{0, 1\}$. Then after measurement, the state of $2$ is
+  \[
+    \qX^{s_1} \qJ(\alpha) \bket{\psi}.
+  \]
+  Also, two outcomes $s = 0, 1$ always occurs with probability $\frac{1}{2}$, regardless of the values of $a, b, \alpha$.
+\end{lemma}
+
+\begin{proof}
+  Just write it out.
+\end{proof}
+
+We denote this pictorially as
+\begin{center}
+  \begin{tikzpicture}
+    \node [circ] {};
+    \node [above] {$\alpha$};
+    \node [circ] at (2, 0) {};
+    \draw (0, 0) -- (2, 0);
+    \draw [->] (0.05, -0.05) -- +(0.5, -0.5) node [right] {$s_1$};
+
+    \draw [gray, ->] (-0.5, -0.5) node [below] {$\bket{\psi}$} -- (-0.02, -0.02);
+    \draw [gray, ->] (2.5, -0.5) node [below] {$\bket{+}$} -- (2.02, -0.02);
+  \end{tikzpicture}
+\end{center}
+If we measure $\qZ$, we denote that by
+\begin{center}
+  \begin{tikzpicture}
+    \node [circ] {};
+    \node [above] {$\qZ$};
+    \draw [->] (0.05, -0.05) -- (0.5, -0.5) node [below] {$i$};
+  \end{tikzpicture}
+\end{center}
+
+In fact, we have
+\begin{lemma}
+  This can be extended if $1$ is just a single qubit part of a larger multi-qubit system $1\mathcal{S}$, ie.
+  \[
+    \bket{\psi}_{1\mathcal{S}} \bket{\alpha}_\mathcal{S}\bket{0}_1 + \bket{b}_\mathcal{S} \bket{1}.
+  \]
+  We then apply the $J$-lemma process  by adding a new qubit $\bket{+}$ for $2 \not \in \mathcal{S}$, and then query $1$. Then the resulting state is
+  \[
+    \qX_2^{s_1}\qJ_2(\alpha) \bket{\psi}_{2\mathcal{S}}.
+  \]
+\end{lemma}
+So the $\qJ$-lemma allows us to simulate $\qJ$-gates with measurements. But we want to do many $\qJ$ gates. So we need the concatenation lemma:
+\begin{lemma}[Concatenation lemma]
+  If we concatenate the process of $\qJ$-lemma on a row of qubits $1, 2, 3, \cdots$ to apply a sequence of $\qJ(\alpha)$ gates, then all the entangling operators $\qE_{12}, \qE_{23}, \cdots$ can be done \emph{first} before any measurements are applied.
+\end{lemma}
+
+It is a fact that for any composite quantum system $A \otimes B$, any local actions (unitary gates or measurements) done on $A$ always commutes with anything done on $B$, which is easy to check by expanding out the definition.
+
+\begin{proof}
+  For $\bket{\psi}_1 \bket{+}_2 \bket{+}_3\cdots$, we can look at the sequence of $\qJ$-processes in the sequence of operations (left to right):
+  \[
+    \qE_{12} \qM_1(\alpha_1) \qE_{23}\qM_2(\alpha_2) \qE_{34} \qM_3(\alpha_3)\cdots
+  \]
+  It is then clear that each $\qE_{ij}$ commutes with all the measurements before it. So we are safe.
+\end{proof}
+
+We can now determine the MQC process corresponding to a quantum circuit $C$ of gates  $U_1, U_2, \cdots, U_K$ with each $U_i$ either a $\qJ(\alpha)$ or a nearest-neighbour $\qE_{ij}$. We may wlog assume the input state to $C$ is
+\[
+  \bket{+}\cdots\bket{+}
+\]
+as any $1$-qubit product state may be written as
+\[
+  \bket{\psi} = U \bket{+}
+\]
+for suitable $U$, which is then represented as at most three $\qJ(\alpha)$'s. So we simply prefix $C$ with these $J(\alpha)$ gates.
+
+\begin{eg}
+  We can write $\bket{j}$ for $j  = 0, 1$ as
+  \[
+    \bket{j} = \qX^j\qH \bket{+}.
+  \]
+  We also have
+  \[
+    \qH = J(0),\quad \qX = \qJ(\pi)\qJ(0).
   \]
 \end{eg}
 
-A \emph{cluster state} is a graph state $\bket{\psi_G}$ for $G$ being a rectangular $2D$ grid.
-\begin{center}
-  \begin{tikzpicture}
-    \draw [step=1cm] (0, 0) grid (4, 3);
-    \foreach \x in {0,1,2,3,4} {
-      \foreach \y in {0,1,2,3} { \node [circ] at (\x, \y) {};
-      }
-    }
-  \end{tikzpicture}
-\end{center}
-\end{notation}
+We will write the input qubits as vertical ``blobs'' \begin{tikzpicture}\node [circ] {};\end{tikzpicture}, and all $\qJ(\alpha)$ gates will be implemented by $J$-processes. All nearest-neighbour $\qE_{ij}$'s will just exploit the $\qE$ gates used to make the graph state.
 
+We first do a simple example:
+\begin{eg}
+  Consider $C$ given by
+  \begin{center}
+    \begin{tikzpicture}
+      \addstate{$\bket{+}$}{0}{5};
+      \addstate{$\bket{+}$}{1}{5};
+      \addoperator{$\qJ(\alpha_1)$}{0}{1};
+      \addoperator{$\qJ{\alpha_2}$}{1}{1};
+      \addoperator{$\qJ{\alpha_3}$}{0}{3};
+
+      \drawvert{0}{1}{2};
+      % draw vertical line (2, 0) -- (2, 1) with dots
+    \end{tikzpicture}
+  \end{center}
+  and then we measure the outputs $i_1, i_2$ by $\qM(Z)$ measurements.
+
+  We use the graph state
+  \begin{center}
+    \begin{tikzpicture}
+      \node [circ] at (0, 0) {};
+      \node [circ] at (1, 0) {};
+      \node [circ] at (2, 0) {};
+      \node [circ] at (0, -1) {};
+      \node [circ] at (1, -1) {};
+
+      \draw (0, 0) -- (2, 0);
+      \draw (0, -1) -- (1, -1) -- (1, 0);
+    \end{tikzpicture}
+  \end{center}
+  In other words, we put a node for a $\bket{+}$, horizontal line for a $\qJ(\alpha)$ and a vertical line for an $\qE$.
+
+  If we just measure all the qubits for the $J$-process:
+  \begin{center}
+    \begin{tikzpicture}
+      \node [circ] at (0, 0) {};
+      \node [circ] at (1, 0) {};
+      \node [circ] at (2, 0) {};
+      \node [circ] at (0, -1) {};
+      \node [circ] at (1, -1) {};
+
+      \draw (0, 0) -- (2, 0);
+      \draw (0, -1) -- (1, -1) -- (1, 0);
+
+      \draw [->] (0.05, -0.05) -- +(0.5, -0.5) node [right] {$s_1$};
+      \draw [->] (1.05, -0.05) -- +(0.5, -0.5) node [right] {$s_3$};
+      \draw [->] (2.05, -0.05) -- +(0.5, -0.5) node [right] {$i_1$};
+      \draw [->] (0.05, -1.05) -- +(0.5, -0.5) node [right] {$s_2$};
+      \draw [->] (1.05, -1.05) -- +(0.5, -0.5) node [right] {$i_2$};
+    \end{tikzpicture}
+  \end{center}
+  then we would have effect the circuit
+  \begin{center}
+    \begin{tikzpicture}
+      \addstate{$\bket{+}$}{0}{5};
+      \addstate{$\bket{+}$}{1}{5};
+      \addoperator{$\qJ(\alpha_1)$}{0}{1};
+      \addoperator{$\qJ(\alpha_2)$}{1}{1};
+
+      \addoperator{$\qX^{s_1}$}{0}{2};
+      \addoperator{$\qX^{s_2}$}{1}{2};
+
+      \addoperator{$\qJ(\alpha_3)$}{0}{4};
+      \addoperator{$\qX^{s_3}$}{0}{5};
+
+      \drawvert{0}{1}{3};
+    \end{tikzpicture}
+  \end{center}
+  Now the problem is to get rid of the $X^i$'s.
+\end{eg}
 \printindex
 \end{document}

@@ -1926,7 +1926,7 @@ Finally, we can specify a measure by \emph{specifying a density}.
     \item $\nu(\phi) = \mu(f\mathbf{1}_\emptyset) = \mu(0) = 0$.
     \item If $(A_n)$ is a disjoint sequence in $\mathcal{E}$, then
       \[
-        \nu\left(\bigcup A_n\right) = \nu(f\mathbf{1}_{\bigcup A_n}) = \nu\left(f \sum\mathbf{1}_{A_n}\right) = \sum \nu\left(f \mathbf{1}_{A_n}\right) = \sum \nu(f).
+        \nu\left(\bigcup A_n\right) = \mu(f\mathbf{1}_{\bigcup A_n}) = \mu\left(f \sum\mathbf{1}_{A_n}\right) = \sum \mu\left(f \mathbf{1}_{A_n}\right) = \sum \nu(f).
       \]
   \end{enumerate}
 \end{proof}
@@ -2857,6 +2857,399 @@ Before we do that, we prove a lemma that rephrases what it means for something t
     &= \varepsilon.
   \end{align*}
    So done.
+\end{proof}
+
+To prove our ultimate theorem, we first need the following result:
+\begin{thm}[Bounded convegence theorem]
+  Suppose $X, (X_n)$ are random variables. Assume that there exists a (non-random) constant $C > 0$ such that $|X_n| \leq C$. If $X_n \to X$ in probability, then $X_n \to X$ in $L^1$.
+\end{thm}
+This is somewhat a ``baby version'' of dominated convergence, but we have a much stronger condition of $|X_n|$ bounded by a constant, rather than an integrable function.
+
+\begin{proof}
+  Fix $\varepsilon > 0$. Then
+  \begin{align*}
+    \P[|X| > C+ \varepsilon] &\leq \P[|X - X_n| + |X_n| > C + \varepsilon]\\
+    &\leq \P[|X - X_n|> \varepsilon] + \P[|X_n| > C]
+  \end{align*}
+  We know the second term vanishes, while the first term $\to 0$ as $n \to \infty$. So $|X| \leq C$ a.s.
+
+  Now take $N$ such that
+  \[
+    \P\left[|X_n - X| > \frac{\varepsilon}{2}\right] \leq \frac{\varepsilon}{4C}
+  \]
+  for $n \geq N$. Then for $n \geq N$, we have
+  \begin{align*}
+    \E[|X_n - X|] &= \E\left[|X_n - X|(\mathbf{1}_{\{|X_n - X| \leq \frac{\varepsilon}{2}\}} + \mathbf{1}_{\{|X_n - X| > \frac{\varepsilon}{2}\})}\right]\\
+    &\leq \frac{\varepsilon}{2} + 2C \P\left[|X_n - X| > \frac{\varepsilon}{2}\right]\\
+    &\leq \frac{\varepsilon}{2} + 2C \frac{\varepsilon}{4C}\\
+    &= \varepsilon
+  \end{align*}
+\end{proof}
+
+We now come to the main theorem on uniform integrability.
+\begin{thm}
+  Let $X, (X_n)$ be random variables. Then the following are equivalent:
+  \begin{enumerate}
+    \item $X_n, X \in L^1$ for all $n$ and $X_n \to X$ in $L^1$.
+    \item $\{X_n\}$ is uniformly integrable and $X_n \to X$ in probability.
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}
+  We first assume that $X_n, X$ are $L^1$ and $X_n \to X$ in $L^1$. We want to show that $\{X_n\}$ is uniformly integrable and $X_n \to X$ in probability.
+
+  We first show that $X_n \to X$ in probability. This is just going to come from the Chebyshev inequality. For $\varepsilon > 0$. Then we have
+  \[
+    \P[|X - X_n| > \varepsilon] \leq \frac{\E[|X - X_n|]}{\varepsilon} \to 0
+  \]
+  as $n \to \infty$.
+
+  Next we show that $\{X_n\}$ is uniformly integrable. Fix $\varepsilon > 0$. Take $N$ such that $n \geq N$ implies $\E[|X - X_n|] \leq \frac{\varepsilon}{2}$. Since \emph{finite} families of $L^1$ random variables are uniformly integrable, we can pick $\delta > 0$ such that $A \in \mathcal{F}$ and $\P[A] < \delta$ implies
+  \[
+    \E[X \mathbf{1}_A], \E[|X_n|\mathbf{1}_A] \leq \frac{\varepsilon}{2}
+  \]
+  for $n = 1, \cdots, N$.
+
+  Now when $n > N$ and $A \in \mathcal{F}$ with $\P[A] \leq \delta$, then we have
+  \begin{align*}
+    \E[|X_n| \mathbf{1}_A] &\leq \E[|X - X_n| \mathbf{1}_A] + \E[|X|\mathbf{1}_A]\\
+    &\leq \E[|X - X_n|] + \frac{\varepsilon}{2}\\
+    &\leq \frac{\varepsilon}{2} + \frac{\varepsilon}{2}\\
+    &= \varepsilon.
+  \end{align*}
+  So $\{X_n\}$ is uniformly integrable.
+
+  \separator
+
+  Assume that $\{X_n\}$ is uniformly integrable and $X_n \to X$ in probability.
+
+  The first step is to show that $X \in L^1$. We want to use Fatou's lemma, but to do so, we want almost sure convergence, not just convergence in probability.
+
+  Recall that we have previously shown that there is a subsequence $(X_{n_k})$ of $(X_n)$ such that $X_{n_k} \to X$ a.s. Then we have
+  \[
+    \E[|X|] = \E\left[\liminf_{k \to \infty} |X_{n_k}|\right] \leq \liminf_{k \to \infty} \E[|X_{n_k}|] < \infty
+  \]
+  since uniformly integrable families are $L^1$ bounded. So $\E[|X|] < \infty$, hence $X \in L^1$.
+
+  Next we want to show that $X_n \to X$ in $L^1$. Take $\varepsilon > 0$. Then there exists $K \in (0, \infty)$ such that
+  \[
+    \E\left[|X| \mathbf{1}_{\{|X| > k\}}\right], \E\left[|X_n| \mathbf{1}_{\{|X_n| > k\}}\right] \leq \frac{\varepsilon}{3}.
+  \]
+  To set things up so that we can use the bounded convergence theorem, we have to invent new random variables
+  \[
+    X_n^K = (X_n \vee -K) \wedge K,\quad X^K = (X \vee (-K))\wedge K.
+  \]
+  Since $X_n \to X$ in probability, it follows that $X_n^K \to X^k$ in probability.
+  
+  Now bounded convergence tells us that there is some $N$ such that $n \geq N$ implies
+  \[
+    \E[|X_n^K - X^K|] \leq \frac{\varepsilon}{3}.
+  \]
+  Combining, we have for $n \geq N$ that
+  \[
+    \E[|X_n - X|] \leq \E[|X_n^K - X^K|] + \E[|X|\mathbf{1}_{\{|X| \geq K\}}] + \E[|X_n|\mathbf{1}_{\{|X_n| \geq K\}}] \leq \varepsilon.
+  \]
+  So we know that $X_n \to X$ in $L^1$.
+\end{proof}
+
+The main application is that when $\{X_n\}$ is a type of stochastic process known as a \term{martingale}. This can be seen in III Advanced Probability and III Stochastic Calculus.
+
+\section{Fourier transform}
+From now on, we will write $L^p$ for \emph{complex valued} Borel functions on $\R^d$ with
+\[
+  \|f\|_p = \left(\int_{\R^d} |f|^p\right)^{1/p} < \infty.
+\]
+\begin{defi}[Fourier transform]\index{Fourier transform}
+  The \emph{Fourier transform} $\hat{f}$ of $f \in L^1(\R^d)$ is given by
+  \[
+    \hat{f}(u) = \int_{\R^d}f(x) e^{i (u, x)}\;\d x,
+  \]
+  where $u \in \R^d$ and $(u, x)$ denotes the inner product, ie.
+  \[
+    (u, x) = u_1 x_1 + \cdots + u_d x_d.
+  \]
+\end{defi}
+
+The main goal is to show that if $f \in L^1, \hat{f} \in L^1$, then the Fourier inversion holds:
+\[
+  f(x) = \frac{1}{(2\pi)^d} \int \hat{f}(u) e^{-i(u, x)} \;\d u\text{ a.e.}
+\]
+We will also prove the Plancherel identity: if $f \in L^2(\R^d)$, then
+\[
+  \|\hat{f}\|_2 = (2\pi)^{d/2} \|f\|_2.
+\]
+Why do we care about Fourier transforms? Many computations are easier with $\hat{f}$ in place of $f$, especially computations that involve differentiation and convolutions (which are relevant to sums of independent random variables). In particular, we will use it to prove the central limit theorem.
+
+More general, we can define the Fourier transform of a measure:
+
+\begin{defi}[Fourier transform of measure]\index{Fourier transform!of measure}
+  The Fourier transform of a \emph{finite measure} $\mu$ on $\R^d$ is the function
+  \[
+    \hat{\mu}(u) = \int_{\R^d} e^{i(u, x)} \mu(\d x).
+  \]
+\end{defi}
+
+We now make the following observations:
+\begin{prop}
+  \[
+    \|\hat{f}\|_\infty \leq \|f\|_1, \quad \|\hat{\mu}\|_\infty \leq \mu(\R^d).
+  \]
+\end{prop}
+
+\begin{prop}
+  The functions $\hat{f}, \hat{\mu}$ are continuous.
+\end{prop}
+
+\begin{proof}
+  If $(u_n) \to u$, then
+  \[
+    f(x) e^{i(u_n, x)} \to f(x) e^{i(u, x)}.
+  \]
+  Also, we know that 
+  \[
+    |f(x) e^{i(u_n, x)}| = |f(x)|.
+  \]
+  So we can apply dominated convergence theorem with $|f|$ as the bound.
+\end{proof}
+
+\begin{defi}[Characteristic function]\index{characteristic function}\index{random variable!characteristic function}
+  Let $X$ be a random variable. Then the \emph{characteristic function} of $X$ is the Fourier transform of its law, ie.
+  \[
+    \phi_X(u) = \E[e^{i(u, X)}] = \hat{\mu}_X(u),
+  \]
+  where $\mu_X$ is the law of $X$.
+\end{defi}
+
+\subsection{Convolution}
+\begin{defi}[Convolution of random variables]\index{convolution!random variable}\index{random variable!convolution}
+  Let $\mu, \nu$ be probability measures. Their \emph{convolution} $\mu * \nu$ is the law of $X + Y$, where $X$ has law $\mu$ and $Y$ has law $\nu$, and $X, Y$ are independent. Explicitly, we have
+  \begin{align*}
+    \mu * \varsigma (A) &= \P[X + Y \in \mathcal{A}] \\
+    &= \int \int \mathbf{1}_{A}(x + y)\;\mu(\d x)\;\nu(\d y)
+  \end{align*}
+\end{defi}
+Let's suppose that $\mu$ has a density function $f$ with respect to the Lebesgue measure. Then we have
+\begin{align*}
+  \mu * \nu(A) &= \int \int \mathbf{1}_A(x + y) f(x) \;\d x\;\nu(\d y)\\
+  &= \int \int \mathbf{1}_A(x) f(x - y) \;\d x\;\nu(\d y)\\
+  &= \int \mathbf{1}_A(x) \left(\int f(x - y)\;\nu (\d y)\right)\;\d x.
+\end{align*}
+So we know that $\mu * \nu$ has law
+\[
+  \int f(x - y)\;\nu (\d y).
+\]
+This thing has a name.
+\begin{defi}[Convolution of function with measure]\index{convolution!function with measure}
+  Let $f \in L^p$ and $\nu$ a probability measure. Then the \emph{convolution} of $f$ with $\mu$ is
+  \[
+    f * \nu(x) = \int f(x - y)\;\nu(\d y) \in L^p.
+  \]
+\end{defi}
+We check that it is indeed in $L^p$.
+\[
+  \int \left(\int |f(x - y)| \nu(\d y)\right)^p \;\d x.
+\]
+Since $\nu$ is a probability measure, Jensen's inequality says we have
+\begin{align*}
+  \|f * \nu\|_p^p &= \int \left(\int |f(x - y)| \nu(\d y)\right)^p \;\d x\\
+  &\leq \int \int |f(x - y)|^p \nu(\d y)\;\d x\\
+  &= \int \int |f(x - y)|^p \;\d x \;\nu (\d y)\\
+  &= \|f\|_p^p \\
+  &< \infty.
+\end{align*}
+In fact, from this computation, we see that
+\begin{prop}
+  For any $f \in L^p$ and $\nu$ a probability measure, we have
+  \[
+    \|f * \nu\|_p \leq \|f\|_p.
+  \]
+\end{prop}
+
+The interesting thing happens when we try to take the Fourier transform of a convolution.
+\begin{prop}
+  \[
+    \widehat{f * \nu}(u) = \hat{f}(u) \hat{\nu}(u).
+  \]
+\end{prop}
+
+\begin{proof}
+  We have
+  \begin{align*}
+    \widehat{f * \nu}(u) &= \int \left(\int f(x - y) \nu(\d y)\right) e^{i(u, x)}\;\d x\\
+    &= \int \int f(x - y) e^{i(u, x)} \;\d x\;\nu (\d y)\\
+    &= \int \left(\int f(x - y) e^{i(u, x - y)} \;\d (x - y)\right) e^{i(u, y)}\;\mu(\d y)\\
+    &= \int \left(\int f(x) e^{i(u, x)} \;\d (x)\right) e^{i(u, y)}\;\mu(\d y)\\
+    &= \int \hat{f}(u) e^{i(u, x)}\;\mu(\d y)\\
+    &= \hat{f}(u) \int e^{i(u, x)}\;\mu(\d y)\\
+    &= \hat{f}(u) \hat{\nu}(u).
+  \end{align*}
+\end{proof}
+
+In the context of random variables, we have a similar result:
+\begin{prop}
+  Let $\mu, \nu$ be probability measures, and $X, Y$ be independent variables with laws $\mu, \nu$ respectively. Then
+  \[
+    \widehat{\mu * \nu}(u) = \hat{\mu}(u) \hat{\nu}(u).
+  \]
+\end{prop}
+
+\begin{proof}
+  We have
+  \[
+    \widehat{\mu * \nu}(u) = \E[e^{i(u, X + Y)}] = \E[e^{i(u, X)}] \E[e^{i(u, Y)}] = \hat{\mu}(u) \hat{\nu}(u).
+  \]
+\end{proof}
+
+\subsection{Fourier inversion formula}
+We now want to work towards proving the Fourier inversion formula. Our strategy is as follows:
+\begin{enumerate}
+  \item Show that the Fourier inversion formula holds for a Gaussian distribution by direct computations.
+  \item Show that the formula holds for Gaussian convolutions, ie. the convolution of an arbitrary function with a Gaussian.
+  \item We show that any function can be approximated by a Gaussian convolution.
+\end{enumerate}
+Note that the last part makes a lot of sense. If $X$ is a random variable, then convolving with a Gaussian is just adding $X + \sqrt{t}Z$, and if we take $t \to 0$, we recover the original function. What we have to do is to show that this behaves sufficiently well with the Fourier transform and the Fourier inversion formula that we will actually get the result we want.
+
+
+\subsubsection*{Gaussian densities}
+Before we start, we had better start by defining the Gaussian distribution.
+\begin{defi}[Gaussian density]\index{Gaussian density}
+  The \emph{Gaussian density} with variance $t$ is
+  \[
+    g_t(x) = \left(\frac{1}{2\pi t}\right)^{d/2} = e^{-|x|^2/2t}.
+  \]
+  This is equivalently the density of $\sqrt{t} Z$, where $Z = (Z_1, \cdots, Z_d)$ with $Z_i \sim N(0, 1)$ independent.
+\end{defi}
+
+We now want to compute the Fourier transformation directly and show that the Fourier inversion formula works for this.
+
+We start off by working in the case $d = 1$ and $Z \sim N(0, 1)$. We want to compute the Fourier transform of the law of this guy, ie. the Fourier transform of its characteristic function. We will use a nice trick.
+
+\begin{prop}
+  Let $Z \sim N(0, 1)$. Then
+  \[
+    \phi_Z(a) = e^{-u^2/2}.
+  \]
+\end{prop}
+We see that this is in fact a Gaussian up to a factor of $2\pi$.
+
+\begin{proof}
+  We have
+  \begin{align*}
+    \phi_Z(a) &= \E[e^{iuZ}]\\
+    &= \frac{1}{\sqrt{2\pi}} \int e^{iux} e^{-x^2/2}\;\d x.
+  \end{align*}
+  We now notice that the function is bounded, so we can differentiate under the integral sign, and obtain
+  \begin{align*}
+    \phi_Z'(u) &= \E[iZ e^{iuZ}]\\
+    &= \frac{1}{\sqrt{2\pi}} \int ix e^{iux} e^{-x^2/2}\;\d x\\
+    &= - u\phi_Z(u),
+  \end{align*}
+  where the last equality is obtained by integrating by parts. So we know that $\phi_Z(u)$ solves
+  \[
+    \phi_Z'(u) = -u \phi_Z(u).
+  \]
+  This is easy to solve, since we can just integrate this. We find that
+  \[
+    \log \phi_Z(u) = - \frac{1}{2}u^2 + C.
+  \]
+  So we have
+  \[
+    \phi_Z(u) = A e^{-u^2/2}.
+  \]
+  We know that $A = 1$, since $\phi_Z(0) = 1$. So we have
+  \[
+    \phi_Z(u) = e^{-u^2/2}.
+  \]
+\end{proof}
+
+We now do this problem in general.
+\begin{prop}
+  Let $Z = (Z_1, \cdots, Z_d)$ with $Z_j \sim N(0, 1)$ independent. Then $\sqrt{t} Z$ has density
+  \[
+    g_t(x) = \frac{1}{(2\pi t)^{d/2}} e^{-|x|^2/(2t)}.
+  \]
+  with
+  \[
+    \hat{g}_t(u) = e^{-|u|^2 t/2}.
+  \]
+\end{prop}
+
+\begin{proof}
+  We have
+  \begin{align*}
+    \hat{g}_t(u) &= \E[e^{i(u, \sqrt{t}Z)}]\\
+    &= \prod_{j = 1}^d \E[e^{i(u_j, \sqrt{t} Z_j)}]\\
+    &= \prod_{j = 1}^d \phi_Z(\sqrt{t} u_j)\\
+    &= \prod_{j = 1}^d e^{-t u_j^2/2}\\
+    &= e^{-|u|^2 t/2}.
+  \end{align*}
+\end{proof}
+Again, $g_t$ and $\hat{g}_t$ are almost the same, apart form the factor of $(2\pi t)^{-d/2}$ and the position of $t$ shifted. We can thus write this as
+\[
+  \hat{g}_t(u) = (2\pi)^{d/2} t^{-d/2} g_{1/t} (u).
+\]
+So this tells us that
+\[
+  \hat{\hat{g}}(u) = (2\pi)^d g_t(u).
+\]
+This is not exactly the same as saying the Fourier inversion formula works, because in the Fourier inversion formula, we integrated against $e^{-i(u, x)}$, not $e^{i(u, x)}$. However, we know that by the symmetry of the Gaussian distribution, we have
+\[
+  g_t(x) = g_t(-x) = (2\pi)^{-d} \hat{\hat{g}}_t (-x) = \left(\frac{1}{2\pi}\right)^d \int \hat{g}_t(u) e^{-i(u, x)}\;\d u.
+\]
+So we conclude that
+\begin{lemma}
+  The Fourier inversion formula holds for the Gaussian density function.
+\end{lemma}
+
+\subsubsection*{Gaussian convolutions}
+\begin{defi}[Gaussian convolution]\index{Gaussian convolution}
+  Let $f \in L^1$. Then a \emph{Gaussian convolution} of $f$ is a function of the form $f * g_t$.
+\end{defi}
+
+We are now going to do a little computation that shows that functions of this type also satisfy the Fourier inversion formula.
+
+Before we start, we make some observations about the Gaussian convolution. By general theory of convolutions, we know that we have
+\[
+  \|f * g_t\|_1 \leq \|f\|_1.
+\]
+We also have a pointwise bound
+\begin{align*}
+  |f*g_t(x)| &= \left|\int f(x - y) e^{-|y|^2/(2t)} \left(\frac{1}{2\pi t}\right)^{d/2} \;\d y\right| \\
+  &\leq (2\pi t)^{-d/2} \int |f(x - y)| \;\d x\\
+  &\leq (2\pi t)^{-d/2} \|f\|_1.
+\end{align*}
+This tells us that in fact
+\[
+  \|f * g_t\|_\infty \leq (2\pi t)^{-d/2} \|f\|_1.
+\]
+So in fact the convolution is pointwise bounded. We see that the bound gets worse as $t \to \infty$, and we will see that this is because as $t \to \infty$, the convolution $f * g_t$ becomes a better and better approximation of $f$, and we did not assume that $f$ is bounded.
+
+Similarly, we can compute that
+\[
+  \|\widehat{f * g_t}\| = \|\hat{f} \hat{g}_t\|_1 \leq (2\pi)^{d/2} t^{-d/2}\|f\|_1,
+\]
+and
+\[
+  \|\widehat{f * g_t}\|_\infty \leq \|\hat{f}\|.
+\]
+Now given these bounds, it makes sense to write down the Fourier inversion formula for a Gaussian convolution.
+\begin{lemma}
+  The Fourier inversion formula holds for Gaussian convolutions.
+\end{lemma}
+
+We are going to reduce this to the fact that the Gaussian distribution itself satisfies Fourier inversion.
+
+\begin{proof}
+  We have
+  \begin{align*}
+    f * g_t(x) &= \int f(x - y) g_t(y) \;\d y\\
+    &= \int f(x - y) \left(\frac{1}{(2\pi)^d} \int \hat{g}_t(u) e^{-i(u, y)}\;\d u\right)\;\d y\\
+    &= \left(\frac{1}{2\pi}\right)^d \int \int f(x - y) \hat{g}_t(u) e^{-i(u, y)}\;\d u\;\d y\\
+    &= \left(\frac{1}{2\pi}\right)^d \int \left(\int f(x - y) e^{-i(u, x - y)} \;\d y\right) \hat{g}_t(u) e^{-i(u, x)}\;\d u\\
+    &= \left(\frac{1}{2\pi}\right)^d \int \hat{f}(u)\hat{g}_t(u) e^{-i(u, x)}\;\d u\\
+    &= \left(\frac{2}{2\pi}\right)^d \int \widehat{f * g_t}(u) e^{-i(u, x)}\;\d u
+  \end{align*}
+  So done.
 \end{proof}
 \printindex
 \end{document}
