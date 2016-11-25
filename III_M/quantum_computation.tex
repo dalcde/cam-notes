@@ -1529,7 +1529,6 @@ We first do a simple example:
       \addoperator{$\qJ{\alpha_3}$}{0}{3};
 
       \drawvert{0}{1}{2};
-      % draw vertical line (2, 0) -- (2, 1) with dots
     \end{tikzpicture}
   \end{center}
   and then we measure the outputs $i_1, i_2$ by $\qM(Z)$ measurements.
@@ -1549,7 +1548,7 @@ We first do a simple example:
   \end{center}
   In other words, we put a node for a $\bket{+}$, horizontal line for a $\qJ(\alpha)$ and a vertical line for an $\qE$.
 
-  If we just measure all the qubits for the $J$-process:
+  If we just measure all the qubits for the $J$-process in the order $\alpha_1, \alpha_2, \alpha_3$:
   \begin{center}
     \begin{tikzpicture}
       \node [circ] at (0, 0) {};
@@ -1585,7 +1584,331 @@ We first do a simple example:
       \drawvert{0}{1}{3};
     \end{tikzpicture}
   \end{center}
-  Now the problem is to get rid of the $X^i$'s.
 \end{eg}
+Now the problem is to get rid of the $X^i$'s. We know each $X^i$ comes with probability $\frac{1}{2}$. So the probability of them all not appearing is tiny for more complicated circtuis, and we cannot just rely on pure chance for it to turn out right.
+
+To deal with the unwanted $X^i$ ``errors'', we want to commute them out to the end of the circuit. But they do not commute, so we are going to use the following commutation relations:
+\[
+  J(\alpha) X = e^{i\alpha} Z J(-\alpha)
+\]
+In other words, up to an overall phase, the following diagrams are equivalent:
+\begin{center}
+  \begin{tikzpicture}
+    \addstate{}{0}{3};
+    \addoperator{$X$}{0}{1};
+    \addoperator{$J(\alpha)$}{0}{2};
+  \end{tikzpicture}
+
+  is equivalent to
+
+  \begin{tikzpicture}
+    \addstate{}{0}{3};
+    \addoperator{$J(-\alpha)$}{0}{1};
+    \addoperator{$Z$}{0}{2};
+  \end{tikzpicture}
+\end{center}
+More generally, we can write
+\begin{align*}
+  J_i(\alpha) X_i^s &= e^{-i\alpha s} Z_i^s J_i((-1)^s \alpha)\\
+  J_i(\alpha) Z_i^s &= X_i^s J_i(\alpha)\\
+  E_{ij}Z_i^s = Z_i^s E_{ij}
+  E_{ij} X_i^s &= X_i^s Z_i^s E_{ij}
+\end{align*}
+Here the subscripts tell us which qubit the gates are acting on.
+
+The last one corresponds to
+\begin{center}
+  \begin{tikzpicture}
+    \addstate{}{0}{4};
+    \addstate{}{1}{4};
+    \addoperator{$X$}{0}{1};
+    \drawvert{0}{1}{2}
+  \end{tikzpicture}
+  is equivalent to
+  \begin{tikzpicture}
+    \addstate{}{0}{4};
+    \addstate{}{1}{4};
+    \drawvert{0}{1}{2}
+    \addoperator{$X$}{0}{3};
+    \addoperator{$Z$}{1}{3};
+  \end{tikzpicture}
+\end{center}
+All of these are good, except for the first one where we have a funny phase and the angle is negatived. The phase change is irrelevant because it doesn't affect measurements, but the sign changes are problematic. To fix this, we need to use adaptive measurements.
+
+\begin{eg}
+  Consider the simpler $1$-qubit circuit
+  \begin{center}
+    \begin{tikzpicture}
+      \addstate{$\bket{+}$}{0}{4};
+      \addoperator{$J(\alpha_1)$}{0}{1};
+      \addoperator{$J(\alpha_2)$}{0}{3};
+    \end{tikzpicture}
+  \end{center}
+  We first prepare the graph sate
+  \begin{center}
+    \begin{tikzpicture}
+      \node [circ] at (0, 0) {};
+      \node [circ] at (1, 0) {};
+      \node [circ] at (2, 0) {};
+
+      \draw (0, 0) -- (2, 0);
+    \end{tikzpicture}
+  \end{center}
+  We now measure the first qubit to get
+  \begin{center}
+    \begin{tikzpicture}
+      \node [circ] at (0, 0) {};
+      \node [circ] at (1, 0) {};
+      \node [circ] at (2, 0) {};
+
+      \draw (0, 0) node [above] {$\alpha_1$} -- (2, 0);
+      \draw [->] (0.05, -0.05) -- +(0.5, -0.5) node [right] {$r_1$};
+    \end{tikzpicture}
+  \end{center}
+  We have thus done
+  \begin{center}
+    \begin{tikzpicture}
+      \addstate{$\bket{+}$}{0}{4};
+      \addoperator{$J(\alpha_1)$}{0}{1};
+      \addoperator{$X^{r_1}$}{0}{3};
+    \end{tikzpicture}
+  \end{center}
+  To deal with the unwanted $X^{r_1}$, we note that
+  \begin{center}
+    \begin{tikzpicture}
+      \addstate{}{0}{4};
+      \addoperator{$X^{r_1}$}{0}{1};
+      \addoperator{$J(\alpha_2)$}{0}{3};
+    \end{tikzpicture}
+    is equivalent to
+    \begin{tikzpicture}
+      \addstate{}{0}{5};
+      \addoperator{$J((-1)^{r_1}\alpha_2)$}{0}{2};
+      \addoperator{$Z^{r_1}$}{0}{4};
+    \end{tikzpicture}
+  \end{center}
+  So we adapt the sign of the second measurement angle to depend on the previous measurement result:
+  \begin{center}
+    \begin{tikzpicture}
+      \node [circ] at (0, 0) {};
+      \node [circ] at (1, 0) {};
+      \node [circ] at (2, 0) {};
+
+      \draw (0, 0) -- (2, 0);
+      \node [above] at (0, 0) {$\alpha_1$};
+      \node [above] at (0, 0) {$(-1)^{r_1}\alpha_2$};
+      \draw [->] (0.05, -0.05) -- +(0.5, -0.5) node [right] {$r_1$};
+      \draw [->] (1.05, -0.05) -- +(0.5, -0.5) node [right] {$r_2$};
+    \end{tikzpicture}
+  \end{center}
+  Then this measurement results in
+  \begin{center}
+    \begin{tikzpicture}
+      \addstate{}{0}{8};
+      \addoperator{$J(\alpha_1)$}{0}{1};
+      \addoperator{$X^{r_1}$}{0}{3};
+      \addoperator{$(-1)^{r_1}J(\alpha_2)$}{0}{5};
+      \addoperator{$X^{r_2}$}{0}{7};
+    \end{tikzpicture}
+
+    is equivalent to
+
+    \begin{tikzpicture}
+      \addstate{}{0}{8};
+      \addoperator{$J(\alpha_1)$}{0}{1};
+      \addoperator{$J(\alpha_2)$}{0}{3};
+      \addoperator{$Z^{r_1}$}{0}{5};
+      \addoperator{$X^{r_2}$}{0}{7};
+    \end{tikzpicture}
+  \end{center}
+  If we had further $J$-gates, we need to commute both $Z^{r_1}$ and $X^{r_2}$ over.
+
+  Note that while we are introducing a lot of funny $X$'s and $Z$'s, these are all we've got, and the order of applying them does not matter, as they anti-commute:
+  \[
+    XZ = -ZX.
+  \]
+  So if we don't care about the phase, they effectively commute.
+
+  Also, since $X^2 = Z^2 I$, we only need to count the number of $X$'s and $Z$'s mod 2, which is very helpful.
+
+  Now what do we do with the $Z$ and $X$ at the end? For the final $Z$-measurement, having moved everything to the end, we simply reinterpret the final, actual $Z$-measurement result $j$:
+  \begin{enumerate}
+    \item The $Z$-gate does not affect outcome or probability of a $Z$-measurement, becasuse if
+      \[
+        \bket{\psi} = a \bket{0} + b \bket{1},
+      \]
+      then
+      \[
+        Z \bket{\psi} = a \bket{0} - b \bket{1}.
+      \]
+      So the probabilities of $\bket{0}$ and $\bket{1}$ are $|a|^2$ and $|b|^2$ regardless.
+
+    \item The $X$ gate simply interchanges the labels, while leavining probabilities the same, because if
+      \[
+        \bket{\psi} = a \bket{0} + b \bket{1},
+      \]
+      then
+      \[
+        X \bket{\psi} = a \bket{1} + b \bket{0}.
+      \]
+  \end{enumerate}
+  So we ignore all $Z$-errors, and for each $X^r$ error, we just modify the seen measurement outcome $j$ by $j \mapsto j \oplus r$.
+\end{eg}
+
+\subsubsection*{Logical depth of a measurement pattern}
+Measurements can always be done ``left to right'', implementing the gates in order. However, we don't have to do that. Recall that quantum operations on disjoint qubits always commute. So the $M_i(\alpha)$ measurements can be performed simultaneously if the angles $\alpha$ do not depend on other measurements. This gives us a novel way to parallel a computation.
+
+For example, in our simple example, we can start by first measuring $r_1$ and $j$, and then measuring $r_2$ after we know $r_1$. In particular, we can \emph{first} measure the ``answer'' $j$, before we do any other thing! The remaining measurements just tell us how we should interpret the answer.
+
+In general, we can divide the measurements into ``layers'' --- the first layer consists of all measurements that do not require any adaptation. The second layer then consists of the measurements that only depends on the first layer.
+
+The \term{logical depth} is then the least number of layers needed.
+
+\section{Phase estimation algorithm}
+Given a unitary operator $U$ and an eigenstate $\bket{v_\varphi}$ such that
+\[
+  U \bket{V_\varphi} = 2^{2\pi i \varphi} \bket{v_\varphi}
+\]
+with $0 \leq \varphi < 1$, we want to estimate $\varphi$ to $n$ binary bits of precision:
+\[
+  \varphi \approx 0.i_1 i_2 i_3 \cdots i_n = \frac{i_1}{2} + \frac{i_2}{2^2} + \cdots + \frac{i_n}{2^n}.
+\]
+We will need a $c-U^k$ for integers $k$ such that
+\begin{align*}
+  \qcd U^k\bket{0}\bket{\xi} &= \bket{0}\bket{\xi}\\
+  \qcd U^k\bket{1}\bket{\xi} &= \bket{1} U^k\bket\xi,
+\end{align*}
+where $\bket{0}, \bket{1}$ are 1-qubit states, and $\bket{\xi}$ is a general $d$-dimensional register.
+
+Note that we have
+\[
+  U^k \bket{v_\varphi} = e^{2\pi i k \varphi}\bket{v_\varphi},
+\]
+and we have
+\[
+  \qcd U^k = (\qcd U)^k,
+\]
+Note that if we are given $U$ as a formula or a circuit \emph{description}, then we can readily implement $\qcd U$ by adding control to each gate. However, if $U$ is a quantum black-box, then we need further info. For example, it suffices to have an eigenstate $\bket{\alpha}$ with \emph{known} eigenvalue $e^{i\alpha}$. However, we will not bother ourselves with that, and just assume that we can indeed implement it.
+
+In fact, we will use a ``generalized'' controlled $U$ given by
+\[
+  \bket{x} \bket{\xi} \mapsto \bket{x}U^x \bket{\xi},
+\]
+where $\bket{x}$ has $n$ qubits with $x \in \Z_n$. We will make this from $\qcd U^k = (\qcd U)^k$ as follows: for % check if Z_n or Z_{2^n}
+\[
+  x = x_{n - 1} \cdots x_1 x_0 = x_0 + 2^1 x_1 + 2^2 x_2 + \cdots + 2^{n - 1}x_{n - 1},
+\]
+we write $\qcd U^k_i$ for the controlled $U^k$ controlled by $i$. Then we just construct
+\[
+  U^{2^0}_0 U^{2^1}_1 \cdots U^{2^{n - 1}}_{n - 1}.
+\]
+Now if input $\bket{\xi} = \bket{v_{\varphi}}$, then we get
+\[
+  2^{\pi i \varphi x} \bket{x} \bket{v_\varphi}.
+\]
+To do phase estimation, we superpose the above over all $x = 0, 1, 2, \cdots, 2^{n - 1}$ and use $\bket{\xi} = \bket{v_\varphi}$. So we construct our starting state by
+\[
+  \bket{s} = \qH \otimes \cdots \otimes \qH \bket{0\cdots0} = \frac{1}{\sqrt{2^n}} \sum_{\text{all }x} \bket{x}.
+\]
+Now if we apply the generalized control $U$, we obtain
+\[
+  \underbrace{\left(\frac{1}{\sqrt{2^n}} \sum_x e^{2\pi i \varphi x}\bket{x}\right)}_{\bket{A}} \bket{v_\psi}.
+\]
+Finally, we apply the inverse Fourier transform $\qQFT_{2^n}^{-1}$ to $\bket{A}$ and measure to see $y_0, y_1, \cdots, y_{n -1 }$ on lines $0, 1, \cdots, n - 1$. Then we simply output
+\[
+  0.y_0 y_1 \cdots y_{n - 1} = \frac{y_0}{2} + \frac{y_1}{4} + \cdots + \frac{y_{n - 1}}{2^n} = \frac{y_0 y_1 \cdots y_{n - 1}}{2^n}.
+\]
+as the estimate of $\varphi$.
+
+Why does this work? Suppose $\varphi$ actually only had $n$ binary digits. Then we have
+\[
+  \varphi = 0.z_0 z_1 \cdots \cdots z_{n - 1} = \frac{z}{2^n},
+\]
+where $z \in \Z_{2^n}$. Then we have
+\[
+  \bket{A} = \frac{1}{\sqrt{2^n}} \sum_x 2^{2\pi i x z/2^n} \bket{x},
+\]
+which is the Fourier transform of $\bket{z}$. So the inverse Fourier transform of $\bket{A}$ is exactly $\bket{Z}$ and we get $\varphi$ exactly with certainty.
+
+If $\varphi$ has more than $n$ bits, say
+\[
+  \varphi = 0.z_0z_1 \cdots z_{n - 1}z_n z_{n + 1} \cdots,
+\]
+then we have
+\begin{thm}
+  If the measurements in the above algorithm give $y_0, y_1, \cdots, y_n$ and we output
+  \[
+    \theta = 0.y_0 y_1 \cdots y_{n - 1},
+  \]
+  then
+  \begin{enumerate}
+    \item The probability that $\theta$ is $\varphi$ to $n$ digits is at least $\frac{4}{\pi^2}$.
+    \item The probability that $|\theta - \varphi| \geq \varepsilon$ is at most $O(1/(2^n \varepsilon))$.
+  \end{enumerate}
+\end{thm}
+The proofs are rather boring and easy algebra.
+
+So for any fixed desired accuracy $\varepsilon$, the probability to fail to get $\varphi$ to this accuracy falls \emph{exponentially} with $n$.
+
+Note that if $\qcd U^{2^k}$ is implemented as $(\qcd U)^{2^k}$, then the algorithm would need
+\[
+  1 + 2 + 4 + \cdots + 2^{n - 1} = 2^{n - 1}
+\]
+many $\qcd U$ gates. But for some special $U$'s, this $\qcd U^{2^k}$ can be implemented in polynomial time in $k$.
+
+For example, in Kitaer's factor algorithm, for $\hcf(a, N) = 1$, we use
+\[
+  U: \bket{m} \mapsto \bket{am \bmod N}
+\]
+Then we have
+\[
+  U^{2^k}\bket{m} = \bket{a^{2^k}m},
+\]
+which we can implement by repeated squaring.
+
+Now what if we didn't have an eigenstate to being with? If instead of $\bket{v_\varphi}$, we used a general input state $\bket{\xi}$, then we can write
+\[
+  \bket{\xi} = \sum_j c_j \bket{v_{\varphi_j}},
+\]
+where
+\[
+  U \bket{v_{\varphi_j}} = e^{2\pi i \varphi_j}\bket{v_{\varphi_j}}.
+\]
+Then in the phase estimation algorithm, just before the final measurement, we have managed to get ourselves
+\[
+  \bket{0\cdots0}\bket{\xi} \to \sum_j c_j \bket{\varphi_j} \bket{v_{\varphi_j}}.
+\]
+Then when we measure some \emph{one} of the $\varphi_j$'s (or an approximation of it) with probability $|c_j|^2$. Note that this is \emph{not} some average of them. Of course, we don't know which one we got, but we still get some meaningful.
+
+\subsubsection*{Quantum counting}
+An application of this is the quantum counting problem. Given $f: B_n \to B$ with $k$ good $x$'s, we want to estimate the number $k$.
+
+Recall the Grove iteration operator $\mathcal{Q}_G$ is rotation through $2\theta$ in a $2$-dimensional plane spanned by
+\[
+  \bket{\psi_0} = \frac{1}{\sqrt{2^n}} \sum_x \bket{x}
+\]
+and its good projection, and $\theta$ is given by
+\[
+  \sin \theta \approx \theta = \sqrt{\frac{k}{N}}.
+\]
+Now the eigenvalues of this rotation in the plane are
+\[
+  e^{2i \theta}, e^{-2i\theta}.
+\]
+So either eigenvalue will suffice to get $k$.
+
+We will equivalently write
+\[
+  e^{i2\theta} = e^{2\pi i \varphi}
+\]
+with
+\[
+  0 \leq \varphi < 1.
+\]
+Then $\pm 2 \theta$ is equivalent to $\varphi$ or $1 - \varphi$, where $\varphi$ is small.
+
+Now we don't have an eigenstate, but we can start with any state in the plane, $\bket{\psi_0}$. We then do phase estimation with it. We will then get either $\varphi$ or $1 - \varphi$ with some probabilities, but we don't mind which one we get, since we can obtain one from the other, and we can tell them apart because $\varphi$ is small.
+
+
 \printindex
 \end{document}

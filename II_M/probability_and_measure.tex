@@ -36,6 +36,8 @@
 \tableofcontents
 \setcounter{section}{-1}
 \section{Introduction}
+In measure theory, the main idea is that we want to assign ``sizes'' to different sets. For example, we might think $[0, 2] \subseteq \R$ has size $2$, while perhaps $\Q \subseteq \R$ has size $0$. This is known as a \emph{measure}. One of the main applications of a measure is that we can use it to come up with a new definition of an integral. The idea is very simple, but it is going to be very powerful mathematically.
+
 Recall that if $f: [0, 1] \to \R$ is continuous, then the Riemann integral of $f$ is defined as follows:
 \begin{enumerate}
   \item Take a partition $0 = t_0 < t_1 < \cdots < t_n = 1$ of $[0, 1]$.
@@ -48,27 +50,53 @@ Recall that if $f: [0, 1] \to \R$ is continuous, then the Riemann integral of $f
       \int f = \text{Limit of Riemann sums as the mesh size of the partition }\to 0.
     \]
 \end{enumerate}
-% insert diagram
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-1, 0) -- (5, 0) node [right] {$x$};
+    \draw [->] (0, -0.5) -- (0, 5) node [above] {$y$};
 
-In this course, we are going to learn a different way of calculating integrals. The idea is very simple, but it is going to be very powerful mathematically.
+    \draw [domain=-1:5] plot (\x, {(\x + 1)*(\x + 1)/10 + 1});
 
+    \draw (0.5, 0) node [below] {$0$} -- (0.5, 1.225) -- (1, 1.225);
+    \draw (1, 0) node [below] {$t_1$} -- (1, 1.4) -- (1.5, 1.4);
+    \draw (1.5, 0) node [below] {$t_2$} -- (1.5, 1.625) -- (2, 1.625) -- (2, 0) node [below] {$t_3$};
+    \node at (2.4, 0.8) {$\cdots$};
+    \draw (2.75, 0) node [below] {$t_k$} -- (2.75, 2.40625) -- (3.25, 2.40625) -- (3.25, 0) node [anchor = north west] {$\!\!\!\!\!t_{k + 1}\cdots$};
+    \node at (3.65, 1.2) {$\cdots$};
+    \draw (4, 0) -- (4, 3.5) -- (4.5, 3.5) -- (4.5, 0) node [below] {$1$};
+  \end{tikzpicture}
+\end{center}
 The idea of measure theory is to use a different approximation scheme. Instead of partitioning the domain, we partition the range of the function. We fix some numbers $r_0 < r_1 < r_2 < \cdots < r_n$.
-
-% insert analogous diagram
 
 We then approximate the integral of $f$ by
 \[
   \sum_{j = 1}^n r_j \cdot (\text{``size of }f^{-1}([r_{j - 1}, r_j])\text{''}).
 \]
 We then define the integral as the limit of approximations of this type as the mesh size of the partition $\to 0$.
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-1, 0) -- (5, 0) node [right] {$x$};
+    \draw [->] (0, -0.5) -- (0, 5) node [above] {$y$};
 
+    \draw [domain=-1:5] plot (\x, {(\x + 1)*(\x + 1)/10 + 1});
+
+    \draw (0.5, 0) rectangle (4.5, 0.7);
+    \draw (0.5, 0.7) rectangle (4.5, 1.225);
+    \draw (1.5, 1.225) rectangle (4.5, 1.625);
+
+    \draw (2.75, 1.625) rectangle (4.5, 2.40625);
+    \draw (3.65, 2.40625) rectangle (4.5, 3.16225);
+  \end{tikzpicture}
+\end{center}
 We can make an analogy with bankers --- If a Riemann banker is given a stack of money, they would just add the values of the money in order. A measure-theoretic banker will sort the bank notes according to the type, and then find the total value by multiplying the number of each type by the value, and adding up.
 
-Why would we want to do so? It turns out this leads to a much more general theory of interaction on a much more general spaces. In the context of $\R$, this theory of integration is much much more powerful than the Riemann sum, and can integrate a much wider class of functions. Theorems for interchanging limits and integration also become much stronger.
+Why would we want to do so? It turns out this leads to a much more general theory of integration on much more general spaces. Instead of integrating functions $[a, b] \to \R$ only, we can replace the domain with any measure space. Even in the context of $\R$, this theory of integration is much much more powerful than the Riemann sum, and can integrate a much wider class of functions. While you probably don't care about those pathological functions anyway, being able to integrate more things means that we can state more general theorems about integration without having to put in funny conditions.
 
-We will write $f_n \nearrow f$ for ``$f_n$ converges to $f$ monotonically increasingly'', and $f_n \searrow f$ similarly.
+That was all about measures. What about probability? It turns out the concepts we develop for measures correspond exactly to many familiar notions from probability if we restrict it to the particular case where the total measure of the space is $1$. Thus, when studying measure theory, we are also secretly studying probability!
 
 \section{Measures}
+In the course, we will write $f_n \nearrow f$ for ``$f_n$ converges to $f$ monotonically increasingly'', and $f_n \searrow f$ similarly. Unless otherwise specified, convergence is taken to be pointwise.
+
 \subsection{Measures}
 The starting point of all these is to come up with a function that determines the ``size'' of a given set, known as a \emph{measure}. It turns out we cannot sensibly define a size for \emph{all} subsets of $[0, 1]$. Thus, we need to restrict our attention to a collection of ``nice'' subsets. Specifying which subsets are ``nice'' would involve specifying a $\sigma$-algebra.
 
@@ -707,13 +735,14 @@ We are now going to prove two ``obvious'' results, known as the \emph{Borel--Can
 \begin{proof}
   For each $k$, we have
   \begin{align*}
-    \P[A_n\text{ i.o}] &= \P\left[\bigcap_n \bigcup_m \geq n A_m\right]\\
+    \P[A_n\text{ i.o}] &= \P\left[\bigcap_n \bigcup_{m \geq n} A_m\right]\\
     &\leq \P\left[\bigcup_{m \geq k} A_m\right]\\
     &\leq \sum_{m = k}^\infty \P[A_m]\\
     &\to 0
   \end{align*}
   as $k \to \infty$. So we have $\P[A_n\text{ i.o.}] = 0$.
 \end{proof}
+Note that we did not need to use the fact that we are working with a probability measure. So in fact this holds for any measure space.
 
 \begin{lemma}[Borel--Cantelli lemma II]\index{Borel--Cantelli lemma II}
   Let $(A_n)$ be independent events. If
@@ -844,7 +873,7 @@ If we want to construct more measurable functions, the following definition will
   \]
   More explicitly, the $\sigma$-algebra is given by
   \[
-    \sigma(\{A \times B: A \in \mathcal{E}, B \in \mathcal{G}\}).
+    \mathcal{E} \otimes \mathcal{G} = \sigma(\{A \times B: A \in \mathcal{E}, B \in \mathcal{G}\}).
   \]
   More generally, if $(E_i, \mathcal{E}_i)$ is a collection of measure spaces, the \emph{product measure space} has underlying set $\prod_i E_i$, and the $\sigma$-algebra generated by the projection maps $\pi_i: \prod_j E_j \to E_i$.
 \end{defi}
@@ -863,9 +892,10 @@ This satisfies the following property:
 Using this, we can prove that a whole lot more functions are measurable.
 \begin{prop}
   Let $(E, \mathcal{E})$ be a measurable space. Let $(f_n: n \in \N)$ be a sequence of non-negative measurable functions on $E$. Then the following are measurable:
-  \[
-    f_1 + f_2,\quad f_1f_2,\quad \inf_n f_n,\quad \sup_n f_n,\quad \liminf_n f_n,\quad \limsup_n f_n.
-  \]
+  \begin{gather*}
+    f_1 + f_2,\quad f_1 f_2,\quad \max \{f_1, f_2\},\quad \min \{f_1, f_2\},\\
+    \inf_n f_n,\quad \sup_n f_n,\quad \liminf_n f_n,\quad \limsup_n f_n.
+  \end{gather*}
   The same is true with ``real'' replaced with ``non-negative'', provided the new functions are real (ie. not infinity).
 \end{prop}
 
@@ -881,7 +911,59 @@ Using this, we can prove that a whole lot more functions are measurable.
   The product follows similarly, but for the infimum and supremum, we need to check explicitly that the corresponding maps $[0, \infty]^\N \to [0, \infty]$ is measurable.
 \end{proof}
 
+\begin{notation}
+  We will write
+  \[
+    f \wedge g = \min\{f, g\},\quad f \vee g = \max\{f, g\}.
+  \]
+\end{notation}
+
+We are now going to prove the monotone class theorem, which is a ``Dynkin's lemma'' for measurable functions. As in the case of Dynkin's lemma, it will sound rather awkward but will prove itself to be very useful.
+\begin{thm}[Monotone class theorem]\index{monotone class theorem}
+  Let $(E, \mathcal{E})$ be a measurable space, and $\mathcal{A} \subseteq \mathcal{E}$ be a $\pi$-system with $\sigma(\mathcal{A}) = \mathcal{E}$. Let $\mathcal{V}$ be a vector space of functions such that
+  \begin{enumerate}
+    \item The constant function $1 = \mathbf{1}_E$ is in $\mathcal{V}$.
+    \item The indicator functions $\mathbf{1}_A \in \mathcal{V}$ for all $A \in \mathcal{A}$
+    \item $\mathcal{V}$ is closed under bounded, monotone limits.
+
+      More explicitly, if $(f_n)$ is a bounded non-negative sequence in $\mathcal{V}$, $f_n \nearrow f$ (pointwise) and $f$ is also bounded, then $f \in \mathcal{V}$.
+  \end{enumerate}
+  Then $\mathcal{V}$ contains all bounded measurable functions.
+\end{thm}
+
+Note that the conditions for $\mathcal{V}$ is pretty like the conditions for a d-system, where taking a bounded, monotone limit is something like taking increasing unions.
+
+\begin{proof}
+  We first deduce that $\mathbf{1}_A \in \mathcal{V}$ for all $A \in \mathcal{E}$.
+  \[
+    \mathcal{D} = \{A \in \mathcal{E}: \mathbf{1}_A \in \mathcal{V}\}.
+  \]
+  We want to show that $\mathcal{D} = \mathcal{E}$. To do this, we have to show that $\mathcal{D}$ is a $d$-system.
+  \begin{enumerate}
+    \item Since $\mathbf{1}_E \in \mathcal{V}$, we know $E \in \mathcal{D}$.
+    \item If $\mathbf{1}_A \in V$, then $1 - \mathbf{1}_A = \mathbf{1}_{E \setminus A} \in \mathcal{V}$. So $E \setminus A \in \mathcal{D}$.
+    \item If $(A_n)$ is an increasing sequence in $\mathcal{D}$, then $\mathbf{1}_{A_n} \to \mathbf{1}_{\bigcup A_n}$ monotonically increasingly. So $\mathbf{1}_{\bigcup A_n}$ is in $\mathcal{D}$.
+  \end{enumerate}
+  So, by Dynkin's lemma, we know $\mathcal{D} = \mathcal{E}$. So $\mathcal{V}$ contains indicators of all measurable sets. We will now try to obtain any measurable function by approximating.
+
+  Suppose that $f$ is bounded and non-negative measurable. We want to show that $f \in \mathcal{V}$. To do this, we approximate it by letting
+  \[
+    f_n = 2^{-n} \lfloor 2^n f\rfloor = \sum_{k = 0}^\infty k 2^{-n} \mathbf{1}_{\{k 2^{-n} \leq f < (k + 1) 2^{-n}\}}.
+  \]
+  Note that since $f$ is bounded, this is a finite sum. So it is a finite linear combination of indicators of elements in $\mathcal{E}$. So $f_n \in \mathcal{V}$, and $0 \leq f_n \to f$ monotonically. So $f \in \mathcal{V}$.
+
+  More generally, if $f$ is bounded and measurable, then we can write
+  \[
+    f = (f \vee 0) + (f \wedge 0) \equiv f^+ - f^-.
+  \]
+  Then $f^+$ and $f^-$ are bounded and non-negative measurable. So $f \in \mathcal{V}$.
+\end{proof}
+
+Unfortunately, we will not have a chance to use this result until the next chapter where we discuss integration. There we will use this \emph{a lot}.
+
 \subsection{Constructing new measures}
+We are going to look at two ways to construct new measures on spaces based on some measurable function we have.
+
 \begin{defi}[Image measure]\index{image measure}
   Let $(E, \mathcal{E})$ and $(G, \mathcal{G})$ be measure spaces. Suppose $\mu$ is a measure on $\mathcal{E}$ and $f: E \to G$ is a measurable function. We define the \emph{image measure} $\nu = \mu \circ f^{-1}$ on $G$ by
   \[
@@ -890,6 +972,9 @@ Using this, we can prove that a whole lot more functions are measurable.
 \end{defi}
 It is a routine check that this is indeed a measure.
 
+If we have a strictly increasing continuous function, then we know it is invertible (if we restrict the codomain appropriately), and the inverse is also strictly increasing. It is also clear that these conditions are necessary for an inverse to exist. However, if we relax the conditions a bit, we can get some sort of ``pseudoinverse'' (some categorists may call them ``left adjoints'' (and will tell you that it is a trivial consequence of the adjoint functor theorem)).
+
+Recall that a function $g$ is \term{right continuous} if $x_n \searrow x$ implies $g(x_n) \to g(x)$, and similarly $f$ is \term{left continuous} if $x_n \nearrow x$ implies $f(x_n) \to f(x)$.
 \begin{lemma}
   Let $g: \R \to \R$ be non-constant, non-decreasing and right continuous. We set
   \[
@@ -897,11 +982,7 @@ It is a routine check that this is indeed a measure.
   \]
   We set $I = (g(-\infty), g(\infty))$. Since $g$ is non-constant, this is non-empty.
 
-  For $x \in I$, we set $f: I \to \R$ by
-  \[
-    f(x) = \inf\{y \in \R: x \leq g(y)\}.
-  \]
-  Then this is non-decreasing, left continuous and for all $x \in I$ and $y \in \R$, we have
+  Then there is a non-decreasing, left continuous function $f: I \to \R$ such that for all $x \in I$ and $y \in \R$, we have
   \[
     x \leq g(y) \Leftrightarrow f(x) \leq y.
   \]
@@ -909,20 +990,18 @@ It is a routine check that this is indeed a measure.
   \[
     x > g(y) \Leftrightarrow f(x) > y.
   \]
+  Explicitly, for $x \in I$, we define
+  \[
+    f(x) = \inf\{y \in \R: x \leq g(y)\}.
+  \]
 \end{lemma}
 
-\begin{own}
-  \begin{proof}
-    By the \term{adjoint functor theorem}.
-  \end{proof}
-\end{own}
-
 \begin{proof}
-  For $x \in I$, consider
+  We just have to verify that it works. For $x \in I$, consider
   \[
     J_x = \{y \in \R: x \leq g(y)\}.
   \]
-  Since $g$ is non-decreasing, if $y \in J_x$ and $y' \geq y$, then $y' \in J_x$. Since $g$ is right-continuous, if $y_n \in J_x$ is a decreasing sequence and $y_n \to y$, then $y \in J_x$. So we have
+  Since $g$ is non-decreasing, if $y \in J_x$ and $y' \geq y$, then $y' \in J_x$. Since $g$ is right-continuous, if $y_n \in J_x$ is such that $y_n \searrow y$, then $y \in J_x$. So we have
   \[
     J_x = [f(x), \infty).
   \]
@@ -932,9 +1011,35 @@ It is a routine check that this is indeed a measure.
   \]
   So we just have to prove the remaining properties of $f$. Now for $x \leq x'$, we have $J_x \subseteq J_{x'}$. So $f(x) \leq f(x')$. So $f$ is non-decreasing.
 
-  Similarly, if $x_n \to x$ is an increasing sequence, then we have $J_x = \bigcap_n J_{x_n}$. So $f(x_n) \to f(x)$. So this is left continuous.
+  Similarly, if $x_n \nearrow x$, then we have $J_x = \bigcap_n J_{x_n}$. So $f(x_n) \to f(x)$. So this is left continuous.
 \end{proof}
 
+\begin{eg}
+  If $g$ is given by the function
+  \begin{center}
+    \begin{tikzpicture}[scale=0.7]
+      \draw [->] (0, 0) -- (4, 0);
+      \draw [->] (0, 0) -- (0, 4);
+
+      \draw [thick, mblue] (0, 0) -- (2, 1.5) node [draw, fill=white, circle, inner sep = 0, minimum size = 3] {};
+
+      \draw [thick, mblue] (2, 2.5) node [circ] {} -- (3, 2.5) -- (4, 4);
+    \end{tikzpicture}
+  \end{center}
+  then $f$ is given by
+  \begin{center}
+    \begin{tikzpicture}[scale=0.7]
+      \draw [->] (0, 0) -- (4, 0);
+      \draw [->] (0, 0) -- (0, 4);
+
+      \draw [thick, mblue] (0, 0) -- (1.5, 2) -- (2.5, 2) node [draw, fill=white, circle, inner sep = 0, minimum size = 3] {};
+
+      \draw [thick, mblue] (2.5, 3) node [circ] {} -- (4, 4);
+    \end{tikzpicture}
+  \end{center}
+\end{eg}
+
+This allows us to construct new measures on $\R$ with ease.
 \begin{thm}
   Let $g: \R \to \R$ be non-constant, non-decreasing and right continuous. Then there exists a unique Radon measure $\d g$ on $\mathcal{B}$ such that
   \[
@@ -968,15 +1073,15 @@ Given the lemma, this is very easy.
 \end{proof}
 
 \subsection{Random variables}
-We are going to look at these ideas in the context of probability.
+We are now going to look at these ideas in the context of probability. It turns out they are concepts we already know and love!
 
 \begin{defi}[Random variable]\index{random variable}
   Let $(\Omega, \mathcal{F}, \P)$ be a probability space, and $(E, \mathcal{E})$ a measurable space. Then an \emph{$E$-valued random variable} is a measurable function $X: \Omega \to E$.
 
   By default, we will assume the random variables are real.
 \end{defi}
-
-\begin{defi}[Distribution]\index{distribution}
+Usually, when we have a random variable $X$, we might ask questions like ``what is the probability that $X \in A$?''. In other words, we are asking for the ``size'' of the set of things that get sent to $A$. This is just the image measure!
+\begin{defi}[Distribution/law]\index{distribution}
   Given a random variable $X: \Omega \to E$, the \emph{distribution} or \term{law} of $X$ is the image measure $\mu_x: \P \circ X^{-1}$. We usually write
   \[
     \P(X \in A) = \mu_x(A) = \P(X^{-1}(A)).
@@ -1001,7 +1106,16 @@ This is known as the \term{distribution function} of $X$.
 \end{prop}
 
 We call any function $F$ with these properties a distribution function.
-
+\begin{defi}[Distribution function]\index{distribution function}
+  A \emph{distribution function} is a non-decreasing, right continuous function $f: \R \to [0, 1]$ satisfying
+  \[
+    F_X(x) \to
+    \begin{cases}
+      0 & x \to -\infty\\
+      1 & x \to +\infty
+    \end{cases}.
+  \]
+\end{defi}
 We now want to show that every distribution function is indeed a distribution.
 
 \begin{prop}
@@ -1026,12 +1140,16 @@ We now want to show that every distribution function is indeed a distribution.
 
 This construction is actually very useful in practice. If we are writing a computer program and want to sample a random variable, we will use this procedure. The computer usually comes with a uniform (pseudo)-random number generator. Then using this procedure allows us to produce random variables of any distribution from a uniform sample.
 
+The next thing we want to consider is the notion of independence of random variables. Recall that for random variables $X, Y$, we used to say that they are independent if for any $A, B$, we have
+\[
+  \P[X \in A, Y \in B] = \P[X \in A]\P[Y \in B].
+\]
+But this is exactly the statement that the $\sigma$-algebras generated by $X$ and $Y$ are independent!
+
 \begin{defi}[Independence of random variables]\index{random variable!independent}\index{independent!random variable}
   A family $(X_n)$ of random variables is said to be \emph{independent} if the family of $\sigma$-algebras $(\sigma(X_n))$ is independent.
 \end{defi}
-How does this compare to the notion of independence we've learnt in IA Probability?
 
-It turns out we have the following theorem:
 \begin{prop}
   Two real-valued random variables $X, Y$ are independent iff
   \[
@@ -1045,10 +1163,10 @@ It turns out we have the following theorem:
 \end{prop}
 
 \begin{proof}
-  See first example sheet.
+  The $\Rightarrow$ direction is obvious. For the other direction, we simply note that $\{(-\infty, x]: x \in \R\}$ is a generating $\pi$-system for the Borel $\sigma$-algebra of $\R$.
 \end{proof}
 
-One question we might ask is how can we build a sequence of independent random variables?
+In probability, we often say things like ``let $X_1, X_2, \cdots$ be iid random variables''. However, how can we guarantee that iid random variables do indeed exist? We start with the less ambitious goal of finding iid $\Bernoulli(1/2)$ random variables:
 
 \begin{prop}
   Let
@@ -1087,7 +1205,12 @@ One question we might ask is how can we build a sequence of independent random v
   \[
     \P[R_n = 0] = 1 - \P[R_n = 1] = \frac{1}{2}
   \]
-  as well. So $R_n \sim \Bernoulli(1/2)$. We can straightforwardly check that $(R_n)$ is an independent sequence.
+  as well. So $R_n \sim \Bernoulli(1/2)$.
+
+  We can straightforwardly check that $(R_n)$ is an independent sequence, since for $n \not= m$, we have
+  \[
+    \P[R_n = 0 \text{ and }R_m = 0] = \frac{1}{4} = \P[R_n = 0] \P[R_m = 0].
+  \]
 \end{proof}
 
 We will now use the $(R_n)$ to construct any independent sequence for any distribution.
@@ -1116,7 +1239,7 @@ We will now use the $(R_n)$ to construct any independent sequence for any distri
   We set $X_n = G_n(Y_n)$. Then $(X_n)$ is a sequence of random variables with $F_{X_n} = F_n$.
 \end{proof}
 
-Interesting fact: We let $(\Omega, \mathcal{F}, \P)$ and $R_j$ be as above. Then $\frac{1}{n} \sum_{j = 1}^n R_j$ is the average of $n$ independent of $\Bernoulli(1/2)$ random variables. The weak law of large numbers says for any $\varepsilon > 0$, we have
+We end the section with a random fact: let $(\Omega, \mathcal{F}, \P)$ and $R_j$ be as above. Then $\frac{1}{n} \sum_{j = 1}^n R_j$ is the average of $n$ independent of $\Bernoulli(1/2)$ random variables. The weak law of large numbers says for any $\varepsilon > 0$, we have
 \[
   \P\left[\left\lvert\frac{1}{n} \sum_{j = 1}^n R_j - \frac{1}{2}\right\rvert \geq \varepsilon\right] \to 0\text{ as }n\to \infty.
 \]
@@ -1127,7 +1250,7 @@ The strong law of large numbers, which we will prove later, says that
 So ``almost every number'' in $(0, 1)$ has an equal proportion of $0$'s and $1$'s in its binary expansion. This is known as the normal number theorem.
 
 \subsection{Convergence of measurable functions}
-We want to talk about the convergence of random variables, and later see how they commute with integrals.
+The next thing to look at is the convergence of measurable functions. In measure theory, wonderful things happen when we talk about convergence. In analysis, most of the time we had to require uniform convergence, or even stronger notions, if we want limits to behave well. However, in measure theory, the kinds of convergence we talk about are somewhat pointwise in nature. In fact, it will be \emph{weaker} than pointwise convergence. Yet, we are still going to get good properties out of them.
 
 \begin{defi}[Convergence almost everywhere]\index{convergence!almost everywhere}\index{almost everywhere}\index{almost sure convergence}\index{convergence!almost sure}
   Suppose that $(E, \mathcal{E}, \mu)$ is a measure space. Suppose that $(f_n), f$ are measurable functions. We say $f_n \to f$ \emph{almost everywhere (a.e.)} if
@@ -1138,21 +1261,33 @@ We want to talk about the convergence of random variables, and later see how the
 \end{defi}
 To see this makes sense note that
 \[
-  \{x \in E: f_n(x) \not\to f(x)\} = \{x \in E: \limsup |f_n(x) - f(x)| > 0\}
+  \{x \in E: f_n(x) \not\to f(x)\} = \{x \in E: \limsup |f_n(x) - f(x)| > 0\}.
 \]
-On the example sheet, we will see that $\limsup |f_n - f|$ is non-negative measurable. So the set $\{x \in E: \limsup |f_n(x) - f(x)| > 0\}$ is measurable. This as a weakening of the notion of pointwise convergence, where we don't even require it to converge everywhere.
+We have previously seen that $\limsup |f_n - f|$ is non-negative measurable. So the set $\{x \in E: \limsup |f_n(x) - f(x)| > 0\}$ is measurable.
 
+Another useful notion of convergence is convergence in measure.
 \begin{defi}[Convergence in measure]\index{convergence!in measure}\index{convergence!in probability}
   Suppose that $(E, \mathcal{E}, \mu)$ is a measure space. Suppose that $(f_n), f$ are measurable functions. We say $f_n \to f$ \emph{in measure} if for each $\varepsilon > 0$, we have
   \[
-    \mu(\{x \in E: |f_n(x) - f(x)| \geq \varepsilon\}) \to 0\quad\text{ as }\quad n \to \infty,
+    \mu(\{x \in E: |f_n(x) - f(x)| \geq \varepsilon\}) \to 0\text{ as } n \to \infty,
   \]
   then we say that $f_n \to f$ \emph{in measure}.
 
-  If $(E, \mathcal{E}, \mu)$ is a probability space, then this is called \emph{convergence in probability}
+  If $(E, \mathcal{E}, \mu)$ is a probability space, then this is called \emph{convergence in probability}.
 \end{defi}
+In the case of a probability space, this says
+\[
+  \P(|X_n - X| \geq \varepsilon) \to 0\text{ as }n \to \infty
+\]
+for all $\varepsilon$, which is how we state the weak law of large numbers in the past.
 
-In general, neither of these notions imply each other. However, we have the following result:
+After we define integration, we can consider the norms of a function $f$ by
+\[
+  \|f\|_p = \left(\int |f(x)|^p \;\d x\right)^{1/p}.
+\]
+Then in particular, if $\|f_n - f\|_p \to 0$, then $f_n \to f$ in measure, and this provides an easy way to see that functions converge in measure.
+
+In general, neither of these notions imply each other. However, the following theorem provides us with a convenient dictionary to translate between the two notions.
 
 \begin{thm}\leavevmode
   \begin{enumerate}
@@ -1166,19 +1301,19 @@ In general, neither of these notions imply each other. However, we have the foll
   \[
     \mu(\{x \in E: |f_n(x) - f(x)|\leq \varepsilon\}).
   \]
-  We show that as $n \to \infty$, this tends to $\mu(E)$. First of all, we know
+  We use the result from the first example sheet that for any sequence of events $(A_n)$, we have
   \[
-    \mu(\{x \in E: |f_n(x) - f(x)|\leq \varepsilon\}) \geq \mu\left(\bigcap_{m \geq n} \{x \in E: |f_m(x) - f(x)| \leq \varepsilon\}\right).
+    \liminf \mu(A_n) \geq \mu(\liminf A_n).
   \]
-  Taking the limit as $n \to \infty$, we have
+  Applying to the above sequence says
   \begin{align*}
-    \mu(\{x \in E: |f_n(x) - f(x)|\leq \varepsilon\}) &\geq \mu\left(\bigcap_{m \geq n} \{x \in E: |f_m(x) - f(x)| \leq \varepsilon\}\right)\\
-    &\geq \mu\left(\bigcup_n \bigcap_{m \geq n} \{x \in E: |f_m(x) - f(x)| \leq \varepsilon\}\right)\\
-    &= \mu(\{x \in E: |f_m(x) - f(x)| \leq \varepsilon \text{ eventually}\})\\
-    &\geq \mu(\{x \in E: |f_m(x) -f(x)| \to 0\})\\
+    \liminf \mu(\{x: |f_n(x) - f(x)|\leq \varepsilon\}) &\geq \mu(\{x: |f_m (x) - f(x)| \leq \varepsilon\text{ eventually}\})\\
+    &\geq \mu(\{x \in E: |f_m - f(x)| \to 0\})\\
     &= \mu(E).
   \end{align*}
   As $\mu(E) < \infty$, we have $\mu(\{x \in E: |f_n(x) - f(x)| > \varepsilon\}) \to 0$ as $n \to \infty$.
+
+  \separator
 
   For the second part, suppose that $f_n \to f$ in measure. We pick a subsequence $(n_k)$ such that
   \[
@@ -1211,6 +1346,8 @@ Note that here we do not need that $(X_n)$ and $X$ live on the same probability 
 
 But why do we have the condition with continuity points? The idea is that if the resulting distribution has a ``jump'' at $x$, it doesn't matter which side of the jump $F_X(x)$ is at. Here is a simple example that tells us why this is very important:
 
+One might now think of cheating by cooking up some random variable such that $F$ is discontinuous at so many points that random, unrelated things converge to $F$. However, this cannot be done, because $F$ is a non-decreasing function, and thus can only have countably many points of discontinuities.
+
 \begin{eg}
   Let $X_n$ to be uniform on $[0, 1/n]$. Intuitively, this should converge to the random variable that is always zero.
 
@@ -1234,6 +1371,8 @@ But why do we have the condition with continuity points? The idea is that if the
   But $F_{X_n}(0) = 0 $ for all $n$, while $F_X(0) = 1$.
 \end{eg}
 
+The big theorem we are going to prove about convergence in distribution is that actually it is very boring and doesn't give us anything new.
+
 \begin{thm}[Skorokhod representation theorem of weak convergence]\index{Skorokhod representation theorem of weak convergence}\leavevmode
   \begin{enumerate}
     \item If $(X_n), X$ are defined on the same probability space, and $X_n \to X$ in probability. Then $X_n \to X$ in distribution.
@@ -1251,16 +1390,16 @@ But why do we have the condition with continuity points? The idea is that if the
         F_X(x - \delta) &\geq F_X(x) - \frac{\varepsilon}{2}\\
         F_X(x + \delta) & \leq F_X(x) + \frac{\varepsilon}{2}.
       \end{align*}
-      We fix $N$ large such that $n \geq N$ such that $\P[|X_n - X| \geq \delta] \leq \frac{\varepsilon}{2}$. Then
+      We fix $N$ large such that $n \geq N$ implies $\P[|X_n - X| \geq \delta] \leq \frac{\varepsilon}{2}$. Then
       \begin{align*}
         F_{X_n}(x) &= \P[X_n \leq x] \\
         &= \P[(X_n - X) + X \leq x] \\
-        \intertext{We now notice that $\{(X_n - x) + X \leq x\} \subseteq \{X \leq x + \delta\} \cup \{|X_n - X| > \delta\}$. So we have}
-        &\leq \P[X \leq x + \delta] + \P[|x_n - X| > \delta]\\
+        \intertext{We now notice that $\{(X_n - X) + X \leq x\} \subseteq \{X \leq x + \delta\} \cup \{|X_n - X| > \delta\}$. So we have}
+        &\leq \P[X \leq x + \delta] + \P[|X_n - X| > \delta]\\
         &\leq F_X(x + \delta) + \frac{\varepsilon}{2}\\
         &\leq F_X(x) + \varepsilon.
        \end{align*}
-       Also, we have
+       We similarly have
        \begin{align*}
          F_{X_n}(x) &= \P[X_n \leq x] \\
          &\geq \P[X \leq x - \delta] - \P[|X_n - X| > \delta]\\
@@ -1275,34 +1414,94 @@ But why do we have the condition with continuity points? The idea is that if the
        We let
        \begin{align*}
          \tilde{X}_n(\omega) &= \inf\{x : \omega \leq F_{X_n}(x)\},\\
-         \tilde{X}(\omega) &= \int \{x : \omega \leq F_X(x)\}.
+         \tilde{X}(\omega) &= \inf \{x : \omega \leq F_X(x)\}.
        \end{align*}
-       Recall from before that $\tilde{X}_n$ has the same distribution function as $X_n$ for all $n$, and $\tilde{X}$ has the same distribution as $X$. We are now going to show that with this particular choice, we have $\tilde{X}_n \to \tilde{X}$ a.s.
+       Recall from before that $\tilde{X}_n$ has the same distribution function as $X_n$ for all $n$, and $\tilde{X}$ has the same distribution as $X$. Moreover, we have
+       \begin{align*}
+         \tilde{X}_n(\omega) \leq x &\Leftrightarrow \omega \leq F_{X_n}(x)\\
+         x < \tilde{X}_n(\omega) &\Leftrightarrow F_{X_n}(x) < \omega,
+       \end{align*}
+       and similarly if we replace $X_n$ with $X$.
+
+       We are now going to show that with this particular choice, we have $\tilde{X}_n \to \tilde{X}$ a.s.
 
        Note that $\tilde{X}$ is a non-decreasing function $(0, 1) \to \R$. Then by general analysis, $\tilde{X}$ has at most countably many discontinuities. We write
        \[
          \Omega_0 = \{\omega \in (0, 1): \tilde{X}\text{ is continuous at }\omega_0\}.
        \]
-       Then $(0, 1) \setminus \Omega$ is countable, and hence has Lebesgue measure $0$. So
+       Then $(0, 1) \setminus \Omega_0$ is countable, and hence has Lebesgue measure $0$. So
        \[
          \P[\Omega_0] = 1.
        \]
        We are now going to show that $\tilde{X}_n (\omega) \to \tilde{X}(\omega)$ for all $\omega \in \Omega_0$.
 
-       Note that $F_X$ is a non-decreasing function, and hence the points of discontinuity $\R \setminus S$ is also countable. So $S$ is dense in $\R$. Fix $\omega \in \Omega_0$ and $\varepsilon > 0$. We want to show that $|\tilde{X}_n(\omega) - \tilde{W}_\omega| \leq \varepsilon$ for all $n$ large enough.
+       Note that $F_X$ is a non-decreasing function, and hence the points of discontinuity $\R \setminus S$ is also countable. So $S$ is dense in $\R$. Fix $\omega \in \Omega_0$ and $\varepsilon > 0$. We want to show that $|\tilde{X}_n(\omega) - \tilde{X}(\omega)| \leq \varepsilon$ for all $n$ large enough.
 
-       Since $S$ is dense in $\R$, we can find $x^-, x^+$ in $S$ such that $x^- < \tilde{X}(\omega) < x^+$ and $x^+ - x^- < \varepsilon$. We can also find $\omega^+\in (\omega, 1)$ such that $\tilde{X}(\omega^+) \leq x^+$ since $\tilde{X}$ is continuous at $\omega^+$. Then we have
+       Since $S$ is dense in $\R$, we can find $x^-, x^+$ in $S$ such that
        \[
-         F_X(x^-) < \varepsilon
+         x^- < \tilde{X}(\omega) < x^+
        \]
-       and
+       and $x^+ - x^- < \varepsilon$. What we \emph{want} to do is to use the characteristic property of $\tilde{X}$ and $F_X$ to say that this implies
        \[
-         F-X(x^+) \geq \omega^+ > \omega.
+         F_X(x^-) < \omega < F_X(x^+).
        \]
-       Then convergence in distribution implies that there is $N$ such that $n \geq N$ implies $F_{X_n}(x^- < \varepsilon)$, and $F_{X_n}(x^+) \geq \omega$. So we have $x^- < \tilde{X}_n(\omega) \leq x^+$. So $|\tilde{X}_n(\omega)- \tilde{X}(\omega)| < x^+ - x^- = \varepsilon$. So done.
+       Then since $F_{X_n} \to F_X$ at the points $x^-, x^+$, for sufficiently large $n$, we have
+       \[
+         F_{X_n}(x^-) < \omega < F_{X_n}(x^+).
+       \]
+       Hence we have
+       \[
+         x^- < \tilde{X}_n(\omega) < x^+.
+       \]
+       Then it follows that $|\tilde{X}_n(\omega) - \tilde{X}(\omega)| < \varepsilon$.
+
+       However, this doesn't work, since $\tilde{X}(\omega) < x^+$ only implies $\omega \leq F_X(x^+)$, and our argument will break down. So we do a funny thing where we introduce a new variable $\omega^+$.
+
+       Since $\tilde{X}$ is continuous at $\omega$, we can find $\omega^+\in (\omega, 1)$ such that $\tilde{X}(\omega^+) \leq x^+$.
+       \begin{center}
+         \begin{tikzpicture}
+           \draw [->] (0, 0) -- (4, 0);
+           \draw [->] (0, 0) -- (0, 3);
+
+           \draw [thick, mblue] (0, 0) .. controls (1, 2) and (3, 1) .. (4, 3) node [right] {$\tilde{X}(\omega)$};
+
+           \node [circ] at (2, 0) {};
+           \node [below] at (2, 0) {$\omega$};
+           \node [circ] at (2, 1.5) {};
+
+           \draw [dashed] (0, 1.24) node [left] {$x^-$} -- (1.3, 1.24) node [circ] {};
+           \draw [dashed] (0, 1.76) node [left] {$x^+$} -- (2.7, 1.76) node [circ] {};
+
+           \node [circ] at (2.5, 0) {};
+           \node [below] at (2.5, 0) {$\omega^+$};
+           \draw [dashed] (2.5, 0) -- (2.5, 1.63);
+           \draw [dashed] (2, 0) -- (2, 1.5);
+
+           \draw [latex'-latex'] (0.5, 1.24) -- (0.5, 1.76) node [pos=0.5, right] {$\varepsilon$};
+         \end{tikzpicture}
+       \end{center}
+       Then we have
+       \[
+         x^- < \tilde{X}(\omega) \leq \tilde{X}(\omega^+) < x^+.
+       \]
+       Then we have
+       \[
+         F_X(x^-) < \omega < \omega^+ \leq F_X(x^+).
+       \]
+       So for sufficiently large $n$, we have
+       \[
+         F_{X_n}(x^-) < \omega < F_{X_n}(x^+).
+       \]
+       So we have
+       \[
+         x^- < \tilde{X}_n(\omega) \leq x^+,
+       \]
+       and we are done.
   \end{enumerate}
 \end{proof}
 
+\subsection{Tail events}
+Finally, we are going to quickly look at tail events. These are events that depend only on the asymptotic behaviour of a sequence of random variables.
 \begin{defi}[Tail $\sigma$-algebra]\index{tail $\sigma$-algebra}\index{$\sigma$-algebra!tail}
   Let $(X_n)$ be a sequence of random variables. We let
   \[
@@ -1312,9 +1511,9 @@ But why do we have the condition with continuity points? The idea is that if the
   \[
     \mathcal{T} = \bigcap_n \mathcal{T}_n.
   \]
-  Then $\mathcal{T}$ is the \emph{tail $\sigma$-algebra}
+  Then $\mathcal{T}$ is the \emph{tail $\sigma$-algebra}.
 \end{defi}
-$\mathcal{T}$-measurable \index{$\mathcal{T}$-measurable} events and random variables only depend on the asymptotic behaviour of the $X_n$'s.
+Then $\mathcal{T}$-measurable \index{$\mathcal{T}$-measurable} events and random variables only depend on the asymptotic behaviour of the $X_n$'s.
 
 \begin{eg}
   Let $(X_n)$ be a sequence of real-valued random variables. Then
@@ -1370,7 +1569,7 @@ $\mathcal{T}$-measurable \index{$\mathcal{T}$-measurable} events and random vari
 
   Finally, note that $\mathcal{T} \subseteq \mathcal{F}_\infty$. So $\mathcal{T}$ is independent of $\mathcal{T}$.
 
-  Finally, suppose that $X$ is $\mathcal{T}$-measurable. Then
+  To find the constant, suppose that $X$ is $\mathcal{T}$-measurable. Then
   \[
     \P[X \leq x] \in \{0, 1\}
   \]
@@ -1383,48 +1582,8 @@ $\mathcal{T}$-measurable \index{$\mathcal{T}$-measurable} events and random vari
   Then with this particular choice of $c$, it is easy to see that $\P[X = c] = 1$. This completes the proof of the theorem.
 \end{proof}
 
-We are now going to prove the monotone class theorem, which is a ``Dynkin's lemma'' for measurable functions.
-\begin{thm}[Monotone class theorem]\index{monotone class theorem}
-  Let $(E, \mathcal{E})$ be a measurable space, and $\mathcal{A} \subseteq \mathcal{E}$ be a $\pi$-system with $\sigma(\mathcal{A}) = \mathcal{E}$. Let $\mathcal{V}$ be a vector space of functions such that
-  \begin{enumerate}
-    \item The constant function $1 = \mathbf{1}_E$ is in $\mathcal{V}$.
-    \item The indicator functions $\mathbf{1}_A \in \mathcal{V}$ for all $A \in \mathcal{A}$
-    \item $\mathcal{V}$ is closed under bounded, monotone limits. More explicitly, if $(f_n)$ is a bounded, non-negative, increasing sequence in $\mathcal{V}$ and $f_n \to f$ is bounded, then $f \in \mathcal{V}$.
-  \end{enumerate}
-  Then $\mathcal{V}$ contains all bounded measurable functions.
-\end{thm}
-
-\begin{proof}
-  Note that the conditions for $\mathcal{V}$ is pretty like the conditions for a d-system, where taking a bounded, monotone limit is something like taking increasing unions.
-
-  In fact, let
-  \[
-    \mathcal{D} = \{A \in \mathcal{E}: \mathbf{1}_A \in \mathcal{V}\}.
-  \]
-  We want to show that $\mathcal{D} = \mathcal{E}$. To do this, we have to show that $\mathcal{D}$ is a $d$-system.
-  \begin{enumerate}
-    \item Since $\mathbf{1}_E \in \mathcal{V}$, we know $E \in \mathcal{D}$.
-    \item If $\mathbf{1}_A \in V$, then $1 - \mathbf{1}_A = \mathbf{1}_{E \setminus A} \in \mathcal{V}$. So $E \setminus A \in \mathcal{D}$.
-    \item If $(A_n)$ is an increasing sequence in $\mathcal{D}$, then $\mathbf{1}_{A_n} \to \mathbf{1}_{\bigcup A_n}$ monotonically increasingly. So $\mathbf{1}_{\bigcup A_n}$ is in $\mathcal{D}$.
-  \end{enumerate}
-  So, by Dynkin's lemma, we know $\mathcal{D} = \mathcal{E}$. So $\mathcal{V}$ contains indicators of all measurable sets. We will now try to obtain any measurable function by approximating.
-
-  Suppose that $f$ is bounded and non-negative measurable. We want to show that $f \in \mathcal{V}$. To do this, we approximate it by letting
-  \[
-    f_n = 2^{-n} \lfloor 2^n f\rfloor = \sum_{k = 0}^\infty k 2^{-n} \mathbf{1}_{\{k 2^{-n} \leq f < (k + 1) 2^{-n}\}}.
-  \]
-  Note that since $f$ is bounded, this is a finite sum. So it is a finite linear combination of indicators of elements in $\mathcal{E}$. So $f_n \in \mathcal{V}$, and $0 \leq f_n \to f$ monotonically. So $f \in \mathcal{V}$.
-
-  More generally, if $f$ is bounded and measurable, then we can write
-  \[
-    f = f^+ - f^- = \max(f, 0) - \max(-f, 0) = (f \vee 0) - ((-f) \vee 0),
-  \]
-  where $f \vee g = \max(f, g)$.
-  Then $f^+$ and $f^-$ are bounded and non-negative measurable.
-\end{proof}
-These results are important, but we will not get to use them until quite later on in the course.
-
 \section{Integration}
+\subsection{Definition and basic properties}
 We are now going to work towards defining the integral of a measurable function on a measure space $(E, \mathcal{E}, \mu)$. Different sources use different notations for the integral. The following notations are all commonly used:
 \[
   \mu(f) = \int_E f \;\d \mu = \int_E f(x) \;\d \mu(x) = \int_E f(x) \mu(\d x).
@@ -1433,7 +1592,7 @@ In the case where $(E, \mathcal{E}, \mu) = (\R, \mathcal{B}, \mathrm{Lebesgue})$
 \[
   \mu(f) = \int_\R f(x)\;\d x.
 \]
-On the other hand, if $(E, \mathcal{E}, \mu) = (\Omega, \F, \P)$ is a probability space, and $X$ is a random variable, then people write the integral as $\E[X]$, the \emph{expectation} of $X$.
+On the other hand, if $(E, \mathcal{E}, \mu) = (\Omega, \F, \P)$ is a probability space, and $X$ is a random variable, then people write the integral as $\E[X]$, the \term{expectation} of $X$.\index{$\E[X]$}\index{$\mu(f)$}
 
 So how are we going to define the integral? There are two steps to defining the integral. The idea is that we first define the integral on \emph{simple functions}, and then extend the definition to more general measurable functions by taking the limit. When we do the definition for simple functions, it will be obvious that the definition satisfies the nice properties, and we will have to check that they are preserved when we take the limit.
 
@@ -1472,7 +1631,7 @@ We are now going to extend this definition to non-negative measurable functions 
   \]
   For arbitrary $f$, we write
   \[
-    f = f^+ - f^- = (f \vee 0) - ((-f) \vee 0).
+    f = f^+ - f^- = (f \vee 0) + (f \wedge 0).
   \]
   We put $|f| = f^+ + f^-$. We say $f$ is \emph{integrable}\index{integrable function} if $\mu(|f|) < \infty$. In this case, set
   \[
@@ -1480,6 +1639,25 @@ We are now going to extend this definition to non-negative measurable functions 
   \]
   If only one of $\mu(f^+), \mu(f_-) < \infty$, then we can still make the above definition, and the result will be infinite.
 \end{defi}
+
+In the case where we are integrating over (a subset of) the reals, we call it the \term{Lebesgue integral}.
+
+\begin{prop}
+  Let $f: [0, 1] \to \R$ be Riemann integrable. Then it is also Lebesgue integrable, and the two integrals agree.
+\end{prop}
+We will not prove this, but this immediately gives us results like the fundamental theorem of calculus, and also helps us to actually compute the integral. However, note that this does not hold for infinite domains, as you will see in the second example sheet.
+
+But the Lebesgue integrable functions are better. A lot of functions are Lebesgue integrable but not Riemann integrable.
+\begin{eg}
+  Take the standard non-Riemann integrable function
+  \[
+    f = \mathbf{1}_{[0, 1]\setminus \Q}.
+  \]
+  Then $f$ is not Riemann integrable, but it is Lebesgue integrable, since
+  \[
+    \mu(f) = \mu([0, 1] \setminus \Q) = 1.
+  \]
+\end{eg}
 
 We are now going to study some basic properties of the integral. We will first look at the properties of integrals of simple functions, and then extend them to general integrable functions.
 
@@ -1495,7 +1673,7 @@ Finally, we have $f = 0$ a.e. iff $\mu(f) = 0$. It is absolutely crucial here th
 
 Our goal is to show that these three properties are also satisfied for arbitrary non-negative measurable functions, and the first two hold for integrable functions.
 
-In order to achieve this, we prove a very important tool --- the monotone convergence theorem. Later, we will also learn about the dominated convergence theorem, and Fatou's lemma. These are the main and very important results about exchanging limits and integration.
+In order to achieve this, we prove a very important tool --- the monotone convergence theorem. Later, we will also learn about the dominated convergence theorem and Fatou's lemma. These are the main and very important results about exchanging limits and integration.
 
 \begin{thm}[Monotone convergence theorem]\index{monotone convergence theorem}
   Suppose that $(f_n), f$ are non-negative measurable with $f_n \nearrow f$. Then $\mu(f_n) \nearrow \mu(f)$.
@@ -1703,7 +1881,20 @@ As mentioned, the converse to (iii) is no longer true. However, we do have the f
 \end{prop}
 
 \begin{proof}
-  On example sheet 2.
+  Let
+  \[
+    \mathcal{D} = \{A \in \mathcal{E}: \mu (f\mathbf{1}_A) = 0\}.
+  \]
+  It follows immediately from the properties of the integral that $\mathcal{D}$ is a d-system. So $\mathcal{D} = \mathcal{E}$ by Dynkin's lemma. Let
+  \begin{align*}
+    A^+ &= \{x \in E: f(x) > 0\},\\
+    A^- &= \{x \in E: f(x) < 0\}.
+  \end{align*}
+  Then $A^{\pm} \in \mathcal{E}$, and
+  \[
+    \mu(f \mathbf{1}_{A^+}) = \mu(f \mathbf{1}_{A^-}) = 0.
+  \]
+  So $f\mathbf{1}_{A^+}$ and $f \mathbf{1}_{A^-}$ vanish a.e. So $f$ vanishes a.e.
 \end{proof}
 
 \begin{prop}
@@ -1720,11 +1911,11 @@ As mentioned, the converse to (iii) is no longer true. However, we do have the f
   \]
   as $N \to \infty$. So by the monotone convergence theorem, we have
   \[
-    \sum_{n = 1}^N \mu(g_n) \mu \left(\sum_{n = 1}^\infty g_n\right) \nearrow \mu\left(\sum_{n = 1}^\infty g_n\right).
+    \sum_{n = 1}^N \mu(g_n) = \mu \left(\sum_{n = 1}^N g_n\right) \nearrow \mu\left(\sum_{n = 1}^\infty g_n\right).
   \]
   But we also know that
   \[
-    \sum_{n = 1}^\infty \mu(g_n) \nearrow \sum_{n = 1}^\infty
+    \sum_{n = 1}^N \mu(g_n) \nearrow \sum_{n = 1}^\infty \mu(g_n)
   \]
   by definition. So we are done.
 \end{proof}
@@ -1738,7 +1929,8 @@ Note that we can consider summation as integration. We let $E = \N$ and $\mathca
 So we can just view our proposition as proving that we can swap the order of two integrals. The general statement is known as Fubini's theorem.
 
 \subsection{Integrals and limits}
-We are now going to prove more things about exchanging limits and integrals.
+We are now going to prove more things about exchanging limits and integrals. These are going to be extremely useful in the future, as we want to exchange limits and integrals a lot.
+
 \begin{thm}[Fatou's lemma]\index{Fatou's lemma}
   Let $(f_n)$ be a sequence of non-negative measurable functions. Then
   \[
@@ -1760,7 +1952,7 @@ Note that a special case was proven in the first example sheet, where we did it 
 
   So we have
   \[
-    \mu(\inf_{m \geq n} f_m) \leq \inf_{k \geq n} \mu(f_k) \leq \liminf_m \mu(f_m).
+    \mu\left(\inf_{m \geq n} f_m\right) \leq \inf_{k \geq n} \mu(f_k) \leq \liminf_m \mu(f_m).
   \]
   It remains to show that the left hand side converges to $\mu(\liminf f_m)$. Indeed, we know that
   \[
@@ -1775,28 +1967,30 @@ Note that a special case was proven in the first example sheet, where we did it 
     \mu\left(\liminf_m f_m\right) \leq \liminf_m \mu(f_m).
   \]
 \end{proof}
-No one ever remembers which direction Fatou's lemma goes, and this leads to many incorrect proofs and results.
+No one ever remembers which direction Fatou's lemma goes, and this leads to many incorrect proofs and results, so it is helpful to keep the following example in mind:
 
-How do we remember which way the inequality goes in Fatou's lemma? We let $(E, \mathcal{E}, \mu) = (\R, \mathcal{B}, \text{Lebesgue})$. We let
-\[
-  f_n = \mathbf{1}_{[n, n + 1]}.
-\]
-Then we have
-\[
-  \liminf_n f_n = 0.
-\]
-So we have
-\[
-  \mu(f_n) = 1\text{ for all }n.
-\]
-So we have
-\[
-  \liminf \mu(f_n) = 1,\quad \mu(\liminf f_n) = 0.
-\]
-So we have
-\[
-  \mu\left(\liminf_m f_m\right) \leq \liminf_m \mu(f_m).
-\]
+\begin{eg}
+  We let $(E, \mathcal{E}, \mu) = (\R, \mathcal{B}, \text{Lebesgue})$. We let
+  \[
+    f_n = \mathbf{1}_{[n, n + 1]}.
+  \]
+  Then we have
+  \[
+    \liminf_n f_n = 0.
+  \]
+  So we have
+  \[
+    \mu(f_n) = 1\text{ for all }n.
+  \]
+  So we have
+  \[
+    \liminf \mu(f_n) = 1,\quad \mu(\liminf f_n) = 0.
+  \]
+  So we have
+  \[
+    \mu\left(\liminf_m f_m\right) \leq \liminf_m \mu(f_m).
+  \]
+\end{eg}
 The next result we want to prove is the dominated convergence theorem. This is like the monotone convergence theorem, but we are going to remove the increasing and non-negative measurable condition, and add in something else.
 \begin{thm}[Dominated convergence theorem]\index{dominated convergence theorem}
   Let $(f_n), f$ be measurable with $f_n(x) \to f(x)$ for all $x \in E$. Suppose that there is an integrable function $g$ such that
@@ -1819,7 +2013,7 @@ The next result we want to prove is the dominated convergence theorem. This is l
   \[
     \mu(|f|) \leq \mu(g) < \infty.
   \]
-  So we know that $f$, $f_n$ is integrable.
+  So we know that $f$, $f_n$ are integrable.
 
   Now note also that
   \[
@@ -1856,19 +2050,8 @@ The next result we want to prove is the dominated convergence theorem. This is l
   So they must be all equal, and thus $\mu(f_n) \to \mu(f)$.
 \end{proof}
 
-\subsection{Relationship between the Riemann and Lebesgue integrals}
-Suppose that $f: [0, 1] \to \R$ is a continuous function. Then $f$ is measurable, and is integrable as it is bounded. It is an exercise to show that the Lebesgue integral of $f$ is equal to the Riemann integral of $f$. More generally, every Riemann integrable function is Lebesgue integrable.% fill in?
-
-However, a lot of functions are Lebesgue integrable but not Riemann integrable. Indeed, take the standard non-Riemann integrable function
-\[
-  f = \mathbf{1}_{[0, 1]\setminus \Q}.
-\]
-Then $f$ is not Riemann integrable, but it is Lebesgue integrable, since
-\[
-  \mu(f) = \mu([0, 1] \setminus \Q) = 1.
-\]
-\subsection{New measure spaces from old}
-We are now going to look at different ways of producing new measure spaces from old ones.
+\subsection{New measures from old}
+We have previously considered several ways of constructing measures from old ones, such as the image measure. We are now going to study a few more ways of constructing new measures, and see how integrals behave when we do these.
 
 \begin{defi}[Restriction of measure space]\index{restriction of measure space}\index{measure space!restriction}
   Let $(E, \mathcal{E}, \mu)$ be a measure space, and let $A \in \mathcal{E}$. The \emph{restriction} of the measure space to $A$ is $(A, \mathcal{E}_A, \mu_A)$, where
@@ -1882,21 +2065,22 @@ We are now going to look at different ways of producing new measure spaces from 
   for all $B \in \mathcal{E}_A$.
 \end{defi}
 
+It is easy to check the following:
 \begin{lemma}
   For $(E, \mathcal{E}, \mu)$ a measure space and $A \in \mathcal{E}$, the restriction to $A$ is a measure space.
 \end{lemma}
 
-\begin{proof}\leavevmode
-  We check that $\mathcal{E}_A$ is a $\sigma$-algebra.
-
-  Since $\emptyset \in \mathcal{E}$ and $\emptyset\subseteq A$, we know $\phi \in \mathcal{E}_A$.
-
-  Also, if $B \in \mathcal{E}$ and $B \subseteq A$, then $A \cap B^C \in \mathcal{E}$. So $A \setminus B \in \mathcal{E}_A$.
-
-  Finally, if $B_n$ is a sequence in $\mathcal{E}$ and $B_n \subseteq A$ for all $n$, then $\bigcup_n B_n \in \mathcal{E}$ and $\bigcup_n B_n \subseteq A$. So $\bigcup_n B_n \in \mathcal{E}_A$.
-
-  It is clear that $\mu_A$ is also a measure.
-\end{proof}
+%\begin{proof}
+% We check that $\mathcal{E}_A$ is a $\sigma$-algebra.
+%
+% Since $\emptyset \in \mathcal{E}$ and $\emptyset\subseteq A$, we know $\phi \in \mathcal{E}_A$.
+%
+% Also, if $B \in \mathcal{E}$ and $B \subseteq A$, then $A \cap B^C \in \mathcal{E}$. So $A \setminus B \in \mathcal{E}_A$.
+%
+% Finally, if $B_n$ is a sequence in $\mathcal{E}$ and $B_n \subseteq A$ for all $n$, then $\bigcup_n B_n \in \mathcal{E}$ and $\bigcup_n B_n \subseteq A$. So $\bigcup_n B_n \in \mathcal{E}_A$.
+%
+% It is clear that $\mu_A$ is also a measure.
+%\end{proof}
 
 \begin{prop}
   Let $(E, \mathcal{E}, \mu)$ and $(F, \mathcal{F}, \mu')$ be measure spaces and $A \in \mathcal{E}$. Let $f: E \to F$ be a measurable function. Then $f|_A$ is $\mathcal{E}_A$-measurable.
@@ -1927,7 +2111,7 @@ In the particular case of Lebesgue integration, if $A$ is an interval with left 
   \int_A f\;\d \mu = \int_a^b f(x) \;\d x.
 \]
 There is another construction we would be interested in.
-\begin{defi}[Pushforward/image of measrue]\index{pushforward of measure}\index{image measure}\index{measure!pushforward}\index{measure!image}
+\begin{defi}[Pushforward/image of measure]\index{pushforward of measure}\index{image measure}\index{measure!pushforward}\index{measure!image}
   Let $(E, \mathcal{E})$ and $(G, \mathcal{G})$ be measure spaces, and $f: E \to G$ a measurable function. If $\mu$ is a measure on $(E, \mathcal{E})$, then
   \[
     \nu = \mu \circ f^{-1}
@@ -1942,6 +2126,10 @@ We have already seen this before, but we can apply this to integration as follow
     \nu(g) = \mu(g \circ f).
   \]
 \end{prop}
+
+\begin{proof}
+  Exercise using the monotone class theorem (see example sheet).
+\end{proof}
 
 Finally, we can specify a measure by \emph{specifying a density}.
 \begin{defi}[Density]\index{density}
@@ -1977,8 +2165,10 @@ Finally, we can specify a measure by \emph{specifying a density}.
   \]
 \end{defi}
 
-We are now going to prove the change of variables formula. As explained earlier, the Lebesgue integral and Riemann integral agree when both are defined, we know that the fundamental theorem of calculus holds for the Lebesgue integral.
+\subsection{Integration and differentiation}
+In ``normal'' calculus, we had three results involving both integration and differentiation. One was the fundamental theorem of calculus, which we already stated. The others are the change of variables formula, and differentiating under the integral sign.
 
+We start by proving the change of variables formula.
 \begin{prop}[Change of variables formula]\index{change of variables formula}
   Let $\phi: [a, b] \to \R$ be continuously differentiable and increasing. Then for any bounded Borel function $g$, we have
   \[
@@ -1992,7 +2182,9 @@ We will use the monotone class theorem.
   \[
     V = \{\text{Borel functions $g$ such that $(*)$ holds}\}.
   \]
-  We will want to use the monotone class theorem to show that this includes all bounded functions. Then we know that
+  We will want to use the monotone class theorem to show that this includes all bounded functions.
+
+  We already know that
   \begin{enumerate}
     \item $V$ contains $\mathbf{1}_A$ for all $A$ in the $\pi$-system of intervals of the form $[u, v] \subseteq [a, b]$. This is just the fundamental theorem of calculus.
     \item By linearity of the integral, $V$ is indeed a vector space.
@@ -2008,7 +2200,10 @@ We will use the monotone class theorem.
   Then by the monotone class theorem, $V$ contains all bounded Borel functions.
 \end{proof}
 
-Now we ask the question --- when can we switch integration and differentiation?
+The next problem is integrating under the differentiation sign. We want to know when we can say
+\[
+  \frac{\d}{\d t} \int f(x, t) \;\d x = \int \frac{\partial f}{\partial t}(x, t) \;\d x.
+\]
 
 \begin{thm}
   Let $(E, \mathcal{E}, \mu)$ be a space, and $U \subseteq \R$ be an open set, and $f: U \times E \to \R$. We assume that
@@ -2017,15 +2212,15 @@ Now we ask the question --- when can we switch integration and differentiation?
     \item For any $x \in E$ fixed, the map $t \mapsto f(t, x)$ is differentiable;
     \item There exists an integrable function $g$ such that
       \[
-        \left|\frac{\d}{\d t}f(t, x)\right| \leq g(x)
+        \left|\frac{\partial f}{\partial t}(t, x)\right| \leq g(x)
       \]
       for all $x \in E$ and $t \in U$.
   \end{enumerate}
   Then the map
   \[
-    x \mapsto \frac{\partial f}{\partial x}(t, x)
+    x \mapsto \frac{\partial f}{\partial t}(t, x)
   \]
-  is integrable for all $t$, then the function
+  is integrable for all $t$, and also the function
   \[
     F(t) = \int_E f(t, x) \d \mu
   \]
@@ -2037,6 +2232,8 @@ Now we ask the question --- when can we switch integration and differentiation?
 The reason why we want the derivative to be bounded is that we want to apply the dominated convergence theorem.
 
 \begin{proof}
+  Measurability of the derivative follows from the fact that it is a limit of measurable functions, and then integrability follows since it is bounded by $g$.
+
   Suppose $(h_n)$ is a positive sequence with $h_n \to 0$. Then let
   \[
     g_n(x) = \frac{f(t + h_n, x) - f(t, x)}{h_n} - \frac{\partial f}{\partial t}(t, x).
@@ -2056,6 +2253,8 @@ The reason why we want the derivative to be bounded is that we want to apply the
   Since $h_n$ was arbitrary, it follows that $F'(t)$ exists and is equal to the integral.
 \end{proof}
 
+\subsection{Product measures and Fubini's theorem}
+Recall the following definition of the product $\sigma$-algebra.
 \begin{defi}[Product $\sigma$-algebra]\index{product $\sigma$-algebra}\index{$\sigma$-algebra!product}
   Let $(E_1, \mathcal{E}_1, \mu_1)$ and $(E_2, \mathcal{E}_2, \mu_2)$ be finite measure spaces. We let
   \[
@@ -2066,42 +2265,49 @@ The reason why we want the derivative to be bounded is that we want to apply the
     \mathcal{E} = \mathcal{E}_1 \otimes \mathcal{E}_2 = \sigma(\mathcal{A}).
   \]
 \end{defi}
+We now want to construct a measure on the product $\sigma$-algebra. We can, of course, just apply the Caratheodory extension theorem, but we would want a more explicit description of the integral. The idea is to define, for $A \in \mathcal{E}_1 \otimes \mathcal{E}_2$,
+\[
+  \mu(A) = \int_{E_1} \left(\int_{E_2} \mathbf{1}_A(x_1, x_2)\;\mu_2(\d x_2)\right)\mu_1(\d x_1).
+\]
+Doing this has the advantage that it would help us in a step of proving Fubini's theorem.
 
+However, before we can make this definition, we need to do some preparation to make sure the above statement actually makes sense:
 \begin{lemma}
   Let $E = E_1 \times E_2$ be a product of $\sigma$-algebras. Suppose $f: E \to \R$ is $\mathcal{E}$-measurable function. Then
   \begin{enumerate}
-    \item For each $x_1 \in E_1$, the function $x_2 \mapsto f(x_1, x_2)$ is $\mathcal{E}_2$-measurable.
+    \item For each $x_2 \in E_2$, the function $x_1 \mapsto f(x_1, x_2)$ is $\mathcal{E}_1$-measurable.
     \item If $f$ is bounded or non-negative measurable, then
       \[
-        f_2(x_2) = \int_{E_1} f(x_1, x_2)\; \mu_1(\d x_1).
+        f_2(x_2) = \int_{E_1} f(x_1, x_2)\; \mu_1(\d x_1)
       \]
+      is $\mathcal{E}_2$-measurable.
   \end{enumerate}
 \end{lemma}
 
 \begin{proof}
-  We are again going to use the monotone class theorem. Let $V$ be the set of all $\mathcal{E}$-measurable functions such that (i) holds. We have
+% We are again going to use the monotone class theorem. Let $V$ be the set of all $\mathcal{E}$-measurable functions such that (i) holds. We have
+% \begin{enumerate}
+% \item It is clear that $\mathbf{1}_E$ and $\mathbf{1}_A \in V$ for all $A \in \mathcal{A}$, where $\mathcal{A}$ is as in the definition of the product $\sigma$-algebra.
+% \item It is also clear that $V$ is a vector space.
+% \item If $(f_n)$ is a sequence in $V$ with $f_n \geq 0$ and $f_n \nearrow f$, then we know that $(x_2 \mapsto f_n(x_1, x_2)) \nearrow x_2 \mapsto f(x_2, x_2)$. Hence $x_2 \mapsto f(x_1, x_2)$ is measurable as a limit of measurable functions.
+% \end{enumerate}
+% By the monotone class theorem, $V$ contains all bounded measurable functions.
+%
+% If $f$ is $\mathcal{E}$-measurable, then $(f \vee (-n))\wedge n$ is a bounded, measurable function. So $f \vee (-n) \vee n \in V$ for all $n$. So
+% \[
+% f = \lim_{n \to \infty} (f \vee ((-n))\wedge n \in V.
+% \]
+% So we are done.
+%
+  The first part follows immediately from the fact that for a fixed $x_2$, the map $\iota_1: E_1 \to E$ given by $\iota_1(x_1) = (x_1, x_2)$ is measurable, and that the composition of measurable functions is measurable.
+
+  For the second part, we use the monotone class theorem. We let $V$ be the set of all measurable functions $f$ such that $x_2 \mapsto \int_{E_1} f(x_1, x_2) \mu_1(\d x_1)$ is $\mathcal{E}_2$-measurable.
   \begin{enumerate}
-    \item It is clear that $\mathbf{1}_E$ and $\mathbf{1}_A \in V$ for all $A \in \mathcal{A}$, where $\mathcal{A}$ is as in the definition of the product $\sigma$-algebra.
-    \item It is also clear that $V$ is a vector space.
-    \item If $(f_n)$ is a sequence in $V$ with $f_n \geq 0$ and $f_n \nearrow f$, then we know that $(x_2 \mapsto f_n(x_1, x_2)) \nearrow x_2 \mapsto f(x_2, x_2)$. Hence $x_2 \mapsto f(x_1, x_2)$ is measurable as a limit of measurable functions.
-  \end{enumerate}
-  By the monotone class theorem, $V$ contains all bounded measurable functions.
-
-  If $f$ is $\mathcal{E}$-measurable, then $(f \vee (-n))\wedge n$ is a bounded, measurable function. So $f \vee (-n) \vee n \in V$ for all $n$. So
-  \[
-    f = \lim_{n \to \infty} (f \vee ((-n))\wedge n \in V.
-  \]
-  So we are done.
-
-  Alternatively, this follows from the fact that the map $\iota_2: E_2 \to E$ given by $\iota_2(x_2) = (x_1, x_2)$ is measurable, and that the composition of measurable functions is measurable.
-
-  For the second part, we again let $V$ be the set of all measurable functions $f$ such that $x_2 \mapsto \int_{E_1} f(x_1, x_2) \mu_1(\d x_1)$ is $\mathcal{E}_2$-measurable.
-  \begin{enumerate}
-    \item It is clear that $\mathbf{1}_E, \mathbf{1}_A \in V$ for all $A \in \mathcal{A}$.
+    \item It is clear that $\mathbf{1}_E, \mathbf{1}_A \in V$ for all $A \in \mathcal{A}$ (where $\mathcal{A}$ is as i n the definition of the product $\sigma$-algebra).
     \item $V$ is a vector space by linearity of the integral.
     \item Suppose $(f_n)$ is a non-negative sequence in $V$ and $f_n \nearrow f$, then
       \[
-        \left(x_2 \mapsto \int_{E_1} f_n(x_1, x_2)\; \mu_1(\d x_1)\right) \nearrow \left(x_2 \mapsto \int_{E_1} f(x_1, x-2)\;\mu(\d x_1)\right)
+        \left(x_2 \mapsto \int_{E_1} f_n(x_1, x_2)\; \mu_1(\d x_1)\right) \nearrow \left(x_2 \mapsto \int_{E_1} f(x_1, x_2)\;\mu(\d x_1)\right)
       \]
       by the monotone convergence theorem. So $f \in V$.
   \end{enumerate}
@@ -2146,6 +2352,11 @@ Here it is crucial that the measure space is finite. Actually, everything still 
   \]
   Uniqueness follows because $\mu$ is finite, and is thus characterized by its values on the $\pi$-system $\mathcal{A}$ that generates $\mathcal{E}$.
 \end{proof}
+
+\begin{ex}
+  Show the non-uniqueness of the product Lebesgue measure on $[0, 1]$ and the counting measure on $[0, 1]$.
+\end{ex}
+
 Note that we could as well have defined the measure as
 \[
   \mu(A) = \int_{E_2} \left(\int_{E_1} \mathbf{1}_A(x_1, x_2)\;\mu_1(\d x_1)\right)\mu_2(\d x_2).
@@ -2215,10 +2426,6 @@ The same proof would go through, so we have another measure on the space. Howeve
   \end{enumerate}
 \end{proof}
 
-\begin{ex}
-  Show the non-uniqueness of the product Lebesgue measure on $[0, 1]$ and the counting measure on $[0, 1]$.
-\end{ex}
-
 Since $\R$ is $\sigma$-finite, we know that we can sensibly talk about the $d$-fold product of the Lebesgue measure on $\R$ to obtain the Lebesgue measure on $\R^d$.
 
 What $\sigma$-algebra is the Lebesgue measure on $\R^d$ defined on? We know the Lebesgue measure on $\R$ is defined on $\mathcal{B}$. So the Lebesgue measure is defined on
@@ -2229,8 +2436,7 @@ By looking at the definition of the product topology, we see that this is just t
 
 Recall that when we constructed the Lebesgue measure, the Caratheodory extension theorem yields a measure on the ``Lebesgue $\sigma$-algebra'' $\mathcal{M}$, which was strictly bigger than the Borel $\sigma$-algebra. It was shown in the first example sheet that $\mathcal{M}$ is complete, ie. if we have $A \subseteq B \subseteq \R$ with $B \in \mathcal{M}$, $\mu(B) = 0$, then $A \in \mathcal{M}$. We can also take the Lebesgue measure on $\R^d$ to be defined on $\mathcal{M} \otimes \cdots \otimes \mathcal{M}$. However, it happens that $\mathcal{M} \otimes \mathcal{M}$ together with the Lebesgue measure on $\R^2$ is no longer complete (proof is left as an exercise for the reader).
 
-\subsection{Product measure and independent random variables}
-Recall that random variables $X_1, \cdots, X_n$ are independent iff the $\sigma$-algebras $\sigma(X_1), \cdots, \sigma(X_n)$ are independent. We will show that random variables are independent iff their laws are given by the product measure.
+We now turn to probability. Recall that random variables $X_1, \cdots, X_n$ are independent iff the $\sigma$-algebras $\sigma(X_1), \cdots, \sigma(X_n)$ are independent. We will show that random variables are independent iff their laws are given by the product measure.
 
 \begin{prop}
   Let $X_1, \cdots, X_n$ be random variables on $(\Omega, \mathcal{F}, \P)$ with values in $(E_1, \mathcal{E}_1), \cdots, (E_n, \mathcal{E}_n)$ respectively. We define
@@ -2280,16 +2486,8 @@ Recall that random variables $X_1, \cdots, X_n$ are independent iff the $\sigma$
   \end{itemize}
 \end{proof}
 
-\section{Norms and inequalities}
-We are going to prove four very important inequalities in measure theory. These are very useful for bounding the integral of a function. These are
-\begin{enumerate}
-  \item Chebyshev/Markov inequality
-  \item Jensen's inequality
-  \item H\"older's inequality
-  \item Minkowski's inequality.
-\end{enumerate}
-Amongst many things, these will be useful for understanding the $L^p$ spaces, which are the right classes of functions to look at when we want to talk about the Fourier transforms.
-
+\section{Inequalities and \texorpdfstring{$L^p$}{Lp} spaces}
+Eventually, we will want to define the $L^p$ spaces as follows:
 \begin{defi}[$L^p$ spaces]\index{$L^p$ space}\index{$\|f\|_p$}
   Let $(E, \mathcal{E}, \mu)$ be a measurable space. For $1 \leq p < \infty$, we define $L^p = L^p(E, \mathcal{E}, \mu)$ to be the set of all measurable functions $f$ such that
   \[
@@ -2300,7 +2498,18 @@ Amongst many things, these will be useful for understanding the $L^p$ spaces, wh
     \|f\|_{\infty} = \inf \{\lambda \geq 0: |f| \leq \lambda \text{ a.e.}\} < \infty.
   \]
 \end{defi}
-It is not clear that this is a norm, because the triangle inequality is not obvious from the definition. This is going to come as a consequence of the Minkowski inequality. Moreover, it is not even clear this is closed under addition! (the problem of non-negativity can be easily solved by quotienting, as we will soon see)
+However, it is not clear that this is a norm. First of all, $\|f\|_p$ does not imply that $f = 0$. It only means that $f = 0$ a.e. But this is easy to solve. We simply quotient out the vector space by functions that differ on a set of measure zero. The more serious problem is that we don't know how to prove the triangle inequality.
+
+To do so, we are going to prove some inequalities. Apart from enabling us to show that $\| \ph \|_p$ is indeed a norm, they will also be very helpful in the future when we want to bound integrals.
+
+\subsection{Four inequalities}
+The four inequalities we are going to prove are the following:
+\begin{enumerate}
+  \item Chebyshev/Markov inequality
+  \item Jensen's inequality
+  \item H\"older's inequality
+  \item Minkowski's inequality.
+\end{enumerate}
 
 So let's start proving the inequalities.
 \begin{prop}[Chebyshev's/Markov's inequality]\index{Chebyshev's inequality}\index{Markov's inequality}
@@ -2323,7 +2532,7 @@ This is incredibly simple, but also incredibly useful!
 
 The next inequality is Jensen's inequality. To state it, we need to know what a convex function is.
 \begin{defi}[Convex function]\index{convex function}
-  Let $I \subseteq \R$ be an interval. Then $c: I \to \R$ is convex if for any $t \in [0, 1]$ and $x, y \in I$, then
+  Let $I \subseteq \R$ be an interval. Then $c: I \to \R$ is convex if for any $t \in [0, 1]$ and $x, y \in I$, we have
   \[
     c(tx + (1 - t)y) \leq t c(x) + (1 - t) c(y).
   \]
@@ -2357,7 +2566,7 @@ It is crucial that this only applies to a probability space. We need the total m
   for all $x \in I$, with equality at $x = m$.
   \begin{center}
     \begin{tikzpicture}
-      \draw [->] (-1.5, 0) -- (1.5, 0) node [right] {$c$};
+      \draw [->] (-1.5, 0) -- (1.5, 0);
       \draw (-1, 2) parabola bend (0, 0.5) (1, 2) node [above] {$\phi$};
       \node [circ] at (0.4, 0.75) {};
       \node [right] at (0.4, 0.75) {$m$};
@@ -2368,7 +2577,11 @@ It is crucial that this only applies to a probability space. We need the total m
 If the function is differentiable, then we can easily extract this from the derivative. However, if it is not, then we need to be more careful.
 
 \begin{proof}
-  Consider $x < m < y$ with $x, y, m \in I$. Take
+  If $c$ is smooth, then we know $c'' \geq 0$, and thus $c'$ is non-decreasing. We are going to show an analogous statement that does not mention the word ``derivative''. Consider $x < m < y$ with $x, y, m \in I$. We want to show that
+   \[
+    \frac{c(m) - c(x)}{m - x} \leq \frac{c(y) - c(m)}{y - m}.
+  \]
+  To see this, take
   \[
     t = \frac{y - m}{y - x}.
   \]
@@ -2392,17 +2605,17 @@ If the function is differentiable, then we can easily extract this from the deri
   \[
     \frac{y - m}{y - x} (c(m) - c(x)) \leq \frac{m - x}{y - x} (c(y) - c(m)).
   \]
-  So we have
+  Cancelling the $y - x$ and dividing by the factors gives
   \[
-    \frac{1}{m - x}(c(m) - c(x)) \leq \frac{1}{y - m} (c(y) - c(m)).
+    \frac{c(m) - c(x)}{m - x} \leq \frac{c(y) - c(m)}{y - m}.
   \]
   What does this say? If our $c$ is smooth, then if $c$ is convex, then $c'' \geq 0$. So $c'$ is non-decreasing. Here in our formula, both sides look like derivatives.
 
   Now since $x$ and $y$ are arbitrary, we know there is some $a \in \R$ such that
   \[
-    \frac{1}{m - x}(c(m) - c(x)) \leq a \leq \frac{1}{y - m} (c(y) - c(m)).
+    \frac{c(m) - c(x)}{m - x} \leq a \leq \frac{c(y) - c(m)}{y - m}.
   \]
-  for all $x < m < Y$. This does the job. If we rearrange, then we obtain
+  for all $x < m < y$. This does the job. If we rearrange, then we obtain
   \[
     c(t) \geq a(t - m) + c(m)
   \]
@@ -2418,7 +2631,9 @@ If the function is differentiable, then we can easily extract this from the deri
   \[
     c(X) \geq aX + b.
   \]
-  We want to take the expectation of the LHS, but why can we do that? Recall that
+  We want to take the expectation of the LHS, but we have to make sure the $\E[c(X)]$ is a sensible thing to talk about. To make sure it makes sense, we show that $\E[c(X)^-] = \E[(-c(X)) \vee 0]$ is finite.
+
+  We simply bound
   \[
     [c(X)]^- = [-c(X)] \vee 0 \leq |a| |X| + |b|.
   \]
@@ -2426,7 +2641,9 @@ If the function is differentiable, then we can easily extract this from the deri
   \[
     \E[c(X)^-] \leq |a| \E |X| + |b| < \infty
   \]
-  since $X$ is integrable. So $\E[c(X)]$ makes sense. Note that this does not rule out the possibility that it is infinite. Thus, we have
+  since $X$ is integrable. So $\E[c(X)]$ makes sense.
+
+  We then just take
   \[
     \E[c(X)] \geq \E[aX + b] = a\E[X] + b = am + b = c(m) = c(\E[X]).
   \]
@@ -2450,8 +2667,9 @@ We are now going to use Jensen's inequality to prove H\"older's inequality. Befo
   When $p = q = 2$, then this is the Cauchy-Schwarz inequality.
 \end{prop}
 
+The proof is some magic, unenlightening manipulations.
 \begin{proof}
-  We assume that $\|f\|_p > 0$ and $\|f\|_p < \infty$. Otherwise, there is nothing to prove. By scaling, we may assume that $\|f\|_p = 1$. We set
+  We assume that $\|f\|_p > 0$ and $\|f\|_p < \infty$. Otherwise, there is nothing to prove. By scaling, we may assume that $\|f\|_p = 1$. We make up a probability measure by
   \[
     \P[A] = \int |f|^p \mathbf{1}_A \;\d \mu.
   \]
@@ -2462,7 +2680,7 @@ We are now going to use Jensen's inequality to prove H\"older's inequality. Befo
   we know $\P[\ph]$ is a probability measure. Then we have
   \begin{align*}
     \mu(|fg|) &= \mu(|fg| \mathbf{1}_{\{|f| > 0\}})\\
-    &= \mu\left(\frac{|g|}{|f|^{p - 1}} \mathbf{1}_{|f| > 0} |f|^p\right)\\
+    &= \mu\left(\frac{|g|}{|f|^{p - 1}} \mathbf{1}_{\{|f| > 0\}} |f|^p\right)\\
     &= \E\left[\frac{|g|}{|f|^p}\mathbf{1}_{\{|f| > 0\}}\right]\\
     \intertext{Now use the fact that $(\E|X|)^q \leq \E[|X|^q]$ since $x \mapsto x^q$ is convex for $q > 1$. Then we obtain}
     &\leq \left(\E\left[\frac{|g|^q}{|f|^{(p - 1)q}}\mathbf{1}_{\{|f| > 0\}}\right]\right)^{1/q}.
@@ -2476,6 +2694,21 @@ We are now going to use Jensen's inequality to prove H\"older's inequality. Befo
 
 Just like Jensen's inequality, this is very useful when bounding integrals, and it is also theoretically very important, because we are going to use it to prove the Minkowski inequality. This tells us that the $L^p$ norm is actually a norm.
 
+Before we prove the Minkowski inequality, we prove the following tiny lemma that we will use repeatedly:
+\begin{lemma}
+  Let $a, b \geq 0$ and $p \geq 1$. Then
+  \[
+    (a + b)^p \leq 2^p(a^p + b^p).
+  \]
+\end{lemma}
+This is a terrible bound, but is useful when we want to prove that things are finite.
+
+\begin{proof}
+  We wlog $a \leq b$. Then
+  \[
+    (a + b)^p \leq (2b)^p \leq 2^p b^p \leq 2^p(a^p + b^p).
+  \]
+\end{proof}
 \begin{thm}[Minkowski inequality]\index{Minkowski inequality}
   Let $p \in [1, \infty]$ and $f, g$ measurable. Then
   \[
@@ -2483,16 +2716,17 @@ Just like Jensen's inequality, this is very useful when bounding integrals, and 
   \]
 \end{thm}
 
+Again the proof is magic.
 \begin{proof}
   We do the boring cases first. If $p = 1$, then
   \[
-    \|f + g\|_1 = \int |f + g| \;eq \int (|f| + |g|) = \int |f| + \int |g| = \|f\|_1 + \|g\|_1.
+    \|f + g\|_1 = \int |f + g| \leq \int (|f| + |g|) = \int |f| + \int |g| = \|f\|_1 + \|g\|_1.
   \]
-  The proof of the case of $p = \infty$ is similar. Now assume $p \in (1, \infty)$. We assume that $\|f\|_p, \|g\|< \infty$, or else the inequality is trivial. Similarly, we assume $\|f + g\|_p \geq 0$.
+  The proof of the case of $p = \infty$ is similar. Now assume $p \in (1, \infty)$. We assume that $\|f\|_p, \|g\|_p< \infty$, or else the inequality is trivial. Similarly, we assume $\|f + g\|_p > 0$.
 
-  We now check that under these assumption, we must have $\|f + g\| < \infty$ as well. Indeed, we have
+  We now check that under these assumption, we must have $\|f + g\|_p < \infty$ as well. Indeed, we have
   \[
-    |f + g|^p \leq (|f| + |g|)^p \leq 2^p |f|^p + |g|^p.
+    |f + g|^p \leq (|f| + |g|)^p \leq 2^p(|f|^p + |g|^p).
   \]
   Then the claim follows by integrating both sides.
 
@@ -2520,8 +2754,8 @@ Just like Jensen's inequality, this is very useful when bounding integrals, and 
 
 Given these inequalities, we can go and prove some properties of $L^p$ spaces.
 
-\subsection{Properties of \texorpdfstring{$L^p$}{L^p}}
-Recall the following definitions:
+\subsection{\texorpdfstring{$L^p$}{L^p} spaces}
+Recall the following definition:
 
 \begin{defi}[Norm of vector space]\index{norm!vector space}\index{vector space!norm}
   Let $V$ be a vector space. A \emph{norm} on $V$ is a function $\|\ph\|: V \to \R_{\geq 0}$ such that
@@ -2530,6 +2764,17 @@ Recall the following definitions:
     \item $\|\alpha v\| = |\alpha|\|v\|$ for all $v \in V$ and $\alpha \in \R$
     \item $\|v\| = 0$ implies $v = 0$.
   \end{enumerate}
+\end{defi}
+
+\begin{defi}[$L^p$ spaces]\index{$L^p$ space}\index{$\|f\|_p$}
+  Let $(E, \mathcal{E}, \mu)$ be a measurable space. For $1 \leq p < \infty$, we define $L^p = L^p(E, \mathcal{E}, \mu)$ to be the set of all measurable functions $f$ such that
+  \[
+    \|f\|_p = \left(\int |f|^p \d \mu\right)^{1/p} < \infty.
+  \]
+  For $p = \infty$, we let $L^\infty = L^\infty(E, \mathcal{E}, \mu)$ to be the space of functions with
+  \[
+    \|f\|_{\infty} = \inf \{\lambda \geq 0: |f| \leq \lambda \text{ a.e.}\} < \infty.
+  \]
 \end{defi}
 
 By Minkowski's inequality, we know $L^p$ is a vector space, and also (i) holds. By definition, (ii) holds obviously. However, (iii) does \emph{not} hold for $\|\ph\|_p$, because $\|f\|_p = 0$ does not imply that $f = 0$. It merely implies that $f = 0$ a.e.
@@ -2562,9 +2807,9 @@ One important property of $L^p$ is that it is complete, ie. every Cauchy sequenc
 \begin{proof}
   We will only give the proof for $p < \infty$. The $p = \infty$ case is left as an exercise for the reader.
 
-  Suppose that $(f_n)$ is a sequence in $L^p$ with $\|f_n - f_m\| \to 0$ as $n, m \to \infty$. Take a subsequence $(f_{n_k})$ of $(f_n)$ with
+  Suppose that $(f_n)$ is a sequence in $L^p$ with $\|f_n - f_m\|_p \to 0$ as $n, m \to \infty$. Take a subsequence $(f_{n_k})$ of $(f_n)$ with
   \[
-    \|f_{n_{k + 1}} - f_{n_k}\| \leq 2^{-k}
+    \|f_{n_{k + 1}} - f_{n_k}\|_p \leq 2^{-k}
   \]
   for all $k \in \N$. We then find that
   \[
@@ -2574,19 +2819,19 @@ One important property of $L^p$ is that it is complete, ie. every Cauchy sequenc
   \[
     \sum_{k = 1}^M |f_{n_{k + 1}} - f_{n_k}| \nearrow \sum_{k = 1}^\infty |f_{n_{k + 1}} - f_{n_k}|\text{ as }M \to \infty.
   \]
-  So applying the Monotone convergence theorem, we know that
+  So applying the monotone convergence theorem, we know that
   \[
-    \norm{\sum_{k = 1}^\infty |f_{n_{k + 1}} - f_{n_k}|}_p \leq \sum_{k = 1}^M \|f_{n_{k + 1}} - f_{n_k}\|_p \leq 1.
+    \norm{\sum_{k = 1}^\infty |f_{n_{k + 1}} - f_{n_k}|}_p \leq \sum_{k = 1}^\infty \|f_{n_{k + 1}} - f_{n_k}\|_p \leq 1.
   \]
   In particular,
   \[
     \sum_{k = 1}^\infty |f_{n_{k + 1}} - f_{n_k}| < \infty \text{ a.e.}
   \]
-  So $f_{n_k}(x)$ converges a.e. $x$, since the real line is complete. So we set
+  So $f_{n_k}(x)$ converges a.e., since the real line is complete. So we set
   \[
     f(x) =
     \begin{cases}
-      \lim_{k \to \infty} f_{n_k}(x) & \text{ if the limit exists}\\
+      \lim_{k \to \infty} f_{n_k}(x) & \text{if the limit exists}\\
       0 & \text{otherwise}
     \end{cases}
   \]
@@ -2594,7 +2839,7 @@ One important property of $L^p$ is that it is complete, ie. every Cauchy sequenc
   \begin{align*}
     \|f_n - f\|_p^p &= \mu(|f_n - f|^p) \\
     &= \mu\left(\liminf_{k \to \infty} |f_n - f_{n_k}|^p\right)\\
-    &\leq \liminf_{k \to \infty} \mu(|f_n - f_{n_k}|)^p,
+    &\leq \liminf_{k \to \infty} \mu(|f_n - f_{n_k}|^p),
   \end{align*}
   which tends to $0$ as $n \to \infty$ since the sequence is Cauchy. So $f$ is indeed the limit.
 
@@ -2608,11 +2853,12 @@ One important property of $L^p$ is that it is complete, ie. every Cauchy sequenc
   We know the first term tends to $0$, and in particular is finite for $n$ large enough, and the second term is also finite. So done.
 \end{proof}
 
-Now for $f, g \in L^2$, we can define the inner product
+\subsection{Orthogonal projection in \texorpdfstring{$\mathcal{L}^2$}{L2}}
+In the particular case $p = 2$, we have an extra structure on $\mathcal{L}^2$, namely an inner product structure, given by
 \[
   \bra f, g\ket = \int fg\;\d \mu.
 \]
-This defines an inner product on $\mathcal{L}^2$ that induces the $\|\ph\|_2$ norm, ie.
+This inner product induces the $L^2$ norm by
 \[
   \|f\|_2^2 = \bra f, f\ket.
 \]
@@ -2624,7 +2870,6 @@ So $\mathcal{L}^2$ is not only a Banach space, but a Hilbert space as well.
 
 Somehow Hilbert spaces are much nicer than Banach spaces, because you have an inner product structure as well. One particular thing we can do is orthogonal complements.
 
-\subsection{Orthogonal projection in \texorpdfstring{$\mathcal{L}^2$}{L2}}
 \begin{defi}[Orthogonal functions]\index{orthogonal functions}
   Two functions $f, g \in \mathcal{L}^2$ are \emph{orthogonal} if
   \[
@@ -2638,6 +2883,10 @@ Somehow Hilbert spaces are much nicer than Banach spaces, because you have an in
     V^\perp = \{f \in L^2: \bra f, v \ket = 0\text{ for all }v \in V\}.
   \]
 \end{defi}
+
+Note that we can always make these definitions for any inner product space. However, the completeness of the space guarantees nice properties of the orthogonal complement.
+
+Before we proceed further, we need to make a definition of what it means for a subspace of $L^2$ to be closed. This isn't the usual definition, since $L^2$ isn't really a normed vector space, so we need to accommodate for that fact.
 
 \begin{defi}[Closed subspace]\index{closed subspace}
   Let $V \subseteq L^2$. Then $V$ is closed if whenever $(f_n)$ is a sequence in $V$ with $f_n \to f$, then there exists $v \in V$ with $v \sim f$.
@@ -2715,13 +2964,13 @@ To prove the existence of orthogonal decomposition, we need to use a slight tric
 
 We are now going to look at the relationship between conditional expectation and orthogonal projection.
 \begin{defi}[Conditional expectation]\index{conditional expectation}
-  Suppose we have a probability space $(\Omega, \mathcal{F}, \P)$, and $(G_n)$ be a collection of pairwise disjoint events with $\bigcup_n G_n = \Omega$. We let
+  Suppose we have a probability space $(\Omega, \mathcal{F}, \P)$, and $(G_n)$ is a collection of pairwise disjoint events with $\bigcup_n G_n = \Omega$. We let
   \[
     \mathcal{G} = \sigma(G_n: n \in \N).
   \]
   The \emph{conditional expectation} of $X$ given $\mathcal{G}$ is the random variable
   \[
-    Y = \sum_{n = 1}^\infty = \sum_{n = 1}^\infty \E[X \mid G_n] \mathbf{1}_{G_n},
+    Y = \sum_{n = 1}^\infty \E[X \mid G_n] \mathbf{1}_{G_n},
   \]
   where
   \[
@@ -2730,12 +2979,12 @@ We are now going to look at the relationship between conditional expectation and
 \end{defi}
 In other words, given any $x \in \Omega$, say $x \in G_n$, then $Y(x) = \E[X \mid G_n]$.
 
-If $X \in L^s(\P)$, then $Y \in L^2(\P)$, and it is clear that $Y$ is $\mathcal{G}$-measurable. We claim that this is in fact the projection of $X$ onto the subspace $L^2(\mathcal{G}, \P)$ of $\mathcal{G}$-measurable $L^2$ random variables in the ambient space $L^2(\P)$.
+If $X \in L^2(\P)$, then $Y \in L^2(\P)$, and it is clear that $Y$ is $\mathcal{G}$-measurable. We claim that this is in fact the projection of $X$ onto the subspace $L^2(\mathcal{G}, \P)$ of $\mathcal{G}$-measurable $L^2$ random variables in the ambient space $L^2(\P)$.
 
 \begin{prop}
   The conditional expectation of $X$ given $\mathcal{G}$ is the projection of $X$ onto the subspace $L^2(\mathcal{G}, \P)$ of $\mathcal{G}$-measurable $L^2$ random variables in the ambient space $L^2(\P)$.
 \end{prop}
-In some sense, this tells us $Y$ is our best prediction of $X$ given the information encoded in $\mathcal{G}$.
+In some sense, this tells us $Y$ is our best prediction of $X$ given only the information encoded in $\mathcal{G}$.
 
 \begin{proof}
   Let $Y$ be the conditional expectation. It suffices to show that $\E[(X - W)^2]$ is minimized for $W = Y$ among $\mathcal{G}$-measurable random variables. Suppose that $W$ is a $\mathcal{G}$-measurable random variable. Since
@@ -2782,14 +3031,22 @@ More generally, the \term{covariance matrix} of a random vector $X = (X_1, \cdot
 \]
 On the example sheet, we will see that the covariance matrix is a positive definite matrix.
 
-\section{Convergence in \texorpdfstring{$L^1(\P)$}{L^1(P)} and uniform integrability}
+\subsection{Convergence in \texorpdfstring{$L^1(\P)$}{L^1(P)} and uniform integrability}
 What we are looking at here is the following question --- suppose $(X_n), X$ are random variables and $X_n \to X$ in probability. Under what extra assumptions is it true that $X_n$ also converges to $X$ in $L_1$, ie. $\E[X_n - X] \to 0$ as $X \to \infty$.
 
-We have to be very careful with this, because it is not always true. If we take $(\Omega, \mathcal{F}, \P) = ((0, 1), \mathcal{B}((0, 1)), \text{Lebesgue})$, and $X_n = n\mathbf{1}_{(0, 1/n)}$. Then $X_n \to 0$ in probability, and in fact $X_n \to 0$ almost surely. However,
-\[
-  \E[|X_n - 0|] = \E[X_n] = n \cdot \frac{1}{n} = 1,
-\]
-which does not converge to $1$.
+This is not always true.
+
+\begin{eg}
+  If we take $(\Omega, \mathcal{F}, \P) = ((0, 1), \mathcal{B}((0, 1)), \text{Lebesgue})$, and
+  \[
+    X_n = n\mathbf{1}_{(0, 1/n)}.
+  \]
+  Then $X_n \to 0$ in probability, and in fact $X_n \to 0$ almost surely. However,
+  \[
+    \E[|X_n - 0|] = \E[X_n] = n \cdot \frac{1}{n} = 1,
+  \]
+  which does not converge to $1$.
+\end{eg}
 
 It turns out there is a precise condition that makes this true, known as uniform integrability.
 
@@ -2809,19 +3066,38 @@ It turns out there is a precise condition that makes this true, known as uniform
 \end{defi}
 In some sense, this is ``uniform continuity for integration''.
 
-\begin{eg}
-  Let $\mathcal{X} = \{X\}$, where $X \in L^1(\P)$. Then $\mathcal{X}$ is uniformly integrable. To see this, we need to show that for any $\varepsilon > 0$, there exists some $\delta > 0$ such that $\P[A] < \delta$ implies $\E[|X|\mathbf{1}_A] < \varepsilon$.
+\begin{prop}
+  Let $\mathcal{X} = \{X\}$, where $X \in L^1(\P)$. Then $\mathcal{X}$ is uniformly integrable.
+\end{prop}
 
-  Suppose not. Then there exists $\varepsilon > 0$ and a sequence $(A_n)$ in $\mathcal{F}$ where $\E[|X|\mathbf{1}_{A_n}] \geq \varepsilon$ for all $n$, and $\P[A_n] \leq 2^{-n}$. We use the first Bore-Cantelli lemma. Since $\sum \P[A_n] < \infty$, we know $\P[A_n\text{ i.o.}] = 0$. We have
+\begin{proof}
+   To see this, we need to show that for any $\varepsilon > 0$, there exists some $\delta > 0$ such that $\P[A] < \delta$ implies $\E[|X|\mathbf{1}_A] < \varepsilon$.
+
+  Suppose not. Then there exists $\varepsilon > 0$ and a sequence $(A_n)$ in $\mathcal{F}$ where $\E[|X|\mathbf{1}_{A_n}] \geq \varepsilon$ for all $n$, and $\P[A_n] \leq 2^{-n}$. Then we have
   \[
     \varepsilon \leq \E[X \mathbf{1}_{\bigcup_{m \geq n} A_n}] \to \E[|X| \mathbf{1}_{A_m\text{ i.o.}}]
   \]
-  by dominated convergence with dominating function $|X|$. But the last thing is just $0$ since the probability that $A_n \text{ i.o.}$ is zero. This is a contradiction.
-\end{eg}
+  by dominated convergence with dominating function $|X|$.
 
-\begin{eg}
-  Let $\mathcal{X}$ be an $L^p$-bounded family for some $p > 1$. We claim that $\mathcal{X}$ is uniformly integrable.
+  On the other hand, since $\sum \P[A_n] < \infty$, by Borel--Cantelli, we know
+  \[
+    \P[A_n\text{ i.o.}] = 0.
+  \]
+  This is a contradiction. So done.
+\end{proof}
 
+It is then a simple corollary that
+\begin{cor}
+  Any finite collection of $L^1$ functions is uniformly integrable.
+\end{cor}
+
+It turns out that it isn't too hard to find uniformly integrable functions.
+
+\begin{prop}
+  Let $\mathcal{X}$ be an $L^p$-bounded family for some $p > 1$. Then $\mathcal{X}$ is uniformly integrable.
+\end{prop}
+
+\begin{proof}
   We let
   \[
     C = \sup\{\|X\|_p : X \in \mathcal{X}\} < \infty.
@@ -2831,9 +3107,13 @@ In some sense, this is ``uniform continuity for integration''.
     \E[|X|\mathbf{1}_A] = \leq \E[|X|^p]^{1/p} \P[A]^{1/q} \leq C \P[A]^{1/q}.
   \]
   by H\"older's inequality, where $p, q$ are conjugates. This is now a uniform bound depending only on $\P[A]$. So done.
-\end{eg}
+\end{proof}
 
-Looking at the example from earlier, we had $X_n = n \mathbf{1}_{(0, 1/n)}$, which is $L^1$ bounded, but not uniformly integrable. So $L^1$ boundedness is not enough.
+This is the best we can get. $L^1$ boundedness is not enough. Indeed, our earlier example
+\[
+  X_n = n \mathbf{1}_{(0, 1/n)},
+\]
+is $L^1$ bounded but not uniformly integrable. So $L^1$ boundedness is not enough.
 
 We are now going to work towards showing that the extra assumption of uniform integrability gives us $L^1$-convergence and in fact this is necessary and sufficient.
 
@@ -2901,14 +3181,18 @@ To prove our ultimate theorem, we first need the following result:
 This is somewhat a ``baby version'' of dominated convergence, but we have a much stronger condition of $|X_n|$ bounded by a constant, rather than an integrable function.
 
 \begin{proof}
-  Fix $\varepsilon > 0$. Then
+  Let $\varepsilon > 0$. We then have
   \begin{align*}
     \P[|X| > C+ \varepsilon] &\leq \P[|X - X_n| + |X_n| > C + \varepsilon]\\
     &\leq \P[|X - X_n|> \varepsilon] + \P[|X_n| > C]
   \end{align*}
-  We know the second term vanishes, while the first term $\to 0$ as $n \to \infty$. So $|X| \leq C$ a.s.
+  We know the second term vanishes, while the first term $\to 0$ as $n \to \infty$. So we know
+  \[
+    \P[|X| > C + \varepsilon] = 0
+  \]
+  for all $\varepsilon$. Since $\varepsilon$ was arbitrary, we know $|X| \leq C$ a.s.
 
-  Now take $N$ such that
+  Now fix an $\varepsilon > 0$, and take $N$ such that
   \[
     \P\left[|X_n - X| > \frac{\varepsilon}{2}\right] \leq \frac{\varepsilon}{4C}
   \]
@@ -2917,8 +3201,9 @@ This is somewhat a ``baby version'' of dominated convergence, but we have a much
     \E[|X_n - X|] &= \E\left[|X_n - X|(\mathbf{1}_{\{|X_n - X| \leq \frac{\varepsilon}{2}\}} + \mathbf{1}_{\{|X_n - X| > \frac{\varepsilon}{2}\})}\right]\\
     &\leq \frac{\varepsilon}{2} + 2C \P\left[|X_n - X| > \frac{\varepsilon}{2}\right]\\
     &\leq \frac{\varepsilon}{2} + 2C \frac{\varepsilon}{4C}\\
-    &= \varepsilon
+    &= \varepsilon.
   \end{align*}
+  So done.
 \end{proof}
 
 We now come to the main theorem on uniform integrability.
@@ -2968,11 +3253,11 @@ We now come to the main theorem on uniform integrability.
 
   Next we want to show that $X_n \to X$ in $L^1$. Take $\varepsilon > 0$. Then there exists $K \in (0, \infty)$ such that
   \[
-    \E\left[|X| \mathbf{1}_{\{|X| > k\}}\right], \E\left[|X_n| \mathbf{1}_{\{|X_n| > k\}}\right] \leq \frac{\varepsilon}{3}.
+    \E\left[|X| \mathbf{1}_{\{|X| > K\}}\right], \E\left[|X_n| \mathbf{1}_{\{|X_n| > K\}}\right] \leq \frac{\varepsilon}{3}.
   \]
   To set things up so that we can use the bounded convergence theorem, we have to invent new random variables
   \[
-    X_n^K = (X_n \vee -K) \wedge K,\quad X^K = (X \vee (-K))\wedge K.
+    X_n^K = (X_n \vee -K) \wedge K,\quad X^K = (X \vee -K)\wedge K.
   \]
   Since $X_n \to X$ in probability, it follows that $X_n^K \to X^k$ in probability.
 
@@ -2987,13 +3272,22 @@ We now come to the main theorem on uniform integrability.
   So we know that $X_n \to X$ in $L^1$.
 \end{proof}
 
-The main application is that when $\{X_n\}$ is a type of stochastic process known as a \term{martingale}. This can be seen in III Advanced Probability and III Stochastic Calculus.
+The main application is that when $\{X_n\}$ is a type of stochastic process known as a \term{martingale}. This will be done in III Advanced Probability and III Stochastic Calculus.
 
 \section{Fourier transform}
-From now on, we will write $L^p$ for \emph{complex valued} Borel functions on $\R^d$ with
+We now turn to the exciting topic of the Fourier transform. There are two main questions we want to ask --- when does the Fourier transform exist, and when we can recover a function from its Fourier transform.
+
+Of course, not only do we want to know if the Fourier transform exists. We also want to know if it lies in some nice space, eg. $L^2$.
+
+It turns out that when we want to prove things about Fourier transforms, it is often helpful to ``smoothen'' the function by doing what is known as a \emph{Gaussian convolution}. So after defining the Fourier transform and proving some really basic properties, we are going to investigate convolutions and Gaussians for a bit (convolutions are also useful on their own, since they correspond to sums of independent random variables). After that, we can go and prove the actual important properties of the Fourier transform.
+
+\subsection{The Fourier transform}
+When talking about Fourier transforms, we will mostly want to talk about functions $\R^d \to \C$. So from now on, we will write $L^p$ for \emph{complex valued} Borel functions on $\R^d$ with
 \[
   \|f\|_p = \left(\int_{\R^d} |f|^p\right)^{1/p} < \infty.
 \]
+The integrals of complex-valued function are defined on the real and imaginary parts separately, and satisfy the properties we would expect them to. The details are on the first example sheet.
+
 \begin{defi}[Fourier transform]\index{Fourier transform}
   The \emph{Fourier transform} $\hat{f}$ of $f \in L^1(\R^d)$ is given by
   \[
@@ -3005,17 +3299,9 @@ From now on, we will write $L^p$ for \emph{complex valued} Borel functions on $\
   \]
 \end{defi}
 
-The main goal is to show that if $f \in L^1, \hat{f} \in L^1$, then the Fourier inversion formula holds:
-\[
-  f(x) = \frac{1}{(2\pi)^d} \int \hat{f}(u) e^{-i(u, x)} \;\d u\text{ a.e.}
-\]
-We will also prove the Plancherel identity: if $f \in L^2(\R^d)$, then
-\[
-  \|\hat{f}\|_2 = (2\pi)^{d/2} \|f\|_2.
-\]
 Why do we care about Fourier transforms? Many computations are easier with $\hat{f}$ in place of $f$, especially computations that involve differentiation and convolutions (which are relevant to sums of independent random variables). In particular, we will use it to prove the central limit theorem.
 
-More general, we can define the Fourier transform of a measure:
+More generally, we can define the Fourier transform of a measure:
 
 \begin{defi}[Fourier transform of measure]\index{Fourier transform!of measure}
   The Fourier transform of a \emph{finite measure} $\mu$ on $\R^d$ is the function
@@ -3024,13 +3310,23 @@ More general, we can define the Fourier transform of a measure:
   \]
 \end{defi}
 
-We now make the following observations:
+In the context of probability, we give these things a different name:
+\begin{defi}[Characteristic function]\index{characteristic function}\index{random variable!characteristic function}
+  Let $X$ be a random variable. Then the \emph{characteristic function} of $X$ is the Fourier transform of its law, ie.
+  \[
+    \phi_X(u) = \E[e^{i(u, X)}] = \hat{\mu}_X(u),
+  \]
+  where $\mu_X$ is the law of $X$.
+\end{defi}
+
+We now make the following (trivial) observations:
 \begin{prop}
   \[
     \|\hat{f}\|_\infty \leq \|f\|_1, \quad \|\hat{\mu}\|_\infty \leq \mu(\R^d).
   \]
 \end{prop}
 
+Less trivially, we have the following result:
 \begin{prop}
   The functions $\hat{f}, \hat{\mu}$ are continuous.
 \end{prop}
@@ -3047,19 +3343,13 @@ We now make the following observations:
   So we can apply dominated convergence theorem with $|f|$ as the bound.
 \end{proof}
 
-\begin{defi}[Characteristic function]\index{characteristic function}\index{random variable!characteristic function}
-  Let $X$ be a random variable. Then the \emph{characteristic function} of $X$ is the Fourier transform of its law, ie.
-  \[
-    \phi_X(u) = \E[e^{i(u, X)}] = \hat{\mu}_X(u),
-  \]
-  where $\mu_X$ is the law of $X$.
-\end{defi}
+\subsection{Convolutions}
+To actually do something useful about the Fourier transforms, we need to talk about convolutions.
 
-\subsection{Convolution}
 \begin{defi}[Convolution of random variables]\index{convolution!random variable}\index{random variable!convolution}
   Let $\mu, \nu$ be probability measures. Their \emph{convolution} $\mu * \nu$ is the law of $X + Y$, where $X$ has law $\mu$ and $Y$ has law $\nu$, and $X, Y$ are independent. Explicitly, we have
   \begin{align*}
-    \mu * \varsigma (A) &= \P[X + Y \in \mathcal{A}] \\
+    \mu * \nu (A) &= \P[X + Y \in \mathcal{A}] \\
     &= \iint \mathbf{1}_{A}(x + y)\;\mu(\d x)\;\nu(\d y)
   \end{align*}
 \end{defi}
@@ -3080,11 +3370,9 @@ This thing has a name.
     f * \nu(x) = \int f(x - y)\;\nu(\d y) \in L^p.
   \]
 \end{defi}
-We check that it is indeed in $L^p$.
-\[
-  \int \left(\int |f(x - y)| \nu(\d y)\right)^p \;\d x.
-\]
-Since $\nu$ is a probability measure, Jensen's inequality says we have
+Note that we do have to treat the two cases of convolutions separately, since a measure need not have a density, and a function need not specify a probability measure (it may not integrate to $1$).
+
+We check that it is indeed in $L^p$. Since $\nu$ is a probability measure, Jensen's inequality says we have
 \begin{align*}
   \|f * \nu\|_p^p &= \int \left(\int |f(x - y)| \nu(\d y)\right)^p \;\d x\\
   &\leq \iint |f(x - y)|^p \nu(\d y)\;\d x\\
@@ -3137,9 +3425,13 @@ In the context of random variables, we have a similar result:
 
 \subsection{Fourier inversion formula}
 We now want to work towards proving the Fourier inversion formula:
-\[
-  f(x) = \frac{1}{(2\pi)^d} \int \hat{f}(u) e^{-i(u, x)} \;\d u\text{ a.e.}
-\]
+\begin{thm}[Fourier inversion formula]
+  Let $f,\hat{f} \in L^1$. Then
+  \[
+    f(x) = \frac{1}{(2\pi)^d} \int \hat{f}(u) e^{-i(u, x)} \;\d u\text{ a.e.}
+  \]
+\end{thm}
+
 Our strategy is as follows:
 \begin{enumerate}
   \item Show that the Fourier inversion formula holds for a Gaussian distribution by direct computations.
@@ -3173,7 +3465,7 @@ We see that this is in fact a Gaussian up to a factor of $2\pi$.
 \begin{proof}
   We have
   \begin{align*}
-    \phi_Z(a) &= \E[e^{iuZ}]\\
+    \phi_Z(u) &= \E[e^{iuZ}]\\
     &= \frac{1}{\sqrt{2\pi}} \int e^{iux} e^{-x^2/2}\;\d x.
   \end{align*}
   We now notice that the function is bounded, so we can differentiate under the integral sign, and obtain
@@ -3247,9 +3539,11 @@ So we conclude that
 We are now going to do a little computation that shows that functions of this type also satisfy the Fourier inversion formula.
 
 Before we start, we make some observations about the Gaussian convolution. By general theory of convolutions, we know that we have
-\[
-  \|f * g_t\|_1 \leq \|f\|_1.
-\]
+\begin{prop}
+  \[
+    \|f * g_t\|_1 \leq \|f\|_1.
+  \]
+\end{prop}
 We also have a pointwise bound
 \begin{align*}
   |f*g_t(x)| &= \left|\int f(x - y) e^{-|y|^2/(2t)} \left(\frac{1}{2\pi t}\right)^{d/2} \;\d y\right| \\
@@ -3257,19 +3551,23 @@ We also have a pointwise bound
   &\leq (2\pi t)^{-d/2} \|f\|_1.
 \end{align*}
 This tells us that in fact
-\[
-  \|f * g_t\|_\infty \leq (2\pi t)^{-d/2} \|f\|_1.
-\]
+\begin{prop}
+  \[
+    \|f * g_t\|_\infty \leq (2\pi t)^{-d/2} \|f\|_1.
+  \]
+\end{prop}
 So in fact the convolution is pointwise bounded. We see that the bound gets worse as $t \to 0$, and we will see that this is because as $t \to 0$, the convolution $f * g_t$ becomes a better and better approximation of $f$, and we did not assume that $f$ is bounded.
 
 Similarly, we can compute that
-\[
-  \|\widehat{f * g_t}\| = \|\hat{f} \hat{g}_t\|_1 \leq (2\pi)^{d/2} t^{-d/2}\|f\|_1,
-\]
-and
-\[
-  \|\widehat{f * g_t}\|_\infty \leq \|\hat{f}\|.
-\]
+\begin{prop}
+  \[
+    \|\widehat{f * g_t}\|_1 = \|\hat{f} \hat{g}_t\|_1 \leq (2\pi)^{d/2} t^{-d/2}\|\hat{f}\|_1,
+  \]
+  and
+  \[
+    \|\widehat{f * g_t}\|_\infty \leq \|\hat{f}\|_\infty.
+  \]
+\end{prop}
 Now given these bounds, it makes sense to write down the Fourier inversion formula for a Gaussian convolution.
 \begin{lemma}
   The Fourier inversion formula holds for Gaussian convolutions.
@@ -3285,7 +3583,7 @@ We are going to reduce this to the fact that the Gaussian distribution itself sa
     &= \left(\frac{1}{2\pi}\right)^d \iint f(x - y) \hat{g}_t(u) e^{-i(u, y)}\;\d u\;\d y\\
     &= \left(\frac{1}{2\pi}\right)^d \int \left(\int f(x - y) e^{-i(u, x - y)} \;\d y\right) \hat{g}_t(u) e^{-i(u, x)}\;\d u\\
     &= \left(\frac{1}{2\pi}\right)^d \int \hat{f}(u)\hat{g}_t(u) e^{-i(u, x)}\;\d u\\
-    &= \left(\frac{2}{2\pi}\right)^d \int \widehat{f * g_t}(u) e^{-i(u, x)}\;\d u
+    &= \left(\frac{1}{2\pi}\right)^d \int \widehat{f * g_t}(u) e^{-i(u, x)}\;\d u
   \end{align*}
   So done.
 \end{proof}
@@ -3300,6 +3598,7 @@ Finally, we are going to extend the Fourier inversion formula to the case where 
   Then $\|f_t - f\|_1 \to 0$, as $t \to 0$, and the Fourier inversion holds whenever $f, \hat{f} \in L^1$.
 \end{thm}
 
+To prove this, we first need to show that the Gaussian convolution is indeed a good approximation of $f$:
 \begin{lemma}
   Suppose that $f \in L^p$ with $p \in [1, \infty)$. Then $\|f * g_t - f\|_p \to 0$ as $t \to 0$.
 \end{lemma}
@@ -3316,8 +3615,8 @@ Note that this cannot hold for $p = \infty$. Indeed, if $p = \infty$, then the $
   \]
   We first show that $e$ is a bounded function:
   \begin{align*}
-    e(y) &\leq \int 2^{p - 1}(|h(x - y)|^p + |h(x)|^p)\;\d x\\
-    &= 2^p \|h\|_p^p.
+    e(y) &\leq \int 2^p(|h(x - y)|^p + |h(x)|^p)\;\d x\\
+    &= 2^{p + 1} \|h\|_p^p.
   \end{align*}
   Also, since $h$ is continuous and bounded, the dominated convergence theorem tells us that $e(y) \to 0$ as $y \to 0$.
 
@@ -3365,13 +3664,14 @@ With this lemma, we can now prove the Fourier inversion theorem.
   \[
     f_t(x) \to (2\pi)^{-d} \int \hat{f}(u) e^{-i(u, x)}\;\d u\text{ as }t \to 0.
   \]
-  By the first part, we know that $\|f_t - f\| \to 0$ as $t \to 0$. So we can find a sequence $(t_n)$ with $t_n > 0$, $t_n \to 0$ so that $f_{t_n} \to f$ a.e. Combining these, we know that
+  By the first part, we know that $\|f_t - f\|_1 \to 0$ as $t \to 0$. So we can find a sequence $(t_n)$ with $t_n > 0$, $t_n \to 0$ so that $f_{t_n} \to f$ a.e. Combining these, we know that
   \[
-    f(x) = \int \hat{f} e^{-i(u, x)}\;\d u \text{ a.e.}
+    f(x) = \int \hat{f}(u) e^{-i(u, x)}\;\d u \text{ a.e.}
   \]
+  So done.
 \end{proof}
 
-\subsubsection*{Fourier transform and \texorpdfstring{$L^2$}{L^2}}
+\subsection{Fourier transform in \texorpdfstring{$\mathcal{L}^2$}{L2}}
 It turns out wonderful things happen when we take the Fourier transform of an $L^2$ function.
 \begin{thm}[Plancherel identity]\index{Plancherel identity}
   For any function $f \in L^1 \cap L^2$, the \emph{Plancherel identity} holds:
@@ -3414,8 +3714,10 @@ As we are going to see in a moment, this is just going to follow from the Fourie
   Taking the limit as $t \to 0$, the result follows.
 \end{proof}
 
+What is this good for? It turns out that the Fourier transform gives as a bijection from $\mathcal{L}^2$ to itself. While it is not true that the Fourier inversion formula holds for everything in $\mathcal{L}^2$, it holds for enough of them that we can just approximate everything else by the ones that are nice. Then the above tells us that in fact this bijection is a norm-preserving automorphism.
+
 \begin{thm}
-  There exists a unique Hilbert space automorphism $F; \mathcal{L}^2 \to \mathcal{L}^2$ such that
+  There exists a unique Hilbert space automorphism $F: \mathcal{L}^2 \to \mathcal{L}^2$ such that
   \[
     F([f]) = [(2\pi)^{-d/2}\hat{f}]
   \]
@@ -3423,6 +3725,7 @@ As we are going to see in a moment, this is just going to follow from the Fourie
 
   Here $[f]$ denotes the equivalence class of $f$ in $\mathcal{L}^2$, and we say $F: \mathcal{L}^2 \to \mathcal{L}^2$ is a Hilbert space automorphism if it is a linear bijection that preserves the inner product.
 \end{thm}
+Note that in general, there is no guarantee that $F$ sends a function to its Fourier transform. We know that only if it is a well-behaved function (ie. in $L^1 \cap L^2$). However, the formal property of it being a bijection from $\mathcal{L}^2$ to itself will be convenient for many things.
 
 \begin{proof}
   We define $F_0: \mathcal{L}^1 \cap \mathcal{L}^2 \to \mathcal{L}^2$ by
@@ -3433,13 +3736,372 @@ As we are going to see in a moment, this is just going to follow from the Fourie
   \[
     \|F_0([f])\|_2 = \|[f]\|_2.
   \]
-  Also, we know that $\mathcal{L}^1 \cap \mathcal{L}^2$ is dense in $\mathcal{L}^2$, since it contains all Gaussian convolutions. So we know $F_0$ extends uniquely to an isometry $F: \mathcal{L}^2 \to \mathcal{L}^2$.
+  Also, we know that $\mathcal{L}^1 \cap \mathcal{L}^2$ is dense in $\mathcal{L}^2$, since even the continuous functions with compact support are dense. So we know $F_0$ extends uniquely to an isometry $F: \mathcal{L}^2 \to \mathcal{L}^2$.
 
   Since it preserves distance, it is in particular injective. So it remains to show that the map is surjective. By Fourier inversion, the subspace
   \[
     V = \{[f] \in \mathcal{L}^2: f, \hat{f} \in L^1\}
   \]
-  is sent to itself by the map $F$. Also if $f \in V$, then $F^4[f] = [f]$ (note that applying it twice does not suffice, because we actually have $F^2[f](x) = [f](-x)$). So $V$ is contained in the image $F$, and also $V$ is dense in $\mathcal{L}^2$, again because it contains all Gaussian convolutions. So we know that $F$ is surjective.
+  is sent to itself by the map $F$. Also if $f \in V$, then $F^4[f] = [f]$ (note that applying it twice does not suffice, because we actually have $F^2[f](x) = [f](-x)$). So $V$ is contained in the image $F$, and also $V$ is dense in $\mathcal{L}^2$, again because it contains all Gaussian convolutions (we have $\hat{f_t} = \hat{f} \hat{g_t}$, and $\hat{f}$ is bounded and $\hat{g_t}$ is decaying exponentially). So we know that $F$ is surjective.
+\end{proof}
+
+\subsection{Properties of characteristic functions}
+We are now going to state a bunch of theorems about characteristic functions. Since the proofs are not examinable (but the statements are!), we are only going to provide a rough proof sketch.
+
+\begin{thm}
+  The characteristic function $\phi_X$ of a distribution $\mu_X$ of a random variable $X$ determines $\mu_X$. In other words, if $X$ and $\tilde{X}$ are random variables and $\phi_X = \phi_{\tilde{X}}$, then $\mu_X = \mu_{\tilde{X}}$
+\end{thm}
+
+\begin{proof}[Proof sketch]
+  Use the Fourier inversion to show that $\phi_X$ determines $\mu_X(g) = \E[g(X)]$ for any bounded, continuous $g$.
+\end{proof}
+
+\begin{thm}
+  If $\phi_X$ is integrable, then $\mu_X$ has a bounded, continuous density function
+  \[
+    f_X(x) = (2\pi)^{-d} \int \phi_X(u) e^{-i(u, x)}\;\d u.
+  \]
+\end{thm}
+
+\begin{proof}[Proof sketch]
+  Let $Z \sim N(0, 1)$ be independent of $X$. Then $X + \sqrt{t} Z$ has a bounded continuous density function which, by Fourier inversion, is
+  \[
+    f_t(x) = (2\pi)^{-d} \int \phi_X(u) e^{-|u|^2 t / 2} e^{-i(u, x)}\;\d u.
+  \]
+  Sending $t \to 0$ and using the dominated convergence theorem with dominating function $|\phi_X|$.
+\end{proof}
+
+The next theorem relates to the notion of weak convergence.
+\begin{defi}[Weak convergence of measures]\index{weak convergence!of measures}
+  Let $\mu, (\mu_n)$ be Borel probability measures. We say that $\mu_n \to \mu$ \emph{weakly} if and only if $\mu_n(g) \to \mu(g)$ for all bounded continuous $g$.
+\end{defi}
+
+Similarly, we can define weak convergence of random variables.
+
+\begin{defi}[Weak convergence of random variables]\index{weak convergence!of random variables}
+  Let $X, (X_n)$ be random variables. We say $X_n \to X$ weakly iff $\mu_{X_n} \to \mu_X$ weakly, iff $\E[g(X_n)] \to \E[g(X)]$ for all bounded continuous $g$.
+\end{defi}
+
+This is related to the notion of convergence in distribution, which we defined long time ago without talking about it much. It is an exercise on the example sheet that weak convergence of random variables in $\R$ is equivalent to convergence in distribution.
+
+It turns out that weak convergence is very useful theoretically. One reason is that they are related to convergence of characteristic functions.
+\begin{thm}
+  Let $X, (X_n)$ be random variables with values in $\R^d$. If $\phi_{X_n}(u) \to \phi_X(u)$ for each $u \in \R^d$, then $\mu_{X_n} \to \mu_X$ weakly.
+\end{thm}
+
+The main application of this that will appear later is that this is the fact that allows us to prove the central limit theorem.
+
+\begin{proof}[Proof sketch]
+  By the example sheet, it suffices to show that $\E[g(X_n)] \to \E[g(X)]$ for all compactly supported $g \in C^\infty$. We then use Fourier inversion and convergence of characteristic functions to check that
+  \[
+    \E[g(X_n + \sqrt{t}Z)] \to \E[g(X + \sqrt{t}Z)]
+  \]
+  for all $t > 0$ for $Z\sim N(0, 1)$ independent of $X, (X_n)$. Then we check that $\E[g(X_n + \sqrt{t}Z)]$ is close to $\E[g(X_n)]$ for $t > 0$ small, and similarly for $X$.
+\end{proof}
+
+\subsection{Gaussian random variables}
+Recall that in the proof of the Fourier inversion theorem, we used these things called Gaussians, but didn't really say much about them. These will be useful later on when we want to prove the central limit theorem, because the central limit theorem says that in the long run, things look like Gaussians. So here we lay out some of the basic definitions and properties of Gaussians.
+
+\begin{defi}[Gaussian random variable]\index{Gaussian random variable}\index{random variable!Gaussian}
+  Let $X$ be a random variable on $\R$. This is said to be \emph{Gaussian} if there exists $\mu \in \R$ and $\sigma \in (0, \infty)$ such that the density of $X$ is
+  \[
+    f_X(x) = \frac{1}{\sqrt{2\pi \sigma^2}} \exp\left(-\frac{(x - \mu)^2}{2 \sigma^2}\right).
+  \]
+  A constant random variable $X = \mu$ corresponds to $\sigma = 0$. We say this has \term{mean} $\mu$ and \term{variance} $\sigma^2$.\index{Gaussian random variable!mean}\index{Gaussian random variable!variance}
+
+  When this happens, we write $X \sim N(\mu, \sigma^2)$.\index{$N(\mu, \sigma^2)$}
+\end{defi}
+
+For completeness, we record some properties of Gaussian random variables.
+
+\begin{prop}
+  Let $X \sim N(\mu, \sigma^2)$. Then
+  \[
+    \E[X] = \mu,\quad \var(X) = \sigma^2.
+  \]
+  Also, for any $a, b \in \R$, we have
+  \[
+    aX + b \sim N(a\mu + b, a^2 \sigma^2).
+  \]
+  Lastly, we have
+  \[
+    \phi_X(u) = e^{-i\mu u - u^2 \sigma^2/2}.
+  \]
+\end{prop}
+
+\begin{proof}
+  All but the last of them follow from direct calculation, and can be found in IA Probability.
+
+  For the last part, if $X \sim N(\mu, \sigma^2)$, then we can write
+  \[
+    X = \sigma Z + \mu,
+  \]
+  where $Z \sim N(0, 1)$. Recall that we have previously found that the characteristic function of a $N(0, 1)$ function is
+  \[
+    \phi_Z(u) = e^{-|u|^2/2}.
+  \]
+  So we have
+  \begin{align*}
+    \phi_X(u) &= \E[e^{iu(\sigma Z + \mu)}]\\
+    &= e^{iu\mu} \E[e^{iu\sigma \Z}]\\
+    &= e^{iu\mu} \phi_Z(iu\sigma)\\
+    &= e^{iu \mu - u^2 \sigma^2/2}.
+  \end{align*}
+\end{proof}
+What we are next going to do is to talk about the corresponding facts for the Gaussian in higher dimensions. Before that, we need to come up with the definition of a higher-dimensional Gaussian distribution. This might be different from the one you've seen previously, because we want to allow some degeneracy in our random variable, eg. some of the dimensions can be constant.
+
+\begin{defi}[Gaussian random variable]\index{Gaussian random variable}\index{random variable!Gaussian}
+  Let $X$ be a random variable. We say that $X$ is a \emph{Gaussian on $\R^n$} if $(u, X)$ is Gaussian on $\R$ for all $u \in \R^n$.
+\end{defi}
+
+We are now going to prove a version of our previous theorem to higher dimensional Gaussians.
+\begin{thm}
+  Let $X$ be Gaussian on $\R^n$, and le t$A$ be an $m \times n$ matrix and $b \in \R^m$. Then
+  \begin{enumerate}
+    \item $AX + b$ is Gaussian on $\R^m$.
+    \item $X \in L^2$ and its law $\mu_X$ is determined by $\mu = \E[X]$ and $V = \var(X)$, the covariance matrix.
+    \item We have
+      \[
+        \phi_X(u) = e^{i(u, \mu) - (u, Vu)/2}.
+      \]
+    \item If $V$ is invertible, then $X$ has a density of
+      \[
+        f_X (x) = (2\pi)^{-n/2} (\det V)^{-1/2} \exp\left(-\frac{1}{2} (x - \mu, V^{-1}(x - \mu))\right).
+      \]
+    \item If $X = (X_1, X_2)$ where $X_i \in \R^{n_i}$, then $\cov(X_1, X_2) = 0$ iff $X_1$ and $X_2$ are independent.
+  \end{enumerate}
+\end{thm}
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item If $u \in \R^m$, then we have
+      \[
+        (AX + b, u) = (AX, u) + (b, u) = (X, A^T u) + (b, u).
+      \]
+      Since $(X, A^T u)$ is Gaussian and $(b, u)$ is constant, it follows that $(AX + b, u)$ is Gaussian.
+    \item We know in particular that each component of $X$ is a Gaussian random variable, which are in $L^2$. So $X \in L^2$. We will prove the second part of (ii) with (iii)
+    \item If $\mu = \E[X]$ and $V = \var(X)$, then if $u \in \R^n$, then we have
+      \[
+        \E[(u, X)] = (u, \mu),\quad \var((u, X)) = (u, Vu).
+      \]
+      So we know
+      \[
+        (u, X) \sim N((u, \mu), (u, Vu)).
+      \]
+      So it follows that
+      \[
+        \phi_X(u) = \E[e^{i(u, X)}] = e^{i(u, \mu) - (u, Vu)/2}.
+      \]
+      So $\mu$ and $V$ determine the characteristic function of $X$, which in turn determines the law of $X$.
+    \item We start off with a boring Gaussian vector $Y = (Y_1, \cdots, Y_n)$, where the $Y_i \sim N(0, 1)$ are independent. Then the density of $Y$ is
+      \[
+        f_Y(y) = (2\pi)^{-n/2} e^{-|y|^2/2}.
+      \]
+      We are now going to construct $X$ from $Y$. We define
+      \[
+        \tilde{X} = V^{1/2} Y + \mu.
+      \]
+      This makes sense because $V$ is always non-negative definite. Then $\tilde{X}$ is Gaussian with $\E[\tilde{X}] = \mu$ and $\var(\tilde{X}) = V$. Therefore $X$ has the same distribution as $\tilde{X}$. Since $V$ is assumed to be invertible, we can compute the density of $\tilde{X}$ using the change of variables formula.
+    \item It is clear that if $X_1$ and $X_2$ are independent, then $\cov(X_1, X_2) = 0$.
+
+      Conversely, let $X = (X_1, X_2)$, where $\cov(X_1, X_2) = 0$. Then we have
+      \[
+        V = \var(X) =
+        \begin{pmatrix}
+          V_{11} & 0\\
+          0 & V_{22}
+        \end{pmatrix}.
+      \]
+      Then for $u = (u_1, u_2)$, we have
+      \[
+        (u, Vu) = (u_1 V_{11} u_1) + (u_2, V_{22}u_2),
+      \]
+      where $V_{11} = \var(X_1)$ and $V_{22} \var(X_2)$. Then we have
+      \begin{align*}
+        \phi_X(u) &= e^{i\mu u - (u, Vu)/2}\\
+        &= e^{i\mu_1 u_1 - (u_1, V_{11}u_1)/2} e^{i\mu_2 u_2 - (u_2, V_{22}u_2)/2}\\
+        &= \phi_{X_1}(u_1)\phi_{X_2} (u_2).
+      \end{align*}
+      So it follows that $X_1$ and $X_2$ are independent.
+  \end{enumerate}
+\end{proof}
+
+\section{Ergodic theory}
+We are now going to study a new topic --- ergodic theory. Due to time constraints, we will only briefly touch on the topic. The general setup of ergodic theory is as follows:
+\begin{enumerate}
+  \item We have a measure space $(E, \mathcal{E}, \mu)$ and a measurable map $\Theta: E \to E$ that is measure preserving, ie. $\mu(A) = \mu(\Theta^{-1}(A))$ for all $A \in \mathcal{E}$.
+\end{enumerate}
+
+\begin{eg}
+  Take $(E, \mathcal{E}, \mu) = ([0, 1), \mathcal{B}([0, 1)), \mathrm{Lebesgue})$. For each $a \in [0, 1)$, we can define
+  \[
+    \Theta_a (x) = x + a \mod 1.
+  \]
+  By what we've done earlier in the course, we know this translation map preserves the Lebesgue measure on $[0, 1)$.
+\end{eg}
+
+Our goal is to try to understand the ``long run averages'' of the system when we apply $\Theta$ many times. One particular quantity we are going to look at is the following:
+
+Let $f$ be measurable. We define\index{$S_n(f)$}
+\[
+  S_n(f) = f + f \circ \Theta + \cdots + f \circ \Theta^{n - 1}.
+\]
+We want to know what is the long run behaviour of $\frac{S_n(f)}{n}$ as $n \to \infty$.
+
+The \emph{Ergodic theorems} are going to give us the answer in a certain special case. Finally, we will apply this in a particular case to get the strong law of large numbers.
+
+\begin{defi}[Invariant subset]\index{invariant subset}
+  We say $A \in \mathcal{E}$ is invariant for $\Theta$ if $A = \Theta^{-1}(A)$.
+\end{defi}
+
+\begin{defi}[Invariant function]\index{invariant function}
+  A measurable function $f$ is invariant if $f = f \circ \Theta$.
+\end{defi}
+
+\begin{defi}[$\mathcal{E}_\Theta$]\index{$\mathcal{E}_\Theta$}
+  We write
+  \[
+    \mathcal{E}_\Theta = \{A \in \mathcal{E}: A\text{ is invariant}\}.
+  \]
+\end{defi}
+It is easy to show that $\mathcal{E}_\Theta$ is a $\sigma$-algebra, and $f: E \to \R$ is invariant iff it is $\mathcal{E}_\Theta$ measurable.
+
+\begin{defi}[Ergodic]\index{ergodic}
+  We say $\Theta$ is \emph{ergodic} if $\mathcal{A} \in \mathcal{E}_\Theta$ implies $\mu(A) = 0$ or $\mu(A^C) = 0$.
+\end{defi}
+
+\begin{eg}
+  For the translation map on $[0, 1)$, we have $\Theta_a$ is ergodic iff $a$ is irrational. Proof is left on example sheet 4.
+\end{eg}
+
+\begin{prop}
+  If $f$ is integrable and $\Theta$ is measure-preserving. Then $f \circ \Theta$ is integrable and
+  \[
+    \int f \circ \Theta \d \mu = \int_E f \d \mu.
+  \]
+\end{prop}
+
+\begin{prop}
+  If $\Theta$ is ergodic and $f$ is invariant, then there exists a constant $C$ such that $f = c$ a.e.
+\end{prop}
+The proofs of these are left as an exercise on example sheet $4$.
+
+We are now going to spend a little bit of time studying a particular example, because this will be needed to prove the strong law of large numbers.
+
+\begin{eg}[Bernoulli shifts]\index{Bernoulli shift}
+  Let $m$ be a probability distribution on $\R$. Then there exists an iid sequence $Y_1, Y_2, \cdots$ with law $m$. Recall we constructed this in a really funny way. Now we are going to build it in a more natural way.
+
+  We let $E = \R^\N$ be the set of all real sequences $(x_n)$. We define the $\sigma$-algebra $\mathcal{E}$ to be the $\sigma$-algebra generated by the projections $X_n(x) = x_n$. In other words, this is the smallest $\sigma$-algebra such that all these functions are measurable. Alternatively, this is the $\sigma$-algebra generated by the $\pi$-system
+  \[
+    \mathcal{A} = \left\{\prod_{n \in \N} A_n, A_n \in \mathcal{B}\text{ for all $n$ and $A_n = \R$ eventually}\right\}.
+  \]
+  Finally, to define the measure $\mu$, we let
+  \[
+    Y = (Y_1, Y_2, \cdots) : \Omega \to E
+  \]
+  where $Y_i$ are iid random variables defined earlier, and $\Omega$ is the sample space of the $Y_i$.
+
+  Then $Y$ is a measurable map because each of the $Y_i$'s is a random variable. We let $\mu = \P \circ Y^{-1}$.
+
+  By the independence of $Y_i$'s, we have that
+  \[
+    \mu(A) = \prod_{n \in \N} m(A_n)
+  \]
+  for any
+  \[
+    A = A_1 \times A_2 \times \cdots \times A_n \times \R \times \cdots \times \R.
+  \]
+  Note that the product is eventually $1$, so it is really a finite product.
+
+  This $(E, \mathcal{E}, \mu)$ is known as the \term{canonical space} associated with the sequence of iid random variables with law $m$.
+
+  Finally, we need to define $\Theta$. We define $\Theta: E \to E$ by
+  \[
+    \Theta(x) = \Theta(x_1, x_2, x_3, \cdots) = (x_2, x_3, x_4, \cdots).
+  \]
+  This is known as the \term{shift map}.
+\end{eg}
+Why do we care about this? Later, we are going to look at the function
+\[
+  f(x) = f(x_1, x_2, \cdots) = x_1.
+\]
+Then we have
+\[
+  S_n(f) = f + f \circ \Theta + \cdots + f \circ \Theta^{n - 1} = X_1 + \cdots + X_n.
+\]
+So $\frac{S_n(f)}{n}$ will the average of the first $n$ things. This will be related to the law of large numbers.
+
+\begin{thm}
+  The shift map $\Theta$ is an ergodic, measure preserving transformation.
+\end{thm}
+
+\begin{proof}
+  It is an exercise to show that $\Theta$ is measurable and measure preserving.
+
+  To show that $\Theta$ is ergodic, recall the definition of the tail $\sigma$-algebra
+  \[
+    \mathcal{T}_n = \sigma(X_m: m \geq n + 1),\quad \mathcal{T} = \bigcap_n \mathcal{T}_n.
+  \]
+  Suppose that $A \in \prod_{n \in \N} A_n \in \mathcal{A}$. Then
+  \[
+    \Theta^{-n}(A) = \{X_{n + k} \in A_k \text{ for all }k\} \in \mathcal{T}_n.
+  \]
+  Since $\mathcal{T}_n$ is a $\sigma$-algebra, we and $\Theta^{-n}(A) \in \mathcal{J}_N$ for all $A \in \mathcal{A}$ and $\sigma(\mathcal{A}) = \mathcal{E}$, we know $\Theta^{-n}(A) \in \mathcal{T}_N$ for all $A \in \mathcal{E}$.
+
+  So if $A \in \mathcal{E}_\Theta$, ie. $A = \mathcal{O}^{-1}(A)$, then $A \in \mathcal{T}_N$ for all $n$. So $A \in \mathcal{T}$.
+
+  From the Kolmogorov 0-1 law, we know either $\mu[A] = 1$ or $\mu[A] = 0$. So done.
+\end{proof}
+
+\subsection{Ergodic theorems}
+To prove the Ergodic theorems, we need the following magical lemma:
+\begin{lemma}
+  Let $f$ be integrable, and
+  \[
+    S^* = \sup_{n \geq 0} S_n(f) \geq 0,
+  \]
+  since $S_0(f) = 0$ by convention. Then
+  \[
+    \int_{\{S^* > 0\}} f \;\d \mu \geq 0.
+  \]
+\end{lemma}
+
+\begin{proof}
+  We let
+  \[
+    S_n^* = \max_{0 \leq m \leq n} S_m
+  \]
+  and
+  \[
+    A_n = \{S_n^* > 0\}.
+  \]
+  Now if $1 \leq m \leq n$, then we know
+  \[
+    S_m = f + S_{m - 1} \circ \Theta \leq f + S_n^* \circ \Theta.
+  \]
+  Now on $A_n$, we have
+  \[
+    S_n^* = \max_{1 \leq m \leq n} S_m,
+  \]
+  since $S_0 = 0$. So we have
+  \[
+    S_n^* \leq f + S_n^* \circ \Theta.
+  \]
+  On $A_n^C$, we have
+  \[
+    S_n^* = 0 \leq S_n^* \circ \Theta.
+  \]
+  So we know
+  \begin{align*}
+    \int_E S_n^*\;\d \mu&= \int_{A_n} S_n^*\; \d \mu + \int_{A_n^C} S_n^* \;\d \mu\\
+    &\leq \int_{A_n} f \;\d \mu + \int_{A_n} S_n^* \circ \Theta \;\d \mu + \int_{A_n^C} S_n^* \circ \Theta \;\d \mu\\
+    &= \int_{A_n} f\;\d \mu + \int_E S_n^* \circ \Theta \;\d \mu\\
+    &= \int_{A_n} f\;\d \mu + \int_E S_n^* \;\d \mu
+  \end{align*}
+  So we know
+  \[
+    \int_{A_n} f\;\d \mu \geq 0.
+  \]
+  Taking the limit as $n \to \infty$ gives the result by dominated convergence with dominating function $f$.
 \end{proof}
 
 
