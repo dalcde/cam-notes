@@ -6,7 +6,7 @@
 \def\nlecturer {R. Jozsa}
 \def\ncourse {Quantum Computation}
 \def\nofficial {https://www.qi.damtp.cam.ac.uk/node/261}
-\def\nlectures {TT.9}
+\def\nnotready {}
 
 \input{header}
 
@@ -1909,6 +1909,230 @@ Then $\pm 2 \theta$ is equivalent to $\varphi$ or $1 - \varphi$, where $\varphi$
 
 Now we don't have an eigenstate, but we can start with any state in the plane, $\bket{\psi_0}$. We then do phase estimation with it. We will then get either $\varphi$ or $1 - \varphi$ with some probabilities, but we don't mind which one we get, since we can obtain one from the other, and we can tell them apart because $\varphi$ is small.
 
+\section{Hamiltonian simulation}
+We now move on to our last topic. This is more physics-oriented, but we are going to do it in a more mathematical way. We want to use a quantum computer to simulate the evolution/dynamics of a quantum system given its Hamiltonian $H$. For $n$ qubits, this generally needs $O(2^n)$ classically, but we'll do it in polynomial time quantumly. One might think this is trivial, since we are simulating a quantum system with a quantum system, but it is in fact rather subtle.
 
+\subsection{Hamiltonians and quantum evolution}
+In a physical system, we have a \term{state} $\bket{\psi}$, ad we have a \term{Hamiltonian} $H$ that is self-adjoint (Hermitian) operator. In physics, this represents the energy, so
+\[
+  \brak{\psi} H \bket{\psi} = \text{average value obtained in measurement of energy}.
+\]
+The time evolution is given by the Schr\"odinger equation
+\[
+  \frac{\d}{\d t} \bket{\psi(t)} = -i H \bket{\psi(t)}.
+\]
+We'll consider only time-independent Hamiltonians $H(t) = H$. Then we have
+\[
+  \bket{\psi(t)} = e^{-iHt} \bket{\psi(0)}.
+\]
+Here $e^{-iHt}$ is the matrix exponential given by
+\[
+  e^A = I + A + \frac{A^2}{2} + \cdots,
+\]
+Now given an $H$ and a time $t$, we want to simulate $U(t) = e^{-iHt}$ to suitable approximations.
+
+Before we start doing that, we introduce a few more concepts.
+\begin{defi}[Operator norm]\index{operator norm}\index{$\|A\|$}
+  The \emph{operator norm} of an operator $A$ is
+  \[
+    \|A\| = \max_{\|\bket{\psi}\| = 1} \norm{A \bket{\psi}}.
+  \]
+  If $A$ is diagonalizable, then this is the maximum eigenvalue of $A$.
+\end{defi}
+
+The following properties are easy to see:
+\begin{prop}
+  \begin{align*}
+    \norm{A + B} &\leq \norm{A} + \norm{B}\\
+    \norm{AB} &\leq \norm{A}\norm{B}
+  \end{align*}
+\end{prop}
+
+\subsection{Hamiltonian simulation}
+Suppose we have a Hamiltonian $H$ on $n$ qubits. This is a $2^n \times 2^n$ matrix. We'll want to simulate $U = e^{-iHt}$ with a circuit of $\poly(n, t)$ basic unitary gates.
+
+\begin{defi}[$k$-local Hamiltonian]\index{$k$-local Hamiltonian}\index{Hamiltonian!$k$-local}
+  We say a Hamiltonian $H$ is $k$-local (for $k$ a fixed constant) on $n$ qubits if
+  \[
+    H = \sum_{j = 1}^m H_j,
+  \]
+  where each $H_j$ acts on at most $k$ qubits (not necessarily contiguous), ie. we can write
+  \[
+    H_j = \tilde{H}_j \otimes I,
+  \]
+  where $\tilde{H}_j$ acts on some $k$ qubits, and $I$ acts on all other qubits as the identity.
+\end{defi}
+The number $m$ of terms we need is bounded by
+\[
+  m \leq \binom{n}{k} = O(n^k),
+\]
+which is polynomial in $n$.
+
+\begin{eg}
+  The Hamiltonian
+  \[
+    H = \qX \otimes I \otimes I - \qZ \otimes I \otimes Y
+  \]
+  is $2$-local on $3$ qubits.
+\end{eg}
+
+We write $M_{(i)}$ to denote the operator $M$ acting on the $i$th qubit.
+\begin{eg}
+  We could write
+  \[
+    X \otimes I \otimes I = X_{(1)}.
+  \]
+\end{eg}
+
+\begin{eg}[Ising model]\index{Ising model}
+  The \emph{Ising model} on an $n \times n$ square lattice of qubits is given by
+  \[
+    H = \qJ \sum_{i, j = 1}^{n - 1} \qZ_{(i, j)} \qZ_{i, j + 1} + \qZ_{(i, j)} \qZ_{(i + 1, j)}
+  \]
+  Then this is $2$-local.
+\end{eg}
+
+\begin{eg}[Heisenberg model]\index{Heisenberg model}
+  The Heisenberg model on a line is given by
+  \[
+    H = \sum_{i = 1}^{n - 1} J_x \qX_{(i)} \qX_{(i + 1)} + J_y \qY_{(i)}\qY_{(i + 1)} + J_z \qZ_{(i)} \qZ_{(i + 1)},
+  \]
+  where $J_x, J_y$ and $J_z$ are real constants.
+\end{eg}
+This is useful in modelling magnetic system.
+
+It is important to note that in genera, if $\{H_j\}$ doesn't commute, then
+\[
+  e^{-i\sum_j H_j t} \not= \prod_j e^{-iH_j t}.
+\]
+However, we do want to do things like this, because we want to decompose our $K$-local Hamiltonians into the sum, and we want to simulate
+\[
+  U(t) = e^{i\sum_j H_j t}.
+\]
+If we want instead to use a standard universal set of gates, we need the following theorem:
+
+\begin{thm}[Solovay-Kitaer theorem] % check spelling and add index
+  Let $U$ be a unitary operator on $k$ qubits and $S$ any universal set of quantum gates. Then $U$ can be approximated to within $\varepsilon$ using $O(\log^c \frac{1}{\varepsilon})$ from $S$, where $c < 4$.
+\end{thm}
+In other words, there is very modest overhead in circuit size for improved error.
+
+\begin{proof}
+  Omitted.
+\end{proof}
+
+We will also need to keep track of the accumulation of errors.
+\begin{lemma}
+  Let $\{U_i\}$ and $\{V_i\}$ be sets of unitary operators with
+  \[
+    \norm{U_i - V_i} \leq \varepsilon.
+  \]
+  Then
+  \[
+    \norm{U_m \cdots U_1 - V_m \cdots V_1} \leq m\varepsilon.
+  \]
+\end{lemma}
+This is remarkable!
+
+\begin{proof}
+  See example sheet $2$. The idea is that unitary gates preserve the size of vectors, hence do not blow up errors.
+\end{proof}
+
+\subsection{Hamiltonian simulation for \texorpdfstring{$k$}{k}-local Hamiltonians}
+We do a warm-up: we do the easy case where the terms in the Hamiltonian commute.
+\begin{prop}
+  Let
+  \[
+    H = \sum_{j = 1}^m H_j
+  \]
+  be any $k$-local Hamiltonian with commuting terms.
+
+  Then for any $t$, $e^{-iHt}$ can be approximated to within $\varepsilon$ by a circuit of $O(m \poly(\log(m/\varepsilon)))$ gates from any given universal set.
+\end{prop}
+
+\begin{proof}
+  We pick $\varepsilon' = \frac{\varepsilon}{m}$, and approximate $e^{-iH_jt}$ to within $\varepsilon'$. Then the total error is bounded by $m\varepsilon' = \varepsilon$, and this uses
+  \[
+    O(m\poly(\log(m/\varepsilon)))
+  \]
+  gates.
+\end{proof}
+
+We now do the full non-commutative case. For a matrix $X$, we write $X + O (\varepsilon)$ for $X + E$ with $\|E\| = O(\varepsilon)$.
+
+\begin{lemma}[Lie-Trotter product formula]\index{Lie-Trotter product formula}
+  Let $A, B$ be matrices with $\|A\|, \|B\| \leq K < 1$. Then we have
+  \[
+    e^{-iA} e^{-iB} = e^{-i(A + B)} + O(K^2).
+  \]
+\end{lemma}
+
+\begin{proof}
+  We have
+  \begin{align*}
+    e^{-iA} &= 1 - iA + \sum_{k = 2}^\infty \frac{(iA)^k}{k!}\\
+    &= I - iA + (iA)^2 \sum_{k = 0}^\infty \frac{(-iA)^k}{(k + 2)!}
+  \end{align*}
+  We notice that $\|iA)^2\| \leq K^2$, the final sum has norm bounded by $e^K < e$. So we have
+  \[
+    e^{-iA} = I - iA + O(K^2).
+  \]
+  Then we have
+  \begin{align*}
+    e^{-iA} e^{-iB} &= (I - iA + O(K^2))(I - iB + O(K^2)) \\
+    &= I - i(A + B) + O(K^2) \\
+    &= e^{-i(A + B)} + O(K^2).
+  \end{align*}
+  Here we needed the fact that $\|A + B\| \leq 2K = O(K)$.
+\end{proof}
+
+We now apply this repeatedly to accumulate sums $H_1, H_2, .., H_m$ in the exponent. First of all, we note that if each $\|H_i\| < K$, then $\|H_i + \cdots + H_\ell\| < \ell K$. We want this to be $ < 1$ for all $\ell \leq m$. So for now, we assume $K < \frac{1}{m}$. Also, we take $t = 1$ for now. Then consider
+\begin{align*}
+  e^{-iH_1} e^{-iH_2} \cdots e^{-iH_m} &= (e^{-i(H_1 + H_2)} + O(K^2)) e^{-i H_3} \cdots e^{-iH_m}\\
+  &= e^{-i(H_1 + H_2)} e^{-iH_3} \cdots e^{-i H_m} + O(K^2)\\
+  &= e^{-i(H_1 + H_2 + H_3)} e^{-iH_4} \cdots e^{-iH_m} + O((2K)^2) + O(K^2)\\
+  &= e^{-i\sum H_j} + O(m^3 K^2),
+\end{align*}
+where we used the fact that
+\[
+  1^2 + 2^2 + \cdots + m^2 = O(m^3).
+\]
+We write the error as $C m^3 K^2$.
+
+This is fine if $K$ is super small, but it won't be in general. Now finally for general $K > \|H_j\|$ and $t$ values, we have $\|H_j t\| < Kt$, which can be large. To fix this, we introduce a large $N$, and then
+\[
+  \norm{\frac{H_j t}{N}} < \frac{Kt}{N} \leq \tilde{K}.
+\]
+In other words, we divide time up into small $\frac{t}{N}$ intervals. We then try to simulate
+\[
+  U = e^{-i (H_1 + \cdots + H_m)t } = \left(e^{-i \left(\frac{H_1 t}{n} + \ldots + \frac{H_n t}{n}\right)}\right)^N.
+\]
+We now want to make sure the final error for $U$ is $< \varepsilon$. So we know each term $e^{-i \left(\frac{H_1 t}{n} + \ldots + \frac{H_n t}{n}\right)}$ needs to be approximated to $\frac{\varepsilon}{N}$. So using our previous formula, we want that
+\[
+  Cm^3 \tilde{K}^2 < \frac{\varepsilon}{N},
+\]
+Doing some algebraic manipulation, we find that we need
+\[
+  N > \frac{cm^3 K^2 t^2}{\varepsilon}.
+\]
+We now h ave $Nm$ gates of the form $e^{iH_j t/N}$. So the circuit size
+\[
+  O\left(\frac{m^4(Kt)^2}{\varepsilon}\right).
+\]
+Recall for $n$-qubits, a general $k$-local Hamiltonian has $n = O(n^k)$. So the circuit size is
+\[
+  O(n^{4k} (2t)^2/\varepsilon).
+\]
+Now this is in terms of the number of $e^{iH_j t/N}$ gates. If we want to express this in terms of universal gates, then each gate needs to be approximated to $O(\varepsilon/|\mathcal{C}|)$. We then need $O(\log^c(\frac{|\mathcal{C}|}{\varepsilon}))$ gates for each, for some $c < 4$. So we only get a modest extra multiplicative factor in $|\mathcal{C}|$.
+
+Note that for a fixed $n, t$ with a variable $t$, then a quantum process $e^{-iHt}$ runs in time $t$, but our simulation needs time $O(t^2)$. This can be improved to $O(t^{1 + \delta})$ for any $\delta > 0$ by ``better'' Lie-Trotter expansions.
+
+\subsection{Local Hamiltonian ground state problem}
+There are many other things we might want to do with a $k$-local Hamiltonian. Given $H = \sum_{i = 1}^m H_j$ be a $5$-local Hamiltonian with $n$ qubits (this was the original result proved). We suppose $\|H_i\| < 1$, and we are given two numbers $a < b$, eg. $a = \frac{1}{3}$ and $b = \frac{2}{3}$.
+
+We are promised that the smallest eigenvalue $E_0$ of $H$ is $ < a$ or $> b$. The problem is whether $E_0 < a$.
+
+The reason why we have these funny $a, b$ is so that we don't have to worry about precision problems. If we only had a single $a$ and we want to determine if $E_0 > a$ or $E_0 < a$, then it would be difficult to figure out if $E_0$ is very close to $a$.
+
+Kivaev's theorem says that the above problem is complete for QMA, ie. it is the ``hardest'' problem in QMA. Roughly, QMA is a quantum version of NP. MA stands for Merlin and Arthur. By complete, we mean any problem in QMA can be translated into a local Hamiltonian ground state problem with polynomial overhead. A brief survey can be found on arXiv:quant-ph/0210077.
 \printindex
 \end{document}
