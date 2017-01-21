@@ -1,0 +1,335 @@
+\documentclass[a4paper]{article}
+
+\def\npart {III}
+\def\nterm {Lent}
+\def\nyear {2017}
+\def\nlecturer {T. E. Forster}
+\def\ncourse {Logic}
+
+\input{header}
+
+\usepackage{bussproofs}
+\newcommand\intro[1]{\RightLabel{\scriptsize#1-int}}
+\newcommand\intron[2]{\RightLabel{\scriptsize#1-int (#2)}}
+\newcommand\elim[1]{\RightLabel{\scriptsize#1-elim}}
+
+\makeatletter
+\DeclareRobustCommand{\rvdots}{%
+  \vbox{
+    \baselineskip4\p@\lineskiplimit\z@
+    \kern-\p@
+    \hbox{.}\hbox{.}\hbox{.}
+  }}
+\newenvironment{bprooftree}
+  {\leavevmode\hbox\bgroup}
+  {\DisplayProof\egroup}
+\makeatother
+
+\begin{document}
+\maketitle
+{\small
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+This course is the sequel to the Part II courses in Set Theory and Logic and in Automata and Formal Languages lectured in 2015-6. (It is already being referred to informally as ``Son of ST\&L and Automata \& Formal Languages''). Because of the advent of that second course this Part III course no longer covers elementary computability in the way that its predecessor (``Computability and Logic'') did, and this is reflected in the change in title. It will say less about Set Theory than one would expect from a course entitled `Logic'; this is because in Lent term Benedikt L\"owe will be lecturing a course entitled `Topics in Set Theory' and I do not wish to tread on his toes. Material likely to be covered include: advanced topics in first-order logic (Natural Deduction, Sequent Calculus, Cut-elimination, Interpolation, Skolemisation, Completeness and Undecidability of First-Order Logic, Curry-Howard, Possible world semantics, G\"odel's Negative Interpretation, Generalised quantifiers\ldots); Advanced Computability ($\lambda$-representability of computable functions, Tennenbaum's theorem, Friedberg-Muchnik, Baker-Gill-Solovay\ldots); Model theory background (ultraproducts, Los's theorem, elementary embeddings, omitting types, categoricity, saturation, Ehrenfeucht-Mostowski theorem\ldots); Logical combinatorics (Paris-Harrington, WQO and BQO theory at least as far as Kruskal's theorem on wellquasiorderings of trees\ldots). This is a new syllabus and may change in the coming months. It is entirely in order for students to contact the lecturer for updates.
+
+\subsubsection*{Pre-requisites}
+The obvious prerequisites from last year's Part II are Professor Johnstone's Set Theory and Logic and Dr Chiodo's Automata and Formal Languages, and I would like to assume that everybody coming to my lectures is on top of all the material lectured in those courses. This aspiration is less unreasonable than it may sound, since in 2016-7 both these courses are being lectured the term before this one, in Michaelmas; indeed supervisions for Part III students attending them can be arranged if needed: contact me or your director of studies. I am lecturing Part II Set Theory and Logic and I am even going to be issuing a ``Sheet 5'' for Set Theory and Logic, of material likely to be of interest to people who are thinking of pursuing this material at Part III. Attending these two Part II courses in Michaelmas is a course of action that may appeal particularly to students from outside Cambridge.
+}
+\tableofcontents
+
+\section{Proof theory and constructive logic}
+\subsection{Natural deduction}
+The first person to have the notion of ``proof'' as a mathematical notion was probably G\"odel, and he needed this to write down the incompleteness theorem. The notion of proof he had was a very unintuitive notion. It is not very easy to manipulate, but they are easy to reason about.
+
+In later years, people came up with more ``natural'' ways of defining proofs, and they are called natural deduction. In the formalism we learnt in IID Logic and Set Theory, we had three axioms only, and one rule of inference. In natural deduction, we have many rules of deduction.
+
+We write or rules in the following form:
+\[
+  \begin{bprooftree}
+    \AxiomC{$A$}
+    \AxiomC{$B$}
+    \intro{$\wedge$}
+    \BinaryInfC{$A \wedge B$}
+  \end{bprooftree}
+\]
+This says if we know $A$ and $B$ are true, then we can conclude $A \wedge B$. We call the things above the line the \term{premises}, and those below the line the \term{conclusions}. We can write out the other rules as follows:
+\begin{center}
+\begin{tabular}{cc}
+   \begin{bprooftree}
+    \AxiomC{$A$}
+    \AxiomC{$B$}
+    \intro{$\wedge$}
+    \BinaryInfC{$A \wedge B$}
+  \end{bprooftree} &
+  \begin{bprooftree}
+    \AxiomC{$A \wedge B$}
+    \elim{$\wedge$}
+    \UnaryInfC{$A$}
+  \end{bprooftree}
+  \begin{bprooftree}
+    \AxiomC{$A \wedge B$}
+    \elim{$\wedge$}
+    \UnaryInfC{$B$}
+  \end{bprooftree}\\[2em]
+  \begin{bprooftree}
+    \AxiomC{$A$}
+    \intro{$\vee$}
+    \UnaryInfC{$A \vee B$}
+  \end{bprooftree}
+  \begin{bprooftree}
+    \AxiomC{$B$}
+    \intro{$\vee$}
+    \UnaryInfC{$A \vee B$}
+  \end{bprooftree}\\[2em]
+  &
+  \begin{bprooftree}
+    \AxiomC{$A$}
+    \AxiomC{$A \to B$}
+    \elim{$\to$}
+    \BinaryInfC{$B$}
+  \end{bprooftree}
+\end{tabular}
+\end{center}
+Here we are separating these rules into two kinds --- the first column is the \term{introduction rules}. These tell us how we can \emph{introduce} a $\wedge$ or $\vee$ into our conclusions. The second column is the \term{elimination rules}. These tell us how we can \emph{eliminate} the $\wedge$ or $\to$ from our premises.
+
+In general, we can think of these rules as ``LEGO pieces'', and we can use them to piece together to get ``LEGO assembles'', ie. proofs.
+\begin{eg}
+  For example, we might have a proof that looks like
+  \begin{prooftree}
+    \AxiomC{$A$}
+    \intro{$\vee$}
+    \UnaryInfC{$A \vee B$}
+    \AxiomC{$A \vee B \to C$}
+    \elim{$\to$}
+    \BinaryInfC{$C$}
+  \end{prooftree}
+  This corresponds to a proof that we can prove $C$ from $A$ and $A \vee B \to C$. Note that sometimes we are lazy and don't specify the rules we are using.
+\end{eg}
+Instead of trying to formally describe how we can put these rules together to form a proof, we will work through some examples as we go, and it should become clear.
+
+We see that we are missing some rules from the table, as there are no introduction rule for $\to$ and elimination rule for $\vee$.
+
+We work with $\to$ first. How we can prove $A \to B$? To do so, we assume $A$, and then try to prove $B$. If we can do so, then we have proved $A \to B$. But we cannot express this in the form of our previous rules. Instead what we want is some ``function'' that takes proof trees to proof trees.
+
+The actual rule is as follows: suppose we have derivation that looks like
+\begin{prooftree}
+  \AxiomC{$A$}
+  \noLine
+  \UnaryInfC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$C$}
+\end{prooftree}
+This is a proof of C under the assumption A. The $\to$-introduction rule says we can take this and turn it into a proof of $A \to C$.
+\begin{prooftree}
+  \AxiomC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$A \to C$}
+\end{prooftree}
+This rule is not a LEGO piece. Instead, it is a magic wand that turns a LEGO piece into a LEGO piece.
+
+But we do not want magic wands in our proofs. We want to figure out some more static way of writing this rule. We decided that it should look like this:
+\begin{prooftree}
+  \AxiomC{$[A]$}
+  \noLine
+  \UnaryInfC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$C$}
+  \intro{$\to$}
+  \UnaryInfC{$A \to C$}
+\end{prooftree}
+Here the brackets denotes that we have given up on our assumption $A$ to obtain the conclusion $A \to C$. After doing so, we are no longer assuming $A$. When we work with complicated proofs, it is easy to get lost where we are eliminating the assumptions. So we would label them, and write this as, say
+\begin{prooftree}
+  \AxiomC{$[A]^1$}
+  \noLine
+  \UnaryInfC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$C$}
+  \intron{$\to$}{1}
+  \UnaryInfC{$A \to C$}
+\end{prooftree}
+
+\begin{eg}
+  We can transform our previous example to say
+  \begin{prooftree}
+    \AxiomC{$[A]^1$}
+    \intro{$\vee$}
+    \UnaryInfC{$A \vee B$}
+    \AxiomC{$A \vee B \to C$}
+    \elim{$\to$}
+    \BinaryInfC{$C$}
+    \intron{$\to$}{1}
+    \UnaryInfC{$A \to C$}
+  \end{prooftree}
+  Originally, we had a proof that $A$ and $A \vee B \to C$ proves $C$. Now what we have is a proof that $A \vee B \to C$ implies $A \to C$.
+\end{eg}
+
+Next, we need an elimination rule of $A \vee B$. What should this be? Suppose we proved \emph{both} that $A$ proves $C$, \emph{and} $B$ proves $C$. Then if we know $A \vee B$, then we know $C$ must be true.
+
+In other words, if we have
+\begin{prooftree}
+  \AxiomC{$A \vee B$}
+  \AxiomC{$A$}
+  \noLine
+  \UnaryInfC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$C$}
+  \AxiomC{$B$}
+  \noLine
+  \UnaryInfC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$C$}
+  \TrinaryInfC{}
+\end{prooftree}
+then we can deduce $C$. We write this as
+\begin{prooftree}
+  \AxiomC{$A \vee B$}
+  \AxiomC{$[A]$}
+  \noLine
+  \UnaryInfC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$C$}
+  \AxiomC{$[B]$}
+  \noLine
+  \UnaryInfC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$C$}
+  \elim{$\vee$}
+  \TrinaryInfC{$C$}
+\end{prooftree}
+There is an obvious generalization to many disjunctions:
+\begin{prooftree}
+  \AxiomC{$A_1 \vee \cdots\vee A_n$}
+  \AxiomC{$[A_1]$}
+  \noLine
+  \UnaryInfC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$C$}
+  \AxiomC{$[A_n]$}
+  \noLine
+  \UnaryInfC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$C$}
+  \elim{$\vee$}
+  \TrinaryInfC{$C$}
+\end{prooftree}
+How about when we have an empty disjunction? The empty disjunction is just false. So this gives the rule
+\begin{prooftree}
+  \AxiomC{$\bot$}
+  \UnaryInfC{$B$}
+\end{prooftree}
+In other words, we can prove anything assume falsehood. This is known as \term{ex falso sequitur quolibet}.
+
+Note that we did not provide any rules for talking about negation. We do not need to do so, because we just take $\neg A$ to be $A \to \bot$.
+
+So far, what we have described it \term{constructive propositional logic}. What is missing? We cannot use our system to prove the \term{law of excluded middle}, $A \vee \neg A$, or the \term{law of double negation} $\neg \neg A \to A$. It is not difficult to convince ourselves that it is impossible to prove these using the laws we have described above.
+
+To obtain \term{classical propositional logic}, we need just one more rule, which is
+\begin{prooftree}
+  \AxiomC{$[A\to \bot]$}
+  \noLine
+  \UnaryInfC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$\bot$}
+  \UnaryInfC{$A$}
+\end{prooftree}
+If we add this, then we get classical propositional calculus, and it is a theorem that any truth-table-tautology (ie. propositions that are always true for all possible values of $A, B, C$ etc) can be proved using natural deduction with the law of excluded middle.
+
+\begin{eg}
+  Suppose we want to prove
+  \[
+    A \to (B \to C) \to ((A \to B) \to (A \to C))
+  \]
+  How can we possibly prove this? The only way we can obtain this is to get something of the form
+  \begin{prooftree}
+    \AxiomC{$[A \to (B \to C)]$}
+    \noLine
+    \UnaryInfC{$\rvdots$}
+    \noLine
+    \UnaryInfC{$(A \to B) \to (A \to C)$}
+    \intro{$\to$}
+    \UnaryInfC{$A \to (B \to C) \to ((A \to B) \to (A \to C))$}
+  \end{prooftree}
+  Now the only way we can get the second-to-last conclusion is
+  \begin{prooftree}
+    \AxiomC{$A \to B$}
+    \AxiomC{$[A]$}
+    \noLine
+    \BinaryInfC{$\rvdots$}
+    \noLine
+    \UnaryInfC{$C$}
+    \UnaryInfC{$A \to C$}
+  \end{prooftree}
+  and then further eliminating $A \to B$ gives us $(A \to B) \to (A \to C)$. At this point we might see how we can patch them together to get a proof:
+  \begin{prooftree}
+    \AxiomC{$[A]^3$}
+    \AxiomC{$[A \to (B \to C)]^1$}
+    \BinaryInfC{$B \to C$}
+
+    \AxiomC{$[A \to B]^2$}
+    \AxiomC{$[A]^3$}
+    \BinaryInfC{$B$}
+    \BinaryInfC{$C$}
+    \intron{$\to$}{3}
+    \UnaryInfC{$A \to C$}
+    \intron{$\to$}{2}
+    \UnaryInfC{$(A \to B) \to (A \to C)$}
+    \intron{$\to$}{1}
+    \UnaryInfC{$A \to (B \to C) \to ((A \to B) \to (A \to C))$}
+  \end{prooftree}
+  Note that when we did $\to$-int (3), we consumed two copies of $A$ in one go. This is allowed, as an assumption doesn't become false after we use it once.
+
+  However, some people study logical systems that do \emph{not} allow it, and demand that assumptions can only be used once. These are known as \term{resource logics}, one prominent example of which is \term{linear logic}.
+\end{eg}
+
+\begin{eg}
+  Suppose we want to prove $A \to (B \to A)$. We have a proof tree
+  \begin{prooftree}
+    \AxiomC{$[A]^1$}
+    \AxiomC{$[B]^2$}
+    \BinaryInfC{$A$}
+    \intron{$\to$}{2}
+    \UnaryInfC{$B \to A$}
+    \intron{$\to$}{1}
+    \UnaryInfC{$A \to (B \to A)$}
+  \end{prooftree}
+  How did we manage to do the step from $A\;\; B$ to $A$? One can prove it as follows:
+  \begin{prooftree}
+    \AxiomC{$A$}
+    \AxiomC{$B$}
+    \intro{$\wedge$}
+    \BinaryInfC{$A\wedge B$}
+    \elim{$\wedge$}
+    \UnaryInfC{$A$}
+  \end{prooftree}
+  but this is slightly unpleasant. It is redundant, and also breaks some nice properties of natural deduction we are going to prove later, eg. the subformula property. So instead, we just put an additional \term{weakening rule} that just says we can drop any assumptions we like at any time.
+\end{eg}
+
+\begin{eg}
+  Suppose we wanted to prove
+  \[
+    A \to (B \wedge C) \to ((A \to B) \wedge (A \to C)).
+  \]
+  This is indeed a truth-table tautology, as we can write out the truth table and see this is always true.
+
+  If we try very hard, we will find out that we cannot prove it without using the law of excluded middle. In fact, this is not valid in constructive logic. Intuitively, the reason is that assuming $A$ is true, which of $B$ or $C$ is true can depend on why $A$ is true, and this it is impossible to directly prove that either $A \to B$ is true, or $A \to C$ is true.
+
+  Of course, this is true in classical logic.
+\end{eg}
+
+\begin{ex}
+  Prove the following:
+  \begin{itemize}
+    \item $(P \to Q) \to ((Q \to R) \to (P \to R))$
+    \item $(A \to C) \to ((A \wedge B) \to C)$
+    \item $((A \vee B) \to C) \to (A \to C)$
+    \item $P \to (\neg P \to Q)$
+    \item $A \to (A \to A)$
+    \item $(P \vee Q) \to ((( P \to R) \wedge (Q \to S)) \to R \vee S)$
+    \item $(P \wedge Q) \to ((( P \to R) \vee (Q \to S)) \to R \vee S)$
+    \item $A \to ((((A \to B) \to B) \to C) \to C$
+    \item $((((P \to Q) \to P) \to P ) \to Q) \to Q$
+  \end{itemize}
+  Don't do the last two.
+\end{ex}
+\printindex
+\end{document}

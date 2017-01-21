@@ -1,0 +1,124 @@
+\documentclass[a4paper]{article}
+
+\def\npart {III}
+\def\nterm {Lent}
+\def\nyear {2017}
+\def\nlecturer {A. G. Kovalev}
+\def\ncourse {Riemannian Geometry}
+
+\input{header}
+
+\begin{document}
+\maketitle
+{\small
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+This course is a possible natural sequel of the course Differential Geometry offered in Michaelmas Term. We shall explore various techniques and results revealing intricate and subtle relations between Riemannian metrics, curvature and topology. I hope to cover much of the following:
+
+\emph{A closer look at geodesics and curvature.} Brief review from the Differential Geometry course. Geodesic coordinates and Gauss' lemma. Jacobi fields, completeness and the Hopf--Rinow theorem. Variations of energy, Bonnet--Myers diameter theorem and Synge's theorem.
+
+\emph{Hodge theory and Riemannian holonomy.} The Hodge star and Laplace--Beltrami operator. The Hodge decomposition theorem (with the `geometry part' of the proof). Bochner--Weitzenock formulae. Holonomy groups. Interplays with curvature and de Rham cohomology.
+
+\emph{Ricci curvature.} Fundamental groups and Ricci curvature. The Cheeger--Gromoll splitting theorem.
+
+\subsubsection*{Pre-requisites}
+Manifolds, differential forms, vector fields. Basic concepts of Riemannian geometry (curvature, geodesics etc.) and Lie groups. The course Differential Geometry offered in Michaelmas Term is the ideal pre-requisite.
+}
+\tableofcontents
+
+\section{Basics of Riemannian manifolds}
+This will be a very brief summary of some topics in the Michaelmas Differential Geometry course.
+
+Let $M$ be a smooth manifold. A \term{Riemannian metric} $g$ on $M$ is an inner product on the tangent bundle $TM$ varying smoothly with the fibers. Formally, this is a global section of $T^*M \otimes T^*M$ that is fiberwise symmetric and positive definite.
+
+On every coordinate neighbourhood with coordinates $x = (x_1, \cdots, x_n)$, we can write
+\[
+  g = \sum_{i, j = 1}^n g_{ij}(x)\;\d x_i \d x_j.
+\]
+These $g_{ij}$ are given by
+\[
+  g_{ij} = g\left(\frac{\partial}{\partial x_i}, \frac{\partial}{\partial x_j}\right)
+\]
+and are $C^\infty$ functions. The pair $(M, g)$ is called a \term{Riemannian manifold}.
+
+\begin{eg}
+  The manifold $\R^k$ has a canonical metric given by the Euclidean metric. In the usual coordinates, $g$ is given by $g_{ij} = \delta_{ij}$.
+\end{eg}
+
+The Whitney embedding theorem says every smooth manifold $M$ admits an embedding into $\R^k$ for some $k$. In other words, $M$ is diffeomorphic to a submanifold of $\R^k$. In fact, we can pick $k$ such that $k \leq 2 \dim M$.
+
+Using such an embedding, we can induce a Riemannian metric on $M$ by restricting the inner product from Euclidean space, since we have inclusions $T_pM \hookrightarrow T_p \R^k \cong \R^k$.
+
+A bit more generally, if $(N, h)$ is a Riemannian manifold, and $F: M \to N$ is an immersion, then the pullback $g = F^*h$ defines a metric on $M$, where the condition of immersion is required for the pullback to be non-degenerate.
+
+In particular, we can consider the case when $F$ is a diffeomorphism $M \to N$.
+\begin{defi}[Isometry]\index{isometry}
+  Let $(M, g)$ and $(N, h)$ be Riemannian manifolds. We say $f: M \to N$ is an \emph{isometry} if it is a diffeomorphism and $f^*h = g$. In other words, for any $p \in M$ and $u, v \in T_p M$, we need
+  \[
+    h\big((\d f)_p u, (\d f)_p v\big) = g(u, v).
+  \]
+\end{defi}
+This is a natural equivalence relation between Riemannian manifolds.
+
+\begin{eg}
+  Let $G$ be a Lie group. Then for any $x$, we have maps $L_x, R_x: G \to G$ given by
+  \begin{align*}
+    L_x(y) &= xy\\
+    R_x(y) &= yx
+  \end{align*}
+  These maps are in fact diffeomorphisms of $G$.
+
+  Given such a group $G$, we can define the \term{Lie algebra} $\mathfrak{g} = T_e G$. We say a vector field $X$ on $G$ is said to be \emph{left-invariant} if for any $x \in G$, we have $\d (L_x) X = X$. Any such $X$ arises from picking some $X_e \in \mathfrak{g}$ and then setting
+  \[
+    X_a = \d (L_a) X_e.
+  \]
+  The resulting vector field is indeed smooth, as shown in the differential geometry course.
+
+  We say a Riemannian metric $g$ is \emph{left-invariant}\index{left-invariant metric}\index{right-invariant metric} if each $L_x$ is an isometry. Again, to construct these, we can just pick a metric at the identity and the propagating it around using left-translation. More explicitly, given any inner product on $\bra \ph, \ph\ket$ on $T_eG$, we can define $g$ by
+  \[
+    g(u, v) = \bra (\d L_{x^{-1}})_x u, (\d L_{x^{-1}})_x v\ket
+  \]
+  for all $x \in G$ and $u, v \in T_x G$. The argument for smoothness is similar to that for vector fields.
+\end{eg}
+Of course, everything works when we replace ``left'' with ``right''. A Riemannian metric is said to be \emph{bi-invariant}\index{bi-invariant metric} if it is both left- and right-invariant. These are harder to find, but it is a fact that every compact Lie group admits a bi-invariant metric. The basic idea of the proof is to start from a left-invariant metric, then integrate the metric along right translations of all group elements. Here compactness is necessary for the result to be finite.
+
+We will later see that we cannot drop the compactness condition. There are non-compact Lie groups that do not admit bi-invariant metrics, such as $\SL(2, \R)$.
+
+\subsubsection*{Levi-Cevita connection}
+Let $(M, g)$ be a Riemannian manifold. Then there is a preferred choice of connection on $M$ (ie. on $TM$), known as the Levi-Cevita connection $\nabla: \Omega^0_M(TM) \to \Omega^1_M(TM)$. This satisfies the compatibility condition
+\[
+  Z g(X, Y) = g(\nabla_Z X, Y) + g(X, \nabla_Z Y),
+\]
+and also it is symmetric in the sense that
+\[
+  \nabla_X Y - \nabla_Y X = [X, Y].
+\]
+The first property can be written as
+\[
+  \d (g(X, Y)) = g(\nabla X, Y) + g(X, \nabla Y),
+\]
+and the second property can be expressed in coordinate representation by
+\[
+  \Gamma_{jk}^i = \Gamma_{kj}^i,
+\]
+where $\Gamma_{jk}^i$ is defined by
+\[
+  \nabla_{\partial/\partial x_j} \frac{\partial}{\partial x_k} = \sum_{i = 1}^n \Gamma_{jk}^i \frac{\partial}{\partial x_i}.
+\]
+The connection $\nabla$ induces a unique covariant derivative on $T^*M$, also denoted $\nabla$, given by
+\[
+  X\bra \alpha, Y\ket = \bra \nabla_X \alpha , Y\ket + \bra \alpha, \nabla_X Y\ket
+\]
+for any $X,Y \in \Vect(M)$ and $\alpha \in \in \Omega^1(M)$. This can be further extended to a unique connection $\nabla$ on tensor bundles $(TM)^{\otimes q} \otimes (T^*M)^{\otimes p}$ for any $p, q \geq 0$.
+
+This is a completely general construction. In general, suppose we have vector bundles $E$ and $F$, and $s_1 \in \Gamma(E)$ and $s_2 \in \Gamma(F)$. If we have connections $\Gamma^E$ and $\Gamma^F$ on $E$ and $F$ respectively, then we can define
+\[
+  \nabla^{E\otimes F} (s_1 \otimes s_2) = (\nabla^E s_1) \otimes s_2 + s_1 \otimes (\nabla^F s_2).
+\]
+Recall that the Riemannian metric is formally a section $g \in \Gamma(T^*M \otimes T^*M)$. Then the compatibility with the metric can be written in the following even more compact form:
+\[
+  \nabla g = 0.
+\]
+
+\printindex
+\end{document}
