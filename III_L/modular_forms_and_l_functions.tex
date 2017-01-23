@@ -16,7 +16,7 @@
 Modular Forms are classical objects that appear in many areas of mathematics, from number theory to representation theory and mathematical physics. Most famous is, of course, the role they played in the proof of Fermat's Last Theorem, through the conjecture of Shimura-Taniyama-Weil that elliptic curves are modular. One connection between modular forms and arithmetic is through the medium of $L$-functions, the basic example of which is the Riemann Riemann $\zeta$-function. We will discuss various types of $L$-function in this course and give arithmetic applications.
 
 \subsubsection*{Pre-requisites}
-Prerequisites for the course are fairly modest; from number theory, apart from basic elementary notions, some knowledge of quadratic fields is desirable. A fair chunk of the course will involve (fairly 19th-century) analysis, so we will assume the basic theory of holomorphic functions in one complex variable, such as are found in a first course on complex analysis (e.g. the 2nd year Complex Analysis course of the Tripos).
+Prerequisites for the course are fairly modest; from number theory, apart from basic elementary notions, some knowledge of quadratic fields is desirable. A fair chunk of the course will involve (fairly 19th-century) analysis, so we will assume the basic theory of holomorphic functions in one complex variable, such as are found in a first course on complex analysis (eg. the 2nd year Complex Analysis course of the Tripos).
 }
 \tableofcontents
 
@@ -158,7 +158,6 @@ The same is true for functions on $\R^n$, where we take
 \[
   \hat{f}(y) = \int_{\R^n} e^{-2\pi i x\cdot y} f(x) \;\d x = \int_{\R^n} \chi_y(x)^{-1} f(x)\;\d x.
 \]
-
 We've also seen things called Fourier series. They are another version of this, where do the Fourier transform on $G = \R/\Z$ instead of $G$. For $n \in \Z$, we let $\chi_n \in \hat{G}$ by
 \[
   \chi_n(x) = e^{2\pi i nx}.
@@ -184,6 +183,36 @@ Finally, in the case when $G = \Z/N\Z$, given a function $f: \Z/N\Z \to \C$, we 
   \]
 \end{prop}
 
+\begin{proof}
+  We see that both sides are linear in $f$, and we can write each function $f$ as
+  \[
+    f = \sum_{a \in \Z/N\Z} f(a) \delta_a,
+  \]
+  where
+  \[
+    \delta_a(x) =
+    \begin{cases}
+      1 & x = a\\
+      0 & x \not= a
+    \end{cases}.
+  \]
+  So we wlog $f = \delta_a$. Thus we have
+  \[
+    \hat{f}(\zeta) = \zeta^{-a},
+  \]
+  and the RHS gives
+  \[
+    \frac{1}{N} \sum_{\zeta \in \mu_N} \zeta^{x - a}.
+  \]
+  We have to see that this is equal to $\delta_a$. This follows from the fact that
+  \[
+    \sum_{\zeta \in \mu_N} \zeta^k =
+    \begin{cases}
+      N & k \equiv 0 \pmod N\\
+      0 & \text{otherwise}
+    \end{cases}.
+  \]
+\end{proof}
 The general picture is for any locally compact abelian group $G$, there is a canonical way to integrate functions defined on $G$ given by the \term{Haar measure}, which is a translation-invariant measure. For example, on $G = \R$, this is the usual Lebesgue measure, and if $G$ is discrete, this is just the counting measure, and
 \[
   \int f = \sum_{g \in G} f(g).
@@ -199,5 +228,192 @@ Then given any $f \in L^1(G)$, we have
   \hat{f}(X) = \int_G \chi(g)^{-1}f(g) \;\d g.
 \]
 Then one shows that for suitable $f$, we have $\hat{\hat{f}}(g) = C f(-g)$, using the canonical isomorphism $G \to \hat{\hat{G}}$, where $C$ is some constant independent of $f$. This constant is necessary, because the measure is only defined up to a multiplicative constant.
+
+\begin{thm}[Poisson summation formula]\index{Poisson summation formula}
+  Let $f \in \mathcal{S}(\R^n)$. Then
+  \[
+    \sum_{a \in \Z^n} f(a) = \sum_{b \in \Z^n} \hat{f}(b).
+  \]
+\end{thm}
+This is in fact true for more general functions $f$, at the expense of doing more analysis. The proof involves connecting to the Fourier series.
+
+\begin{proof}
+  Let
+  \[
+    g(x) = \sum_{a \in \Z^n} f(x + a).
+  \]
+  This is now a function that is invariant under translation of $\Z^n$. It is easy to check this is a well-defined $C^\infty$ function on $\R^n/\Z^n$, and so has a Fourier series. We write
+  \[
+    g(x) = \sum_{b \in \Z^n} c_b(g) e^{2pi i b \cdot x},
+  \]
+  with
+  \[
+    c_b(g) = \int_{\R^n/\Z^n} e^{-2\pi i b\cdot x} g(x) \;\d x = \sum_{a \in \Z^n} \int_{[0, 1]^n} e^{2\pi i b\cdot x} f(x + a) \;\d x.
+  \]
+  We can then do a change of variables $x \mapsto x - a$, which does not change the exponential term, and get that
+  \[
+    c_b(g) = \int_{\R^n} e^{-2\pi i b \cdot x} f(x) \;\d x = \hat{f}(b).
+  \]
+  Finally, we have
+  \[
+    \sum_{a \in \Z^n} f(a) = g(0) = \sum_{b \in \Z^n} c_b(x) = \sum_{b \in \Z^n} \hat{f}(b).
+  \]
+\end{proof}
+
+\section{Mellin transform and \texorpdfstring{$\Gamma$}{Gamma}-function}
+There is one more analytic thing we have to do, which involves the Mellin transform. The general setting is that we have a function $f: \R_{>0} \to \C$.
+
+\begin{defi}[Mellin transform]\index{Mellin transform}\index{$M(f, s)$}
+  Let $f: \R_{>0} \to\C$ be a function. We define
+  \[
+    M(f, s) = \int_0^\infty y^s f(y) \frac{\d y}{y}.
+  \]
+  with the domain specified by the following lemma:
+\end{defi}
+
+\begin{lemma}
+  Suppose $f$ is rapidly decreasing at $\infty$, so that $y^N f(y) \to 0$ as $y \to \infty$ for all $N$, and has ``moderate growth'' at $0$, so that there exists $m$ such that $|y^m f(y)|$ is bounded as $y \to 0$. Then $M(f, s)$ converges and is an analytic function of $s$ for $\Re(s) > m$.
+\end{lemma}
+
+\begin{proof}
+  We know that for any $0 < r < R < \infty$, the integral
+  \[
+    \int_r^R y^s f(y) \frac{\d y}{y}
+  \]
+  is analytic for all $s$ since $f$ is continuous. Also, we know $\int_R^\infty \to 0$ as $R \to \infty$ uniformly on compact subsets of $\C$, and on the other the integral $\int_0^r$ as $r \to 0$ converges uniformly on compact subsets of $\{s \in \C: \Re(s) > m\}$.
+\end{proof}
+
+This transform might seem a bit strange, but we can think of this as an analytic continuation of the Fourier transform. Suppose we are in the rather good situation that
+\[
+  \int_0^\infty |f| \frac{\d y}{y} < \infty.
+\]
+In practice, this will hardly ever be the case, but this is a good place to start exploring. In this case, the integral actually converges on $i\R$, and equals the Fourier transform of $f \in L^1(G) = L^1(\R^\times_{>0})$. Indeed, we find
+\[
+  \hat{G} = \{y \mapsto y^{i\sigma} : \sigma \in \R\}s,.
+\]
+and $\frac{\d y}{y}$ is just the invariant measure on $G$. So the formula for the Mellin transform is exactly the formula for the Fourier transform, and we can view the Mellin transform as an analytic continuation of the Fourier transform.
+
+We now move on to explore properties of the Mellin transform. When we make a change of variables $y \leftrightarrow \alpha y$, by inspection of the formula, we find
+\[
+  M(f(\alpha y), s) = \alpha^{-s} M(f, s)
+\]
+for $\alpha > 0$.
+
+\begin{eg}
+  Consider
+  \[
+    f(y) = e^{-y}.
+  \]
+  Then
+  \[
+    M(f, s) = \int_0^\infty e^{-y} y^s \frac{\d y}{y} = \Gamma(s).
+  \]
+  This is the \term{Gamma function}\index{$\Gamma$ function}. This is analytic for $\Re(s) > 0$.
+\end{eg}
+
+If we just integrate by parts, we find
+\[
+  \int_0^\infty e^{-y} y^{s - 1}\;\d y = \left[e^{-y} \frac{y^s}{s} \right]_0^\infty + \frac{1}{s}\int_0^\infty e^{-y} y^s \;\d y.
+\]
+So we find that
+\begin{prop}
+  \[
+    s \Gamma(s) = \Gamma(s + 1).
+  \]
+\end{prop}
+Moreover, we can compute
+\[
+  \Gamma(1) = \int_0^\infty e^{-y}\;\d y = 1.
+\]
+So we get
+\begin{prop}
+  For an integer $n \geq 1$, we have
+  \[
+    \Gamma(n) = (n - 1)!.
+  \]
+\end{prop}
+In general, we have
+\[
+  \Gamma(s) = \frac{1}{s (s + 1) \cdots (s + N - 1)} \Gamma(s + N).
+\]
+We can thus use this to define an analytic continuation of $\Gamma(s)$ to $\{\Re(s) > -N\}$, with simple poles at $0, 1, \cdots, 1 - N$, with
+\[
+  \res_{s = 1 - N} \Gamma(s) = \frac{(-1)^{N - 1}}{(N - 1)!}.
+\]
+Here are two facts about the $\Gamma$ function that we are not going to prove, because, even if the current experience might suggest otherwise, this is not an analysis course.
+\begin{prop}\leavevmode
+  \begin{enumerate}
+    \item The \term{Weierstrass product}: We have
+      \[
+        \Gamma(s)^{-1} = e^{\gamma s} s \prod_{n \geq 1} \left(1 + \frac{s}{n}\right) e^{-s/n}
+      \]
+      for all $s \in \C$. In particular, $\Gamma(s)$ is never zero. Here $\gamma$ is the \term{Euler-Mascheroni constant}, given by
+      \[
+        \gamma = \lim_{n \to \infty}\left(1 + \frac{1}{2} + \cdots + \frac{1}{n} - \log n\right).
+      \]
+    \item \emph{Duplication and reflection formulae}\index{duplication formula}\index{reflection formula}:
+      \[
+        \pi^{\frac{1}{2}} \Gamma(2s) = 2^{s - 1} \Gamma(s) \Gamma\left(s + \frac{1}{2}\right)
+      \]
+      and
+      \[
+        \Gamma(s) \Gamma(1 - s) = \frac{\pi}{\sin \pi z}.
+      \]
+  \end{enumerate}
+\end{prop}
+
+One useful property of the Mellin transform is that it converts power series into \emph{Dirichlet series}. Let
+\[
+  f(z) = \sum_{n \geq 0} a_n e^{2\pi i n z}.
+\]
+where $|a_n| < c n^K$ for some $c, K$, say. Then
+\[
+  f(iy) = \sum a_n e^{-2\pi n y}.
+\]
+This will converge for all $y > 0$ since the $a_n$ only have polynomial growth. Then if $\Re(s) > \max(0, K + 1)$ (so that the series we are going to write down is absolutely convergent), we find
+\begin{align*}
+  (2\pi)^{-s} \Gamma(s)\sum_{n = 1}^\infty \frac{a_n}{n^s} &= \sum_{n = 1}^\infty a_n (2\pi n)^{-s} M(e^{-y}, s)\\
+  &= \sum_{n = 1}^\infty M(e^{-2 \pi n y}, s) \\
+  &= M(f(iy), s).
+\end{align*}
+The series $\sum a_n/n^s$ is known as a \term{Dirichlet series}. The first example of such is the \emph{Riemann zeta function}
+\[
+  \zeta(s) = \sum_{n \geq 1} \frac{1}{n^s}.
+\]
+\section{Riemann \texorpdfstring{$\zeta$}{zeta}-function}
+\begin{defi}[Riemann $\zeta$-function]\index{Riemann $\zeta$-function}
+  The \emph{Riemann $\zeta$-function} is defined by
+  \[
+    \zeta(s) = \sum_{n \geq 1} \frac{1}{n^s}
+  \]
+  for $\Re(s) > 1$.
+\end{defi}
+
+\begin{prop}[Euler product formula]\index{Euler index formula}
+  We have
+  \[
+    \zeta(s) = \prod_{p \text{ prime}} \frac{1}{1 - p^{-s}}.
+  \]
+\end{prop}
+
+\begin{proof}
+  Euler's proof was purely formal, without worrying about convergence. We have
+  \[
+    \prod_{p\text{ prime}} \frac{1}{1 - p^{-s}} = \prod_p (1 + p^{-s} + (p^2)^{-s} + \cdots) = \sum_{n \geq 1} n^{-s},
+  \]
+  where the last equality follows by unique factorization in $\Z$. However, to prove this properly, we need to be a bit more careful and make sure things converge.
+
+  Saying the infinite product $\prod_p$ convergence is the same as saying $\sum p^{-s}$ converges, by basic analysis, which is okay since we know $\zeta(s)$ converges absolutely when $\Re(s) > 1$. Then we can look at the difference
+  \begin{align*}
+    \zeta(s) - \prod_{p \leq X} \frac{1}{1 - p^{-s}} &= \zeta(s) - \prod_{p \leq X} (1 + p^{-s} + p^{-2s} + \cdots)\\
+    &= \prod_{n \in \mathcal{N}_X} n^{-s},
+  \end{align*}
+  where $\mathcal{N}_X$ is the set of all $n \geq 1$ such that at least one prime factor is $\geq X$. In particular, we know
+  \[
+    \left|\zeta(s) - \prod_{p \leq X} \frac{1}{1 - p^{-s}}\right| \leq \sum_{n \geq X} |n^{-s}| \to 0
+  \]
+  as $X \to \infty$.
+\end{proof}
+The Euler product formula is the beginning of the connection between the $\zeta$-function and the distribution of primes.
 \printindex
 \end{document}

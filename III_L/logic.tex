@@ -326,10 +326,214 @@ If we add this, then we get classical propositional calculus, and it is a theore
     \item $A \to (A \to A)$
     \item $(P \vee Q) \to ((( P \to R) \wedge (Q \to S)) \to R \vee S)$
     \item $(P \wedge Q) \to ((( P \to R) \vee (Q \to S)) \to R \vee S)$
-    \item $A \to ((((A \to B) \to B) \to C) \to C$
+    \item $A \to ((((A \to B) \to B) \to C) \to C)$
     \item $((((P \to Q) \to P) \to P ) \to Q) \to Q$
   \end{itemize}
   Don't do the last two.
 \end{ex}
+
+One can think of natural deduction as a ``platform'', and we can use this to describe other logics.
+
+\separator
+
+For example, we might want to describe first-order logic. We can give introduction rules for $\exists$ as follows:
+\begin{prooftree}
+  \AxiomC {$\varphi(t)$}
+  \intro{$\exists$}
+  \UnaryInfC{$\exists x\; \varphi(x)$}
+\end{prooftree}
+Similarly, we can have an elimination rule for $\forall$ easily:
+\begin{prooftree}
+  \AxiomC{$\forall \varphi(x)$}
+  \elim{$\forall$}
+  \UnaryInfC{$\forall$}
+\end{prooftree}
+The introduction rule for $\forall$ is a bit more complicated. The rule again looks something like
+\begin{prooftree}
+  \AxiomC {$\varphi(x)$}
+  \intro{$\forall$}
+  \UnaryInfC{$\exists x\; \varphi(x)$}
+\end{prooftree}
+but for such a proof to be valid, the $x$ must be ``arbitrary''. So we need an additional condition on this rule that there is no free occurence of $x$'s.
+
+Finally, suppose we know $\exists x\; \varphi(x)$. How can we use this to deduce some $p$? Suppose we know that $\varphi(x)$ implies $p$, and also $p$ does not depend on $x$. Then just knowing that there exists some $x$ such that $\varphi(x)$, we know $p$ must be true.
+\begin{prooftree}
+  \AxiomC{$\exists x\; varphi(x)$}
+  \AxiomC{$\varphi(x)$}
+  \noLine
+  \UnaryInfC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$p$}
+  \elim{$exists$}
+  \BinaryInfC{$p$}
+\end{prooftree}
+Again we need $x$ to be arbitrary.
+
+\separator
+
+We can also use natural deduction for ``naive set theory''. We can give an $\in$-introduction rule
+\begin{prooftree}
+  \AxiomC{$\varphi(x)$}
+  \intro{$\in$}
+  \UnaryInfC{$x \in \{y : \varphi(y)\}$}
+\end{prooftree}
+and a similar elimination rule
+\begin{prooftree}
+  \AxiomC{$x \in \{y: \varphi (y)\}$}
+  \elim{$\in$}
+  \UnaryInfC{$\varphi(x)$}
+\end{prooftree}
+
+\separator
+In general, to obtain a sensible natural deduction theory, we need the notion of harmony.
+\begin{defi}[Harmony]\index{harmony}
+  We say a connective $\$ $ is \term{harmonious} if $\phi \$ \psi$ is the strongest assertion you can deduce from the assumptions in the rule of $\$ $-introduction, and $\phi \$ \psi$ is the weakest thing that implies the conclusion of the $\$ $-elimination rule.
+\end{defi}
+This might seem a bit vauge, but it becomes clearer as we look at examples. The introduction and elimination rules for $\in$ we presented are certainly harmonious, because the conclusions and assumptions are in fact equivalent. One can also check that the introduction and elimination rules for $\wedge$ and $\vee$ are harmonious. But when we study more complicated systems, it is usually difficult to show that they are harmonious.
+
+\begin{eg}[Russel's paradox]
+  We write
+  \[
+    R = \{x: x \in X \to \bot\}.
+  \]
+  Suppose this existed. Then we can have the deductions
+  \begin{prooftree}
+    \AxiomC{$[R \to R]^1$}
+    \AxiomC{$[R \to R]^1$}
+    \elim{$\in$}
+    \UnaryInfC{$R \in R \to \bot$}
+    \elim{$\to$}
+    \BinaryInfC{$\bot$}
+    \intron{$\to$}{1}
+    \UnaryInfC{$R \in R \to \bot$}
+    \intro{$\in$}
+    \UnaryInfC{$R \in R$}
+  \end{prooftree}
+  We now look at this, and we see that we have proved that $R \in R$. But we previously had a proof that $R \in R$ gives a contradiction. So what we are going to do is to make two copies of this proof:
+  \begin{prooftree}
+    \AxiomC{$[R \to R]^1$}
+    \AxiomC{$[R \to R]^1$}
+    \elim{$\in$}
+    \UnaryInfC{$R \in R \to \bot$}
+    \elim{$\to$}
+    \BinaryInfC{$\bot$}
+    \intron{$\to$}{1}
+    \UnaryInfC{$R \in R \to \bot$}
+    \intro{$\in$}
+    \UnaryInfC{$R \in R$}
+    \AxiomC{$[R \to R]^2$}
+    \AxiomC{$[R \to R]^2$}
+    \elim{$\in$}
+    \UnaryInfC{$R \in R \to \bot$}
+    \elim{$\to$}
+    \BinaryInfC{$\bot$}
+    \intron{$\to$}{2}
+    \UnaryInfC{$R \in R \to \bot$}
+    \intro{$\in$}
+    \UnaryInfC{$R \in R$}
+    \elim{$\in$}
+    \UnaryInfC{$R \in R \to \bot$}
+    \elim{$\to$}
+    \BinaryInfC{$\bot$}
+  \end{prooftree}
+  So we showed that we have an inconsitent theory.
+\end{eg}
+Note that we didn't use a lot of ``logical power'' here. We didn't use the law of excluded middle, so this contradiction manifests itself even in the case of constructive logic. Moreover, we didn't really use many axioms of naive set theory. We didn't even need things like extensionality for this to work.
+
+Now we notice that this proof is rather weird. We first had an $\to$-introduction, and then subsequently eliminated it. In general, if we have a derivation of the form
+\begin{prooftree}
+  \AxiomC{$P$}
+  \noLine
+  \UnaryInfC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$Q$}
+  \intro{$\to$}
+  \UnaryInfC{$P \to Q$}
+  \AxiomC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$P$}
+  \BinaryInfC{$Q$}
+\end{prooftree}
+We can just move the second column to the top of the first to get
+\begin{prooftree}
+  \AxiomC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$Q$}
+\end{prooftree}
+If we do this for our previous proof, we see that we get the same proof!
+
+In general,
+\begin{defi}[Maximal formula]\index{maximal formula}\index{formula}
+  We sa a formula in a derivation is \emph{maximal} iff it is both the conclusion of an occurence of an introduction rule, \emph{and} the major premiss of an occurnece of the elimination rule for the same connective.
+\end{defi}
+
+Here it is important that we are talking about the \emph{major} premise. In a deduction
+\begin{prooftree}
+  \AxiomC{$A \to B$}
+  \AxiomC{$A$}
+  \BinaryInfC{$B$}
+\end{prooftree}
+we call $A \to B$ the \emph{major premise}, and $B$ the \emph{minor premise}. In the case of $\wedge$ and $\vee$, the terms are symmetric, and we do not need such a distinction.
+
+This distinction is necessary since a deduction of the form
+\begin{prooftree}
+  \AxiomC{$(A \to B) \to C$}
+  \AxiomC{$[A]$}
+  \noLine
+  \UnaryInfC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$B$}
+  \intro{$to$}
+  \UnaryInfC{$A \to B$}
+  \elim{$\to$}
+  \BinaryInfC{$C$}
+\end{prooftree}
+
+One can prove that any derivation in propositional logic can be converted to one that does not contain maximal formulae.
+
+\section{Curry--Howard correspondence}
+Recall that in IID Logic and Set Theory, we had the axioms $K$ and $S$:
+\begin{itemize}
+  \item[$K$:] $A\to(B\to A)$
+  \item[$S$:] $[A\to(B\to C)]\to[(A\to B)\to(A \to C)]$
+\end{itemize}
+It is a fact that $\{K, S\}$ axiomatizes the conditional ($\to$) fragment of constructive propositional logic. It is also true that if we add a new law, \term{Peirce's law}:
+\[
+  ((A \to B) \to A) \to A,
+\]
+then we get the whole conditional ($\to$) fragment of classical logic!
+
+In particular, we cannot prove Peirce's law from $K$ and $S$. How can we prove this? The most elementary way of doing so would be to try to allow for more truth values, such that $K$, $S$ and modus ponens hold, but Peirce's law does not. It turns out three truth values are sufficient, with
+\begin{center}
+  \begin{tabular}{cccc}
+    \toprule
+    $\to$ & 1 & 2 & 3\\
+    \midrule
+    1 & 1 & 2 & 3\\
+    2 & 1 & 1 & 3\\
+    3 & 1 & 1 & 1\\
+    \bottomrule
+  \end{tabular}
+\end{center}
+Here we interpret $1$ as ``true'', $3$ as ``false'', and $2$ as ``maybe''. One can just write out the truth values and realize the formulas $K, S$ always take truth values $1$, and also if $A$ and $A \to B$ are $1$, then so is $B$. So by induction on the structure of a proof, we know that anything we can deduce from $K$ and $S$ will have value $1$ with these truth values. However, if we put $A = 2$ and $B = 3$, then $((A \to B) \to A) \to A$ has value $2$, not $1$. So it cannot possibly be deduced from $K$ and $S$.
+
+But what does this proof really mean? How could we have come up with such a truth table? It turns out these things do have a meaning, but they do not become clear until we get to the possible world semantics. However, before we go into that, we can prove this in a different way, using the \emph{Curry-Howard correspondence}.
+
+We start by looking at
+\[
+  A \to B.
+\]
+This is a piece of syntax. Two letters, and an arrow between them. So far, we have seen this as a logical formula, with $A$ and $B$ being formulas, and $\to$ being implication. However, we may also be familiar with this notation representing the set of all functions from $A$ to $B$, where $A$ and $B$ are sets. This possibility of reading it like this is known as the \term{Curry-Howard correspondence}, or \term{propositions as types}.
+
+In this context, what is modus ponens? What does
+\begin{prooftree}
+  \AxiomC{$A$}
+  \AxiomC{$A \to B$}
+  \BinaryInfC{$B$}
+\end{prooftree}
+mean? We can just think of this as function application! If we have an element $a\in A$, and an element of $f \in A \to B$, then we have $f(a) \in B$.
+
+What is the axiom $K$ about? $K$ is a function $A \to (B \to A)$, which gives the constant function. For any $a \in A$, the function $K(a)$ is the constant function $K$! It is called $K$, not $C$, because it was discovered by German.
+
 \printindex
 \end{document}
