@@ -5,6 +5,7 @@
 \def\nyear {2017}
 \def\nlecturer {B. P. Narayanan}
 \def\ncourse {Ramsey Theory}
+\def\ncourse {TT.9}
 
 \input{header}
 
@@ -24,6 +25,7 @@ There are almost no pre-requisites and the material presented in this course wil
 \tableofcontents
 
 \section{Graph Ramsey theory}
+\subsection{Infinite graphs}
 We start by laying out some notations and definitions.
 \begin{notation}
   For a set $X$, we write $X^{(r)}$\index{$X^{(r)}$} for the subsets of $X$ of size $r$.
@@ -99,7 +101,6 @@ It is in fact an open problem to find an explicit infinite monochromatic set for
   Pick an arbitrary point $a_1 \in \N$. Then by the pigeonhole principle, there must exist an infinite set $\mathcal{B}_1 \subseteq \N \setminus \{a_1\}$ such that all the $a_1$-$\mathcal{B}_1$ edges (ie. edges of the form $(a_1, b_1)$ with $b_1 \in \mathcal{B}_1$) are of the same colour $c_1$.
 
   Now again arbitrarily pick an element $a_2 \in \mathcal{B}_1$. Again, we find some $\mathcal{B}_2 \subseteq \mathcal{B}_1$ such that all $a_2$-$\mathcal{B}_2$ edges are the same colour $c_2$. We proceed inductively.
-  % insert a picture!
   \begin{center}
     \begin{tikzpicture}[rotate=270]
       \draw [fill opacity=0.3, fill=morange] (2, 0) parabola bend (0, -5) (-2, 0) node [right] {$\mathcal{B}_1$};
@@ -162,8 +163,383 @@ This theorem looks rather innocuous, but it has many interesting applications.
   Then Ramsey's theorem gives us an infinite monochromatic set, which is the same as a monotone subsequence. Since this is bounded, it must convergence.
 \end{proof}
 
-Now a natural question to ask is --- what happens when we have infinitely many colours? Clearly an infinite monochromatic subset cannot be guaranteed, because we can just colour all edges with different colours. Thus, we can ask a different question --- can we find an $X$ such that \emph{either} $c|_{X}$ is monochromatic, \emph{or} $c|_{X}$ is injective. It turns out this is not quite true, but something very like this is true.
+Now a natural question to ask is --- what happens when we have infinitely many colours? Clearly an infinite monochromatic subset cannot be guaranteed, because we can just colour all edges with different colours. Thus, we can ask a different question --- can we find an $X$ such that \emph{either} $c|_{X}$ is monochromatic, \emph{or} $c|_{X}$ is injective.
 
+It turns out this is also not quite true. We can construct a colouring on $\N^{(2)}$ as follows: we first colour all edges that involve $1$ with the colour $1$, then all edges that involve $2$ with the colour $2$ etc., and then we will realize we cannot find an infinite monochromatic subset or an infinite subset with all edges of different colours. So we need to take these things into account as well.
+
+It turns out to answer this question, we need the following natural generalization of Ramsey's theorem:
+\begin{thm}[Ramsey's theorem for $r$ sets]\index{Ramsey's theorem!for $r$ sets}
+  Whenever $\N^{(r)}$ is $k$-coloured, there exists an infinite monochromatic set, ie. for any $c: \N^{(r)} \to [k]$, there exists an infinite $X \subseteq \N$ such that $c|_{X^{(r)}}$ is constant.
+\end{thm}
+
+\begin{eg}
+  We define $c: \N^{(3)} \to \{\mathrm{red}, \mathrm{blue}$ by
+  \[
+    c(ijk) =
+    \begin{cases}
+      \mathrm{red} & i \mid j + k\\
+      \mathrm{blue} & \mathrm{otherwise}
+    \end{cases}
+  \]
+  Then $X = \{2^0, 2^1, 2^2, \cdots\}$ is an infinite monochromatic set.
+\end{eg}
+
+
+\begin{proof}
+  We induct on $r$. This is trivial when $r = 1$. Assume $r > 1$. We fix $a_1 \in \N$. We induce a $k$-colouring $c_1$ of $(\N \setminus \{a_1\})^{(r - 1)}$ by
+  \[
+    c_1(F) = c(F \cup \{a_1\}).
+  \]
+  By induction, there exists an infinite $B_1 \subseteq \N \setminus \{a_1\}$ such that $B_1$ is monochromatic for $c_1$, ie. all $a_1-B_1$ $r$-sets have the same colour $c_1$.
+
+  We proceed inductively as before. We get $a_1, a_2, a_3, \cdots$ and colours $c_1, c_2, \cdots$ etc. such that for any $r$-set $F$ contained in $\{a_1, a_2, \cdots\}$, we have $c(F) = c_{\min F}$.
+
+  Then again, there exists $c_{i_1}, c_{i_2}, c_{i_3}, \cdots$ all identical, and our monochromatic set is $\{a_{i_1}, a_{i_2}, a_{i_3}, \cdots\}$.
+\end{proof}
+
+With this, we can answer our previous question:
+\begin{thm}[Canonical Ramsey theorem]\index{canonical Ramsey theorem}\index{Ramsey theorem!canonical}
+  For any $c: \N^{(2)} \to \N$, there exists an infinite $X \subseteq \N$ such that one of the following hold:
+  \begin{enumerate}
+    \item $c|_{X^{(2)}}$ is constant.
+    \item $c|_{X^{(2)}}$ is injective.
+    \item $c(ij) = c(k\ell)$ iff $i = k$ for all $i, j, k \ell \in X$.
+    \item $c(ij) = c(k\ell)$ iff $j = \ell$ for all $i, j, k \ell \in X$.
+  \end{enumerate}
+\end{thm}
+Recall that when we write $ij$, we always implicitly assume $i < j$, so that (iii) and (iv) make sense.
+
+In previous proofs, we only had to go through two passes to get the desired set. This time we will need more.
+\begin{proof}
+  Consider the following colouring of $X^{(4)}$: let $c_1$ be a $2$-colouring
+  \[
+    c_1(ijk\ell) =
+    \begin{cases}
+      \mathtt{SAME} & c(ij) = c(k\ell)\\
+      \mathtt{DIFF} & \mathrm{otherwise}
+    \end{cases}
+  \]
+  \begin{center}
+    \begin{tikzpicture}
+      \foreach \x in {0, 1, 2, 3} {
+        \node [circ] at (\x, 0) {};
+      }
+      \draw (0, 0) edge [out=60, in=120] (1, 0);
+      \draw (2, 0) edge [out=60, in=120] (3, 0);
+    \end{tikzpicture}
+  \end{center}
+  Then we know there is some infinite monochromatic set $X_1 \subseteq \N$ for $c_1$. If $X_1$ is coloured $\mathtt{SAME}$, then we are done, since $c|_{X_1^{(2)}}$ is constant, since for any pair $ij$ and $i'j'$, we can pick some huge $k, \ell$ such that $j, j' < k < \ell$, and then
+  \[
+    c(ij) = c(k\ell) = c(i'j')
+  \]
+  as we know $c_1(ijk\ell) = c_1(i'j'k\ell) = \mathtt{SAME}$.
+
+  What if $X_1$ is coloured $\mathtt{DIFF}$? We next look at what happens when we have edges that are nested each other. We define $c_2: X_1^{(4)} \to \{\mathtt{SAME}, \mathtt{DIFF}\}$ defined by
+  \[
+    c_2(ijk\ell) =
+    \begin{cases}
+      \mathtt{SAME} & c(i\ell) = c(jk)\\
+      \mathtt{DIFF} & \mathrm{otherwise}
+    \end{cases}
+  \]
+  \begin{center}
+    \begin{tikzpicture}
+      \foreach \x in {0, 1, 2, 3} {
+        \node [circ] at (\x, 0) {};
+      }
+      \draw (0, 0) edge [out=60, in=120] (3, 0);
+      \draw (1, 0) edge [out=60, in=120] (2, 0);
+    \end{tikzpicture}
+  \end{center}
+  Again, we can find an infinite monochromatic subset $X_2 \subseteq X_1$ with respect to $c_2$.
+
+  We now note that $X_2$ cannot be coloured $\mathtt{SAME}$. Indeed, we can just look at
+  \begin{center}
+    \begin{tikzpicture}
+      \foreach \x/\y in {0/i, 1/j, 2/k, 3/\ell, 4/m, 5/n} {
+        \node [circ] at (\x, 0) {};
+        \node [below] at (\x, 0) {$\y$};
+      }
+      \draw (0, 0) edge [out=60, in=120] (5, 0);
+      \draw (1, 0) edge [out=60, in=120] (2, 0);
+      \draw (3, 0) edge [out=60, in=120] (4, 0);
+    \end{tikzpicture}
+  \end{center}
+  So if $X_2$ were $\mathtt{SAME}$, we would have
+  \[
+    c(\ell m) = c(in) = c(jk),
+  \]
+  which is impossible since $X_1$ is coloured $\mathtt{DIFF}$ under $c_1$.
+
+  So $X_2$ is $\mathtt{DIFF}$. Now consider $c_3: X_2^{(4)} \to \{\mathtt{SAME}, \mathtt{DIFF}\}$ given by
+  \[
+    c_3(ijk\ell) =
+    \begin{cases}
+      \mathtt{SAME} & c(ik) = c(j\ell)\\
+      \mathtt{DIFF} & \mathrm{otherwise}
+    \end{cases}
+  \]
+  \begin{center}
+    \begin{tikzpicture}
+      \foreach \x in {0, 1, 2, 3} {
+        \node [circ] at (\x, 0) {};
+      }
+      \draw (0, 0) edge [out=60, in=120] (2, 0);
+      \draw (1, 0) edge [out=-60, in=-120] (3, 0);
+    \end{tikzpicture}
+  \end{center}
+  Again find an infinite monochromatic subset $X_3 \subseteq X_2$ for $c_3$. Then $X_3$ cannot be $\mathtt{SAME}$, this time using the following picture:
+   \begin{center}
+    \begin{tikzpicture}
+      \foreach \x/\y in {0, 1, 2, 3, 4, 5} {
+        \node [circ] at (\x, 0) {};
+      }
+      \draw (0, 0) edge [out=-60, in=-120] (3, 0);
+      \draw (1, 0) edge [out=60, in=120] (5, 0);
+      \draw (2, 0) edge [out=60, in=120] (4, 0);
+    \end{tikzpicture}
+  \end{center}
+  contradicting the fact that $c_2$ is $\mathtt{DIFF}$. So we know $X_3$ is $\mathtt{DIFF}$.
+
+  We have now have ended up in this set $X_3$ such that if we have any two pairs of edges with different end points, then they must be different.
+
+  We now want to look at cases where things share a vertex. Consider $c_4: X_3^{(3)} \to \{\mathtt{SAME}, \mathtt{DIFF}\}$ given by
+  \[
+    c_4(ijk) =
+    \begin{cases}
+      \mathtt{SAME} & c(ij) = c(jk)\\
+      \mathtt{DIFF} & \mathrm{otherwise}
+    \end{cases}
+  \]
+  \begin{center}
+    \begin{tikzpicture}
+      \foreach \x in {0, 1, 2} {
+        \node [circ] at (\x, 0) {};
+      }
+      \draw (0, 0) edge [out=60, in=120] (1, 0);
+      \draw (1, 0) edge [out=60, in=120] (2, 0);
+    \end{tikzpicture}
+  \end{center}
+  Let $X_4 \subseteq X_3$ be an infinite monochromatic set for $c_4$. Now $X_4$ cannot be coloured $\mathtt{SAME}$, using the following picture:
+  \begin{center}
+    \begin{tikzpicture}
+      \foreach \x in {0, 1, 2, 3} {
+        \node [circ] at (\x, 0) {};
+      }
+      \draw (0, 0) edge [out=60, in=120] (1, 0);
+      \draw (1, 0) edge [out=60, in=120] (2, 0);
+      \draw (2, 0) edge [out=60, in=120] (3, 0);
+    \end{tikzpicture}
+  \end{center}
+  which contradicts the fact that $c_1$ is $\mathtt{DIFF}$. So we know $X_4$ is also coloured $\mathtt{DIFF}$ under $c_4$.
+
+  We are almost there. We need to deal with edges that nest in the sense of (iii) and (iv). We look at $c_5: X_4^{(3)} \to \{\mathtt{LSAME}, \mathtt{LDIFF}\}$ given by
+  \[
+    c_5(ijk) =
+    \begin{cases}
+      \mathtt{LSAME} & c(ij) = c(ik)\\
+      \mathtt{LDIFF} & \mathrm{otherwise}
+    \end{cases}
+  \]
+   \begin{center}
+    \begin{tikzpicture}
+      \foreach \x in {0, 1, 2} {
+        \node [circ] at (\x, 0) {};
+      }
+      \draw (0, 0) edge [out=60, in=120] (1, 0);
+      \draw (0, 0) edge [out=60, in=120] (2, 0);
+    \end{tikzpicture}
+  \end{center}
+  Again we find $X_5 \subseteq X_4$, an infinite monochromatic set for $c_5$. We don't separate into cases yet, because we know both cases are possible, but move on to classify the right case as well. Define $c_6: X_5^{(3)} \to \{\mathtt{RSAME}, \mathtt{RDIFF}\}$ given by
+  \[
+    c_5(ijk) =
+    \begin{cases}
+      \mathtt{RSAME} & c(ik) = c(jk)\\
+      \mathtt{RDIFF} & \mathrm{otherwise}
+    \end{cases}
+  \]
+   \begin{center}
+    \begin{tikzpicture}
+      \foreach \x in {0, 1, 2} {
+        \node [circ] at (\x, 0) {};
+      }
+      \draw (1, 0) edge [out=60, in=120] (2, 0);
+      \draw (0, 0) edge [out=60, in=120] (2, 0);
+    \end{tikzpicture}
+  \end{center}
+  Let $X_6 \subseteq X_5$ be an infinite monochromatic subset under $c_5$.
+
+  As before, we can check that it is impossible to get both $\mathtt{LSAME}$ and $\mathtt{RSAME}$, using the following picture:
+  \begin{center}
+    \begin{tikzpicture}
+      \foreach \x in {0, 1, 2, 3} {
+        \node [circ] at (\x, 0) {};
+      }
+      \draw (0, 0) edge [out=60, in=120] (1, 0);
+      \draw (1, 0) edge [out=60, in=120] (2, 0);
+      \draw (2, 0) edge [out=60, in=120] (3, 0);
+    \end{tikzpicture}
+  \end{center}
+  contradicting $c_4$ being $\mathtt{DIFF}$.
+
+  Then the remaining cases $(\mathtt{LDIFF}, \mathtt{RDIFF})$, $(\mathtt{LSAME}, \mathtt{RDIFF})$ and $(\mathtt{RDIFF}, \mathtt{LSAME})$ corresponds to the cases (ii), (iii) and (iv).
+\end{proof}
+Note that we could this theorem in one pass only, instead of six, by considering a much more complicated colouring $(c_1, c_2, c_3, c_4, c_5, c_6)$ with values in
+\[
+  \{\mathtt{SAME}, \mathtt{DIFF}\}^4 \times \{\mathtt{LSAME}, \mathtt{LDIFF}\} \times \{\mathtt{RSAME}, \mathtt{RDIFF}\},
+\]
+but we still have to do the same analysis and it just complicates matters more.
+
+There is a generalization of this to $r$-sets. One way we can rewrite the theorem is to say that the colour is uniquely determined by some subset of the vertices. The cases (i), (ii), (iii), (iv) correspond to no vertices, all vertices, first vertex, and second vertex respectively. Then for $r$-sets, we have $2^r$ possibilities, one for each subset of the $r$-coordinates.
+
+\begin{thm}[Higher dimensional canonical Ramsey theorem]\index{higher dimensional canonical Ramsey theorem}\index{canonical Ramsey theorem!!higher dimensional}\index{Ramsey theorem!higher dimensional, canonical}
+  Let $c: \N^{(r)} \to \N$ be a colouring. Then there exists $D \subseteq [r]$ and an infinite subset $X \subseteq \N$ such that for all $x \not= y \in X^{(r)}$, we have $c(x) = c(y)$ iff $\{i: x_i = y_i\} = D$, where $x = \{x_1 < x_2 < \cdots < x_r\}$ (and similarly for $y$).
+\end{thm} % this may be wrong
+
+\subsection{Finite graphs}
+We will usually restrict to $2$ colours. Everything we say will either be trivially be generalizable to more colours, or we have no idea how to do so. It is an exercise for the reader to figure out which it is.
+
+Recall again that a graph $G$ is a pair $(V, E)$ where $E \subseteq V^{(2)}$.
+\begin{eg}
+  The \term{path graph} on $n$ vertices \term{$P_n$} is
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (0, 0) node [circ] {} -- (1, 0) node [circ] {} -- (2, 0) node [circ] {};
+
+      \draw [dashed] (2.2, 0) -- (2.8, 0);
+
+      \draw (3, 0) node [circ] {} -- (4, 0) node [circ] {};
+    \end{tikzpicture}
+  \end{center}
+  We can write
+  \[
+    V = [n],\quad E = \{12, 23, 34, \cdots, (n-1)n\}.
+  \]
+\end{eg}
+
+\begin{eg}
+  The $n$-cycle \term{$C_n$} is
+  % insert picture
+  \[
+    V = [n],\quad E = \{12, 23, \cdots, (n-1)n, 1n\}.
+  \]
+\end{eg}
+
+Finally, we have
+\begin{eg}
+  The \term{complete graph} \term{$V_n$} on $n$ vertices is
+  \[
+    V = [n], E = V^{(2)}.
+  \]
+\end{eg}
+
+Our previous Ramsey theorem can be said as saying given an infinite complete graph $K_n$ with a colouring, there is an infinite monochromatic complete subgraph.
+
+Obviously, our initial graph had to be infinite for the result to hold. But we can ask another question --- how big does our graph have to be to guarantee a complete monochromatic subgraph of size $n$?
+\begin{defi}[Ramsey number]\index{Ramsey number}\index{$R(n)$}\index{$R(K_n)$}
+  We let $R(n) = R(K_n)$ to be the smallest $N \in \N$ whenever we red-blue colour the edges of $K_N$, then there is a monochromatic copy of $K_n$.
+\end{defi}
+
+\begin{thm} % insert name
+  For all $n$, we have $R(n) < \infty$.
+\end{thm}
+
+\begin{proof}
+  Suppose not. Let $n$ be such that $R(n) = \infty$. Then for any $m \geq n$, there is a $2$-colouring $c_m$ of $K_m = [m]^{(2)}$ such that there is no monochromatic et of size $n$.
+
+  We want to use these colourings to build up a colouring of $\N^{(2)}$ with no monochromatic set of size $n$. We want to say we take the ``limit'' of these colourings, but what does this mean? To do so, we need these colourings to be nested.
+
+  By the pigeonhole principle, there exists an infinite set $M_1 \subseteq \N$ and some fixed $2$-colouring $d_n$ of $[n]$ such that $c_m|_{[n]^{(2)}} = d_n$ for all $m \in M_1$.
+
+  Similarly, there exists an infinite $M_2 \subseteq M_1$ such that $c_m|_{[n + 1]^{(2)}} = d_{n + 1}$ for $m \in M_2$, again for some $2$-colouring $d_{n + 1}$ of $[n + 1]$. We repeat this over and over again. Then we get a sequence $d_n, d_{n + 1}, \cdots$ of colourings such that $d_i$ is a $2$-colouring of $[i]^{(2)}$ without a monochromatic $K_n$, and further for $i < j$, we have
+  \[
+    d_j|_{[i]^{(2)}} = d_i.
+  \]
+  We then define a $2$-colouring $c$ of $\N^{(2)}$ by
+  \[
+    c(ij) = d_m(ij)
+  \]
+  for any $m > i, j$. Clearly, there exists no monochromatic $K_n$ in $c$, as any $K_n$ is finite. This massively contradicts the infinite Ramsey theorem.
+\end{proof}
+There are other ways of proving this. We can do it by using compactness. We consider the space $\{1, 2\}^\N$ with metric
+\[
+  d(f, g) = \frac{1}{2^n}\text{ if } n = \min \{i: f_i \not= g_i\}.
+\]
+By Tychonoff theorem, we know this is compact, and we can deduce the theorem from this. % how?
+
+The problem with these proofs is that they are completely non-constructive. The proof gives us no bound on $R(n)$ whatsoever.
+
+To obtain a bound, we can mimic the proof of the infinite Ramsey theorem. To do so, it is convenient to consider the following generalization of the Ramsey number: % we might have found a lot of blue things, and we want a big red or small blue.
+\begin{defi}[Ramsey number]\index{Ramsey number}\index{$R(n, m)$}\index{$R(K_n, K_m)$}
+  We define $R(n, m) = R(K_n, K_m)$ to be the minimum $N \in \N$ such that whenever we red-blue colour the edges of $K_N$, we either get a red $K_n$ or a blue $K_m$.
+\end{defi}
+
+Clearly we have
+\[
+  R(n, m) \leq R(\max{n, m}).
+\]
+In particular, they are finite. Once we make this definition, it is easy to find an easy bound on $R$.
+\begin{thm}
+  We have
+  \[
+    R(n, m) \leq R(n - 1, m) + R(n, m - 1).
+  \]
+  for all $n, m \in \N$. Consequently, we have
+  \[
+    R(n, m) \leq \binom{n + m - 1}{n - 2}.
+  \]
+\end{thm}
+
+\begin{proof}
+  We induct on $n + m$. It is clear that
+  \[
+    R(1, n) = R(n, 1) = 1,\quad R(n, 2) = R(2, n) = n
+  \]
+  Now suppose $N \geq R(n - 1, m) + R(n, m - 1)$. Consider any red-blue colouring of $K_N$ and any vertex $v \in V(K_n)$. We write
+  \[
+    v(K_n) \setminus \{v\} = A \cup B,
+  \]
+  where each vertex $A$ is joined by a red edge to $v$, and each vertex in $B$ is joined by a blue edge to $v$. Then
+  \[
+    |A| + |B| \geq N - 1 \geq R(n - 1, m) + R(n, m - 1) - 1.
+  \]
+  It follows that either $|A| \geq R(n - 1, m)$ or $|B| \geq R(n, m - 1)$. We wlog it is the former. Then by definition of $R(n - 1, m)$, we know $A$ contains either a blue copy of $K_m$ or a red copy of $K_{n - 1}$. In the first case, we are done, and in the second case, we just add $v$ to the red $K_{n - 1}$.
+
+  The last formula is just a straightforward property of binomial coefficients.
+\end{proof}
+
+In particular, we find
+\[
+  R(n) \leq \binom{2n - 1}{n - 2} \leq \frac{4^n}{\sqrt{n}}.
+\]
+We genuinely have no idea whether $\sim 4^n$ is the correct growth rate, ie. if there is some $\varepsilon$ such that $R(n) \leq (4 - \varepsilon)^n$. However, we do know that
+\[
+  R(n) \leq \frac{4^n}{n^c}
+\]
+for any $c > 0$ (eventually).
+
+But do we have a lower bound? Does it have to grow exponentially? The answer is yes, and the answer is a very classical construction of Erd\"os.
+
+\begin{thm}
+  We have $R(n) \geq \sqrt{2}^n$ for sufficiently large $n \in \N$.
+\end{thm}
+The proof is remarkable in that before this was shown, we had no sensible bound at all. However, the proof is incredibly simple, and revolutionized how we think about colourings.
+
+\begin{proof}
+  Let $N \leq \sqrt{2}^N$. We perform a red-blue colouring of $K_N$ randomly, where each edge is coloured red independently of the others with probability $\frac{1}{2}$.
+
+  We let $X_R$ be the number of red copies of $K_n$ in such a colouring. Then since expectation is linear, we know the expected value is
+  \begin{align*}
+    [X_R] &= \binom{N}{n} \left(\frac{1}{2}\right)^{-\binom{n}{2}}\\
+    &\leq \left(\frac{eN}{n}\right)^n \left(\frac{1}{2}\right)^{\binom{n}{2}}\\
+    &\leq \left(\frac{e}{n}\right)^n \sqrt(2)^{n^2} \sqrt{2}^{-n^2}\\
+    &= \left(\frac{e}{n}\right)^{n}\\
+    &< \frac{1}{2}
+  \end{align*}
+  for sufficiently large $n$.
+
+  Similarly, we have $[X_B] < \frac{1}{2}$. So the expected number of monochromatic $K_n$ is $< 1$. So in particular there must be some colouring with no monochromatic $K_n$.
+\end{proof}
 \section{Ramsey theory on the integers}
 \section{Partition Regularity}
 \section{Topological Dynamics}

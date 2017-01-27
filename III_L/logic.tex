@@ -5,6 +5,7 @@
 \def\nyear {2017}
 \def\nlecturer {T. E. Forster}
 \def\ncourse {Logic}
+\def\nlectures {MWF.10}
 
 \input{header}
 
@@ -332,71 +333,102 @@ If we add this, then we get classical propositional calculus, and it is a theore
   Don't do the last two.
 \end{ex}
 
-One can think of natural deduction as a ``platform'', and we can use this to describe other logics.
+Instead of thinking of natural deduction as an actual logical theory, we often think of it as a ``platform'' that allows us to describe different logical theories, which we can do by introducing other connectives.
 
-\separator
+\begin{eg}
+  For example, we might want to describe first-order logic. We can give introduction rules for $\exists$ as follows:
+  \begin{prooftree}
+    \AxiomC {$\varphi(t)$}
+    \intro{$\exists$}
+    \UnaryInfC{$\exists x\; \varphi(x)$}
+  \end{prooftree}
+  Similarly, we can have an elimination rule for $\forall$ easily:
+  \begin{prooftree}
+    \AxiomC{$\forall \varphi(x)$}
+    \elim{$\forall$}
+    \UnaryInfC{$\varphi(t)$}
+  \end{prooftree}
+  The introduction rule for $\forall$ is a bit more complicated. The rule again looks something like
+  \begin{prooftree}
+    \AxiomC {$\varphi(x)$}
+    \intro{$\forall$}
+    \UnaryInfC{$\forall x\; \varphi(x)$}
+  \end{prooftree}
+  but for such a proof to be valid, the $x$ must be ``arbitrary''. So we need an additional condition on this rule that there is no free occurence of $x$'s.
 
-For example, we might want to describe first-order logic. We can give introduction rules for $\exists$ as follows:
-\begin{prooftree}
-  \AxiomC {$\varphi(t)$}
-  \intro{$\exists$}
-  \UnaryInfC{$\exists x\; \varphi(x)$}
-\end{prooftree}
-Similarly, we can have an elimination rule for $\forall$ easily:
-\begin{prooftree}
-  \AxiomC{$\forall \varphi(x)$}
-  \elim{$\forall$}
-  \UnaryInfC{$\forall$}
-\end{prooftree}
-The introduction rule for $\forall$ is a bit more complicated. The rule again looks something like
-\begin{prooftree}
-  \AxiomC {$\varphi(x)$}
-  \intro{$\forall$}
-  \UnaryInfC{$\exists x\; \varphi(x)$}
-\end{prooftree}
-but for such a proof to be valid, the $x$ must be ``arbitrary''. So we need an additional condition on this rule that there is no free occurence of $x$'s.
+  Finally, suppose we know $\exists x\; \varphi(x)$. How can we use this to deduce some $p$? Suppose we know that $\varphi(x)$ implies $p$, and also $p$ does not depend on $x$. Then just knowing that there exists some $x$ such that $\varphi(x)$, we know $p$ must be true.
+  \begin{prooftree}
+    \AxiomC{$\exists x\; \varphi(x)$}
+    \AxiomC{$\varphi(x)$}
+    \noLine
+    \UnaryInfC{$\rvdots$}
+    \noLine
+    \UnaryInfC{$p$}
+    \elim{$\exists$}
+    \BinaryInfC{$p$}
+  \end{prooftree}
+  Again we need $x$ to be arbitrary in $p$. % maybe clarify this more
+\end{eg}
 
-Finally, suppose we know $\exists x\; \varphi(x)$. How can we use this to deduce some $p$? Suppose we know that $\varphi(x)$ implies $p$, and also $p$ does not depend on $x$. Then just knowing that there exists some $x$ such that $\varphi(x)$, we know $p$ must be true.
-\begin{prooftree}
-  \AxiomC{$\exists x\; varphi(x)$}
-  \AxiomC{$\varphi(x)$}
-  \noLine
-  \UnaryInfC{$\rvdots$}
-  \noLine
-  \UnaryInfC{$p$}
-  \elim{$exists$}
-  \BinaryInfC{$p$}
-\end{prooftree}
-Again we need $x$ to be arbitrary.
+\begin{eg}
+  We can also use natural deduction for ``naive set theory'', which we will later find to be inconsistent. We can give an $\in$-introduction rule
+  \begin{prooftree}
+    \AxiomC{$\varphi(x)$}
+    \intro{$\in$}
+    \UnaryInfC{$x \in \{y : \varphi(y)\}$}
+  \end{prooftree}
+  and a similar elimination rule
+  \begin{prooftree}
+    \AxiomC{$x \in \{y: \varphi (y)\}$}
+    \elim{$\in$}
+    \UnaryInfC{$\varphi(x)$}
+  \end{prooftree}
+\end{eg}
 
-\separator
+One cannot expect that we can write down whatever introduction and elimination rule we like, and expect to get a sensible theory. For example, if we introduce a connective $\&$ with the following silly rules:
+\begin{center}
+  \begin{bprooftree}
+    \AxiomC{$A$}
+    \intro{$\&$}
+    \UnaryInfC{$A \& B$}
+  \end{bprooftree}
+  \begin{bprooftree}
+    \AxiomC{$A \& B$}
+    \elim{$\&$}
+    \UnaryInfC{$B$}
+  \end{bprooftree}
+\end{center}
+then this would immediately give us a theory that proves anything we like.
 
-We can also use natural deduction for ``naive set theory''. We can give an $\in$-introduction rule
-\begin{prooftree}
-  \AxiomC{$\varphi(x)$}
-  \intro{$\in$}
-  \UnaryInfC{$x \in \{y : \varphi(y)\}$}
-\end{prooftree}
-and a similar elimination rule
-\begin{prooftree}
-  \AxiomC{$x \in \{y: \varphi (y)\}$}
-  \elim{$\in$}
-  \UnaryInfC{$\varphi(x)$}
-\end{prooftree}
+There are in fact two problems with our introduction and elimination rules. The first is that once we use our $A$ to deduce $A \& B$, it is completely gone, and we cannot recover anything about $A$ from $A \& B$. The second problem is that, obviously, proving $A \& B$ doesn't really involve $B$ at all, but we can use $A \& B$ to deduce something about $B$.
 
-\separator
-In general, to obtain a sensible natural deduction theory, we need the notion of harmony.
+In general, to obtain a sensible natural deduction theory, we need harmony.
 \begin{defi}[Harmony]\index{harmony}
   We say a connective $\$ $ is \term{harmonious} if $\phi \$ \psi$ is the strongest assertion you can deduce from the assumptions in the rule of $\$ $-introduction, and $\phi \$ \psi$ is the weakest thing that implies the conclusion of the $\$ $-elimination rule.
 \end{defi}
-This might seem a bit vauge, but it becomes clearer as we look at examples. The introduction and elimination rules for $\in$ we presented are certainly harmonious, because the conclusions and assumptions are in fact equivalent. One can also check that the introduction and elimination rules for $\wedge$ and $\vee$ are harmonious. But when we study more complicated systems, it is usually difficult to show that they are harmonious.
+We will not make the notion more precise than this.
+
+\begin{eg}
+  The introduction and elimination rules for $\in$ we presented are certainly harmonious, because the conclusions and assumptions are in fact equivalent.
+  
+  One can also check that the introduction and elimination rules for $\wedge$ and $\vee$ are harmonious.
+\end{eg}
 
 \begin{eg}[Russel's paradox]
-  We write
+  In naive set theory, consider
   \[
-    R = \{x: x \in X \to \bot\}.
+    R = \{x: x \in x \to \bot\}.
   \]
-  Suppose this existed. Then we can have the deductions
+  Then we can have the deductions
+  \begin{prooftree}
+    \AxiomC{$R \to R$}
+    \AxiomC{$R \to R$}
+    \elim{$\in$}
+    \UnaryInfC{$R \in R \to \bot$}
+    \elim{$\to$}
+    \BinaryInfC{$\bot$}
+  \end{prooftree}
+  We can then move on to use this to deduce that $R \in R$:
   \begin{prooftree}
     \AxiomC{$[R \to R]^1$}
     \AxiomC{$[R \to R]^1$}
@@ -409,7 +441,7 @@ This might seem a bit vauge, but it becomes clearer as we look at examples. The 
     \intro{$\in$}
     \UnaryInfC{$R \in R$}
   \end{prooftree}
-  We now look at this, and we see that we have proved that $R \in R$. But we previously had a proof that $R \in R$ gives a contradiction. So what we are going to do is to make two copies of this proof:
+  Now we have proved $R \in R$. But we previously had a proof that $R \in R$ gives a contradiction. So what we are going to do is to make two copies of this proof:
   \begin{prooftree}
     \AxiomC{$[R \to R]^1$}
     \AxiomC{$[R \to R]^1$}
@@ -429,18 +461,15 @@ This might seem a bit vauge, but it becomes clearer as we look at examples. The 
     \BinaryInfC{$\bot$}
     \intron{$\to$}{2}
     \UnaryInfC{$R \in R \to \bot$}
-    \intro{$\in$}
-    \UnaryInfC{$R \in R$}
-    \elim{$\in$}
-    \UnaryInfC{$R \in R \to \bot$}
     \elim{$\to$}
     \BinaryInfC{$\bot$}
   \end{prooftree}
-  So we showed that we have an inconsitent theory.
-\end{eg}
-Note that we didn't use a lot of ``logical power'' here. We didn't use the law of excluded middle, so this contradiction manifests itself even in the case of constructive logic. Moreover, we didn't really use many axioms of naive set theory. We didn't even need things like extensionality for this to work.
+  So we showed that we have an inconsistent theory.
 
-Now we notice that this proof is rather weird. We first had an $\to$-introduction, and then subsequently eliminated it. In general, if we have a derivation of the form
+  Note that we didn't use a lot of ``logical power'' here. We didn't use the law of excluded middle, so this contradiction manifests itself even in the case of constructive logic. Moreover, we didn't really use many axioms of naive set theory. We didn't even need things like extensionality for this to work.
+\end{eg}
+
+Now we notice that this proof is rather weird. We first had an $\to$-introduction (2), and then subsequently eliminated it immediately. In general, if we have a derivation of the form
 \begin{prooftree}
   \AxiomC{$P$}
   \noLine
@@ -452,6 +481,7 @@ Now we notice that this proof is rather weird. We first had an $\to$-introductio
   \AxiomC{$\rvdots$}
   \noLine
   \UnaryInfC{$P$}
+  \elim{$\to$}
   \BinaryInfC{$Q$}
 \end{prooftree}
 We can just move the second column to the top of the first to get
@@ -460,17 +490,17 @@ We can just move the second column to the top of the first to get
   \noLine
   \UnaryInfC{$Q$}
 \end{prooftree}
-If we do this for our previous proof, we see that we get the same proof!
 
 In general,
 \begin{defi}[Maximal formula]\index{maximal formula}\index{formula}
-  We sa a formula in a derivation is \emph{maximal} iff it is both the conclusion of an occurence of an introduction rule, \emph{and} the major premiss of an occurnece of the elimination rule for the same connective.
+  We say a formula in a derivation is \emph{maximal} iff it is both the conclusion of an occurence of an introduction rule, \emph{and} the major premiss of an occurnece of the elimination rule for the same connective.
 \end{defi}
 
 Here it is important that we are talking about the \emph{major} premise. In a deduction
 \begin{prooftree}
   \AxiomC{$A \to B$}
   \AxiomC{$A$}
+  \elim{$\to$}
   \BinaryInfC{$B$}
 \end{prooftree}
 we call $A \to B$ the \emph{major premise}, and $B$ the \emph{minor premise}. In the case of $\wedge$ and $\vee$, the terms are symmetric, and we do not need such a distinction.
@@ -483,27 +513,27 @@ This distinction is necessary since a deduction of the form
   \UnaryInfC{$\rvdots$}
   \noLine
   \UnaryInfC{$B$}
-  \intro{$to$}
+  \intro{$\to$}
   \UnaryInfC{$A \to B$}
   \elim{$\to$}
   \BinaryInfC{$C$}
 \end{prooftree}
 
-One can prove that any derivation in propositional logic can be converted to one that does not contain maximal formulae.
+One can prove that any derivation in propositional logic can be converted to one that does not contain maximal formulae. However, if we try to eliminate the maximal fomrula in our proof of inconsistency of naive set theory, we will find that we will end up with the same proof!
 
-\section{Curry--Howard correspondence}
-Recall that in IID Logic and Set Theory, we had the axioms $K$ and $S$:
+\subsection{Curry--Howard correspondence}
+Return to the days where we did IID Logic and Set Theory. Instead of natural deduction, we bootstrapped our system with two axioms $K$ and $S$:
 \begin{itemize}
   \item[$K$:] $A\to(B\to A)$
   \item[$S$:] $[A\to(B\to C)]\to[(A\to B)\to(A \to C)]$
 \end{itemize}
-It is a fact that $\{K, S\}$ axiomatizes the conditional ($\to$) fragment of constructive propositional logic. It is also true that if we add a new law, \term{Peirce's law}:
+It is a fact that $\{K, S\}$ axiomatizes the conditional ($\to$) fragment of \emph{constructive} propositional logic. To axiomatize the conditional fragment of \emph{classical} logic, we need a new law, \term{Peirce's law}:
 \[
-  ((A \to B) \to A) \to A,
+  ((A \to B) \to A) \to A.
 \]
-then we get the whole conditional ($\to$) fragment of classical logic!
+In particular, we cannot prove Peirce's law from $K$ and $S$.
 
-In particular, we cannot prove Peirce's law from $K$ and $S$. How can we prove this? The most elementary way of doing so would be to try to allow for more truth values, such that $K$, $S$ and modus ponens hold, but Peirce's law does not. It turns out three truth values are sufficient, with
+How can we go about proving that Peirce's law is unprovable? The most elementary way of doing so would be to try to allow for more truth values, such that $K$, $S$ and modus ponens hold, but Peirce's law does not. It turns out three truth values are sufficient. We consider the following truth table for $\to$:
 \begin{center}
   \begin{tabular}{cccc}
     \toprule
@@ -515,25 +545,390 @@ In particular, we cannot prove Peirce's law from $K$ and $S$. How can we prove t
     \bottomrule
   \end{tabular}
 \end{center}
-Here we interpret $1$ as ``true'', $3$ as ``false'', and $2$ as ``maybe''. One can just write out the truth values and realize the formulas $K, S$ always take truth values $1$, and also if $A$ and $A \to B$ are $1$, then so is $B$. So by induction on the structure of a proof, we know that anything we can deduce from $K$ and $S$ will have value $1$ with these truth values. However, if we put $A = 2$ and $B = 3$, then $((A \to B) \to A) \to A$ has value $2$, not $1$. So it cannot possibly be deduced from $K$ and $S$.
+Here we interpret $1$ as ``true'', $3$ as ``false'', and $2$ as ``maybe''.
 
-But what does this proof really mean? How could we have come up with such a truth table? It turns out these things do have a meaning, but they do not become clear until we get to the possible world semantics. However, before we go into that, we can prove this in a different way, using the \emph{Curry-Howard correspondence}.
+By writing out the truth tables, one can verify that the formulas $K$ and $S$ always take truth value $1$. Also, if $A$ and $A \to B$ are both $1$, then so is $B$. So by induction on the structure of the proof, we know that anything deduced from $K$ and $S$ and \emph{modus ponens} will have truth value $1$. 
 
-We start by looking at
+However, if we put $A = 2$ and $B = 3$, then $((A \to B) \to A) \to A$ has value $2$, not $1$. So it cannot possibly be deduced from $K$ and $S$.
+
+This is, of course, a very unsatisfactory answer. The truth table was just pulled out of a hat, and we just checked to see that Peirce's law doesn't hold. It doesn't tell us where the truth table came from, and \emph{why} we can't prove Peirce's law.
+
+We will answer the second question first using the \emph{Curry--Howard correspondence}. Then we will see how we can come up with this truth table using \emph{possible world semantics} in the next chapter.
+
+Consider the piece of syntax
 \[
   A \to B.
 \]
-This is a piece of syntax. Two letters, and an arrow between them. So far, we have seen this as a logical formula, with $A$ and $B$ being formulas, and $\to$ being implication. However, we may also be familiar with this notation representing the set of all functions from $A$ to $B$, where $A$ and $B$ are sets. This possibility of reading it like this is known as the \term{Curry-Howard correspondence}, or \term{propositions as types}.
+So far, we have viewed this as a logical formula --- $A$ and $B$ are formulae, and $\to$ denotes implication. However, in mathematics, there is another common use of this notation --- we can think of $A$ and $B$ as sets, and $A \to B$ is the set of all functions from $A$ to $B$. The idea of the Curry--Howard correspondence is to view implication as functions between sets.
 
-In this context, what is modus ponens? What does
+While this might seem like a bizarre thing to do, it actually makes sense. Given a formula $A$, we can view $A$ as a ``set'', whose ``elements'' are the proofs of $A$. Now if we know $A \to B$, this means any proof of $A$ becomes a proof of $B$. In other words, we have a function $A \to B$. As we move on, we will see that this idea of viewing a formula $A$ as the set of all proofs of $A$ gives a very close correspondence between the logical connectives and set-theoretic constructions.
+
+This is also known as \term{propositions as types}, and it is common to call $A$, $B$ etc ``types'' instead of ``sets''.
+
+Under this correspondence, \emph{modus ponens} has a very natural interpretation. We can just think of the rule
 \begin{prooftree}
   \AxiomC{$A$}
   \AxiomC{$A \to B$}
   \BinaryInfC{$B$}
 \end{prooftree}
-mean? We can just think of this as function application! If we have an element $a\in A$, and an element of $f \in A \to B$, then we have $f(a) \in B$.
+as function application! If we have an element $a\in A$, and an element $f \in A \to B$, then we have $f(a) \in B$. Now it is awkward to write $f \in A \to B$ instead of $f: A \to B$. So in fact, we will write $f: A \to B$ instead. Moreover, we will use the colon instead of $\in$ for \emph{all} types. So we can write
+\begin{prooftree}
+  \AxiomC{$x: A$}
+  \AxiomC{$f: A \to B$}
+  \BinaryInfC{$f(x): B$}
+\end{prooftree}
+Often, we will just write $fx$ instead of $f(x)$. If we write $fxy$, then it means $(fx)y$, but we will usually put brackets to indicate.
 
-What is the axiom $K$ about? $K$ is a function $A \to (B \to A)$, which gives the constant function. For any $a \in A$, the function $K(a)$ is the constant function $K$! It is called $K$, not $C$, because it was discovered by German.
+\begin{eg}
+  What is the interpretation of $K$ under the Curry--Howard correspondence? It corresponds to a function
+  \[
+    A \to (B \to A).
+  \]
+  Let's try to think of a function that does this. Given an element $a: A$, we need to find a function $B \to A$. Since the only thing we know about is $a$, we could return the constant function that always returns $a$. So for each $a : A$, we define $K(a)$ to be the constant function $a$.
+
+  This is indeed where the name $K$ came from. It's just that the inventor was German, and so it is not $C$.
+\end{eg}
+What about conjunction? To prove $A \wedge B$, we need to prove $A$ and $B$. In other words, an element of $A \wedge B$ should be an element of the Cartesian product $A \times B$.
+
+We can write the introduction rule as
+\begin{prooftree}
+  \AxiomC{$x: A$}
+  \AxiomC{$y: B$}
+  \BinaryInfC{$\bra x, y\ket: A \wedge B$}
+\end{prooftree}
+Here we are using the angled brackets to denote ordered pairs. The elimination rules are just given by the projection $\fst: A \times B \to A$ and $\snd: A \times B \to B$:
+\begin{center}
+  \begin{bprooftree}
+    \AxiomC{$x: A \wedge B$}
+    \UnaryInfC{$\fst(x): A$}
+  \end{bprooftree}
+  \begin{bprooftree}
+    \AxiomC{$x: A \wedge B$}
+    \UnaryInfC{$\snd(x): B$}
+  \end{bprooftree}
+\end{center}
+Some people write $\fst$ and $\snd$ as $\pi_1$ and $\pi_2$ instead.
+
+We are not going to talk about the rules for ``or'', because they are horrendous. But if we think hard about it, then $A \vee B$ corresponds to the disjoint union of $A$ and $B$. % include
+
+So far, we only know how to decorate our LEGO pieces. When we assemble them to get proofs, we can get more complicated tress. Suppose we had the tree
+\begin{prooftree}
+  \AxiomC{$[A \wedge B]^1$}
+  \elim{$\wedge$}
+  \UnaryInfC{$B$}
+  \AxiomC{$[A \wedge B]^1$}
+  \elim{$\wedge$}
+  \UnaryInfC{$A$}
+  \intro{$\wedge$}
+  \BinaryInfC{$B \wedge A$}
+  \intron{$\to$}{1}
+  \UnaryInfC{$(A \wedge B) \to (B \wedge A)$}
+\end{prooftree}
+We now try to decorate this tree:
+\begin{prooftree}
+  \AxiomC{$x: [A \wedge B]^1$}
+  \elim{$\wedge$}
+  \UnaryInfC{$\snd(x): B$}
+  \AxiomC{$x: [A \wedge B]^1$}
+  \elim{$\wedge$}
+  \UnaryInfC{$\fst(x): A$}
+  \intro{$\wedge$}
+  \BinaryInfC{$\bra \snd(x), \fst(x)\ket : B \wedge A$}
+  \intron{$\to$}{1}
+  \UnaryInfC{$(A \wedge B) \to (B \wedge A)$}
+\end{prooftree}
+Note that both $[A \wedge B]^1$ are decorated using the same letter $x$. This is since they are cancelled at the same time, so we are using the same instance of $A \wedge B$ in the statement $(A \wedge B) \to (B \wedge A)$.
+
+Now the remaining question to answer is how we are going to decorate the $\to$-introduction. We want some notation that denotes the function that takes $x$ and returns $\bra \snd(x), \fst(x)$. More generally, if we have an expression $\varphi(x)$ in $x$, we want a notation that denotes the function that takes in $x$ and returns $\varphi(x)$.
+
+The convention is to denote this  using a $\lambda$:\index{$\lambda$}
+\[
+  \lambda x. \varphi(x).
+\]
+These expressions we produce are known as \term{$\lambda$ expressions}\index{lambda expressions}.
+
+For example, in the previous case, the final result is
+\[
+  \lambda x. \bra \fst(x), \snd(x)\ket : (A \wedge B) \to (B \wedge A).
+\]
+The general decoration rule for $\to$-introduction is
+\begin{prooftree}
+  \AxiomC{$x: [A]^1$}
+  \noLine
+  \UnaryInfC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$\varphi(x): C$}
+  \intron{$\to$}{1}
+  \UnaryInfC{$\lambda x. \varphi(x): A \to C$}
+\end{prooftree}
+Recall that previously we had a rule for getting rid of maximal formulae. Given a tree of the form
+\begin{prooftree}
+  \AxiomC{$P$}
+  \noLine
+  \UnaryInfC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$Q$}
+  \intro{$\to$}
+  \UnaryInfC{$P \to Q$}
+  \AxiomC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$P$}
+  \elim{$\to$}
+  \BinaryInfC{$Q$}
+\end{prooftree}
+We can just move the second column to the top of the first to get
+\begin{prooftree}
+  \AxiomC{$\rvdots$}
+  \noLine
+  \UnaryInfC{$Q$}
+\end{prooftree}
+This conversion corresponds to the conversion
+\[
+  (\lambda x. \varphi(x)) a \rightsquigarrow \varphi(a),
+\]
+which is just applying the function! This process is known as \term{$\beta$-reduction}\index{beta-reduction}.
+
+Since there is $\beta$-reduction, there is, of course, also \term{$\alpha$-reduction}\index{alpha-reduction}-reduction, but this is boring. It is just re-lettering $\lambda x. \phi(x)$ to $\lambda y. \phi(y)$.  There will also be an $\eta$-reduction, and we will talk about that later.
+
+In the following exercise/example, note that we have a convention that if we write $A \to B \to C$, then we mean $A \to (B \to C)$.
+\begin{ex}
+  Find $\lambda$-expressions that encode proofs of
+  \begin{enumerate}
+    \item $((A \to B) \wedge (C \to D)) \to ((A \wedge C) \to (B \wedge D))$
+    \item $(A \to B) \to (B \to C) \to (A \to C)$ % insert convention about associativity somewhere
+    \item $((A \to B) \to A) \to (A \to B) \to B$
+    \item $(A \to B \to C) \to (B \to A \to C)$
+    \item $(A \to B \to C) \to ((A \wedge B) \to C)$
+    \item $(B \wedge A \to C) \to (A \to B \to C)$
+  \end{enumerate}
+\end{ex}
+
+\begin{proof}[Solutions]\leavevmode
+  \begin{enumerate}
+    \item $\lambda f. \lambda x. \bra \fst(f)(\fst(x)), \snd(f)(\snd(x))\ket$
+    \item $\lambda f. \lambda g. \lambda a. g(fa)$
+    \item $\lambda f. \lambda g. g(fg)$
+    \item $\lambda f. \lambda b. \lambda a. (fa)b$
+    \item $\lambda f. \lambda x. f(\fst x)(\snd x)$
+    \item $\lambda f. \lambda a. \lambda b. f\bra b, a\ket$
+  \end{enumerate}
+  One can write out the corresponding trees explicitly. For example, (iii) can be done by
+  \begin{prooftree}
+    \AxiomC{$g: [A \to B]^1$}
+    \AxiomC{$f: [(A \to B) \to A]^2$}
+    \elim{$\to$}
+    \BinaryInfC{$fg: A$}
+    \AxiomC{$g: [A \to B]^1$}
+    \elim{$\to$}
+    \BinaryInfC{$g(fg)$}
+    \intron{$\to$}{1}
+    \UnaryInfC{$\lambda g. g(fg): (A \to B) \to B$}
+    \intron{$\to$}{2}
+    \UnaryInfC{$\lambda f. \lambda g. g(fg): (A \to B) \to A \to (A \to B) \to B$}
+  \end{prooftree}
+  Note that we always decorate assumptions with a single variable, say $f$, even if they are very complicated. For example, if we have an assumption $A \wedge B$, it might be tempting to decorate it as $\bra a, b\ket$, but we do not.
+\end{proof}
+
+Now what we have is that for any proof tree, we obtain a $\lambda$ formula. But for any formula, it can have many proofs, and so it can be given by many $\lambda$ formula.
+\begin{eg}
+  Consider
+  \begin{prooftree}
+    \AxiomC{$x: [A]^1$}
+    \AxiomC{$f: [A \to A]^2$}
+    \elim{$\to$}
+    \BinaryInfC{$fx: A$}
+    \intron{$\to$}{1}
+    \UnaryInfC{$\lambda x. fx: A \to A$}
+    \intron{$\to$}{2}
+    \UnaryInfC{$\lambda f. \lambda x. fx: (A \to A) \to (A \to A)$}
+  \end{prooftree}
+  This is really just the identity function!
+
+  We can also try something slightly more complicated.
+  \begin{prooftree}
+    \AxiomC{$x: [A]^1$}
+    \AxiomC{$f: [A \to A]^2$}
+    \BinaryInfC{$f x: A$}
+    \AxiomC{$f: [A \to A]^2$}
+    \BinaryInfC{$f(f x): A$}
+    \intron{$\to$}{1}
+    \UnaryInfC{$\lambda x. f(f(x)): A \to A$}
+    \intron{$\to$}{2}
+    \UnaryInfC{$\lambda f. \lambda x. f(f x): (A \to A) \to (A \to A)$}
+  \end{prooftree}
+  This is another $\lambda$ term for $(A \to A) \to (A \to A)$. This says given any $f$, we return the function that does $f$ twice. These are two genuinely different functions, and thus these two $\lambda$ terms correspond to two different \emph{proofs} of $(A \to A) \to (A \to A)$.
+\end{eg}
+
+Note that given any proof tree, we can produce some $\lambda$ expression representing the proof rather systematically. However, given any $\lambda$ expression, it is difficult to figure out what it is a proof of, or if it represents a proof at all. For example, if we write down
+\[
+  \lambda x. xx,
+\]
+then we have no idea what this can possibly mean.
+
+The problem is that we don't know what formula, or \emph{type} each variable is representing. The expression
+\[
+  \lambda f. \lambda x. f (f x)
+\]
+is confusing, because we need to guess that $x$ is probably just some arbitrary variable of type $A$, and that $f$ is probably a function $A \to A$. Instead, we can make these types explicit:
+\[
+  \lambda f_{A \to A}. \lambda x_A. f_{A \to A} (f_{A \to A} x_A).
+\]
+Given such a term, we can systematically deduce that it is of type $(A \to A) \to (A \to A)$, ie. it encodes a proof of $(A \to A) \to (A \to A)$. Such an expression with explicit types is known as a \term{typed $\lambda$ term}\index{typed lambda term}, and one without types is known as an \term{untyped $\lambda$ term}\index{untyped lambda term}.
+
+Moreover, it is also straightforward to reconstruct the proof tree from this expression. Of course, we need to make sure the typing of the expression is valid. For example, we cannot write
+\[
+  f_{A \to A} x_B,
+\]
+since $f$ is not a function from $B$. Assuming we restrict to these valid terms, we have established a correspondence
+\begin{significant}
+  Proofs in propositional natural deduction are in a $1$-to-$1$ correspondence with typed $\lambda$ terms.
+\end{significant}
+That is, if we also make it clear what the rules for $\vee$ are.
+
+Finally, what about $\bot$? To what set does the proposition $\bot$ correspond? The proposition $\bot$ should have \emph{no} proofs. So we would think $\bot$ should correspond to $\emptyset$.
+
+In propositional calculus, the defining property of $\bot$ is that we can prove any proposition we like from $\bot$. Indeed, the empty set is a set that admits a function to any set $X$ whatsoever, and in fact this function can be uniformly defined for all sets, by the empty function. We again see that the ideas of propositional calculus correspond nicely with the properties of sets.
+
+\begin{eg}
+  Consider the law of excluded middle:
+  \[
+    ((A \to \bot) \to \bot) \to A.
+  \]
+  Can we write down a $\lambda$ expressions for this?
+
+  We will argue rather informally. If there is a $\lambda$ expression of this type, then it should define the function ``uniformly'' without regards to what $A$ is about. We now see what this function could be.
+  \begin{itemize}
+    \item If $A$ is empty, then $A \to \bot$ contains exactly the empty function. So $(A\to \bot) \to \bot$ is the empty set, since there is no function from a non-empty set to the empty set. And there is a function $\emptyset \to A$, namely the empty function again.
+    \item If $A$ is non-empty, then $A \to \bot$ contains no functions, so $(A \to \bot) \to \bot$ contains the empty function. So $((A \to \bot) \to \bot) \to A$ is given by exactly an element of $A$.
+  \end{itemize}
+  We see that to construct such a function, we need to first know if $A$ is empty or not. If it is non-empty, then we have to arbitrarily pick an element of $A$. Thus, there is no way we can uniformly construct such a function without knowing anything about $A$.
+\end{eg}
+
+\begin{prop}
+  We cannot prove $((A \to B) \to A) \to A$ in natural deduction without the law of excluded middle.
+\end{prop}
+
+\begin{proof}
+  Suppose there were a lambda term of type $((A \to B) \to A) \to A$.
+  
+  We pick
+  \[
+    B = \{0, 1\}, \quad A = \{0, 1, 2, 3, 4\}.
+  \]
+  In this setting, any function $f: A \to B$ identifies a distinguished member of $B$, namely the one that is hit by more members of $A$. We know $B \subseteq A$, so this is  an element in $A$. So we have a function $(A \to B) \to A$. If we really had a lambda term $((A \to B) \to A) \to A$, then it would give us a member of $A$.
+
+  % to be completed later
+\end{proof}
+
+\subsection{Possible world semantics}
+For classical logic, semantics was easy. We had a collection of propositions $P$, and a model is just a function $P \to \{\top, \bot\}$. We can then define truth in this model recursively in the obvious way.
+
+It turns out to get a sensible model theory of constructive logic, we need to consider \emph{many} such objects.
+
+\begin{defi}[Possible world semantics]\index{possible world semantics}
+  Let $P$ be a collection of propositions. A \term{world}\index{possible world semantics!world} is a subset $w \subseteq P$. A \term{model}\index{possible world semantics!model} is a collection $W$ of worlds, and a partial order $\geq$ on $W$ called \term{accessibility}\index{possible world semantics!accessibility}, satisfying the \term{persistence}\index{possible world semantics!persistence} property:
+  \begin{itemize}
+    \item If $p \in P$ is such that $p \in w$ and $w' \geq w$, then $p \in w'$.
+  \end{itemize}
+  Given any proposition $\varphi$, we define the relation $w \vDash \varphi$ by
+  \begin{itemize}
+    \item $w \not\vDash \bot$
+    \item If $\varphi$ is \emph{atomic} (and not $\bot$), then then $w \vDash \varphi$ iff $\varphi \in w$.
+    \item $w \vDash \varphi \wedge \psi$ iff $w \vDash \varphi$ and $w \vDash \psi$.
+    \item $w \vDash \varphi \vee \psi$ iff $w \vDash \varphi$ or $w \vDash \psi$.
+    \item $w \vDash \varphi \to \psi$ iff (for all $w' \geq w$, if $w' \vDash \varphi$, then $w' \vDash \psi$).
+  \end{itemize}
+  We will say that $w$ ``believes'' $\varphi$ if $w \vDash \varphi$, and that $w$ ``sees'' $w'$ if $w'' \geq w$.
+\end{defi}
+All but the last rule are obvious. The idea is that each world can have some beliefs, namely the subset $w \subseteq p$. The important idea is that if a world $w$ does not believe in $p$, it does not mean it believes that $p$ is false. It just that $w$ remains ignorant about whether $p$ is true.
+
+Now we have $w' \geq w$ if $w'$ a more knowledgable version of $w$ that has more beliefs. Alternatively, $w'$ is a world whose beliefs are compatible with that of $w$. It is easy to show by induction that if $\varphi$ is \emph{any formula} that $w$ believes, and $w' \geq w$, then $w'$ also believes in $\varphi$. Then we can interpret the law of implication as saying ``$w$ believes that $p \to q$ iff for any possible thinkable world where $p$ is true, then $q$ is also true''.
+
+Note that if we only have one world, then we recover models of classical logic.
+
+What happens to negation? By definition, we have $w \vDash \neg A$ iff $w \vDash A \to \bot$. Expanding the definition, believing that $\neg A$ means there is no possible world compatible with $w$ in which $A$ is true. This is much stronger than just saying $w \not\vDash A$, which just says we do not hold any opinion on whether $A$ is true.
+
+\begin{eg}
+  We want to construct a world $w$ where $w \not \vDash A\vee \neg A$. So we need a $W$ such that $w$ neither believes $A$ nor believes $\neg A$.
+
+  We can achieve the former by just making the world not believe in $A$. To make the world not believe $\neg A$, it needs to be able to see a world $w'$ such that $w' \vDash A$. So we can consider the following world:
+  \begin{center}
+    \begin{tikzpicture}
+      \node [mstate] (1) at (0, 0) {$w'$};
+      \node [right=10pt] at (1) {$\vDash A$};
+
+      \node [mstate] (2) at (0, -2) {$w$};
+      \node [right=10pt] at (2) {$\not\vDash A$};
+
+      \draw (1) edge (2);
+    \end{tikzpicture}
+  \end{center}
+\end{eg}
+
+\begin{eg}
+  This time consider the statement $w \vDash \neg \neg A \to A$. This takes some work to unravel.
+
+  We need a world $w$ such that for all $w' \geq w$, if $w' \vDash \neg \neg A$, then $w' \vDash A$. If we unravel a bit more, we find that $w' \vDash \neg \neg A$ means for any $w'' \geq w'$, we can find some $w''' \geq w''$ such that $w''' \vDash A$.
+
+  It is easy to see that actually in the model of the previous question, $w \not\vDash \neg \neg A \to A$, since $w \vDash \neg \neg A$, but $w \not\vDash A$.
+\end{eg}
+
+\begin{eg}
+  The following model is a counter-model for $\neg \neg A \vee \neg A$:
+  \begin{center}
+    \begin{tikzpicture}
+      \node [mstate] (b) at (0, 0) {};
+      \node [right=10pt] at (b) {$\not\vDash A$};
+
+      \node [mstate, above right=of b] (r) {};
+      \node [right=10pt] at (r) {$\vDash A$};
+
+      \node [mstate, above left=of b] (l) {};
+      \node [right=10pt] at (l) {$\not\vDash A$};
+
+      \draw (b) edge (r);
+      \draw (b) edge (l);
+    \end{tikzpicture}
+  \end{center}
+  where the bottom world believes in neither $\neg \neg A$ nor $\neg A$, since it sees worlds where $\neg A$ is true and also worlds where $A$ is true.
+\end{eg}
+
+Usually, we don't talk about a particular world believing in something. We talk about an entire structure of possible worlds believing something.
+\begin{notation}
+  If our model of possible world semantics has a minimum element $w$ under $\geq$, we call it the \term{root world}, and we write
+  \[
+    \vDash \varphi \Longleftrightarrow w \vDash \varphi.
+  \]
+\end{notation}
+Clearly, if $\vDash \varphi$, then for any world $w'$, we have $w' \vDash \varphi$.
+
+\begin{ex}
+  Find a possible world model that does not believe Peirce's law.
+\end{ex}
+
+One can readily verify that classically, we have $(A \to B) \to B$ is equivalent to $A \vee B$, but they are not constructively equivalent.
+\begin{ex}
+  Find a possible world model that $\vDash (A \to B) \to B$, but does not $\vDash A \vee B$.
+\end{ex}
+
+\begin{ex}
+  Find a possible world model that $\vDash (A \to B) \to B$ but does not believe $\vDash (B \to A) \to A$.
+\end{ex}
+
+\begin{ex}
+  Find a possible world model that does not believe in $\vDash (A \to B) \vee (B \to A)$.
+\end{ex}
+
+Possible world semantics can be used for all sorts of logical systems, not just propositional logic. In general, the notion of accessibility need not be a partial order, but can be anything we want. And we need to modify the according notion of a world.
+
+\begin{eg}
+  If we want to produce possible world semantics for constructive first-order logic, we need to modify our definition of worlds so that they have ``elements''. Assuming we have done so, we can encode $\forall$ and $\exists$ using the following rules:
+  \begin{itemize}
+    \item $w \vDash \exists x, F(x)$ if there is some $y \in w$ for which $w \vDash F(y)$.
+    \item $w \vDash \forall x, F(x)$ if for all $w' \geq w$ and $x \in w'$, we have $w' \vDash F(x)$.
+  \end{itemize}
+  The second condition is much stronger than the naive ``for all $x \in w$, we have $w \vDash F(x)$'', because the $w'' \geq w$ may have many more elements. What our condition say is that $w$ somehow has a ``global'' way of showing that everything satisfies $F$.
+\end{eg}
 
 \printindex
 \end{document}
