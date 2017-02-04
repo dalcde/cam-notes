@@ -831,6 +831,8 @@ It turns out to get a sensible model theory of constructive logic, we need to co
     \item $w \vDash \varphi \to \psi$ iff (for all $w' \geq w$, if $w' \vDash \varphi$, then $w' \vDash \psi$).
   \end{itemize}
   We will say that $w$ ``believes'' $\varphi$ if $w \vDash \varphi$, and that $w$ ``sees'' $w'$ if $w'' \geq w$.
+
+  We also require that there is a designated minimum element under $\leq$, known as the \term{root world}. We can think of a possible world model as a poset decorated with worlds, and such a poset is called a \term{frame}. % replace poset with quasi-order, remove comment later on
 \end{defi}
 All but the last rule are obvious. The idea is that each world can have some beliefs, namely the subset $w \subseteq p$. The important idea is that if a world $w$ does not believe in $p$, it does not mean it believes that $p$ is false. It just that $w$ remains ignorant about whether $p$ is true.
 
@@ -887,12 +889,12 @@ What happens to negation? By definition, we have $w \vDash \neg A$ iff $w \vDash
 
 Usually, we don't talk about a particular world believing in something. We talk about an entire structure of possible worlds believing something.
 \begin{notation}
-  If our model of possible world semantics has a minimum element $w$ under $\geq$, we call it the \term{root world}, and we write
+  If the root world of our model is $w$, then we write
   \[
     \vDash \varphi \Longleftrightarrow w \vDash \varphi.
   \]
 \end{notation}
-Clearly, if $\vDash \varphi$, then for any world $w'$, we have $w' \vDash \varphi$.
+Almost by definition, if $\vDash \varphi$, then for any world $w'$, we have $w' \vDash \varphi$.
 
 \begin{ex}
   Find a possible world model that does not believe Peirce's law.
@@ -911,7 +913,7 @@ One can readily verify that classically, we have $(A \to B) \to B$ is equivalent
   Find a possible world model that does not believe in $\vDash (A \to B) \vee (B \to A)$.
 \end{ex}
 
-Possible world semantics can be used for all sorts of logical systems, not just propositional logic. In general, the notion of accessibility need not be a partial order, but can be anything we want. And we need to modify the according notion of a world.
+Possible world semantics can be used for all sorts of logical systems, not just propositional logic. In general, the notion of accessibility need not be a partial order, but can be anything we want. Also, we do not necessarily have to require persistence. Of course, we also need to modify the according notion of a world.
 
 \begin{eg}
   If we want to produce possible world semantics for constructive first-order logic, we need to modify our definition of worlds so that they have ``elements''. Assuming we have done so, we can encode $\forall$ and $\exists$ using the following rules:
@@ -922,5 +924,192 @@ Possible world semantics can be used for all sorts of logical systems, not just 
   The second condition is much stronger than the naive ``for all $x \in w$, we have $w \vDash F(x)$'', because the $w'' \geq w$ may have many more elements. What our condition say is that $w$ somehow has a ``global'' way of showing that everything satisfies $F$.
 \end{eg}
 
+Let's talk a bit about persistence of formulae. We $\varphi$ is persistent iff $w \vDash\varphi$, $w' \geq w$ implies $w' \vDash \varphi$. By definition, all atomic formulae are persistent by stipulation. We can prove by induction that all formulae are persistent. This is just a massive yet easy proof by cases, and we will not do so.
+
+\begin{eg}
+  The proposition $A \to \neg \neg A$ is valid all possible world models.
+
+  % To see this, we note that if we have a world $w$ that believes in $A$, then by persistence, any world that $A$ sees also believes in $A$. We want to show that it does not believe in $\neg A$. % complete proof, make use of reflexivity and transitivity
+\end{eg}
+
+% insert talk about finiteness of possible world models, therefore decidable.
+
+Now suppose we have a possible world model in front of us. Then given a formula $\varphi$, the set of worlds that believe $\varphi$ is an upward-closed subset of the frame. So we can think of the truth value of $\varphi$ as these upward-closed set.
+\begin{eg}
+  Suppose we have the following worlds:
+  \begin{center}
+    \begin{tikzpicture}
+      \node [mstate] (1) at (0, 0) {$w_2$};
+      \node [right=10pt] at (1) {$A$};
+
+      \node [mstate] (2) at (0, -2) {$w_1$};
+
+      \draw (1) edge (2);
+    \end{tikzpicture}
+  \end{center}
+  So the top world only believes $A$, and the root world doesn't believe anything. The possible truth values are
+  \[
+    \emptyset, \{w_2\}, \{w_1, w_2\}.
+  \]
+  This is indeed the three-valued algebra we used to disprove Peirce's law. % check
+\end{eg}
+What can we say about the collection of upward-closed subset of frames, ie. our truth values? Under inclusion, it is easy to see that these are complete and co-complete, ie. we have all infinite unions and intersections.
+\begin{defi}[Heyting algebra]\index{Heyting algebra}
+  A Heyting algebra is a complete poset with joins $\wedge$ and $\vee$ and an operator $\to$ such that $A \Rightarrow B$ is the largest $C$ such that
+  \[
+    C \wedge A \leq B.
+  \]
+\end{defi}
+We would expect
+\[
+  A \Rightarrow B = \vee \{C : C \wedge A \leq B\}.
+\]
+The only thing we need to check is that this choice of $A \Rightarrow B$ does indeed satisfy $(A \Rightarrow B) \wedge A \leq B$. % fix this!
+
+The thought is that Heyting algebras would ``validate'' all constructive theses, by interpreting $\wedge$ with $\wedge$, $\vee$ with $\vee$ and $\rightarrow$ with $\Rightarrow$.
+
+In other words, if we try to build a truth table for a formula with values in a Heyting algebra, we will get the top element $\top$ all the time iff the formula is constructively valid. So we have a parallel between the relation between classical logic and boolean algebras, and constructive logic and Heyting algebras.
+
+Note that in classical logic, we only ever use the two-element boolean algebra. If we use the 4-element Boolean algebra, then we would detect the same set of tautologies. However, in the case of constructive logic we genuinely need all Heyting algebras.
+
+\begin{lemma}
+  Any formula with a natural deduction proof not using the rule for classical negation is true in all possible world models.
+\end{lemma}
+For any frame $F$, every such formula is satisfied by every possible world model on that frame. We say it is \emph{valid on $F$}. Such formulae are valid on all quasi-ordered sets with a bottom element.
+
+\begin{proof}
+  The hard case is implication. Suppose we have a natural deduction proof of $A \to B$. The last rule is a $\to$-introduction. So by the induction hypothesis, every world that believes $A$ also believes $B$. Now let $w$ be a world that believes all the other undischarged assumptions in $A \to B$. By persistence, every $w' \geq w$ believes similarly. So any $w' \geq w$ that believes $A$ also believes $B$. So $w \vDash A \to B$.
+\end{proof}
+
+\subsection{Negative interpretation}
+Suppose a constructive logician found a classical logician, and then they try to talk to each other. Then they would find that they disagree on a lot of things. The classical logician has no problems accepting $\neg \neg A \to A$, but the constructive logician thinks that is nonsense. Can they make sense of each other?
+
+The classical logician can understand the constructive logician via possible world semantics. He could think that when the constructive logician says a proposition is false, they mean there are possible world models where the proposition fails. This is all fine.
+
+But can a constructive logician make sense of the classical logician? When the constructivist sees $A \vee B$, he thinks that either we can prove $A$, or we can prove $B$. However, the classical logician views this as a much weaker statement. It is more a long the lines of ``it is not true that $A$ and $B$ are both false''. In general, we can try to interpret classical statements by putting in enough negations:
+\begin{center}
+  \begin{tabular}{cc}
+    \toprule
+    Classical proposition & Constructive interpretation\\
+    \midrule
+    $A \vee B$ & $\neg (\neg A \vee \neg B)$\\
+    $A \wedge B$& $A \wedge B$\\
+    $\exists x\; W(x)$ & $\neg \forall x \neg W(x)$\\
+    $A \to B$ & $\neg (A \wedge \neg B)$\\
+    \bottomrule
+  \end{tabular}
+\end{center}
+This gives rise to the \emph{negative interpretation} of classical logic into constructive logic, due to G\"odel:
+\begin{defi}[Negative interpretation]\index{negative interpretation}
+  Given a proposition $\phi$, the interpretation $\phi^*$ is defined recursively by
+  \begin{itemize}
+    \item $\bot^* = \bot$.
+    \item If $\varphi$ is atomic, then $\varphi^* = \neg\neg \varphi$.
+    \item If $\varphi$ is negatomic, then $\varphi^* = \varphi$.
+    \item If $\varphi = \psi \wedge \theta$, then $\varphi^* = \psi^* \wedge \theta^*$.
+    \item If $\varphi = \psi \vee \theta$, then $\varphi^* = \neg (\neg \psi^* \wedge \neg \theta^*)$.
+    \item If $\varphi = \forall x\; \psi(x)$, then $(\forall x)(\psi^*(x))$.
+    \item If $\varphi = \psi \to \theta$, then $\varphi^* = \neg(\psi^* \wedge \neg \theta^*)$.
+    \item If $\varphi = \exists \; \psi(x)$, then $\varphi^* = \neg \forall x \neg \psi^*(x)$.
+  \end{itemize}
+\end{defi}
+One can check that we always have $\vdash \varphi \to \varphi^*$. So the constructive version is always stronger.
+
+\begin{defi}[Stable formula]\index{stable formula}
+  A formula is \emph{stable} if
+  \[
+    \vdash \varphi^* \to \varphi.
+  \]
+\end{defi}
+
+\begin{lemma}
+  Any formula built up from negated and doubly negated atomics by $\neg$, $\wedge$ and $\forall$ is stable.
+\end{lemma}
+
+\begin{proof}
+  By induction on formulae. The base case is immediate, using the fact that $\neg \neg \neg A \to \neg A$. More generally, we have
+  \[
+    (((p \to q) \to q) \to q) \to p \to q.
+  \]
+  It is less confusing to prove this in two steps, and we will write $\lambda$-terms for our proofs. First note that if we have $f: A \to B$, then we can obtain $f^T: (B \to q) \to A \to q$ for any $q$,  using
+  \[
+    f^T = \lambda g_{B \to q}. \lambda a_A: g(f(a)).
+  \]
+  So it suffices to prove that
+  \[
+    p \to (p \to q) \to q,
+  \]
+  and the corresponding term is
+  \[
+    \lambda x_p. \lambda g_{p \to q}. g x
+  \]
+  We now proceed by induction.
+  \begin{itemize}
+    \item Now assume that we have proofs of $\neg \neg p \to p$ and $\neg \neg q \to q$. We want to prove $p \wedge q$ from $\neg \neg (p \wedge q)$. It suffices to prove $\neg \neg p$ and $\neg \neg q$ form $\neg \neg (p \wedge q)$, and we will just do the first one by symmetry.
+
+      We suppose $\neg p$. Then we know $\neg (p \wedge q)$. But we know $\neg \neg (p \wedge q)$. So we obtain a contradiction. So we have proved that $\neg \neg p$.
+    \item Note that we have
+      \[
+        \vdash \exists x \neg \neg \varphi(x) \to \neg \neg \exists x \varphi(x),
+      \]
+      but not the other way round. For universal quantification, we have
+      \[
+        \neg \neg \forall x \varphi(x) \to \forall x \neg \neg \varphi(x),
+      \]
+      but not the other way round. We can construct a proof as follows:
+      \begin{prooftree}
+        \AxiomC{$[\forall x) \varphi(x)]^1$}
+        \elim{$\forall$}
+        \UnaryInfC{$\varphi(a)$}
+        \AxiomC{$[\neg \varphi(x)]^2$}
+        \elim{$\to$}
+        \BinaryInfC{$\to$}
+        \intron{$\to$}{1}
+        \UnaryInfC{$\neg \forall x \varphi(x)$}
+        \AxiomC{$[\neg \neg \forall x \varphi(x)]^3$}
+        \elim{$\to$}
+        \BinaryInfC{$\bot$}
+        \intron{$\to$}{2}
+        \UnaryInfC{$\neg \neg \varphi(a)$}
+        \intro{$\forall$}
+        \UnaryInfC{$\neg \neg \forall \varphi(x)$}
+        \intron{$\to$}{3}
+        \UnaryInfC{$\neg \neg \forall x F(x) \to \forall x \neg \neg F(x)$}
+      \end{prooftree}
+      We now want to show that if $\varphi$ is stable, then $\forall x \varphi(x)$ is stable. In other words, we want
+      \[
+        \neg \neg \forall x \varphi^*(x) \to \forall x \varphi^*(x).
+      \]
+      But form $\neg \neg \forall x \varphi^*(x)$, we can deduce $\forall x \neg \neg \varphi^*(x)$, which implies $\forall x \varphi^* (x)$.
+  \end{itemize}
+  So every formula in the range of the negative interpretation is stable. Every stable formula is equivalent to its double negation (classically). Every formula is classically equivalent to a stable formula.
+\end{proof}
+So if a constructive logician meets a classical logician who is making some bizarre assertions about first order logic. To make sense of this, the constructive logician can translate it to its negative interpretation, which the classical logician thinks is equivalent to the original one. And now these interpretations follow the law of excluded middle.
+
+\subsection{Constructive mathematics}
+We now want to try to do mathematics constructively. We note that even classically, if we do not have the law of excluded middle, then we have many distinct notions of ``finite set''. When we go constructive, things get more complicated.
+
+We look at several possible definitions of finite sets.
+\begin{defi}[Kuratowski finite]\index{Kuratowski finite}\index{finite!Kuratowski}
+  We define ``finite'' recursively: $\emptyset$ is Kuratowski finite. If $x$ is Kuratowski finite, then so is $x \cup \{y\}$.
+\end{defi}
+
+There is a separate definition of $N$-finiteness:
+\begin{defi}[$N$-finite]\index{$N$-finite}\index{finite!$N$}
+  $\emptyset$ is $N$-finite. If $x$ is $N$-finite, and $y \not \in x$, then $x \cup \{y\}$ is $N$-finite.
+\end{defi}
+These two definitions are not the same! In a $N$-finite set, we know any two things are either equal, or they are not, as this is built into the definition of an $N$-finite set. However, in the case of Kuratowski finite, this is not true, since we don't have the law of exlcuded middle. We say $N$-finite sets have \term{decidable equality}.
+If we want to do constructive arithmetic, the correct notion is $N$-finiteness.
+
+We can still define natural numbers as the smallest set containing $\emptyset$ and is closed under successor. This gives us $N$-finite sets, but the least number principle is dodgy. It turns out the least number principle implies excluded middle.
+
+It is helpful to note the following two definitions:
+\begin{defi}[Non-empty set]\index{non-empty set}
+  A set $x$ is non-empty if $\neg (\forall y)(y \not \in x)$.
+\end{defi}
+
+\begin{defi}[Inhabited set]\index{inhabited set}
+  A set $x$ is inhabited if $(\exists y)(y \in x)$.
+\end{defi}
 \printindex
 \end{document}

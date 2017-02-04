@@ -5,7 +5,7 @@
 \def\nyear {2017}
 \def\nlecturer {B. P. Narayanan}
 \def\ncourse {Ramsey Theory}
-\def\ncourse {TT.9}
+\def\nlectures {TT.9}
 
 \input{header}
 
@@ -394,7 +394,7 @@ There is a generalization of this to $r$-sets. One way we can rewrite the theore
 
 \begin{thm}[Higher dimensional canonical Ramsey theorem]\index{higher dimensional canonical Ramsey theorem}\index{canonical Ramsey theorem!!higher dimensional}\index{Ramsey theorem!higher dimensional, canonical}
   Let $c: \N^{(r)} \to \N$ be a colouring. Then there exists $D \subseteq [r]$ and an infinite subset $X \subseteq \N$ such that for all $x \not= y \in X^{(r)}$, we have $c(x) = c(y)$ iff $\{i: x_i = y_i\} = D$, where $x = \{x_1 < x_2 < \cdots < x_r\}$ (and similarly for $y$).
-\end{thm} % this may be wrong
+\end{thm}
 
 \subsection{Finite graphs}
 We will usually restrict to $2$ colours. Everything we say will either be trivially be generalizable to more colours, or we have no idea how to do so. It is an exercise for the reader to figure out which it is.
@@ -470,7 +470,7 @@ By Tychonoff theorem, we know this is compact, and we can deduce the theorem fro
 The problem with these proofs is that they are completely non-constructive. The proof gives us no bound on $R(n)$ whatsoever.
 
 To obtain a bound, we can mimic the proof of the infinite Ramsey theorem. To do so, it is convenient to consider the following generalization of the Ramsey number: % we might have found a lot of blue things, and we want a big red or small blue.
-\begin{defi}[Ramsey number]\index{Ramsey number}\index{$R(n, m)$}\index{$R(K_n, K_m)$}
+\begin{defi}[Off-diagonal Ramsey number]\index{off-diagonal Ramsey number}\index{Ramsey number!off-diagonal}\index{$R(n, m)$}\index{$R(K_n, K_m)$}
   We define $R(n, m) = R(K_n, K_m)$ to be the minimum $N \in \N$ such that whenever we red-blue colour the edges of $K_N$, we either get a red $K_n$ or a blue $K_m$.
 \end{defi}
 
@@ -540,7 +540,136 @@ The proof is remarkable in that before this was shown, we had no sensible bound 
 
   Similarly, we have $[X_B] < \frac{1}{2}$. So the expected number of monochromatic $K_n$ is $< 1$. So in particular there must be some colouring with no monochromatic $K_n$.
 \end{proof}
+
+Recall the bound
+\[
+  R(m, n) \leq \binom{m + n - 2}{m - 1}.
+\]
+If we think of $m$ as being fixed, then this tells us
+\[
+  R(m, n) \sim (n + m)^{m - 1}.
+\]
+For example, if $m$ is $3$, then we have
+\[
+  R(3, n) \leq \binom{n + !}{2} = \frac{n(n + 1)}{2} \sim n^2.
+\]
+We can sort-of imagine where this bound came from. Suppose we randomly pick a vertex $v_1$. Then if it is connected to at least $n$ other vertices by a red edge, then we are done --- if there is even one red edge among those $n$ things, then we have a red triangle. Otherwise, all edges are blue, and we've found a complete blue $K_n$.
+
+So this is connected to at most $n - 1$ things by a red edge. So if our graph is big enough, we can pick some $v_2$ connected to $v_1$ by a blue edge, and do the same thing to $v_2$. We keep going on, and by the time we reach $v_n$, we would have found $v_1, \cdots, v_n$ all connected to each other by blue edges, and we are done. So we have $K(3, n) \sim n^2$.
+
+But this argument is rather weak, because we didn't use that large pool of blue edges we've found at $v_1$. So in fact this time we can do better than $n^2$.
+\begin{thm}
+  We have
+  \[
+    R(3, n) \leq \frac{100 n^2}{\log n}
+  \]
+  for sufficiently large $n \in \N$.
+\end{thm}
+Here the $100$ is, obviously, just some random big number.
+
+\begin{proof}
+  Let $N \geq 100n^2/\log n$, and consider a red-blue colouring of the edges of $K_N$ with no red $K_3$. We want to find a blue $K_n$ in such a colouring.
+
+  We may assume that
+  \begin{enumerate}
+    \item No vertex $v$ has $ \geq n$ red edges incident to it, as argued just now.
+    \item If we have $v_1, v_2, v_3$ such that $v_1v_2$ and $v_1 v_3$ are red, then $v_2 v_3$ is blue:
+      \begin{center}
+        \begin{tikzpicture}
+          \node [circ] at (0, 0) {};
+          \node [circ] at (2, 0) {};
+          \node [circ] at (1, 1.732) {};
+          \draw [mred] (2, 0) -- (0, 0) -- (1, 1.732);
+          \draw (1, 1.732) -- (2, 0);
+
+          \node [left] at (0, 0) {$v_1$};
+          \node [above] at (1, 1.732) {$v_2$};
+          \node [right] at (2, 0) {$v_3$};
+        \end{tikzpicture}
+      \end{center}
+  \end{enumerate}
+  We now let
+  \[
+    \mathcal{F} = \{\mathcal{U} : \mathcal{U} \subseteq V(K_N)\text{ such that }\mathcal{U}^{(2)} \text{ is monochromatic and blue}\}.
+  \]
+  We want to find some $\mathcal{U} \in \mathcal{F}$ such that $|\mathcal{U}| \geq n$, ie. a blue $K_n$. How can we go about finding this? 
+
+  Let $W$ be a uniformly random member of $\mathcal{F}$. We will be done if we can show that that $\E[|W|] \geq n$.
+
+  We are going to define a bunch of random variables. For each vertex $v \in V(K_N)$, we define the variable
+  \[
+    X_v = n \mathbf{1}_{\{v \in W\}} + |\{u: uv\text{ is red and }u \in W\}|.
+  \]
+  \begin{claim}
+   \[
+    \E[X_v] > \frac{\log n}{10}
+  \]
+  for each vertex $v$.   
+  \end{claim}
+  To see this, let
+  \[
+    A = \{u: uv \text{ is red}\}
+  \]
+  and let
+  \[
+    B = \{u: uv \text{ is blue}\}.
+  \]
+  then from the properties we've noted down, we know that $|A| < n$ and $A^{(2)}$ is blue. So we know very well what is happening in $A$, and nothing about what is in $B$.
+
+  We fix a set $\mathcal{S} \subseteq B$ such that $\mathcal{S} \in \mathcal{F}$, ie. $\mathcal{S}^{(2)}$ is blue. What can we say about $W$ if we condition on $B \cap W = S$?
+
+  Let $T \subseteq A$ be the set of vertices that are joined to $S$ only by blue edges. Write $|T| = x$. Then if $B \cap W = S$, then either $W \subseteq S \cup T$, or $W \subseteq S \cup \{v\}$. So there are exactly $2^x + 1$ choices of $W$. So we know
+  \begin{align*}
+    \E[X_v \mid W \cap B = S] &\geq \frac{n}{2^x + 1} + \frac{2^x}{2^x + 1}(\E[\text{random subset of T}])\\
+    &= \frac{n}{2^x + 1} + \frac{2^{x - 1}x}{2^x + 1}.
+  \end{align*}
+  Now if
+  \[
+    x < \frac{\log n}{2},
+  \]
+  then
+  \[
+    \frac{n}{2^x + 1} \geq \frac{n}{\sqrt{n} + 1} \geq \frac{\log n}{10}
+  \]
+  for all sufficiently large $n$. On the other hand, if 
+  \[
+    x \geq \frac{\log n}{2},
+  \]
+  then 
+  \[
+    \frac{2^{x - 1}x}{2^x + 1} \geq \frac{1}{4} \cdot \frac{\log n}{2} \geq \frac{\log n}{10}.
+  \]
+  So we are done.
+
+  \begin{claim}
+    \[
+      \sum_{v \in V} X_v \leq 2n |W|.
+    \]
+  \end{claim}
+  To see this, for each vertex $v$, we know that if $v \in W$, then it contributes $n$ to the sum via the first term. Also, by our initial observation, we know that $v \in W$ has at most $n$ neighbours. So it contributes at most $n$ to the second term (acting as the ``$u$''). So finally, we know that
+  \[
+    \E[|W|] \geq \frac{1}{2n} \sum \E[X_V] \geq \frac{N}{2n} \frac{\log n}{10} \geq \frac{100n^2}{\log n} \cdot \frac{\log n}{20 n} \geq 5n.
+  \]
+  Therefore we can always find some $\mathcal{U} \in \mathcal{F}$ such that $|\mathcal{U}| \geq n$.
+\end{proof}
+
+Now of course, there is the following obvious generalization of Ramsey numbers:
+\begin{defi}[$R(G, H)$]\index{$R(G, H)$}
+  Let $G, H$ be graphs. Then we define $R(G, H)$ to be the smallest $N$ such that any red-blue colouring of $K_N$ has either a red copy of $G$ or a blue copy of $H$.
+\end{defi}
+Obviously, we have $R(G, H) \leq R(|G|, |H|)$. So the natural question is if we can do better than that.
+
+\begin{ex}
+  Show that
+  \[
+    R(P_n. P_n) \leq 2n.
+  \]
+\end{ex}
+So sometimes it cna be much better.
+
 \section{Ramsey theory on the integers}
+
+
 \section{Partition Regularity}
 \section{Topological Dynamics}
 

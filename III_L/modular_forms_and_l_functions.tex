@@ -584,5 +584,315 @@ The proof is again just do it.
 \end{proof}
 We will use this to prove a \emph{functional equation} relating $\zeta(s)$ and $\zeta(1 - s)$.
 
+We notice that most of the time, when we talk about the $\Gamma$-function, there are factors of $\pi$ floating around. So we can conveniently set
+\begin{notation}\index{$\Gamma_\R(s)$}\index{$\Gamma_\C(s)$}
+  \begin{align*}
+    \Gamma_\R(s) &= \pi^{-s/2} \Gamma(s/2).\\
+    \Gamma_\C(s) &= 2 (2\pi)^{-s} \Gamma(s)
+  \end{align*}
+  These are the real/complex \term{$\Gamma$-factors}\index{Gamma-functions}
+\end{notation}
+
+We now prove a functional equation for the $\Theta$-function. Recall that we had the function
+\[
+  \vartheta(z) = \sum_{n \in \Z} e^{\pi i n^2 z}.
+\]
+for $\Im(z) > 0$. Then
+\begin{thm}[Functional equation for $\Theta$-function]
+  \[
+    \vartheta \left(-\frac{1}{z}\right) = \left(\frac{z}{i}\right)^{1/2} \vartheta(z).
+  \]
+  Here we take the branch of $\sqrt{\;}$ which is positive for $z = iy$, $y > 0$.
+
+  So in particular,
+  \[
+    \Theta\left(\frac{1}{y}\right) = y^{1/2} \Theta(y)\tag{$*$}
+  \]
+  if $y > 0$, and this is the positive square root.
+\end{thm}
+
+The proof is rather magical.
+\begin{proof}
+  By analytic continuation, it suffices to prove this for $(*)$. Let
+  \[
+    g_t(x) = e^{-\pi t x^2} = g_1(t^{1/2} x).
+  \]
+  In particular,
+  \[
+    g_1(x) = e^{-\pi x^2}.
+  \]
+  Now recall that $\hat{g}_1 = g_1$. Moreover, the Fourier transform of $f(\alpha x)$ is $\frac{1}{\alpha} \hat{f}(y/\alpha)$. So
+  \[
+    \hat{g}_t(y) = t^{-1/2} \hat{g}_1(y t^{-1/2})  = t^{-1/2} g_1(y t^{-1/2}) = t^{-1/2} e^{-\pi y^2/t}.
+  \]
+  We now apply the Poisson summation formula:
+  \[
+    \Theta(t) = \sum_{n \in \Z} e^{-\pi n^2 t} = \sum_{n \in \Z} \hat{g}_t(n) = \sum_{n \in \Z} \hat{g}_t(n) = t^{-1/2} \Theta(1/t).
+  \]
+\end{proof}
+
+\begin{thm}[Functional equation for $\zeta$-function]
+  \[
+    Z(s) = \Gamma_\R(s) \zeta(s) = \pi^{-s/2} \Gamma\left(\frac{s}{2}\right) \zeta(s) = Z(1 - s),
+  \]
+  and $Z(s)$ is meromorphic, with only poles at $s = 1$ and $0$.
+\end{thm}
+
+\begin{proof}
+  For $\Re(s) > 1$, we have
+  \begin{align*}
+    2Z(s) &= M(\Theta(y) - 1, s/2) \\
+    &= \int_0^\infty [\Theta(y) - 1] y^{s/2} \frac{\d y}{y}\\
+    &= \left(\int_0^1 + \int_1^\infty\right)[\Theta(y) - 1] y^{s/2} \frac{\d y}{y}\\
+  \end{align*}
+  The idea is that using the functional equation for the $\Theta$-function, we can relate the $\int_0^1$ part adn the $\int_1^\infty$ part. We have
+  \begin{align*}
+    \int_0^1 (\Theta(y) - 1) y^{s/2} \frac{\d y}{y} &= \int_0^1 (\Theta(y) - y^{-1/2}) y^{s/2} \frac{\d y}{y} + \int_0^1 \left(y^{\frac{s - 1}{2}} - y^{/2}\right) \frac{\d y}{y}\\
+    &= \int_0^1 (y^{-1/2} \Theta(1/y) - y^{-1/2}) \frac{\d y}{y} + \frac{2}{s - 1} - \frac{2}{s}.\\
+    \intertext{On the left, we change variables $y \leftrightarrow 1/y$, and get}
+    &= \int_1^\infty y^{1/2} (\Theta(y) - 1) y^{-s/2} \frac{\d y}{y} + \frac{2}{s - 1} - \frac{2}{s}.
+  \end{align*}
+  Note that what we've done by separating out the $y^{\frac{s - 1}{2}} - y^{s/2}$ term is that we separated out the two poles of our function. So we find that
+  \[
+    2Z(s) = \int_1^\infty (\Theta(y) - 1)(y^{s/2} + y^{\frac{1 - s}{2}}) \frac{\d y}{y} + \frac{2}{s - 1} - \frac{2}{s} = 2Z(1 - s).
+  \]
+\end{proof}
+Later on, we will come across more $L$-functions, and we will prove functional equations in the same way.
+
+Note that we can write
+\[
+  Z(s) = \Gamma_\R(s) \prod_{p\text{ primes}} \frac{1}{1 - p^{-s}},
+\]
+and the term $\Gamma_\R(s)$ should be thought of as the Euler factor for $p = \infty$, ie. the Archimedean valuation on $\Q$. Now that we understand number theory, a general principle is that we should consider all of these in one go. Using this ``adelic'' approach gives $Z(s)$ directly.
+
+\section{Dirichlet \texorpdfstring{$L$}{L}-functions}
+\begin{defi}[Dirichlet characters]\index{Dirichlet character}
+  Let $N \geq 1$. A \emph{Dirichlet character} is a character (ie. group homomorphism) $\chi: (\Z/N\Z)^\times \to \C^\times$.  
+
+  In the case $N = 1$, we have
+  \[
+    \Z/N\Z = \{0 = 1\} = (\Z/N\Z)^\times,
+  \]
+  and $\chi$ is identically $1$.
+
+  As before, we write $\widehat{(\Z/n\Z)^\times}$ for the group of characters.
+\end{defi}
+
+If $\chi$ is a character mod $N$, then we have the reduction mod $N$ map
+\[
+  \begin{tikzcd}
+    (\Z/Nd\Z)^\times \ar[r, two heads] & (\Z/n\Z)^\times,
+  \end{tikzcd}
+\]
+and we can compose$\chi$ with this to get a character mod $Nd$.
+\begin{defi}[Primitive character]\index{primitive character}\index{character!primitive}
+  We say a character $\chi \in \widehat{(\Z/n\Z)^\times}$ is \emph{primitive} if there is no $M < N$ with $M \mid N$ with $\chi' \in \widehat{(\Z/M\Z)^\times}$ such that
+  \[
+    \chi = \chi' \circ (\text{reduction mod $M$}).
+  \]
+\end{defi}
+
+\begin{defi}[Equivalent characters]\index{equivalent characters}\index{characters!equivalent}
+  We say $\chi_i \in \widehat{(\Z/N_i\Z)^\times}$ for $i = 1, 2$ are \emph{equivalent} if for all $x \in \Z$ such that $(x, N_1 N_2) = 1$, we have
+  \[
+    \chi_1(x \bmod N_1) = \chi_2(x \bmod N_2).
+  \]
+\end{defi}
+It is clear that if we produce a new character from an old one via reduction mod $Nd$, then they are equivalent.
+
+\begin{prop}
+  If $\chi \in \widehat{(\Z/N\Z)^\times}$, then there exists a unique $M \mid N$ and a \emph{primitive} $\chi_* \in \widehat{(\Z/M\Z)^\times}$ that is equivalent to $\chi$.
+\end{prop}
+We will not prove this.
+
+\begin{eg}
+  Take
+  \[
+    \chi = \chi_0 \in \widehat{(\Z/N\Z)^\times},
+  \]
+  given by $\chi_0(x) \equiv 1$. If $N > 1$, then $\chi_0$ is not primitive, and the associated primitive character is the trivial character modulo $M = 11$.
+\end{eg}
+
+\begin{defi}[Conductor]\index{conductor}
+  The \emph{conductor} of a character $\chi$ is the unique $M \mid N$ and such that there is a \emph{primitive} $\chi_* \in \widehat{(\Z/M\Z)^\times}$ that is equivalent to $\chi$.
+\end{defi}
+
+\begin{defi}[Dirichlet $L$-series]\index{Dirichlet $L$-series}\index{$L(\chi, s)$}
+  Let $\chi \in \widehat{(\Z/N\Z)^\times}$ be a Dirichlet character. The \emph{Dirichlet $L$-series} of $\chi$ is
+  \[
+    L(\chi, s) = \sum_{\substack{n \geq 1\\(m, N) = 1}} \chi(n) n^{-s}.
+  \]
+\end{defi}
+Since $|\chi(n)| = 1$, we again know this is absolutely convergent for $\Re(s) > 1$.
+
+As $\chi(mn) = \chi(m)\chi(n)$ whenever $(mn, N) = 1$, we get the same Euler product as we got for the $\zeta$-function:
+\begin{prop}
+  \[
+    L(\chi, s) = \prod_{\text{prime }p \nmid N} (1 + \chi(p) p^{-s} + \chi(p^2) p^{-2s} + \cdots) = \prod_{\text{prime }p \nmid N} \frac{1}{1 - \chi(p) p^{-s}}.
+  \]
+\end{prop}
+The proof of convergence is again similar to the case of the $\zeta$-function.
+
+\begin{prop}
+  Suppose $M \mid N$ and $\chi_M \in \widehat{(\Z/M\Z)^\times}$ and $\chi_N \in \widehat{(\Z/N\Z)^\times}$ are equivalent. Then
+  \[
+    L(\chi_M, s) = \prod_{\substack{p \nmid M\\ p \mid N}} \frac{1}{1 - \chi_M(p) p^{-s}} L(\chi_N, s).
+  \]
+  In particular,
+  \[
+    \frac{L(\chi_M, s)}{ L(\chi_N, s)} = \prod_{\substack{p \nmid M\\ p \mid N}} \frac{1}{1 - \chi_M(p) p^{-s}}
+  \]
+  is analytic and non-zero for $\Re(s) > 0$.
+\end{prop}
+
+We'll next show that $L(\chi, s)$ has a meromorphic continuation to $\C$, and is analytic unless $\chi = \chi_0$.
+
+More generally, let $\phi: \Z/N\Z \to \C$ be any $N$-periodic function, and let
+\[
+  L(\phi, s) = \sum_{n = 1}^\infty \phi(n) n^{-s}.
+\]
+Then
+\[
+  (2\pi)^{-s} \Gamma(s) L(\phi,s) = \sum_{n = 1}^\infty \phi(n) M(e^{-2\pi ny}, s) = M(f(y), s),
+\]
+where
+\begin{align*}
+  f(y) &= \sum_{n \geq 1} \phi(n) e^{-2\pi n y} \\
+  &= \sum_{n = 1}^N \sum_{r = 0}^\infty \phi(n) e^{-2\pi (n + rN) y} \\
+  &= \sum_{n = 1}^N \phi(n) \frac{e^{-2\pi n y}}{1 - e^{-2 \pi n y}} \\
+  &= \sum_{n = 1}^N \phi(n) \frac{e^{2\pi (N - n) y}}{e^{2\pi Ny} - 1}.
+\end{align*}
+As $0 \leq N - n < N$, this is $O(e^{-2\pi y})$ as $y \to \infty$. Copying for $\zeta(s)$, we know $M(f, s)$ is sum of
+\[
+  M_\infty (s) = \int_1^\infty f(y) y^s \frac{\d y}{y},
+\]
+which is analytic for all $s \in \C$, and
+\[
+  M_0(s) = \int_0^1 = \sum_{n = 1}^N \phi(n) \int_0^1 \frac{e^{2\pi (N -n) y}}{ e^{2\pi Ny} - 1} y^s \frac{\d y}{y}.
+\]
+Now for any $L$, we can write
+\[
+  \frac{e^{2\pi (N - n) y}}{e^{2\pi Ny} - 1} = \frac{1}{2 \pi N y} + \sum_{r = 0}^{L - 1} c_{r, n} y^r + y^L g_{L, n}(y)
+\]
+for some $g_{L, n}(y) \in C^\infty[0, 1]$. Hence we have
+\[
+  M_0(s) = \sum_{n = 1}^N \phi(n) \left(\int_0^1 \frac{1}{2\pi N y} y^s \frac{\d y}{y} + \int_0^1 \sum_{r = 0}^{L - 1}\sum_{r = 0}^{L - 1} c_{r, n} y^{r + s - 1} \;\d y\right) + (\text{analytic for $\Re(s) > -L$}).
+\]
+So we see that
+\[
+  (2\pi)^{-s} \Gamma(s) L(\phi, s) = \sum_{n = 1}^N \phi(n) \left(\frac{1}{2\pi N(s - 1)} + \frac{c_{0, n}}{s} + \cdots + \frac{c_{L - 1, n}}{s + L - 1}\right) + \text{analytic for $\Re(s) > -L$}.
+\]
+As $\Gamma(s)$ has poles at $s = 0, -1, \cdots$, this cancels with all the poles apart from the one at $s = 1$.
+
+Applying this to
+\[
+  \phi(n) =
+  \begin{cases}
+    \chi(n)  & (n, N) = 1\\
+    0 & (n, N) \geq 1
+  \end{cases},
+\]
+then we get the first part of
+\begin{thm}\leavevmode
+  \begin{enumerate}
+    \item $L(\chi, s)$ has a meromorphic continuation to $\C$, which is analytic except for at worst a simple pole at $s = 1$.
+    \item If $\chi \not= \chi_0$ (the trivial character), then $L(\chi, s)$ is analytic everywhere. On the other hand, $L(\chi_0, s)$ has a simple pole with residue
+      \[
+        \frac{\varphi(N)}{N} = \prod_{p \mid N} \left(1 - \frac{1}{p}\right),
+      \]
+      where $\varphi$ is the Euler function.
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}
+  We have
+  \[
+    \res_{s = 1} L(\chi, s) = \frac{1}{N}\sum_{n = 1}^N \phi(n).
+  \]
+  If $\chi \not= \chi_0$, then this vanishes by the orthogonality of characters. Otherwise, it is $|(\Z/N\Z)^\times|/N = \varphi(N)/N$.
+\end{proof}
+Note that this is consistent with the result 
+\[
+  L(\chi_0, s) = \prod_{p \mid N} (1 - p^{-s}) \zeta(s).
+\]
+So for a non-trivial character, our $L$-function doesn't have a pole.
+
+\begin{thm}[]
+  If $\chi \not= \chi_0$, then $L(\chi, 1) \not= 0$.
+\end{thm}
+This is a key theorem. There are lots of theorems of this kind, about non-vanishing of $L$-functions at different points.
+
+\begin{proof}
+  Let
+  \[
+    \zeta_N(s) = \prod_{\chi \in \widehat{(\Z/N\Z)^\times}} L(\chi, s) = \prod_{p \nmid N} \prod_\chi (1 - \chi(p) p^{-s})^{-1}
+  \]
+  if $\Re(s) > 1$.
+
+  \begin{claim}
+    If $p \nmid N$, then
+    \[
+      \prod_{\chi \in \widehat{(\Z/N\Z)^\times}} (1 - \chi(p) T) = (1 - T^{f_p})^{\varphi(N)/f_p},
+    \]
+    where $f_p$ is the order of $p$ in $(\Z/n\Z)^\times$.
+
+    So
+    \[
+      \zeta_N(s) = \prod_{p \nmid N} (1 - p^{-f_p s})^{-\varphi(N)/f_p}.
+    \]
+  \end{claim}
+  To see this, we let $f = f_p$, and $G = (\Z/N\Z)^\times \supseteq H = \bra p\ket$. Then $\hat{G}$ contains $\widehat{G/H}= \{\chi \in \hat{G}: \chi(p) = 1\}$. Also, we know that
+  \[
+    |\widehat{G/H}| = |G/H| = \varphi(N)/f,
+  \]
+  and the restriction map
+  \[
+    \frac{\hat{G}}{\hat{G/H}} \to \hat{H}
+  \]
+  is obviously injective, hence an isomorphism by counting orders. So
+  \[
+    \prod_{\chi \in \hat{G}} (1 - \chi(p) T) = \prod_{\chi \in \hat{H}}(1 - \chi(p) T)^{\varphi(N)/f} = \prod_{\zeta \in \mu_f}(1 - \zeta T)^{\varphi(N)/f} = (1 - T^f)^{\varphi(N)/f}.
+  \]
+  We now notice that when we expand the product of $\zeta_N$, at least formally, then we get a Dirichlet series with non-negative coefficients.
+  \begin{claim}
+    Let
+    \[
+      D(s) = \sum_{n \geq 1} a_n n^{-s}
+    \]
+    be a Dirichlet series with real $a_n \geq 0$, and suppose this is absolutely convergent for $\Re(s) > \sigma > 0$. Then if $D(s)$ can be analytically continued to an anlytic function $\tilde{D}$ on $\{\Re(s) > 0\}$, then the series converges for all real $s > 0$.
+  \end{claim}
+  Let $\rho > \sigma$. Then by the analytic continuation, we have a convergent Taylor series on $\{|s - \rho| < \rho\}$
+  \[
+    \tilde{D}(s) = \sum_{k \geq 0} \frac{1}{k!} D^{(k)}(\rho) (s - \rho)^k,
+  \]
+  and as $\rho > \sigma$, we know
+  \[
+    \tilde{D}^{(k)}(\rho) = D^{(k)} (\rho) = \sum_{n\geq 1} a_n (-\log n)^k n^{-\rho}.
+  \]
+  So if $0 < x < \rho$, then
+  \[
+    \tilde{D}(x) = \sum_{k \geq 0} \frac{1}{k!} (p - x)^k \left(\sum_{n \geq 1} a_n (\log n)^k n^{-\rho}\right).
+  \]
+  Now note that all terms in this sum are all non-negative. So the double series has to converge absolutely as well, and thus we are free to rearrange the sum as we wish. So we find
+  \begin{align*}
+    \tilde{D}(x) &= \sum_{n \geq 1} a_n n^{-\rho} \sum_{k \geq 0} \frac{1}{k!} (\rho - x)^k (\log n)^l\\
+    &= \sum_{n \geq 1} a_n n^{-\rho} e^{(\rho - x) \log n}\\
+    &= \sum_{n \geq 1} a_n n^{-\rho} n^{\rho - x}\\
+    &= \sum_{n \geq 1} a_n n^{-x},
+  \end{align*}
+  as desired.
+
+  Now we are done, as
+  \[
+    \zeta_N(s) = L(\chi_0, s) \prod_{\chi \not= \chi_0} L(\chi, s).
+  \]
+  We saw that $L(\chi_0, s)$ has a simple pole at $s = 1$, and the other terms are all holomorphic at $s = 1$. So if some $L(\chi, 1) = 0$, then $\zeta_N(s)$ is holomorphic for $\Re(s) > 0$ (and in fact everywhere).
+
+  Now the Dirichlet series for $\zeta_N$ has $\geq 0$ coefficients. So by the lemma, it converges for $s = x \in (0, \infty)$. But it doesn't, because
+  \[
+    \zeta_N(x) = \prod_{p \nmid N} (1 + p^{-f_p x} + p^{-2 f_p x} + \cdots)^{\varphi(N)/f_p} \geq \sum_{p \nmid N} p^{- \varphi(N) x},
+  \]
+  and $\sum p^{-1} = \infty$, and so $\zeta_N(x)$ is not convergnet for $x = \frac{1}{\varphi(N)}$.
+\end{proof}
 \printindex
 \end{document}
