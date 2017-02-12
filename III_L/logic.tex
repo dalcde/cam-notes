@@ -1209,7 +1209,7 @@ Note that first order logic is not decidable. However, \emph{monadic} first orde
 \begin{defi}[Set of indiscernibles]\index{set of indiscernibles}
   We say $\bra I, \leq_I\ket$ is a \emph{set of indiscernibles} for $\mathcal{L}$ and a structure $\mathcal{M}$ with $I \subseteq \mathcal{M}$ if $\forall \varphi \in \mathcal{L}(M)$, with $\varphi$ of arity $n$, and for all increasing tuples $\mathbf{x}, \mathbf{y} \in I$,
   \[
-    \mathcal{M} \vDash \varphi(\mathbf{x}) \Longleftrightarrow \mathcal{M} \vDash \varphi(\mathbf{x})
+    \mathcal{M} \vDash \varphi(\mathbf{x}) \Longleftrightarrow \mathcal{M} \vDash \varphi(\mathbf{y})
   \]
 \end{defi}
 This is weaker than just saying everything in there are the same.
@@ -1376,6 +1376,122 @@ It is obvious once you start trying to write down a proof, as long as we note th
     \item If $X, Y \subseteq I$ and $X \cup Y \in I$, then $X \in I$ or $Y \in I$.
   \end{enumerate}
 \end{lemma}
+
+How should we think about the elements of the ultraproduct? One can certainly view its elements as equivalence classes of elements in the product. However, sometimes it is helpful to think of the carrier set as the product itself, and instead weaken to notion of equality to say two things are equal if the are equivalent under $\sim_\mathcal{U}$.
+
+\begin{defi}[Ultrapower]\index{ultrapower}
+  If all the factors in an ultraproduct are the same, then we call it an \emph{ultrapower}.
+\end{defi}
+
+Now if the ultrafilter is principal $\{J \subseteq I: i \in J\}$, then the ultraproduct is isomorphic to $A_i$. So we are only interested in non-principal ultrafilters.
+
+Note also that there is an elementary embedding $\iota: \mathcal{M} \to \mathcal{M}^I/\mathcal{U}$ given by sending $m \in \mathcal{M}$ to $[\lambda i. m] \in \mathcal{M}^I/\mathcal{U}$. Here $\lambda i. m$ is the function that always returns $m$, as usual.
+
+This is the natural inclusion one can think of, and we can show this is in fact elementary. It suffices to show that for any $m \in \mathcal{M}$, if there an $x \in \mathcal{M}^I/\mathcal{U}$ such that
+\[
+  \mathcal{M}^I/\mathcal{U} \vDash \varphi(x, \iota(m)),
+\]
+then there is such an $x$ that is in the image of $\iota$.
+
+Consider such an $x$. It is an equivalence class of a family of functions which is almost everywhere related to $m$ by $\varphi$. So by \L{}o\'s theorem, tthere must be some $x' \in \mathcal{M}$ such that
+\[
+  \mathcal{M} \vDash \varphi(x, m).
+\]
+Then we have
+\[
+  \mathcal{M}^I/\mathcal{U} \vDash \varphi(\iota(x'), \iota(m')).
+\]
+Let's now look at some applications of \L{}o\'s theorem.
+
+Recall that by the compactness theorem, if we have a theory $T$ such that every finite subset of $T$ has a model, then the whole theory has a model. Indeed, if every finite subset of $T$ has a model, then every finite subset of $T$ is consistent. Since proofs are finite, we know $T$ is consistent. So by completeness, $T$ has a model.
+
+But wouldn't it be nice if we have a way to go directly from ``every finite subset of $T$ has a model'' to ``$T$ has a model''? Indeed, we can prove this.
+\begin{thm}[Compactness theorem]\index{compactness theorem}
+  Let $T$ be a theory in first order logic such that every finite subset has a model. Then $T$ has a model.
+\end{thm}
+
+\begin{proof}
+  Let $\Delta$ be such a theory. Let $S = \mathcal{P}_{\aleph_0}(\Delta)$ be the set of all finite subsets of $\Delta$. For $s \in S$, let
+  \[
+    X_s = \{t \in S: s \subseteq t\}.
+  \]
+  Pick $\mathcal{M}_s \vDash s$ for all $s \in S$, which exists by assumption. We notice that $\{X_s: s \in S\}$ generate a proper filter on $S$. We extend this to ultrafilter $\mathcal{U}$ by Zorn's lemma. Then we claim that
+  \[
+    \prod_{s \in S} \mathcal{M}_s/\mathcal{U}\vDash \Delta.
+  \]
+  To see this, we note that for any $\varphi \in \Delta$, we have $X_{\{\varphi\}} \in \mathcal{U}$. Also, for any $s \in X_{\{\varphi\}}$, we have $\mathcal{M}_s \vDash \varphi$. So
+  \[
+    \{s: \mathcal{M}_s \vdash \varphi\} \in \mathcal{U}.
+  \]
+\end{proof}
+
+\begin{eg}
+  Let $T$ be the theory consisting of all first-order statements true in $\bra \R, 0, 1,  +, \times\ket$. Add to $T$ a constant $\varepsilon$ and the axioms $\varepsilon < \frac{1}{n}$ for all $n \in \N$. Then for any finite subset of this new theory, $\R$ is still a model, by picking $\varepsilon$ small enough. So by taking the ultraproduct, we have a model of $T$ that contains infinitesimals.
+\end{eg}
+
+\subsection{Saturated models}
+
+\begin{defi}[Type]\index{type}\index{$n$-types}
+  A \emph{type} is a set of formulae all with the same number of free variables. An \emph{$n$-type} is a set of formulae each with $n$ free variables.
+\end{defi}
+What is the motivation of this? A $1$-type is a set of formulae all with one free variable. So if we have a model $\mathcal{M}$ and an element $x \in \mathcal{M}$, then we can consider all formulae that $x$ satisfies, and we see that this gives as a $1$-type.
+
+\begin{defi}[Realization of type]\index{type!realize}\index{realizes type}
+  We say a model $\mathcal{M}$ realizes a $1$-type $\Sigma$ if there is an $m \in M$ such that for all $\varphi \in \mathcal{M}$, we have
+  \[
+    \mathcal{M} \vDash \sigma(m).
+  \]
+  We define it similarly for $n$-types.
+\end{defi}
+
+\begin{defi}[Saturated model]\index{saturated model}\index{model!saturated}\index{model!countably saturated}\index{$\aleph_0$-saturated model}\index{countably saturated model}
+  We say a model $\mathcal{M}$ is called $\aleph_0$-saturated if $\mathcal{M}$ realizes every finitely satisfiable type.
+\end{defi}
+
+\begin{defi}[Complete filter]\index{complete filter}\index{$\kappa$-complete filter}\index{filter!complete}\index{filter!$\kappa$-complete}
+  A filter $F$ is $\kappa$-complete if it is closed under intersection of $<\kappa$ many things.
+\end{defi}
+
+\begin{eg}
+  By definition, every filter is $\aleph_0$-complete.
+\end{eg}
+
+\begin{eg}
+  Principal filters are $\kappa$-complete for all $\kappa$.
+\end{eg}
+
+A natural question is, are there any non-principal ultrafilters that are $\aleph_1$ complete? It turns out this is a deep question, and a lot of the study of set theory originated from this question.
+
+\subsection{Ehrenfeucht--Mostowski theorem}
+Let $T$ be a theory with infinite models. The general line of thought is --- can we get a model of $T$ with special properties?
+
+Given any set $\mathcal{M}$, invent names for every member of $\mathcal{M}$. Add these names to the language of $T$. We add axioms to say all these constants are distinct. Since $T$ has infinite models, we know this theory has a model.
+
+Let $\Omega$ be the set of countable ordinals, consider the language of $\R$, and add a name to this language for every countable ordinal. We further add axioms to say that $\alpha < \beta$ in the ordering of $\R$ whenever $\alpha < \beta$ as ordinals.
+
+Again by compactness, we find that this has a model. So we can embed the set of countable ordinals into a model of reals, which we know is impossible for the genuine $\R$. However, in general, there is no reason to believe these elements are a set of indiscernibles. What Ehrenfeucht--Mostowski says is that we can in fact do so.
+
+\begin{thm}[Ehrenfeucht--Mostowski theorem (1956)]\index{Ehrenfeucht--Mostowski theorem}
+  Let $\bra I, \leq\ket$ be a total order, and let $T$ be a theory with infinite models. Let $P(\ph) \in \mathcal{L}(T)$ such that
+  \[
+    T \vdash \text{the extension of $P$ is a total order}.
+  \]
+  Then $T$ has a model $\mathcal{M}$ in which $I$ is embedded in the extension of $P$, and the copy of $I$ is a set of indiscernibles.
+
+  Indeed, every order-automorphism of $\bra I, \leq \ket$ extends to an automorphism of $\mathcal{M}$.
+\end{thm}
+
+We will give two proofs of this result. We first give the original proof of Ehrenfeucht--Mostowski, which uses Ramsey theory.
+\begin{proof}
+  Let $T$ and $\bra I, \leq \ket$ be as in the statement of the theorem. We add to $\mathcal{L}(T)$ names for every element of $I$, say $\{c_i: i \in I\}$. We add axioms that $c_i \not= c_j$ whenever $i \not= j$. We call this theory $T^*$. By compactness, we know $T^*$ is consistent. Now we add to $T^*$ axioms to say that the $c_i$ form a set of indiscernibles. So we are adding axioms like
+  \[
+    \varphi(c_i, c_j) \Leftrightarrow \varphi(c_{i'}, c_{j'})
+  \]
+  for all $i < j$ and $i' < j'$.
+
+  We do this simultaneously for all $\varphi \in \mathcal{L}(T)$ and all tuples of the appropriate length. We call this theory $T^I$, and it will say that $\bra I, \leq\ket$ forms a set of indiscernibles. The next stage is, of course, to prove that $T^I$ is consistent.
+\end{proof}
+
 
 
 \printindex
