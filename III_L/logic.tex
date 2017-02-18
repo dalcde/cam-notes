@@ -16,6 +16,14 @@
 
 \newcommand\last{\mathsf{last}}
 \newcommand\butlast{\mathsf{butlast}}
+\newcommand\proj{\mathsf{proj}}
+\newcommand\pair{\mathsf{pair}}
+\newcommand\unpair{\mathsf{unpair}}
+\newcommand\plus{\mathsf{plus}}
+\newcommand\mult{\mathsf{mult}}
+\newcommand\clet{\mathsf{let}\;}
+\newcommand\cin{\;\mathsf{in}\;}
+
 \newenvironment{bprooftree}
   {\leavevmode\hbox\bgroup}
   {\DisplayProof\egroup}
@@ -1593,6 +1601,228 @@ We can now recursively define $I(s, t): \mathcal{M}_s \to \mathcal{M}_t$.
 
 We need to know that all these $I(s, t)$ are elementary embedding. We already know $K$ is elementary. So it suffices to show that $L$ of an elementary embedding is elementary. This is a straightforward check.
 
+Now we want to produce a copy of $I$ in the direct limit. So we want to produce a copy of $s$ in $\mathcal{M}_s$ for each $s$, such that the maps preserve these copies.
+
+We construct this by induction. If $|s| = 1$, then $\mathcal{M}_s \cong \mathcal{M}$. We arbitrarily pick some $p \in \mathcal{M}$ and let it be our designated member.
+
+Now suppose know how to point to $|s|$-many things in $\mathcal{M}_s$. How about $\mathcal{M}_t$, where $|t| = |s| + 1$? We let $t'$ be $T$ with the penultimate elemenet deleted. By induction hypothesis, we know what the lsat thing in $\mathcal{M}_{t'}$ is. We have the embedding
+\[
+  I(t', t): \mathcal{M}_{t'} \to \mathcal{M}_t.
+\]
+This will tells us which thing in the $|t|$th ultrapower is the designated element. % figure this out.
+
+Since every finite formula contains only finitely many constants, it follows that the copy of $I$ in the direct limit is a family of indiscernibles.
+
+\subsection{The omitting type theorem}
+Recall the definition of a type.
+\begin{defi}[Realization of type]\index{realization of type}
+  A model $\mathcal{M}$ \emph{realizes an $n$-type $\Sigma$} if there exists $x_1, \cdots, x_n \in \mathcal{M}$ such that for all $\sigma \in \Sigma$, we have
+  \[
+    \mathcal{M} \vDash \sigma(x_1, \cdots, x_n).
+  \]
+\end{defi}
+Any fool can realize a type, but it takes a model theorist to omit one!
+
+\begin{defi}[Omit a type]\index{omit a type}
+  A model $\mathcal{M}$ \emph{omits an $n$-type $\Sigma$} if for all $x_1, \cdots, x_n$, there exists $\sigma \in \Sigma$ such that
+  \[
+    \mathcal{M} \not\vDash \sigma(x_1, \cdots, x_n).
+  \]
+\end{defi}
+
+\begin{eg}
+  Consider the language of PA, and consider the type containing $\sigma_i(x)$ saying $x \not= s^i(x)$. We really want to omit this type!
+
+  Of course, it is not hard in this case --- the standard model of PA does.
+\end{eg}
+
+Let's look for a condition on $T$ and $\Sigma$ for $T$ to have a model that omits this type.
+
+\begin{defi}[Locally realize]\index{locally realize a type}\index{realize a type!locally}
+  We say $\varphi$ realizes $\Sigma$ locally if
+  \[
+    T \vdash \forall_x(\varphi(x) \to \sigma(x)).
+  \]
+\end{defi}
+Suppose there is some $\varphi \in \mathcal{L}(T)$ such that
+\[
+  T \vdash \exists_x \varphi(x)
+\]
+and $\varphi(x)$ locally realizes $\Sigma$, then we certainly cannot omit $\Sigma$.
+
+Now if $T \vDash \forall_x \neg \varphi(x)$ whenever $\varphi$ locally realizes $\Sigma$, then we have a chance. We say \term{$T$ locally omits $\Sigma$}. It turns out this is sufficient!
+
+\begin{thm}[Omitting type theorem]\index{omitting type theorem}\index{type}
+  Let $T$ be a first-order theory, and $\Sigma$ an $n$-type. If
+  \[
+    T \vdash \forall_x \neg \varphi(x)
+  \]
+  whenever $\varphi$ locally realizes $\Sigma$, then $T$ has a model omitting $\Sigma$.
+\end{thm}
+
+We first prove a special case for propositional logic.
+\begin{thm}
+  Let $T$ be a propositional theory, and $\Sigma \subseteq \mathcal{L}(T)$ a type (with $n = 0$). If $T$ locally omits $\Sigma$, then there is a $T$-valuation that omits $\Sigma$.
+\end{thm}
+
+\begin{proof}
+  Suppose there is no $T$-valuation omitting $\Sigma$. By the completeness theorem, we know everything in $\Sigma$ is a theorem of $T$. So $T$ can't locally omit $\Sigma$.
+\end{proof}
+That was pretty trivial. But we can do something more than that --- the \emph{extended} omitting types theorem. It says we can omit countably many types simultaneously.
+
+\begin{thm}
+  Let $T$ be a first-order theory, and for each $i \in \N$, we have a type $\Sigma_i$. If $T$ locally emits $\Sigma_i$ for all $i$, then $T$ has a model that omits every $\Sigma_i$.
+\end{thm}
+
+Again, we prove the propositional version first.
+\begin{thm}
+  Let $T$ be a propositional theory, and for each $i \in \N$, we let $\Sigma_i \subseteq \mathcal{L}(T)$ be a type. If $T$ locally omits each $\Sigma_i$, then there is a $T$-valuation omitting all $\Sigma_i$.
+\end{thm}
+
+\begin{proof}
+  We will show that whenever $T \cup \{\neg A_1, \cdots, \neg A_i\}$ is consistent, where $A_n \in \Sigma_n$ for $n \leq i$, then we can find $A_{n + 1} \in \Sigma_{n + 1}$ such that $T \cup \{\neg A_1, \cdots, \neg A_n, \neg A_{n + 1}\}$ is consistent.
+
+  Suppose we can't do this. Then we know that
+  \[
+    T \vdash \left(\bigwedge_{1 \leq j \leq n} \neg A_j \right) \to A_{n + 1},
+  \]
+  for every $A_{n + 1} \in \Sigma_{n + 1}$. But by assumption, $T$ locally omits $\Sigma_{i + 1}$. This implies
+  \[
+    T \vdash \neg \left(\bigwedge_{1 \leq j \leq n} \neg A_j \right),
+  \]
+  contradicting the inductive hypothesis that $T \cup \{\neg A_1, \cdots, \neg A_i\}$ is consistent.
+
+  Thus by compactness, we know $T \cup \{\neg A_1, \neg A_2, \cdots\}$ is consistent, and a model of this would give us a model of $T$ omitting all those types.
+\end{proof}
+
+We now prove the general case.
+\begin{proof}
+  Let $T$ be a first order theory (in a countable language) locally omitting $\Sigma$. For simplicity, we suppose $\Sigma$ is a $1$-type. We want to find a model omitting $\Sigma$. Suppose $T$ locally omits $\Sigma$, and let $\{c_i: i \in \N\}$ be a countable set of new constant symbols. Let $\bra \varphi_i: i \in \N\ket$ be an enumeration of the sentences of $\mathcal{L}(T)$. We will construct an increasing sequence $\{ T_i: i \in \N\}$ of finite extensions of $T$ such that for each $m \in \N$,
+  \begin{enumerate}\setcounter{enumi}{-1}
+    \item $T_{m + 1}$ is consistent. % this should be 0
+    \item $T_{m + 1}$ decides $\varphi_n$ for $n \leq m$, ie. $T_{m + 1} \vdash \varphi_n$ or $T_{m + 1} \vdash \varphi_n$.
+    \item If $\varphi_m$ is $\exists_x \psi(x)$ and $\varphi_m \in T_{m + 1}$, then $\psi(c_p) \in T_{m + 1}$, where $c_p$ is the first constant not occurring in $T_m$ or $\varphi_m$.
+    \item There is a formula $\sigma(x) \in \Sigma$ such that $\neg \sigma(c_m) \in T_{m + 1}$. % also consistent!!
+  \end{enumerate}
+  We will construct this sequence by recursion. Given $T_m$, we construct $T_{m + 1}$ as follows: think of $T_m$ as $T \cup \{\theta_1, \cdots, \theta_r\}$, and let
+  \[
+    \Theta = \bigwedge_{j \leq r} \theta_j.
+  \]
+  We let $\{c_1, \cdots, c_N\}$ be the constants that have appeared in $\Theta$, and let
+  \[
+    \Theta(\mathbf{x})
+  \]
+  be the result of replacing $c_i$ with $x_i$ in $\theta$. Then clearly, $\Theta(\mathbf{x})$ is consistent with $T$. So for some $\sigma(x) \in \Sigma$, we know
+  \[
+    \Theta \wedge \neg \sigma(x_m)
+  \]
+  is consistent with $T$. We put $\neg \sigma(c_m)$ into $T_{m + 1}$, and this takes care of (iii).
+
+  If $\varphi_m$ is consistent with $T_m \cup \{\neg \sigma(c_m)\}$, then put it into $T_{m + 1}$. Otherwise, put in $\neg \varphi_m$. This takes care of (i).
+
+  If $\varphi_m$ is $\exists_x \psi(x)$ and it's consistent with $T_m \cup \{\neg \sigma(c_m)\}$, we put $\psi(c_m)$ into $T_{m + 1}$. This takes care of (ii).
+
+  Now consider
+  \[
+    T^* = \bigcup_{n \in \N} T_n
+  \]
+  Then $T^*$ is complete by construction, and is complete by compactness.
+  
+  Consider an arbitrary countable model of $T^*$, and the submodel generated by the constants in $C$. This is a model of $T^* \supseteq T$ and condition (iii) ensures that it omtis $\Sigma$.
+\end{proof}
+
+\section{Computability theory}
+Consider a Diophantine equation, say
+\[
+  x^2 + y^2 = z^2,
+\]
+and we want to find solutions to these. We have already figured out how to solve all of these, namely 
+% insert solution
+
+Now given a general Diophantine equation, is there an algorithm to list out all solutions? If there is one, then we can just write an algorithm, and we are done.
+
+But if we want to prove that there \emph{isn't} one, we need to come up with the formal notion of an ``algorithm''. We want to view an algorithm as a \emph{mathematical object}.
+
+Thus, we want to come up with the notion of a function $\N^k \to \N^m$ being a \emph{computable function}.
+
+The idea is to start off with functions that are uncontroversially computable, and close it under operations that uncontroversially preserve computability.
+
+What functions are uncontroversially computable? The constantly zero function $\lambda \mathbf{x}. 0$ is certainly computable. We can also have the identity function $\id: \N^n \to \N^n$. Also, projection functions
+\[
+  \begin{tikzcd}[cdmap]
+    \proj_j^i (\mathbf{x}) : \N^j \ar[r] & \N\\
+    (x_1, \cdots, x_j) \ar[r, maps to ]& x_i
+  \end{tikzcd}
+\]
+We also have the successor function  $s: \N \to \N$ that increments a number. We can think of it as ``$+1$'', but this is a much more primitive idea than addition.
+
+What are the operations that uncontroversially preserve computability? Composition certainly preserves computability. For example, if $f: \N^2 \to \N$, $g: N^j \to \N$ and $h: \N^i \to \N$, then $f(g(\ph), h(\ph)): \N^{i + j} \to \N$ is also computable. Defining this properly is a mess.
+
+We will not worry ourselves with small, technical problems like ``if $f(x, y)$ is computable, then is $f(x, x)$ computable?''.
+
+Finally, to work with natural numbers, it is helpful to have recursion. Suppose $f, g$ are computable. We want to declare $h$ by saying
+\begin{align*}
+  h(0, \mathbf{x}) &= f(\mathbf{x})
+  h(sn, \mathbf{x}) &= f(h(n, \mathbf{x}), n, \mathbf{x}).
+\end{align*}
+So to compute $h$ of a successor $sn$, we compute $h(n, \mathbf{x})$, and then do something to it. It is natural to believe that $h$ should be computable. This is called \term{primitive recursion}.
+
+Do these give us everything we want? Let's look at the primitive recursion definition. When computing $h(sn, \mathbf{x})$, we are only allowed to know about $h(n, \mathbf{x})$, and not any of the previous values. This is pretty restrictive. For example, the usual definition of the Fibonacci numbers says
+\[
+  \mathsf{Fib}(n + 1) = \mathsf{Fib}(n) + \mathsf{Fib}(n - 1),
+\]
+which is not in a primitive recursive form. Does it matter? It turns out not. The main idea is that pairing and unpairing can be done primitive recursively. In other words, there are functions $\plus: \N^2 \to \N$ and $\unpair: \N \to \N^2$ that are inverses to each other.
+
+To do so, we show that addition and multiplication are primitive recursive. This is not hard. We declare
+\begin{align*}
+  \plus(0, n) &= n\\
+  \plus(sm, n) &= s(\plus(m, n))\\
+  \mult(1, n) &= n\\
+  \mult(sm, n) &= \plus(n, \mult(m, n)),
+\end{align*}
+Similarly, we can define $\exp$ etc.
+
+We then define
+\[
+  \pair(x, y) = \binom{x + y + 1}{2} + y.
+\]
+Writing down the inverse $\unpair$ is more annoying, but possible. Given these, we can define a new function $F: \N \to \N$ by
+\[
+  F(n + 1) = \clet (x, y) = \unpair (F(n)) \cin \pair(x + y, y).
+\]
+If we work through all details in our spare time, then we find that all ``natural'' functions $\N \to \N$ we can come up with are indeed primitive recursive.
+
+But it turns out there \emph{is} a problem with our definition. In our definition of recursion, we recurse on only one variable. In other words, we are doing recursion over $\omega$ only, instead of any ordinal, or more generally any well-founded relation.
+
+Consider the \term{Ackermann function}
+\begin{align*}
+  A(0, n) &= n + 1\\
+  A(m, 0) &= A(m -1, 1)\\
+  A(m + 1, n + 1) &= A(m, A(m + 1, n)).
+\end{align*}
+If we try to do this computation, it will take forever, but we know it will eventually halt. Indeed, to evaluate $A$ on $\bra m + 1, n + 1\ket$, we need to know the value of $A$ on $\bra m + 1, n\ket$, and then $\bra m, A(m + 1, n)\ket$. If we order pairs $\N \times \N$ under the lexicographic order, then every time, we require values of $A$ on smaller pairs, and since $\N \times \N$ is well-ordered, this eventually terminates.
+
+However, this function is not primitive recursive! The problem is that it ``grows too fast''.
+\begin{defi}[Dominating function]\index{dominating function}\index{$f < g$}\index{$<$}
+  Let $f, g: \N \to \N$ be functions. Then $f < g$ if for all sufficiently large integer $n$, then $f(n) < g(n)$. We say $g$ \emph{dominates} $f$.
+\end{defi}
+It turns out that the unary Ackermann function $\lambda n. A(n, n)$ dominates \emph{all} primitive recursive functions!
+
+How can we prove this? Our set of primitive recursive functions are defined by recursion on some operations. So we might think we can just prove this by recursion. This is indeed the case, but the proof is very very fiddly, and we will not do that.
+
+We might want to just put in the Ackermann function, and try to close it. But this doesn't really work, as we can invent a three-term Ackermann function and break this. Even if we keep adding more and more Ackermann functions, this is not going to fix it.
+
+The problem is that everything we've had so far are \emph{total}.  We are absolutely certain that such a function will halt, and in particular they are everywhere defined.
+
+But anyone who has tried to write a program have experienced writing a program that is everywhere undefined, and since we have written a program, it is certainly computable!
+
+The key missing piece is inverses. Given a function $f: \N \to \N$, can we compute an inverse to $f$? Suppose we want to find $f^{-1}(17)$. To do so, we compute $f(0)$, $f(1)$, $f(2)$, etc., and then stop when we find something that its $17$.
+
+We can certainly do this when $f$ is total. We just keep computing those things, and then we will get an answer. Even if there is no inverse, we are not really stuck, as we decided we are fine with non-total functions.
+
+Sometimes $f$ is not injective, but this is not too large of a problem. We can just always return the first number that is sent to $17$.
+
+But we are in trouble if $f$ is not total. We might have $f(23) = 17$, but $f(11)$ is undefined. So we will never discover that $f(23) = 17$. One solution might be to ``zig zag''. We compute a bit of $f(1)$, then if it doesn't halt, we compute a bit of $f(2)$, and then go back to do a bit more of $f(1)$, then a bit more of $f(2)$, then compute $f(3)$ etc., but the problem that if $f$ is not injective, which element in the inverse we find depends on how we transverse diagonally, and this is bad.
 
 \printindex
 \end{document}
