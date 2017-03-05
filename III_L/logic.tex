@@ -23,9 +23,27 @@
 \newcommand\unpair{\mathsf{unpair}}
 \newcommand\plus{\mathsf{plus}}
 \newcommand\mult{\mathsf{mult}}
+\newcommand\lexp{\mathsf{exp}}
+\newcommand\K{\mathbb{K}}
+\renewcommand\succ{\mathsf{succ}}
 \newcommand\clet{\mathsf{let}\;}
 \newcommand\cin{\;\mathsf{in}\;}
-
+\newcommand\cif{\mathsf{if}\;}
+\newcommand\cthen{\;\mathsf{then}\;}
+\newcommand\celse{\;\mathsf{else}\;}
+\newcommand\con{\mathrm{con}}
+\newcommand\ctrue{\mathsf{true}}
+\newcommand\cfalse{\mathsf{false}}
+\newcommand\ciszero{\mathsf{iszero}}
+\newcommand\cfst{\mathsf{fst}}
+\newcommand\csnd{\mathsf{snd}}
+\newcommand\cnil{\mathsf{cnil}}
+\newcommand\cfact{\mathsf{fact}}
+\newcommand\cmap{\mathsf{map}}
+\newcommand\cnull{\mathsf{null}}
+\newcommand\metafact{\mathsf{metafact}}
+\newcommand\Yc{\mathsf{Y}}
+\newcommand\meow{\mathsf{miaow}}
 \newenvironment{bprooftree}
   {\leavevmode\hbox\bgroup}
   {\DisplayProof\egroup}
@@ -344,11 +362,11 @@ Instead of thinking of natural deduction as an actual logical theory, we often t
   \begin{prooftree}
     \AxiomC {$\varphi(t)$}
     \intro{$\exists$}
-    \UnaryInfC{$\exists x\; \varphi(x)$}
+    \UnaryInfC{$\exists_x\varphi(x)$}
   \end{prooftree}
   Similarly, we can have an elimination rule for $\forall$ easily:
   \begin{prooftree}
-    \AxiomC{$\forall \varphi(x)$}
+    \AxiomC{$\forall_x \varphi(x)$}
     \elim{$\forall$}
     \UnaryInfC{$\varphi(t)$}
   \end{prooftree}
@@ -356,13 +374,13 @@ Instead of thinking of natural deduction as an actual logical theory, we often t
   \begin{prooftree}
     \AxiomC {$\varphi(x)$}
     \intro{$\forall$}
-    \UnaryInfC{$\forall x\; \varphi(x)$}
+    \UnaryInfC{$\forall_x\varphi(x)$}
   \end{prooftree}
   but for such a proof to be valid, the $x$ must be ``arbitrary''. So we need an additional condition on this rule that there is no free occurrence of $x$'s.
 
-  Finally, suppose we know $\exists x\; \varphi(x)$. How can we use this to deduce some $p$? Suppose we know that $\varphi(x)$ implies $p$, and also $p$ does not depend on $x$. Then just knowing that there exists some $x$ such that $\varphi(x)$, we know $p$ must be true.
+  Finally, suppose we know $\exists_x \varphi(x)$. How can we use this to deduce some $p$? Suppose we know that $\varphi(x)$ implies $p$, and also $p$ does not depend on $x$. Then just knowing that there exists some $x$ such that $\varphi(x)$, we know $p$ must be true.
   \begin{prooftree}
-    \AxiomC{$\exists x\; \varphi(x)$}
+    \AxiomC{$\exists_x \varphi(x)$}
     \AxiomC{$\varphi(x)$}
     \noLine
     \UnaryInfC{$\rvdots$}
@@ -930,13 +948,11 @@ Possible world semantics can be used for all sorts of logical systems, not just 
 \begin{eg}
   If we want to produce possible world semantics for constructive first-order logic, we need to modify our definition of worlds so that they have ``elements''. Assuming we have done so, we can encode $\forall$ and $\exists$ using the following rules:
   \begin{itemize}
-    \item $w \vDash \exists x, F(x)$ if there is some $y \in w$ for which $w \vDash F(y)$.
-    \item $w \vDash \forall x, F(x)$ if for all $w' \geq w$ and $x \in w'$, we have $w' \vDash F(x)$.
+    \item $w \vDash \exists_x, F(x)$ if there is some $y \in w$ for which $w \vDash F(y)$.
+    \item $w \vDash \forall_x, F(x)$ if for all $w' \geq w$ and $x \in w'$, we have $w' \vDash F(x)$.
   \end{itemize}
   The second condition is much stronger than the naive ``for all $x \in w$, we have $w \vDash F(x)$'', because the $w'' \geq w$ may have many more elements. What our condition say is that $w$ somehow has a ``global'' way of showing that everything satisfies $F$.
 \end{eg}
-
-Let's talk a bit about persistence of formulae. We $\varphi$ is persistent iff $w \vDash\varphi$, $w' \geq w$ implies $w' \vDash \varphi$. By definition, all atomic formulae are persistent by stipulation. We can prove by induction that all formulae are persistent. This is just a massive yet easy proof by cases, and we will not do so.
 
 \begin{eg}
   The proposition $A \to \neg \neg A$ is valid all possible world models.
@@ -944,7 +960,7 @@ Let's talk a bit about persistence of formulae. We $\varphi$ is persistent iff $
   % To see this, we note that if we have a world $w$ that believes in $A$, then by persistence, any world that $A$ sees also believes in $A$. We want to show that it does not believe in $\neg A$. % complete proof, make use of reflexivity and transitivity
 \end{eg}
 
-% insert talk about finiteness of possible world models, therefore decidable.
+For classical logic, we had semantics given by truth tables. This easily shows that classical truth is decidable. Similarly, given any formula, it involves only finitely many variables, there are only finitely many distinct possible world models one has to check. So whether something is refuted by possible world models is again a decidable problem.
 
 Now suppose we have a possible world model in front of us. Then given a formula $\varphi$, the set of worlds that believe $\varphi$ is an upward-closed subset of the frame. So we can think of the truth value of $\varphi$ as these upward-closed set.
 \begin{eg}
@@ -952,38 +968,38 @@ Now suppose we have a possible world model in front of us. Then given a formula 
   \begin{center}
     \begin{tikzpicture}
       \node [mstate] (1) at (0, 0) {$w_2$};
-      \node [right=10pt] at (1) {$A$};
 
       \node [mstate] (2) at (0, -2) {$w_1$};
 
       \draw (1) edge (2);
     \end{tikzpicture}
   \end{center}
-  So the top world only believes $A$, and the root world doesn't believe anything. The possible truth values are
+  Then the possible truth values are
   \[
     \emptyset, \{w_2\}, \{w_1, w_2\}.
   \]
-  This is indeed the three-valued algebra we used to disprove Peirce's law. % check
+  Suppose the top world believes $A$, but the bottom world does not. Then we say that $A$ has truth value $\{w_2\}$. This is indeed the three-valued algebra we used to disprove Peirce's law.
 \end{eg}
-What can we say about the collection of upward-closed subset of frames, ie. our truth values? Under inclusion, it is easy to see that these are complete and co-complete, ie. we have all infinite unions and intersections.
+What can we say about the collection of upward-closed subset of frames, ie. our truth values? Under inclusion, it is easy to see that these are complete and co-complete, ie. we have all infinite unions and intersections. More importantly, we can do ``implications''.
 \begin{defi}[Heyting algebra]\index{Heyting algebra}
-  A Heyting algebra is a complete poset with joins $\wedge$ and $\vee$ and an operator $\to$ such that $A \Rightarrow B$ is the largest $C$ such that
+  A Heyting algebra is a poset with $\top$, $\bot$, $\wedge$ and $\vee$ and an operator $\Rightarrow$ such that $A \Rightarrow B$ is the largest $C$ such that
   \[
     C \wedge A \leq B.
   \]
 \end{defi}
-We would expect
+If a poset is complete co-complete, then we would expect the implication to be given by
 \[
-  A \Rightarrow B = \vee \{C : C \wedge A \leq B\}.
+  A \Rightarrow B = \bigvee \{C : C \wedge A \leq B\}.
 \]
-The only thing we need to check is that this choice of $A \Rightarrow B$ does indeed satisfy $(A \Rightarrow B) \wedge A \leq B$. % fix this!
+Indeed, if the poset is a Heyting algebra, then it \emph{must} be given by this. So we just have to check that this works.
 
-The thought is that Heyting algebras would ``validate'' all constructive theses, by interpreting $\wedge$ with $\wedge$, $\vee$ with $\vee$ and $\rightarrow$ with $\Rightarrow$.
+The thought is that Heyting algebras would ``validate'' all constructive theses, by interpreting $\wedge$ with $\wedge$, $\vee$ with $\vee$ and $\rightarrow$ with $\Rightarrow$. In other words, if we try to build a truth table for a formula with values in a Heyting algebra, we will get the top element $\top$ all the time iff the formula is constructively valid. So we have a parallel between the relation between classical logic and boolean algebras, and constructive logic and Heyting algebras.
 
-In other words, if we try to build a truth table for a formula with values in a Heyting algebra, we will get the top element $\top$ all the time iff the formula is constructively valid. So we have a parallel between the relation between classical logic and boolean algebras, and constructive logic and Heyting algebras.
+It is an easy inductive proof that any constructively valid statement is ``true'' in all Heyting algebras, and the other direction is also true, but takes more work to prove.
 
 Note that in classical logic, we only ever use the two-element boolean algebra. If we use the 4-element Boolean algebra, then we would detect the same set of tautologies. However, in the case of constructive logic we genuinely need all Heyting algebras.
 
+Finally, we prove half the completeness theorem for possible world models.
 \begin{lemma}
   Any formula with a natural deduction proof not using the rule for classical negation is true in all possible world models.
 \end{lemma}
@@ -992,6 +1008,8 @@ For any frame $F$, every such formula is satisfied by every possible world model
 \begin{proof}
   The hard case is implication. Suppose we have a natural deduction proof of $A \to B$. The last rule is a $\to$-introduction. So by the induction hypothesis, every world that believes $A$ also believes $B$. Now let $w$ be a world that believes all the other undischarged assumptions in $A \to B$. By persistence, every $w' \geq w$ believes similarly. So any $w' \geq w$ that believes $A$ also believes $B$. So $w \vDash A \to B$.
 \end{proof}
+
+% how about other half.
 
 \subsection{Negative interpretation}
 Suppose a constructive logician found a classical logician, and then they try to talk to each other. Then they would find that they disagree on a lot of things. The classical logician has no problems accepting $\neg \neg A \to A$, but the constructive logician thinks that is nonsense. Can they make sense of each other?
@@ -1006,7 +1024,7 @@ But can a constructive logician make sense of the classical logician? When the c
     \midrule
     $A \vee B$ & $\neg (\neg A \vee \neg B)$\\
     $A \wedge B$& $A \wedge B$\\
-    $\exists x\; W(x)$ & $\neg \forall x \neg W(x)$\\
+    $\exists_x W(x)$ & $\neg \forall_x \neg W(x)$\\
     $A \to B$ & $\neg (A \wedge \neg B)$\\
     \bottomrule
   \end{tabular}
@@ -1020,9 +1038,9 @@ This gives rise to the \emph{negative interpretation} of classical logic into co
     \item If $\varphi$ is negatomic, then $\varphi^* = \varphi$.
     \item If $\varphi = \psi \wedge \theta$, then $\varphi^* = \psi^* \wedge \theta^*$.
     \item If $\varphi = \psi \vee \theta$, then $\varphi^* = \neg (\neg \psi^* \wedge \neg \theta^*)$.
-    \item If $\varphi = \forall x\; \psi(x)$, then $(\forall x)(\psi^*(x))$.
+    \item If $\varphi = \forall_x \psi(x)$, then $(\forall_x)(\psi^*(x))$.
     \item If $\varphi = \psi \to \theta$, then $\varphi^* = \neg(\psi^* \wedge \neg \theta^*)$.
-    \item If $\varphi = \exists \; \psi(x)$, then $\varphi^* = \neg \forall x \neg \psi^*(x)$.
+    \item If $\varphi = \exists_x \psi(x)$, then $\varphi^* = \neg \forall_x \neg \psi^*(x)$.
   \end{itemize}
 \end{defi}
 One can check that we always have $\vdash \varphi \to \varphi^*$. So the constructive version is always stronger.
@@ -1039,13 +1057,13 @@ One can check that we always have $\vdash \varphi \to \varphi^*$. So the constru
 \end{lemma}
 
 \begin{proof}
-  By induction on formulae. The base case is immediate, using the fact that $\neg \neg \neg A \to \neg A$. More generally, we have
+  By induction on formulae. The base case is immediate, using the fact that $\neg \neg \neg A \to \neg A$. This follows from the more general fact that
   \[
     (((p \to q) \to q) \to q) \to p \to q.
   \]
   It is less confusing to prove this in two steps, and we will write $\lambda$-terms for our proofs. First note that if we have $f: A \to B$, then we can obtain $f^T: (B \to q) \to A \to q$ for any $q$, using
   \[
-    f^T = \lambda g_{B \to q}. \lambda a_A: g(f(a)).
+    f^T = \lambda g_{B \to q}. \lambda a_A. g(f(a)).
   \]
   So it suffices to prove that
   \[
@@ -1062,46 +1080,48 @@ One can check that we always have $\vdash \varphi \to \varphi^*$. So the constru
       We suppose $\neg p$. Then we know $\neg (p \wedge q)$. But we know $\neg \neg (p \wedge q)$. So we obtain a contradiction. So we have proved that $\neg \neg p$.
     \item Note that we have
       \[
-        \vdash \exists x \neg \neg \varphi(x) \to \neg \neg \exists x \varphi(x),
+        \vdash \exists_x \neg \neg \varphi(x) \to \neg \neg \exists_x \varphi(x),
       \]
       but not the other way round. For universal quantification, we have
       \[
-        \neg \neg \forall x \varphi(x) \to \forall x \neg \neg \varphi(x),
+        \neg \neg \forall_x \varphi(x) \to \forall_x \neg \neg \varphi(x),
       \]
       but not the other way round. We can construct a proof as follows:
       \begin{prooftree}
-        \AxiomC{$[\forall x) \varphi(x)]^1$}
+        \AxiomC{$[\forall_x \varphi(x)]^1$}
         \elim{$\forall$}
         \UnaryInfC{$\varphi(a)$}
         \AxiomC{$[\neg \varphi(x)]^2$}
         \elim{$\to$}
         \BinaryInfC{$\to$}
         \intron{$\to$}{1}
-        \UnaryInfC{$\neg \forall x \varphi(x)$}
-        \AxiomC{$[\neg \neg \forall x \varphi(x)]^3$}
+        \UnaryInfC{$\neg \forall_x \varphi(x)$}
+        \AxiomC{$[\neg \neg \forall_x \varphi(x)]^3$}
         \elim{$\to$}
         \BinaryInfC{$\bot$}
         \intron{$\to$}{2}
         \UnaryInfC{$\neg \neg \varphi(a)$}
         \intro{$\forall$}
-        \UnaryInfC{$\neg \neg \forall \varphi(x)$}
+        \UnaryInfC{$\neg \neg \forall_x \varphi(x)$}
         \intron{$\to$}{3}
-        \UnaryInfC{$\neg \neg \forall x F(x) \to \forall x \neg \neg F(x)$}
+        \UnaryInfC{$\neg \neg \forall_x F(x) \to \forall_x \neg \neg F(x)$}
       \end{prooftree}
-      We now want to show that if $\varphi$ is stable, then $\forall x \varphi(x)$ is stable. In other words, we want
+      We now want to show that if $\varphi$ is stable, then $\forall_x \varphi(x)$ is stable. In other words, we want
       \[
-        \neg \neg \forall x \varphi^*(x) \to \forall x \varphi^*(x).
+        \neg \neg \forall_x \varphi^*(x) \to \forall_x \varphi^*(x).
       \]
-      But form $\neg \neg \forall x \varphi^*(x)$, we can deduce $\forall x \neg \neg \varphi^*(x)$, which implies $\forall x \varphi^* (x)$.
+      But form $\neg \neg \forall_x \varphi^*(x)$, we can deduce $\forall_x \neg \neg \varphi^*(x)$, which implies $\forall_x \varphi^* (x)$.
   \end{itemize}
   So every formula in the range of the negative interpretation is stable. Every stable formula is equivalent to its double negation (classically). Every formula is classically equivalent to a stable formula.
 \end{proof}
-So if a constructive logician meets a classical logician who is making some bizarre assertions about first order logic. To make sense of this, the constructive logician can translate it to its negative interpretation, which the classical logician thinks is equivalent to the original one. And now these interpretations follow the law of excluded middle.
+So if a constructive logician meets a classical logician who is making some bizarre assertions about first order logic. To make sense of this, the constructive logician can translate it to its negative interpretation, which the classical logician thinks is equivalent to the original one.
 
 \subsection{Constructive mathematics}
-We now want to try to do mathematics constructively. We note that even classically, if we do not have the law of excluded middle, then we have many distinct notions of ``finite set''. When we go constructive, things get more complicated.
+We now end with some remarks about how we can do mathematics ``constructively'', and the subtleties we have to be careful of.
 
-We look at several possible definitions of finite sets.
+We first discuss the notion of finiteness. Even classically, if we do not have the axiom of choice, then we have many distinct notions of ``finite set''. When we go constructive, things get more complicated.
+
+We can produce (at least) two different definitions of finiteness.
 \begin{defi}[Kuratowski finite]\index{Kuratowski finite}\index{finite!Kuratowski}
   We define ``finite'' recursively: $\emptyset$ is Kuratowski finite. If $x$ is Kuratowski finite, then so is $x \cup \{y\}$.
 \end{defi}
@@ -1115,14 +1135,16 @@ If we want to do constructive arithmetic, the correct notion is $N$-finiteness.
 
 We can still define natural numbers as the smallest set containing $\emptyset$ and is closed under successor. This gives us $N$-finite sets, but the least number principle is dodgy. It turns out the least number principle implies excluded middle.
 
-It is helpful to note the following two definitions:
+There are also subtleties involving the notion of a non-empty set!
 \begin{defi}[Non-empty set]\index{non-empty set}
-  A set $x$ is non-empty if $\neg (\forall y)(y \not \in x)$.
+  A set $x$ is \emph{non-empty} if $\neg \forall_yy \not \in x$.
 \end{defi}
 
 \begin{defi}[Inhabited set]\index{inhabited set}
-  A set $x$ is inhabited if $(\exists y)(y \in x)$.
+  A set $x$ is \emph{inhabited} if $\exists_yy \in x$.
 \end{defi}
+
+They are not the same! Being inhabited is stronger than being non-empty! We shall not go into more details about constructive mathematics, because, disappointingly, very few people care.
 
 \section{Model theory}
 
@@ -1131,7 +1153,7 @@ Recall the following definition:
 \begin{defi}[Universal theory]\index{universal theory}
   A universal theory is a theory that can be axiomatized in a way such that all axioms are of the form
   \[
-    (\forall \cdots)(\text{stuff not involving quantifiers})\tag{$*$}
+    \forall_{\cdots}(\text{stuff not involving quantifiers})\tag{$*$}
   \]
 \end{defi}
 For example, groups, rings, modules etc. are universal theories. It is easy to see that if we have a model of a universal theory, then any substructure is also a model.
@@ -1167,7 +1189,7 @@ The proof isn't very hard, and this is the first result we will prove about mode
 \end{lemma}
 
 \begin{proof}
-  Suppose $T \cup D(\mathcal{M})$ is not consistent. Then there is an inconsistency that can be derived from finitely many of the new axioms. Call this finite conjunction $\psi$. Then we have a proof of $\neg \psi$ from $T$. But $T$ knows nothing about the constants we added to $T$. So we know $T\vdash \forall \mathbf{x} \neg \psi$. This is a universal consequence of $T$ that $\mathcal{M}$ does not satisfy, and this is a contradiction.
+  Suppose $T \cup D(\mathcal{M})$ is not consistent. Then there is an inconsistency that can be derived from finitely many of the new axioms. Call this finite conjunction $\psi$. Then we have a proof of $\neg \psi$ from $T$. But $T$ knows nothing about the constants we added to $T$. So we know $T\vdash \forall_{\mathbf{x}} \neg \psi$. This is a universal consequence of $T$ that $\mathcal{M}$ does not satisfy, and this is a contradiction.
 \end{proof}
 
 \begin{thm}
@@ -1216,7 +1238,7 @@ What sort of things do products preserve? As we know from undergraduate mathemat
 \begin{defi}[Equational theory]\index{equational theory}
   An equational theory is a theory all of whose axioms are of the form
   \[
-    (\forall \mathbf{x}) (w_1(\mathbf{\mathbf{x}}) = w_2(\mathbf{x})),
+    \forall_{\mathbf{x}} (w_1(\mathbf{\mathbf{x}}) = w_2(\mathbf{x})),
   \]
   where $w_i$ are some terms in $\mathbf{x}$.
 \end{defi}
@@ -1247,7 +1269,7 @@ It turns out actually the class of things preserved by products is much more gen
 \begin{proof}
   Suppose every factor
   \[
-    A_i \vDash (\forall \mathbf{x}) \bigwedge \varphi_i(\mathbf{x}) \to \chi(\mathbf{x}).
+    A_i \vDash \forall_{\mathbf{x}} \bigwedge \varphi_i(\mathbf{x}) \to \chi(\mathbf{x}).
   \]
   We want to show that the product believes in the same statement. So let $(f_1, \cdots, f_k)$ be a tuple in the product of the right length satisfying the antecedent, ie. for each $n \in I$, we have
   \[
@@ -1443,11 +1465,11 @@ Now that we are equipped with ultraproducts, it is possible to prove the compact
 \begin{defi}[Skolem function]\index{Skolem function}
   \emph{Skolem functions} for a structure are functions $f_\varphi$ for each $\varphi \in \mathcal{L}$ such that if
   \[
-    \mathcal{M} \vDash \forall \mathbf{x} \exists \mathbf{y} \varphi(\mathbf{x}, \mathbf{y}),
+    \mathcal{M} \vDash \forall_\mathbf{x} \exists_\mathbf{y} \varphi(\mathbf{x}, \mathbf{y}),
   \]
   then
   \[
-    \mathcal{M} \vDash \forall \mathbf{x} \varphi(\mathbf{x}, f_\varphi(\mathbf{x})).
+    \mathcal{M} \vDash \forall_\mathbf{x} \varphi(\mathbf{x}, f_\varphi(\mathbf{x})).
   \]
 \end{defi}
 
@@ -1488,7 +1510,7 @@ Note that first order logic is not decidable. However, \emph{monadic} first orde
 \end{proof}
 
 \begin{defi}[Set of indiscernibles]\index{set of indiscernibles}
-  We say $\bra I, \leq_I\ket$ is a \emph{set of indiscernibles} for $\mathcal{L}$ and a structure $\mathcal{M}$ with $I \subseteq \mathcal{M}$ if $\forall \varphi \in \mathcal{L}(M)$, with $\varphi$ of arity $n$, and for all increasing tuples $\mathbf{x}, \mathbf{y} \in I$,
+  We say $\bra I, \leq_I\ket$ is a \emph{set of indiscernibles} for $\mathcal{L}$ and a structure $\mathcal{M}$ with $I \subseteq \mathcal{M}$ if for any $\varphi \in \mathcal{L}(M)$ of arity $n$, and for all increasing tuples $\mathbf{x}, \mathbf{y} \in I$,
   \[
     \mathcal{M} \vDash \varphi(\mathbf{x}) \Longleftrightarrow \mathcal{M} \vDash \varphi(\mathbf{y})
   \]
@@ -1615,23 +1637,23 @@ It is easy to see that both of these maps are elementary embeddings, where we re
 %How do we construct these $\mathcal{M}_s$? We start with any model $\mathcal{M}$ of $T$. We are going to assume that there is no last $\preccurlyeq$-thing in $\mathcal{M}$, and also that the graph of $\preccurlyeq$ is infinite. We let $\mathcal{U}$ be a non-principal ultrafilter $J = \{x: P(x)\}$. Then we pick $\mathcal{M}_s$ to be the result of doing an ultrapower construction using $\mathcal{U}$, $|s|$ many times to $\mathcal{M}$. The tricky bit is to construct the embeddings.
 %We define this by recursion. We write $\last(s)$ for the last element of $s$, and $\butlast(s)$ for $s \setminus \{\last(s)\}$. Given a structure $\mathcal{M}$, we write
 %\[
-%  L(\mathcal{M}) = \mathcal{M}^p/\mathcal{U}.
+% L(\mathcal{M}) = \mathcal{M}^p/\mathcal{U}.
 %\]
 %We need two gadgets
 %\begin{enumerate}
-%  \item An elementary embedding $K(\mathcal{M}): \mathcal{M} \to L(\mathcal{M})$.
-%  \item If $i$ is an embedding from $\mathcal{M}$ into $\mathcal{N}$, then there is an
-%    \[
-%      L(i): L(\mathcal{M}) \to L(\mathcal{N}).
-%    \]
-%    which is ``compose with $i$ on the right''.
+% \item An elementary embedding $K(\mathcal{M}): \mathcal{M} \to L(\mathcal{M})$.
+% \item If $i$ is an embedding from $\mathcal{M}$ into $\mathcal{N}$, then there is an
+% \[
+% L(i): L(\mathcal{M}) \to L(\mathcal{N}).
+% \]
+% which is ``compose with $i$ on the right''.
 %\end{enumerate}
 %Moreover, these are compatible in the sense
 %\[
-%  \begin{tikzcd}
-%    \mathcal{M} \ar[r, "i"] \ar[d, "K(\mathcal{M})"] & \mathcal{N} \ar[d, "K(\mathcal{N})"]\\
-%    L(\mathcal{M}) \ar[r, "L(i)"] & L(\mathcal{N})
-%  \end{tikzcd}
+% \begin{tikzcd}
+% \mathcal{M} \ar[r, "i"] \ar[d, "K(\mathcal{M})"] & \mathcal{N} \ar[d, "K(\mathcal{N})"]\\
+% L(\mathcal{M}) \ar[r, "L(i)"] & L(\mathcal{N})
+% \end{tikzcd}
 %\]
 %We can now recursively define $I(s, t): \mathcal{M}_s \to \mathcal{M}_t$.
 We now further consider the functions $\head$ and $\tail$ defined on finite linear orders by
@@ -1639,13 +1661,13 @@ We now further consider the functions $\head$ and $\tail$ defined on finite line
   \head(a_1 < \cdots < a_n) &= a_1\\
   \tail(a_1 < \cdots < a_n) &= a_2 < \cdots < a_n.
 \end{align*}
-We can now define the embeddings recursively. We write $I(s, t)$ for the desired inclusion from $\mathcal{M}_s$ into $\mathcal{M}_t$.  We set
+We can now define the embeddings recursively. We write $I(s, t)$ for the desired inclusion from $\mathcal{M}_s$ into $\mathcal{M}_t$. We set
 \begin{itemize}
   \item If $s = t$, then $I(s, t)$ is the identity.
   \item If $\head(s) = \head(t)$, then $I(s, t)$ is $L(I(\tail(s), \tail(t)))$.
   \item Otherwise, $I(s, t)$ is $K \circ I(s, \tail(t))$.
-%  \item If $s = t$, then $I(s, t)$ is the identity.
-%  \item If $\last(s) = \last(t)$, then $I(s, t)$ is $L(I(\butlast(s), \butlast(t)))$. Otherwise, it is $K \circ I(s, \butlast(t))$.
+% \item If $s = t$, then $I(s, t)$ is the identity.
+% \item If $\last(s) = \last(t)$, then $I(s, t)$ is $L(I(\butlast(s), \butlast(t)))$. Otherwise, it is $K \circ I(s, \butlast(t))$.
 \end{itemize}
 By our previous remark, we know these are all elementary embeddings, and that these maps form a commuting set. Thus, we obtain a direct limit $\mathcal{M}_\infty$.
 
@@ -1662,7 +1684,7 @@ Once we have done this, it is immediate that the copy of $I$ in the direct limit
 %
 %Now suppose know how to point to $|s|$-many things in $\mathcal{M}_s$. How about $\mathcal{M}_t$, where $|t| = |s| + 1$? We let $t'$ be $T$ with the penultimate elemenet deleted. By induction hypothesis, we know what the lsat thing in $\mathcal{M}_{t'}$ is. We have the embedding
 %\[
-%  I(t', t): \mathcal{M}_{t'} \to \mathcal{M}_t.
+% I(t', t): \mathcal{M}_{t'} \to \mathcal{M}_t.
 %\]
 %This will tells us which thing in the $|t|$th ultrapower is the designated element. % figure this out.
 %
@@ -1682,7 +1704,7 @@ What is the motivation of this? A $1$-type is a set of formulae all with one fre
 \end{defi}
 %
 %\begin{defi}[Saturated model]\index{saturated model}\index{model!saturated}\index{model!countably saturated}\index{$\aleph_0$-saturated model}\index{countably saturated model}
-%  We say a model $\mathcal{M}$ is called $\aleph_0$-saturated if $\mathcal{M}$ realizes every finitely satisfiable type.
+% We say a model $\mathcal{M}$ is called $\aleph_0$-saturated if $\mathcal{M}$ realizes every finitely satisfiable type.
 %\end{defi}
 
 Any fool can realize a type, but it takes a model theorist to omit one!
@@ -1735,7 +1757,7 @@ We first prove a special case for propositional logic.
 That was pretty trivial. But we can do something more than that --- the \emph{extended} omitting types theorem. It says we can omit countably many types simultaneously.
 
 %\begin{thm}
-%  Let $T$ be a first-order theory, and for each $i \in \N$, we have a type $\Sigma_i$. If $T$ locally emits $\Sigma_i$ for all $i$, then $T$ has a model that omits every $\Sigma_i$.
+% Let $T$ be a first-order theory, and for each $i \in \N$, we have a type $\Sigma_i$. If $T$ locally emits $\Sigma_i$ for all $i$, then $T$ has a model that omits every $\Sigma_i$.
 %\end{thm}
 %
 %Again, we prove the propositional version first.
@@ -1830,7 +1852,7 @@ We will not worry ourselves with small, technical problems like ``if $f(x, y)$ i
 
 Finally, to work with natural numbers, it is helpful to have recursion. Suppose $f, g$ are computable. We want to declare $h$ by saying
 \begin{align*}
-  h(0, \mathbf{x}) &= f(\mathbf{x})
+  h(0, \mathbf{x}) &= f(\mathbf{x})\\
   h(sn, \mathbf{x}) &= f(h(n, \mathbf{x}), n, \mathbf{x}).
 \end{align*}
 So to compute $h$ of a successor $sn$, we compute $h(n, \mathbf{x})$, and then do something to it. It is natural to believe that $h$ should be computable. This is called \term{primitive recursion}.
@@ -1894,7 +1916,7 @@ But we are in trouble if $f$ is not total. We might have $f(23) = 17$, but $f(11
 
 The solution is that we allow us to do a lot of primitive recursive stuff, which is always total, and then allow \emph{one} application of minimization. This works, and it works for some very particular reason.
 
-What does it mean for our formulation to ``work''? What we have described so far is \emph{syntactic} declarations of functions. We describe how we can build up our functions. We can also define computability \emph{semanticly}, by describing some rules for constructing machines that compute functions. What we want to prove is a completeness theorem, that says these are equivalent.
+What does it mean for our formulation to ``work''? What we have described so far is \emph{syntactic} declarations of functions. We describe how we can build up our functions. We can also define computability \emph{semantically}, by describing some rules for constructing machines that compute functions. What we want to prove is a completeness theorem, that says these are equivalent.
 
 We will not go into details about how we can define these machines. It doesn't matter too much. The key property is that they are ``finite'', and that they are deterministic. In particular, it is possible to number all machines. For example, we can use register machines, or Turing machines.
 
@@ -1902,17 +1924,17 @@ We consider \term{Kleene's $T$-function}. We define a function $T(m, i, t)$, whe
 
 It is obvious that this function is ``informally computable'', because the machine is deterministic. What is less obvious, but nevertheless true, is that for sufficiently sensible encodings of machines, our function $T$ is primitive recursive. To prove this properly, we have to pick an actual model of machines, and write things out properly, but we will not do this. % include some justification.
 
-On the other hand, every primitve recursive function can be computed by a register/Turing machine. This is, of course, proven inductively, and we are not going to prove this.a
+On the other hand, every primitive recursive function can be computed by a register/Turing machine. This is, of course, proven inductively, and we are not going to prove this.a
 
 So, any function computed by a register/Turing machine can be captured by primitive recursion and \emph{one} application of minimization. Indeed, consider the function computed by the machine numbered by $m$. This is the function which, on being given $i$, looks for the least $t$ such that the last frame of $T(m, i, t)$ says that the machine is halted. our output is then the content of register zero (or whatever it is).
 
 This gives us a completeness theorem! % talk about the other direction
 
-Now Kleene's $T$-function is primitive recursive, and is computed by some machine. Such a machhine can be used to simulate all other machines! In principle, what we have described so far specifies a rule for producing a universal Turing machine, but of course, following this description will construct something really nasty. It turns out we can produce them rather more easily, but we are programmers, and we will not do that.
+Now Kleene's $T$-function is primitive recursive, and is computed by some machine. Such a machine can be used to simulate all other machines! In principle, what we have described so far specifies a rule for producing a universal Turing machine, but of course, following this description will construct something really nasty. It turns out we can produce them rather more easily, but we are programmers, and we will not do that.
 
 Now let's use this to explain ``decidable'' subsets of $\N$. It turns out the basic notion in this area is not decidability, but \emph{semi-decidability}. We can think of this as ``finite recognizability''.
 
-Informally, we say $X \subseteq \N$ is semidecidable iff, on being a candidate $n$ for membership of $X$, then if $n \in X$, then we learn this in finite time.
+Informally, we say $X \subseteq \N$ is semi-decidable iff, on being a candidate $n$ for membership of $X$, then if $n \in X$, then we learn this in finite time.
 
 There are several ways to define semi-decidable sets.
 \begin{defi}[Semi-decidable set]\index{semi-decidable set}
@@ -1921,7 +1943,7 @@ There are several ways to define semi-decidable sets.
     \item $X$ is the image of some partial computable function $f: \N \to \N$.
     \item $X$ is the image of some total computable function $f: \N \to \N$.
     \item There is some partial computable function $f: \N \to \N$ such that $X = \{n \in \N: f(n) \downarrow\}$, where ``$f(n) \downarrow$'' means ``$f$ halts when given input $x$''.\index{$\downarrow$}
-    \item The fucntion $\chi_X: \N \to \{0\}$ given by
+    \item The function $\chi_X: \N \to \{0\}$ given by
       \[
         \chi_X =
         \begin{cases}
@@ -1969,6 +1991,367 @@ One should convince themselves that these are ``the same sets'', in the sense th
 
   So $\mathcal{M}$ cannot exist.
 \end{proof}
+
+We are now going to prove Rice's theorem. To prove that, we need the $smn$ theorem.
+
+\begin{thm}[$smn$ theorem]\index{$snm$ theorem}
+  There is a total computable function $s$ of two variables such that for all $e$, we have
+  \[
+    \{e\}(b, a) = \{s(e, b)\}(a).
+  \]
+  Here $\{e\}$ refers to the program coded by $e$.\index{$\{e\}$}
+
+  Similarly, we can find such an $s$ for any tuples $\mathbf{b}$ and $\mathbf{a}$.
+\end{thm}
+This is called the $smn$ theorem because the function is called $s$, and $m$ and $n$ usually refers to the length of the tuples $\mathbf{b}$ and $\mathbf{a}$.
+
+This is ``obviously'' true.
+
+\begin{thm}[Fixed point theorem]
+  Let $h: \N \to \N$ be total computable. Then there is an $n \in \N$ such that $\{n\} = \{h(n)\}$, in the sense that they have the same graph.
+\end{thm}
+
+\begin{proof}
+  Consider the map
+  \[
+    \pair(e, x) \mapsto \{h(s(e, e))\}(x).
+  \]
+  This is clearly computable, and is computed by a machine numbered $a$, say. We then pick $n = s(a, a)$. Then we have
+  \[
+    \{n\}(x) = \{s(a, a)\}(x) = \{a\}(a, x) = \{h(s(a, a))\}(x) = \{h(n)\}(x).
+  \]
+\end{proof}
+This is a piece of black magic. Later, we will see that this is actually just applying the $Y$ combinator, which is what is used to produce fixed points in general.
+
+\begin{thm}[Rice's theorem]\index{Rice's theorem}
+  Let $A$ be a non-empty proper subset of the set of graphs of all computable functions $\N \to \N$. Then $\{n: \mathrm{graph}(\{n\}) \in A\}$ is not decidable.
+\end{thm}
+This says it is impossible to decide what a program does based on what its code is.
+
+\begin{proof}
+  We fix an $A$. Suppose not. We let $\chi$ be the (total) characteristic function of $\{n: \mathrm{graph}(\{n\}) \in A\}$. Suppose $\chi$ is computable. We find naturals $a, b$ such that $\mathrm{graph}(\{a\}) \in A$ and $\mathrm{graph}(\{b\}) \not\in A$. Then by the hypothesis, the following is computable:
+  \[
+    g(n) =
+    \begin{cases}
+      b & \mathrm{graph}(\{n\}) \in A\\
+      a & \text{otherwise}
+    \end{cases}.
+  \]
+  The key point is that this is the wrong way round. We return something in $A$ if the graph of $\{n\}$ is \emph{not} in $A$. Now by the fixed point theorem, there is some $n \in \N$ such that
+  \[
+    \{n\} = \{g(n)\}.
+  \]
+  We now ask ourselves --- do we have $\mathrm{graph}(\{n\}) \in A$? If so, then we also have $\mathrm{graph}(\{g(n)\}) \in A$. But these separately imply $g(n) = b$ and $g(g(n))$ respectively. This implies $g(b) = b$, which is not possible.
+
+  Similarly, if $\mathrm{graph}(\{n\}) \not \in A$, then $\mathrm{graph}(\{g(n)\}) \not \in A$. These again separately imply $g(n) = a$ and $g(g(n)) = a$. So we find $g(a) = a$, which is again a contradiction.
+\end{proof}
+
+\begin{cor}
+  It is impossible to grade programming homework.
+\end{cor}
+
+\begin{prop}
+  A set $X \subseteq \N^k$ is semi-decidable iff it is a projection of a decidable subset of $\N^{k + 1}$.
+\end{prop}
+
+\begin{prop}
+  $(\Rightarrow)$ We write $\mathbf{x}:n$ for the tuple obtained by appending $n$ to $\mathbf{x}$. Then if
+  \[
+    X = \{\mathbf{x} \mid \exists_n \mathbf{x}:n\in Y\},
+  \]
+  where $Y \subseteq \N^{k + 1}$ is decidable, then to check for any candidate $\mathbf{x}$ whether $\mathbf{x} \in X$, we just test $\mathbf{x}:0, \mathbf{x}:1, \mathbf{x}:2, \cdots$ for membership of $Y$. So we see that $X$ is semi-decidable.
+
+  $(\Leftarrow)$ Suppose $X$ is semi-decidable. So $X = \dom(\{m\})$ for some $m \in n$, ie. $X = \{n: \{m\}(n) \downarrow\}$. Then we can define
+  \[
+    Y = \{(\mathbf{x}, t) \mid \{m\}(\mathbf{x})\text{ halts in $t$ steps}\}.
+  \]
+\end{prop}
+There are a lot of things we can encode as natural numbers. For example, we can encode decidable sets by natural numbers, via encoding them by the functions that define them. Thus, we can talk about decidable sets of decidable sets.
+
+We can also encode theorems in theories. Usually, our theories have a decidable set of axioms. It follows that the set of all valid proofs in a theory is decidable. So it follows that the set of theorems in a theory is semi-decidable. This also works with theories with a semi-decidable set of axioms.
+
+\begin{thm}[Craig's theorem]
+  Every first-order theory with a semi-decidable set of axioms has a decidable set of axioms.
+\end{thm}
+
+\begin{proof}
+  By assumption, there is a function that lists out all axioms. We then take the $n$th axiom of our new axiomatization to be
+  \[
+    \left(\wedge_{i < n} \varphi_i\right) \to \varphi_n,
+  \]
+  where $\varphi_n$ is the $n$ axiom emitted. Then this is a decidable set.
+\end{proof}
+
+Suppose we take the theory of ``true arithmetic''. We can add a constant $c$, and add axioms to say $0 < c$, $1 < c$, $2 < c$, \ldots, and by compactness, this has a model. Moreover, by Lowenheim--Skolem, we know have a countable non-standard model of $\N$. We may wlog the carrier set is in fact $\N$. How bad can this model look like?
+
+It turns out that in such a model, the graph of $+$ and $\times$ cannot be decidable. Why is this so?
+
+It turns out every model of arithmetic gives us a model of second-order arithmetic. The idea is to code up subsets of the ``standard copy of $\N$'' using other (bigger) numbers.
+
+We note that
+\[
+  nEm\text{ if the $n$th bit of $m$ is $1$}.
+\]
+In fact, this gives $\bra \N, E\ket \cong \bra V_\omega\ket$. This is not hard to see --- this relation is clearly extensional, and given any collection of naturals, we can construct a number that ``contains'' them.
+
+We claim that any decidable set of standard naturals can be encoded by a (possibly nonstandard) natural, in the sense that if $X \subseteq \{\text{standard part}\}$, then there exists a possibly non-standard $n$ such that $x = \{\text{standard part}\} \cap \{m: m E n\}$. Note that this $n$ is not unique.
+
+We write $x \oplus y$ for the logical or of $x, y \in \N$ thought of as bit-strings. This is arithmetically definable. Let $P$ be a decidable predicate. We want to find a natural number that encodes the extension of $P$. We declare
+\begin{align*}
+  f(0) &= 0\\
+  f(n + 1) &= \cif P(n + 1) \cthen f(n) \oplus 2^{n + 1} \celse f(n).
+\end{align*}
+Since $P$ is decidable, this is a computable function. Then by induction, we know that if $n < m$, then % need to take care of n =0
+\[
+  P(n) \Leftrightarrow n E f(m).
+\]
+Thus, we simply pick an $m$ greater than all non-standard naturals, and then the standard part of $\mathrm{graph}(P)$ is
+\[
+  \{n: n E f(m)\} \cap \text{standard}.
+\]
+Can we encode any undecidable subset? Consider the function
+\begin{align*}
+  f(0) &= 0\\
+  f(n + 1) &= \clet n + 1 = \bra p, i, t\ket \cin \cif \{p\} \cthen f(n) \oplus 2^{\bra p, i \ket} \cthen f(n).
+\end{align*}
+Then values of $f$ are every-improving approximations to the halting set. The plan is that if $m$ is nonstandard, then $f(m)$ all questions ``does $p(i)$ halt'' for standard $p$ and $i$.
+
+Unfortunately, this doesn't really work! Our function does tell us whether $p(i)$ halts, but it is possible that it halts in a non-standard number of steps!
+
+For example, consider the theory $T = PA + \neg \con(PA)$. By G\"odel's incompleteness theorem, this is consistent! Certainly, $T \vdash \neg \con(T)$. Let $P$ be the programme that, on given an input $i$, examines, in order, all numbers $ > i$ and halts when it finds a proof of $\neg\con(T)$. Then $P$ halts on all standard input, but never holds in standard time, because there is no proof of $\neg \con (PA)$ (if $PA$ is indeed consistent!)!
+
+What we need is the extra assumption that our model is a model of true arithmetic. If this is the case, then this function $f$ really does encode the halting set of standard computations. So there exists some $m$ such that $\{n: n E m\} \cap \mathrm{standard} = \{\bra p, i\ket: \{p\}(i) \downarrow, p, i\text{standard}\}$.
+
+Now if $+$ and $\times$ are computable, then we can compute this $f$! And thus we can solve the halting problem, which is nonsense.
+
+\subsection{Computability by \texorpdfstring{$\lambda$}{lambda}-calculus}
+We have seen $\lambda$-calculus in the setting of decorating natural deduction proofs. It turns out we can do a lot of things with $\lambda$ calculus. We begin by encoding numerals. They will be of the type $\mathbf{N} = (A \to A) \to (A \to A)$, and the idea is that $n$ will be encoded by $f \mapsto f^n$. Formally, we define them as follows:
+\begin{defi}[Church numerals]\index{church numerals}\index{$\underline{n}$}
+  We define
+  \begin{align*}
+    \underline{0} &= K(\id) = \lambda f. \lambda x. x : \mathbf{N}\\
+    \succ &= \lambda n. \lambda f. \lambda x. f((nf)x) : \mathbf{N} \to \mathbf{N}
+  \end{align*}
+  We write $\underline{n} = \succ^n(\underline{0})$.
+
+  We can define arithmetic as follows:
+  \begin{align*}
+    \plus &= \lambda n. \lambda m. \lambda f. \lambda x. (nf)((mf)x): \mathbf{N} \to \mathbf{N} \to \mathbf{N}\\
+    \mult &= \lambda n. \lambda m. \lambda f. \lambda x. (n(mf))x: \mathbf{N} \to \mathbf{N} \to \mathbf{N}\\
+    \lexp &= \lambda n. \lambda m. \lambda f. \lambda x. ((nm)f))x: \mathbf{N} \to \mathbf{N} \to \mathbf{N}
+  \end{align*}
+  Here $\exp n\; m = n^m$.
+\end{defi}
+We can also write $\mult$ as
+\[
+  \mult = \lambda n. \lambda m.\lambda f. n(mf).
+\]
+We can also encode logic. We let
+\begin{align*}
+  \ctrue &= \lambda x y. x\\
+  \cfalse &= \lambda xy. y\\]
+  \cif b \cthen x \celse  &= \lambda b x y. b x y
+\end{align*}
+We also need a test for zero.
+\begin{align*}
+  \ciszero &= \lambda n. n (\lambda x \cfalse) \ctrue\\
+  \cfst &= \lambda x y f. f\; x\; y\\
+  \csnd &= \lambda p. p \cfalse\\
+  \cnil &= \lambda x. \ctrue
+\end{align*}
+We can check that
+\begin{align*}
+  \fst\; (\pair x\; y) &= x\\
+  \snd\; (\pair x\; y) &= y
+\end{align*}
+We also need lists. There are various solutions, and quick and dirty way is to define a list as an ordered pair of head an tail.
+
+Using these, we see that we can represent all primitive recursive functions with $\lambda$-terms. The only non-trivial part to check is that we can do recursion. This is done via fixed point functions. To illustrate this, we look at an example. We take our favorite example $\cfact: \N \to \N$
+\[
+  \cfact(n) = \cif n = 0 \cthen 1 \celse n \cdot \cfact (n - 1).
+\]
+But this is not a valid definition, since it is a circular definition. Of course, externally, we know this is always well-defined, but this is not clear \emph{a priori}.
+
+To get around this, we introduce a new function $\metafact: (\N \to \N) \to (\N \to \N)$, given by
+\[
+  \metafact\; f\; n = \cif n = 0 \cthen 1 \celse n \cdot f(n - 1)
+\]
+This is a genuinely legitimate definition of a function. Now suppose $f$ is a fixed point of $\metafact$, ie. $f = \metafact f$. Then we must have
+\[
+  f(n) = (\metafact f)(n) = \cif n = 0\cthen 1 \celse n \cdot (f(n - 1)).
+\]
+So all we need is a fixed point of $\metafact$.
+
+The idea is that any recursive function can be expressed as a fixed point of some such functions. So to implement ``all recursive functions'', all we need is to implement a fixed point function. We define the \term{$\Yc$-combinator}:
+\[
+  \Yc = \lambda f. \Big[ (\lambda x. f(x\; x)) (\lambda x. f(x\; x))\Big].
+\]
+Let's see what this does. Consider any function $g$. This gives
+\begin{align*}
+  \Yc\; g &= \lambda f. \Big[ (\lambda x. f(x\; x)) (\lambda x. f(x\; x))\Big]\; g\\
+  &= (\lambda x. (g(x\; x))) (\lambda x . g(x\; x))\\
+  &= g\Big((\lambda x. (g(x\; x))) (\lambda x . g(x\; x))\Big)
+\end{align*}
+Note that the last line is just $g$ applied to the second. In other words, we have
+\[
+  \Yc\; g = g (\Yc\; g).
+\]
+We also need to implement the minimization operator. In order to do so, we want an infinite list that represents all the values of a function.
+
+We need a function called $\cmap$, which takes a list and a function, and returns the list obtained by applying the function to each of the elements. We first need the $\cnull$ function that tells us whether a list is empty. We define
+\[ % introduce list notation properly
+  \cmap\; f\; x = \cif \cnull x\cthen x \celse f(\cfst x):(\cmap f (\csnd x)).
+\]
+Again, this is a ``circular'' definition, and we have to produce this using the $\Yc$-combinator.
+
+Next we need the infinite list of natural numbers. Computer scientists call these \term{streams}. This is a fixed point for
+\[
+  \lambda \ell. (0:(\cmap \succ \ell)).
+\]
+To get the $\mu$ combinator,  we need a way of searching through lists. We need to search through the list (stream) of values of $f$. In fact, we need to search through the list of pairs $\bra 0, f(0)\ket, \bra 1, f(1)\ket, \cdots$.
+
+We will need the function
+\[
+  \meow\; \mathbf{n}\; x = \cif \snd (\head x) = n \cthen \fst (\head x) \celse \meow\; n\; (\tail x).
+\]
+This is again a recursive definition, which we obtain via the $\Yc$-combinator. And so we are done.
+
+This is not so satisfactory. The function $\Yc$ clearly cannot be well-typed. These things are actually quite hard to think or reason about. It would be nice if we can implement more interesting functions using only well-typed objects. For example, we can implement the Ackermann function by
+\[
+  \lambda m. m ( \lambda f n. n\; f\; (f\; 1))\; \succ.
+\]
+One can check this is indeed well-typed.
+
+% can we implement primitive recursion.
+
+\begin{thm}
+  The set of G\"odel numbers of machines that compute total functions is not semi-decidable.
+\end{thm}
+
+\begin{proof}
+  Suppose it were. Then there is a computable total function $f: \N \to \N$ such that every computable total function is $\{f(n)\}$ for some $n$. Now consider
+  \[
+    \lambda n. (\{f(n)\} (n) + 1).
+  \]
+  This is a total computable function! But it is not $\{f(n)\}$ for any $n$, because it differs from $\{f(n)\}$ at $n$.
+\end{proof}
+
+Suppose $g: \N \to \N$ is a total computable function whose image is contained in the set of all machines that compute total functions. Then this construction computes a number $n$ such that $\{n\}$ is total, and $n$ is not in the range of $g$.
+
+\begin{defi}[Productive set]\index{productive set}
+  A set $X \subseteq \N$ is \emph{productive} if there is a total computable function $f: \N \to \N$ such that whenever $\im \{n\} \subseteq X$, then $f(n) \in X \setminus \im \{n\}$
+\end{defi}
+In some sense, these are ``decidably non-semi-decidable'' set.
+
+We can use this to prove G\"odel's incompleteness theorem!
+\begin{defi}[Sound theory]\index{sound theory}\index{theory!sound}
+  A \emph{sound} theory of arithmetic is one all of whose axioms are true in $\N$ (for some fixed copy of $\N$ in some greater theory).
+\end{defi}
+This is not to be confused with consistency, which does not refer to any model. For example, $PA + \neg \con (PA)$ is an unsound consistent theory.
+
+We fix a theory of arithmetic, call it $T$, that is recursively axiomatized, ie. the set of axioms is a semi-decidable set (hence decidable). Then the set of its theorems is semi-decidable. So $\{n: T \vdash \{n\}\text{ is a total function}\}$ is semi-decidable. So there must be some total function such that $T$ does not prove it is total. In other words, $T$ is not complete!
+
+% maybe missing something, arithmetic truths are productive?
+
+Let $A$ be a non-empty semi-decidable set, so it is $\im g$ for some total computable $g: \N \to \N$. Recall that we can construct a ``diagonalization'' of $g$ to enumerate elements in the image. Let $f$ be the G\"odel number of this function.
+
+Let $a \in A$ be any member of $A$, and deifne $h: \N^2 \to \N$ by
+\[
+  h(n, k) = \cif T(f, n, k)\text{ has final state \textsf{HALT}} \cthen \text{emit register contents of $T(f, n, k)$} \celse a.
+\]
+Evidently $h$ is primitive recursive, and $A = h(\N \times \N)$.
+
+The notion of decidable and semi-decidable sets can be smuggled into any sort of mathematics that involves countable things.
+
+For example, in Ramsey's theory, we partition $\N^{(2)}$ into pieces, and then ask for an infinite monochromatic subset of $\N$. Ramsey's theorem says there is always one. But if the partition is decidable, can we obtain a decidable infinite monochromatic set?
+
+One might expect not, because the proof of Ramsey's theorem is rather non-constructive. In fact, twe have the following theorem:
+\begin{thm}[Jockusch]
+  There exists a decidable partition of $[\N]^3$ into two pieces with no infinite decidable monochromatic set.
+\end{thm}
+
+\begin{proof}
+  We define
+  \[
+    \rho(\{x < y < z\}) =
+    \begin{cases}
+      0 & \text{for all $p, d < x$, $\{p\}(d)$ halts in $y$ steps iff $\{p\}(d)$ halts in $z$ steps}\\
+      1 & \text{otherwise}
+    \end{cases}
+  \]
+  Now no monochromatic set can be coloured $1$, as there aren't enough truth values. On the other hand, an infinite monochromatic set for $0$ will solve the Halting problem, so cannot be decidable. Indeed, if we want to know if $\{p\}$ halts on $d$, then we look for the first number $x$ in the infinite monochromatic set greater than $x$. Then by construction of $\rho$, if $\{p\}(d)$ halts at all, then it must halt in $x$ steps, and we can just check this.
+\end{proof}
+
+But how about pairs? We can't do the same trick, and the situation is quite complex. That is beyond the scope of the course.
+
+This is cute result, but also introduces us to the notion of reducability. What we have done in the proof is that we showed if something can decide a monochromatic subset of $\N$, then we can solve the halting problem.
+
+\begin{defi}[Many-to-one reducibility]\index{many-to-one reducibility}\index{$\leq_m$}
+  Let $A, B \in \N$. We write $B \leq_m A$ if there exists a total computable functions $f: \N \to \N$ such taht for all $n \in \N$, we have $n \in B \leftrightarrow f(n) \in A$.
+\end{defi}
+Thus, if we have such a set, then whenever we can correctly answer questions about memebership in $A$, then we can answer questions about membership in $B$.
+
+It is easy to see that this is a quasi-order. If we take the intersection $\leq_m \cap \geq_m$ of the relations, then we get an equivalence relation. The equivalence classes are called \term{many-one degrees}. We think of these as ``degree of unsolvability''.
+
+Recall we had the halting set $\K$, and we had two potential defintions:
+\[
+  \{\bra p, i\ket: \{p\} (i) \downarrow\},\quad \{p: \{p\}(p)\downarrow\}.
+\]
+It is a nice exercise to show that these have the same many-one degree. More significantly, we have
+\begin{prop}
+  Let $A \subseteq \N$. Then $A \leq_m \K$ iff $A$ is semi-decidable.
+\end{prop}
+This is agian a technical exercise.
+
+Another useful fact is the following:
+\begin{prop}
+  $(\N \setminus \K) \leq_M A$ iff $A$ is productive.
+\end{prop}
+
+But is $\leq_m$ the right notion of relative computability? There is another notion of relative computability.
+
+In our definition of many-one reducibility, we are only allowed to run $f$ once, and see if the answer is in $A$. But why once?
+
+We can instead implement reducibility via \emph{oracles}. We enhance our architecture to allow our machine to ask whether $n \in A$. This reducibility relation is written $\leq_T$, where $T$ stands for ``Turing'', or just $\leq$. Since we are now allowed to ask this question many times, and potentially use it to do some computation afterwards, it is clear tha
+\[
+  B \leq_m A \Rightarrow B \leq A.
+\]
+It turns out the right notion to consider is $\leq_T$.
+
+Again $\leq$ is a quasi-order, and intersecting with the reverse, we get an equivalence relation, which we call \term{Turing degree}, or just \term{degree}.
+
+Now the quasi-order gives us a relation on Turing degrees. A natural question to ask is if this is actually a total order.
+
+To begin with, Turing degrees certainly form an upper semi-lattice, as given $A$ and $B$, we can form the disjoint union of $A$ and $B$, and knowing about membership of $A \coprod B$ means we know membership of $A$ and $B$, and vice versa.
+
+But are they linearly ordered by $\leq$? The answer is no! This was proved by Friedberg and Muchnik independently and simultaneously during the cold war.
+
+We will construct two sets $A$ and $B$, with $A \not\leq B \not\leq A$, and both sets will be semi-decidable. We will obtain them by
+\[
+  A = \bigcup_{n < \omega} A_n,\quad B = \bigcup_{n < \omega} B_n,
+\]
+where $A_n$ and $B_n$ are finite (and in particular decidable) and nested, ie. $i < j$ implies $A_i \subseteq A_j$ and $B_i \subseteq B_j$.
+
+Note that if we want $A \not\leq B$ and $B \not\leq A$, then neither of them can be decidable. Thus, these inclusions cannot be end extensions.
+
+We want to eventually ensure that $A$ is not the $e$th thing computable from $B$.
+
+We introduce a bit of notation. If we allow our programs to access the oracle $B$, then our ``programming language'' will allow consulation of $B$. Then in this new language, we can again assign G\"odel numbers to programs, and we write $\{e\}^B$ for the program whose G\"odel number is $e$.
+
+So we want
+\[
+  \chi_A \not= \{e\}^B
+\]
+for all $e$. We also want
+\[
+  \chi_B \not= \{e\}^A
+\]
+for all $e$.
+
+The idea is to choose $A_m$ such that it prevents $\chi_A$ from being $\{m\}^B$. But this is not straightforward, because when we try to pick $A_m$, we don't know the whole of $B$. We only know it up to stage $B_m$.
+
+
+
 
 \printindex
 \end{document}
