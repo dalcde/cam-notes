@@ -28,22 +28,24 @@
 \renewcommand\succ{\mathsf{succ}}
 \newcommand\clet{\mathsf{let}\;}
 \newcommand\cin{\;\mathsf{in}\;}
-\newcommand\cif{\mathsf{if}\;}
-\newcommand\cthen{\;\mathsf{then}\;}
-\newcommand\celse{\;\mathsf{else}\;}
+\newcommand\cid{\;\mathsf{id}\;}
+\newcommand\cif{{\color{blue} \mathsf{if}\;}}
+\newcommand\cthen{{\color{blue}\;\mathsf{then}\;}}
+\newcommand\celse{{\color{blue}\;\mathsf{else}\;}}
 \newcommand\con{\mathrm{con}}
 \newcommand\ctrue{\mathsf{true}}
+\newcommand\cons{\mathsf{cons}}
 \newcommand\cfalse{\mathsf{false}}
 \newcommand\ciszero{\mathsf{iszero}}
 \newcommand\cfst{\mathsf{fst}}
 \newcommand\csnd{\mathsf{snd}}
-\newcommand\cnil{\mathsf{cnil}}
+\newcommand\cnil{\mathsf{nil}}
 \newcommand\cfact{\mathsf{fact}}
 \newcommand\cmap{\mathsf{map}}
 \newcommand\cnull{\mathsf{null}}
 \newcommand\metafact{\mathsf{metafact}}
 \newcommand\Yc{\mathsf{Y}}
-\newcommand\meow{\mathsf{miaow}}
+\newcommand\cfind{\mathsf{find}}
 \newenvironment{bprooftree}
   {\leavevmode\hbox\bgroup}
   {\DisplayProof\egroup}
@@ -1822,127 +1824,268 @@ We now prove the general case.
 \end{proof}
 
 \section{Computability theory}
-Consider a Diophantine equation, say
+\subsection{Computability}
+We begin by discussing some number theory. Consider the Diophantine equation
 \[
-  x^2 + y^2 = z^2,
+  x^2 + y^2 = z^2.\tag{$*$}
 \]
-and we want to find solutions to these. We have already figured out how to solve all of these, namely
-% insert solution
-
-Now given a general Diophantine equation, is there an algorithm to list out all solutions? If there is one, then we can just write an algorithm, and we are done.
-
-But if we want to prove that there \emph{isn't} one, we need to come up with the formal notion of an ``algorithm''. We want to view an algorithm as a \emph{mathematical object}.
-
-Thus, we want to come up with the notion of a function $\N^k \to \N^m$ being a \emph{computable function}.
-
-The idea is to start off with functions that are uncontroversially computable, and close it under operations that uncontroversially preserve computability.
-
-What functions are uncontroversially computable? The constantly zero function $\lambda \mathbf{x}. 0$ is certainly computable. We can also have the identity function $\id: \N^n \to \N^n$. Also, projection functions
+We can certainly write down some solutions to this equation, eg.
 \[
-  \begin{tikzcd}[cdmap]
-    \proj_j^i (\mathbf{x}) : \N^j \ar[r] & \N\\
-    (x_1, \cdots, x_j) \ar[r, maps to ]& x_i
-  \end{tikzcd}
+  3^2 + 4^2 = 5^2.
 \]
-We also have the successor function $s: \N \to \N$ that increments a number. We can think of it as ``$+1$'', but this is a much more primitive idea than addition.
-
-What are the operations that uncontroversially preserve computability? Composition certainly preserves computability. For example, if $f: \N^2 \to \N$, $g: N^j \to \N$ and $h: \N^i \to \N$, then $f(g(\ph), h(\ph)): \N^{i + j} \to \N$ is also computable. Defining this properly is a mess.
-
-We will not worry ourselves with small, technical problems like ``if $f(x, y)$ is computable, then is $f(x, x)$ computable?''.
-
-Finally, to work with natural numbers, it is helpful to have recursion. Suppose $f, g$ are computable. We want to declare $h$ by saying
-\begin{align*}
-  h(0, \mathbf{x}) &= f(\mathbf{x})\\
-  h(sn, \mathbf{x}) &= f(h(n, \mathbf{x}), n, \mathbf{x}).
-\end{align*}
-So to compute $h$ of a successor $sn$, we compute $h(n, \mathbf{x})$, and then do something to it. It is natural to believe that $h$ should be computable. This is called \term{primitive recursion}.
-
-Do these give us everything we want? Let's look at the primitive recursion definition. When computing $h(sn, \mathbf{x})$, we are only allowed to know about $h(n, \mathbf{x})$, and not any of the previous values. This is pretty restrictive. For example, the usual definition of the Fibonacci numbers says
+But is it possible to find \emph{all} solutions? It is a well-known result that we can. Of course, to do so, it suffices to enumerate all solutions where $x, y, z$ are coprime It turns out every such solution of $(*)$ can be written as
 \[
-  \mathsf{Fib}(n + 1) = \mathsf{Fib}(n) + \mathsf{Fib}(n - 1),
+  x = m^2 - n^2,\quad y = 2mn, z = m^2 + n^2
 \]
-which is not in a primitive recursive form. Does it matter? It turns out not. The main idea is that pairing and unpairing can be done primitive recursively. In other words, there are functions $\plus: \N^2 \to \N$ and $\unpair: \N \to \N^2$ that are inverses to each other.
+for some $m, n \in \N$, and conversely, for any $m, n \in \N$, the $(x, y, z)$ given by this formula is a solution. Thus, if we want to list all solutions to $(*)$, then it suffices to plug in all possible values of $m$ and $n$. In other words, we have an \emph{algorithm} that enumerates all solutions to $(*)$.
 
-To do so, we show that addition and multiplication are primitive recursive. This is not hard. We declare
+Given any Diophantine equation, it would be great to have some similar algorithm that enumerates all solutions to the equation. But even before that, it would be great to have some algorithms that tell us whether there is any solution at all. This was Hilbert's 10th problem --- is there an algorithm that determines whether or not a Diophantine equation has a solution?
+
+If such an algorithm existed, then to prove this, we merely have to exhibit such an algorithm, and prove that it works? But how could we prove that there \emph{isn't} one. To do so, we must formulate an ``algorithm'' as a \emph{mathematical object}. Alternatively, we want a formal notion of what is a ``computable'' function.
+
+One way to do so is to define ``computable functions'' recursively. We will be concerned with functions $\N^n \to \N^m$ for different $k$ and $m$, and the idea is to list some functions that any sensible computer should be able to compute, and then close it under operations that really should preserve computability. We then hope that the set of functions produced this way is exactly the functions that can be ``computed'' by an ``algorithm''.
+
+We start with a naive attempt, and what we obtain is known as ``primitive recursive'' functions.
+\begin{defi}[Primitive recursive functions]\index{primitive recursive function}
+  The class of \emph{primitive recursive functions} $\N^n \to \N^m$ for all $n, m$ is defined inductively as follows:
+  \begin{itemize}
+    \item The constantly zero function $f(\mathbf{x}) = 0$, $f: \N^n \to \N$ is primitive recursive.
+    \item The successor function $\succ: \N \to \N$ sending a natural number to its successor (ie. it ``plus one'') is primitive recursive.
+    \item The identity function $\cid: \N \to \N$ is primitive recursive.
+    \item The projection functions
+      \[
+        \begin{tikzcd}[cdmap]
+          \proj_j^i (\mathbf{x}) : \N^j \ar[r] & \N\\
+          (x_1, \cdots, x_j) \ar[r, maps to ]& x_i
+        \end{tikzcd}
+      \]
+      are primitive recursive.
+  \end{itemize}
+  Moreover,
+  \begin{itemize}
+    \item Let $f: \N^k \to \N^m$ and $g_1, \cdots, g_k: \N^n \to \N$ be primitive recursive. Then the function
+      \[
+        (x_1, \cdots, x_n) \mapsto f(g_1(x_1, \cdots, x_n), \cdots, g_k(x_1, \cdots, x_n)): \N^n \to \N^m
+      \]
+      is primitive recursive.
+  \end{itemize}
+  Finally, we have closure under \term{primitive recursion}
+  \begin{itemize}
+    \item If $g: \N^k \to \N^m$ and $f: \N^{m + k + 1} \to \N^m$ are primitive recursive, then so is the function $h: \N^{k + 1} \to \N^m$ defined by
+      \begin{align*}
+        h(0, \mathbf{x}) &= g(\mathbf{x})\\
+        h(\succ \; n, \mathbf{x}) &= f(h(n, \mathbf{x}), n, \mathbf{x}).
+      \end{align*}
+  \end{itemize}
+\end{defi}
+Do these give us everything we want? We first notice that we can define basic arithmetic using primitive recursion by
 \begin{align*}
   \plus(0, n) &= n\\
-  \plus(sm, n) &= s(\plus(m, n))\\
+  \plus(\succ\; m, n) &= \succ (\plus(m, n))\\
   \mult(1, n) &= n\\
-  \mult(sm, n) &= \plus(n, \mult(m, n)),
+  \mult(\succ\; m, n) &= \plus(n, \mult(m, n)),
 \end{align*}
-Similarly, we can define $\exp$ etc.
+Similarly, we can define $\mathsf{exp}$ etc.
 
-We then define
+What else can we do? We might want to define the Fibonacci function
 \[
-  \pair(x, y) = \binom{x + y + 1}{2} + y.
+  \mathsf{Fib}(0) = \mathsf{Fib}(1) = 1, \quad \mathsf{Fib}(n + 1) = \mathsf{Fib}(n) + \mathsf{Fib}(n - 1)?
 \]
-Writing down the inverse $\unpair$ is more annoying, but possible. Given these, we can define a new function $F: \N \to \N$ by
+But the definition of primitive recursion only allows us to refer to $h(n, \mathbf{x})$ when computing $h(\succ \; n, \mathbf{x})$. This isn't really a problem. The trick is to not define $\mathsf{Fib}$ directly, but to define the function
 \[
-  F(n + 1) = \clet (x, y) = \unpair (F(n)) \cin \pair(x + y, y).
+  \mathsf{Fib}' (n) =
+  \begin{pmatrix}
+  \mathsf{Fib} (n)\\
+  \mathsf{Fib} (n - 1)
+  \end{pmatrix}
 \]
-If we work through all details in our spare time, then we find that all ``natural'' functions $\N \to \N$ we can come up with are indeed primitive recursive.
+instead, using primitive recursion, and then projecting back to the first component. But this requires us to fix the number of things we are required to refer back to. What if we want to refer back to everything less than $n$?
 
-But it turns out there \emph{is} a problem with our definition. In our definition of recursion, we recurse on only one variable. In other words, we are doing recursion over $\omega$ only, instead of any ordinal, or more generally any well-founded relation.
+The solution to this is that we can actually encode pairs as natural numbers themselves:
+\begin{prop}
+  There exists primitive recursion functions $\pair: \N^2 \to \N$ and $\unpair: \N \to \N^2$ such that
+  \[
+    \unpair (\pair(x, y)) = (x, y)
+  \]
+  for all $x, y \in \N$.
+\end{prop}
 
-Consider the \term{Ackermann function}
+\begin{proof}
+  We can define the pairing function by
+  \[
+    \pair(x, y) = \binom{x + y + 1}{2} + y.
+  \]
+  The unpairing function can be shown to be primitive recursive, but is more messy.
+\end{proof}
+
+The benefit of this is that we can now encode lists as naturals. What would it mean to be a list? We will informally denote a list by square brackets, eg. $[x_1, \cdots, x_n]$. The idea is that we have functions $\head, \tail, \cons$ such that
 \begin{align*}
-  A(0, n) &= n + 1\\
-  A(m, 0) &= A(m -1, 1)\\
-  A(m + 1, n + 1) &= A(m, A(m + 1, n)).
+  \head\; [x_1, \cdots, x_n] &= x_1\\
+  \tail\; [x_1, \cdots, x_n] &= [x_2, \cdots, x_n]\\
+  \cons (x, [x_1, \cdots, x_n]) &= [x, x_1, \cdots, x_n]
 \end{align*}
-If we try to do this computation, it will take forever, but we know it will eventually halt. Indeed, to evaluate $A$ on $\bra m + 1, n + 1\ket$, we need to know the value of $A$ on $\bra m + 1, n\ket$, and then $\bra m, A(m + 1, n)\ket$. If we order pairs $\N \times \N$ under the lexicographic order, then every time, we require values of $A$ on smaller pairs, and since $\N \times \N$ is well-ordered, this eventually terminates.
+If we think a bit harder, then what we are really looking for is really the following property:
+\begin{cor}
+  There exists $\cons : \N \to \N, \head: \N \to \N$ and $\tail: \N \to \N$ such that
+  \[
+    \cons (\head \;x, \tail \;x) = x
+  \]
+\end{cor}
 
-However, this function is not primitive recursive! The problem is that it ``grows too fast''.
-\begin{defi}[Dominating function]\index{dominating function}\index{$f < g$}\index{$<$}
-  Let $f, g: \N \to \N$ be functions. Then $f < g$ if for all sufficiently large integer $n$, then $f(n) < g(n)$. We say $g$ \emph{dominates} $f$.
+\begin{proof}
+  Take $\cons = \pair$; $\head$ to be the first projection of the unpairing and $\tail$ to be a second projection.
+\end{proof}
+
+So we can encode lists as well. We can lock ourselves in a room with enough pen and paper, and try to prove that most functions $\N \to \N$ we encounter ``in daily life'' are indeed primitive recursive.
+
+However, it turns out there are some contrived examples that really should be computable, but not primitive recursive.
+
+\begin{defi}[Ackermann function]
+  The \term{Ackermann function} is defined to be
+  \begin{align*}
+    A(0, n) &= n + 1\\
+    A(m, 0) &= A(m -1, 1)\\
+    A(m + 1, n + 1) &= A(m, A(m + 1, n)).
+  \end{align*}
 \end{defi}
-It turns out that the unary Ackermann function $\lambda n. A(n, n)$ dominates \emph{all} primitive recursive functions!
 
-How can we prove this? Our set of primitive recursive functions are defined by recursion on some operations. So we might think we can just prove this by recursion. This is indeed the case, but the proof is very very fiddly, and we will not do that.
+\begin{prop}
+  The Ackermann function is well-defined.
+\end{prop}
 
-We might want to just put in the Ackermann function, and try to close it. But this doesn't really work, as we can invent a three-term Ackermann function and break this. Even if we keep adding more and more Ackermann functions, this is not going to fix it.
+\begin{proof}
+  To see this, note that computing $A(m + 1, n + 1)$ requires knowledge of the values of $A(m + 1, n)$, and $A(m, A(m + 1, n))$.
 
-The problem is that everything we've had so far are \emph{total}. We are absolutely certain that such a function will halt, and in particular they are everywhere defined.
+  Consider $\N \times \N$ ordered lexicographically. Then computing $A(m + 1, n + 1)$ requires knowledge of the values of $A$ at pairs lying below $\bra m + 1, n + 1\ket$ in this order. Since the lexicographic order of $\N \times \N$ is well-ordered (it has order type $\omega \times \omega$), by transfinite induction, we know $A$ is well-defined.
+\end{proof}
+We can indeed use this definition to compute $A$, and it is going to take forever. But we can still do it.
 
-But anyone who has tried to write a program have experienced writing a program that is everywhere undefined, and since we have written a program, it is certainly computable!
+However, this function is not primitive recursive! Intuitively, this is because the definition of $A$ does ``transfinite recursion over $\omega \times \omega$'', while the definition of primitive recursion only allows us to do ``transfinite recursion over $\omega$''.
 
-The key missing piece is inverses. Given a function $f: \N \to \N$, can we compute an inverse to $f$? Suppose we want to find $f^{-1}(17)$. To do so, we compute $f(0)$, $f(1)$, $f(2)$, etc., and then stop when we find something that its $17$.
+That is the idea, but obviously not a proof. To prove it properly, this is done by proving that the Ackermann ``grows too fast''.
+\begin{defi}[Dominating function]\index{dominating function}\index{$f < g$}\index{$<$}
+  Let $f, g: \N \to \N$ be functions. Then we write $f < g$ if for all sufficiently large integer $n$, we have $f(n) < g(n)$. We say $g$ \emph{dominates} $f$.
+\end{defi}
 
-We can certainly do this when $f$ is total. We just keep computing those things, and then we will get an answer. Even if there is no inverse, we are not really stuck, as we decided we are fine with non-total functions.
+It is a remarkable theorem that
+\begin{thm}
+  The function $n \mapsto A(n, n)$ dominates all primitive recursive functions.
+\end{thm}
+We will not prove this, as it is messy, and not really the point of the course. The point of bringing up the Ackermann function is just to know that we are not doing good enough!
 
-Sometimes $f$ is not injective, but this is not too large of a problem. We can just always return the first number that is sent to $17$.
+The obvious fix would be to allow some more complicated form of recursion, and hope that we will be safe. But this doesn't really do the job.
 
-But we are in trouble if $f$ is not total. We might have $f(23) = 17$, but $f(11)$ is undefined. So we will never discover that $f(23) = 17$. One solution might be to ``zig zag''. We compute a bit of $f(1)$, then if it doesn't halt, we compute a bit of $f(2)$, and then go back to do a bit more of $f(1)$, then a bit more of $f(2)$, then compute $f(3)$ etc., but the problem that if $f$ is not injective, which element in the inverse we find depends on how we transverse diagonally, and this is bad.
+It turns out the problem is that we are only defining \emph{total} functions. If we tried to compute any of the primitive recursive functions, we are guaranteed that we can do it in finite time. In particular, our functions are always defined everywhere. But anyone with programming experience knows very well that most programs we write are not everywhere defined. Often, they are \emph{nowhere defined}, and just doesn't run, or perhaps gets stuck in a loop for ever! But we did write some code for this program, so surely this nowhere defined function should be computable as well!
 
-The solution is that we allow us to do a lot of primitive recursive stuff, which is always total, and then allow \emph{one} application of minimization. This works, and it works for some very particular reason.
+Our way of thinking about functions that are not everywhere defined is via non-termination. We imagine we have a computer program trying to compute a function $f$. If $f(42)$ is undefined, instead of the program running for a while and then saying ``I give up'', the program keeps running forever,
 
-What does it mean for our formulation to ``work''? What we have described so far is \emph{syntactic} declarations of functions. We describe how we can build up our functions. We can also define computability \emph{semantically}, by describing some rules for constructing machines that compute functions. What we want to prove is a completeness theorem, that says these are equivalent.
+It turns out we can ``fix'' the problem merely by introducing one operation --- inverses. This is slightly subtle. Imagine we are writing a compute program, and suppose we have a (computable) function $f: \N \to \N$. We want to compute an inverse to $f$. Say we want to find $f^{-1}(17)$. To compute this, we just compute $f(0)$, $f(1)$, $f(2)$, etc., and if $17$ is in the image, then we will eventually find something that gets sent to $17$.
 
-We will not go into details about how we can define these machines. It doesn't matter too much. The key property is that they are ``finite'', and that they are deterministic. In particular, it is possible to number all machines. For example, we can use register machines, or Turing machines.
+There are two minor problems and one major problems with this:
+\begin{itemize}
+  \item $f$ might not be injective, and there are multiple values that get sent to $17$. If this happens, we just agree that we return the first natural number that gets sent to $17$, which is what is going to happen if we perform the above procedure.
+  \item $f$ might not be surjective, and we can never find something that gets sent to $17$. But this is not a problem, since we just decided that our functions don't have to be total! If $f$ is not surjective, we can just let the program keep running forever.
+\end{itemize}
+But there is still a major problem. Since we decided functions need not be total, what happens if $f$ is total? We might have $f(23) = 17$, but $f(11)$ never halts. So we never learn that $f(23) = 17$.
 
-We consider \term{Kleene's $T$-function}. We define a function $T(m, i, t)$, where $m$ is the number of a machine; $i$ is the input; and $t$ is the time interval. This function does this --- we feed $i$ into the machine $m$, and then let it run for $t$ many time steps. We then return the description of the state of the machine at all times $1, 2, \cdots, t$, encoded as an natural.
+We might think we can get around this problem by ``diagonalizing''. We assume our computers perform computations for discrete time steps. Then we compute $f(1)$ for one step; then $f(1)$ and $f(2)$ for two steps; then $f(1)$, $f(2)$ and $f(3)$ for three steps, etc. Then if $f(23) = 17$, and it takes $100$ steps of computation to compute this, then we will figure this out on the $100$th iteration of this process.
 
-It is obvious that this function is ``informally computable'', because the machine is deterministic. What is less obvious, but nevertheless true, is that for sufficiently sensible encodings of machines, our function $T$ is primitive recursive. To prove this properly, we have to pick an actual model of machines, and write things out properly, but we will not do this. % include some justification.
+This doesn't really solve our problem, though. If $f$ is not injective, then this doesn't guarantee to return the minimum $x$ such that $f(x) = 17$. It just returns some \emph{arbitrary} $x$ such that $f(x) = 17$. This is bad.
 
-On the other hand, every primitive recursive function can be computed by a register/Turing machine. This is, of course, proven inductively, and we are not going to prove this.a
+So we make a compromise. The obvious compromise is to just allow computing inverses of total functions, but since total functions are hard to invert, we shall make a further compromise to just allow computing inverse of primitive recursive functions.
 
-So, any function computed by a register/Turing machine can be captured by primitive recursion and \emph{one} application of minimization. Indeed, consider the function computed by the machine numbered by $m$. This is the function which, on being given $i$, looks for the least $t$ such that the last frame of $T(m, i, t)$ says that the machine is halted. our output is then the content of register zero (or whatever it is).
+Before we continue, we define some useful conventions:
+\begin{notation}\index{$\uparrow$}\index{$\downarrow$}
+  We write $f(x) \uparrow$ if $f(x)$ is undefined, or alternatively, after we define what this actually means, if the computation of $f(x)$ doesn't halt. We write $f(x) \downarrow$ otherwise.
+\end{notation}
 
-This gives us a completeness theorem! % talk about the other direction
+\begin{defi}[Partial recursive function]\index{partial recursive function}
+  The class of \emph{partial recursive functions} is given inductively by
+  \begin{itemize}
+    \item Every primitive recursive function is partial recursive.
+    \item The inverse of every primitive recursive function is partial recursive, where if $f: \N^{k + n} \to \N^m$, then the/an inverse of $f$ is the function $f^{-1}: \N^{k + m} \to \N^n$ given by
+      \[
+        f^{-1}(\mathbf{x}; \mathbf{y}) =
+        \begin{cases}
+          \min \{\mathbf{z}: f(\mathbf{x}, \mathbf{z}) = \mathbf{y}\} &\text{if exists}\\
+          \uparrow & \text{otherwise}
+        \end{cases}.
+      \]
+    \item The set of partial recursive functions is closed under primitive recursion and composition.
+  \end{itemize}
+\end{defi}
+Of course, this allows us to compute the inverse of functions of several inputs using pairing and unpairing functions.
 
-Now Kleene's $T$-function is primitive recursive, and is computed by some machine. Such a machine can be used to simulate all other machines! In principle, what we have described so far specifies a rule for producing a universal Turing machine, but of course, following this description will construct something really nasty. It turns out we can produce them rather more easily, but we are programmers, and we will not do that.
+It turns out this definition is ``correct''. What do we mean by this?
 
-Now let's use this to explain ``decidable'' subsets of $\N$. It turns out the basic notion in this area is not decidability, but \emph{semi-decidability}. We can think of this as ``finite recognizability''.
+What we have described so far is \emph{syntactic} declarations of functions. We describe how we can build up our functions. We can also define computability \emph{semantically}, by describing some rules for constructing machines that compute functions. In other words, we actually define what a ``computer'' is, and then a function is computable if it can be computed by a computer. What we want to prove is that the partial recursive functions are exactly the functions that can be computed by a machine.
 
-Informally, we say $X \subseteq \N$ is semi-decidable iff, on being a candidate $n$ for membership of $X$, then if $n \in X$, then we learn this in finite time.
+We will not go into details about how we can define these machines. It is possible to do so; it doesn't really matter; and the actual details are messy. However, any sensible construction of machines will satisfy the following description:
+\begin{itemize}
+  \item A machine can be described by a finite string. In particular, it is possible to number all the possible machines. Thus, each machine can be specified by a \term{G\"odel number} uniquely. We write $\{m\}$ for the machine corresponding to the numbering $m$.
+  \item A machine has a countable (enumerated) number of possible \term{states}, and one of them is called \texttt{HALT}. A machine also has a \term{register} that can store a natural number.
+  \item A machine can take in a fixed number of inputs. Afterwards, in every discrete time step, it (potentially) changes the content of its register, and moves to a new state. However, if the current state is \texttt{HALT}, then it does nothing.
 
-There are several ways to define semi-decidable sets.
+    For inputs $x_1, \cdots, x_n$ into the machine $\{m\}$, we write
+    \[
+      \{m\}(x_1, \cdots, x_n) =
+      \begin{cases}
+        \text{value in the register after halting} & \text{if machine halts}\\
+        \uparrow & \text{otherwise}
+      \end{cases}
+    \]
+    Thus, we will also write $\{m\}$ for the function computed by $\{m\}$.
+  \item The above process is ``computable'' in the following precise sense --- we define \term{Kleene's $T$ function} $T(m, i, t): \N^3 \to \N$ whose value encodes (in a primitive recursive way) the states and register contents during the first $t$ steps in the evaluation of $\{m\}(i)$. Then $T$ is a \emph{primitive} recursive function.
+  \item For any partial recursive function $f$, there is a machine $\{m\}$ such that $\{m\}(x) = f(x)$ for all $x \in \N$. In particular $\{m\}(x)$ always halts.
+\end{itemize}
+
+Now of course, given our requirements for what a ``machine'' should be, it is absolutely obvious that functions computable by programs in the above sense is exactly the same as the functions that are partial recursive. The only perhaps slightly non-trivial part is to show that every function computed by a machine is partial recursive. To prove this, given a machine $\{m\}$, inversion gives us the function
+\[
+  g(i) = \min \{t: T(m, i, t) \text{ has final state \texttt{HALT}}\},
+\]
+and then we can define $h(i)$ by computing $T(m, i, g(i))$ and then extracting the register content in the final state, which we assumed is a primitive recursive process. Then $h(i) = \{m\}(i)$, and so $\{m\}$ is a partial recursive function. % revisit this
+
+%
+%The key property is that they are ``finite'', and that they are deterministic. In particular, it is possible to number all machines. For example, we can use register machines, or Turing machines.
+%
+%We consider \term{Kleene's $T$-function}. We define a function $T(m, i, t)$, where $m$ is the number of a machine; $i$ is the input; and $t$ is the time interval. This function does this --- we feed $i$ into the machine $m$, and then let it run for $t$ many time steps. We then return the description of the state of the machine at all times $1, 2, \cdots, t$, encoded as an natural.
+%
+%It is obvious that this function is ``informally computable'', because the machine is deterministic. What is less obvious, but nevertheless true, is that for sufficiently sensible encodings of machines, our function $T$ is primitive recursive. To prove this properly, we have to pick an actual model of machines, and write things out properly, but we will not do this. % include some justification.
+%
+%On the other hand, every primitive recursive function can be computed by a register/Turing machine. This is, of course, proven inductively, and we are not going to prove this.
+%
+%So, any function computed by a register/Turing machine can be captured by primitive recursion and \emph{one} application of minimization. Indeed, consider the function computed by the machine numbered by $m$. This is the function which, on being given $i$, looks for the least $t$ such that the last frame of $T(m, i, t)$ says that the machine is halted. our output is then the content of register zero (or whatever it is).
+%
+%This gives us a completeness theorem! % talk about the other direction
+%
+%Now Kleene's $T$-function is primitive recursive, and is computed by some machine. Such a machine can be used to simulate all other machines! In principle, what we have described so far specifies a rule for producing a universal Turing machine, but of course, following this description will construct something really nasty. It turns out we can produce them rather more easily, but we are programmers, and we will not do that.
+
+\subsection{Decidable and semi-decidable sets}
+So we've managed to come up with a notion of computability of a function. From now on, we will assume anything that is ``intuitively computable'' is actually computable.
+
+We now want to try to talk about ``computable subsets'' of $\N$. There are two possible things we might be interested in.
+\begin{defi}[Decidable set]\index{decidable set}
+  A subset $X \subseteq \N$ is \emph{decidable} if there is a total computable function $\N \to \N$ such that
+  \[
+    f(n) =
+    \begin{cases}
+      1 & n \in X\\
+      0 & n \not \in X
+    \end{cases}.
+  \]
+\end{defi}
+This is a rather strong notion. We can always tell, in finite time, whether an element is in $X$. Often, a weaker notion is desired, namely semi-decidability. Informally, a subset $X \subseteq \N$ is semi-decidable if upon given some $n \in X$, if $n \in X$, then we can learn this in finite time. If $n \not \in X$, we might never figure this is the case.
+
+There are several ways to define semi-decidable sets properly.
 \begin{defi}[Semi-decidable set]\index{semi-decidable set}
   We say a subset $X \subseteq \N$ is \emph{semi-decidable} if it satisfies one of the following equivalent definitions:
   \begin{enumerate}
     \item $X$ is the image of some partial computable function $f: \N \to \N$.
     \item $X$ is the image of some total computable function $f: \N \to \N$.
-    \item There is some partial computable function $f: \N \to \N$ such that $X = \{n \in \N: f(n) \downarrow\}$, where ``$f(n) \downarrow$'' means ``$f$ halts when given input $x$''.\index{$\downarrow$}
+    \item There is some partial computable function $f: \N \to \N$ such that
+      \[
+        X = \{n \in \N: f(n) \downarrow\}
+      \]
     \item The function $\chi_X: \N \to \{0\}$ given by
       \[
         \chi_X =
@@ -1951,89 +2094,109 @@ There are several ways to define semi-decidable sets.
           \uparrow & n\not\in X
         \end{cases}
       \]
-      is computable, where \emph{$\uparrow$}\index{$\uparrow$} means ``undefined''.
+      is computable.
   \end{enumerate}
 \end{defi}
-The last two obviously capture what we are trying to do, but the first two seem a bit less clear. How are these related?
+%The last two obviously capture what we are trying to do, but the first two seem a bit less clear. How are these related?
+%
+%Suppose we have some $x \in \N$. How do we know if it is in the image of $f: \N \to \N$? To do so, we enumerate all pairs $\bra n, m\ket \in \N \times \N$. For each $(n, m)$, we run $f(n)$ for $m$ steps. If it halts and gives the answer $x$, then we know $x$ is in the image. If it never halts, then we know $x$ is not in the image.
 
-Suppose we have some $x \in \N$. How do we know if it is in the image of $f: \N \to \N$? To do so, we enumerate all pairs $\bra n, m\ket \in \N \times \N$. For each $(n, m)$, we run $f(n)$ for $m$ steps. If it halts and gives the answer $x$, then we know $x$ is in the image. If it never halts, then we know $x$ is not in the image.
+There are obvious generalizations of these definitions to subsets of $\N^k$ for any $k$. It is an easy, and also important, exercise to prove that these are equivalent.
 
-It is an easy, and also important, exercise to prove that these are equivalent.
-\subsection{The halting problem}
-A very natural example of a semi-decidable set is the \emph{halting set}. We define the halting set as
-\[
-  \{\bra p, i\ket : p(i) \downarrow \} \subseteq \N^2.
-\]
-This is obviously a semi-decidable set. We just run $p(i)$, and if $p$ halts on $i$, we will learn about this fact in finite time. There is another similar halting set, given by
-\[
-  \{m: m(m) \downarrow\} \subseteq \N.
-\]
-One should convince themselves that these are ``the same sets'', in the sense that if we have an oracle that decides membership of one of the sets, then we can use it to construct a machine that decides membership of the other.
+We can prove another equivalent characterization of semi-decidable sets.
+\begin{prop}
+  A set $X \subseteq \N^k$ is semi-decidable iff it is a projection of a decidable subset of $\N^{k + 1}$.
+\end{prop}
+
+\begin{proof}
+  $(\Leftarrow)$ Let $Y \subseteq \N^{k + 1}$ be such that $\proj_k Y = X$, where $\proj_k$ here denotes the projection to the first $k$ factors. Since $Y$ is decidable, there is a computable function $f: \N \to \N^{k + 1}$ such that $\im f = Y$. Then $\im (\proj_k \circ f) = X$. So $X$ is the image of a computable function.
+
+  $(\Rightarrow)$ Suppose $X$ is semi-decidable. So $X = \dom(\{m\})$ for some $m \in \N$, ie. $X = \{n: \{m\}(n) \downarrow\}$. Then we can pick
+  \[
+    Y = \{(\mathbf{x}, t) \mid \{m\}(\mathbf{x})\text{ halts in $t$ steps}\}.
+  \]
+\end{proof}
+
+A crucial example of a semi-decidable set is the \emph{halting set}.
+\begin{defi}[Halting set]\index{halting set}
+  The \emph{halting set} is
+  \[
+    \{\bra p, i\ket : \{p\}(i) \downarrow \} \subseteq \N^2.
+  \]
+  Some people prefer to define it as
+  \[
+    \{m: \{m\}(m) \downarrow\} \subseteq \N
+  \]
+  instead.
+\end{defi}
+These two definitions are ``the same'' in the sense that if we are given some magic ``oracle'' that determines membership of one of these sets, then we can use it to build a program that determines the other. (Exercise)
 
 \begin{thm}[Turing]\index{Halting problem}
   The halting set is semi-decidable but not decidable.
 \end{thm}
 
+The proof is just some version of Liar's paradox.
 \begin{proof}
   Suppose not, and $\mathcal{M}$ is a machine with two inputs such that for all $p, i$, we have
   \[
     \mathcal{M}(p, i) =
     \begin{cases}
-      \mathrm{yes} & p(i) \downarrow\\
-      \mathrm{no} & p(i) \uparrow
+      \mathrm{yes} & \{p\}(i) \downarrow\\
+      \mathrm{no} & \{p\}(i) \uparrow
     \end{cases}.
   \]
   If there were such a machine, then we could do some ``wrapping'' --- if the output is ``yes'', we intercept this, and pretend we are still running. If the output is ``no'', then we halt. Call this $\mathcal{M}'$. From this, we construct $\mathcal{M}''(n) = \mathcal{M}'(n, n)$. Suppose this machine is coded by $m$.
 
-  Now does $m(m)$ halt? Suppose it does. Then $\mathcal{M}(m, m) = \mathrm{yes}$, and hence $\mathcal{M}'(m, m)$ does not halt. This means $m(m)$ doesn't halt, which is a contradiction.
+  Now does $\{m\}(m)$ halt? Suppose it does. Then $\mathcal{M}(m, m) = \mathrm{yes}$, and hence $\mathcal{M}'(m, m)$ does not halt. This means $m(m)$ doesn't halt, which is a contradiction.
 
   Conversely, if $m(m)$ does not halt, then $\mathcal{M}'(m, m)$ says $\mathrm{no}$. Thus, $m(m)$ halts. This is again a contradiction!
 
   So $\mathcal{M}$ cannot exist.
 \end{proof}
-
-We are now going to prove Rice's theorem. To prove that, we need the $smn$ theorem.
+So the problem of deciding whether a program halts is not decidable. In fact, we can prove something much stronger --- \emph{any} non-trivial question you can ask about the behaviour of the function represented by a program is undecidable. To prove this, we need to go through a few equally remarkable theorems.
 
 \begin{thm}[$smn$ theorem]\index{$snm$ theorem}
   There is a total computable function $s$ of two variables such that for all $e$, we have
   \[
     \{e\}(b, a) = \{s(e, b)\}(a).
   \]
-  Here $\{e\}$ refers to the program coded by $e$.\index{$\{e\}$}
-
   Similarly, we can find such an $s$ for any tuples $\mathbf{b}$ and $\mathbf{a}$.
 \end{thm}
 This is called the $smn$ theorem because the function is called $s$, and $m$ and $n$ usually refers to the length of the tuples $\mathbf{b}$ and $\mathbf{a}$.
 
-This is ``obviously'' true.
+Computer scientists call this process ``currying''.
+
+\begin{proof}
+  We can certainly write a program that does this.
+\end{proof}
 
 \begin{thm}[Fixed point theorem]
-  Let $h: \N \to \N$ be total computable. Then there is an $n \in \N$ such that $\{n\} = \{h(n)\}$, in the sense that they have the same graph.
+  Let $h: \N \to \N$ be total computable. Then there is an $n \in \N$ such that $\{n\} = \{h(n)\}$ (as functions).
 \end{thm}
 
 \begin{proof}
   Consider the map
   \[
-    \pair(e, x) \mapsto \{h(s(e, e))\}(x).
+    \bra e, x\ket \mapsto \{h(s(e, e))\}(x).
   \]
   This is clearly computable, and is computed by a machine numbered $a$, say. We then pick $n = s(a, a)$. Then we have
   \[
     \{n\}(x) = \{s(a, a)\}(x) = \{a\}(a, x) = \{h(s(a, a))\}(x) = \{h(n)\}(x).
   \]
 \end{proof}
-This is a piece of black magic. Later, we will see that this is actually just applying the $Y$ combinator, which is what is used to produce fixed points in general.
+This is a piece of black magic. When we do lambda calculus later, we will see that this is an example of the $Y$ combinator, which is what is used to produce fixed points in general (and is also black magic).
 
 \begin{thm}[Rice's theorem]\index{Rice's theorem}
-  Let $A$ be a non-empty proper subset of the set of graphs of all computable functions $\N \to \N$. Then $\{n: \mathrm{graph}(\{n\}) \in A\}$ is not decidable.
+  Let $A$ be a non-empty proper subset of the set of all computable functions $\N \to \N$. Then $\{n: \{n\} \in A\}$ is not decidable.
 \end{thm}
 This says it is impossible to decide what a program does based on what its code is.
 
 \begin{proof}
-  We fix an $A$. Suppose not. We let $\chi$ be the (total) characteristic function of $\{n: \mathrm{graph}(\{n\}) \in A\}$. Suppose $\chi$ is computable. We find naturals $a, b$ such that $\mathrm{graph}(\{a\}) \in A$ and $\mathrm{graph}(\{b\}) \not\in A$. Then by the hypothesis, the following is computable:
+  We fix an $A$. Suppose not. We let $\chi$ be the (total) characteristic function of $\{n: \{n\} \in A\}$. By assumption, $\chi$ is computable. We find naturals $a, b$ such that $\{a\} \in A$ and $\{b\} \not\in A$. Then by the hypothesis, the following is computable:
   \[
     g(n) =
     \begin{cases}
-      b & \mathrm{graph}(\{n\}) \in A\\
+      b & \{n\} \in A\\
       a & \text{otherwise}
     \end{cases}.
   \]
@@ -2041,317 +2204,557 @@ This says it is impossible to decide what a program does based on what its code 
   \[
     \{n\} = \{g(n)\}.
   \]
-  We now ask ourselves --- do we have $\mathrm{graph}(\{n\}) \in A$? If so, then we also have $\mathrm{graph}(\{g(n)\}) \in A$. But these separately imply $g(n) = b$ and $g(g(n))$ respectively. This implies $g(b) = b$, which is not possible.
+  We now ask ourselves --- do we have $\{n\} \in A$? If so, then we also have $\{g(n)\} \in A$. But these separately imply $g(n) = b$ and $g(g(n)) = b$ respectively. This implies $g(b) = b$, which is not possible.
 
-  Similarly, if $\mathrm{graph}(\{n\}) \not \in A$, then $\mathrm{graph}(\{g(n)\}) \not \in A$. These again separately imply $g(n) = a$ and $g(g(n)) = a$. So we find $g(a) = a$, which is again a contradiction.
+  Similarly, if $\{n\} \not \in A$, then $\{g(n)\} \not \in A$. These again separately imply $g(n) = a$ and $g(g(n)) = a$. So we find $g(a) = a$, which is again a contradiction.
 \end{proof}
 
 \begin{cor}
   It is impossible to grade programming homework.
 \end{cor}
 
-\begin{prop}
-  A set $X \subseteq \N^k$ is semi-decidable iff it is a projection of a decidable subset of $\N^{k + 1}$.
-\end{prop}
+\subsection{Computability elsewhere}
+In all of mathematics, whenever the objects we talk about are countable, we can try to sneak in computability theory. Examples include, for example, Ramsey theory, or logic.
 
-\begin{prop}
-  $(\Rightarrow)$ We write $\mathbf{x}:n$ for the tuple obtained by appending $n$ to $\mathbf{x}$. Then if
-  \[
-    X = \{\mathbf{x} \mid \exists_n \mathbf{x}:n\in Y\},
-  \]
-  where $Y \subseteq \N^{k + 1}$ is decidable, then to check for any candidate $\mathbf{x}$ whether $\mathbf{x} \in X$, we just test $\mathbf{x}:0, \mathbf{x}:1, \mathbf{x}:2, \cdots$ for membership of $Y$. So we see that $X$ is semi-decidable.
+\subsection{Logic}
+When we do logic, our theorems, proofs, rules etc. are all encoded as some finite strings, which can certainly be encoded as numbers. Even though our theories often have infinitely many axioms, the set of axioms is also decidable. It follows from this that the set of theorems in our theory is semi-decidable, as to know if something is a theorem, we can run through all possible strings and see if they encode a proof of the statement. This also works if our set of axioms is just semi-decidable, but we will need to use some diagonalization argument.
 
-  $(\Leftarrow)$ Suppose $X$ is semi-decidable. So $X = \dom(\{m\})$ for some $m \in n$, ie. $X = \{n: \{m\}(n) \downarrow\}$. Then we can define
-  \[
-    Y = \{(\mathbf{x}, t) \mid \{m\}(\mathbf{x})\text{ halts in $t$ steps}\}.
-  \]
-\end{prop}
-There are a lot of things we can encode as natural numbers. For example, we can encode decidable sets by natural numbers, via encoding them by the functions that define them. Thus, we can talk about decidable sets of decidable sets.
-
-We can also encode theorems in theories. Usually, our theories have a decidable set of axioms. It follows that the set of all valid proofs in a theory is decidable. So it follows that the set of theorems in a theory is semi-decidable. This also works with theories with a semi-decidable set of axioms.
-
+We start with a rather cute observation.
 \begin{thm}[Craig's theorem]
   Every first-order theory with a semi-decidable set of axioms has a decidable set of axioms.
 \end{thm}
 
 \begin{proof}
-  By assumption, there is a function that lists out all axioms. We then take the $n$th axiom of our new axiomatization to be
+  By assumption, there is a total computable function $f$ such that the axioms of the theory are exactly $\{f(n): n \in \N\}$. We write the $n$th axiom as $\varphi_n$.
+
+  The idea is to give an alternative axiom that says the same thing as $\varphi_n$, but from the form of the new axiom itself, we can deduce the value of $n$, and so we can compute $f(n)$ to see if they agree. There are many possible ways to do this. For example, we can say that we add $n$ many useless brackets around $\varphi_n$ and take it as the new axiom.
+
+  Alternatively, without silly bracketing, we can take the $n$th axiom to be
   \[
-    \left(\wedge_{i < n} \varphi_i\right) \to \varphi_n,
+    \phi_n = \left(\bigwedge_{i < n} \varphi_i\right) \to \varphi_n.
   \]
-  where $\varphi_n$ is the $n$ axiom emitted. Then this is a decidable set.
+  Then given any statement $\psi$, we can just keep computing $f(1), f(2), \cdots$, and then if $\psi = \phi_n$, then we will figure in finite time. Otherwise, we will, in finite time, see that $\psi$ doesn't look like $f(1) \wedge f(2) \wedge \cdots $, and thus deduce it is not an axiom.
 \end{proof}
 
-Suppose we take the theory of ``true arithmetic''. We can add a constant $c$, and add axioms to say $0 < c$, $1 < c$, $2 < c$, \ldots, and by compactness, this has a model. Moreover, by Lowenheim--Skolem, we know have a countable non-standard model of $\N$. We may wlog the carrier set is in fact $\N$. How bad can this model look like?
-
-It turns out that in such a model, the graph of $+$ and $\times$ cannot be decidable. Why is this so?
-
-It turns out every model of arithmetic gives us a model of second-order arithmetic. The idea is to code up subsets of the ``standard copy of $\N$'' using other (bigger) numbers.
-
-We note that
+We can also do some other fun things. Suppose we take take our favorite copy of $\N$ with the usual $0$ and successor functions. We let $T$ be the theory of all true first-order statements in $\N$. We call this the theory of \term{true arithmetic}. We add a constant $c$ to this theory, and add axioms to say
 \[
-  nEm\text{ if the $n$th bit of $m$ is $1$}.
+  0 < c,\quad 1 < c, \quad 2 < c, \quad \cdots.
 \]
-In fact, this gives $\bra \N, E\ket \cong \bra V_\omega\ket$. This is not hard to see --- this relation is clearly extensional, and given any collection of naturals, we can construct a number that ``contains'' them.
+Then by compactness, this has a model, and by Lowenheim--Skolem, it has a countable model, which is a \term{non-standard model} of $\N$. We wlog the carrier set of this model is in fact $\N$. How bad can this be?
 
-We claim that any decidable set of standard naturals can be encoded by a (possibly nonstandard) natural, in the sense that if $X \subseteq \{\text{standard part}\}$, then there exists a possibly non-standard $n$ such that $x = \{\text{standard part}\} \cap \{m: m E n\}$. Note that this $n$ is not unique.
+\begin{thm}[Tennenbaum's theorem]\index{Tennenbaum's theorem}
+  For any countable non-standard model of true arithmetic, the graph of $+$ and $\times$ cannot be decidable.
+\end{thm}
 
-We write $x \oplus y$ for the logical or of $x, y \in \N$ thought of as bit-strings. This is arithmetically definable. Let $P$ be a decidable predicate. We want to find a natural number that encodes the extension of $P$. We declare
-\begin{align*}
-  f(0) &= 0\\
-  f(n + 1) &= \cif P(n + 1) \cthen f(n) \oplus 2^{n + 1} \celse f(n).
-\end{align*}
-Since $P$ is decidable, this is a computable function. Then by induction, we know that if $n < m$, then % need to take care of n =0
-\[
-  P(n) \Leftrightarrow n E f(m).
-\]
-Thus, we simply pick an $m$ greater than all non-standard naturals, and then the standard part of $\mathrm{graph}(P)$ is
-\[
-  \{n: n E f(m)\} \cap \text{standard}.
-\]
-Can we encode any undecidable subset? Consider the function
-\begin{align*}
-  f(0) &= 0\\
-  f(n + 1) &= \clet n + 1 = \bra p, i, t\ket \cin \cif \{p\} \cthen f(n) \oplus 2^{\bra p, i \ket} \cthen f(n).
-\end{align*}
-Then values of $f$ are every-improving approximations to the halting set. The plan is that if $m$ is nonstandard, then $f(m)$ all questions ``does $p(i)$ halt'' for standard $p$ and $i$.
+%\begin{proof}
+%
+%\end{proof}
+%
+%It turns out every model of arithmetic gives us a model of second-order arithmetic. The idea is to code up subsets of the ``standard copy of $\N$'' using other (bigger) numbers.
+%
+%We note that
+%\[
+% nEm\text{ if the $n$th bit of $m$ is $1$}.
+%\]
+%In fact, this gives $\bra \N, E\ket \cong \bra V_\omega\ket$. This is not hard to see --- this relation is clearly extensional, and given any collection of naturals, we can construct a number that ``contains'' them.
+%
+%We claim that any decidable set of standard naturals can be encoded by a (possibly nonstandard) natural, in the sense that if $X \subseteq \{\text{standard part}\}$, then there exists a possibly non-standard $n$ such that $x = \{\text{standard part}\} \cap \{m: m E n\}$. Note that this $n$ is not unique.
+%
+%We write $x \oplus y$ for the logical or of $x, y \in \N$ thought of as bit-strings. This is arithmetically definable. Let $P$ be a decidable predicate. We want to find a natural number that encodes the extension of $P$. We declare
+%\begin{align*}
+% f(0) &= 0\\
+% f(n + 1) &= \cif P(n + 1) \cthen f(n) \oplus 2^{n + 1} \celse f(n).
+%\end{align*}
+%Since $P$ is decidable, this is a computable function. Then by induction, we know that if $n < m$, then % need to take care of n =0
+%\[
+% P(n) \Leftrightarrow n E f(m).
+%\]
+%Thus, we simply pick an $m$ greater than all non-standard naturals, and then the standard part of $\mathrm{graph}(P)$ is
+%\[
+% \{n: n E f(m)\} \cap \text{standard}.
+%\]
+%Can we encode any undecidable subset? Consider the function
+%\begin{align*}
+% f(0) &= 0\\
+% f(n + 1) &= \clet n + 1 = \bra p, i, t\ket \cin \cif \{p\} \cthen f(n) \oplus 2^{\bra p, i \ket} \cthen f(n).
+%\end{align*}
+%Then values of $f$ are every-improving approximations to the halting set. The plan is that if $m$ is nonstandard, then $f(m)$ all questions ``does $p(i)$ halt'' for standard $p$ and $i$.
+%
+%Unfortunately, this doesn't really work! Our function does tell us whether $p(i)$ halts, but it is possible that it halts in a non-standard number of steps!
+%
+%For example, consider the theory $T = PA + \neg \con(PA)$. By G\"odel's incompleteness theorem, this is consistent! Certainly, $T \vdash \neg \con(T)$. Let $P$ be the programme that, on given an input $i$, examines, in order, all numbers $ > i$ and halts when it finds a proof of $\neg\con(T)$. Then $P$ halts on all standard input, but never holds in standard time, because there is no proof of $\neg \con (PA)$ (if $PA$ is indeed consistent!)!
+%
+%What we need is the extra assumption that our model is a model of true arithmetic. If this is the case, then this function $f$ really does encode the halting set of standard computations. So there exists some $m$ such that $\{n: n E m\} \cap \mathrm{standard} = \{\bra p, i\ket: \{p\}(i) \downarrow, p, i\text{standard}\}$.
+%
+%Now if $+$ and $\times$ are computable, then we can compute this $f$! And thus we can solve the halting problem, which is nonsense.
+ % insert an actual proof
 
-Unfortunately, this doesn't really work! Our function does tell us whether $p(i)$ halts, but it is possible that it halts in a non-standard number of steps!
-
-For example, consider the theory $T = PA + \neg \con(PA)$. By G\"odel's incompleteness theorem, this is consistent! Certainly, $T \vdash \neg \con(T)$. Let $P$ be the programme that, on given an input $i$, examines, in order, all numbers $ > i$ and halts when it finds a proof of $\neg\con(T)$. Then $P$ halts on all standard input, but never holds in standard time, because there is no proof of $\neg \con (PA)$ (if $PA$ is indeed consistent!)!
-
-What we need is the extra assumption that our model is a model of true arithmetic. If this is the case, then this function $f$ really does encode the halting set of standard computations. So there exists some $m$ such that $\{n: n E m\} \cap \mathrm{standard} = \{\bra p, i\ket: \{p\}(i) \downarrow, p, i\text{standard}\}$.
-
-Now if $+$ and $\times$ are computable, then we can compute this $f$! And thus we can solve the halting problem, which is nonsense.
-
-\subsection{Computability by \texorpdfstring{$\lambda$}{lambda}-calculus}
-We have seen $\lambda$-calculus in the setting of decorating natural deduction proofs. It turns out we can do a lot of things with $\lambda$ calculus. We begin by encoding numerals. They will be of the type $\mathbf{N} = (A \to A) \to (A \to A)$, and the idea is that $n$ will be encoded by $f \mapsto f^n$. Formally, we define them as follows:
-\begin{defi}[Church numerals]\index{church numerals}\index{$\underline{n}$}
-  We define
-  \begin{align*}
-    \underline{0} &= K(\id) = \lambda f. \lambda x. x : \mathbf{N}\\
-    \succ &= \lambda n. \lambda f. \lambda x. f((nf)x) : \mathbf{N} \to \mathbf{N}
-  \end{align*}
-  We write $\underline{n} = \succ^n(\underline{0})$.
-
-  We can define arithmetic as follows:
-  \begin{align*}
-    \plus &= \lambda n. \lambda m. \lambda f. \lambda x. (nf)((mf)x): \mathbf{N} \to \mathbf{N} \to \mathbf{N}\\
-    \mult &= \lambda n. \lambda m. \lambda f. \lambda x. (n(mf))x: \mathbf{N} \to \mathbf{N} \to \mathbf{N}\\
-    \lexp &= \lambda n. \lambda m. \lambda f. \lambda x. ((nm)f))x: \mathbf{N} \to \mathbf{N} \to \mathbf{N}
-  \end{align*}
-  Here $\exp n\; m = n^m$.
-\end{defi}
-We can also write $\mult$ as
-\[
-  \mult = \lambda n. \lambda m.\lambda f. n(mf).
-\]
-We can also encode logic. We let
-\begin{align*}
-  \ctrue &= \lambda x y. x\\
-  \cfalse &= \lambda xy. y\\]
-  \cif b \cthen x \celse  &= \lambda b x y. b x y
-\end{align*}
-We also need a test for zero.
-\begin{align*}
-  \ciszero &= \lambda n. n (\lambda x \cfalse) \ctrue\\
-  \cfst &= \lambda x y f. f\; x\; y\\
-  \csnd &= \lambda p. p \cfalse\\
-  \cnil &= \lambda x. \ctrue
-\end{align*}
-We can check that
-\begin{align*}
-  \fst\; (\pair x\; y) &= x\\
-  \snd\; (\pair x\; y) &= y
-\end{align*}
-We also need lists. There are various solutions, and quick and dirty way is to define a list as an ordered pair of head an tail.
-
-Using these, we see that we can represent all primitive recursive functions with $\lambda$-terms. The only non-trivial part to check is that we can do recursion. This is done via fixed point functions. To illustrate this, we look at an example. We take our favorite example $\cfact: \N \to \N$
-\[
-  \cfact(n) = \cif n = 0 \cthen 1 \celse n \cdot \cfact (n - 1).
-\]
-But this is not a valid definition, since it is a circular definition. Of course, externally, we know this is always well-defined, but this is not clear \emph{a priori}.
-
-To get around this, we introduce a new function $\metafact: (\N \to \N) \to (\N \to \N)$, given by
-\[
-  \metafact\; f\; n = \cif n = 0 \cthen 1 \celse n \cdot f(n - 1)
-\]
-This is a genuinely legitimate definition of a function. Now suppose $f$ is a fixed point of $\metafact$, ie. $f = \metafact f$. Then we must have
-\[
-  f(n) = (\metafact f)(n) = \cif n = 0\cthen 1 \celse n \cdot (f(n - 1)).
-\]
-So all we need is a fixed point of $\metafact$.
-
-The idea is that any recursive function can be expressed as a fixed point of some such functions. So to implement ``all recursive functions'', all we need is to implement a fixed point function. We define the \term{$\Yc$-combinator}:
-\[
-  \Yc = \lambda f. \Big[ (\lambda x. f(x\; x)) (\lambda x. f(x\; x))\Big].
-\]
-Let's see what this does. Consider any function $g$. This gives
-\begin{align*}
-  \Yc\; g &= \lambda f. \Big[ (\lambda x. f(x\; x)) (\lambda x. f(x\; x))\Big]\; g\\
-  &= (\lambda x. (g(x\; x))) (\lambda x . g(x\; x))\\
-  &= g\Big((\lambda x. (g(x\; x))) (\lambda x . g(x\; x))\Big)
-\end{align*}
-Note that the last line is just $g$ applied to the second. In other words, we have
-\[
-  \Yc\; g = g (\Yc\; g).
-\]
-We also need to implement the minimization operator. In order to do so, we want an infinite list that represents all the values of a function.
-
-We need a function called $\cmap$, which takes a list and a function, and returns the list obtained by applying the function to each of the elements. We first need the $\cnull$ function that tells us whether a list is empty. We define
-\[ % introduce list notation properly
-  \cmap\; f\; x = \cif \cnull x\cthen x \celse f(\cfst x):(\cmap f (\csnd x)).
-\]
-Again, this is a ``circular'' definition, and we have to produce this using the $\Yc$-combinator.
-
-Next we need the infinite list of natural numbers. Computer scientists call these \term{streams}. This is a fixed point for
-\[
-  \lambda \ell. (0:(\cmap \succ \ell)).
-\]
-To get the $\mu$ combinator,  we need a way of searching through lists. We need to search through the list (stream) of values of $f$. In fact, we need to search through the list of pairs $\bra 0, f(0)\ket, \bra 1, f(1)\ket, \cdots$.
-
-We will need the function
-\[
-  \meow\; \mathbf{n}\; x = \cif \snd (\head x) = n \cthen \fst (\head x) \celse \meow\; n\; (\tail x).
-\]
-This is again a recursive definition, which we obtain via the $\Yc$-combinator. And so we are done.
-
-This is not so satisfactory. The function $\Yc$ clearly cannot be well-typed. These things are actually quite hard to think or reason about. It would be nice if we can implement more interesting functions using only well-typed objects. For example, we can implement the Ackermann function by
-\[
-  \lambda m. m ( \lambda f n. n\; f\; (f\; 1))\; \succ.
-\]
-One can check this is indeed well-typed.
-
-% can we implement primitive recursion.
-
+Interestingly, computability theory offers us an easy proof of G\"odel's incompleteness theorem. We first note the following result:
 \begin{thm}
   The set of G\"odel numbers of machines that compute total functions is not semi-decidable.
 \end{thm}
 
 \begin{proof}
-  Suppose it were. Then there is a computable total function $f: \N \to \N$ such that every computable total function is $\{f(n)\}$ for some $n$. Now consider
+  Suppose it were. Then there is a computable total function $f: \N \to \N$ such that every computable total function is $\{f(n)\}$ for some $n$. Now consider the function
   \[
-    \lambda n. (\{f(n)\} (n) + 1).
+    g(n) = \{f(n)\} (n) + 1.
   \]
   This is a total computable function! But it is not $\{f(n)\}$ for any $n$, because it differs from $\{f(n)\}$ at $n$.
 \end{proof}
-
-Suppose $g: \N \to \N$ is a total computable function whose image is contained in the set of all machines that compute total functions. Then this construction computes a number $n$ such that $\{n\}$ is total, and $n$ is not in the range of $g$.
+Note that this proof is very explicit and constructive. If we are presented with a function $\{e\}: \N \to \N$, then there is an algorithm that returns an $n$ such that $\{n\}$ is total, and is not in the image of $\{e\}$.
 
 \begin{defi}[Productive set]\index{productive set}
-  A set $X \subseteq \N$ is \emph{productive} if there is a total computable function $f: \N \to \N$ such that whenever $\im \{n\} \subseteq X$, then $f(n) \in X \setminus \im \{n\}$
+  A set $X \subseteq \N$ is \emph{productive} if there is a total computable function $f: \N \to \N$ such that for all $n \in \N$, we have $f(n) \in X \setminus (\im \{n\})$.
 \end{defi}
-In some sense, these are ``decidably non-semi-decidable'' set.
+Then the theorem says the set of all machines that compute total functions is productive.
 
-We can use this to prove G\"odel's incompleteness theorem!
+In some sense, productive sets are ``decidably non-semi-decidable''.
+
+If we work in, say, ZFC, then there exists a fixed, canonical copy of $\N$. We note the following definition:
 \begin{defi}[Sound theory]\index{sound theory}\index{theory!sound}
-  A \emph{sound} theory of arithmetic is one all of whose axioms are true in $\N$ (for some fixed copy of $\N$ in some greater theory).
+  A \emph{sound} theory of arithmetic is one all of whose axioms are true in $\N$.
 \end{defi}
-This is not to be confused with consistency, which does not refer to any model. For example, $PA + \neg \con (PA)$ is an unsound consistent theory.
+This is not to be confused with consistency, which does not refer to any model. For example, the theory of Peano arithmetic plus the statement that PA is inconsistent is actually a consistent theory, but is unsound (if PA is consistent).
 
-We fix a theory of arithmetic, call it $T$, that is recursively axiomatized, ie. the set of axioms is a semi-decidable set (hence decidable). Then the set of its theorems is semi-decidable. So $\{n: T \vdash \{n\}\text{ is a total function}\}$ is semi-decidable. So there must be some total function such that $T$ does not prove it is total. In other words, $T$ is not complete!
-
-% maybe missing something, arithmetic truths are productive?
-
-Let $A$ be a non-empty semi-decidable set, so it is $\im g$ for some total computable $g: \N \to \N$. Recall that we can construct a ``diagonalization'' of $g$ to enumerate elements in the image. Let $f$ be the G\"odel number of this function.
-
-Let $a \in A$ be any member of $A$, and deifne $h: \N^2 \to \N$ by
-\[
-  h(n, k) = \cif T(f, n, k)\text{ has final state \textsf{HALT}} \cthen \text{emit register contents of $T(f, n, k)$} \celse a.
-\]
-Evidently $h$ is primitive recursive, and $A = h(\N \times \N)$.
-
-The notion of decidable and semi-decidable sets can be smuggled into any sort of mathematics that involves countable things.
-
-For example, in Ramsey's theory, we partition $\N^{(2)}$ into pieces, and then ask for an infinite monochromatic subset of $\N$. Ramsey's theorem says there is always one. But if the partition is decidable, can we obtain a decidable infinite monochromatic set?
-
-One might expect not, because the proof of Ramsey's theorem is rather non-constructive. In fact, twe have the following theorem:
-\begin{thm}[Jockusch]
-  There exists a decidable partition of $[\N]^3$ into two pieces with no infinite decidable monochromatic set.
+\begin{thm}[G\"odel's incompleteness theorem]\index{G\"odel's incompleteness theorem}
+  Let $T$ be a recursively axiomatized theory of arithmetic, ie. the set of axioms is semi-decidable (hence decidable). Suppose $T$ is sufficiently strong to talk about computability of functions (eg. Peano arithmetic is). Then there is some proposition true in $\N$ that cannot be proven in $T$.
 \end{thm}
 
 \begin{proof}
-  We define
-  \[
-    \rho(\{x < y < z\}) =
-    \begin{cases}
-      0 & \text{for all $p, d < x$, $\{p\}(d)$ halts in $y$ steps iff $\{p\}(d)$ halts in $z$ steps}\\
-      1 & \text{otherwise}
-    \end{cases}
-  \]
-  Now no monochromatic set can be coloured $1$, as there aren't enough truth values. On the other hand, an infinite monochromatic set for $0$ will solve the Halting problem, so cannot be decidable. Indeed, if we want to know if $\{p\}$ halts on $d$, then we look for the first number $x$ in the infinite monochromatic set greater than $x$. Then by construction of $\rho$, if $\{p\}(d)$ halts at all, then it must halt in $x$ steps, and we can just check this.
+  We know the set of theorems of $T$ is semi-decidable. So $\{n: T \vdash \{n\}\text{ is a total function}\}$ is semi-decidable. So there must be some total function such that $T$ does not prove it is total. In other words, $T$ is not complete!
 \end{proof}
 
-But how about pairs? We can't do the same trick, and the situation is quite complex. That is beyond the scope of the course.
+ % maybe missing something, arithmetic truths are productive?
 
-This is cute result, but also introduces us to the notion of reducability. What we have done in the proof is that we showed if something can decide a monochromatic subset of $\N$, then we can solve the halting problem.
+% Let $A$ be a non-empty semi-decidable set, so it is $\im g$ for some total computable $g: \N \to \N$. Recall that we can construct a ``diagonalization'' of $g$ to enumerate elements in the image. Let $f$ be the G\"odel number of this function.
+
+% Let $a \in A$ be any member of $A$, and deifne $h: \N^2 \to \N$ by
+%\[
+% h(n, k) = \cif T(f, n, k)\text{ has final state \textsf{HALT}} \cthen \text{emit register contents of $T(f, n, k)$} \celse a.
+%\]
+%Evidently $h$ is primitive recursive, and $A = h(\N \times \N)$.
+
+\subsubsection*{Ramsey theory}
+In Ramsey theory, we have the following famous result:
+\begin{thm}[Ramsey's theorem]\index{Ramsey's theorem}
+  We write $\N^{(k)}$ for the set of all subsets of $\N$ of size $k$. Suppose we partition $\N^{(k)}$ in $m$ many distinct pieces. Then there exists some infinite $X \subseteq \N$ such that $X$ is monochromatic, ie. $X^{(k)} \subseteq \N^{(k)}$ lie entirely within a partition.
+\end{thm}
+The natural thing for us to do is to insert the word ``decidable'' everywhere in the theorem, and see if it is true. Note that a partition of $\N^{(k)}$ into $k$ pieces is equivalently a function $\N^{(k)} \to \{0, 1, \cdots, k - 1\}$, and it is not hard to encode $k$-subsets of $\N$ as natural numbers, eg. by encoding them as an increasing $k$-tuple. Thus, it makes sense for us to ask if the partition is decidable, then are we guaranteed to have a decidable infinite monochromatic set?
+
+One might expect not, because the proof of Ramsey's theorem is rather non-constructive. Indeed, we have the following theorem:
+\begin{thm}[Jockusch]
+  There exists a decidable partition of $\N^{(3)}$ into two pieces with no infinite decidable monochromatic set.
+\end{thm}
+
+\begin{proof}
+  We define a partition $\rho: \N^{(3)} \to \{0, 1\}$ as follows. Given $x < y < z$, we define $\rho(\{x, y, z\})$ to be $0$ if for any $p, d < x$, we have ``$\{p\}(d)$ halts in $y$ steps iff $\{p\}(d)$ halts in $z$ steps'', and $1$ otherwise. This is a rather weird colouring, but let's see what it gives us.
+
+  We first note that there can be no monochromatic set coloured $1$, as given any $x$, for sufficiently large $y$ and $z$, we must have $\{p\}(d)$ halts in $y$ steps iff $\{p\}(d)$ halts in $z$ steps.
+
+  We claim that an infinite decidable monochromatic set $A$ for $0$ will solve the halting problem. Indeed, if we want to know if $\{p\}$ halts on $d$, then we pick some $x \in A$ such that $p, d < x$. Then pick some $y \in A$ such that $y > x$. Then by construction of $\rho$, if $\{p\}(d)$ halts at all, then it must halt in $x$ steps, and we can just check this.
+
+  Thus, there cannot be an infinite decidable monochromatic set for this partition.
+\end{proof}
+
+But what about partitioning $\N^{(2)}$? The same trick doesn't work, and the situation is quite complex. We will not talk about this.
+
+\subsection{Computability by \texorpdfstring{$\lambda$}{lambda}-calculus} % this section needs a better rewrite
+We first introduced $\lambda$-calculus in the setting of decorating natural deduction proofs. Remarkably, it turns out $\lambda$-calculus can be used to encode any program at all! For the sake of concreteness, we will properly define $\lambda$ calculus.
+
+\begin{defi}[$\lambda$ terms]\index{$\lambda$ terms}
+  The set $\Lambda$ of $\lambda$ terms is defined recursively as follows:
+  \begin{itemize}
+    \item If $x$ is any variable, then $x \in \Lambda$.
+    \item If $x$ is a variable and $g \in \Lambda$, then $\lambda x.\; g \in \Lambda$.
+    \item If $f, g \in \Lambda$, then $(f\; g) \in \Lambda$.
+  \end{itemize}
+\end{defi}
+As always, we use variables sensibly, so that we don't write things like $x\;(\lambda x.\; f x)$. We also write $f(x)$ to denote a $\lambda$ term that has a free variable $x$, and then $f(y)$ would mean taking $f$ and replacing all occurrences of $x$ with $y$.
+
+We will often be lazy and write $\lambda xy. f$ instead of $\lambda x.\; \lambda y.\; f$.
+
+We can define free variables and bound variables in the obvious way. If we want to be really formal, we can define them as follows:
+\begin{defi}[Free and bound variables]\index{free variables}\index{bound variables}\leavevmode
+  \begin{itemize}
+    \item In the $\lambda$ term $x$, we say $x$ is a free variable.
+    \item In the $\lambda$ term $\lambda x.\; g$, the free variables are all free variables of $g$ except $x$.
+    \item In the $\lambda$ term $(f\; g)$, the free variables is the union of the free variables of $f$ and those of $g$,
+  \end{itemize}
+  The variables that are not free are said to be bound.
+\end{defi}
+The definitions become more subtle when we have, say, a variable that is free in $f$ and bound in $g$, but this is not a course on pedantry. We will just not worry about these, and keep ourself disciplined and not wrote things like that. We will gloss over subtleties like this in our upcoming definitions as well.
+
+As mentioned previously, we want to think of $\lambda x.\; f(x)$ as some sort of function. So we want things like
+\[
+  (\lambda x.\; f(x))\; y = f(y)
+\]
+to be true. Of course, they are not actually equal as expressions, but they are more-or-less equivalent.
+\begin{defi}[$\alpha$-equivalence]\index{$\alpha$-equivalence}
+  We say two $\lambda$ terms are $\alpha$-equivalent if they are the same up to renaming of bound variables.
+\end{defi}
+
+\begin{eg}
+  $\lambda x.\; x$ and $\lambda y.\; y$ are $\alpha$-equivalent.
+\end{eg}
+For any sane purposes at all in $\lambda$ calculus, $\alpha$-equivalent terms are really considered equal.
+
+\begin{defi}[$\beta$-reduction]\index{$\beta$-reduction}
+  If $f = (\lambda x.\; y(x)) z$ and $g = y(z)$, then we say $g$ is obtained from $f$ via $\beta$-reduction.
+\end{defi}
+This captures the idea that $\lambda$ expressions are really functions.
+
+\begin{defi}[$\eta$-reduction]\index{$\eta$-reduction}
+  $\eta$-conversion is the conversion from $\lambda x.\; (f\; x)$ to $f$, whenever $x$ is not free in $f$.
+\end{defi}
+This captures ``function extensionality'', ie. the idea that functions are the same iff they give the same results for all inputs. % insert something about normal forms.
+
+\begin{defi}[$\beta$-normal form]\index{$\beta$-normal form}
+  We say a term is in $\beta$-normal form if it has no possible $\beta$-reduction.
+\end{defi}
+Our model of computation with $\lambda$ calculus is as follows. A program is a $\lambda$ expression $f$, and an input is another $\lambda$ expression $x$. To run $f$ on $x$, we take $f\; x$, and then try to $\beta$-reduce it as far as possible. If it reaches a $\beta$-normal form, then we are done, and say that is the output. If we never get to a $\beta$-normal form, then we say we don't terminate.
+
+To do so, we need a \term{reduction strategy}. It is possible that a $\lambda$ expression can be $\beta$-reduced in many ways, eg. if we have
+\[
+  (\lambda x.\; (\lambda y.\; f\;y\; x)\;x)\;z,
+\]
+then we can reduce this to either $(\lambda y.\; f\; y\; z)\; z$ or $(\lambda x\; f\; x\; x)\; z$. These are not $\alpha$-equivalent, but of course performing one more $\beta$-reduction will yield the same terms. A reduction strategy is a prescription of which $\beta$-reduction we should perform when there is more than one choice.
+
+There are some things that might worry us. The first is that if we reduce in different ways, then we might end up in different normal forms. Even worse, it could be that one reduction strategy would not terminate, while another might halt in $3$ steps!
+
+For this to work, we need the following theorem:
+\begin{thm}
+  Every $\lambda$ expression can be reduced to at most one $\beta$-normal form. Moreover, there exists a reduction strategy such that whenever a $\lambda$ expression can be reduced to a $\beta$-normal form, then it will be reduced to it via this reduction strategy.
+
+  This magic reduction strategy is just to always perform $\beta$-reduction on the leftmost thing possible.
+\end{thm}
+
+\begin{notation}[$\rightsquigarrow$]
+  We write $f \rightsquigarrow g$ if $f$ $\beta$-reduces to $g$.
+\end{notation}
+There is another thing we should note, which is \term{currying}. If we want to implement a function with, say, $2$ inputs, say a function $f: \N \times \N \to \N$, we can instead implement it as a function $\tilde{f}:\N \to (\N \to \N)$, where
+\[
+  \tilde{f}(x)(y) = f(x, y).
+\]
+This allows us to always work with functions of one variable that can potentially return functions. We will usually just write the type as $\N \to \N \to \N$.
+
+Note that in this setting, officially, our $\lambda$ terms do not have ``types''. However, it is often convenient to imagine they have types to make things less confusing, and we will often do so.
+
+With the formalities out of the way, we should start doing things. We claimed that we can do programming with $\lambda$ terms. The first thing we might want to try is to encode numbers. How can we do so?
+
+Recalling that types don't exist in $\lambda$ calculus, consider a ``generic type'' $A$. We will imagine that natural numbers take in ``functions'' $A \to A$ and returns a new function $A \to A$. We write
+\[
+  \mathbf{N} = (A \to A) \to (A \to A)
+\]
+for the ``type'' of natural numbers. The idea is that $n$ represents the $\lambda$ term that sends $f$ to the $n$th iteration $f^n$.
+
+Formally, we define them as follows:
+\begin{defi}[Church numerals]\index{church numerals}\index{$\underline{n}$}
+  We define
+  \begin{align*}
+    \underline{0} &= K(\id) = \lambda f.\; \lambda x.\; x : \mathbf{N}\\
+    \succ &= \lambda n.\; \lambda f.\; \lambda x.\; f\; ((n\; f)\; x) : \mathbf{N} \to \mathbf{N}
+  \end{align*}
+  We write $\underline{n} = \succ^n(\underline{0})$.
+
+  We can define arithmetic as follows:
+  \begin{align*}
+    \plus &= \lambda n.\; \lambda m.\; \lambda f.\; \lambda x.\; (n\;f)\;((m\;f)\;x): \mathbf{N} \to \mathbf{N} \to \mathbf{N}\\
+    \mult &= \lambda n.\; \lambda m.\; \lambda f.\; \lambda x.\; (n\;(m\; f))\;x: \mathbf{N} \to \mathbf{N} \to \mathbf{N}\\
+    \lexp &= \lambda n.\; \lambda m.\; \lambda f.\; \lambda x.\; ((n\;m)\;f))\;x: \mathbf{N} \to \mathbf{N} \to \mathbf{N}
+  \end{align*}
+  Here $\exp n\; m = n^m$.
+\end{defi}
+Of course, our ``typing'' doesn't really make sense, but helps us figure out what we are trying to say.
+
+Certain people might prefer to write $\mult$ instead as
+\[
+  \mult = \lambda n.\; \lambda m.\;\lambda f.\; n\; (m\;f).
+\]
+We can define a lot of other things. It is possible to give motivation for these, and if one thinks hard enough, these are ``obviously'' the right definitions to make. However, we are not really concerned about this, because what we really want to talk about is recursion. We can define
+\begin{align*} % explain this
+  \ctrue &= \lambda xy.\; x\\
+  \cfalse &= \lambda xy.\; y\\
+  \cif b \cthen x \celse y &= \lambda b x y.\; b\;x\;y\\
+  \ciszero &= \lambda n.\; n \;(\lambda x.\; \cfalse)\; \ctrue\\
+  \pair &= \lambda x y f.\; f\; x\; y\\
+  \cfst &= \lambda p.\; p\;\ctrue\\
+  \csnd &= \lambda p.\; p\;\cfalse\\
+  \cnil &= \lambda x.\; \ctrue\\
+  \cnull &= \lambda p.\; p \;( \lambda xy.\; \cfalse)
+\end{align*}
+We can check that
+\begin{align*}
+  \cfst\; (\pair\; x\; y) &= x\\
+  \csnd\; (\pair\; x\; y) &= y
+\end{align*}
+Using $\pair$, $\cfst$ and $\csnd$, we can implement lists just as pairs of pair, with functions $\head, \tail, \cons$ satisfying
+\[
+  \cons\; (\head \;x)\; (\tail \;x) = x.
+\]
+We by convention always end our lists with a $\cnil$, and $\cnull$ is a test of whether something is $\cnil$.
+
+\begin{ex}
+  Implement the predecessor function that sends $n$ to $(n - 1)$, if $n > 1$, and $0$ otherwise. Also implement $\mathsf{and}$, $\mathsf{or}$, and test of equality for two general church numerals. % fill this in
+\end{ex}
+We want to show that we can in fact represent all primitive recursive functions with $\lambda$-terms. We will in fact do something stronger --- we will implement \term{general recursion}. This is a version of recursion that doesn't always guarantee termination, but will be useful if we want to implement ``infinite structures''.
+
+We look at an example. We take our favorite example $\cfact: \N \to \N$
+\[
+  \cfact\; n = \cif \ciszero \;n \cthen 1 \celse n \cdot \cfact\; (n - 1).
+\]
+But this is not a valid definition, since it is circular, and doesn't really give us a $\lambda$ expression. The trick is to introduce a new function $\metafact: (\N \to \N) \to (\N \to \N)$, given by
+\[
+  \metafact\; f\; n = \cif n = 0 \cthen 1 \celse n \cdot f\; (n - 1)
+\]
+This is a genuinely legitimate definition of a function. Now suppose $f$ is a fixed point of $\metafact$, ie. $f = \metafact\; f$. Then we must have
+\[
+  f(n) = (\metafact\; f)(n) = \cif n = 0\cthen 1 \celse n \cdot (f(n - 1)).
+\]
+So $f$ is in fact the factorial function!
+
+Thus, we have reduced the problem of recursion to the problem of computing fixed points. If we have a general fixed point operator, then we can implement all recursive functions.
+
+\begin{defi}[$\Yc$-combinator]\index{$\Yc$-combinator}
+  The \emph{$\Yc$-combinator} is
+  \[
+    \Yc = \lambda f. \Big[ (\lambda x. f(x\; x)) (\lambda x. f(x\; x))\Big].
+  \]
+\end{defi}
+
+\begin{thm}
+  For any $g$, we have
+  \[
+    \Yc\; g \rightsquigarrow g\; (\Yc\; g).
+  \]
+\end{thm}
+
+\begin{proof}
+  \begin{align*}
+    \Yc\; g &\rightsquigarrow \lambda f. \Big[ (\lambda x. f(x\; x)) (\lambda x. f(x\; x))\Big]\; g\\
+    &\rightsquigarrow (\lambda x. (g(x\; x))) (\lambda x . g(x\; x))\\
+    &\rightsquigarrow g\Big((\lambda x. (g(x\; x))) (\lambda x . g(x\; x))\Big)
+  \end{align*}
+\end{proof}
+We also need to implement the minimization operator. To compute $f^{-1}(17)$, our plan is as follows:
+\begin{enumerate}
+  \item Produce an ``infintie list'' (\term{stream}) of natural numbers.
+  \item Apply a function $f$ to every element of the stream.
+  \item Find the first element in the stream that is sent to $17$.
+\end{enumerate}
+Note that infinite lists are genuinely allowed in $\lambda$-calculus. These behave like lists, but they never have an ending $\cnil$ element. We can always extract more and more terms out of it.
+
+We do them in a slightly different order
+\begin{enumerate}
+  \item[(ii)] We implement a function $\cmap$ that takes in a list or stream, and applies a function $f$ to every element of the list. We simply define it as
+    \[
+      \cmap\; f\; x = \cif \cnull\; x \cthen x \celse \cons\; (f\; (\head\; x))\;(\cmap\;f\; (\tail\; x)).
+    \]
+    Of course, we need to use our $\Yc$ combinator to actually achieve this.
+  \item[(i)] We can produce a stream of natural numbers by asking for the fixed point of
+    \[
+      \lambda \ell.\; \cons \; 0 (\cmap\;\succ\;\ell).
+    \]
+  \item [(iii)] We will actually apply $\cmap$ to $\lambda n.\; \pair\; n\; (f\; n)$, so that we remember the index. We then use the function
+    \[
+      \cfind\; n\; x = \cif \csnd\;(\head\;x) = n \cthen \cfst\;(\head\;x) \celse \cfind\; n\; (\tail\;x).
+    \]
+\end{enumerate}
+%This is not so satisfactory. The function $\Yc$ clearly cannot be well-typed. These things are actually quite hard to think or reason about. It would be nice if we can implement more interesting functions using only well-typed objects. For example, we can implement the Ackermann function by
+%\[
+% \lambda m. m ( \lambda f n. n\; f\; (f\; 1))\; \succ.
+%\]
+%One can check this is indeed well-typed.
+
+% can we implement primitive recursion.
+
+\subsection{Reducibility}
+We've alluded to the notion of reducibility several times previously. For example, we had two versions of the halting set, and said that if we could decide membership of one of them, then we can decide membership of the other. When we proved that there is a decidable partition of $\N^{(3)}$ with no infinite decidable monochromatic set, we said if we had such a thing, then we could use it to solve the halting problem.
+
+The general idea is that we can often ``reduce'' one problem to another one. The most basic way of expressing this is via many-to-one reducibility.
 
 \begin{defi}[Many-to-one reducibility]\index{many-to-one reducibility}\index{$\leq_m$}
-  Let $A, B \in \N$. We write $B \leq_m A$ if there exists a total computable functions $f: \N \to \N$ such taht for all $n \in \N$, we have $n \in B \leftrightarrow f(n) \in A$.
+  Let $A, B \in \N$. We write $B \leq_m A$ if there exists a total computable functions $f: \N \to \N$ such that for all $n \in \N$, we have $n \in B \leftrightarrow f(n) \in A$.
 \end{defi}
-Thus, if we have such a set, then whenever we can correctly answer questions about memebership in $A$, then we can answer questions about membership in $B$.
+Thus, if we have such a set, then whenever we can correctly answer questions about membership in $A$, then we can answer questions about membership in $B$.
 
 It is easy to see that this is a quasi-order. If we take the intersection $\leq_m \cap \geq_m$ of the relations, then we get an equivalence relation. The equivalence classes are called \term{many-one degrees}. We think of these as ``degree of unsolvability''.
 
-Recall we had the halting set $\K$, and we had two potential defintions:
-\[
-  \{\bra p, i\ket: \{p\} (i) \downarrow\},\quad \{p: \{p\}(p)\downarrow\}.
-\]
-It is a nice exercise to show that these have the same many-one degree. More significantly, we have
 \begin{prop}
   Let $A \subseteq \N$. Then $A \leq_m \K$ iff $A$ is semi-decidable.
 \end{prop}
-This is agian a technical exercise.
-
-Another useful fact is the following:
+This is a technical exercise. Another useful fact is the following:
 \begin{prop}
   $(\N \setminus \K) \leq_M A$ iff $A$ is productive.
 \end{prop}
+But it turns out this is a rather awkward definition of ``relative computability''. In our definition of many-one reducibility, we are only allowed to run $f$ once, and see if the answer is in $A$. But why once?
 
-But is $\leq_m$ the right notion of relative computability? There is another notion of relative computability.
+The idea is define reducibility semantically. We assume that when writing programs, we can do all the usual stuff, but also have access to a magic function $f$, and we are allowed to call $f$ as many times as we wish and use the results. We call $f$ an \term{oracle}. For our purposes, $f$ is the (total) characteristic function of $A$.
 
-In our definition of many-one reducibility, we are only allowed to run $f$ once, and see if the answer is in $A$. But why once?
+For technical reasons, we will suppose we have a fixed programming language that just refers to an opaque function $f$, and then we can later plug different things as $f$. This allows us to compare G\"odel numberings for functions with different oracles.
 
-We can instead implement reducibility via \emph{oracles}. We enhance our architecture to allow our machine to ask whether $n \in A$. This reducibility relation is written $\leq_T$, where $T$ stands for ``Turing'', or just $\leq$. Since we are now allowed to ask this question many times, and potentially use it to do some computation afterwards, it is clear tha
-\[
-  B \leq_m A \Rightarrow B \leq A.
-\]
-It turns out the right notion to consider is $\leq_T$.
-
+\begin{defi}[Turing reducibility]\index{Turing reducibility}\index{$\leq$}
+  We say $B \leq_T A$, or simply $B \leq A$, if it is possible to determine membership of $B$ whenever we have access to an oracle that computes $\chi_A$.
+\end{defi}
 Again $\leq$ is a quasi-order, and intersecting with the reverse, we get an equivalence relation, which we call \term{Turing degree}, or just \term{degree}.
 
 Now the quasi-order gives us a relation on Turing degrees. A natural question to ask is if this is actually a total order.
 
-To begin with, Turing degrees certainly form an upper semi-lattice, as given $A$ and $B$, we can form the disjoint union of $A$ and $B$, and knowing about membership of $A \coprod B$ means we know membership of $A$ and $B$, and vice versa.
+To begin with, Turing degrees certainly form an upper semi-lattice, as given $A$ and $B$, we can form the disjoint union of $A$ and $B$, and knowing about membership of $A \coprod B$ means we know membership of $A$ and $B$, and vice versa. But are they linearly ordered by $\leq$? The answer is no!
+\begin{thm}[Friedberg--Muchnik]
+  There exists two $A, B \subseteq \N$ such that $A \not\leq B \not\leq A$. Moreover, $A$ and $B$ are both semi-decidable.
+\end{thm}
 
-But are they linearly ordered by $\leq$? The answer is no! This was proved by Friedberg and Muchnik independently and simultaneously during the cold war.
+\begin{proof} % think a bit more about the proof.
+  We will obtain the sets $A$ and $B$ as
+  \[
+    A = \bigcup_{n < \omega} A_n,\quad B = \bigcup_{n < \omega} B_n,
+  \]
+  where $A_n$ and $B_n$ are finite (and in particular decidable) and nested, ie. $i < j$ implies $A_i \subseteq A_j$ and $B_i \subseteq B_j$.
 
-We will construct two sets $A$ and $B$, with $A \not\leq B \not\leq A$, and both sets will be semi-decidable. We will obtain them by
+% Note that if we want $A \not\leq B$ and $B \not\leq A$, then neither of them can be decidable. Thus, these inclusions cannot be end extensions.
+
+  We introduce a bit of notation. As mentioned, if we allow our programs to access the oracle $B$, then our ``programming language'' will allow consultation of $B$. Then in this new language, we can again assign G\"odel numbers to programs, and we write $\{e\}^B$ for the program whose G\"odel number is $e$. Instead of inventing a new language for each $B$, we invent a language that allows calling an ``oracle'', without specifying what it is. We can then plug in different sets and run.
+
+  Our objective is to pick $A, B$ such that
+  \begin{align*}
+    \chi_A &\not= \{e\}^B\\
+    \chi_B &\not= \{e\}^A
+  \end{align*}
+  for all $e$. Here we are taking $\chi_A$ to be the total version, ie.
+  \[
+    \chi_A(x) =
+    \begin{cases}
+      1 & x \in A\\
+      0 & x \not\in A
+    \end{cases}.
+  \]
+  The idea is, of course, to choose $A_m$ such that it prevents $\chi_A$ from being $\{m\}^B$, and vice versa. But this is tricky, because when we try to pick $A_m$, we don't know the whole of $B$ yet.
+
+  It helps to spell out more explicitly what we want to achieve. We want to find some $n_i, m_i \in \N$ such that for each $i$, we have
+  \begin{align*}
+    \chi_A(n^{(i)}) &\not= \{i\}^B(n^{(i)})\\
+    \chi_B(m^{(i)}) &\not= \{i\}^A(m^{(i)})
+  \end{align*}
+  These $n_i$ and $m_i$ are the \emph{witness} to the functions being not equal.
+
+  We now begin by producing infinite lists
+  \begin{align*}
+    N_i &= \{n_1^{(i)}, n_2^{(i)}, \cdots\}\\
+    M_i &= \{m_1^{(i)}, m_2^{(i)}, \cdots\}
+  \end{align*}
+  of ``candidate witnesses''. We will assume all of these are disjoint. For reasons that will become clear later, we assign some ``priorities'' to these sets, say
+  \[
+    N_1 > M_1 > N_2 > M_2 > N_3 > N_3 > \cdots.
+  \]
+  We begin by picking
+  \[
+    A_0 = B_0 = \emptyset.
+  \]
+  Suppose at the $t$th iteration of the process, we have managed to produce $A_{t - 1}$ and $B_{t - 1}$. We now look at $N_1, \ldots, N_t$ and $M_1, \cdots, M_t$. If they have managed to found a witness, then we leave them alone. Otherwise, suppose $N_i$ hasn't found a witness yet. Then we run $\{i\}^{B_{t - 1}}(n^{(i)}_1)$ for $t$ many time steps. We consider the various possibilities:
+  \begin{itemize}
+    \item Let $n$ be the first remaining element of $N_i$. If $\{i\}^{B_{t - 1}}(n)$ halts within $t$ steps and returns $0$, then we put $n$ into $A_t$, and then pick this as the desired witness. We now look at all members of $B_{t - 1}$ our computation of $\{i\}^{B_{t - 1}}$ has queried. We \emph{remove} all of these from all sets of lower priority than $N_i$.
+    \item Otherwise, do nothing, and move on with life.
+  \end{itemize}
+  Now the problem, of course, is that whenever we add things into $A_t$ or $B_t$, it might have changed the results of some previous computations. Suppose we originally found that $\{10\}^{B_4}(32) = 0$, and therefore put $32$ into $A_5$ as a witness. But later, we found that $\{3\}^{A_{23}}(70) = 0$, and so we put $70$ into $B_{24}$. But if the computation of $\{10\}^{B_4}(32)$ relied on the fact that $70\not\in B_4$, then we might have
+  \[
+    \{10\}^{B_{24}}(32) \not= 0,
+  \]
+  and now our witness is ``injured''. When this happens, we forget the fact that we picked $32$ as a witness, and then pretend $N_{10}$ hasn't managed to find a witness after all.
+
+  Fortunately, this can only happen because $M_3$ is of higher priority than $N_{10}$, and thus $70$ was not forbidden from being a witness of $M_3$. Since there are only finitely many things of higher priorities, our witness can be injured only finitely many times, and we will eventually be stabilized.
+
+  We are almost done. After all this process, we take the union and get $A$ and $B$. If, say, $\{i\}^A$ has a witness, then we are happy. What if it does not? Suppose $\{i\}^A$ is some characteristic function, and $m$ is the first element in the list of witnesses. Then since the lists of candidate witnesses are disjoint, we know $m \not \in B$. So it suffices to show that $\{i\}^A(m) \not= 0$. But if $\{i\}^{A}(m) = 0$, then since this computation only involves finitely many values of $A$, eventually, the membership of these things in $A$ would have stabilized. So we would have $\{i\}^{A}(m) = 0$ long ago, and made $m$ a witness.
+
+% finite injury construction
+\end{proof}
+
+\section{WQO and BQO theory}
+We start by talking about well-foundedness. The idea is that we want to allow for the following \term{$R$-induction} principle:
+\begin{prooftree}
+  \AxiomC{$\forall_x ((\forall_y R(y, x) \to \varphi(y)) \to \varphi(x))$}
+  \UnaryInfC{$\forall_x \varphi(x)$}
+\end{prooftree}
+How can this fail? Suppose the top line holds, but the bottom line does not. Then we know
 \[
-  A = \bigcup_{n < \omega} A_n,\quad B = \bigcup_{n < \omega} B_n,
+  A = \{x: \neg \varphi(x)\}
 \]
-where $A_n$ and $B_n$ are finite (and in particular decidable) and nested, ie. $i < j$ implies $A_i \subseteq A_j$ and $B_i \subseteq B_j$.
-
-Note that if we want $A \not\leq B$ and $B \not\leq A$, then neither of them can be decidable. Thus, these inclusions cannot be end extensions.
-
-We want to eventually ensure that $A$ is not the $e$th thing computable from $B$.
-
-We introduce a bit of notation. If we allow our programs to access the oracle $B$, then our ``programming language'' will allow consulation of $B$. Then in this new language, we can again assign G\"odel numbers to programs, and we write $\{e\}^B$ for the program whose G\"odel number is $e$.
-
-So we want
+is non-empty. Then thee top line says
 \[
-  \chi_A \not= \{e\}^B
+  \forall_{x \in A} \exists_{y \in A} R(y, x)
 \]
-for all $e$. We also want
+Thus, we need $R$ to be \emph{well-founded}:
+\begin{defi}[Well-founded relation]\index{well-founded relation}\index{relation!well-founded}
+  A relation $R$ is said to be \emph{well-founded} if for all $A \subseteq \dom R$ non-empty, there is some $x \in A$ such that for any $y \in A$, we have $\neg R(y, x)$.
+\end{defi}
+
+There is another way of expressing the well-founded relation, if we believe in the \term{axiom of dependent choice}
+\begin{axiom}[Axiom of dependent choice]
+  Suppose we have a set $X$ and a relation $R$ such that for any $x \in X$, there is some $y \in X$ such that $R(x, y)$. Then we can find some $f: \N \to X$ such that $R(f(n), f(n + 1))$ for all $n$.
+\end{axiom}
+Assuming this, then being well-founded is equivalent to the non-existing of infinite decreasing $R$-chains.
+
+The notion of well-foundedness is important in computer science, because it is what guarantees termination. Suppose we have a program with a loop of the form ``repeat \ldots until \ldots''. To prove that the ``until'' part will always happen, we look for a loop parameter taking values in $\dom(R)$ such that in every iteration of the loop, the value decreases. % fix this, talk about ackermann function
+
+If we think of well-foundedness as saying there is no infinite decreasing sequence, then it is clear that transitive closures of well-founded relations are well-founded relations.
+
+This leads us to think about quasiorders that are reflexive transitive closures of well-founded relations. We call these \term{well-founded quasi-orders}. Note that these are not actually well-founded, as any reflexive relation can certainly not be well-founded.
+
+Under what operations are this class closed? We can think about \emph{lifting} a quasi-order on $X$ to a quasi-order on $\mathcal{P}(X), \mathcal{P}_{\aleph_0}(X), X^{ < \omega}$, multisets on $X$ etc. % < \omega means lists
+
+We can try lifting $\bra X, \leq_X\ket$ to $\mathcal{P}(X)$ by
 \[
-  \chi_B \not= \{e\}^A
+  X_1\leq^+ X_2\text{ if }\forall_{x_1 \in X_1} \exists_{x_2 \in X_2} (x_1 \leq_X x_2).
 \]
-for all $e$.
+It is not hard to see this is actually a quasi-order. There are lots of operations like this, and we want to know which of these operations preserve well-foundedness.
 
-The idea is to choose $A_m$ such that it prevents $\chi_A$ from being $\{m\}^B$. But this is not straightforward, because when we try to pick $A_m$, we don't know the whole of $B$. We only know it up to stage $B_m$.
-
-
+The idea is that lifts ``of finite character'' preserve well-foundedness. These are those lifts such that to compare two elements, we only have to appeal to finitely many instances of $\leq_X$. We will not make this more precise. However, it is not reliably true that $\bra \mathcal{P}(X), \leq^+\ket$ is well-founded if $\bra X, \leq_X$ is well-founded. For example, $\bra \N, =\ket$ is a well-founded quasi-order, being the reflexive transitive closure of the trivial relation. But $\bra \mathcal{P}(N), =^+\ket$ has an infinite decreasing sequence. Indeed, $=^+$ is just the subset relation.
 
 
+Now consider the class of those quasi-orders $\bra X, \leq\ket$ such that $\bra \mathcal{P}(X), \leq^+\ket$ is well-founded. This class of quasi-orders is the class of \term{well quasi-orders}, otherwise known as \term{WQO}'s.
+
+WQO's were used for more than 100 years in the history of mathematics, but people never thought about WQO's explicitly until 1960's, and until then, people were just working with them in a rather ad hoc manner.
+
+When does a quasi-order fail to be a well quasi-order? Suppose $x_1, x_2, x_3, \cdots$ is an infinite antichain, ie. a collection of mutually unrelated elements. Then as above
+\[
+  \bra \{x_i: i > n\}: n \in \N\ket
+\]
+is an infinite descending sequence in $\bra \mathcal{P}(X), \leq^+\ket$. The same happens with descending chains.
+
+So $ \bra X, \leq\ket$ is a WQO as long as there are no infinite descending chains, and no infinite anti-chains. % it is sufficient?
+
+\begin{prop}
+  Let $\bra X, \leq$ be a quasi-order. Then the following are equivalent:
+  \begin{enumerate}
+    \item There is no infinite decreasing sequence and no infinite anti-chain.
+    \item Whenever we have any sequence $x_i \in X$ whatsoever, we can find $i < j$ such that $x_i < x_j$.
+  \end{enumerate}
+\end{prop}
+
+\begin{proof}
+  $\Leftarrow$ is clear. To prove $\Rightarrow$, we show that whenever $x_i$ is a sequence without $i < j$ such that $f(i) \leq f(j)$, then it either contains an infinite anti-chain, or an infinite descending chain.
+
+  To do so, we two-colour $[\N]$ by
+  \[
+    X(\{i < j\}) =
+    \begin{cases}
+      0 & f(i) \geq f(j)\\
+      1 & \text{otherwise}
+    \end{cases}
+  \]
+  By Ramsey's theorem, this has an infinite monochromatic set. If we have an infinite monochromatic set of colour $0$, then this is a descending chain. Otherwise, if it is of colour $1$, then together with our hypothesis, we know $\{x_i\}$ is an anti-chain.
+\end{proof}
+% The second property is what is usually taken as the definition of a WQO ?
+
+A natural question to ask is if we keep lifting more times, does it remain well-founded? The answer is, rather unsurprisingly, no. In fact, for any $n$, we can find some well-order such that the first $n$th lifts are well-ordered but the $n + 1$th lift is not.
+
+Now how about quasi-ordering $X^{<\omega}$, the finite sequences in $X$? The one we are going to use involves ``stretching''. We say sequences $\{x_i\}_{i = 1}^n \leq_ \{y_i\}_{i = 1}^\ell$ if there is a subsequence $\{y_{i_k}\}_{k = 1}^n$ of $\{y_i\}$ such that $x_k \leq y_{i_k}$ for all $k$.
+
+There is also a recursive definition of this.
+\begin{itemize}
+  \item The empty list is $\leq$ any list.
+  \item The tail of $l$ is always $\leq l$
+  \item If $\tail (\ell_1) \leq \tail(l_2)$ and $\head(\ell_1) \leq_X \head (\ell_2)$, then $\ell_1 \leq \ell_2$.
+\end{itemize}
+There is also a co-recursive definition of this for streams.
 \printindex
 \end{document}
