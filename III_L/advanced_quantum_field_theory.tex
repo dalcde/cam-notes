@@ -6,6 +6,7 @@
 \def\nlecturer {D. B. Skinner}
 \def\ncourse {Advanced Quantum Field Theory}
 \def\nlectures {MWF.11}
+\def\nnotready {}
 
 \input{header}
 
@@ -3531,103 +3532,216 @@ This negative sign appears because we are multiplying by $\det (\slashed D + m)$
 \end{align*}
 
 \section{Non-abelian gauge theory}
-We are first going to talk about the \emph{geometry} lying being the classical theory of non-abelian gauge theory. Only after that, we will do it quantumly.
+\subsection{Some differential geometry}
+To do non-abelian gauge theory (or even abelian gauge theory, really), we need to know some differential geometry.
 
-Non-abelian gauge theories are based on saying the world is a \term{principal $G$-bundle} $\pi: P \to M$. For a fixed Lie group $G$, this is a manifold $P$ together with a projection map $\pi: P \to M$ to another manifold $M$, where for each $x \in M$, $\pi^{-1}(\{x\}) \cong G$.
+So far, we had a universe $M$, and our fields took values in some vector space $V$. Then a field is just a (smooth) function $f: M \to V$. However, this requires the field to take values in the \emph{same} vector space at each point. It turns out it is a more natural thing to assign a vector space $V_x$ for each $x \in M$, and then a field $\phi$ would be a function
+\[
+  \phi: M \to \coprod_{x \in M} V_x \equiv E,
+\]
+where $\coprod$ means, as usual, the disjoint union of the vector spaces. Of course, the point of doing so is that we shall require
+\[
+  \phi(x) \in V_x \text{ for each $x$}.\tag{$*$}
+\]
+This will open a can of worms, but is needed to do gauge theory properly.
 
-We should think of this as assigning a Lie group $G$ to each point of $M$, and the collection of all these Lie groups is $P$. The Lie group $G$ is often called the \term{structure group} (usually in mathematics) or the \term{gauge group} (usually in physics). The name ``gauge group'' is slightly ambiguous, because sometimes ``gauge group'' refers to something else.
+We are not saying that each $x \in M$ will be assigned a completely random vector space, eg. one would get $\R^3$ and another would get $\R^{144169}$. In fact, they will be isomorphic to some fixed space $V$. So what do we actually achieve? While it is true that $V_x \cong V$ for all $x$, there is no canonical \emph{choice} of such an isomorphism. We will later see that picking such an isomorphism correspond to picking a \emph{gauge} of the field.
 
-For example, Maxwell theory has $G = \U(1)$, while the standard model, for some unknown reason, has
+Now if we just have a bunch of vector spaces $V_x$ for each $x \in M$, then we lose the ability to talk about whether a field is differentiable or not, let alone taking the derivative of a field. So we want to ``glue'' them together in some way. We can write
+\[
+  E = \{(x, v): x \in M, v \in V_x\},
+\]
+and we require $E$ to be a \emph{manifold} as well. We call these \emph{vector bundles}. There are some technical conditions we want to impose on $E$ so that it is actually possible to work on it.
+
+There is a canonical projection map $\pi: E \to M$ that sends $(x, v)$ to $x$. Then we have $V_x = \pi^{-1}(\{x\})$. A natural requirement is that we require this map to be smooth. Otherwise, we might find someone making $E$ into a manifold in a really stupid way.
+
+\begin{defi}[Section]\index{section}
+  Let $p: E \to M$ be a map between manifolds. A \emph{section} is a map $s: M \to E$ such that $p \circ s = \id_M$.
+\end{defi}
+Now we can rewrite the condition $(*)$ as saying $\phi$ is a section of the map $\pi: E \to M$. In general, our fields will usually be sections of some vector bundle.
+
+\begin{eg}
+  Let $M$ be any manifold, and $V$ be any vector space. Then $M \times V$ is a manifold in a natural way, with a natural projection $\pi_1: M \times V \to M$. This is called the \term{trivial bundle}.
+\end{eg}
+
+Now trivial bundles are very easy to work with, since a section of the trivial bundle is in a very natural correspondence with maps $M \to V$. So we know exactly how to work with them.
+
+The final condition we want to impose on our vector bundles is not that they are trivial, or else we have achieved absolutely nothing. What we want to require is that near every point, the vector bundle looks trivial.
+
+\begin{defi}[Vector bundle]\index{vector bundle}
+  Let $M$ be a manifold, and $V$ a vector space. A \emph{vector bundle} over $M$ with \term{typical fiber}\index{fiber} $V$ is a manifold $E$ with a map $\pi: E \to M$ such that for all $x \in M$, the fiber $E_x \cong \pi^{-1}(\{x\})$ is a vector space that is isomorphic to $V$.
+
+  Moreover, we require that for each $x \in M$, there exists an open neighbourhood $U$ of $x$, and a diffeomorphism $\Phi: U \times V \to \pi^{-1}(U)$ such that $\pi(\Phi(y, v)) = y$ for all $y$, and $\Phi(y, \ph): \{y\} \times V \to E_y$ is a \emph{linear isomorphism} of vector spaces.
+
+  Such a $\Phi$ is called a \term{local trivialization} of $E$, and $U$ is called a \term{trivializing neighbourhood}.
+\end{defi}
+By definition, each point $x$ is contained in some trivializing neighbourhood. Thus, we can find a \term{trivializing cover} $\{U_\alpha\}$ with a trivialization on each $U_\alpha$ such that $\bigcup U_\alpha = M$.
+
+There are some philosophical remarks we can make here. On $\R^n$, every bundle is isomorphic to a trivial bundle. If we only care about Euclidean (or Minkowski) space, then it seems like we are not actually achieving much. But morally, requiring that a bundle is just locally trivial, and not globally trivial in some sense tells us everything we do is ``local''. Indeed, we are mere mortals who can at best observe the observable universe. We cannot ``see'' anything outside of the observable universe, and in particular, it is impossible to know whether bundles remain trivial if we go out of the observable universe. Even if we observe that everything we find resembles a trivial bundle, we are only morally allowed to conclude that we have a \emph{locally} trivial bundle, and are not allowed to conclude anything about the global geometry of the universe.
+
+Another reason for thinking about bundles instead of just trivial ones is that while every bundle over $\R^n$ is globally trivial, the \emph{choice} of trivialization is not canonical, and there is a lot of choice to be made. Usually, when we have a vector space $V$ and want to identify it with $\R^n$, then we just pick a basis for it. But now if we have a vector bundle, then we have to pick a basis at \emph{each point} in space. This is a lot of arbitrary choices to be made, and it is often more natural to study the universe without making such choices. Working on a vector bundle in general also prevents us from saying things that depends on the way we trivialize our bundle, and so we ``force'' ourselves to say sensible things only.
+
+Recall that for a trivial bundle, a section of the bundle is just a map $M \to V$. Thus, for a general vector bundle, if we have a local trivialization $\Phi$ on $U$, then under the identification given by $\Phi$, a section defined on $U$ can be alternatively be written as a map $\phi: U \to V$, which we may write, in coordinates, as $\phi^a(x)$, for $a = 1, \cdots, \dim V$. Note that this is only valid in the neighbourhood $U$, and also depends on the $\Phi$ we pick.
+
+\begin{eg}
+  Let $M$ be any manifold. Then the \term{tangent bundle}
+  \[
+    TM = \coprod_{x \in M} T_x M \to M
+  \]
+  is a vector bundle. Similarly, the \term{cotangent bundle}
+  \[
+    T^*M = \coprod_{x \in M} T_x^* M \to M
+  \]
+  is a vector bundle. More generally, we can take \term{tensor products} of bundles, and consider tensor product bundles such as $(TM)^{\otimes n} \otimes (T^*M)^{\otimes m}$. % explain tensor products of bundles
+
+  In more familiar notation, (in a local trivialization) we write sections of tangent bundles as $X^\mu(x)$, and sections of the cotangent bundle as $Y_\mu(x)$. Sections of the tensor product are written as $X^{\mu_1, \ldots, \mu_n}\!_{\nu_1, \ldots, \nu_m}$.
+\end{eg}
+
+% insert mobius band
+
+\begin{notation}
+  Let $E \to M$ be a vector bundle. Then we write \term{$\Omega^0_M(E)$} for the vector space of sections of $E \to M$. Locally, we can write an element of this as $X^a$, for $a = 1, \cdots, \dim E_x$.
+
+  More generally, we write \term{$\Omega^p_M(E)$} for sections of $E \otimes \Lambda^pT^*M \to M$, where $\Lambda^p T^*M$ is the bundle of $p$-forms on $M$. Elements can locally be written as $X^a_{\mu_1 \ldots \mu_n}$.
+
+  If $V$ is a vector space, then $\Omega^p_M(V)$ is a shorthand for $\Omega^p_M(V \times M)$. % explain this better.
+\end{notation}
+
+Let's return to the definition of a vector bundle. Suppose we had two trivializing neighbourhoods $U_\alpha$ and $U_\beta$, and that they have a non-trivial intersection $U_\alpha \cap U_\beta$. We can then compare the two trivializations on $U_\alpha$ and $U_\beta$:
+\[
+  \begin{tikzcd}
+    (U_\alpha \cap U_\beta) \times V \ar[r, "\Phi_\alpha"] & \pi^{-1}(U_\alpha \times U_\beta) & (U_\alpha \cap U_\beta) \times V \ar[l, "\Phi_\beta"'].
+  \end{tikzcd}
+\]
+Composing the maps gives us a map
+\[
+  t_{\alpha\beta} : \Phi_\alpha^{-1} \circ \Phi_\beta: (U_\alpha \cap U_\beta) \times V \to (U_\alpha \cap U_\beta) \times V
+\]
+that restricts to a linear isomorphism on each fiber. Thus, this is equivalently a map $U_\alpha \cap U_\beta \to \GL(V)$. This is called the \term{transition function}.
+
+These transition functions satisfy some compatibility conditions. Whenever $x \in U_\alpha \cap U_\beta \cap U_\gamma$, we have
+\[
+  t_{\alpha\beta}(x) \cdot t_{\beta\gamma}(x) = t_{\alpha\gamma}(x).
+\]
+Note that on the left, what we have is the (group) multiplication of $\GL(V)$. These also satisfy the boring condition $t_{\alpha\alpha} = \id$. These are collectively known as the \term{cocycle conditions}.
+
+\begin{ex}
+  Convince yourself that it is possible to reconstruct the whole vector bundle just from the knowledge of the transition functions. Moreover, given any cover $\{U_\alpha\}$ of $M$ and functions $t_{\alpha\beta}: U_\alpha \cap U_\beta \to \GL(V)$ satisfying the cocycle conditions, we can construct a vector bundle with these transition functions.
+\end{ex}
+This exercise is crucial. It is left as an exercise, instead of being spelt out explicitly, because it is much easier to imagine what is going on geometrically in your head than writing it down in words. The idea is that the transition functions tell us how we can glue different local trivializations together to get a vector bundle.
+
+Now we want to do better than this. For example, suppose we have $V = \R^n$, which comes with the Euclidean inner product. Then we want the local trivializations to respect this inner product, ie. they are given by orthogonal maps, rather than just linear isomorphisms. It turns out this is equivalent to requiring that the transition functions $t_{\alpha\beta}$ actually land in $\Or(n)$ instead of just $\GL(n, \R)$. More generally, we can have the following definition:
+
+\begin{defi}[$G$-bundle]\index{$G$-bundle}
+  Let $V$ be a vector space, and $G \leq \GL(V)$ be a Lie subgroup. Then a $G$-bundle over $M$ is a vector bundle over $M$ with fiber $V$, equipped with a trivializing cover such that the transition functions take value in $G$.
+\end{defi}
+Note that it is possible to turn a vector bundle into a $G$-bundle into many different ways. So the trivializing cover is part of the \emph{data} needed to specify the $G$-bundle.
+
+We can further generalize this a bit. Instead of picking a subgroup $G \leq \GL(V)$, we pick an arbitrary Lie group $G$ with a representation on $V$. The difference is that now certain elements of $G$ are allowed to act trivially on $V$.
+
+\begin{defi}[$G$-bundle]\index{$G$-bundle}
+  Let $V$ be a representation, $G$ a Lie group, and $\rho: G \to \GL(V)$ a representation. Then a $G$-bundle consists of the following data:
+  \begin{enumerate}
+    \item A vector bundle $E \to M$.
+    \item A trivializing cover $\{U_\alpha\}$ with transition functions $t_{\alpha\beta}$.
+    \item A collection of maps $\varphi_{\alpha\beta}: U_{\alpha} \cap U_\beta: \to G$ satisfying the cocycle conditions such that $t_{\alpha\beta} = \rho \circ \varphi_{\alpha\beta}$.
+  \end{enumerate}
+\end{defi}
+Note that to specify a $G$-bundle, we require specifying an element $\varphi_{\alpha\beta}(x) \in G$ for each $x \in M$, instead of just the induced action $\rho(\varphi_{\alpha\beta}(x)) \in \GL(V)$. This is crucial for our story. We are requiring more information than just how the elements in $V$ transform. Of course, this makes no difference if the representation $\rho$ is faithful (ie. injective), but makes a huge difference when $\rho$ is the trivial representation.
+
+We previously noted that it is possible to recover the whole vector bundle just from the transition functions. Consequently, the information in (i) and (ii) are actually redundant, as we can recover $t_{\alpha\beta}$ from $\varphi_{\alpha\beta}$ by composing with $\rho$. Thus, a $G$-bundle is equivalently a cover $\{U_\alpha\}$ of $M$, and maps $\varphi_{\alpha\beta}: U_\alpha \cap U_\beta \to G$ satisfying the cocycle condition.
+
+Note that this equivalent formulation \emph{does not} mention $\rho$ or $V$ at all!
+
+\subsection{Principal \texorpdfstring{$G$}{G}-bundles}
+We are halfway through our voyage into differential geometry. I promise this really has something to do with physics.
+
+We just saw that a $G$-bundle can be purely specified by the transition functions, without mentioning the representation or fibers at all. In some sense, these transition functions encode the ``pure twisting'' part of the bundle. Given this ``pure twisting'' information, and any object $V$ with a representation of $G$ on $V$, we can construct a bundle with fiber $V$, twisted according to this prescription.
+
+This is what we are going to do with gauge theory. The \term{gauge group} is the group $G$, and the gauge business is encoded in these ``twisting'' information. Traditionally, a field is a function $M \to V$ for some vector space $V$. To do gauge coupling, we pick a representation of $G$ on $V$. Then the twisting information allows us to construct a vector bundle over $M$ with fiber $V$. Then gauge-coupled fields now correspond to \emph{sections} of this bundle. Picking different local trivializations of the vector bundle corresponds to picking different gauges, and the transition functions are the gauge transformations!
+
+But really, we prefer to work with some geometric object, instead of some collection of transition functions. We want to find the most ``natural'' object for $G$ to act on. It turns out the most natural object with a $G$-action is not a vector space. It is just $G$ itself!
+
+\begin{defi}[Principal $G$-bundle]\index{principal $G$-bundle}
+  Let $G$ be a Lie group, and $M$ a manifold. A \emph{principal $G$-bundle} is a map $\pi: P \to M$ such that $\pi^{-1}(\{x\}) \cong G$ for each $x \in M$. Moreover, $\pi: P \to M$ is locally trivial, ie. it locally looks like $U \times G$, and transition functions are given by left-multiplication by an element of $G$.
+
+  More precisely, we are given an open cover $\{U_\alpha\}$ of $M$ and diffeomorphisms
+  \[
+    \Phi_\alpha: U_\alpha \times G \to \pi^{-1}(U_\alpha)
+  \]
+  satisfying $\pi(\Phi_\alpha(x, g)) = x$, such that the transition functions
+  \[
+    \Phi_\alpha^{-1} \circ \Phi_\beta: (U_\alpha \cap U_\beta) \times G \to (U_\alpha \cap U_\beta) \times G
+  \]
+  is of the form
+  \[
+    (x, g) \mapsto (x, t_{\alpha\beta}(x) \cdot g)
+  \]
+  for some $t_{\alpha\beta}: U_\alpha \cap U_\beta \to G$.
+\end{defi}
+
+\begin{thm}
+  Given a principal $G$-bundle $\pi: P \to M$ and a representation $\rho: G \to \GL(V)$, there is a canonical way of producing a $G$-bundle $E \to M$ with fiber $V$. This is called the \term{associated bundle}.
+
+  Conversely, given a $G$-bundle $E\to M$ with fiber $V$, there is a canonical way of producing a principal $G$-bundle out of it, and these procedures are mutual inverses.
+
+  Moreover, this gives a correspondence between local trivializations of $P \to M$ and local trivializations of $E \to M$.
+\end{thm}
+
+\begin{proof}
+  If the expression
+  \[
+    P \times_G V \to M
+  \]
+  makes any sense to you, then this proves the first part directly. Otherwise, just note that both a principal $G$-bundle and a $G$-bundle with fiber $V$ can be specified just by the transition functions, which do not make any reference to what the fibers look like.
+
+  The proof is actually slightly less trivial than this, because the same vector bundle can have be many choices of trivializing covers, which gives us different transition functions. While these different transition functions patch to give the same vector bundle, by assumption, it is not immediate that they must give the same principal $G$-bundle as well, or vice versa.
+
+  The way to fix this problem is to figure out explicitly when two collection of transition functions give the same vector bundle or principal bundle, and the answer is that this is true if they are \term{cohomologous}. Thus, the precise statement needed to prove this is that both principal $G$-bundle and $G$-bundles with fiber $V$ biject naturally with the \term{first \v{C}ech cohomology group} of $M$ with coefficients in $G$.
+\end{proof}
+
+We now get to the physics part of the story. To specify a \emph{gauge theory} with gauge group $G$, we supplement our universe $M$ with a principal $G$-bundle $\pi: P \to M$. In QED, the gauge group is $\U(1)$, and in QCD, the gauge group is $\SU(3)$. In the standard model, for some unknown reason, the gauge group is
 \[
   G = \SU(3) \times \SU(2) \times \U(1).
 \]
-There is a right action of $G$ on $P$ that preserves the fibers, ie. given $g \in G$, and we fix an isomorphism $\pi^{-1}(\{x\}) \cong G$, then this is simply $p \mapsto pg$. % insert local triviality conditions
-
-The simplest example is to take $M = S^1$ and $G = \R$. Then there are two possible $\R$-bundles. One is just the cylinder $S^1 \times \R$, and the other is the M\"obius strip. % insert pictures.
-
-For any point $x \in M$, we can find an open set $U \subseteq M$ containing $x$ such that we have a \emph{local trivialization} $\Phi$
-\[
-  \Phi: P|_{\pi^{-1}(U)} \cong U \times G.
-\]
-Suppose, $\{U_\alpha\}$ are a collection of open sets, and that we are given trivializations $\Phi_\alpha$ on each $U_\alpha$. We can write this as
-\[
-  \Phi_\alpha: p \mapsto (x, \phi_\alpha(p)) \in U_\alpha \times G,
-\]
-Similarly, we have
-\[
-  \Phi_\beta: p' \mapsto (x, \phi_\beta(p')) \in U_\beta \times G.
-\]
-Now suppose $U_\alpha \cap U_\beta \not= \emptyset$. Then on this intersection, we can compare our two trivializations. Since $\phi_\alpha(p)$ and $\phi_\beta(p) \in G$, we must have
-\[
-  \phi_\beta(p) = \phi_\alpha(p) t_{\alpha\beta}
-\]
-for some $t_{\alpha\beta} \in G$. We require this $t_{\alpha\beta}$ depends only on $\pi(p)$, and not $p$ itself.
-
-If we want to compare these trivializations throughout $U_\alpha \cap U_\beta$, then our $t_{\alpha\beta}$ may need to vary with $x \in U_\alpha$. We define a \emph{transition function} $T_{\alpha\beta}: U_\alpha \cap U_\beta \to G$ by $x \mapsto t_{\alpha\beta}(x)$ obeying the following properties:
-\[
-  t_{\alpha\beta}(x)^{-1} = t_{\beta\alpha}(x)
-\]
-for all $x \in U_\alpha \cap U_\beta$. We also have
-\[
-  t_{\alpha\beta}(x) t_{\beta\gamma}(x) = t_{\alpha\gamma}(x)
-\]
-for all $x \in U_\alpha \cap U_\beta \cap U_\gamma$. We also have $t_{\alpha\alpha}(x) = e$ for all $x$.
-
-In physics, the most common application is when $M \cong \R^n$, and all the $U_\alpha$ are the whole space $M$. Still, we can have different trivializations in different regions. So we are just comparing different trivializations of $\pi^{-1}(\R^n) \cong \R^n \times G$. For example, in electromagnetism, we have
-\[
-  M \cong \R^{3, 1},\quad G = \U(1).
-\]
-Then our local trivializations are a choice of \emph{gauge}, and these transition functions are gauge transformations. They allow us to compare the values at different gauges.
-
-On the other hand, in GR, we take $G = \GL(n, \R)$ if $\dim M = n$. Then the transition functions just allow us to change coordinates.
-
-In Symmetries, Fields, and Particles, we met the idea that given a Lie group, we want to study its representations. Recall that a \emph{representation} is a continuous group homomorphism $\rho: G \to \GL_r(\C)$, where
-\[
-  \rho(gh) = \rho(g) \rho(h),\quad \rho(e) = I.
-\]
-In a principal bundle, we don't just have one Lie group. We have a vector space at each point in spacetime. So given a representation, we get a vector space at every point in spacetime. This gives us a \term{vector bundle} of rank $r$.
-
-This is a map $\pi: E \to M$ such that we have local trivializations
-\[
-  \Phi_\alpha: E|_{\pi^{-1}(U_\alpha)} \to U \times \C^r.
-\]
-The transition functions $T_{\alpha\beta}: U_\alpha \cap U_\beta \to M_r(\C)$. If the original $P$ has structure group $G \subseteq \GL_r(\C)$, then the transition functions preserve some extra structure. For example, if $G = \U(r)$, then the transition functions on our vector bundle preserve the obvious inner product
-\[
-  \bra z_1, z_2\ket = \sum_{i = 1}^r \bar{z}_1^i z_2^i.
-\]
-If $G = \SU(r)$, then transition functions also have unit determinant.
-
-Charged matter is a section of a vector bundle $\pi: E \to M$.
-\begin{defi}[Section]\index{section}
-  A \emph{section} of a bundle $\pi: E \to M$ is a (smooth) map $s: M \to E$ that obeys $\pi \circ s = \id$.
-\end{defi}
-This corresponds to assigning to each point in $M$ a value in its fiber. % maybe insert a picture.
+Normally, a field with values in a vector space $V$ is is given by a smooth map $\phi: M \to V$. To do gauge coupling, we pick a representation $\rho: G \to V$, and then form the associated bundle to $P \to M$. Then a field is now a section of this associated bundle.
 
 \begin{eg}
-  In electromagnetism, a scalar field $\phi$ of charge $q$ isn't really a function on $M$, but rather a section of a vector bundle of rank $1$ over $M$. This is because under a gauge transform, ie. change of local trivialization, we have
+  In Maxwell theory, we have $G = \U(1)$. A complex scalar field is a function $\phi: G \to \C$. The vector space $\C$ has a very natural action of $\U(1)$ given by left-multiplication.
+
+  We pick our universe to be $M = \R^4$, and then the bundle is trivial. However, we can consider two different trivializations defined on the whole of $M$. Then we have a transition function $t: M \to \U(1)$, say $t(x) = e^{i \theta(x)}$. Then under this change of trivialization, the field would transform as
   \[
-    \phi(x) \mapsto e^{i\theta \lambda(x)} \phi(x),
+    \phi(x) \mapsto e^{i\theta(x)} \phi(x).
   \]
-  which is the transformation behaviour of a section.
+  This is just the usual gauge transformation we've seen all the time!
 \end{eg}
 
-\begin{eg}
-  In QCD, we have a gauge group $G = \SU(3)$, and quarks and anti-quarks lie in the fundamental and anti-fundamental representations respectively. A quark field $q(x) \in E|_x \cong \C^3$ transforms under gauge transformations by
-  \[
-    q(x) \mapsto \rho(t(x)) q(x),
-  \]
-  where $\rho$ is the (anti-)fundamental representation and $t(x)$ is the gauge transformation.
-\end{eg}
-
-\subsection{Connections and covariant derivatives}
-On a vector bundle, we need a new notion of how to differentiate a section $s: M \to E$ of a vector bundle, because for any finite $\varepsilon$, the expression
+\subsection{Connection and curvature}
+Let's go back to the general picture of vector bundles, and forget about the structure group $G$ for the moment. Consider a general vector bundle $\pi: E \to M$, and a section $s: M \to E$. We would like to be able to talk about derivatives of this section. However, the ``obvious'' attempt looking like
 \[
   \frac{s(x + \varepsilon) - s(x)}{|\varepsilon|}
 \]
-doesn't really make sense, because $s(x + \varepsilon)$ and $s(x)$ live in different vector spaces, namely $E|_{x + \varepsilon}$ and $E|_x$.
+doesn't really make sense, because $s(x + \varepsilon)$ and $s(x)$ live in different vector spaces, namely $E_{x + \varepsilon}$ and $E_x$.
 
-Let $\Omega^0_M(E)$ be the space of smooth sections of $E$, and let $\Omega^1_M(E)$ be the space of all smooth $1$-forms with values in $E$, ie. sections of $E \otimes T^* M$. Elements in $\Omega^0_M(E)$ look like $s(x)$, while elements in $\Omega^1_M(E)$ looks like $\omega_\mu(x)$.
+We have encountered this problem in General Relativity already, where we realized the ``obvious'' derivative of, say, a vector field on the universe doesn't make sense. We figured that what we needed was a \emph{connection}, and it turns out the metric on $M$ gives us a canonical choice of the connection, namely the \term{Levi-Civita connection}.
 
+We can still formulate the notion of a connection for a general vector bundle, but this time, there isn't a canonical choice of connection. It is some additional data we have to supply.
+
+Before we meet the full, abstract definition, we first look at an example of a connection.
+\begin{eg}
+  Consider a trivial bundle $M \times V \to M$. Then the space of sections $\Omega^0_M(V)$ is canonically isomorphic to the space of maps $M \to V$. This we know how to differentiate. There is a canonical map $\d: \Omega^0_M(V) \to \Omega^1_M(V)$ sending $f \mapsto \d f$, where for any vector $X \in T_p M$, we have
+  \[
+    \d f(X) = \frac{\partial f}{\partial X} \in V.
+  \]
+  This is a one-form with values in $V$ (or $M \times V$) because it takes in a vector $X$ and returns an element of $V$.
+
+  In coordinates, we can write this as
+  \[
+    \d f_\mu = \frac{\partial f}{\partial \mu} \;\d x^\mu.
+  \]
+\end{eg}
+
+We can now define a connection:
 \begin{defi}[Connection]\index{connection}
   A \emph{connection} \index{$\nabla$} is a linear map $\nabla: \Omega_M^0(E) \to \Omega_M^1(E)$ satisfying
   \begin{enumerate}
@@ -3645,71 +3759,248 @@ Let $\Omega^0_M(E)$ be the space of smooth sections of $E$, and let $\Omega^1_M(
         \d f = \frac{\partial f}{\partial x^\mu} \d x^\mu.
       \]
   \end{enumerate}
+  Given a vector field $V$ on $M$, the \term{covariant derivative} of a section in the direction of $V$ is the map
+  \[
+    \nabla_V: \Omega^0_M(E) \to \Omega^0_M(E)
+  \]
+  defined by
+  \[
+    \nabla_V s = V \lrcorner \nabla s = V^\mu \nabla_\mu s.
+  \]
 \end{defi}
+In more physics settings, the connection is usually written as $\D_\mu$.
 
-Given a vector field $V$ on $M$, the \emph{covariant derivative} of a section in the direction of $V$ is the map
-\[
-  \nabla_V: \Omega^0_M(E) \to \Omega^0_M(E)
-\]
-defined by
-\[
-  \nabla_V s = v \lrcorner \nabla s = v^\mu \nabla_\mu s.
-\]
-There is a lot of freedom in choosing a covariant derivative, but the standard result is that given any two connections $\nabla, \nabla'$, the difference satisfies
+Consider any two connections $\nabla, \nabla'$. Their difference is \emph{not} another connection. Instead, for any $f \in C^\infty(M)$ and $s \in \Omega^0_M(E)$, we have
 \[
   (\nabla' - \nabla)(fs) = f (\nabla' - \nabla)(s).
 \]
-So in fact is a map $\Omega^0_M(E) \to \Omega_M^1(E)$ that is linear over functions in $C^\infty(M)$. Hence it must be some element of $\Omega^1_M(\End(E))$, ie. some matrix-valued $1$-form $(A_\mu (x))^a\!_b$.
+So in fact the difference is a map $\Omega^0_M(E) \to \Omega_M^1(E)$ that is linear over functions in $C^\infty(M)$. Equivalently, it is some element of $\Omega^1_M(\End(E))$, ie. some matrix-valued $1$-form $A_\mu (x) \in \End(E_x)$.
 
-In particular, in an open set $U \subseteq M$ with a trivialization $\Phi$, we have a map
-\begin{align*}
-  \Phi \circ s: U &\to U \times \C^r\\
-  x &\mapsto (x, s_\Phi(x))
-\end{align*}
-Then we can think $s_\phi(x)$ as just a collection of $r$ functions, and we could define a ``trivial'' connection just as $\Delta = \d$.
-
-Then any other connection $\nabla$ can be expressed as
+In particular, consider any open set $U \subseteq M$ equipped with a local trivialization. Then after picking the trivialization, we can treat the bundle on $U$ as a trivial one, and our previous example showed that we had a ``trivial'' connection given by $\d$. Then any other connection $\nabla$ can be expressed as
 \[
   \nabla s = \d s + A s
 \]
-for some $A \in \Omega^1_M(\End(E))$, where the particular $A$ depends on our trivialization. This is called the \term{connection 1-form}, or the \term{gauge field}.
+for some $A \in \Omega^1_U(\End(V))$, where the particular $A$ depends on our trivialization. This is called the \term{connection 1-form}, or the \term{gauge field}. In the case where $E$ is the tangent bundle, this is also known as the \term{Christoffel symbols}.
 
-Suppose $U_\alpha \cap U_\beta \not= \emptyset$, with trivializations $\Phi_\alpha, \Phi_\beta$, and let $g_{\alpha\beta}: U_\alpha \cap U_\beta \to \End(\C^r)$ denote the transition functions.
+This was all on a general vector bundle. But the case we are really interested in is a $G$-bundle. Of course, we can still say the same words as above, as any $G$-bundle is also a vector bundle. But can we tell a bit more about how the connection looks like? We recall that specifying a $G$-bundle with fiber $V$ is equivalent to specifying a principal $G$-bundle. What we would like is to have some notion of ``connection on a principal $G$-bundle''.
 
-Given a section $s$ of $E$, we have
-\[
-  s_\alpha = g_{\alpha\beta} s_\beta.
-\]
-Also, by definition, we have
-\[
-  (\nabla s)_\alpha = g_{\alpha\beta} (\nabla s)_\beta.
-\]
-From these definitions, it follows that
-\[
-  A_\alpha = - g_{\alpha\beta} \d (g_{\alpha\beta})^{-1} + g_{\alpha \beta} A g_{\alpha\beta}^{-1}.
-\]
-This is the transformation law of the gauge field.
+\begin{thm}
+  There exists a notion of a connection on a principal $G$-bundle. Locally on a trivializing neighbourhood $U$, the connection $1$-form is an element $A_\mu(x) \in \Omega^1_U(\mathfrak{g})$, where $\mathfrak{g}$ is the Lie algebra of $G$.
 
-In the rank 1 case, our transition functions $g_{\alpha\beta}$ are just multiplication by complex numbers. So
+  Every connection on a principal $G$-bundle induces a connection on any associated vector bundle. On local trivializations, the connection on the associated vector bundle has the ``same'' connection $1$-form $A_\mu(x)$, where $A_\mu(x)$ is regarded as an element of $\End(V)$ by the action of $G$ on the vector space.
+\end{thm}
+
+Readers interested in the precise construction of a connection on a principal $G$-bundle should consult a textbook on differential geometry. Our previous work doesn't apply because $G$ is not a vector space.
+
+It is useful to know how the connection transforms under a change of local trivialization. Given a transition map $g_{\alpha\beta}: U_\alpha \cap U_\beta \to G$, the gauge fields on $U_\alpha$ and $U_\beta$ are related by
 \[
-  A_{\beta} = g \d g^{-1} = g A_\alpha g^{-1} = g \d g^{-1} + A = i(\d \lambda - iA)
+  A_\beta = g_{\alpha \beta} A_\alpha g_{\alpha\beta}^{-1} - g_{\alpha\beta} \d (g_{\alpha\beta})^{-1}.
 \]
-if $g = e^{-i \lambda}$.
+This expression makes sense if $G$ is a matrix Lie group, and so we can canonically identify both $G$ and $\mathfrak{g}$ as subsets of $\GL(n, \R)$ for some $n$. Then we know what it means to multiply them together. For a more general Lie group, we have to replace the first term by the adjoint representation of $G$ on $\mathfrak{g}$, and the second by the \term{Maurer--Cartan form}.
+
+\begin{eg}
+  In the $\U(1)$ case,our transition functions $g_{\alpha\beta}$ are just multiplication by complex numbers. So if $g = e^{-i\lambda}$, then we have
+  \[
+    A_{\beta} = -g \d g^{-1} + g A_\alpha g^{-1} = -g \d g^{-1} + A = i(\d \lambda - iA).
+  \]
+  Note that since $\U(1)$ is abelian, the conjugation by $g$ has no effect on $A$. This is one of the reasons why non-abelian gauge theory is simple.
+\end{eg}
+
+
+
+%To specify how these $V_y$ glue together to form an $E$, it suffices to describe the local trivializations. We have to specify a bunch of trivializing neighbourhoods $U_\alpha$, such that $\pi^{-1}(U_\alpha)$ is isomorphic to $U_\alpha \times V$. The requirement dictates that
+%\[
+% M = \bigcup_\alpha U_\alpha,
+%\]
+%so that each point lies in some of these trivializing neighbourhoods.
+%
+%They trivialization maps are functions $\Phi_\alpha: U_\alpha \times V \to \pi^{-1}(U_\alpha)$. For each $y \in U_\alpha$, this is a map $\Phi_\alpha(y,\ph): \{y\} \times V \to V_y \cong V$. But this is just a linear isomorphism $V \to V$, or equivalently an element of $\GL(V)$. So we can think of $\Phi_\alpha$ as a map $U_\alpha \to \GL(V)$. We need to provide such maps for each $U_\alpha$, and, subject to certain compatibility condition we will not go into detail, this gives us a vector bundle.
+%
+%This is not entirely satisfactory. Usually, our vector space $V$ is not just a vector space. It might have an inner product, for example. Then we want the local trivializations not just to be linear isomorphisms, but orthogonal or unitary maps. In other words, we want the $\Phi_\alpha$ to induce maps $U_\alpha \to \Or(V)$ or $\U(V)$, instead of just $\GL(V)$. More generally, we can make the following definition:
+%\begin{defi}[Vector bundle with structure group]\index{vector bundle!structure group}\index{structure group!vector bundle}
+% A vector bundle with \emph{structure group} $G \leq \GL(V)$ (or a \term{$G$-bundle}) is a vector bundle $E \to M$ with typical fiber $V$, equipped with a collection of local trivializations $\{U_\alpha\}$ such that the corresponding maps $U_\alpha \to \GL(V)$ actually have image lying in $G$.
+%
+% Even more generally, given a Lie group $G$ and a representation $\rho$ on $V$, a $G$-bundle consists of an open cover $\{U_\alpha\}$ of $M$, and maps $\Phi_\alpha: U_\alpha \to G$, such that the maps $\rho \circ \Phi_\alpha: U_\alpha \to \GL(V)$ specify a vector bundle over $M$ with fiber $V$.
+%\end{defi}
+%The second definition is what we really want. Note that we worded the definition very carefully. The $G$-bundle consists of maps $U_\alpha \to G$, and only composing with the representation $\rho$ gives us the data of the local trivialization. This is crucial. For example, $G$ might have the \emph{trivial} representation on $V$. Then as a vector bundle, the trivialization maps are required to be trivial, and so the resulting vector bundle must be trivial. However, as a $G$-bundle, the maps $U_\alpha \to G$ can be very complicated!
+
+%\subsection{Principal bundles}
+%We are first going to talk about the \emph{geometry} lying being the classical theory of non-abelian gauge theory. Only after that, we will do it quantumly.
+%
+%Non-abelian gauge theories are based on saying the world is a \term{principal $G$-bundle} $\pi: P \to M$. For a fixed Lie group $G$, this is a manifold $P$ together with a projection map $\pi: P \to M$ to another manifold $M$, where for each $x \in M$, $\pi^{-1}(\{x\}) \cong G$.
+%
+%We should think of this as assigning a Lie group $G$ to each point of $M$, and the collection of all these Lie groups is $P$. The Lie group $G$ is often called the \term{structure group} (usually in mathematics) or the \term{gauge group} (usually in physics). The name ``gauge group'' is slightly ambiguous, because sometimes ``gauge group'' refers to something else.
+%
+%For example, Maxwell theory has $G = \U(1)$, while the standard model, for some unknown reason, has
+%\[
+% G = \SU(3) \times \SU(2) \times \U(1).
+%\]
+%There is a right action of $G$ on $P$ that preserves the fibers, ie. given $g \in G$, and we fix an isomorphism $\pi^{-1}(\{x\}) \cong G$, then this is simply $p \mapsto pg$. % insert local triviality conditions
+%
+%The simplest example is to take $M = S^1$ and $G = \R$. Then there are two possible $\R$-bundles. One is just the cylinder $S^1 \times \R$, and the other is the M\"obius strip. % insert pictures.
+%
+%For any point $x \in M$, we can find an open set $U \subseteq M$ containing $x$ such that we have a \emph{local trivialization} $\Phi$
+%\[
+% \Phi: P|_{\pi^{-1}(U)} \cong U \times G.
+%\]
+%Suppose, $\{U_\alpha\}$ are a collection of open sets, and that we are given trivializations $\Phi_\alpha$ on each $U_\alpha$. We can write this as
+%\[
+% \Phi_\alpha: p \mapsto (x, \phi_\alpha(p)) \in U_\alpha \times G,
+%\]
+%Similarly, we have
+%\[
+% \Phi_\beta: p' \mapsto (x, \phi_\beta(p')) \in U_\beta \times G.
+%\]
+%Now suppose $U_\alpha \cap U_\beta \not= \emptyset$. Then on this intersection, we can compare our two trivializations. Since $\phi_\alpha(p)$ and $\phi_\beta(p) \in G$, we must have
+%\[
+% \phi_\beta(p) = \phi_\alpha(p) t_{\alpha\beta}
+%\]
+%for some $t_{\alpha\beta} \in G$. We require this $t_{\alpha\beta}$ depends only on $\pi(p)$, and not $p$ itself.
+%
+%If we want to compare these trivializations throughout $U_\alpha \cap U_\beta$, then our $t_{\alpha\beta}$ may need to vary with $x \in U_\alpha$. We define a \emph{transition function} $T_{\alpha\beta}: U_\alpha \cap U_\beta \to G$ by $x \mapsto t_{\alpha\beta}(x)$ obeying the following properties:
+%\[
+% t_{\alpha\beta}(x)^{-1} = t_{\beta\alpha}(x)
+%\]
+%for all $x \in U_\alpha \cap U_\beta$. We also have
+%\[
+% t_{\alpha\beta}(x) t_{\beta\gamma}(x) = t_{\alpha\gamma}(x)
+%\]
+%for all $x \in U_\alpha \cap U_\beta \cap U_\gamma$. We also have $t_{\alpha\alpha}(x) = e$ for all $x$.
+%
+%In physics, the most common application is when $M \cong \R^n$, and all the $U_\alpha$ are the whole space $M$. Still, we can have different trivializations in different regions. So we are just comparing different trivializations of $\pi^{-1}(\R^n) \cong \R^n \times G$. For example, in electromagnetism, we have
+%\[
+% M \cong \R^{3, 1},\quad G = \U(1).
+%\]
+%Then our local trivializations are a choice of \emph{gauge}, and these transition functions are gauge transformations. They allow us to compare the values at different gauges.
+%
+%On the other hand, in GR, we take $G = \GL(n, \R)$ if $\dim M = n$. Then the transition functions just allow us to change coordinates.
+%
+%In Symmetries, Fields, and Particles, we met the idea that given a Lie group, we want to study its representations. Recall that a \emph{representation} is a continuous group homomorphism $\rho: G \to \GL_r(\C)$, where
+%\[
+% \rho(gh) = \rho(g) \rho(h),\quad \rho(e) = I.
+%\]
+%In a principal bundle, we don't just have one Lie group. We have a vector space at each point in spacetime. So given a representation, we get a vector space at every point in spacetime. This gives us a \term{vector bundle} of rank $r$.
+%
+%This is a map $\pi: E \to M$ such that we have local trivializations
+%\[
+% \Phi_\alpha: E|_{\pi^{-1}(U_\alpha)} \to U \times \C^r.
+%\]
+%The transition functions $T_{\alpha\beta}: U_\alpha \cap U_\beta \to M_r(\C)$. If the original $P$ has structure group $G \subseteq \GL_r(\C)$, then the transition functions preserve some extra structure. For example, if $G = \U(r)$, then the transition functions on our vector bundle preserve the obvious inner product
+%\[
+% \bra z_1, z_2\ket = \sum_{i = 1}^r \bar{z}_1^i z_2^i.
+%\]
+%If $G = \SU(r)$, then transition functions also have unit determinant.
+%
+%Charged matter is a section of a vector bundle $\pi: E \to M$.
+%\begin{defi}[Section]\index{section}
+% A \emph{section} of a bundle $\pi: E \to M$ is a (smooth) map $s: M \to E$ that obeys $\pi \circ s = \id$.
+%\end{defi}
+%This corresponds to assigning to each point in $M$ a value in its fiber. % maybe insert a picture.
+%
+%\begin{eg}
+% In electromagnetism, a scalar field $\phi$ of charge $q$ isn't really a function on $M$, but rather a section of a vector bundle of rank $1$ over $M$. This is because under a gauge transform, ie. change of local trivialization, we have
+% \[
+% \phi(x) \mapsto e^{i\theta \lambda(x)} \phi(x),
+% \]
+% which is the transformation behaviour of a section.
+%\end{eg}
+%
+%\begin{eg}
+% In QCD, we have a gauge group $G = \SU(3)$, and quarks and anti-quarks lie in the fundamental and anti-fundamental representations respectively. A quark field $q(x) \in E|_x \cong \C^3$ transforms under gauge transformations by
+% \[
+% q(x) \mapsto \rho(t(x)) q(x),
+% \]
+% where $\rho$ is the (anti-)fundamental representation and $t(x)$ is the gauge transformation.
+%\end{eg}
+%
+%\subsection{Connections and covariant derivatives}
+%On a vector bundle, we need a new notion of how to differentiate a section $s: M \to E$ of a vector bundle, because for any finite $\varepsilon$, the expression
+%\[
+% \frac{s(x + \varepsilon) - s(x)}{|\varepsilon|}
+%\]
+%doesn't really make sense, because $s(x + \varepsilon)$ and $s(x)$ live in different vector spaces, namely $E|_{x + \varepsilon}$ and $E|_x$.
+%
+%Let $\Omega^0_M(E)$ be the space of smooth sections of $E$, and let $\Omega^1_M(E)$ be the space of all smooth $1$-forms with values in $E$, ie. sections of $E \otimes T^* M$. Elements in $\Omega^0_M(E)$ look like $s(x)$, while elements in $\Omega^1_M(E)$ looks like $\omega_\mu(x)$.
+%
+%\begin{defi}[Connection]\index{connection}
+% A \emph{connection} \index{$\nabla$} is a linear map $\nabla: \Omega_M^0(E) \to \Omega_M^1(E)$ satisfying
+% \begin{enumerate}
+% \item Linearity:
+% \[
+% \nabla(\alpha_1 s_1 + \alpha_2 s_2) = \alpha_1 (\nabla s_1) + \alpha_2( \nabla s_2)
+% \]
+% for all $s_1, s_2 \in \Omega_M^0(E)$ and $\alpha_1, \alpha_2$ constants.
+% \item Leibnitz property:
+% \[
+% \nabla (fs) = (\d f) s + f (\nabla S)
+% \]
+% for all $s \in \Omega^0_M(E)$ and $f \in C^\infty(M)$, where, $\d f$ is the usual exterior derivative of a function, given in local coordinates by
+% \[
+% \d f = \frac{\partial f}{\partial x^\mu} \d x^\mu.
+% \]
+% \end{enumerate}
+%\end{defi}
+%
+%Given a vector field $V$ on $M$, the \emph{covariant derivative} of a section in the direction of $V$ is the map
+%\[
+% \nabla_V: \Omega^0_M(E) \to \Omega^0_M(E)
+%\]
+%defined by
+%\[
+% \nabla_V s = v \lrcorner \nabla s = v^\mu \nabla_\mu s.
+%\]
+%There is a lot of freedom in choosing a covariant derivative, but the standard result is that given any two connections $\nabla, \nabla'$, the difference satisfies
+%\[
+% (\nabla' - \nabla)(fs) = f (\nabla' - \nabla)(s).
+%\]
+%So in fact is a map $\Omega^0_M(E) \to \Omega_M^1(E)$ that is linear over functions in $C^\infty(M)$. Hence it must be some element of $\Omega^1_M(\End(E))$, ie. some matrix-valued $1$-form $(A_\mu (x))^a\!_b$.
+%
+%In particular, in an open set $U \subseteq M$ with a trivialization $\Phi$, we have a map
+%\begin{align*}
+% \Phi \circ s: U &\to U \times \C^r\\
+% x &\mapsto (x, s_\Phi(x))
+%\end{align*}
+%Then we can think $s_\phi(x)$ as just a collection of $r$ functions, and we could define a ``trivial'' connection just as $\Delta = \d$.
+%
+%Then any other connection $\nabla$ can be expressed as
+%\[
+% \nabla s = \d s + A s
+%\]
+%for some $A \in \Omega^1_M(\End(E))$, where the particular $A$ depends on our trivialization. This is called the \term{connection 1-form}, or the \term{gauge field}.
+%
+%Suppose $U_\alpha \cap U_\beta \not= \emptyset$, with trivializations $\Phi_\alpha, \Phi_\beta$, and let $g_{\alpha\beta}: U_\alpha \cap U_\beta \to \End(\C^r)$ denote the transition functions.
+%
+%Given a section $s$ of $E$, we have
+%\[
+% s_\alpha = g_{\alpha\beta} s_\beta.
+%\]
+%Also, by definition, we have
+%\[
+% (\nabla s)_\alpha = g_{\alpha\beta} (\nabla s)_\beta.
+%\]
+%From these definitions, it follows that
+%\[
+% A_\alpha = - g_{\alpha\beta} \d (g_{\alpha\beta})^{-1} + g_{\alpha \beta} A g_{\alpha\beta}^{-1}.
+%\]
+%This is the transformation law of the gauge field.
+%
+%In the rank 1 case, our transition functions $g_{\alpha\beta}$ are just multiplication by complex numbers. So
+%\[
+% A_{\beta} = g \d g^{-1} = g A_\alpha g^{-1} = g \d g^{-1} + A = i(\d \lambda - iA)
+%\]
+%if $g = e^{-i \lambda}$.
 
 \subsection{Curvature}
-Given a connection $\nabla$, we can extend its action to elements $s_{\mu_1, \ldots, \mu_p}(x) \in \Omega^p_M(E) \to \Omega^{p + 1}_M(E)$ satisfying
-\[ % include construction
-  \nabla (\alpha_1 s_1 + \alpha_2 s_2) = \alpha_1( \nabla s_1) + \alpha_2 (\nabla s_2),
-\]
-and the Leibnitz rule for \emph{forms}
-\[
-  \nabla (\omega \wedge s) + (\d \omega) \wedge s + (-1)^{\deg \omega} \omega \wedge \nabla s.
-\]
+Given a connection $\nabla$, we can extend it to a map $\Omega^p_M(E) \to \Omega^{p + 1}_M(E)$ by requiring it to satisfy the conditions
+\begin{align*}
+  \nabla (\alpha_1 s_1 + \alpha_2 s_2) &= \alpha_1( \nabla s_1) + \alpha_2 (\nabla s_2),\\
+  \nabla (\omega \wedge s) &= (\d \omega) \wedge s + (-1)^{\deg \omega} \omega \wedge \nabla s.
+\end{align*}
 whenever $\omega \in \Omega^q(M)$ and $s \in \Omega_M^{p - q}(E)$.
 
-$\nabla$ is thus a ``covariant generalization'' of the de Rham operator $\d$. However, where the ordinary $\d$ is nilpotent, ie. $\d^2 = 0$, here this is not necessarily the case.
+We can think of $\nabla$ as a ``covariant generalization'' of the de Rham operator $\d$. However, where the ordinary $\d$ is nilpotent, ie. $\d^2 = 0$, here this is not necessarily the case.
 
-What kind of object is $\nabla^2$, then?
+What kind of object is $\nabla^2$, then? We can compute
 \begin{align*}
   \nabla^2 (\omega \wedge s) &= \nabla(\d \omega \wedge s + (-1)^q \omega \wedge \nabla s)\\
   &= \d^2 \omega \wedge s + (-1)^{q + 1}\d \omega \wedge \nabla s + (-1)^q \d \omega \wedge \nabla s + (-1)^{2q} \omega \wedge \nabla^2 s\\
@@ -3717,9 +4008,9 @@ What kind of object is $\nabla^2$, then?
 \end{align*}
 So we find that $\nabla^2$ is in fact a map $\Omega^q_M(E) \to \Omega^{q + 2}_M(E)$ that is linear over any forms! Specializing to the case of $q = 0$ only, we can write $\nabla^2$ as
 \[
-  \nabla^2(s) = F_\nabla \wedge s,
+  \nabla^2(s) = F_\nabla s,
 \]
-where $F_\nabla \in \Omega^2_M(\End(E))$. It is an easy exercise to check that the same formula works for all $q$. In local coordinates, we can write
+for some $F_\nabla \in \Omega^2_M(\End(E))$. It is an easy exercise to check that the same formula works for all $q$. In local coordinates, we can write
 \[
   F_\nabla = \frac{1}{2} (F_{\mu\nu}(x))^a\!_b\; \d x^\mu \wedge \d x^\nu.
 \]
@@ -3731,34 +4022,40 @@ we find that
 \[
   \nabla^2 s = \nabla(\d s + A s) = \d^2 s + \d (As) + A(\d s + A s) = (\d A + A \wedge A) s.
 \]
+Note that by $A\wedge A$, we mean, locally in coordinates, $A^a\!_b \wedge A^b\!_c$, which is still a form with values in $\End(V)$.
+
 Thus, locally, we have
 \begin{align*}
   F &= \d A + A \wedge A \\
   &= (\partial_\mu A_\nu + A_\mu A_n) \d x^\mu \wedge \d x^\nu\\
   &= \frac{1}{2} (\partial_\mu A_\nu - \partial_\nu A_\mu + A_\mu A_\nu - A_\nu A_\mu)\;\d x^\mu \wedge \d x^\nu\\
-  &= \frac{1}{2} (\partial_\mu A_\nu - \partial_\nu A_\mu + [A_\mu, A_\nu]) \d x^\mu \wedge \d x^\nu
+  &= \frac{1}{2} (\partial_\mu A_\nu - \partial_\nu A_\mu + [A_\mu, A_\nu])\; \d x^\mu \wedge \d x^\nu
 \end{align*}
-We have a matrix commutator, which doesn't appear in in the abelian case, because things are abelian.
+Of course, when in the case of $\U(1)$ theory, the bracket vanishes, and this is just the usual field strength tensor. Unsurprisingly, this is what will go into the Lagrangian for a general gauge theory.
 
-This is important. This is no longer linear in $A$. When we do Yang--Mills later, we will consider $F^2$, and then we will have $A^3$ and $A^4$ terms, and this causes interaction of the gauge field with itself.
+Crucially, in the non-abelian theory, the bracket term is there, and is non-zero. This is important. Our $F$ is no longer linear in $A$. When we do Yang--Mills later, the action will contain a $F^2$ term, and then expanding this out will give $A^3$ and $A^4$ terms. This causes interaction of the gauge field with itself, even without the presence of matter!
 
-We can also compute
+We end by noting a seemingly-innocent identity. Note that we can compute
 \[
   \nabla^3 s = \nabla(\nabla^2 s) = \nabla(F s) = (\nabla F)\wedge s + F\wedge (\nabla s).
 \]
-We can also compute
+On the other hand, we also have
 \[
   \nabla^3 s = \nabla^2 (\nabla s) = F \wedge \nabla s.
 \]
-These two ways of thinking about $\nabla^3$ are consistent iff $\nabla (F_\nabla) \equiv 0$. This is known as the \term{Bianchi identity}.
+These two ways of thinking about $\nabla^3$ must be consistent. This implies we have
+\[
+  \nabla (F_\nabla) \equiv 0.
+\]
+This is known as the \term{Bianchi identity}.
 
-We can compute this explicitly on local coordinates. On $U$, we have
-\begin{align*}
-  \nabla F|_U &= (\d + A)(\d A + A\wedge A)\\
-  &= \d(\d A + A \wedge A) + A \wedge (\d A + A \wedge A) - (\d A + A \wedge A) \wedge A\\
-  &= \d^2 A + \d A \wedge A - A \wedge \d A + A \wedge \d A + A^3 - \d A \wedge A - A^3\\
-  &= 0
-\end{align*}
+%We can compute this explicitly on local coordinates. On $U$, we have
+%\begin{align*}
+% \nabla F|_U &= (\d + A)(\d A + A\wedge A)\\
+% &= \d(\d A + A \wedge A) + A \wedge (\d A + A \wedge A) - (\d A + A \wedge A) \wedge A\\
+% &= \d^2 A + \d A \wedge A - A \wedge \d A + A \wedge \d A + A^3 - \d A \wedge A - A^3\\
+% &= 0
+%\end{align*}
 \subsection{Yang--Mills theory}
 At the classical level, Yang--Mills is an example of non-abelian gauge theory defined by the action % Chern-Simon theory?
 \[
@@ -3864,13 +4161,608 @@ So $\delta A$ depends on where we start.
 
 The solution is given by ghosts.
 \subsection{Faddeev--Popov ghosts}
-% fix the name
+To understand how to do this, we will first consider a particular finite-dimensional example. Suppose we have a field $(x, y): \{\mathrm{pt}\} \to \R^2$ on a zero-dimensional universe and an action $S[x, y]$. For simplicity, we will often ignore the existence of the origin in $\R^2$.
 
-Let's consider a simple finite-dimensional example. Suppose we have fields $(x, y): \{\mathrm{pt}\} \to \R$, but suppose the action $S[x, y]$ is rotationally invariant. Then the path integral
+The partition function we are interested in is
 \[
-  \int_{\R^2} \d x\; \d y\; e^{-S[x, y]} = \int_0^{2\pi} \d \theta \int_0^\infty r \;\d r e^{-S[r]}.
+  \int_{\R^2}\d x\; \d y\; e^{-S[x, y]}.
 \]
-The factor $2\pi$ is here the volume of the gauge group $\U(1) = \SO(2)$, while the radial integral is the integral over the quotient space $(\R^2 \setminus \{0\})/\SO(2) \cong \R_{> 0}$. Note that the measure on this quotient space is $r\;\d r$, and not the trivial measure $\d r$. We have to do something similar in Yang--Mills.
+Suppose the action is rotationally invariant. Then we can write the integral as
+\[
+  \int_{\R^2} \d x\; \d y\; e^{-S[x, y]} = \int_0^{2\pi} \d \theta \int_0^\infty r \;\d r\; e^{-S[r]} = 2\pi \int_0^\infty r \;\d r\; e^{-S[r]}.
+\]
+We can try to formulate this result in more abstract terms. Our space $\R^2$ of fields has an action of the group $\SO(2)$ by rotation. The quotient/orbit space of this action is
+\[
+  \frac{\R^2 \setminus \{0\}}{\SO(2)} \cong \R_{> 0}.
+\]
+Then what we have done is that we have replaced the integral over the whole of $\R^2$, namely the $(x, y)$ integral, with an integral over the orbit space $\R_{>0}$, namely the $r$ integral. There are two particularly important things to notice:
+\begin{itemize}
+  \item The measure on $\R_{>0}$ is not the ``obvious'' measure $\d r$. In general, we have to do some work to figure out what the correct measure is.
+  \item We had a factor of $2\pi$ sticking out at the front, which corresponds to the ``volume'' of the group $\SO(2)$.
+\end{itemize}
+In general, how do we figure out what the quotient space $\R_{>0}$ is, and how do we find the right measure to integrate against? The idea, as we have always done, is to ``pick a gauge''.
+
+We do so via a gauge fixing function. We specify a function $f: \R^2 \to \R$, and then our gauge condition will be $f(x) = 0$. In other words, the ``space of gauge orbits'' will be
+\[
+  C = \{\mathbf{x} \in \R^2: f(\mathbf{x}) = 0\}
+\]
+\begin{center}
+  \begin{tikzpicture}
+    \draw (-2, -2) rectangle (2, 2);
+    \node [circ] {};
+
+    \draw (0, 0) .. controls (1, 0.5) and (0, 1) .. (2, 1.7) node [pos=0.6, left] {\small $f(\mathbf{x}) = 0$};
+  \end{tikzpicture}
+\end{center}
+For this to work out well, we need the following two conditions:
+\begin{enumerate}
+  \item For each $x \in \R^2$, there exists some $R \in \SO(2)$ such that $f(R \mathbf{x}) = 0$.
+  \item $f$ is non-degenerate. Technically, we require that for any $x$ such that $f(x) = 0$, we have
+    \[
+      \Delta_f (x) = \left.\frac{\partial}{\partial \theta} f(R_\theta(\mathbf{x}))\right|_{\theta = 0} \not= 0,
+    \]
+    where $R_\theta$ is rotation by $\theta$.
+\end{enumerate}
+The first condition is an obvious requirement --- our function $f$ does pick out a representative for each gauge orbit. The second condition is technical, but also crucial. We want the curve to pick out a unique point in each gauge orbit. This prevents a gauge orbit from looking like
+\begin{center}
+  \begin{tikzpicture}
+    \draw (-2, -2) rectangle (2, 2);
+    \node [circ] {};
+
+    \draw (0, 0) .. controls (2, 0.5) and (-1.5, -0.5) .. (1, 2);
+
+    \draw [dashed] circle [radius=0.5];
+  \end{tikzpicture}
+\end{center}
+where the dashed circle intersects the curved line three times. For any curve that looks like this, we would have a vanishing $\Delta_f(x)$ at the turning points of the curve. The non-degeneracy condition forces the curve to always move radially outwards, so that we pick out a good gauge representative.
+
+It is important to note that the non-degeneracy condition in general does not guarantee that each gauge orbit has a unique representative. In fact, it forces each gauge orbit to have two representatives instead. Indeed, if we consider a simple gauge fixing function $f(x, y) = x$, then this is non-degenerate, but the zero set looks like
+\begin{center}
+  \begin{tikzpicture}
+    \draw (-2, -2) rectangle (2, 2);
+    \node [circ] {};
+
+    \draw (-2, 0) -- (2, 0);
+
+    \draw [dashed] circle [radius=1];
+  \end{tikzpicture}
+\end{center}
+It is an easy exercise with the intermediate value theorem to show that there must be at least two representatives in each gauge orbit (one will need to use the non-degeneracy condition).
+
+This is not a particularly huge problem, since we are just double counting each gauge orbit, and we know how to divide by $2$. Let's stick with this and move on.
+
+To integrate over the gauge orbit, it is natural to try the integral.
+\[
+  \int_{\R^2}\d x\; \d y\; \delta(f(x)) e^{-S(x, y)}.
+\]
+Then the $\delta$-function restricts us to the curve $C$, known as the \term{gauge slice}.
+
+However, this has a problem. We would want our result to not depend on how we choose our gauge. But not only does this integral depend on $C$. It in fact depends on $f$ as well!
+
+To see this, we can simply replace $f$ by $cf$ for some constant $c \in \R$. Then
+\[
+  \delta(f(x)) \mapsto \delta(cf(x)) = \frac{1}{|c|} \delta(f(x)).
+\]
+So our integral changes. It turns out the trick is to include the factor of $\Delta_f$ we previously defined. Consider the new integral
+\[
+  \int_{\R^2}\d x\; \d y\; \delta(f(\mathbf{x})) |\Delta_f(\mathbf{x})| e^{-S(\mathbf{x})}.\tag{$*$}
+\]
+To analyze how this depends on $f$, we pretend that the zero set $C$ of $f$ actually looks like this:
+\begin{center}
+  \begin{tikzpicture}
+    \draw (-2, -2) rectangle (2, 2);
+    \node [circ] {};
+
+    \draw (0, 0) .. controls (1, 0.5) and (0, 1) .. (2, 1.7);
+  \end{tikzpicture}
+\end{center}
+rather than
+\begin{center}
+  \begin{tikzpicture}
+    \draw (-2, -2) rectangle (2, 2);
+    \node [circ] {};
+
+    \draw (0, 0) .. controls (1, 0.5) and (0, 1) .. (2, 1.7);
+    \draw (0, 0) .. controls (-1, -0.5) and (0, -1) .. (-2, -1.7);
+  \end{tikzpicture}
+\end{center}
+Of course, we know the former is impossible, and the zero set must look like the latter. However, the value of the integral $(*)$ depends only on how $f$ behaves locally near the zero set, and so we may analyze each ``branch'' separately, pretending it looks like the former. This will make it much easier to say what we want to say.
+
+\begin{thm}\leavevmode
+  The integral $(*)$ is independent of the choice of $f$ and $C$.
+\end{thm}
+
+\begin{proof}
+  We first note that if we replace $f(\mathbf{x})$ by $c(r) f(\mathbf{x})$ for some $c > 0$, then we have
+  \[
+    \delta(cf) = \frac{1}{|c|} \delta(f),\quad |\Delta_{cf}(x)| = c(r) |\Delta_f|,
+  \]
+  and so the integral doesn't change.
+
+  Next, suppose we replace $f$ with some $\tilde{f}$, but they have the zero set. Now notice that $\delta(f)$ and $|\Delta_f|$ depend only on the first-order behaviour of $f$ at $C$. In particular, it depends only on $\frac{\partial f}{\partial \theta}$ on $C$. So for all practical purposes, changing $f$ to $\tilde{f}$ is equivalent to multiplying $f$ by the ratio of their derivatives. So changing the function $f$ while keeping $C$ fixed doesn't affect the value of $(*)$.
+
+  Finally, suppose we have two arbitrary $f$ and $\tilde{f}$, with potentially different zero sets. Now for each value of $r$, we pick a rotation $R_{\theta(r)} \in \SO(2)$ such that
+  \[
+    \tilde{f}(x) \propto f(R_{\theta(r)} \mathbf{x}).
+  \]
+  By the previous part, we can rescale $f$ or $\tilde{f}$, and assume we in fact have equality.
+
+  We let $\mathbf{x}' = R_{\theta(r)}\mathbf{x}$. Now since the action only depends on the radius, it in particular is invariant under the action of $R_{\theta(r)}$. The measure $\d x\;\d y$ is also invariant, which is particularly clear if we write it as $\d \theta\; r\;\d r$ instead. Then we have
+  \begin{align*}
+    \int_{\R^2}\d x\; \d y\; \delta(f(\mathbf{x})) |\Delta_f(\mathbf{x})| e^{-S(\mathbf{x})} &= \int_{\R^2}\d x'\; \d y'\; \delta(f(\mathbf{x}')) |\Delta_f(\mathbf{x}')| e^{-S(\mathbf{x}')}\\
+    &= \int_{\R^2}\d x'\; \d y'\; \delta(\tilde{f}(\mathbf{x})) |\Delta_{\tilde{f}}(\mathbf{x})| e^{-S(\mathbf{x}')}\\
+    &= \int_{\R^2}\d x\; \d y\; \delta(\tilde{f}(\mathbf{x})) |\Delta_{\tilde{f}}(\mathbf{x})| e^{-S(\mathbf{x})}
+  \end{align*}
+\end{proof}
+
+\begin{eg}
+  We choose $C$ to be the $x$-axis with $f(\mathbf{x}) = y$. Then under a rotation
+  \[
+    f(\mathbf{x}) = y \mapsto y \sin \theta - x \sin \theta,
+  \]
+  we have
+  \[
+    \Delta_f (\mathbf{x}) = -x.
+  \]
+  So we have
+  \begin{align*}
+    \int_{\R^2} \d x\; \d y\; \delta(f) \Delta_f (x) e^{-S(x, y)} &= \int_{\R^2} \d x\;\d y\; \delta(y) |x| e^{-S(x, y)}\\
+    &= \int_{-\infty}^\infty \d x\; |x| e^{-S(x, 0)}\\
+    &= 2 \int_0^\infty \d |x|\; |x| e^{-S(|x|)}\\
+    &= 2 \int_0^\infty r\;\d r\;e^{-S(r)}.
+  \end{align*}
+\end{eg}
+So this gives us back the original integral
+\[
+  \int_0^\infty r\;\d r\; e^{-S(r)}
+\]
+of along the gauge orbit we wanted, except for the factor of $2$. As we mentioned previously, this is because our gauge fixing condition actually specifies two points on each gauge orbit, instead of one. This is known as the \term{Gribov ambiguity}.
+
+When we do perturbation theory later on, we will not be sensitive to this global factor, because in perturbation theory, we only try to understand the curve locally, and the choice of gauge is locally unique.
+
+The advantage of looking at the integral
+\[
+  \int_{\R^2}\d x\;\d y\; \delta(f) \Delta_f e^{-S(x, y)}
+\]
+is that it only refers to functions and measures on the full space $\R^2$, which we understand well.
+
+More generally, suppose we have a (well-understood) space $X$ with a measure $\d \mu$. We then have a Lie group $G$ acting on $X$. Suppose locally (near the identity), we can parametrize elements of $G$ by parameters $\theta^a$ for $a = 1, \cdots, \dim G$. We write $R_\theta$ for the corresponding element of $G$ (technically, we are passing on to the Lie algebra level).
+
+To do gauge fixing, we now need many gauge fixing functions, say $f^a$, again with $a = 1, \cdots, \dim G$. We then let
+\[
+  \Delta_f = \det\left(\left.\frac{\partial f^a(R_\theta \mathbf{x})}{\partial \theta^b}\right|_{\theta = 0}\right).
+\]
+This is known as the \term{Fadeev--Popov determinant}.
+
+Then if we have a function $e^{-S[\mathbf{x}]}$ that is invariant under the action of $G$, then to integrate over the gauge orbits, we integrate
+\[
+  \int_X \d \mu\; |\Delta_f| \prod_{a = 1}^{\dim G} \delta(f^a(x)) e^{-S[\mathbf{x}]}.
+\]
+Now in Yang--Mills, our spaces and groups are no longer finite-dimensional, and nothing makes sense. Well, we can manipulate expressions formally. Suppose we have some gauge fixing condition $f$. Then the expression we want is
+\[
+  \mathcal{Z} = \int_{\mathcal{A}/\mathcal{G}} \D \mu \; e^{-S_{YM}} = \int_\mathcal{A} \D A\; \delta[f] |\Delta_f(A)| e^{-S_{YM}[A]},
+\]
+Suppose the gauge group is $G$, with Lie algebra $\mathfrak{g}$. We will assume the gauge fixing condition is pointwise, ie. we have functions $f^a: \mathfrak{g} \to \mathfrak{g}$, and the gauge fixing condition is
+\[
+  f(A(x)) = 0\text{ for all } x\in M.
+\]
+Then writing $n = \dim \mathfrak{g}$, we can write
+\[
+  \delta[f] = \prod_{x \in M} \delta^{(n)}(f(A(x))).
+\]
+We don't really know what to do with these formal expressions. Our strategy is to write this integral in terms of more ``usual'' path integrals, and then we can use our usual tools of perturbation theory to evaluate the integral.
+
+We first take care of the $\delta[f]$ term. We introduce a new field $h \in \Omega^0_M(\mathfrak{g})$.
+\[
+  \delta[f] = \int \D h\; \exp\left(-\int (h(x), f(A(x)))\;\d^d x\right),
+\]
+where the $(\ph, \ph)$ denotes the Killing form of the Lie algebra. This $h$ acts as a ``Lagrange multiplier'' that enforces the condition $f(A(x)) = 0$.
+
+To take care of the determinant term, we wanted to have
+\[
+  \Delta_f = \det \frac{\delta f^a[A^\lambda(x)]}{\delta \lambda^b (y)},
+\]
+where $\lambda^a(y)$ are our gauge parameters, and $A^\lambda$ is the gauge-transformed field.
+
+Now recall that for a finite-dimensional $n \times n$ matrix $M$, we have
+\[
+  \det (M) = \int \d^n c\; \d^n \bar{c}\; e^{- \bar{c} M c},
+\]
+where $c, \bar{c} \in \R^n$. Thus, in our case, we can write the Fadeev---Popov determinant as the path integral
+\[
+  \Delta_f = \int \D \bar{c}\; \D c\;\exp \left(- \int_{M \times M} \d^n x\;\d^n y\; \bar{c}_a(x) \frac{\delta f^a(A^\lambda(x))}{\partial \lambda^b(y)} c^b(y)\right),
+\]
+where $c, \bar{c}$ are \emph{fermionic} scalars, again valued in $\mathfrak{g}$.
+
+The fermionic fields $c$ and $\bar{c}$ are known as \term{ghosts} and \term{anti-ghosts} respectively. We might find these a bit strange, since they are spin $0$ fermionic fields, which violates the spin statistic theorem. So, if we do canonical quantization with this, then we find that we don't get a Hilbert space, as we get states with negative norm! Fortunately, there is a subspace of \emph{gauge invariant} states that do not involve the ghosts, and the inner product is positive definite in this subspace. When we focus on these states, and on operators that do not involve ghosts, then we are left with a good, unitary theory. These $c$ and $\bar{c}$ aren't ``genuine'' fields, and they are just there to get rid of the extra fields we don't want. The ``physically meaningful'' theory is supposed to happen in $\mathcal{A}/\mathcal{G}$, where no ghosts exist.
+
+\begin{eg}
+  We often pick Lorenz gauge $f^a(A) = \partial^\mu A_\mu^a$. Under a gauge transformation, we have $A \mapsto A^\lambda = A + \nabla \lambda$. More explicitly, we have
+  \[
+    (A^\lambda)^a\!_\mu = A^a\!_\mu + \partial_\mu \lambda^a + f^a\!_{bc} A_\mu^b \lambda^c.
+  \]
+  So the matrix appearing in the Fadeev--Popov determinant is
+  \[
+    \frac{\partial f^a(A^\lambda)}{\partial \lambda^b(y)} = \partial^\mu\left(\delta^a\!_c \partial_\mu^{(x)} + f^a\!_{bc} A_\mu(x)\right) \delta^d(x - y).
+  \]
+  The $\delta$-function tells us the transformation has no effect if we vary $A$ at a point different from $x$. Then the ghost action is
+  \begin{align*}
+    S_{gh} &= \int \d^d x\; \d^d y\; \bar{c}(x) \partial^\mu\left(\delta^a\!_c \partial_\mu^{(x)} + f^a\!_{bc} A_\mu^b(x)\right) \delta^{(d)}(x - y) c^b(y)\\
+    &= \int \d^d x\; \bar{c}_a(x) \partial^\mu (\nabla_\mu c)^a.
+  \end{align*}
+  Thus, the whole Yang--Mills path integral is
+  \begin{multline*}
+    \mathcal{Z} = \int \D A\; \D \bar{c}\;\D \bar{c} \;\D h\; \exp\left(-\frac{1}{4g^2_{YM}} \int F_{\mu\nu}^a F^{\mu\nu, a} - \int h_a \partial^\mu A_\mu^a\right.\\
+    \left.+ \int \bar{c}_a \partial^\mu(\nabla c)^a \;\d^d x\right).
+  \end{multline*}
+  All these stuff is just a fake way to say that all we wanted to do was to integrate over the space $\mathcal{A}/\mathcal{G}$, rather than $\mathcal{A}$ itself.
+\end{eg}
+
+Why do we bother to do this? Why didn't we had to bother when we did electrodynamics?
+
+If we did this for the gauge field, then the structure constants were zero. Consequently, all $f^a\!_{bc}$ terms do not exist. So the ghost kinetic operator does not involve the gauge field. So the path integral over the ghosts would be completely independent of the gauge field, and so as long as we worked in a gauge, then we can ignore the ghosts.
+
+However, in a non-abelian gauge theory, this is not true. We cannot just impose a gauge and get away with it. We need to put back the Jacobian to take into account the change of variables, and this is where the ghosts come in.
+
+The benefit of doing this is that it now looks very familiar. It seems like something we can tackle using Feynman rules with perturbation theory.
+
+Note that instead of imposing $f[A] = 0$ by the % insert name Nakamishi Lautrug
+term
+\[
+  i h_a f^a[A]\;\d^d x,
+\]
+we can instead ``smear'' the gauge condition by including a quadratic piece in $h$, ie. we take
+\[
+  S[h, \ph] = i \int \d^d x h_a (\partial^\mu A_\mu^a) + \frac{1}{2 \xi} \int \d^d x\; h^a h_a
+\]
+for some constant $\xi$. Integrating out $h$ now yields a contribution
+\[
+  - \frac{\xi}{2} \int\d^d x\; (\partial^\mu A_\mu^a) (\partial^\nu A_\nu^a).
+\]
+So the path integral is a ``Gaussian peaked on $\partial^\mu A_\mu = 0$, rather than localized on it. The real justification for why we are allowed to include this term is part of the BRST story, which we shall not go into.
+
+In the finite-dimensional example, we saw that any gauge-fixing curve would do the job, so we are sort-of ``averaging out'' over many gauge fixing curves.
+
+The complete gauge-fixed Yang--Mills action is then (with coupling to fermions $\psi$)
+\begin{multline*}
+  S[A, \bar{c}, c, \psi] = \frac{1}{4g^2} \int F_{\mu\nu}^a F^{\mu\nu,a}\;\d^d x - \frac{\xi}{2} \int (\partial^\mu A_\mu^a) (\partial^\nu A_\nu^a)\;\d^d x \\
+  + \int \bar{c} \partial^\mu \nabla_\mu c \;\d^d x + \int \d^d x\; \bar\psi (\slashed\nabla + m)\psi,
+\end{multline*}
+where
+\[
+  \slashed{\nabla} = \gamma^\mu (\partial_\mu A_\mu^a),
+\]
+where the gauge field acts in some representation $R$.
+
+We have corresopnding Feynman rules, with propagators
+\begin{align*}
+  \begin{tikzpicture}[eqpic]
+    \begin{feynman}
+      \vertex (l);
+      \vertex [right=of l] (r);
+      \diagram*{
+        (l) -- [gluon, momentum=$p$] (r),
+      };
+    \end{feynman}
+  \end{tikzpicture} &= \D_{\mu\nu}^{ab} (p) = \frac{\delta^{ab}}{p^2} \left(\delta_{\mu\nu}(1 - \xi) \frac{p_\mu p_\nu}{p^2}\right)\\
+  \begin{tikzpicture}[eqpic]
+    \begin{feynman}
+      \vertex (l);
+      \vertex [right=of l] (r);
+      \diagram*{
+        (l) -- [fermion, momentum=$p$] (r),
+      };
+    \end{feynman}
+  \end{tikzpicture} &= S(p) = \frac{1}{i\slashed{p} + m}\\
+  \begin{tikzpicture}[eqpic]
+    \begin{feynman}
+      \vertex (l) {$\bar{c}$};
+      \vertex [right=of l] (r) {$c$};
+      \diagram*{
+        (l) -- [scalar, momentum=$p$] (r),
+      };
+    \end{feynman}
+  \end{tikzpicture} &= C^{ab}(p) = \frac{\delta^{ab}}{ip^2}
+\end{align*}
+and interaction vertices
+\begin{align*}
+  \begin{tikzpicture}[eqpic]
+    \begin{feynman}
+      \vertex (c);
+      \vertex [above left=of c] (tl) {$A_\mu^a$};
+      \vertex [above right=of c] (tr) {$A_\nu^b$};
+      \vertex [below=of c] (b) {$A_\lambda^c$};
+      \diagram*{
+        (c) -- [gluon, momentum=$p$] (tl),
+        (c) -- [gluon, momentum=$q$] (tr), % fix directions
+        (c) -- [gluon, momentum=$k$] (b),
+      };
+    \end{feynman}
+  \end{tikzpicture} &= \Gamma^{abc}_{\mu\nu\lambda} (k, p, q) = g_{YM} \delta^d(k + p + q)\\
+  &\hphantom{={}} f^{abc} \left((k - p)_\lambda \delta_{\mu\nu} + (p - q)_\mu \delta_{\nu\lambda} + (q - k) \delta_{\mu\lambda}\right)\\
+  \begin{tikzpicture}[eqpic]
+    \begin{feynman}
+      \vertex (c);
+      \vertex [above left=of c] (tl) {$A_\mu^a$};
+      \vertex [above right=of c] (tr) {$A_\nu^b$};
+      \vertex [below left=of c] (bl) {$A_\lambda^c$};
+      \vertex [below right=of c] (br) {$A_\sigma^d$};
+      \diagram*{
+        (c) -- [gluon, momentum=$p$] (tl),
+        (c) -- [gluon, momentum=$p$] (tr), % fix directions
+        (c) -- [gluon, momentum=$p$] (bl),
+        (c) -- [gluon, momentum=$p$] (br), % no explicit momentum dependence because no derivative
+      };
+    \end{feynman}
+  \end{tikzpicture} &= (-g_{YM}^2 f^{abe}f^{cde} (\delta_{\mu\lambda} \delta_{\nu\sigma} - \delta_{\mu\sigma} \delta_{\nu\lambda}) \\
+  &\hphantom{={}}- g_{YM}^2 f^{ace} f^{bde} (\delta_{\mu\nu} \delta_{\sigma\lambda} - \delta_{\mu\sigma} \delta_{\nu\lambda}) \\
+  &\hphantom{={}}- g^2_{YM} f^{ade} f^{bce} (\delta_{\mu\nu} \delta_{\sigma\lambda} - \delta_{\mu\lambda} \delta_{\nu\sigma})) \delta^d(l + p + q + \ell)\\
+  \begin{tikzpicture}[eqpic]
+    \begin{feynman}
+      \vertex (c);
+      \vertex [above left=of c] (tl) {$\bar{c}$};
+      \vertex [above right=of c] (tr) {$c$};
+      \vertex [below=of c] (b) {$A_\mu(p)$}; % reflect this
+      \diagram*{
+        (c) -- [scalar] (tl),
+        (c) -- [scalar] (tr), % fix directions
+        (c) -- [gluon, momentum=$p$] (b),
+      };
+    \end{feynman}
+  \end{tikzpicture} &= \Gamma^{abc}(p) = g_{YM} f^{abc} p_\mu\\
+  \begin{tikzpicture}[eqpic]
+    \begin{feynman}
+      \vertex (c);
+      \vertex [above left=of c] (tl) {$\bar{\psi}$};
+      \vertex [above right=of c] (tr) {$\psi$};
+      \vertex [below=of c] (b) {$A_\mu(p)$}; % reflect this
+      \diagram*{
+        (c) -- [fermion] (tl),
+        (c) -- [fermion] (tr), % fix directions
+        (c) -- [gluon, momentum=$p$] (b),
+      };
+    \end{feynman}
+  \end{tikzpicture} &= -g_{YM} \gamma^\mu(t^a_f). % t is generator of fundamental rep?
+\end{align*}
+Conclusion: Yick! This is horrible! Perturbation theory is not going to be the right way to think about Yang--Mills, and GR is worse!
+
+Then what is a good way to do Yang--Mills? We don't know. Some people try to use lattice regularization and put it on a computer. Alternatively, we might just accept the life is hard.
+
+However, it turns out when we try to do computations, the answer looks very nice. So there must be some hidden structure of Yang--Mills we are missing. But we don't really know.
+
+The only thing we can do now is to work with this.
+
+\subsection{Background fields}
+To compute the $\beta$-function of Yang--Mills, we expand the action around a classical solution $A_\mu$ with all other fields $\psi, \bar\psi, \bar{c}, c = 0$. We set
+\[
+  A^{\mathrm{full}}_\mu = A_\mu + a_\mu,
+\]
+so that
+\[
+  \nabla = \nabla^0 + a.
+\]
+We then have
+\[
+  F_{\mu\nu} = F_{\mu\nu}^0 + \nabla_{[\mu} A_{\nu]} + [a_\mu, a_\nu].
+\]
+We treat $(a, \psi, \bar{\psi}, \bar{c}, c)$ as fluctuations, and compute the path integral to $1$-loop accuracy. Again, since we always have $P - V = L - 1$, at 1-loop, we must have $P = V$, and since only the fluctuations propagator, we also have
+\[
+  2P = \sum_{\text{vertices $i$}} n_{q, i},
+\]
+where $n_{q, i}$ is the number of vertices at the node $i$, and $q$ says we just count over the quantum (non-background) fields. So we know that
+\[
+  0 = \sum (n_{q, i} - 2).
+\]
+If the background field $A_\mu^0$ satisfies the Yang--Mills equation, then we can ignore all vertices with $n_{q, i} = 1$, since the sum of all these terms is proportional to the field equations. So we must have $n_{q, i} = 2$ for all $i$. So at $1$-loop, we only need to consider vertices that are quadratic. We saw exactly the same situation when we were looking at local potentials previously.
+
+We'll also work in ``background field gauge'', where $\nabla^\mu a_\mu = 0$. The $\nabla^\mu$ uses the background term $A_\mu^0$. In Feynman gauge ($\xi = 1$), we have
+\begin{align*}
+  &\phantom{={}}S^{\mathrm{quad}} [a, \bar{c}, c, \bar\psi, \psi]\\
+  &= - \frac{1}{4 g_{YM}^2} \int \d^d x\; \left((\nabla_\mu a_\nu^a - \nabla_\nu a_\mu^a)^2 - 2 F_{\nabla^0}^{\mu\nu} [a_\mu, a_\nu] + 2 (\nabla^{0, \mu}_{a_\mu} \nabla^{0, \nu} a_\nu)\right) \\
+  &\hphantom{={}}+ \int\ d^d x\; \bar{c} \nabla^\mu \nabla_\mu^0 c + \int \d^d x\; \bar\psi (i \slashed{\Delta}^0 + m)\psi.
+\end{align*}
+Let's first look at the fluctuations in $a_\mu$, we have % all derivatives are wrt background gauge field
+\begin{align*}
+  4g_{YM} \mathcal{L}^{\mathrm{quad}} &= (\nabla_\mu a_\nu - \nabla_\nu a_\mu)^2 - 2F^{\mu\nu} [a_\mu, a_\nu] + 2 (\nabla^\mu a_\mu)^2\\
+  &= a_\mu \left[-\delta^{\mu\nu} \nabla^2 + \nabla^\nu \nabla^\mu - \nabla^\mu \nabla^\nu \right] a_\nu - 2 F^{\mu\nu} [a_\mu, a_\nu]\\
+  &= a_\mu^a \left(- \delta^{\mu\nu} ((\nabla)^2)^c_a + 2 \left(\frac{1}{2} F_{\rho\sigma}^b \mathcal{J}^{\rho\sigma}\right)^{\mu\nu} (t_b)^c_a\right) a_{\nu, c},
+\end{align*}
+where
+\[
+  (\mathcal{J}^{\rho\sigma})_{\mu\nu} = i \left(\delta^\rho_\mu \delta^\sigma_\nu - \delta^\rho_\nu \delta^\sigma_\mu\right)
+\]
+are the $\SO(d)$ generators acting on the vector representation, and
+\[
+  (t_b)^c_a = f^c_{ba}
+\]
+are the structure constants of $g$ generated by the adjoint representation.
+
+Similarly, for the Dirac field $\psi$, we get $\det(\slashed{\nabla} + m)$, and it will be helpful to use $(\det M)^2 = \det (M^2)$ to write this as follows:
+\begin{align*}
+  \slashed{\nabla}^2 &= \gamma^\mu \gamma^\nu \nabla_\mu \nabla_\nu \\
+  &= \left(\frac{1}{2} [\gamma^\mu, \gamma^\nu] + \frac{1}{2} \{\gamma^\mu \gamma^\nu\}\right) \nabla_\mu \nabla_\nu\\
+  &= \nabla^2 - \frac{1}{4} [\gamma^\mu \gamma^\nu] (\nabla_\mu \nabla_\nu - \nabla_\nu \nabla_\mu)\\
+  &= \nabla^2 + 2\left(\frac{1}{2} F_{\mu\nu}^a S^{\mu\nu} (t^a_R)\right),
+\end{align*}
+where
+\[
+  S^{\mu\nu} = \frac{1}{4} [\gamma^\mu, \gamma^\nu].
+\]
+Finally, the ghost Lagrangian is easier. it is just
+\[
+  \mathcal{L}_{\mathrm{ghosts}} = \bar{c}_a (\nabla^2 c)^a.
+\]
+All together, integrating out these fluctuations gives, to one-loop accuracy,
+\[
+  \frac{(\det \Delta_{R, 1/2})^{n/2}}{ (\det \Delta_{\mathrm{adj}, 1})^{1/2}} (\det \Delta_{\mathrm{adj}, 0}),
+\]
+where
+\[ % point is that we got every operator in the same form.
+  \Delta_{R, j} = \nabla^2 + 2\left(\frac{1}{2} F_{\mu\nu}^a J^{\mu\nu}_{(j)}\right)t^a_R,
+\]
+and we have $n$ flavours of massless Dirac fermions. We can think of the second term as the ``magnetic moment''.
+
+Everything here depends on the background gauge field. We now see what this looks like in terms of the background gauge field. The effective action for the background field $\nabla^{(0)} = \partial + A$ is
+\[
+  e^{-S_{\mathrm{eff}}[A]} = \exp\left(- \frac{1}{4g_{YM}^2} \int (F_{\mu\nu}, F^{\mu\nu})\;\d^d x\right) \frac{(\det \Delta_{\mathrm{adj}, 0}) (\det \Delta_{R, \frac{1}{2}})^{n/2}}{(\det \Delta_{\mathrm{adj}, 1})^{1/2}},
+\]
+We can write out $\Delta$ explicitly, we have
+\[
+  \Delta_{R, j} = - \partial^2 + \underbrace{\{\partial^\mu, A_\mu^a\} t^a_{(R)}}_{\Delta^{(1)}} +  \underbrace{A^{\mu, a} A_\mu^b t^a_R t^b_R}_{\Delta^{(2)}} + \underbrace{2 \left(\frac{1}{2} F^a_{\mu\nu} J^{\mu\nu}_{(j)}\right) t^a_{(R)}}_{\Delta^{(J)}}.
+\]
+The effective action involves
+\begin{align*}
+  \log \det \Delta_{R, j} &= \log \det (- \partial^2 + \Delta^{(1)} + \Delta^{(2)} + \Delta^{(J)})\\
+  &= \log \det (- \partial^2) + \tr \log (1 - (\partial^2)^{-1} (\Delta^{(1)} + \delta^{(2)} + \Delta^{(J)})).
+\end{align*}
+Again, the first term is a constant, and we will ignore it. We want to know the correction to the coupling $\frac{1}{4 g_{YM}^2}$. Since everything is covariant with respect to the background field $\nabla^{(0)}$, it is enough to just compute the quadratic terms in $A_\mu$, because all the other terms are required to behave accordingly.
+
+We see that $\Delta^{(2)}$ is already quadratic. So we only need it up to linear order, and this contributes
+\[
+  \tr (-(\partial^2)^{-1} \Delta^{(2)}).
+\]
+The $\Delta^{(1)}$ term is first-order. So we need the square term, and this contributes
+\[
+  -\frac{1}{2} \tr ((-\partial^2)^{-1} \Delta^{(1)} (-\partial^2)^{-1} \Delta^{(1)}).
+\]
+Similarly, the last term contributes
+\[
+  - \frac{1}{2} \tr ((-\partial^2)^{-1} \Delta^{(J)} (-\partial^2)^{-1} \Delta^{(J)})
+\]
+All other cross terms vanish, at least in the case $G = \SU(N)$, using the fact that $\tr t^a = \tr J_{\mu\nu} = 0$ for $J \in \so(d)$.
+
+The first term can be interpreted as the Feynman diagram
+\begin{center}
+  \begin{tikzpicture}
+    \begin{feynman}
+      \vertex (l);
+      \node [left] at (l){$A_\mu^a(k)$};
+      \vertex [right=of l] (c);
+      \vertex [above=1cm of c] (t);
+      \vertex [right=of c] (r) {$A_\nu^b(-k)$};
+
+      \diagram*{ 
+        (l) -- [gluon, momentum'=$k$] (c) -- [gluon] (r),
+        (c) -- [half left, momentum=$p$] (t) -- [half left] (c), % loop
+      };
+    \end{feynman}
+  \end{tikzpicture}
+\end{center}
+The second term is
+\begin{center}
+  \begin{tikzpicture}
+    \begin{feynman}
+      \vertex (l);
+      \node [left] at (l){$A_\mu^a(k)$};
+      \vertex [right=of l] (c1);
+      \vertex [right=of c1] (c2);
+      \vertex [right=of c2] (r) {$A_\nu^b(-k)$};
+
+      \diagram*{ 
+        (l) -- [gluon, momentum'=$k$] (c1),
+        (c2)-- [gluon] (r),
+        (c1) -- [half left, momentum=$p + k$] (c2),
+        (c1) -- [half right, reversed momentum'=$p$] (c2),
+      };
+    \end{feynman}
+  \end{tikzpicture}
+\end{center}
+The last one looks the same, but we have a different vertex structure, depending on what is going on in $J$.
+
+The first term gives
+\[
+  \tr ((-\partial^2)^{-1} \Delta^{(2)}) = \int \frac{\d^d k}{(2\pi)^d} A_\mu^a(k) A_\nu^b(-k) \int \frac{\d^d p}{(2\pi)^d} \frac{\tr_R(t^a t^b)}{p^2} \delta^{\mu\nu} d(j),
+\]
+where
+\[
+  d(j) =
+  \begin{cases}
+    1 & \mathrm{scalar}\\
+    4 & \mathrm{dirac}\\
+    4 & \text{4-vector}
+  \end{cases}
+\]
+denotes the number of spin components running around the loop. Similarly,
+\begin{align*}
+  \frac{1}{2} \tr ((-\partial^2)^{-1} \Delta^{(1)} (-\partial^2)^{-1} \Delta^{(1)}) \\
+  = \int \frac{\d^d k}{(2\pi)^d} \frac{\d^d p}{(2\pi)^d} \frac{(k + 2p)_\mu (k + 2p)_\nu\tr(t^a t^b) A_\mu^a(k) A_\nu^b(k)}{p^2 (p + k)^2}
+\end{align*}
+In dimensional regularization, these two diagrams combine to give
+\[
+  \int\frac{\d^d k}{(2\pi)^d} A^a_\mu(k) A^bb_\nu(-k) (k^2 \delta_{\mu\nu} - k_\mu k_\nu) \pi(k^2),
+\]
+where
+\[ % details in Osborn notes.
+  \pi(k^2) = - \frac{1}{d - 1} d(j) \tr_R (t^a t^b) \frac{\Gamma\left(2 - \frac{d}{2}\right) \Gamma\left(\frac{d}{2} - 1\right)^2}{\Gamma(d - 2)} \frac{(k^2)^{(d - 4)/2}}{2(\pi)^{d/2}}.
+\]
+We have
+\[
+  \tr_R (t^a t^b) = C(R) \delta^{ab},
+\]
+where $C(R)$ is the index of the representation. For $G = \SU(N)$, we have $C(\mathrm{adj}) = N$ and $C(\mathrm{fund}) = \frac{1}{2}$.
+
+Finally, we have 
+\begin{multline*}
+  \frac{1}{2} \tr ((-\partial^2) \Delta^{(J)} (-\partial^2) \Delta^{(J)}) \\
+  = \int \frac{\d^d k}{(2\pi)^d} \frac{\d^d p}{(2\pi)^d} A_\mu^a(k) A_\nu^b(-k) (k^2 \delta_{\mu\nu} - k_\mu k_\nu) \frac{1}{p^2(p + k)^2} C(j) \tr (t^a t^b),
+\end{multline*}
+where $C(j)$ is defined by
+\[
+  \tr_j (J_{\mu\nu} J_{\kappa\lambda}) = C(j) (\delta_{\mu\kappa} \delta_{\nu\lambda} - \delta_{\mu\lambda} \delta_{\nu\kappa}).
+\]
+Explicitly, we have
+\[
+  C(j) =
+  \begin{cases}
+    0 & \mathrm{scalar}\\
+    1 & \mathrm{Dirac}\\
+    2 & \mathrm{4-vector}
+  \end{cases}
+\]
+Performing this again in dimensional regularization, we have
+\[
+  \frac{1}{2} \int \frac{\d^d k}{(2\pi)^d} A_\mu^a (k) A_\nu^a (k^2 \delta_{\mu\nu} - k_\mu k_\nu) (k^2)^{(d - 4)/2} \Gamma\left(2 - \frac{d}{2}\right) \frac{4}{(4\pi)^{d/2}} C(R) C(j).
+\]
+Combining all the pieces, the effective action for the background field $A_\mu$ is
+\begin{multline*}
+  S_{\mathrm{eff}}[A] = \frac{1}{4 g_{YM}^2}\int \d^d x\; (F_{\mu\nu}, F^{\mu\nu}) \\
+  - \frac{\Gamma\left(2 - \frac{d}{2}\right)}{4} \int\d^d x\; (-\partial^2)^{\frac{d - 4}{2}} F_{\mu\nu}^a F^{\mu\nu}_a \times \left(\frac{1}{2} C_{\mathrm{adj}, 1} - C_{\mathrm{adj}, 0} - \frac{n}{2} C_{R, 1/2}\right),
+\end{multline*}
+where
+\[
+  C_{R, j} = \frac{C(R)}{(4\pi)^2} \left(\frac{d(j)}{3} - 4 C(j)\right).
+\]
+Explicitly, we have
+\[
+  C_{R, j} = \frac{C9R)}{(4\pi)^2}  \times
+  \begin{cases}
+    \frac{1}{3} & \mathrm{scalars}\\
+    -\frac{8}{3} & \mathrm{Dirac}\\
+    -\frac{20}{3} & \mathrm{vectors}
+  \end{cases}.
+\]
+As always, the $\Gamma$ function diverges as we take $d \to 4$, and we need to remove the divergence using counterterms. In the \textoverline{MS} scheme with scale $\mu$ (with $g_{YM}^2 = \mu^{4 - d} g^2(\mu)$), we are left with logarithmic dependence on $\mu^2$. The independence of $\mu$ gives the condition
+\[
+  \mu\frac{\d}{\d \mu}\left(\frac{1}{g^2(\mu)} + \log \left(\frac{\mu^2}{\cdots}\right)\left(\frac{1}{2} C_{\mathrm{adj}, 1} - C_{\mathrm{adj}, 0} - \frac{n}{2} C_{R, \frac{1}{2}}\right)\right) = 0.
+\]
+So
+\[
+  -\frac{2}{g^3(\mu)} \beta(g) + 2\left(\frac{1}{2} C_{\mathrm{adj}, 1} - C_{\mathrm{adj}, 0} - \frac{n}{2} C_{R, 1}\right) = 0.
+\]
+In other words, we find
+\begin{align*}
+  \beta(g) &= g^3(\mu) \left(\frac{1}{2} C_{\mathrm{adj}, 1} - C_{\mathrm{adj}, 0} - \frac{n_f}{2} C_{R, 1}\right)\\
+  &= - \frac{g^3(\mu)}{(4\pi)^2} \left(\frac{11}{3} C(\mathrm{adj}) - \frac{4n}{3} C(R)\right)\\
+  &= - \frac{g^3}{(4\pi)^2} \left(\frac{11}{3} N - \frac{2n}{3}\right),
+\end{align*}
+where we take $G = \SU(N)$ and $R = \mathrm{fund}$.
+
+Thus, for $n_f$ sufficiently small, the $\beta$-function is negative! Hence, at least for small values of $g$, where we can trust perturbation theory, this coupling now \emph{increases} as $\Lambda \to 0$, and decreases as $\Lambda \to \infty$.
+
+The first consequence is that this theory has a sensible continuum limit! The coupling is large at low energies, and after a long story, this is supposed to lead to the confinement of quarks.
+
+In fact, in 1973, Gross--Coleman showed that the \emph{only} non-trivial QFT's in $d = 4$ with a continuum limit are non-abelian gauge theories. The proof was by \emph{exhaustion}! They just considered the most general kind of QFT we can have, and then computed the $\beta$-functions etc, and figured the only ones that existed were non-abelian gauge theories.
+
 
 \printindex
 \end{document}

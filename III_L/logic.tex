@@ -5,7 +5,6 @@
 \def\nyear {2017}
 \def\nlecturer {T. E. Forster}
 \def\ncourse {Logic}
-\def\nlectures {MWF.10}
 
 \input{header}
 
@@ -354,7 +353,7 @@ If we add this, then we get classical propositional calculus, and it is a theore
     \item $A \to ((((A \to B) \to B) \to C) \to C)$
     \item $((((P \to Q) \to P) \to P ) \to Q) \to Q$
   \end{itemize}
-  Don't do the last two.
+  The last two are hard.
 \end{ex}
 
 Instead of thinking of natural deduction as an actual logical theory, we often think of it as a ``platform'' that allows us to describe different logical theories, which we can do by introducing other connectives.
@@ -719,12 +718,13 @@ In the following exercise/example, note that we have a convention that if we wri
   Find $\lambda$-expressions that encode proofs of
   \begin{enumerate}
     \item $((A \to B) \wedge (C \to D)) \to ((A \wedge C) \to (B \wedge D))$
-    \item $(A \to B) \to (B \to C) \to (A \to C)$ % insert convention about associativity somewhere
+    \item $(A \to B) \to (B \to C) \to (A \to C)$
     \item $((A \to B) \to A) \to (A \to B) \to B$
     \item $(A \to B \to C) \to (B \to A \to C)$
     \item $(A \to B \to C) \to ((A \wedge B) \to C)$
     \item $(B \wedge A \to C) \to (A \to B \to C)$
   \end{enumerate}
+  Note that statements of the form $A \to B \to C$ are to be interpreted as $A \to (B \to C)$.
 \end{ex}
 
 \begin{proof}[Solutions]\leavevmode
@@ -832,16 +832,32 @@ In propositional calculus, the defining property of $\bot$ is that we can prove 
   We cannot prove $((A \to B) \to A) \to A$ in natural deduction without the law of excluded middle.
 \end{prop}
 
+ % prove this
 \begin{proof}
-  Suppose there were a lambda term of type $((A \to B) \to A) \to A$.
+  Suppose there were a lambda term $P: ((A \to B) \to A) \to A$.
 
   We pick
   \[
     B = \{0, 1\}, \quad A = \{0, 1, 2, 3, 4\}.
   \]
-  In this setting, any function $f: A \to B$ identifies a distinguished member of $B$, namely the one that is hit by more members of $A$. We know $B \subseteq A$, so this is an element in $A$. So we have a function $(A \to B) \to A$. If we really had a lambda term $((A \to B) \to A) \to A$, then it would give us a member of $A$.
+  In this setting, any function $f: A \to B$ identifies a distinguished member of $B$, namely the one that is hit by more members of $A$. We know $B \subseteq A$, so this is anfelement in $A$. So we have a function $F: (A \to B) \to A$. Then $P(F)$ is a member of $A$. We claim that in fact $P(F) \in B$.
 
-  % to be completed later
+  Indeed, we write $P(F) = a \in A$. Let $\pi$ be a $3$-cycle moving everything in $A \setminus B$ and fixing $B$. Then this induces an action on functions among $A$ and $B$ by conjugation. We have.
+  \[
+    \pi(P(F)) = \pi(a).
+  \]
+  But since $P$ is given by a $\lambda$ term, it cannot distinguish between the different memebers of $A \setminus B$. So we have
+  \[
+    P(\pi(F)) = \pi(a).
+  \]
+  We now claim that $\pi(F) = F$. By construction, $\pi (F) = \pi^{-1} \circ F \circ \pi$. Then for all $f: A \to B$, we have
+  \begin{multline*}
+    \pi(F)(f) = (\pi^{-1} \circ f \circ \pi)(f) = (\pi^{-1} \circ F)(\pi(f)) \\
+    = \pi^{-1} (F(\pi(f))) = \pi^{-1}(F(f)) = F(f).
+  \end{multline*}
+  Noting that $\pi$ fixes $f$, the only equality that isn't obvious from unravelling the definitions is $F(\pi(f)) = F(f)$. Indeed, we have $\pi(f) = \pi^{-1} \circ f \circ \pi = f \circ \pi$. But $F(f\circ \pi) = F(f)$ because our explicit construction of $F$ depends only on the image of $f$. So $\pi(F) = F$. So this implies $a = \pi(a)$, which means $a \in B$. So we always have $P(F) \in B$.
+
+  But this means we have found a way of uniformly picking a distinguished element out of a two-membered set. Indeed, given any such set $B$, we pick any three random objects, and combine it with $B$ to obtain $A$. Then we just apply $P(F)$. This is clearly nonsense.
 \end{proof}
 
 \subsection{Possible world semantics}
@@ -864,7 +880,7 @@ It turns out to get a sensible model theory of constructive logic, we need to co
   \end{itemize}
   We will say that $w$ ``believes'' $\varphi$ if $w \vDash \varphi$, and that $w$ ``sees'' $w'$ if $w'' \geq w$.
 
-  We also require that there is a designated minimum element under $\leq$, known as the \term{root world}. We can think of a possible world model as a poset decorated with worlds, and such a poset is called a \term{frame}. % replace poset with quasi-order, remove comment later on
+  We also require that there is a designated minimum element under $\leq$, known as the \term{root world}. We can think of a possible world model as a poset decorated with worlds, and such a poset is called a \term{frame}.
 \end{defi}
 All but the last rule are obvious. The idea is that each world can have some beliefs, namely the subset $w \subseteq p$. The important idea is that if a world $w$ does not believe in $p$, it does not mean it believes that $p$ is false. It just that $w$ remains ignorant about whether $p$ is true.
 
@@ -1005,13 +1021,13 @@ Finally, we prove half the completeness theorem for possible world models.
 \begin{lemma}
   Any formula with a natural deduction proof not using the rule for classical negation is true in all possible world models.
 \end{lemma}
-For any frame $F$, every such formula is satisfied by every possible world model on that frame. We say it is \emph{valid on $F$}. Such formulae are valid on all quasi-ordered sets with a bottom element.
+For any frame $F$, every such formula is satisfied by every possible world model on that frame. We say it is \emph{valid on $F$}. Such formulae are valid on all posets with a bottom element.
 
 \begin{proof}
   The hard case is implication. Suppose we have a natural deduction proof of $A \to B$. The last rule is a $\to$-introduction. So by the induction hypothesis, every world that believes $A$ also believes $B$. Now let $w$ be a world that believes all the other undischarged assumptions in $A \to B$. By persistence, every $w' \geq w$ believes similarly. So any $w' \geq w$ that believes $A$ also believes $B$. So $w \vDash A \to B$.
 \end{proof}
 
-% how about other half.
+ % how about other half.
 
 \subsection{Negative interpretation}
 Suppose a constructive logician found a classical logician, and then they try to talk to each other. Then they would find that they disagree on a lot of things. The classical logician has no problems accepting $\neg \neg A \to A$, but the constructive logician thinks that is nonsense. Can they make sense of each other?
@@ -1483,7 +1499,7 @@ Now that we are equipped with ultraproducts, it is possible to prove the compact
   Let $\Gamma$ be a set of formulae. A function $i: \mathcal{M}_1 \to \mathcal{M}_2$ is \term{$\Gamma$-elementary} iff for all $\varphi \in \Gamma$ we have $\mathcal{M}_1 \vDash \varphi(\mathbf{x})$ implies $\mathcal{M}_2 \vDash \varphi(i(\mathbf{x}))$.
 
   If $\Gamma$ is the set of all formulae in the language, then we just say it is \emph{elementary}.
-\end{defi} % move this to earlier
+\end{defi}
 Usually, we take $\Gamma$ to be the set of all formulae, and $\mathcal{M}_1$ to be a substructure of $\mathcal{M}_2$.
 
 \begin{eg}
@@ -1608,7 +1624,7 @@ To prove Ehrenfeucht--Mostowski, we construct a model satisfying the statement o
 \]
 and when $s \subseteq t \in \mathcal{P}(I)$, we have an elementary embedding $\mathcal{M}_s \hookrightarrow \mathcal{M}_t$. We then note that if all the $\sigma_{ij}$ are elementary, then the $\sigma_i: A_i \hookrightarrow A_\infty$ are also elementary. In particular, if each $\mathcal{M}_s$ are models of our theory, then so is $A_\infty$.
 
-We start by picking any infinite model $\mathcal{M}$ of $I$. By standard compactness arguments, we may wlog there is no last $\preccurlyeq$-thing in $\mathcal{M}$, and also that $J = \{x: P(x)\}$ is infinite. We pick $\mathcal{U}$ an ultrafilter on $J$ that contains all terminal segments of $\preccurlyeq$. Since $J$ does not have a last element, this is a non-principal ultrafulter.
+We start by picking any infinite model $\mathcal{M}$ of $I$. By standard compactness arguments, we may wlog there is no last $\preccurlyeq$-thing in $\mathcal{M}$, and also that $J = \{x: P(x)\}$ is infinite. We pick $\mathcal{U}$ an ultrafilter on $J$ that contains all terminal segments of $\preccurlyeq$. Since $J$ does not have a last element, this is a non-principal ultrafilter.
 
 We now write
 \[
@@ -2406,7 +2422,7 @@ This captures the idea that $\lambda$ expressions are really functions.
 \begin{defi}[$\eta$-reduction]\index{$\eta$-reduction}
   $\eta$-conversion is the conversion from $\lambda x.\; (f\; x)$ to $f$, whenever $x$ is not free in $f$.
 \end{defi}
-This captures ``function extensionality'', ie. the idea that functions are the same iff they give the same results for all inputs. % insert something about normal forms.
+This captures ``function extensionality'', ie. the idea that functions are the same iff they give the same results for all inputs.
 
 \begin{defi}[$\beta$-normal form]\index{$\beta$-normal form}
   We say a term is in $\beta$-normal form if it has no possible $\beta$-reduction.
@@ -2537,7 +2553,7 @@ Thus, we have reduced the problem of recursion to the problem of computing fixed
 \end{proof}
 We also need to implement the minimization operator. To compute $f^{-1}(17)$, our plan is as follows:
 \begin{enumerate}
-  \item Produce an ``infintie list'' (\term{stream}) of natural numbers.
+  \item Produce an ``infinite list'' (\term{stream}) of natural numbers.
   \item Apply a function $f$ to every element of the stream.
   \item Find the first element in the stream that is sent to $17$.
 \end{enumerate}
@@ -2665,96 +2681,342 @@ To begin with, Turing degrees certainly form an upper semi-lattice, as given $A$
 
   We are almost done. After all this process, we take the union and get $A$ and $B$. If, say, $\{i\}^A$ has a witness, then we are happy. What if it does not? Suppose $\{i\}^A$ is some characteristic function, and $m$ is the first element in the list of witnesses. Then since the lists of candidate witnesses are disjoint, we know $m \not \in B$. So it suffices to show that $\{i\}^A(m) \not= 0$. But if $\{i\}^{A}(m) = 0$, then since this computation only involves finitely many values of $A$, eventually, the membership of these things in $A$ would have stabilized. So we would have $\{i\}^{A}(m) = 0$ long ago, and made $m$ a witness.
 
-% finite injury construction
+ % finite injury construction
 \end{proof}
 
-\section{WQO and BQO theory}
-We start by talking about well-foundedness. The idea is that we want to allow for the following \term{$R$-induction} principle:
+\section{Well-quasi-orderings}
+We end by a discussion on well-quasi-orders. The beginning of all this is the idea of well-foundedness. We begin by recalling the definition of a quasi-order.
+
+\begin{defi}[Quasi-order]\index{quasi-order}
+  An order $\bra X, \leq\ket$ is a \emph{quasi-order} if it is \term{transitive} and \term{reflexive}, ie. for all $a, b, c \in X$,
+  \begin{itemize}
+    \item If $a \leq b$ and $b \leq c$, then $a \leq c$.
+    \item We always have $a \leq a$.
+  \end{itemize}
+\end{defi}
+Note that unlike a poset, we do not require reflexivity, ie. we can have distinct $a, b$ satisfying $a \leq b$ and $b \leq a$. There is a canonical way of turning a quasi-order into a partial order, namely by actually identifying elements satisfying $a \leq b$ and $b \leq a$, and so it appears we don't lose much by restricting to partial orders. However, it turns out a lot of the orders we construct are naturally quasi-orders, not partial orders, and the extra hypothesis of being a partial order is not really useful. So we will talk about quasi-orders.
+
+The main idea behind the whole chapter is the notion of well-foundedness. We probably first met this concept in set theory, where the axiom of foundation said sets are well-founded. Chances are, it was motivated to get rid of scenarios such as $x \in \{x\}$. However, as we do set theory, we figure that the real benefit it brings us is the ability to do $\varepsilon$-induction.
+
+In general, for an arbitrary relation $R$ on $X$, we want to admit the following \term{$R$-induction} principle:
 \begin{prooftree}
-  \AxiomC{$\forall_x ((\forall_y R(y, x) \to \varphi(y)) \to \varphi(x))$}
-  \UnaryInfC{$\forall_x \varphi(x)$}
+  \AxiomC{$\forall_{x \in X} ((\forall_{y \in X} R(y, x) \to \varphi(y)) \to \varphi(x))$}
+  \UnaryInfC{$\forall_{x \in X} \varphi(x)$}
 \end{prooftree}
-How can this fail? Suppose the top line holds, but the bottom line does not. Then we know
+How can this fail? Suppose the top line holds, but the bottom line does not. We set
 \[
-  A = \{x: \neg \varphi(x)\}
+  A = \{x: \neg \varphi(x)\}.
 \]
-is non-empty. Then thee top line says
+Then we know this set is non-empty. Moreover, the top line says
 \[
-  \forall_{x \in A} \exists_{y \in A} R(y, x)
+  \forall_{x \in A} \exists_{y \in A} R(y, x).
 \]
-Thus, we need $R$ to be \emph{well-founded}:
+Thus, if we forbid such sets from existing, then we can admit the induction principle.
 \begin{defi}[Well-founded relation]\index{well-founded relation}\index{relation!well-founded}
-  A relation $R$ is said to be \emph{well-founded} if for all $A \subseteq \dom R$ non-empty, there is some $x \in A$ such that for any $y \in A$, we have $\neg R(y, x)$.
+  A relation $R$ on $X$ is said to be \emph{well-founded} if for all $A \subseteq X$ non-empty, there is some $x \in A$ such that for any $y \in A$, we have $\neg R(y, x)$.
 \end{defi}
 
-There is another way of expressing the well-founded relation, if we believe in the \term{axiom of dependent choice}
+There is another way of expressing the well-founded relation, if we believe in the \term{axiom of dependent choice}.
 \begin{axiom}[Axiom of dependent choice]
-  Suppose we have a set $X$ and a relation $R$ such that for any $x \in X$, there is some $y \in X$ such that $R(x, y)$. Then we can find some $f: \N \to X$ such that $R(f(n), f(n + 1))$ for all $n$.
+  Let $X$ be a set an $R$ a relation on $X$. The \emph{axiom of dependent choice} says if for all $x \in X$, there exists $y \in X$ such that $R(x, y)$, then we can find a sequence $x_1, x_2, \cdots$ such that $R(x_i, x_{i + 1})$ for all $i \in \N$.
 \end{axiom}
-Assuming this, then being well-founded is equivalent to the non-existing of infinite decreasing $R$-chains.
+This is a rather weak form of the axiom of choice, which we will freely assume. Assuming this, then being well-founded is equivalent to the non-existing of infinite decreasing $R$-chains.
 
-The notion of well-foundedness is important in computer science, because it is what guarantees termination. Suppose we have a program with a loop of the form ``repeat \ldots until \ldots''. To prove that the ``until'' part will always happen, we look for a loop parameter taking values in $\dom(R)$ such that in every iteration of the loop, the value decreases. % fix this, talk about ackermann function
+Why do we care about well-foundedness? There are many reasons, and one we can provide comes from computer science. In general, it guarantees \emph{termination}. When writing programs, we often find ourselves writing loops like
+\begin{verbatim}
+   while ( some condition holds ) {
+       do something;
+   }
+\end{verbatim}
+This repeats the ``do something'' until the condition fails. In general, there is no reason why such a program should eventually terminate.
 
-If we think of well-foundedness as saying there is no infinite decreasing sequence, then it is clear that transitive closures of well-founded relations are well-founded relations.
+Often, the loop is actually of the form
+\begin{verbatim}
+   while ( i != BOT ) {
+       do something with i;
+   }
+\end{verbatim}
+where $i$ takes value in some partial order $R$, with \texttt{BOT} being the bottom element. Suppose every time the loop runs, the value of $i$ decreases. Then if $R$ is well-founded, then we are guaranteed that the program will indeed terminate. More generally, if $R$ doesn't have a unique bottom element, but is still well-founded, then loops of the form
+\begin{verbatim}
+   while ( i is not a minimal element ) {
+       do something with i;
+   }
+\end{verbatim}
+are still guaranteed to terminate.
 
-This leads us to think about quasiorders that are reflexive transitive closures of well-founded relations. We call these \term{well-founded quasi-orders}. Note that these are not actually well-founded, as any reflexive relation can certainly not be well-founded.
+\begin{eg}
+  Consider \emph{typed} $\lambda$ calculus, which is the form of $\lambda$ calculus where we require each term to have a type, and all terms have to be typed, just as we did when we used it to decorate natural deduction proofs.
 
-Under what operations are this class closed? We can think about \emph{lifting} a quasi-order on $X$ to a quasi-order on $\mathcal{P}(X), \mathcal{P}_{\aleph_0}(X), X^{ < \omega}$, multisets on $X$ etc. % < \omega means lists
+  We let $X$ be the set of all typed $\lambda$ terms up to $\alpha$-equivalence, and for $f, g \in X$, we write $f \leq g$ if $g$ can be $\beta$-reduced to $f$. It is a remarkable theorem that $X$ is well-founded. In other words, we can keep applying $\beta$-reduction in any way we like, and we are guaranteed to always end up in a normal form. It is also true that the normal form of a $\lambda$ term is unique, but this is not implied by well-foundedness.
+\end{eg}
 
-We can try lifting $\bra X, \leq_X\ket$ to $\mathcal{P}(X)$ by
-\[
-  X_1\leq^+ X_2\text{ if }\forall_{x_1 \in X_1} \exists_{x_2 \in X_2} (x_1 \leq_X x_2).
-\]
-It is not hard to see this is actually a quasi-order. There are lots of operations like this, and we want to know which of these operations preserve well-foundedness.
+It is clear from definition that a quasi-order is never well-founded, since it is reflexive. It is also clear that it fails for a silly reason, and we can fix it by defining
+\begin{defi}[Well-ordered quasi-order]\index{well-ordered quasi-order}\index{quasi-order!well-founded}
+  A quasi-order is \emph{well-ordered} if there is no \emph{strictly} decreasing infinite sequence.
+\end{defi}
+Here we are not worried about choice issues anymore.
 
-The idea is that lifts ``of finite character'' preserve well-foundedness. These are those lifts such that to compare two elements, we only have to appeal to finitely many instances of $\leq_X$. We will not make this more precise. However, it is not reliably true that $\bra \mathcal{P}(X), \leq^+\ket$ is well-founded if $\bra X, \leq_X$ is well-founded. For example, $\bra \N, =\ket$ is a well-founded quasi-order, being the reflexive transitive closure of the trivial relation. But $\bra \mathcal{P}(N), =^+\ket$ has an infinite decreasing sequence. Indeed, $=^+$ is just the subset relation.
+Once we are convinced that being well-founded is a good thing, it is natural ask what operations preserve well-foundedness. We begin by listing some constructions we can do.
+\begin{defi}[$\mathcal{P}(X)$]\index{$\mathcal{P}(X)$}\index{$\leq^+$}
+  Let $\bra X, \leq_X \ket$ be a quasi-order. We define a quasi-order $\leq_X^+$ on $\mathcal{P}(X)$ by
+  \[
+    X_1\leq_X^+ X_2\text{ if }\forall_{x_1 \in X_1} \exists_{x_2 \in X_2} (x_1 \leq_X x_2).
+  \]
+\end{defi}
 
+\begin{defi}[$X^{<\omega}$]\index{$X^{<\omega}$}\index{$\leq_s$}
+  Let $\bra X, \leq_X\ket$ be a quasi-order. We let $X^{<\omega}$ be the set of all \emph{finite} lists (ie. sequences) in $X$. We define a quasi-order on $X^{<\omega}$ recursively by
+  \begin{itemize}
+    \item $\cnil \leq \ell_1$, where $\cnil$ is the empty list.
+    \item $\tail (\ell_1) \leq \ell_1$
+    \item If $\tail (\ell_1) \leq \tail(\ell_2)$ and $\head(\ell_1) \leq_X \head (\ell_2)$, then $\ell_1 \leq \ell_2$.
+  \end{itemize}
+  for all lists $\ell_1, \ell_2$.
 
-Now consider the class of those quasi-orders $\bra X, \leq\ket$ such that $\bra \mathcal{P}(X), \leq^+\ket$ is well-founded. This class of quasi-orders is the class of \term{well quasi-orders}, otherwise known as \term{WQO}'s.
+  Equivalently, sequences $\{x_i\}_{i = 1}^n \leq_s \{y_i\}_{i = 1}^\ell$\index{$\leq_s$} if there is a subsequence $\{y_{i_k}\}_{k = 1}^n$ of $\{y_i\}$ such that $x_k \leq y_{i_k}$ for all $k$.
+\end{defi}
 
-WQO's were used for more than 100 years in the history of mathematics, but people never thought about WQO's explicitly until 1960's, and until then, people were just working with them in a rather ad hoc manner.
+Finally, the construction we are really interested in is \emph{trees}.
+\begin{defi}[Tree]\index{tree}\index{$\leq_s$}\index{$\mathrm{Trees}(X)$}
+  Let $\bra X, \leq_X\ket $ be a quasi-order. The set of all trees (in $X$) is defined inductively as follows:
+  \begin{itemize}
+    \item If $x \in X$ and $L$ is a list of trees, then $(x, L)$ is a tree. We call $x$ a \term{node} of the tree. In particular $(x, \cnil)$ is a tree. We write
+      \[
+        \mathrm{root}(x, L) = x,\quad \mathrm{children}(x, L) = L.
+      \]
+  \end{itemize}
+  Haskell programmers would define this by
+  \begin{verbatim}
+    data Tree a = Branch a [Tree a]\end{verbatim}
+  We write $\mathrm{Trees}(X)$ for the set of all trees on $X$.
+
+  We define an order relation $\leq_s$ on $\mathrm{Trees}(X)$ as follows --- let $T_1, T_2 \in \mathrm{Trees}(X)$. Then $T_1 \leq T_2$ if
+  \begin{enumerate}
+    \item $T_1 \leq T'$ for some $T' \in \mathrm{children}(T_2)$.
+    \item $\mathrm{root}(T_1) \leq \mathrm{root}(T_2)$ and $\mathrm{children}(T_1) \leq \mathrm{children}(T_2)$ as lists.
+  \end{enumerate}
+\end{defi}
+It is an exercise to think hard and convince yourself this recursively-defined relation is indeed well-defined.
+
+Which of these operations preserve well-foundedness? It is not hard to see the following:
+\begin{lemma}
+  If $\bra X, \leq_X\ket$ is a well-founded quasi-order, then so is $X^{<\omega}$ and $\mathrm{Trees}(X)$.
+\end{lemma}
+The reason why this works is that the lifts of the order on $X$ to $X^{<\omega}$ and $\mathrm{Trees}(X)$ are ``of finite character''. To compare two elements in $X^{<\omega}$ or $\mathrm{Trees}(X)$, we only have to appeal to finitely many instances of $\leq_X$.
+
+On the other hand, $\bra \mathcal{P}(X), \leq_X^+\ket$ is in general not well-founded. For example, $\bra \N, =\ket$ is a well-founded quasi-order, being the reflexive transitive closure of the trivial relation. But $\bra \mathcal{P}(N), =^+\ket$ has an infinite decreasing sequence. Indeed, $=^+$ is just the subset relation.
+
+\begin{defi}[Well-quasi-order]\index{well-quasi-order}\index{WQO}
+  A \emph{well-quasi-order} (WQO) is a well-founded quasi-order $\bra X, \leq_X\ket$ such that $\bra \mathcal{P}(X), \leq_X^+\ket$ is also well-founded.
+\end{defi}
+Note that the power set of a well-quasi-order need not be a well-quasi-order.
+
+The question we want to answer is whether the operations $X^{<\omega}$ and $\mathrm{Trees}(X)$ preserve well-quasi-orders. To do so, we try to characterize well-quasi-orders in a more concrete way.
 
 When does a quasi-order fail to be a well quasi-order? Suppose $x_1, x_2, x_3, \cdots$ is an infinite antichain, ie. a collection of mutually unrelated elements. Then as above
 \[
   \bra \{x_i: i > n\}: n \in \N\ket
 \]
-is an infinite descending sequence in $\bra \mathcal{P}(X), \leq^+\ket$. The same happens with descending chains.
-
-So $ \bra X, \leq\ket$ is a WQO as long as there are no infinite descending chains, and no infinite anti-chains. % it is sufficient?
+is an infinite descending sequence in $\bra \mathcal{P}(X), \leq^+\ket$. Of course, to be well-founded, we also need the non-existence of infinite decreasing sequences.
 
 \begin{prop}
   Let $\bra X, \leq$ be a quasi-order. Then the following are equivalent:
   \begin{enumerate}
+    \item $\bra X, \leq\ket$ is a well-quasi-order.
     \item There is no infinite decreasing sequence and no infinite anti-chain.
-    \item Whenever we have any sequence $x_i \in X$ whatsoever, we can find $i < j$ such that $x_i < x_j$.
+    \item Whenever we have any sequence $x_i \in X$ whatsoever, we can find $i < j$ such that $x_i \leq x_j$.
   \end{enumerate}
 \end{prop}
+In standard literature, (iii) is often taken as the definition of a well-quasi-order instead.
+
+\begin{proof}\leavevmode
+  \begin{itemize}
+    \item (i) $\Rightarrow$ (ii): We just showed this.
+    \item (iii) $\Rightarrow$ (i): Suppose $X_1, X_2, X_3, \cdots$ is a strictly decreasing chain in $\mathcal{P}(X)$. Then by definition, we can pick $x_i \in X_i$ such that $x_i$ is not $\leq$ anything in $X_{i + 1}$. Now for any $j > i$, we know $x_i \not \leq x_j$, because $x_j$ is $\leq$ something in $X_{i + 1}$. So we have found a sequence $\{x_i\}$ such that $x_i \not \leq x_j$ for all $i < j$.
+
+    \item (iii) $\Rightarrow$ (ii) is clear.
+
+    \item (ii) $\Rightarrow$ (iii), we show that whenever $x_i$ is a sequence without $i < j$ such that $x_i \leq x_j$, then it either contains an infinite anti-chain, or an infinite descending chain.
+
+      To do so, we two-colour $[\N]$ by
+      \[
+        X(\{i < j\}) =
+        \begin{cases}
+          0 & x_i > x_j\\
+          1 & \text{otherwise}
+        \end{cases}
+      \]
+      By Ramsey's theorem, this has an infinite monochromatic set. If we have an infinite monochromatic set of colour $0$, then this is a descending chain. Otherwise, if it is of colour $1$, then together with our hypothesis, we know $\{x_i\}$ is an anti-chain.
+  \end{itemize}
+\end{proof}
+
+If we want to reason about well-founded relations, then the following notion is often a useful one to have in mind:
+\begin{defi}[Well-founded part of a relation]\index{well-founded part of relation}
+  Let $\bra X, R\ket$ be a set with a relation. Then the \emph{well-founded part} of a relation is the $\subseteq$-least subset $A \subseteq X$ satisfying the property
+  \begin{itemize}
+    \item If $x$ is such that all predecessors of $x$ are in $A$, then $x \in A$.
+  \end{itemize}
+\end{defi}
+So for example, any minimal element of $X$ would be in the well-founded part. One can prove that the well-founded part is indeed well-founded without much difficulty.
+
+Is there a good notion of the WQO-part of a quasi-order? It turns out not, or at least there isn't an obvious one that works. For our later discussion, it is convenient to have the following definition:
+
+\begin{defi}[Bad sequence]\index{bad sequence}
+  Let $\bra X, \leq\ket$ be a well-founded quasi-order. A sequence $\{x_i\}$ is \emph{bad} if for all $i < j$, we have $f(i) \not\leq f(j)$.
+\end{defi}
+Then a quasi-order is a WQO iff it has no bad sequences.
+
+The idea is now to pick a bad sequence that is ``minimal'' in some sense, and then looking at things below this minimal bad sequence will give is a well-quasi-order. This ``WQO-part'' isn't some object canonically associated to the order $\bra X, \leq\ket$, because it depends on the choice of the minimal bad sequence, but is very useful in our upcoming proof.
+
+\begin{defi}[Minimal bad sequence]\index{minimal bad sequence}\index{bad sequence!minimal}
+  Let $\bra X, \leq\ket$ be a quasi-order. A \emph{minimal bad sequence} is a bad sequence $\{x_i\}$ such that for each $k \in \N$, $x_k$ is a $\leq$-minimal element in
+  \[
+    \{x:\text{there exists a bad sequence starting with }x_1, x_2, \cdots, x_{k - 1}, x\}.
+  \]
+\end{defi}
+
+\begin{lemma}
+  Let $\bra X, \leq\ket$ be a well-founded quasi-order that is not a WQO. Then it has a minimal bad sequence.
+\end{lemma}
 
 \begin{proof}
-  $\Leftarrow$ is clear. To prove $\Rightarrow$, we show that whenever $x_i$ is a sequence without $i < j$ such that $f(i) \leq f(j)$, then it either contains an infinite anti-chain, or an infinite descending chain.
+  Just pick each $x_i$ according to the requirement in the definition. Such an $x_i$ can always be found because $\bra X, \leq\ket$ is well-founded.
+\end{proof}
 
-  To do so, we two-colour $[\N]$ by
+What makes minimal bad sequences useful is the following promised lemma:
+\begin{lemma}[Minimal bad sequence lemma]\index{minimal bad sequence lemma}
+  Let $\bra X, \leq\ket$ be a quasi-order and $B = \{b_i\}$ a minimal bad sequence. Let
   \[
-    X(\{i < j\}) =
+    X' = \{x \in X: \exists_{n \in \N} x < b_n\}.
+  \]
+  Then $\bra X', \leq\ket$ is a WQO.
+\end{lemma}
+
+\begin{proof}
+  Suppose $\{s_i\}$ is a bad sequence in $X'$. We prove by induction that nothing in $\{s_i\}$ is below $b_n$, which gives a contradiction.
+
+  Suppose $s_i < b_0$ for some $i$. Then $s_i, s_{i + 1}, s_{i + 2}, \cdots$ is a bad sequence, whose first element is less than $b_0$. This then contradicts the minimality of $B$.
+
+  For the induction step, suppose nothing in $S$ is strictly less than $b_0, \cdots, b_n$. Suppose, for contradiction, that $s_i < b_{n + 1}$. Now consider the sequence
+  \[
+    b_0,. \cdots, b_n, s_i, s_{i + 1}, s_{i + 2}, \cdots.
+  \]
+  By minimality of $B$, we know this cannot be a bad sequence. This implies there is some $n, m$ such that the $n$th element of the sequence is less than the $m$th element. But they can't be both from the $\{b_k\}$ or both from then $\{s_k\}$. This implies there is some $b_j \leq s_k$ with $j \leq n$ and $k \geq i + 1$.
+
+  Consider $s_k$. Since $s_k \in X'$, it must be $\leq b_m$ for some $m$. Moreover, by induction hypothesis, we must have $m > n$. Then by transitivity, we have $b_j \leq b_m$, contradicting the fact that $B$ is bad.
+\end{proof}
+
+We need one more technical lemma.
+
+\begin{lemma}[Perfect subsequence lemma]\index{perfect subsequence lemma}
+  Let $\bra X, \leq\ket$ be a WQO. Then every sequence $\{x_n\}$ in $X$ has a \term{perfect subsequence}, ie. an infinite subset $A \subseteq \N$ such that for all $i < j \in A$, we have $f(i) \leq f(j)$.
+\end{lemma}
+By definition of well-quasi order, we can always find some $i < j$ such that $f(i) \leq f(j)$. This says we can find an infinite subset such that this works.
+
+\begin{proof}
+  We apply Ramsey's theorem. We two-colour $[\N]^2$ by
+  \[
+    c(i < j) =
     \begin{cases}
-      0 & f(i) \geq f(j)\\
-      1 & \text{otherwise}
+      \mathrm{red} & f(i) \leq f(j)\\
+      \mathrm{blue} & f(i) \not\leq f(j)
     \end{cases}
   \]
-  By Ramsey's theorem, this has an infinite monochromatic set. If we have an infinite monochromatic set of colour $0$, then this is a descending chain. Otherwise, if it is of colour $1$, then together with our hypothesis, we know $\{x_i\}$ is an anti-chain.
+  Then Ramsey's theorem gives us an infinite monochromatic set. But we cannot have an infinite monochromatic blue set, as this will give a bad sequence. So there is a monochromatic red set, which is a perfect subsequence.
 \end{proof}
-% The second property is what is usually taken as the definition of a WQO ?
 
-A natural question to ask is if we keep lifting more times, does it remain well-founded? The answer is, rather unsurprisingly, no. In fact, for any $n$, we can find some well-order such that the first $n$th lifts are well-ordered but the $n + 1$th lift is not.
+We are now in a position to prove that lists over a WQO are WQO's.
+\begin{lemma}[Higman's lemma]\index{Higman's lemma}
+  Let $\bra X, \leq_X\ket$ be a WQO. Then $\bra X^{<\omega}, \leq_s\ket$ is a WQO.
+\end{lemma}
 
-Now how about quasi-ordering $X^{<\omega}$, the finite sequences in $X$? The one we are going to use involves ``stretching''. We say sequences $\{x_i\}_{i = 1}^n \leq_ \{y_i\}_{i = 1}^\ell$ if there is a subsequence $\{y_{i_k}\}_{k = 1}^n$ of $\{y_i\}$ such that $x_k \leq y_{i_k}$ for all $k$.
+\begin{proof}
+  We already know that $X^{<\omega}$ is well-founded. Suppose it is not a WQO. Then there is a minimal bad sequence $\{x_i\}$ of $X$-lists under $\leq_s$.
 
-There is also a recursive definition of this.
-\begin{itemize}
-  \item The empty list is $\leq$ any list.
-  \item The tail of $l$ is always $\leq l$
-  \item If $\tail (\ell_1) \leq \tail(l_2)$ and $\head(\ell_1) \leq_X \head (\ell_2)$, then $\ell_1 \leq \ell_2$.
-\end{itemize}
-There is also a co-recursive definition of this for streams.
+  Now consider the sequence $\{\head(x_i)\}$. By the perfect subsequence lemma, after removing some elements in the sequence, we may wlog this is a perfect sequence.
+
+  Now consider the sequence $\{\tail(x_i)\}$. Now note that $\tail(x_i) < x_i$ for each $i$ (here it is crucial that lists are finite). Thus, using the notation in the minimal bad sequence lemma, we know $\tail(x_i) \in X'$ for all $i$.
+
+  But $X'$ is a well quasi-order. So we can find some $i < j$ such that $\tail(x_i) \leq \tail(x_j)$. But also $\head (x_i) \leq \head(x_j)$ by assumption. So $x_i \leq x_j$, and this is a contradiction.
+\end{proof}
+
+We can apply a similar juggle to prove Kruskal's theorem. The twist is that we will have to apply Higman's lemma!
+
+\begin{thm}[Kruskal's theorem]\index{Kruskal's theorem}
+  Let $\bra X, \leq_X\ket$ be a WQO. Then $\bra \mathrm{Trees}(X), \leq_s\ket$ is a WQO.
+\end{thm}
+
+\begin{proof}
+  We already know that $\mathrm{Trees}(X)$ is well-founded. Suppose it is not a WQO. Then we can pick a minimal bad sequence $\{x_i\}$ of trees.
+
+  As before, we may wlog $\{\mathrm{root}(x_i)\}$ is a perfect sequence. Consider
+  \[
+    Y = \{T: T \in \mathrm{children}(x_i)\text{ for some }i\}.
+  \]
+  Then $Y \subseteq X'$. So $Y$ is a WQO, and hence by Higman's lemma, $Y^{<\omega}$ is a WQO. So there exists some $i, j$ such that $\mathrm{children}(x_i) \leq \mathrm{children}(x_j)$. But by perfectness, we have $\mathrm{root}(x_i) \leq \mathrm{root}{x_j}$. So by definition of the ordering, $x_i \leq x_j$.
+\end{proof}
+
+What good is this theorem? It is possible to use Kruskal's theorem to prove the termination of some algorithms, but this is not a computer science course, and we will not go into that. Instead, we look at some proof-theoretic consequences of Kruskal's theorem.
+
+We begin with the simplest possible WQO --- the WQO with one element only and the only possible order. Then a tree over this WQO is just a tree with no labels on each node, ie. a tree.
+
+Consider the statement
+\[
+  P(k) = \parbox{9cm}{there exists some $n \in \N$ such that there is no finite bad sequence $T_1, \cdots, T_n$ where $T_i$ has $k + i$ nodes}.
+\]
+This is a finitary version of the statement of Kruskal's theorem. We claim that $P(k)$ is true for all $k$. Suppose not. Then for each $n$, we find a bad sequence $T_1^n, \cdots, T_n^n$, where $T_i^n$ is a tree with $k + i$ nodes. We can put these trees in a grid:
+\begin{center}
+  \begin{tabular}{ccccc}
+    $T_1^1$\\
+    $T_1^2$ & $T_2^2$\\
+    $T_1^3$ & $T_2^3$ & $T_3^3$\\
+    $T_1^4$ & $T_2^4$ & $T_3^4$ & $T_4^4$\\
+    $T_1^5$ & $T_2^5$ & $T_3^5$ & $T_4^5$ & $T_5^5$\\
+  \end{tabular}
+\end{center}
+We look at the first column. Each tree has $k + 1$ nodes. But there are only finitely many such trees. So there is some tree that appears infinitely often. Pick one, call it $T_1$, and throw away all other rows. Similarly, we can then find some tree that appears infinitely often in the second row, call it $T_2$, and throw the other rows away. We keep going. Then we find a sequence
+\[
+  T_1, T_2, T_3, \cdots
+\]
+such that every initial segment is a bad sequence. So this is a bad sequence, which is impossible.
+
+\begin{prop}[Friedman's finite form]\index{Friedman's finite form}
+  For all $k \in \N$, the statement $P(k)$ is true.
+\end{prop}
+Why do we care about this? The statement $P(k)$ is something we can write out in Peano arithmetic, as it is finitary in nature. But our proof certainly didn't live in Peano arithmetic, as we had to talk about infinite sets. It turns out for each $k \in \N$, we can indeed prove $P(k)$ in Peano arithmetic. However, it is impossible to prove $\forall_k P(k)$! This in particular means we cannot ``prove Kruskal's theorem'' in Peano arithmetic (whatever that might mean).
+
+We can also relate this to ordinal analysis. Given a WQO $\bra X, \leq\ket$, we can construct a well-founded structure from it. The obvious thing to try is to take $\bra \mathcal{P}(X), \leq^+\ket$, but this is not what we want. The problem is that talking about power sets involves talking about infinite sets, and this is not something we know how to do in Peano arithmetic.
+
+Instead, we let $\tilde{X}$ be the set of all finite bad sequences in $X$, and order them by $s \leq t$ if $s$ is an end-extension of $t$. Note that this is ``upside down''. Then by definition of a WQO, this is a well-founded downward-branching tree whose top element is the empty sequence. Then by taking the rank of this structure, we obtain an ordinal.
+
+Using Kruskal's theorem, we can produce some really huge WQO's, which in turn gives us some really huge ordinals. So in some sense, being able to prove Kruskal's theorem means we can prove the well-foundedness of some really big ordinal in our theory.
+
+%Recall that we usually define (second-order) arithmetic by quantifying over infinite sets in the induction principle. However, it is possible to state the induction principle using finite sets. Indeed, we say $n$ is a natural number iff for all $X$, if $n \in X$ and ``$m \in X \Rightarrow (m - 1) \in X$'', then $0 \in X$.
+%
+%We can obtain long sequences from WQO's. We know that a WQO has no infinite bad sequences. So, from $\bra X, \leq\ket$, we construct the set of finite bad sequences from $X$, and order them upside down, ie. This gives a downward-branching tree whose top element is the empty sequence.
+%
+%Note that this tree is well-founded! Any infinite decreasing tree would patch to give us an infinite bad sequence. So it has a rank. This rank is in some sense the largest ordinal that can be associated to the WQO.
+%
+%Rank functions on a well-founded structure are parsimonious --- they are surjections onto an initial segment of $\mathrm{On}$.
+%
+%The rank of the tree of bad sequences of $\bra X, \leq\ket$ the largest initial segment of $\mathrm{On}$ such that there exists a homomorphism from $\bra X,\leq\ket$ onto that initial segment.
+
+We end with some natural generalization of WQO's. Suppose $\bra X, \leq\ket$ is a WQO. Then $\bra \mathcal{P}(X), \leq^+\ket$ need not be a WQO. Suppose it is not, and let $X_1, X_2, X_3, \cdots$ be a bad sequence of subsets. Then for each $i < j$, we can find some $x_{ij} \in X_i$ such that $x_{ij}$ is not less than anything in $X_j$.
+
+Using dependent choice, we can find a function
+\[
+  f: \{\bra i, j\ket: i < j \in \N\} \to X
+\]
+such that for all $i < j < k$, we have $f(i, j) \not\leq f(j, k)$. This is a strengthening of bad sequence, where the sequence is now indexed by pairs $(i < j)$.
+
+\begin{defi}[$\omega^2$-good]\index{$\omega^2$-good}
+  A well-ordering $\bra X, \leq\ket$ is \emph{$\omega^2$-good} if for any
+  \[
+    f: \{\bra i, j\ket: i < j \in \N\} \to X,
+  \]
+  there is some $i < j < k$ such that $f(i, j) \leq f(j, k)$.
+\end{defi}
+There is an analogue of the perfect subsequence lemma for these, but there is no analogous notion of a minimal bad sequence (or at least no obvious one).
+
 \printindex
 \end{document}
