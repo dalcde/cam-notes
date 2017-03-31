@@ -46,9 +46,20 @@ Currently, the notes for the following subjects are available.
 ### Michaelmas Term
  - Algebraic Topology (2015, H. Wilton)
  - Galois Theory (2015, C. Birkar)
+ - Integrable Systems (2016, A. Ashton)
  - Linear Analysis (2015, J. W. Luk)
+ - Probability and Measure (2016, J. Miller)
 
 ### Lent Term
  - Logic and Set Theory (2015, I. B. Leader)
  - Number Fields (2016, I. Grojnowski)
  - Representation Theory (2016, S. Martin)
+
+## Part III
+### Michaelmas Term
+ - Algebraic Topology (2016, O. Randal-Williams)
+ - Differential Geometry (2016, J. A. Ross)
+ - Local Fields (2016, H. C. Johansson)
+ - Quantum Computation (2016, R. Jozsa)
+ - Quantum Field Theory (2016, B. Allanach)
+ - Symmetries, Fields and Particles (2016, N. Dorey)
