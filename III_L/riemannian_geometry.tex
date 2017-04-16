@@ -5,11 +5,15 @@
 \def\nyear {2017}
 \def\nlecturer {A. G. Kovalev}
 \def\ncourse {Riemannian Geometry}
-\def\nnotready {}
 
 \input{header}
 
 \renewcommand\div{\mathrm{div}}
+\newcommand{\exterior}{\mathchoice{{\textstyle\bigwedge}}%
+    {{\bigwedge}}%
+    {{\textstyle\wedge}}%
+    {{\scriptstyle\wedge}}}
+
 \begin{document}
 \maketitle
 {\small
@@ -29,7 +33,35 @@ Manifolds, differential forms, vector fields. Basic concepts of Riemannian geome
 \tableofcontents
 
 \section{Basics of Riemannian manifolds}
-This will be a very brief summary of some topics in the Michaelmas Differential Geometry course.
+Before we do anything, we lay out our conventions. Given a choice of local coordinates $\{x^k\}$, the coefficients $X^k$ for a vector field $X$ is defined by
+\[
+  X = \sum_k X^k \frac{\partial}{\partial x^k}.
+\]
+In general, for a tensor field $X \in TM^{\otimes q} \otimes T^*M^{\otimes p}$, we write
+\[
+  X = \sum X^{k_1 \ldots k_q}_{\ell_1 \ldots \ell_p} \frac{\partial}{\partial x^{k_1}} \otimes \cdots \otimes \frac{\partial}{\partial x^{k_q}} \otimes \d x^{\ell_1} \otimes \cdots \otimes \d^{\ell_p},
+\]
+and we often leave out the $\otimes signs$.
+
+For the sake of sanity, we will often use implicit summation convention, i.e.\ whenever we write something of the form
+\[
+  X_{ijk} Y^{i\ell jk},
+\]
+we mean
+\[
+  \sum_{i, j} X_{ijk} Y^{i\ell jk}.
+\]
+
+We will use upper indices to denote contravariant components, and lower indices for covariant components, as we have done above. Thus, we always sum an upper index with a lower index, as this corresponds to applying a covector to a vector.
+
+We will index the basis elements oppositely, e.g.\ we write $\d x^k$ instead of $\d x_k$ for a basis element of $T^*M$, so that the indices in expressions of the form $A_k \;\d x^k$ seem to match up. Whenever we do not follow this convention, we will write out summations explicitly.
+
+We will also adopt the shorthands\index{$\partial_k$}\index{$\nabla_k$}
+\[
+  \partial_k = \frac{\partial}{\partial x^k},\quad \nabla_k = \nabla_{\partial_k}.
+\]
+
+With these conventions out of the way, we begin with a very brief summary of some topics in the Michaelmas Differential Geometry course, starting from the definition of a Riemannian metric.
 
 \begin{defi}[Riemannian metric]
   Let $M$ be a smooth manifold. A \term{Riemannian metric} $g$ on $M$ is an inner product on the tangent bundle $TM$ varying smoothly with the fibers. Formally, this is a global section of $T^*M \otimes T^*M$ that is fiberwise symmetric and positive definite.
@@ -39,11 +71,11 @@ This will be a very brief summary of some topics in the Michaelmas Differential 
 
 On every coordinate neighbourhood with coordinates $x = (x_1, \cdots, x_n)$, we can write
 \[
-  g = \sum_{i, j = 1}^n g_{ij}(x)\;\d x_i \d x_j,
+  g = \sum_{i, j = 1}^n g_{ij}(x)\;\d x^i\; \d x^j,
 \]
 and we can find the coefficients $g_{ij}$ by
 \[
-  g_{ij} = g\left(\frac{\partial}{\partial x_i}, \frac{\partial}{\partial x_j}\right)
+  g_{ij} = g\left(\frac{\partial}{\partial x^i}, \frac{\partial}{\partial x^j}\right)
 \]
 and are $C^\infty$ functions.
 
@@ -61,7 +93,7 @@ Using such an embedding, we can induce a Riemannian metric on $M$ by restricting
 
 More generally,
 \begin{lemma}
-  Let $(N, h)$ is a Riemannian manifold, and $F: M \to N$ is an immersion, then the pullback $g = F^*h$ defines a metric on $M$.
+  Let $(N, h)$ be a Riemannian manifold, and $F: M \to N$ is an immersion, then the pullback $g = F^*h$ defines a metric on $M$.
 \end{lemma}
 The condition of immersion is required for the pullback to be non-degenerate.
 
@@ -83,9 +115,11 @@ In Differential Geometry, if we do not have metrics, then we tend to consider di
 
   We already know that $G$ admits a Riemannian metric, but we might want to ask something stronger --- does there exist a \term{left-invariant metric?} In other words, is there a metric such that each $L_x$ is an isometry?
 
-  Recall that we previously had techniques to produce left-invariant vector fields, where a vector field $X$ on $G$ is \emph{left-invariant} if for any $x \in G$, we have $\d (L_x) X = X$.
-
-  Given a Lie group $G$, we can define the \term{Lie algebra} $\mathfrak{g} = T_e G$. Then we can produce left-invariant vector fields by picking some $X_e \in \mathfrak{g}$, and then setting
+  Recall the following definition:
+  \begin{defi}[Left-invariant vector field]\index{left-invariant vector field}\index{vector field!left invariant}
+    Let $G$ be a Lie group, and $X$ a vector field. Then $X$ is \emph{left invariant} if for any $x \in G$, we have $\d (L_x) X = X$.
+  \end{defi}
+  We had a rather general technique for producing left-invariant vector fields. Given a Lie group $G$, we can define the \term{Lie algebra} $\mathfrak{g} = T_e G$. Then we can produce left-invariant vector fields by picking some $X_e \in \mathfrak{g}$, and then setting
   \[
     X_a = \d (L_a) X_e.
   \]
@@ -115,21 +149,26 @@ Recall that in order to differentiate vectors, or even tensors on a manifold, we
       \]
   \end{enumerate}
 \end{defi}
+
+\begin{defi}[Christoffel symbols]\index{Christoffel symbols}
+  In local coordaintes, the \emph{Christoffel symbols} are defined by
+  \[
+    \nabla_{\partial_j} \frac{\partial}{\partial x^k} = \Gamma_{jk}^i \frac{\partial}{\partial x^i}.
+  \]
+\end{defi}
+
 With a bit more imagination on what the symbols mean, we can write the first property as
 \[
   \d (g(X, Y)) = g(\nabla X, Y) + g(X, \nabla Y),
 \]
 while the second property can be expressed in coordinate representation by
 \[
-  \Gamma_{jk}^i = \Gamma_{kj}^i,
+  \Gamma_{jk}^i = \Gamma_{kj}^i.
 \]
-where $\Gamma_{jk}^i$ is defined by
-\[
-  \nabla_{\partial/\partial x_j} \frac{\partial}{\partial x_k} = \sum_{i = 1}^n \Gamma_{jk}^i \frac{\partial}{\partial x_i}.
-\]
-In fact, the connection allows us to differentiate many more things, and not just tangent vectors.
 
-Firstly, the connection $\nabla$ induces a unique covariant derivative on $T^*M$, also denoted $\nabla$, given by
+The connection was defined on $TM$, but in fact, the connection allows us to differentiate many more things, and not just tangent vectors.
+
+Firstly, the connection $\nabla$ induces a unique covariant derivative on $T^*M$, also denoted $\nabla$, defined uniquely by the relation
 \[
   X\bra \alpha, Y\ket = \bra \nabla_X \alpha , Y\ket + \bra \alpha, \nabla_X Y\ket
 \]
@@ -141,30 +180,21 @@ In general, suppose we have vector bundles $E$ and $F$, and $s_1 \in \Gamma(E)$ 
 \[
   \nabla^{E\otimes F} (s_1 \otimes s_2) = (\nabla^E s_1) \otimes s_2 + s_1 \otimes (\nabla^F s_2).
 \]
+
+Since we already have a connection on $TM$ and $T^*M$, this allows us to extend the connection to all tensor bundles.
+
 Given this machinery, recall that the Riemannian metric is formally a section $g \in \Gamma(T^*M \otimes T^*M)$. Then the compatibility with the metric can be written in the following even more compact form:
 \[
   \nabla g = 0.
 \]
 
 \section{Riemann curvature}
-With all those definitions out of the way, we now start by studying the notion of \emph{curvature}. For the sake of sanity, we will always use implicit summation convention, i.e.\ whenever we write something of the form
-\[
-  X_{ijk} Y^{i\ell jk},
-\]
-we mean
-\[
-  \sum_{i, j} X_{ijk} Y^{i\ell jk}.
-\]
-We will use upper indices to denote contravariant components, so that, for example, $X^i$ refers to the $i$th component of an element in $TM$. Dually, covariant components, i.e.\ those living in the cotangent space, are denoted with lower indices. Note that we always sum an upper index with a lower index.
-
-We will index the basis elements oppositely, e.g.\ we write $\d x^k$ instead of $\d x_k$ for a basis element of $T^*M$, so that the indices in expressions of the form $A_k \;\d x^k$ seem to match up. Whenever we do not follow this convention, we will write out summations explicitly.
-
-The definition of the curvature tensor might not seem intuitive at first, but motivation was somewhat given in the III Differential Geometry course, and we will not repeat that.
+With all those definitions out of the way, we now start by studying the notion of \emph{curvature}. The definition of the curvature tensor might not seem intuitive at first, but motivation was somewhat given in the III Differential Geometry course, and we will not repeat that.
 
 \begin{defi}[Curvature]\index{curvature}\index{curvature 2-form}
   Let $(M, g)$ be a Riemannian manifold with Levi-Civita connection $\nabla$. The \emph{curvature $2$-form} is the section
   \[
-    R = - \nabla \circ \nabla \in \Gamma(\Lambda^2 T^*M \otimes T^*M \otimes TM) \subseteq \Gamma(T^{1, 3}M).
+    R = - \nabla \circ \nabla \in \Gamma(\exterior^2 T^*M \otimes T^*M \otimes TM) \subseteq \Gamma(T^{1, 3}M).
   \]
 \end{defi}
 This can be thought of as a $2$-form with values in $T^*M \otimes TM = \End(TM)$. Given any $X, Y \in \Vect(M)$, we have
@@ -187,18 +217,12 @@ In local coordinates, we can write
 \[
   R = \Big(R^i_{j, k\ell} \d x^k \d x^\ell\Big)_{i, j = 1, \ldots, \dim M} \in \Omega_M^2(\End(TM)).
 \]
-The comma between $j$ and $k\ell$ is purely for artistic reasons. Then we have
+Then we have
 \[
-  R(X, Y)^i_j = R^i_{j, k\ell} X^k Y^\ell,
+  R(X, Y)^i_j = R^i_{j, k\ell} X^k Y^\ell.
 \]
-where
-\[
-  X = \sum X^k \frac{\partial}{\partial x_k},\quad Y = \sum Y^\ell \frac{\partial}{\partial x_\ell}.
-\]
-To make life easier, we introduce the following short hands:
-\begin{notation}
-  In local coordinates, we will write $\partial_k$ for $\frac{\partial}{\partial x_k}$\index{$\partial_k$}, and $\nabla_k = \nabla_{\partial_k}$
-\end{notation}
+
+The comma between $j$ and $k\ell$ is purely for artistic reasons.
 
 It is often slightly convenient to consider a different form of the Riemann curvature tensor. Instead of having a tensor of type $(1, 3)$, we have one of type $(0, 4)$ by
 \[
@@ -229,21 +253,19 @@ Note that the first Bianchi identity can also be written for the $(0, 4)$ tensor
 \[
   R_{ij, k\ell} + R_{ik, \ell j} + R_{i\ell, jk} = 0.
 \]
-We'll first prove these, and discuss a little bit more afterwards.
-
 \begin{proof}\leavevmode
   \begin{enumerate}
-    \item The first equality is obvious as coefficients of a $2$-form. For the second equality, we note that the compatibility of the connection with the metric means
+    \item The first equality is obvious as coefficients of a $2$-form. For the second equality, we begin with the compatibility of the connection with the metric:
       \[
-        \frac{\partial g_{ij}}{\partial x_k} = g(\nabla_k \partial_i, \partial_j) + g(\partial_i, \nabla_k \partial_j).
+        \frac{\partial g_{ij}}{\partial x^k} = g(\nabla_k \partial_i, \partial_j) + g(\partial_i, \nabla_k \partial_j).
       \]
       We take a partial derivative, say with respect to $x_\ell$, to obtain
       \[
-        \frac{\partial^2 g_{ij}}{\partial x_\ell \partial x_k} = g(\nabla_\ell \nabla_k \partial_i, \partial_j) + g(\nabla_k \partial_i, \nabla_\ell \partial_j) + g(\nabla_\ell \partial_i, \nabla_k \partial_j) + g(\partial_i, \nabla_\ell \nabla_k \partial_j).
+        \frac{\partial^2 g_{ij}}{\partial x^\ell \partial x^k} = g(\nabla_\ell \nabla_k \partial_i, \partial_j) + g(\nabla_k \partial_i, \nabla_\ell \partial_j) + g(\nabla_\ell \partial_i, \nabla_k \partial_j) + g(\partial_i, \nabla_\ell \nabla_k \partial_j).
       \]
       Then we know
       \[
-        0 = \frac{\partial^2 g}{\partial x_\ell \partial x_k} - \frac{\partial^2 g}{\partial x_k \partial x_\ell} = g([\nabla_\ell, \nabla_k] \partial_i, \partial_j) + g(\partial_i, [\nabla_\ell, \nabla_k]\partial_j).
+        0 = \frac{\partial^2 g}{\partial x^\ell \partial x^k} - \frac{\partial^2 g}{\partial x_k \partial x_\ell} = g([\nabla_\ell, \nabla_k] \partial_i, \partial_j) + g(\partial_i, [\nabla_\ell, \nabla_k]\partial_j).
       \]
       But we know
       \[
@@ -254,7 +276,7 @@ We'll first prove these, and discuss a little bit more afterwards.
         0 = g(R_{k\ell} \partial_i, \partial_j) + g(\partial_i, R_{k\ell} \partial_j) = R_{ji, k\ell} + R_{ij, k\ell}.
       \]
       So we are done.
-    \item We now prove the first Bianchi identity. Recall
+    \item Recall
       \[
         R^i_{j, k\ell} = (R_{k\ell} \partial_j)^i = ([\nabla_\ell, \nabla_k] \partial_j)^i.
       \]
@@ -311,10 +333,8 @@ We'll first prove these, and discuss a little bit more afterwards.
 \end{proof}
 What exactly are the properties of the Levi-Civita connection that make these equality works? The first equality of (i) did not require anything. The second equality of (i) required the compatibility with the metric, and (ii) required the symmetric property. The last one required both properties.
 
-We can express the last property as saying $R_{ij, k\ell}$ is a symmetric bilinear form on $\Lambda^2 T_p^*M$. It is a straightforward exercise to rewrite the statement of this proposition in coordinate free notation using test vector fields. For example, the first equality in (i) can be written as
-\[
-  R(X, Y) = -R(Y, X).
-\]
+Note that we can express the last property as saying $R_{ij, k\ell}$ is a symmetric bilinear form on $\exterior^2 T_p^*M$.
+
 \subsubsection*{Sectional curvature}
 The full curvature tensor is rather scary. So it is convenient to obtain some simpler quantities from it. Recall that if we had tangent vectors $X, Y$, then we can form
 \[
@@ -371,22 +391,19 @@ This is really just linear algebra.
     R_p= K_p R_p^0.
   \]
   Here $K_p$ is just a real number, since it is constant. Moreover, $K_p$ is a smooth function of $p$.
+
+  Equivalently, in local coordinates, if the metric at a point is $\delta_{ij}$, then we have
+  \[
+    R_{ij, ij} = - R_{ij, ji} = K_p,
+  \]
+  and all other entries all zero.
 \end{cor}
+Of course, the converse also holds.
 
 \begin{proof}
   We apply the previous lemma as follows: we define $R' = K_p R_p^0$ and $R'' = R_p$. It is a straightforward inspection to see that this $R^0$ does follow the symmetry properties of $R_p$, and that they define the same sectional curvature. So $R'' = R'$. We know $K_p$ is smooth in $p$ as both $g$ and $R$ are smooth.
 \end{proof}
 We can further show that if $\dim M > 2$, then $K_p$ is in fact independent of $p$ under the hypothesis of this function, and the proof requires a second Bianchi identity. This can be found on the first example sheet.
-
-When does the condition of the corollary hold? We pick an \emph{orthonormal} basis, and express $R$ in coordinates $R_{ij, k\ell}$. Then writing $k = K_p$, the hypothesis holds iff
-\[
-  R_{ij, k\ell} = k(\delta_{ik}\delta_{j\ell} - \delta_{i\ell} \delta_{jk})
-\]
-iff
-\[
-  R_{ij, ij} = - R_{ij, ji} = k,
-\]
-and all other entries all zero.
 
 \subsubsection*{Other curvatures}
 There are other quantities we can extract out of the curvature, which will later be useful.
@@ -399,7 +416,7 @@ There are other quantities we can extract out of the curvature, which will later
   \[
     \Ric_{ij} = R^q_{i,jq} = g^{pq} R_{pi, jq},
   \]
-  where $g^{pq}$ denotes the inverse of $g$, and we implicitly sum over repeated indices.
+  where $g^{pq}$ denotes the inverse of $g$.
 
   This $\Ric$ is a symmetric bilinear form on $T_p M$. This can be determined by the quadratic form
   \[
@@ -438,13 +455,13 @@ Thus $s/2$ is also the sectional curvature (there can only be one plane in the t
 \[
   \frac{s}{2} = K = \frac{LN - M^2}{EG - F^2},
 \]
-the \term{Gaussian curvature}. We see that in two dimensions, there is only one independent component of the Gaussian curvature. Also, $R_{12, 21}$ is the determinant of the second fundamental form.
+the \term{Gaussian curvature}. Thus, the full curvature tensor is determined by the Gaussian curvature. Also, $R_{12, 21}$ is the determinant of the second fundamental form.
 
 If $n = 3$, one can check that $R(g)$ is determined by the Ricci curvature.
 
 \section{Geodesics}
 \subsection{Definitions and basic properties}
-We will eventually want to talk about geodesics. However, the set up we need to write down the definition of geodesics can be done in a much more general way, and we will do that.
+We will eventually want to talk about geodesics. However, the setup we need to write down the definition of geodesics can be done in a much more general way, and we will do that.
 
 The general setting is that we have a vector bundle $\pi: E \to M$.
 \begin{defi}[Lift]\index{lift}
@@ -461,7 +478,6 @@ For $p \in M$, we write $E_p = \pi^{-1}(\{p\}) \cong V$ for the fiber above $p$.
 Thus, given a path $\gamma$ in $M$, a lift corresponds to providing that piece of ``information'' at each point along the curve. For example, if $E = TM$, then we can canonically produce a lift of $\gamma$, given by taking the derivative of $\gamma$ at each point.
 
 Locally, suppose we are in some coordinate neighbourhood $U \subseteq M$ such that $E$ is trivial on $U$. After picking a trivialization, we can write our lift as
- Then $\gamma^E$ is of the form
 \[
   \gamma^E(t) = (\gamma(t), a(t))
 \]
@@ -524,7 +540,7 @@ In local coordinates, we write this condition as
 \[
   \ddot{x}_i + \Gamma^i_{jk}\dot{x}^j \dot{x}^k = 0.
 \]
-This time, we obtain a second-order ODE. So a geodesic is uniquely specified by the initial conditions $p = x(0)$ and $a = \dot{x}(0)$. We will denote the resulting geodesic as $\gamma_p(t; a)$, where $t$ is the time coordinate as usual.
+This time, we obtain a second-order ODE. So a geodesic is uniquely specified by the initial conditions $p = x(0)$ and $a = \dot{x}(0)$. We will denote the resulting geodesic as $\gamma_p(t, a)$, where $t$ is the time coordinate as usual.
 
 Since we have a non-linear ODE, existence is no longer guaranteed on all time, but just for some interval $(-\varepsilon, \varepsilon)$. Of course, we still have uniqueness of solutions.
 
@@ -660,7 +676,25 @@ In these coordinates, the geodesics from $p$ have the very simple form
 \]
 for all $a \in T_p M$ and $t$ sufficiently small that this makes sense.
 
-Now consider a linear isometry $(T_p N, g(p)) \cong (\R^n, \mathrm{eucl})$, and under this identification, we have a map
+\begin{cor}
+  For any point $p \in M$, there exists a local coordinate chart around $p$ such that
+  \begin{itemize}
+    \item The coordinates of $p$ are $(0, \cdots, 0)$.
+    \item In local coordinates, the metric at $p$ is $g_{ij}(p) = \delta_{ij}$.
+    \item We have $\Gamma^i_{jk}(p) = 0$ .
+  \end{itemize}
+\end{cor}
+Coordinates satisfying these properties are known as \term{normal coordinates}.
+\begin{proof}
+  The geodesic local coordinates satisfies these property, after identifying $T_p M$ isometrically with $(\R^n, \mathrm{eucl})$. For the last property, we note that the geodesic equations are given by
+  \[
+    \ddot{x}^i + \Gamma^i_{jk}\dot{x}^k \dot{x}^j = 0.
+  \]
+  But geodesics through the origin are given by straight lines. So we must have $\Gamma^i_{jk} = 0$.
+\end{proof}
+Such coordinates will be useful later on for explicit calculations, since whenever we want to verify a coordinate-independent equation (which is essentially all equations we care about), we can check it at each point, and then use normal coordinates at that point to simplify calculations.
+
+We again identify $(T_p N, g(p)) \cong (\R^n, \mathrm{eucl})$, and then we have a map
 \[
   (r, \mathbf{v}) \in (0, \delta) \times S^{n - 1} \mapsto \exp_p (r\mathbf{v}) \in M^n.
 \]
@@ -705,7 +739,7 @@ The proof is not hard, but it involves a few subtle points.
   \[
     \nabla_{\partial_r} \tilde{X} - \nabla_{\tilde{X}} \partial_r = [\partial_r , \tilde{X}] = 0.
   \]
-  So we have
+  Also, we have
   \[
     \frac{\d}{\d r} G(r) = g(\nabla_{\dot{\gamma}} \tilde{X}, \dot{\gamma}) + g(\tilde{X}, \nabla_{\dot{\gamma}} \dot{\gamma}).
   \]
@@ -834,7 +868,7 @@ Note that in $\frac{\partial f}{\partial t}$, we are differentiating $f$ with re
 
 By the geodesic equation, we have
 \[
-  0 = \frac{\nabla}{\d t} \dot{\gamma} = \Delta_{\partial_t} \partial_t.
+  0 = \frac{\nabla}{\d t} \dot{\gamma} = \nabla_{\partial_t} \partial_t.
 \]
 Therefore, using the definition of the curvature tensor $R$, we obtain
 \begin{align*}
@@ -1299,7 +1333,7 @@ This has a flat metric from $\R^n$, and the derivative of the exponential map is
 
   Now consider any curve $\psi$ of distance $\varepsilon$ away from $\gamma$. Then $\psi([t_i, t_{i + 1}]) \subseteq W_i$. So we can lift it up to $T_p M$, and the end point of the lift is $a$. So we are done by local minimization of length.
 \end{proof}
-Note that the tricky part of doing the proof is to make sure the lift of $\psi$ has the same end point as $\gamma$ in $T_p M$, which is why we need to do it neighbourhood by neighbourhood.
+Note that the tricky part of doing the proof is to make sure the lift of $\psi$ has the same end point as $\gamma$ in $T_p M$, which is why we needed to do it neighbourhood by neighbourhood.
 
 \subsection{Completeness and the Hopf--Rinow theorem}
 There are some natural questions we can ask about geodesics. For example, we might want to know if geodesics can be extended to exist for all time. We might also be interested if distances can always be realized by geodesics. It turns out these questions have the same answer.
@@ -1406,7 +1440,7 @@ We can now prove the theorem.
 \end{cor}
 
 \begin{proof}
-  (i) and (ii) are equivalent by definition. (ii) $\Rightarrow$ (iii) is clear, and we proved (iii) $\Rightarrow$ (ii).
+  (i) and (ii) are equivalent by definition. (ii) $\Rightarrow$ (iii) is clear, and we proved (iii) $\Rightarrow$ (i).
 
   \begin{itemize}
     \item (iii) $\Rightarrow$ (iv): Let $K \subseteq M$ be closed and bounded. Then by boundedness, $K$ is contained in $\exp_p(\overline{B(0, R)})$. Let $K'$ be the pre-image of $K$ under $\exp_p$. Then it is a closed and bounded subset of $\R^n$, hence compact. Then $K$ is the continuous image of a compact set, hence compact.
@@ -1569,7 +1603,7 @@ Note that if we have fixed end points, then the first terms in the variation for
   \]
   Taking the derivative with respect to $s$ again gives
   \begin{multline*}
-    \frac{\d^2}{\d s^2}E(\gamma_s) =\left. g\left(\frac{\nabla Y}{\d s}, \dot{\gamma}\right)\right|_{t = 0}^{t = T} + \left.g\left(Y, \frac{\nabla}{\d s} \dot{\gamma}_s\right)\right|_{t = 0}^{T} \\
+    \frac{\d^2}{\d s^2}E(\gamma_s) =\left. g\left(\frac{\nabla Y}{\d s}, \dot{\gamma}\right)\right|_{t = 0}^T + \left.g\left(Y, \frac{\nabla}{\d s} \dot{\gamma}_s\right)\right|_{t = 0}^{T} \\
     - \int_0^T \left(g\left(\frac{\nabla Y}{\d s}, \frac{\nabla}{\d t} \dot{\gamma}_s\right) + g\left(Y, \frac{\nabla}{\d s} \frac{\nabla}{\d t} \dot{\gamma}\right)\right)\;\d t.
   \end{multline*}
   We now use that
@@ -1694,7 +1728,7 @@ We first prove a technical lemma.
 \end{proof}
 
 \subsubsection*{Conjugate points}
-Recall that when a geodesic starts moving, for a short period of time, it is length-minimizing. However, in general, if we keep on moving for a long time, then we cease to be minimizing. The point where this transition happens is interesting.
+Recall that when a geodesic starts moving, for a short period of time, it is length-minimizing. However, in general, if we keep on moving for a long time, then we cease to be minimizing. It is useful to characterize when this happens.
 
 As before, for a vector field $J$ along a curve $\gamma(t)$, we will write
 \[
@@ -1711,7 +1745,7 @@ It is easy to see that this does not depend on parametrization of the curve, bec
 
 \begin{prop}\leavevmode
   \begin{enumerate}
-    \item If $\gamma(t) = \exp_p(t a)$ and $q = \exp_p(\beta a)$ is conjugate to $p$, then $q$ is a singular value of $\exp$.
+    \item If $\gamma(t) = \exp_p(t a)$, and $q = \exp_p(\beta a)$ is conjugate to $p$, then $q$ is a singular value of $\exp$.
     \item Let $J$ be as in the definition. Then $J$ must be pointwise normal to $\dot{\gamma}$.
   \end{enumerate}
 \end{prop}
@@ -1735,7 +1769,7 @@ It is easy to see that this does not depend on parametrization of the curve, bec
       \]
       by symmetries of $R$. So we have
       \[
-        \frac{\d}{\d t}(J, \dot{\gamma}) = g(J'(t), \dot{\gamma}(t)) = g(J'(0), \dot{\gamma}(0)).
+        \frac{\d}{\d t} g(J, \dot{\gamma}) = g(J'(t), \dot{\gamma}(t)) = g(J'(0), \dot{\gamma}(0)).
       \]
       Now integrating gives the desired result.
 
@@ -2009,8 +2043,7 @@ To prove the next result, we need to talk a bit more about coverings.
   \]
   Using Hopf-Rinow, either $\{\tilde{\gamma}(t_n)\}$ is contained in some compact $K$, or it is unbounded. We claim that unboundedness is impossible. We have
   \begin{align*}
-    \ell(\gamma) &\geq \ell(\gamma|_{[0, t_n]}) \\
-    &= \int_0^{t_n} |\dot{\gamma}|\; \d t\\
+    \ell(\gamma) \geq \ell(\gamma|_{[0, t_n]}) &= \int_0^{t_n} |\dot{\gamma}|\; \d t\\
     &= \int_0^{t_n} |\d f_{\tilde{\gamma}(t)} \dot{\tilde{\gamma}}(t)|\;\d t\\
     &\geq \int_0^{t_n} |\dot{\tilde{\gamma}}| \;\d t \\
     &= \ell(\tilde{\gamma}|_{[0, t_n]}) \\
@@ -2028,7 +2061,7 @@ Note that since $N$ is (assumed to be) connected, we know $f$ is necessarily sur
 
 For a change, our next result will assume a \emph{negative} curvature, instead of a positive one!
 \begin{thm}[Hadamard--Cartan theorem]\index{Hadamard--Cartan theorem}
-  Let $(M^n, g)$ be a complete Riemannian manifold such that the sectional curvature is always non-positive. Then for every point $p \in M$, we know $\exp_p: T_p M \to M$ is a covering map. In particular, if $\pi_1(M) = 0$, then $M$ is diffeomorphic to $\R^n$.
+  Let $(M^n, g)$ be a complete Riemannian manifold such that the sectional curvature is always non-positive. Then for every point $p \in M$, the map $\exp_p: T_p M \to M$ is a covering map. In particular, if $\pi_1(M) = 0$, then $M$ is diffeomorphic to $\R^n$.
 \end{thm}
 
 We will need one more technical lemma.
@@ -2051,14 +2084,15 @@ We will need one more technical lemma.
 \end{proof}
 
 We can now prove the theorem.
-\begin{proof}
-  By the lemma, we know there are not conjugate points. So we know $\exp_p$ is regular everywhere, hence a local diffeomorphism by inverse function theorem. We can use this fact to pull back a metric from $M$ to $T_p M$ such that $\exp_p$ is a local isometry. Since this is a local isometry, we know geodesics are preserved. So geodesics originating from the origin in $T_p M$ are straight lines, and the speed of the geodesics under the two metrics are the same. So we know $T_p M$ is complete under this metric. Also, by Hopf--Rinow, $\exp_p$ is surjective. So we are done.
+\begin{proof}[Proof of theorem]
+  By the lemma, we know there are no conjugate points. So we know $\exp_p$ is regular everywhere, hence a local diffeomorphism by inverse function theorem. We can use this fact to pull back a metric from $M$ to $T_p M$ such that $\exp_p$ is a local isometry. Since this is a local isometry, we know geodesics are preserved. So geodesics originating from the origin in $T_p M$ are straight lines, and the speed of the geodesics under the two metrics are the same. So we know $T_p M$ is complete under this metric. Also, by Hopf--Rinow, $\exp_p$ is surjective. So we are done.
 \end{proof}
 
 \section{Hodge theory on Riemannian manifolds}
+\subsection{Hodge star and operators}
 Throughout this chapter, we will assume our manifolds are oriented, and write $n$ of the dimension. We will write $\varepsilon \in \Omega^n(M)$ for a non-vanishing form defining the orientation.
 
-Given a coordinate patch $U \subseteq M$, we can use Gram-Schmidt to obtain a positively-oriented orthonormal frame $e_1, \cdots, e_n$. This allows us to dualize and obtain a basis $\omega_1, \cdots, \omega_n \in \Omega^1(n)$, defined by
+Given a coordinate patch $U \subseteq M$, we can use Gram-Schmidt to obtain a positively-oriented orthonormal frame $e_1, \cdots, e_n$. This allows us to dualize and obtain a basis $\omega_1, \cdots, \omega_n \in \Omega^1(M)$, defined by
 \[
   \omega_i(e_i) = \delta_{ij}.
 \]
@@ -2068,50 +2102,53 @@ Since these are linearly independent, we can multiply all of them together to ob
 \]
 for some $a \in C^\infty(U)$, $a > 0$. We can do this for any coordinate patches, and the resulting $n$-form agrees on intersections. Indeed, given any other choice $\omega_1', \cdots, \omega_n'$, they must be related to the original $\omega_1, \cdots, \omega_n$ by an element $\Phi \in \SO(n)$. Then by linear algebra, we have
 \[
-  \omega_1' \wedge \cdots \wedge \omega_n' = \det (\Phi) \omega_1 \wedge \cdots \wedge \omega_n = \omega_1 \wedge \cdots \wedge \omega_n.
+  \omega_1' \wedge \cdots \wedge \omega_n' = \det (\Phi)\; \omega_1 \wedge \cdots \wedge \omega_n = \omega_1 \wedge \cdots \wedge \omega_n.
 \]
-So we can patch all these forms together to get a global $n$-form $\omega_g \in \Omega^n(M)$ that gives the same orientation. This is a canonical sch $n$-form, depending only on $g$ and the orientation chosen. This is called the (Riemannian) \term{volume form} of $(M, g)$.
+So we can patch all these forms together to get a global $n$-form $\omega_g \in \Omega^n(M)$ that gives the same orientation. This is a canonical such $n$-form, depending only on $g$ and the orientation chosen. This is called the (Riemannian) \term{volume form} of $(M, g)$.
 
-Recall that the $\omega_i$ are orthonormal with respect to the natural dual inner product on $T^* M$. In general, $g$ induces an inner product on $\Lambda^p T^* M$ for all $p = 0, 1, \cdots, n$, which is still denoted $g$. One way to describe this is to give an orthonormal basis on each fiber, given by
+Recall that the $\omega_i$ are orthonormal with respect to the natural dual inner product on $T^* M$. In general, $g$ induces an inner product on $\exterior^p T^* M$ for all $p = 0, 1, \cdots, n$, which is still denoted $g$. One way to describe this is to give an orthonormal basis on each fiber, given by
 \[
   \{\omega_{i_1} \wedge \cdots \wedge \omega_{i_p} : 1 \leq i_1 < \cdots < i_p \leq n\}.
 \]
-From this point of view, the volume form becomes a form of unit length.
+From this point of view, the volume form becomes a form of ``unit length''.
 
 We now come to the central definition of Hodge theory.
 \begin{defi}[Hodge star]\index{Hodge star}
-  The \emph{Hodge star operator} on $(M^n, g)$ is a linear map
+  The \emph{Hodge star operator} on $(M^n, g)$ is the linear map
   \[
-    *: \Lambda^p T^*_x M \to \Lambda^{n - p} T_x^* M
+    \star: \exterior^p (T^*_x M) \to \exterior^{n - p} (T_x^* M)
   \]
-  satisfying the property that for all $\alpha, \beta \in \Lambda^p T_x^* M$, we have
+  satisfying the property that for all $\alpha, \beta \in \exterior^p (T_x^* M)$, we have
   \[
-    \alpha \wedge *\beta = \bra \alpha, \beta\ket_g \theta_g.
+    \alpha \wedge \star\beta = \bra \alpha, \beta\ket_g\;\omega_g.
   \]
 \end{defi}
 Since $g$ is non-degenerate, it follows that this is well-defined.
 
-How do we actually compute this? Since we have vector spaces, it is natural to consider what happens in a basis. Suppose $\omega_1, \cdots, \omega_n$ is an orthonormal basis of $T_x^* M$. Then we claim that
-\[
-  *(\omega_1 \wedge \cdots \wedge \omega_p) = \omega_{p + 1} \wedge \cdots \wedge \omega_n.
-\]
-We can check this by checking all basis vectors of $\Lambda^p M$, and the result drops out immediately. Since we can always relabel the numbers, this already tells us how to compute the Hodge star of all other basis elements.
-
-We can apply the Hodge star twice, which gives us a linear endomorphism $**: \Lambda^p T_x^* M \to \Lambda^p T_x^* M$.
+How do we actually compute this? Since we have vector spaces, it is natural to consider what happens in a basis.
 \begin{prop}
-  The double Hodge star $**: \Lambda^p T_x^* M \to \Lambda^p T_x^* M$ is equal to $(-1)^{p(n - p)}$.
+  Suppose $\omega_1, \cdots, \omega_n$ is an orthonormal basis of $T_x^* M$. Then we claim that
+  \[
+    \star(\omega_1 \wedge \cdots \wedge \omega_p) = \omega_{p + 1} \wedge \cdots \wedge \omega_n.
+  \]
+\end{prop}
+We can check this by checking all basis vectors of $\exterior^p M$, and the result drops out immediately. Since we can always relabel the numbers, this already tells us how to compute the Hodge star of all other basis elements.
+
+We can apply the Hodge star twice, which gives us a linear endomorphism $\star\star: \exterior^p T_x^* M \to \exterior^p T_x^* M$. From the above, it follows that
+\begin{prop}
+  The double Hodge star $\star\star: \exterior^p (T_x^* M) \to \exterior^p (T_x^* M)$ is equal to $(-1)^{p(n - p)}$.
 \end{prop}
 In particular,
 \[
-  *1 = \omega_g,\quad * \omega_g = 1.
+  \star1 = \omega_g,\quad \star \omega_g = 1.
 \]
 Using the Hodge star, we can define a differential operator:
-\begin{defi}[$\delta$]\index{$\delta$}
+\begin{defi}[Co-differential ($\delta$)]\index{$\delta$}
   We define $\delta: \Omega^p(M) \to \Omega^{p - 1}(M)$ for $0 \leq p \leq \dim M$ by
   \[
     \delta =
     \begin{cases}
-      (-1)^{n(p + 1) + 1} *\d * & p \not= 0\\
+      (-1)^{n(p + 1) + 1} \star\d \star & p \not= 0\\
       0 & p = 0
     \end{cases}.
   \]
@@ -2127,40 +2164,52 @@ We further define
   \]
   This is also known as the (Hodge) \term{Laplacian}\index{Hodge Laplacian}.
 \end{defi}
+We quickly note that
+\begin{prop}
+  \[
+    \star\Delta = \Delta \star.
+  \]
+\end{prop}
 Consider the spacial case of $(M, g) = (\R^n, \mathrm{eucl})$, and $p = 0$. Then a straightforward calculation shows that
 \[
   \Delta f = - \frac{\partial^2 f}{\partial x_1^2} - \cdots - \frac{\partial^2 f}{\partial x_n^2}
 \]
-for each $f \in C^\infty(\R^n) = \Omega^0(\R^n)$.
+for each $f \in C^\infty(\R^n) = \Omega^0(\R^n)$. This is just the usual Laplacian, except there is a negative sign. This is there for a good reason, but we shall not go into that.
 
-The negative sign is there for a good reason. For example, having a negative sign there ensures the eigenvalue of $\Delta$ are non-negative.
+More generally, metric $g = g_{ij}\; \d x^i\; \d x^j$ on $\R^n$ (or alternatively a coordinate patch on any Riemannian manifold), we have
+\[
+  \omega_g = \sqrt{|g|}\;\d x^1 \wedge \cdots \wedge \d x^n,
+\]
+where $|g|$ is the determinant of $g$. Then we have
+\[
+  \Delta_g f = -\frac{1}{\sqrt{|g|}} \partial_j (\sqrt{|g|} g^{ij} \partial_i f) = - g^{ij} \partial_i \partial_j f + \text{lower order terms}.
+\]
 
-For a general metric $g = g_{ij}\; \d x^i\; \d x^j$ on $\R^n$ (or alternatively a coordinate patch on any Riemannian manifold), we have
-\[
-  \omega_g = \sqrt{\det g}\;\d x^1 \wedge \cdots \wedge \d x^n,
-\]
-and then we have
-\[
-  \Delta_g f = -\frac{1}{\sqrt{g}} \partial_j (\sqrt{\det g} g^{ij} \partial_i f) = - g^{ij} \partial_i \partial_j f + \text{lower order terms}.
-\]
-As before, $g^{ij}$, as a matrix, is the inverse of $g$. Algebraic, it is the dual inner product on the cotangent space.
+How can we think about this co-differential $\delta$? One way to understand it is that it is the ``adjoint'' to $\d$.
 
 \begin{prop}
   $\delta$ is the formal adjoint of $\d$. Explicitly, for any compactly supported $\alpha \in \Omega^{p - 1}$ and $\beta \in \Omega^p$, then
   \[
-    \int_M \bra \d \alpha, \beta\ket_g \omega_g = \int_M \bra \alpha, \delta \beta\ket_g.
+    \int_M \bra \d \alpha, \beta\ket_g\;\omega_g = \int_M \bra \alpha, \delta \beta\ket_g\;\omega_g.
   \]
 \end{prop}
-We just say it is a formal adjoint, rather than a genuine adjoint, because there is no obvious Banach space structure on $\Omega^p(M)$, and we don't want to go into that.
+We just say it is a formal adjoint, rather than a genuine adjoint, because there is no obvious Banach space structure on $\Omega^p(M)$, and we don't want to go into that. However, we can still define
 
-We can also call this the $L^2$ adjoint, where we define
-\[
-  \bra \bra \xi, \eta\ket\ket_g = \int_M \bra \xi, \eta\ket_g \omega_g,
-\]
-where $\xi, \eta \in \Omega^p(M)$. Then the proposition says
+\begin{defi}[$L^2$ inner product]
+  For $\xi, \eta \in \Omega^p(M)$, we define the \term{$L^2$ inner product}\index{$\bra\bra \xi, \eta\ket \ket_g$} by
+  \[
+    \bra \bra \xi, \eta\ket\ket_g = \int_M \bra \xi, \eta\ket_g\;\omega_g,
+  \]
+  where $\xi, \eta \in \Omega^p(M)$.
+\end{defi}
+Note that this may not be well-defined if the space is not compact.
+
+Under this notation, we can write the proposition as
 \[
   \bra\bra \d \alpha, \beta\ket\ket_g = \bra \bra \alpha, \delta \beta \ket\ket_g.
 \]
+Thus, we also say $\delta$ is the $L^2$ adjoint.
+
 To prove this, we need to recall Stokes' theorem. Since we don't care about manifolds with boundary in this course, we just have
 \[
   \int_M \d \omega = 0
@@ -2169,30 +2218,27 @@ for all forms $\omega$.
 \begin{proof}
   We have
   \begin{align*}
-    0 &= \int_M \d (\alpha \wedge *\beta)\\
-    &= \int_M \d \alpha \wedge *\beta + \int_M (-1)^{p - 1} \alpha \wedge \d * \beta\\
-    &= \int_M \bra \d \alpha, \beta \ket_g \omega_g + (-1)^{p - 1} (-1)^{(n - p + 1)(p - 1)}\int_M \alpha \wedge **\d* \beta\\
-    &= \int_M \bra \d \alpha, \beta \ket_g \omega_g + (-1)^{(n - p)(p - 1)} \int_M \alpha \wedge **\d* \beta\\
-    &= \int_M \bra \d \alpha, \beta\ket_g \omega_g - \int_M \alpha \wedge * \delta \beta\\
-    &= \int_M \bra \d \alpha, \beta\ket_g \omega_g - \int_M \bra \alpha, \delta \beta\ket_g \omega_g.
+    0 &= \int_M \d (\alpha \wedge \star\beta)\\
+    &= \int_M \d \alpha \wedge \star\beta + \int_M (-1)^{p - 1} \alpha \wedge \d \star \beta\\
+    &= \int_M \bra \d \alpha, \beta \ket_g\;\omega_g + (-1)^{p - 1} (-1)^{(n - p + 1)(p - 1)}\int_M \alpha \wedge \star\star\d\star \beta\\
+    &= \int_M \bra \d \alpha, \beta \ket_g\;\omega_g + (-1)^{(n - p)(p - 1)} \int_M \alpha \wedge \star\star\d\star \beta\\
+    &= \int_M \bra \d \alpha, \beta\ket_g\;\omega_g - \int_M \alpha \wedge \star \delta \beta\\
+    &= \int_M \bra \d \alpha, \beta\ket_g\;\omega_g - \int_M \bra \alpha, \delta \beta\ket_g\;\omega_g.
   \end{align*}
 \end{proof}
+This result explains the funny signs we gave $\delta$.
 
 \begin{cor}
   $\Delta$ is formally self-adjoint.
 \end{cor}
 
-Note that we have
-\[
-  * \Delta = \Delta *.
-\]
+Similar to what we did in, say, IB Methods, we can define
 \begin{defi}[Harmonic forms]\index{harmonic form}\index{$\mathcal{H}^p$}
   A \emph{harmonic form} is a $p$-form $\omega$ such that $\Delta \omega = 0$. We write
   \[
     \mathcal{H}^p = \{\alpha \in \Omega^p(M): \Delta \alpha = 0\}.
   \]
 \end{defi}
-One nice result about these forms follows if we assume that $M$ is compact.
 
 We have a further corollary of the proposition.
 \begin{cor}
@@ -2206,7 +2252,7 @@ We say $\alpha$ is closed and \term{co-closed}.
 \begin{proof}
   $\Leftarrow$ is clear. For $\Rightarrow$, suppose $\Delta \alpha = 0$. Then we have
   \[
-    0 = \bra\bra \alpha, \Delta \alpha\ket\ket = \bra\bra \d \delta \alpha + \delta \d \alpha\ket\ket = \|\delta \alpha\|_g^2 + \|\d \alpha\|_g^2.
+    0 = \bra\bra \alpha, \Delta \alpha\ket\ket = \bra\bra\alpha, \d \delta \alpha + \delta \d \alpha\ket\ket = \|\delta \alpha\|_g^2 + \|\d \alpha\|_g^2.
   \]
   Since the $L^2$ norm is non-degenerate, it follows that $\delta \alpha = \d \alpha = 0$.
 \end{proof}
@@ -2215,11 +2261,11 @@ In particular, in degree $0$, co-closed is automatic. Then for all $f \in C^\inf
 \[
   \Delta f = 0 \Leftrightarrow \d f = 0.
 \]
-In other words, harmonic forms on a compact manifold must be constant. This is a good way to demonstrate that the compactness hypothesis is required, as there are many non-trivial harmonic functions on $\R^n$, e.g.\ $x$.
+In other words, harmonic functions on a compact manifold must be constant. This is a good way to demonstrate that the compactness hypothesis is required, as there are many non-trivial harmonic functions on $\R^n$, e.g.\ $x$.
 
-Some of these things simplify if we know about the parity of our manifold. If $\dim M = n = 2m$, then $** = (-1)^p$, and
+Some of these things simplify if we know about the parity of our manifold. If $\dim M = n = 2m$, then $\star\star = (-1)^p$, and
 \[
-  \delta = - * \d *
+  \delta = - \star \d \star
 \]
 whenever $p \not= 0$. In particular, this applies to complex manifolds, say $\C^n \cong \R^{2n}$, with the Hermitian metric. This is to be continued in sheet 3.
 
@@ -2234,17 +2280,37 @@ We now work towards proving the Hodge decomposition theorem. This is a very impo
       \[
         \Omega^p(M) = \mathcal{H}^p \oplus \Delta \Omega^p(M).
       \]
-      It follows that
-      \begin{align*}
-        \Omega^p(M) &= \mathcal{H}^p \oplus \d \delta \Omega^p(M) \oplus \delta \d \Omega^p(M)\\
-        &= \mathcal{H}^p \oplus \d \Omega^{p - 1}(M) \oplus \delta \Omega^{p + 1}(M).
-      \end{align*}
-      Moreover, the direct sums are orthogonal with respect to the $L^2$ inner product. We also formally set $\Omega^{-1}(M) = 0$.
+      Moreover, the direct sum is orthogonal with respect to the $L^2$ inner product. We also formally set $\Omega^{-1}(M) = 0$.
   \end{itemize}
 \end{thm}
 As before, the compactness of $M$ is essential, and cannot be dropped.
+\begin{cor}
+  We have orthogonal decompositions
+  \begin{align*}
+    \Omega^p(M) &= \mathcal{H}^p \oplus \d \delta \Omega^p(M) \oplus \delta \d \Omega^p(M)\\
+    &= \mathcal{H}^p \oplus \d \Omega^{p - 1}(M) \oplus \delta \Omega^{p + 1}(M).
+  \end{align*}
+\end{cor}
 
-This has a rather remarkable corollary. This requires recalling the notion of de Rham cohomology.
+\begin{proof}
+  Now note that for an $\alpha, \beta$, we have
+  \[
+    \bra \bra \d \delta \alpha, \delta \d \beta\ket\ket_g = \bra \bra \d \d \delta \alpha, \d \beta\ket \ket_g = 0.
+  \]
+  So
+  \[
+    \d \delta \Omega^p(M) \oplus \delta \d \Omega^p(M)
+  \]
+  is an orthogonal direct sum that clearly contains $\Delta \Omega^p(M)$. But each component is also orthogonal to harmonic forms, because harmonic forms are closed and co-closed. So the first decomposition follows.
+
+  To obtain the final decomposition, we simply note that
+  \[
+    \d \Omega^{p - 1}(M) = \d (\mathcal{H}^{p - 1} \oplus \Delta \Omega^{p - 1}(M)) = \d (\delta \d \Omega^{p - 1}(M)) \subseteq \d \delta \Omega^p(M).
+  \]
+  On the other hand, we certainly have the other inclusion. So the two terms are equal. The other term follows similarly.
+\end{proof}
+
+This theorem has a rather remarkable corollary.
 \begin{cor}
   Let $(M, g)$ be a compact oriented Riemannian manifold. Then for all $\alpha \in H_{\dR}^p(M)$, there is a unique $\alpha \in \mathcal{H}^p$ such that $[\alpha] = a$. In other words, the obvious map
   \[
@@ -2252,7 +2318,7 @@ This has a rather remarkable corollary. This requires recalling the notion of de
   \]
   is an isomorphism.
 \end{cor}
-This is remarkable. On the left hand side, we have $\mathcal{H}^p$, which is a completely analytic thing, defined by the Laplacian. On the other hand, the right hand sides involves the de Rham cohomology, which is just a topological, and in fact homotopy invariant. It is remarkable that these can identified.
+This is remarkable. On the left hand side, we have $\mathcal{H}^p$, which is a completely analytic thing, defined by the Laplacian. On the other hand, the right hand sides involves the de Rham cohomology, which is just a topological, and in fact homotopy invariant.
 
 \begin{proof}
   To see uniqueness, suppose $\alpha_1, \alpha_2 \in \mathcal{H}^p$ are such that $[\alpha_1] = [\alpha_2] \in H_{\dR}^p(M)$. Then
@@ -2261,16 +2327,25 @@ This is remarkable. On the left hand side, we have $\mathcal{H}^p$, which is a c
   \]
   for some $\beta$. But the left hand side and right hand side live in different parts of the Hodge decomposition. So they must be individually zero. Alternatively, we can compute
   \[
-    \|\d \beta\|_g^2 = \bra\bra \d \beta, \alpha_1- \alpha_2\ket\ket_g = \bra \bra \beta, \delta \alpha_1 - \delta \alpha_2\ket\ket = 0
+    \|\d \beta\|_g^2 = \bra\bra \d \beta, \alpha_1- \alpha_2\ket\ket_g = \bra \bra \beta, \delta \alpha_1 - \delta \alpha_2\ket\ket_g = 0
   \]
-  since harmonic forms are closed.
+  since harmonic forms are co-closed.
 
-  To prove existence, let $\alpha \in \Omega^p(M)$ be such that $\d \delta a = 0$. Then as before, we find that $\|\delta \alpha\| = 0$. Then if $\tilde{\alpha} \in \Omega^p(M)$ is closed, i.e.\ $\d \tilde{\alpha} = 0$, then by Hodge decomposition, we can write
+  To prove existence, let $\alpha \in \Omega^p(M)$ be such that $\d \alpha = 0$. We write
   \[
-    \alpha \in \mathcal{H}^p \oplus \d \Omega^{p - 1}(M).
-  \] % is this complete?
+    \alpha = \alpha_1 + \d \alpha_2 + \delta\alpha_3 \in \mathcal{H}^p \oplus \d \Omega^{p - 1}(M) \oplus \delta \Omega^{p + 1}(M).
+  \]
+  Applying $\d$ gives us
+  \[
+    0 = \d \alpha_1 + \d^2 \alpha_2 + \d \delta \alpha_3.
+  \]
+  We know $\d \alpha_1 = 0$ since $\alpha_1$ is harmonic, and $\d^2 = 0$. So we must have $\d \delta \alpha_3 = 0$. So
+  \[
+    \bra \bra \delta \alpha_3, \delta \alpha_3\ket\ket_g = \bra \bra \alpha_3, \d \delta \alpha_3\ket\ket_g = 0.
+  \]
+  So $\delta \alpha_3 = 0$. So $[\alpha] = [\alpha_1]$ and $\alpha$ has a representative in $\mathcal{H}^p$.
 \end{proof}
-Why is this true? Suppose we are given some de Rham cohomology class $a \in H_{\dR}^p(M)$. We consider
+We can also heuristically justify why this is true. Suppose we are given some de Rham cohomology class $a \in H_{\dR}^p(M)$. We consider
 \[
   B_a = \{\xi \in \Omega^p(M): \d \xi = 0, [\xi] = a\}.
 \]
@@ -2282,96 +2357,76 @@ We now ask ourselves --- which $\alpha \in B_a$ minimizes the $L^2$ norm? We con
 \]
 In other words, we have
 \[
-  0 = \left.\frac{\d}{\d t}\right|_{t = 0} (\|\alpha\|^2 + 2t \bra \bra \alpha, \d \beta\ket\ket + t^2 \|\d \beta\|^2) = 2 \bra\bra \alpha, \d \beta\ket\ket.
+  0 = \left.\frac{\d}{\d t}\right|_{t = 0} (\|\alpha\|^2 + 2t \bra \bra \alpha, \d \beta\ket\ket_g + t^2 \|\d \beta\|^2) = 2 \bra\bra \alpha, \d \beta\ket\ket_g.
 \]
 This is the same as saying
 \[
-  \bra \bra \delta \alpha, \beta\ket\ket = 0.
+  \bra \bra \delta \alpha, \beta\ket\ket_g = 0.
 \]
-So this implies $\delta \alpha = 0$. But $\d \alpha = 0$ by assumption. So we find that $\alpha \in \mathcal{H}^p$. So the result is at least reasonable.
+So this implies $\delta \alpha = 0$. But $\d \alpha = 0$ by assumption. So we find that $\alpha \in \mathcal{H}^p$. So the result is at least believable.
 
+The proof of the Hodge decomposition theorem involves some analysis, which we are not bothered to do. Instead, we will just quote the appropriate results. For convenience, we will use $\bra \ph, \ph\ket$ for the $L^2$ inner product, and then $\|\ph\|$ is the $L^2$ norm.
+
+The first theorem we quote is the following:
+\begin{thm}[Compactness theorem]
+  If a sequence $\alpha_n \in \Omega^n(M)$ satisfies $\|\alpha_n\| < C$ and $\|\Delta \alpha_n\| < C$ for all $n$, then $\alpha_n$ contains a Cauchy subsequence.
+\end{thm}
+This is almost like saying $\Omega^n(M)$ is compact, but it isn't, since it is not complete. So the best thing we can say is that the subsequence is Cauchy.
+
+\begin{cor}
+  $\mathcal{H}^p$ is finite-dimensional.
+\end{cor}
+
+\begin{proof}
+  Suppose not. Then by Gram--Schmidt, we can find an infinite orthonormal sequence $e_n$ such that $\|e_n\| = 1$ and $\|\Delta e_n\| = 0$, and this certainly does not have a Cauchy subsequence.
+\end{proof}
+
+A large part of the proof is trying to solve the PDE
+\[
+  \Delta \omega = \alpha,
+\]
+which we will need in order to carry out the decomposition. In analysis, one useful idea is the notion of weak solutions. We notice that if $\omega$ is a solution, then for any $\varphi \in \Omega^p(M)$, we have
+\[
+  \bra \omega, \Delta\varphi\ket = \bra \Delta \omega, \varphi\ket = \bra \alpha, \varphi\ket,
+\]
+using that $\Delta$ is self-adjoint. In other words, the linear form $\ell = \bra \omega, \ph\ket: \Omega^p(M) \to \R$ satisfies
+\[
+  \ell(\Delta \varphi) = \bra \alpha, \varphi\ket.
+\]
+Conversely, if $\bra \omega, \ph\ket$ satisfies this equation, then $\omega$ must be a solution, since for any $\beta$, we have
+\[
+  \bra \Delta \omega, \beta\ket = \bra \omega, \Delta \beta\ket = \bra \alpha, \beta\ket.
+\]
+\begin{defi}[Weak solution]\index{weak solution}
+  A weak solution to the equation $\Delta \omega = \alpha$ is a linear functional $\ell: \Omega^p(M) \to \R$ such that
+  \begin{enumerate}
+    \item $\ell(\Delta \varphi) = \bra \alpha, \varphi\ket$ for all $\varphi \in \Omega^p(M)$.
+    \item $\ell$ is \term{bounded}, i.e.\ there is some $C$ such that $|\ell (\beta)| < C \|\beta\|$ for all $\beta$.
+  \end{enumerate}
+\end{defi}
+Now given a weak solution, we want to obtain a genuine solution. If $\Omega^p(M)$ were a Hilbert space, then we are immediately done by the Riesz representation theorem, but it isn't. Thus, we need a theorem that gives us what we want.
+
+\begin{thm}[Regularity theorem]
+  Every weak solution of $\Delta \omega = \alpha$ is of the form
+  \[
+    \ell(\beta) = \bra \omega, \beta\ket
+  \]
+  for $\omega \in \Omega^p(M)$.
+\end{thm}
+
+Thus, we have reduced the problem to finding weak solutions. There is one final piece of analysis we need to quote. The definition of a weak solution only cares about what $\ell$ does to $\Delta \Omega^p(M)$. And it is easy to define what $\ell$ should do on $\Delta \Omega^p(M)$ --- we simply define
+\[
+  \ell(\Delta \eta) = \bra \eta, \alpha\ket.
+\]
+Of course, for this to work, it must be well-defined, but this is not necessarily the case in general. We also have to check it is bounded. But suppose this worked. Then the remaining job is to extend this to a bounded functional on all of $\Omega^p(M)$ in \emph{whatever} way we like. This relies on the following (relatively easy) theorem from analysis:
+
+\begin{thm}[Hahn--Banach theorem]
+  Let $L$ be a normed vector space, and $L_0$ be a subspace. We let $f: L_0 \to \R$ be a bounded linear functional. Then $f$ extends to a bounded linear functional $L \to \R$ with the same bound.
+\end{thm}
+
+We can now begin the proof.
 \begin{proof}[Proof of Hodge decomposition theorem]
-  The key statement is to prove that
-  \[
-    \Omega^p(M) = \mathcal{H}^p \oplus \Delta \Omega^p(M).
-  \]
-  Once we have this proved, the other decompositions follow from standard results such as Stokes' theorem. For example, we know that
-  \[
-    \bra \bra \d \delta \alpha, \delta \d \alpha \ket \ket = \bra \bra \d \d \delta \alpha, \d \alpha\ket\ket = 0.
-  \]
-  So we have a decomposition
-  \[
-    \Delta \Omega^p(M) = \d \delta (\Omega^p) \oplus \delta \d (\Omega^p).
-  \]
-  To get the other expressions, we note that
-  \[
-    \d \Omega^{p - 1}(M) = \d (\mathcal{H}^{p - 1} \oplus \Delta \Omega^{p - 1}(M)) = \d (\delta \d \Omega^{p - 1}(M)) \subseteq \d \delta \Omega^p(M).
-  \]
-  On the other hand, we certainly have the other inclusion. So the two terms are equal.
-
-  The claim that $\dim \mathcal{H}^p < \infty$ will follow as a by-product of the key argument. So we start proving it.
-
-  We want to solve
-  \[
-    \Delta \omega = \alpha\tag{$\dagger$}
-  \]
-  for $\omega \in \Omega^p(M)$ given $\alpha \in \Omega^p(M)$. We shall require and assume 2 (non-trivial) from analysis of PDE's. We need a bit of set up before we can state the theorems we need to quote.
-
-  Anywhere in the proof, we use always $\bra \ph, \ph\ket$ for the $L^2$ inner product, and $\|\ph\|$ is the $L^2$ norm.
-
-  Note that if (and only if) $\omega$ is a solution of $(*)$, then we trivially have
-  \[
-    \bra \Delta \omega, \varphi\ket = \bra \alpha, \varphi\ket\tag{$*$}
-  \]
-  for all $\varphi \in \Omega^p(M)$.
-
-  Note that $\Delta$ is self-adjoint, i.e.\ $\Delta^* = \Delta$, but we will sometimes write $\Delta^*$ to keep track of how many adjoints we have taken.
-
-  We define a linear form $\ell: \beta \in \Omega^p(M) \to \bra \omega, \beta\ket \in \R$. Then we have
-  \[
-    \bra \Delta \omega, \varphi\ket = \bra \omega, \Delta^* \varphi\ket.
-  \]
-  So $(*)$ becomes
-  \[
-    \ell(\Delta^* \varphi) = \bra \alpha, \varphi\ket \tag{$**$}
-  \]
-  for all $\varphi \in \Omega^p(M)$.
-
-  \begin{defi}[Weak solution]\index{weak solution}
-    Call a linear functional $\ell: \Omega^p(M) \to \R$ a \emph{weak solution} of $(\dagger)$ if
-    \begin{enumerate}
-      \item $\ell$ satisfies $(**)$
-      \item $\ell$ is ``bounded'', i.e.\ there is some $C$ such that $|\ell (\beta)| < C \|\beta\|$ for all $\beta$.
-    \end{enumerate}
-  \end{defi}
-  We now quote the two results from PDE theory.
-  \begin{thm}[Regularity theorem]
-    Every weak solution of $(\dagger)$ is of the form
-    \[
-      \ell(\beta) = \bra \omega, \beta\ket
-    \]
-    for $\omega \in \Omega^p(M)$.
-  \end{thm}
-  Note that if this is the case, then we have
-  \[
-    \bra \Delta\omega, \beta\ket = \bra \omega, \Delta^* \beta\ket = \ell(\Delta^* \beta) = \bra \alpha, \beta\ket.
-  \]
-  for all $\beta \in \Omega^p(M)$. So it follows that $\Delta \omega = \alpha$. So what this theorem says is that all weak solutions are genuine solutions.
-
-  Note that in analysis, we had the Riesz representation theorem, which says that if we have a Hilbert space, then any linear functional is of the form $\bra \omega, \ph\ket$. However, $C^\infty$ does not have a natural Hilbert space structure. Riesz representation theorem will give us some not-necessarily smooth form that represents $\ell$, and the regularity theorem says this is in fact $C^\infty$.
-
-  \begin{thm}[Compactness theorem]
-    If a sequence $\alpha_n \in \Omega^n(M)$ satisfies $\|\alpha_n\| < C$ and $\|\Delta \alpha_n\| < C$ for all $n$, Then $\alpha_n$ contains a Cauchy subsequence.
-  \end{thm}
-  We are not saying that $\Omega^n(M)$ is compact, because it is not complete. So the best thing we can say is that the subsequence is Cauchy.
-
-  We now know that $\dim \mathcal{H}^p < \infty$. Otherwise, by Gram-Schmidt, we obtain an infinite orthonormal sequence $e_n$, satisfying $\|e_n\| = 1$ and $\|\Delta e_n\| = 0$, which certainly doesn't have a Cauchy subsequence.
-
-  Now suppose we have picked an orthonormal basis $e_1, \cdots, e_m$. Then any $\xi \in \Omega^p(M)$ can be written as
-  \[
-    \xi = \left(\sum_{i = 1}^m \bra \xi, e_i\ket e_i\right) + \left(\xi - \sum_{i = 1}^m \bra \xi, e_i\ket e_i\right).
-  \]
-  So we can write
+  Since $\mathcal{H}^p$ is finite-dimensional, by basic linear algebra, we can decompose
   \[
     \Omega^p(M) = \mathcal{H}^p \oplus (\mathcal{H}^p)^\perp.
   \]
@@ -2379,7 +2434,7 @@ So this implies $\delta \alpha = 0$. But $\d \alpha = 0$ by assumption. So we fi
   \[
     (\mathcal{H}^p)^\perp = \Delta \Omega^p(M).
   \]
-  Suppose $\alpha \in \mathcal{H}^p$. Then we have
+  One inclusion is easy. Suppose $\alpha \in \mathcal{H}^p$ and $\beta \in \Omega^p(M)$. Then we have
   \[
     \bra \alpha, \Delta \beta\ket = \bra \Delta \alpha, \beta\ket = 0.
   \]
@@ -2393,17 +2448,17 @@ So this implies $\delta \alpha = 0$. But $\d \alpha = 0$ by assumption. So we fi
   \[
     \ell (\Delta \eta) = \bra \eta, \alpha\ket.
   \]
-  Suppose that $\Delta \eta = \Delta \xi$, then we have
+  We check this is well-defined. Suppose $\Delta \eta = \Delta \xi$. Then $\eta - \xi \in \mathcal{H}^p$, and we have
   \[
-    \ell(\Delta \eta - \Delta \xi) = \bra \eta - \xi, \alpha\ket = 0
+    \bra \eta, \alpha\ket - \bra \xi, \alpha\ket = \bra \eta - \xi, \alpha \ket = 0
   \]
-  as $\eta - \xi \in \mathcal{H}^p$. So we have $\ell(\Delta \eta) = \ell(\Delta \xi)$. Thus, $\ell$ is well-defined on $\Delta \Omega^p(M) \subseteq \Omega^p(M)$.
+  since $\alpha \in (\mathcal{H}^p)^\perp$.
 
-  Then property (i) of the weak solution holds by construction. We next want to show the boundedness property. We now claim that there exists a positive $C > 0$ such that
+  We next want to show the boundedness property. We now claim that there exists a positive $C > 0$ such that
   \[
     \ell(\Delta \eta)\leq C \|\Delta \eta\|
   \]
-  for all $\eta \in \Omega^p(M)$. To see this, we first note that we always have
+  for all $\eta \in \Omega^p(M)$. To see this, we first note that by Cauchy--Schwartz, we have
   \[
     |\bra \alpha, \eta\ket| \leq \|\alpha\| \cdot \|\eta\| = \|\eta\|.
   \]
@@ -2411,9 +2466,11 @@ So this implies $\delta \alpha = 0$. But $\d \alpha = 0$ by assumption. So we fi
   \[
     \|\eta\| \leq C\|\Delta \eta\|
   \]
-  for every $\eta \in \Omega^p(M)$. Suppose not. Then we can find a sequence $\eta_n \in (\mathcal{H}^p)^{\perp}$ such that $\|\eta_n\| = 1$ and $\|\nabla \eta_n\| \to 0$.
+  for every $\eta \in \Omega^p(M)$.
+  
+  Suppose not. Then we can find a sequence $\eta_k \in (\mathcal{H}^p)^{\perp}$ such that $\|\eta_k\| = 1$ and $\|\Delta \eta_k\| \to 0$.
 
-  But then $\|\nabla \eta_n\|$ is certainly bounded. So by the compactness theorem, we have a Cauchy subsequence $\eta_{n_k}$. Rename $\eta_{n_k} = \eta_k$. Then for any $\psi \in \Omega^p(M)$, the limit $\lim \bra \psi, \eta_k\ket$ exists.
+  But then $\|\Delta \eta_k\|$ is certainly bounded. So by the compactness theorem, we may wlog $\eta_k$ is Cauchy. Then for any $\psi \in \Omega^p(M)$, the sequence $\bra \psi, \eta_k\ket$ is Cauchy, by Cauchy--Schwartz, hence convergent.
 
   We define $a: \Omega^p(M) \to \R$ by
   \[
@@ -2427,195 +2484,108 @@ So this implies $\delta \alpha = 0$. But $\d \alpha = 0$ by assumption. So we fi
   \[
     a(\psi) = \bra \xi, \psi\ket
   \]
-  for some $\xi \in \Omega^p(M)$. Then this forces $\Delta \xi = 0$.
+  for some $\xi \in \Omega^p(M)$. Then $\xi \in \mathcal{H}^p$.
 
-  Then we know $\eta_k\to \xi$ in $\| \ph\|$. Then since $\eta_k \in (\mathcal{H}^p)^\perp$, and $(\mathcal{H}^p)^\infty$ is closed, we know $\xi \in (\mathcal{H}^p)^\perp$. But also by assumption, we have $\xi \in \mathcal{H}^p$. So $\xi = 0$. But we know $\|\xi\| = \lim \|\eta_k\| = 1$, which is bad. So $\ell$ is bounded.
+  We claim that $\eta_k \to \xi$. Let $\varepsilon > 0$, and pick $N$ such that $n, m > N$ implies $\|\eta_n - \eta_m\| < \varepsilon$. Then
+  \[
+    \|\eta_n - \xi\|^2 = \bra \eta_n - \xi, \eta_n - \xi\ket \leq |\bra \eta_m - \xi, \eta_n - \xi\ket| + \varepsilon\|\eta_n - \xi\|.
+  \]
+  Taking the limit as $m \to \infty$, the first term vansihes, and this tells us $\|\eta_n - \xi\| \leq \varepsilon$. So $\eta_n \to \xi$.
 
-  So we now have a linear map $\ell$ that is well-defined and bounded on the subspace $\Delta \Omega^p(M)$. The last step requires another result from analysis.
-  \begin{thm}[Hahn--Banach theorem]
-    Let $L$ be a normed vector space, and $L_0$ be a subspace. We let $f: L_0 \to \R$ be such that $|f(x_0)| \leq \|x_0\|$ for all $x_0 \in L_0$. Then $f$ extends to $L \to \R$ linear and with $|f(x)| \leq \|x\|$ for all $x \in L$.
-  \end{thm}
-  We then apply this to $f = \frac{1}{C}\ell$, with $L = \Omega^p(M)$ and $L_0 = \Delta \Omega^p(M)$. Then $f$ extends to a weak solution of $\Delta \omega = \alpha$. So we are done by the regularity theorem.
+  But this is bad. Since $\eta_k \in (\mathcal{H}^p)^\perp$, and $(\mathcal{H}^p)^\infty$ is closed, we know $\xi \in (\mathcal{H}^p)^\perp$. But also by assumption, we have $\xi \in \mathcal{H}^p$. So $\xi = 0$. But we \emph{also} know $\|\xi\| = \lim \|\eta_k\| = 1$, whcih is a contradiction. So $\ell$ is bounded.
+
+  We then extend $\ell$ to any bounded linear map on $\Omega^p(M)$. Then we are done.
 \end{proof}
 
-Since the Hodge decomposition theorem is important, we look at one explict example, which requires easier (and more believable) analysis.
+That was a correct proof, but we just pulled a bunch of theorems out of nowhere, and non-analysts might not be sufficiently convinced. We now look at an explicit example, namely the torus, and sketch a direct proof of Hodge decomposition. In this case, what we needed for the proof reduces to the fact Fourier series and Green's functions work, which is IB Methods.
 
-\begin{eg}
-  Consider $M = T^n = \R^n/(2\pi \Z)^n$, the $n$-torus with flat metric. This has local coordinates $(x_1, \cdots, x_n)$, induced from the Euclidean space. This is convenient because $\Lambda^p T^*M$ is trivialized by $\{\d x_{i_1} \wedge \cdots \d x_{i_p}\}$. Moreover, the Laplacian is just given by
+Consider $M = T^n = \R^n/(2\pi \Z)^n$, the $n$-torus with flat metric. This has local coordinates $(x_1, \cdots, x_n)$, induced from the Euclidean space. This is convenient because $\exterior^p T^*M$ is trivialized by $\{\d x^{i_1} \wedge \cdots \d x^{i_p}\}$. Moreover, the Laplacian is just given by
+\[
+  \Delta (\alpha \; \d x^{i_1} \wedge \cdots \wedge \d x^{i_p}) = -\sum_{i = 1}^n \frac{\partial^2 \alpha}{\partial x_i^2}\;\d x^{i_1} \wedge \cdots \wedge \d x^{i_p}.
+\]
+So to do Hodge decomposition, it suffices to consider the case $p = 0$, and we are just looking at functions $C^\infty(T^n)$, namely the $2\pi$-periodic functions on $\R$.
+
+Here we will quote the fact that Fourier series work.
+
+\begin{fact}
+  Let $\varphi \in C^\infty (T^n)$. Then it can be (uniquely) represented by a convergent Fourier series
   \[
-    \Delta (\alpha \d x_{i_1} \wedge \cdots \wedge \d x_{i_p}) = -\sum_{i = 1}^n \frac{\partial^2 \alpha}{\partial x_i^2} \d x_{i_1} \wedge \cdots \wedge \d x_{i_p}.
+    \varphi(x) = \sum_{k \in \Z^n} \varphi_k e^{ik \cdot x},
   \]
-  So to do Hodge decomposition, it suffices to consider the case $p = 0$, and we are just looking at functions $C^\infty(T^n)$, namely the $2\pi$-periodic functions on $\R$.
-
-  Here we will quote the fact that Fourier series work.
-  \begin{fact}
-    Let $\varphi \in C^\infty (T^n)$. Then it can be (uniquely) represented by a convergenct Fourier series (to $\varphi$)
-    \[
-      \varphi(x) = \sum_{k \in \Z^n} \varphi_k e^{ik \cdot x},
-    \]
-    where $k$ and $x$ are vectors, and $k \cdot x$ is the standard inner product. Moreover,
-    \[
-      \varphi_k = \frac{1}{(2\pi)^n} \int_{T^n} \varphi(x) e^{-ik\cdot x}\;\d x.
-    \]
-    Note that $\varphi_{-k} = \bar{\varphi}_k \in \C$, and this ensures the resulting sum is real.
-
-    This series converges, and convergence is uniform in $T^n$ with all derivatives (term-by-term). Further, for every $m \in \Z$, we have $\varphi_k = o(|k|^m)$ as $k \to \infty$.
-  \end{fact}
-  Now consider
+  where $k$ and $x$ are vectors, and $k \cdot x$ is the standard inner product, and this is uniformly convergent in all derivatives. In fact, $\varphi_k$ can be given by
   \[
-    \ell^2 = \left\{(\varphi_k)_{k \in \Z^n}: \varphi_{-k} = \bar{\varphi}_k \text{ for all $k$ and }\sum_k |\varphi_k|^2 < \infty\right\}.
+    \varphi_k = \frac{1}{(2\pi)^n} \int_{T^n} \varphi(x) e^{-ik\cdot x}\;\d x.
   \]
-  Then the Fourier series gives us an $\R$-linear map $\mathcal{F}: C^\infty(T^n) \to \ell^2$.
-
-  This is injective, but not surjective, because the Fourier coefficients obey strong decay properties. In fact, the image is
+  Consider the inner product
+  \[
+    \bra \varphi, \psi\ket = (2\pi)^n \sum \bar\varphi_k \psi_k.
+  \]
+  on $\ell^2$, and define the subspace
   \[
     H_\infty = \left\{(\varphi_k) \in \ell^2: \varphi_k = o(|k|^m) \text{ for all }m \in \Z\right\}.
   \]
-  We have an inner product on $\ell^2$, given by
-  \[
-    \bra \varphi, \psi\ket = (2\pi)^n \sum_k \bar\varphi_k \psi_k.
-  \]
-  \emph{Parseval's theorem} says
-  \[
-    \int_{T^n} |\varphi(x)|^2 \;\d x = (2\pi)^n \sum_k |\varphi|^2.
-  \]
-  So this shows that our linear map $\mathcal{F}$ is an isometry $C^\infty(T^n) \to H_\infty \subseteq \ell^2$.
+  Then the map
+  \begin{align*}
+    \mathcal{F}: C^\infty(T^n) &\to \ell^2\\
+    \varphi &\mapsto (\varphi_k).
+  \end{align*}
+  is an isometric bijection onto $H_\infty$.
+\end{fact}
+So we have reduced our problem of working with functions on a torus to working with these infinite series. This makes our calculations rather more explicit.
 
-  So we have reduced our problem of working with functions on a torus to working with these infinite series. This makes our calculations rather more explicit.
-
-  We can now write down how the Laplacian works. By direct computation, we find
-  \[
-    \mathcal{F}(\Delta \varphi) = (-|k|^2 \varphi_k).
-  \]
-  In this case, we know that $\alpha \in (\mathcal{H}^0)^\perp$ iff $\alpha_0 = 0$.
-
-  Now $\ell$ is a weak solution of $\Delta \omega = \alpha$ if $\ell(\Delta \varphi) = \bra \alpha, \varphi\ket$ for all $\varphi \in C^\infty(T^n)$. In terms of the coefficients, this means
-  \[
-    \ell((-|k|^2 \varphi_k)) = (2\pi)^n \sum_k \bar{\alpha}_k \varphi_k.
-  \]
-  Now consider the $\R$-linear map $\lambda: H_\infty\to H_\infty$ by
-  \[
-    (\alpha_k) \mapsto \left(\lambda_k(\alpha) =
-    \begin{cases}
-      \frac{\alpha_k}{-|k|^2} & k \not= 0\\
-      0 & k = 0
-    \end{cases}\right).
-  \]
-  This defines the \emph{Green's operator} $G: C^\infty(T^n) \to C^\infty(T^n)$ satisfying
-  \[
-    \begin{tikzcd}
-      C^\infty(T^n) \ar[r, "G"] \ar[d] & C^\infty(T^n) \ar[d]\\
-      H_\infty \ar[r, "\lambda"] & H_\infty
-    \end{tikzcd}.
-  \]
-  It is immediate that we have $G(\alpha) \in (\mathcal{H}^0)^\perp$ for all $\alpha$. We set
-  \[
-    \ell(\beta) = \bra G(\alpha), \beta\ket,
-  \]
-  which is bounded by Cauchy--Schwartz. In fact, the strong solution is $\omega = G(\alpha) \in C^\infty(T^n)$. This is what was promised by the regularity theorem.
-
-  For the compactness part, we restrict to $n = 1$, so that $T^n = S^1$. We efine the ``\term{Hilbert cube}'' by
-  \[
-    K = \left\{\varphi_k) \in \ell^2: \varphi_{-k} = \bar{\varphi}_k \in \C\text{ and }|\varphi_k| \frac{1}{|k}\text{ for all }k \not= 0\right\}.
-  \]
-  It is an exercise to show that $K$ is sequentially compact, i.e.\ Bolzano--Weierstrass holds.
-\end{eg}
-
-The key property in all of the above is that $\Delta$ corresponds in $\ell^2$ to the diagonal map
+The key property is that the Laplacian is given by
 \[
-  \varphi \mapsto -|k|^2 \varphi_k.
+  \mathcal{F}(\Delta \varphi) = (-|k|^2 \varphi_k).
 \]
-Since $|k|^2$ is non-zero for all but one $k$. So we were able to invert it on the complement of a finite-dimensional subspace. Such operators are particularly nice in analysis, and this is related to them being \emph{elliptic}\term{elliptic}.
+In some sense, $\mathcal{F}$ ``diagonalizes'' the Laplacian. It is now clear that
+\begin{align*}
+  \mathcal{H}^0 &= \{\varphi \in C^\infty(T^n) : \varphi_k = 0\text{ for all }k \not =0\}\\
+  (\mathcal{H}^0)^\perp &= \{\varphi \in C^\infty(T^n) : \varphi_0 = 0\}.
+\end{align*}
+Moreover, since we can divide by $|k|^2$ whenever $k$ is non-zero, it follows that $(\mathcal{H}^0)^\perp = \Delta C^\infty(T^n)$.
 
-More can be found in Well's ``Differentiable analysis on complex manifolds''.
+%Now $\ell$ is a weak solution of $\Delta \omega = \alpha$ if $\ell(\Delta \varphi) = \bra \alpha, \varphi\ket$ for all $\varphi \in C^\infty(T^n)$. In terms of the coefficients, this means
+%\[
+%  \ell((-|k|^2 \varphi_k)) = (2\pi)^n \sum_k \bar{\alpha}_k \varphi_k.
+%\]
+%Now consider the $\R$-linear map $\lambda: H_\infty\to H_\infty$ by
+%\[
+%  (\alpha_k) \mapsto \left(\lambda_k(\alpha) =
+%  \begin{cases}
+%    \frac{\alpha_k}{-|k|^2} & k \not= 0\\
+%    0 & k = 0
+%  \end{cases}\right).
+%\]
+%This defines the \emph{Green's operator} $G: C^\infty(T^n) \to C^\infty(T^n)$ satisfying
+%\[
+%  \begin{tikzcd}
+%    C^\infty(T^n) \ar[r, "G"] \ar[d] & C^\infty(T^n) \ar[d]\\
+%    H_\infty \ar[r, "\lambda"] & H_\infty
+%  \end{tikzcd}.
+%\]
+%It is immediate that we have $G(\alpha) \in (\mathcal{H}^0)^\perp$ for all $\alpha$. We set
+%\[
+%  \ell(\beta) = \bra G(\alpha), \beta\ket,
+%\]
+%which is bounded by Cauchy--Schwartz. In fact, the strong solution is $\omega = G(\alpha) \in C^\infty(T^n)$. This is what was promised by the regularity theorem.
+%
+%For the compactness part, we restrict to $n = 1$, so that $T^n = S^1$. We efine the ``\term{Hilbert cube}'' by
+%\[
+%  K = \left\{\varphi_k) \in \ell^2: \varphi_{-k} = \bar{\varphi}_k \in \C\text{ and }|\varphi_k| \frac{1}{|k}\text{ for all }k \not= 0\right\}.
+%\]
+%It is an exercise to show that $K$ is sequentially compact, i.e.\ Bolzano--Weierstrass holds.
+%
+%The key property in all of the above is that $\Delta$ corresponds in $\ell^2$ to the diagonal map
+%\[
+%  \varphi \mapsto -|k|^2 \varphi_k.
+%\]
+%Since $|k|^2$ is non-zero for all but one $k$. So we were able to invert it on the complement of a finite-dimensional subspace. Such operators are particularly nice in analysis, and this is related to them being \term{elliptic}.
+%
+%More can be found in Well's ``Differentiable analysis on complex manifolds''.
+%
+%We now start a new topic which is more geometric in nature, but continues certain thoughts in Hodge decomposition.
 
-We now start a new topic which is more geometric in nature, but continues certain thoughts in Hodge decomposition.
-
-\subsection{Introduction to Bochner's method}
-Let $E \to M$ be a vector bundle over a Riemannian manifold with inner product on fibers, varying smoothly in the usual way. For a covariant derivative
-\[
-  \nabla = \nabla^E: \Gamma(E) \to \Gamma(E \otimes T^*M),
-\]
-we may define the formal adjoint $(\nabla^E)^*: \Gamma(E \otimes T^* M) \to \Gamma(E)$ by
-\[
-  \int_M \bra \nabla \alpha, \beta\ket_{E, g} \omega_g = \int_M \bra \alpha, \nabla^* \beta\ket_E \omega_g
-\]
-for any $\alpha \in \Gamma(E)$ and $\beta \in \Gamma(E \otimes T M)$. Then
-\[
-  \nabla^* \nabla : \Gamma(E) \to \Gamma(E)
-\]
-is the \term{covariant Laplacian}.
-
-This is something we can do on any vector bundle, but in reality, we are only going to use it on one particular bundle --- $E = T^*M$, and we just take $\nabla$ to be the (induced) Levi-Civita of $g$. We can check that for each local orthonormal frame field $e_1, \cdots, e_n$ on $U \subseteq M$, we have
-\[
-  \nabla^* \nabla \alpha |_U = -\sum_{i = 1}^n \nabla_{e_i} \nabla_{e_i} \alpha.
-\]
-To see this, we recall that
-\[
-  \nabla \alpha |_U = \sum_{i = 1}^n (\nabla_{e_i} \alpha) \otimes \varepsilon_i,
-\]
-where $\varepsilon_i$ is the dual orthonormal co-frame field. It is an exercise to show that
-\[
-  \nabla^* \sum \beta_i \otimes \varepsilon_i = - \sum_{i = 1}^n \nabla_{e_i}\beta_i.
-\]
-This will become clearer as we progress, when we prove more general theory.
-
-We now have a very obvious question --- is this $\nabla^* \nabla$ the same as the Laplace--Beltrami operator $\Delta$ for $1$-forms?
-
-It turns out they are different, and Bochner's method is about exploiting the difference between the two operators.
-
-It turns out the difference is related to the Ricci curvature. We now define the Ricci curvature again, which is now a linear endomorphism $\Ric: \Omega^1(M) \to \Omega^1(M)$.
-
-To reconcile this with the other notion of Ricci curvature we had, given an $\alpha \in \Omega^1(M)$, we can find a unique $Y_\alpha \in \Vect(M)$ such that
-\[
-  \alpha(z) = g(Y_\alpha, Z)
-\]
-for all $Z \in \Vect(M)$. Then given $\alpha \in \Omega^1(M)$, we define $\Ric(\alpha) \in \Omega^1(M)$ by
-\[
-  \Ric(\alpha)(X) = \Ric(X, Y_\alpha),
-\]
-where the second $\Ric$ is the Ricci curvature we are used to.\index{Ricci curvature}\index{$\Ric$}
-
-\begin{thm}[Bochner--Weitzenb\"ock formula]\index{Bochner--Weitzenb\"ock formula}
-  On an oriented Riemannian manifold, we have
-  \[
-    (\Delta \alpha)(X) = (\nabla^* \nabla \alpha)(X) + \Ric(\alpha)(X).
-  \]
-  for $\alpha \in \Omega^1(M)$ and $X \in \Vect(M)$. In other words, we have
-  \[
-    \Delta \alpha = \nabla^*\nabla \alpha + \Ric(\alpha), % in lectures, it is \nabla \nabla^*
-  \]
-  or, even more concisely,
-  \[
-    \Delta = \nabla^* \nabla + \Ric.
-  \]
-\end{thm}
-
-To prove this, we start with a rather technical lemma.
-\begin{lemma}[Ricci identity]\index{Ricci identity}
-  Let $M$ be any Riemannian manifold, and $X, Y, Z \in \Vect(M)$ and $\alpha \in \Omega^1(M)$. Then
-  \[
-    \bra (\nabla_X \nabla_Y - \nabla_Y \nabla_X - \nabla_{[X, Y]})\alpha, Z\ket = \bra \alpha, R(X, Y) Z\ket.
-  \]
-\end{lemma}
-This is not a difficult thing to prove.
-
-\begin{proof}
-  We have
-  \[
-    R(X, Y) = \nabla_{[X, Y]} - [\nabla_X, \nabla_Y].
-  \]
-  Then we have
-  \[
-    \bra \alpha, \nabla_{[X, Y]} Z - [\nabla_X, \nabla_Y] Z\ket = [X, Y] \bra \alpha, Z\ket - \bra \nabla_{[X, Y]}\alpha, Z\ket - \bra \alpha, [\nabla_X, \nabla_Y]Z\ket.
-  \]
-  Also, we can compute
-  \[
-    (XY - YX) \bra \alpha, Z\ket = \bra [\nabla_X, \nabla_Y]\alpha, Z\ket + \bra \alpha, [\nabla_X, \nabla_Y] Z\ket.
-  \]
-  And so we are done.
-\end{proof}
-
+\subsection{Divergence}
 In ordinary multi-variable calculus, we had the notion of the divergence. This makes sense in general as well. Given any $X \in \Vect(M)$, we have
 \[
   \nabla X \in \Gamma(TM \otimes T^*M) = \Gamma(\End TM).
@@ -2624,124 +2594,140 @@ Now we can take the trace of this, because the trace doesn't depend on the choic
 \begin{defi}[Divergence]\index{divergence}
   The \emph{divergence} of a vector field $X \in \Vect(M)$ is
   \[
-    \div X = \tr (\nabla X),.
+    \div X = \tr (\nabla X).
   \]
 \end{defi}
-It is not hard to see that this extends the familiar definition of the divergence. Indeed, we pick $e_1, \cdots, e_n$ a local orthonormal frame field. Then locally, we have
+It is not hard to see that this extends the familiar definition of the divergence. Indeed, by definition of trace, for any local frame field $\{e_i\}$, we have
 \[
   \div X = \sum_{i = 1}^n g(\nabla_{e_i} X, e_i).
 \]
-We have, for any $f \in C^\infty(M)$,
-\[
-  \div (fX) = \tr(\nabla (fX)) = f \div X + \bra \d f, X\ket.
-\]
-This is the product rule for divergence.
-
-Now let $\theta \in \Omega^1(M)$ and $X_\theta \in \Vect(M)$ be the dual via $g$. Then we have
-\[
-  \bra \theta, V\ket = g(X_\theta, V)
-\]
-for all $V \in TM$. Equivalently, we have
-\[
-  \bra \alpha, X_\theta\ket = g(\alpha, \theta)
-\]
-for all $\alpha \in T^*M$
-
+It is straightforward to prove from definition that
 \begin{prop}
-  Let $\theta, X_\theta$ be as above. Then
+  \[
+    \div (fX) = \tr(\nabla (fX)) = f \div X + \bra \d f, X\ket.
+  \]
+\end{prop}
+The key result about divergence is the following:
+\begin{thm}
+  Let $\theta \in \Omega^1(M)$, and let $X_\theta \in \Vect(M)$ be such that $\bra \theta, V\ket = g(X_\theta, V)$ for all $V \in TM$. Then
   \[
     \delta \theta = - \div X_\theta.
   \]
-\end{prop}
-So the divergence we defined is not really a new operator. It is just, up to a sign, the $L^2$ adjoint of $\d$.
+\end{thm}
+So the divergence isn't actually a new operator. However, we have some rather more explicit formulas for the divergence, and this helps us understand $\delta$ better.
 
-This is a rather ambitious thing to prove. To prove this, we will need a lemma.
+To prove this, we need a series of lemmas.
+\begin{lemma}
+  In local coordinates, for any $p$-form $\psi$, we have
+  \[
+    \d \psi = \sum_{k = 1}^n \d x^k \wedge \nabla_k \psi.
+  \]
+\end{lemma}
+
+\begin{proof}
+  We fix a point $x \in M$, and we may wlog we work in normal coordinates at $x$. By linearity and change of coordinates, we wlog
+  \[
+    \psi = f\; \d x^1 \wedge \cdots \wedge \d x^p.
+  \]
+  Now the left hand side is just
+  \[
+    \d \psi = \sum_{k = p + 1}^n  \frac{\partial f}{\partial x^k}\; \d x^k \wedge \d x^1 \wedge \cdots \wedge \d x^p.
+  \]
+  But this is also what the RHS is, because $\nabla_k = \partial_k$ at $p$.
+\end{proof}
+To prove this, we first need a lemma, which is also useful on its own right.
+\begin{defi}[Interior product]\index{$i(X)$}
+  Let $X \in \Vect(M)$. We define the \term{interior product} $i(X): \Omega^p(M) \to \Omega^{p - 1}(M)$ by
+  \[
+    (i(X)\psi)(Y_1, \cdots, Y_{p - 1}) = \psi(X, Y_1, \cdots, Y_{p - 1}).
+  \]
+  This is sometimes written as $i(X) \psi = X \lrcorner \psi$.
+\end{defi}
 
 \begin{lemma}
   We have
   \[
-    (\div X) \omega_g = \d(i(X)\omega_g),
+    (\div X)\;\omega_g = \d(i(X)\;\omega_g),
   \]
-  for all $X \in \Vect(M)$, where $i(X): \Omega^p(M) \to \Omega^{p - 1}(M)$ is the \term{interior product} with $X$ that sends $\psi(\ph, \ph, \cdots, \ph)$ to $\psi(X, \ph, \cdots, \ph)$.\index{$i(X)$}
-
-  Some people also write the operator as
-  \[
-    i(X) \psi = X \lrcorner \psi.
-  \]
+  for all $X \in \Vect(M)$.
 \end{lemma}
 
-We now prove our proposition assuming the lemma
-\begin{proof}[Proof of proposition]
-  By the formal adjoint property of $\delta$, we know that for any $f \in C^\infty(M)$, we have
+\begin{proof}
+  Now by unwrapping the definition of $i(X)$, we see that
   \[
-    \int_M g(\d f, \theta) \omega_g = \int_M f \cdot \delta \theta \cdot \omega_g.
+    \nabla_Y (i (X) \psi) = i(\nabla_Y X)\psi + i(X) \nabla_Y \psi.
   \]
-  We want to show that
+  From example sheet 3, we know that $\nabla \omega_g = 0$. So it follows that
   \[
-    \int_M g(\d f, \theta) \omega_g = - \int_M f \cdot \div X_\omega \cdot \omega_g.
+    \nabla_Y (i(X)\;\omega_g) = i(\nabla_Y X)\;\omega_g.
   \]
-  We have
-  \[
-    \int_M \div (f X_\theta) \omega_g = \int_M g(\d f, \theta) \omega_g + \int_M f \div X_\theta \cdot \omega_g.
-  \]
-  By the lemma, we have
-  \[
-    \div(f X_\theta) \omega_g = \d (i(f X_\theta) \omega_g).
-  \]
-  So the LHS vanishes. So we are done.
-\end{proof}
-
-We then prove the lemma
-\begin{proof}[Proof of lemma]
-  We will assume two facts from sheet 3:
-  \begin{itemize}
-    \item $\nabla \omega_g = 0$.
-    \item In local coordinates, for any $p$-form $\psi$, we have
-      \[
-        \d \psi = \sum_{k = 1}^n \d x_k \wedge \nabla_{\partial_k} \psi.
-      \]
-  \end{itemize}
-  Now as in sheet 1, we have
-  \[
-    \nabla_Y (i (X) \psi) = i(\nabla_Y X)\psi + i(X) \nabla_Y \psi/
-  \]
-  Thus
-  \[
-    \nabla_Y (i(X) \omega_g) = i(\nabla_Y X) \omega_g.
-  \]
-  We also have
+  Therefore we obtain
   \begin{align*}
     &\hphantom{={}}d(i(X) \omega_g) \\
-    &= \sum_{k = 1}^n \d x_k \wedge \nabla_k (i(X) \omega_g)\\
-    &= \sum_{k = 1}^n \d x-k \wedge i(\nabla_k X) \omega_g\\
-    &= \sum_{k = 1}^n \d x_k \wedge i (\nabla_k X) (\sqrt{\det g}\; \d x_k \wedge \cdots \d x_n \wedge \d x_1 \wedge \cdots \wedge \d x_{k - 1} (-1)^{(k - 1)(n - 1)})\\
-    &= \bra \d x_k, \nabla_k X\ket \omega_g\\
-    &= (\div X) \omega_g
+    &= \sum_{k = 1}^n \d x^k \wedge \nabla_k (i(X) \omega_g)\\
+    &= \sum_{k = 1}^n \d x^k \wedge i(\nabla_k X) \omega_g\\
+    &= \sum_{k = 1}^n \d x^k \wedge i (\nabla_k X) (\sqrt{|g|} \d x^1 \wedge \cdots \wedge \d x^n)\\
+    &= \d x^k(\nabla_k X)\; \omega_g\\
+    &= (\div X)\; \omega_g.
   \end{align*}
+  Note that this requires us to think carefully how wedge products work ($i(X)(\alpha \wedge \beta)$ is not just $\alpha(X) \beta$, or else $\alpha \wedge \beta$ would not be anti-symmetric).
 \end{proof}
 
-\begin{cor}
-  If $\theta$ is a $1$-form, then
+\begin{cor}[Divergence theorem]\index{divergence theorem}
+  For any vector field $X$, we have
   \[
-    \delta \theta = - \sum_{k = 1}^n i(e_k) \nabla_{e_i} \theta = - \sum_{k = 1}^n \bra \nabla_{e_k} \theta, e_k\ket
+    \int_M \div(X) \;\omega_g = \int_M \d (i(X) \;\omega_g) = 0.
   \]
-  where $\{e_k\}$ as before denotes a local orthonormal frame field.
+\end{cor}
+We can now prove the theorem.
+
+\begin{thm}
+  Let $\theta \in \Omega^1(M)$, and let $X_\theta \in \Vect(M)$ be such that $\bra \theta, V\ket = g(X_\theta, V)$ for all $V \in TM$. Then
+  \[
+    \delta \theta = - \div X_\theta.
+  \]
+\end{thm}
+
+\begin{proof}
+  By the formal adjoint property of $\delta$, we know that for any $f \in C^\infty(M)$, we have
+  \[
+    \int_M g(\d f, \theta)\;\omega_g = \int_M f \delta \theta\; \omega_g.
+  \]
+  So we want to show that
+  \[
+    \int_M g(\d f, \theta)\;\omega_g = - \int_M f\div X_\omega \; \omega_g.
+  \]
+  But by the product rule, we have
+  \[
+    \int_M \div (f X_\theta)\; \omega_g = \int_M g(\d f, \theta) \;\omega_g + \int_M f \div X_\theta\; \omega_g.
+  \]
+  So the result follows by the divergence theorem.
+\end{proof}
+
+We can now use this to produce some really explicit formulae for what $\delta$ is, which will be very useful next section.
+\begin{cor}
+  If $\theta$ is a $1$-form, and $\{e_k\}$ is a local orthonormal frame field, then
+  \[
+    \delta \theta = - \sum_{k = 1}^n i(e_k) \nabla_{e_i} \theta = - \sum_{k = 1}^n \bra \nabla_{e_k} \theta, e_k\ket.
+  \]
 \end{cor}
 
 \begin{proof}
-  According to the proposition, we have
+  We note that
+  \begin{align*}
+    e_i \bra \theta, e_i\ket &= \bra \nabla_{e_i} \theta, e_i\ket + \bra \theta, \nabla_{e_i}e_i\ket\\
+    e_i g(X_\theta, e_i) &= g(\nabla_{e_i} X_\theta, e_i) + g(X_\theta, \nabla_{e_i}e_i).
+  \end{align*}
+  By definition of $X_\theta$, this implies that
+  \[
+    \bra \nabla_{e_i} \theta, e_i\ket = g(\nabla_{e_i} X_\theta, e_i).
+  \]
+  So we obtain
   \[
     \delta \theta = - \div X_\theta = -\sum_{i = 1}^n g(\nabla_{e_i} X_\theta, e_i) = - \sum_{k = 1}^n \bra \nabla_{e_i} \theta, e_i\ket,
   \]
-  where the last equality follows from the fact that
-  \[
-    \bra \nabla_{e_i} \theta, e_i\ket + \bra \theta \nabla_{e_i}e_i\ket = e_i \bra \theta, e_i\ket,
-  \]
-  and also we know that
-  \[
-    g(\nabla_{e_i} X_\theta, e_i) + g(X_\theta, \nabla_{e_i}e_i) = e_i g(X_\theta, e_i).
-  \]
 \end{proof}
+
 We will assume a version for $2$-forms (the general result is again on the third example sheet):
 \begin{prop}
   If $\beta \in \Omega^2(M)$, then
@@ -2754,128 +2740,90 @@ We will assume a version for $2$-forms (the general result is again on the third
   \]
 \end{prop}
 
-We now take a closer look at $\nabla^*$ (and $\nabla^* \nabla$). We have a vector bundle $E \to M$ with inner product $h$ on fibers, and a ``compatible'' connection $\nabla = \nabla^E : \Omega^p_M(E) \to \Omega^{p + 1}_M(E)$. As in the case of the Levi-Civita connection, ``compatible'' means
+\subsection{Introduction to Bochner's method}
+How can we apply the Hodge decomposition theorem? The Hodge decomposition theorem tells us the de Rham cohomology group is the kernel of the Laplace--Beltrami operator $\Delta$. So if we want to show, say, $H^1_{\dR}(M) = 0$, then we want to show that $\Delta \alpha \not= 0$ for all non-zero $\alpha \in \Omega^1(M)$. The strategy is to show that
 \[
-  \d(h(\alpha, \beta)) = h(\nabla \alpha, \beta) + h(\alpha, \nabla \beta)
+  \bra \bra \alpha, \Delta \alpha\ket\ket \not= 0
 \]
-for $\alpha, \beta \in \Gamma(E) = \Omega_M^0(E)$.
+for all $\alpha \not= 0$. Then we have shown that $H^1_{\dR}(M) = 0$. In fact, we will show that this inner product is positive. To do so, the general strategy is to introduce an operator $T$ with adjoint $T^*$, and then write
+\[
+  \Delta = T^* T + C
+\]
+for some operator $C$. We will choose $T$ cleverly such that $C$ is very simple.
 
-More generally, if
+Now if we can find a manifold such that $C$ is always positive, then since
 \[
-  \alpha = \sum_I \alpha_I \;\d x^I, \beta = \sum_J \beta_J \;\d x^J \in \Omega_M^p(E)
+  \bra \bra T^*T \alpha, \sigma\ket\ket = \bra \bra T \alpha, T \alpha\ket\ket \geq 0,
 \]
-are local $p$ forms, where $I, J \subseteq \{1, \cdots, n\}$ are indices, then we have a Hodge star
-\[
-  * \beta = \sum_J \beta_J * \d x^J.
-\]
-We can then define
-\[
-  \nabla^* = - * \nabla *
-\]
-when $p = 1$.
+it follows that $\Delta$ is always positive, and so $H^1_{\dR}(M) = 0$.
 
-Similar to scalar forms, we can check that
-\[
-  \nabla^* \beta = -\sum_{k = 1}^n i(e_k) \nabla_{e_k}\beta.
-\]
-In particular, when $E = T^*M$ with the canonical connection induced by the Levi-Civita connection, when $\alpha \in \Omega^1(M) = \Omega^0_M(T^*M)$, then
-\[
-  \nabla \alpha = \sum_{\ell} \varepsilon_\ell \otimes (\nabla_{e_\ell} \alpha) \in \Gamma(T^* M \otimes T^* M),
-\]
-where $\varepsilon_\ell$ are the dual orthonormal frame fields. Then we have
-\[
-  \nabla^* \nabla_\alpha = - \sum_{k = 1}^n \nabla_{e_k} \nabla_{e_k} \alpha
-\]
-Finally, to prove Bochner-Weitzenb\"ock, we need to pick our $e_k$ a bit more cleverly. We fix a point $p \in M$. We let $e_1, \cdots, e_k$ be a \emph{normal} local orthonormal frame field at $p$, i.e.\ in addition to being orthonormal, we need
-\[
-  \nabla_Y e_i|_p = 0
-\]
-for every $i$ and any $Y \in \Vect(M)$. This is again on the example sheet. The word ``normal'' comes from ``normal neighbourhood''. Then for any $1$-form $\alpha \in \Omega^1(M)$ and any $X \in \Vect(M)$, then
-\begin{align*}
-  \bra \d \delta \alpha, X\ket &= X( \delta \alpha) \\
-  &= - \sum_{i = 1}^n X \bra \nabla_{e_i} \alpha, e_i\ket\\
-  &= - \sum_{i = 1}^n \bra \nabla_X \nabla_{e_i} \alpha, e_i\ket.
-\end{align*}
-We also have
-\begin{align*}
-  \d \alpha(X, Y) &= X \bra \alpha, Y\ket - Y \bra \alpha, X\ket - \bra \alpha, [X, Y]\ket \\
-  &= \bra \nabla_X \alpha, Y\ket - \bar \nabla_Y \alpha, X\ket.
-\end{align*}
-Recall that our goal is to understand
-\[
-  \Delta \alpha = \d \delta \alpha + \delta \d \alpha
-\]
-for $\alpha \in \Omega^1(M)$. We have previously managed to understand $\d \delta \alpha$. For a fixed point $p \in M$, pick a normal orthonormal frame field at $p$.
-\[
-  \bra \d \delta \alpha, X\ket = -\sum_{k = 1}^n \bra \nabla_X \nabla_{e_k} \alpha, e_k\ket.
-\]
-We are going to exploit this normality quite a lot. Since we know
-\[
-  \nabla_Y e_k = 0
-\]
-for all $Y$ at $p$, we know
-\[
-  \nabla_{e_k} Y = [e_k, Y]
-\]
-at $p$. Then we have
-\[
-  \bra \d \delta \alpha, X \ket = -\sum_{k = 1}^n (\nabla_{e_k} \d \alpha)(e_k, X).
-\]
-We nwo note that for any $\beta \in \Omega^2(M)$, we have
-\[
-  (\nabla_Y \beta)(E, X) = Y(\beta(E, X) - \beta (\nabla_Y E, X) - \beta (E, \nabla_Y X)).
-\]
-So we have
-\begin{align*}
-  \bra \delta(\d \alpha), X\ket &= \sum_{k = 1}^n \Big[-e_k (\d \alpha(e_k, X) + \d \alpha(e_k, \nabla_{e_k} X))\Big]\\
-  &= \sum_{k = 1}^n \Big[- e_k(e_k \bra \alpha, X\ket- X \bra \alpha, e_k\ket - \bra \alpha, [e_k, X]\ket)\Big] \\
-  &\hphantom{aaaaaaaaaaaaaaaaaaaaa}+ \bra \nabla_{e_k}\alpha, \nabla_{e_k} X\ket - \bra\nabla_{\nabla_{e_k}X} \alpha, e_k\ket\\
-  &= - \sum_{k = 1}^n \bra \nabla_{e_k} \nabla_{e_k} \alpha, X\ket + \sum_{k = 1}^n \bra \nabla_{e_k} \nabla_X \alpha, e_k\ket - \sum_{k = 1}^n \bra \nabla_{\nabla_{e_k} X} \alpha, e_k\ket.
-\end{align*}
-Thus
-\begin{align*}
-  \bra \nabla \alpha, X\ket &= - \sum_{k = 1}^n \bra \nabla_{e_k} \nabla_{e_k} \alpha, X\ket + \sum_{k = 1}^n \nabla_{e_k} \bra (\nabla_X - \nabla_X \nabla_{e_i} - \nabla_{e_i, [X]})\alpha , e_i\ket\\
-  &= \bra \nabla^* \nabla \alpha, X\ket + \left\bra \alpha, \sum_{k = 1^n} R(e_i, X) e_i\right\ket\\
-  &= \bra \nabla^* \nabla \alpha, X\ket + g(\alpha, \Ric(X, \ph))\\
-  &= \bra \nabla^* \nabla \alpha, X\ket + \Ric(\alpha)(X)
-\end{align*}
-For the last equality, recall that $\Ric(\alpha)(X)$ in coordinates is
-\[
-  \Ric_{ij} g^{ik} a_k X^j.
-\]
-\subsection{Applications of Bochner--\texorpdfstring{Weitzenb\"ock}{Weitzenbock}}
-We are now going to understand how Riemannian geometry relates to topology. Previously, we mostly used sectional curvature, and exploited properties of geodesics. Here we are going to use Ricci curvature instead.
+Our choice of $T$ will be the covariant derivative $\nabla$ itself. We can formulate this more generally. Suppose we have the following data:
+\begin{itemize}
+  \item A Riemannian manifold $M$.
+  \item A vector bundle $E \to M$.
+  \item An inner product $h$ on $E$.
+  \item A connection $\nabla  = \nabla^E : \Omega^0(E) \to \Omega^1(E)$ on $E$.
+\end{itemize}
+We are eventually going to take $E = T^*M$, but we can still proceed in the general setting for a while.
 
-\begin{thm}
+The formal adjoint $(\nabla^E)^*: \Omega^1(E) \to \Omega^0(E)$ is defined by the relation
+\[
+  \int_M \bra \nabla \alpha, \beta\ket_{E, g}\; \omega_g = \int_M \bra \alpha, \nabla^* \beta\ket_E\; \omega_g
+\]
+for all $\alpha \in \Omega^0(E)$ and $\beta \in \Omega^1(E)$. Since $h$ is non-degenerate, this defines $\nabla^*$ uniquely.
+
+\begin{defi}[Covariant Laplacian]
+  The \term{covariant Laplacian} is
+  \[
+    \nabla^* \nabla : \Gamma(E) \to \Gamma(E)
+  \]
+\end{defi}
+
+We are now going to focus on the case $E = T^*M$. It is helpful to have the following explicit formula for $\nabla^*$, which we shall leave as an exercise:
+
+As mentioned, the objective is to understand $\Delta - \nabla^* \nabla$. The theorem is that this difference is given by the Ricci curvature.
+
+This can't be quite right, because  the Ricci curvature is a bilinear form on $TM^2$, but $\Delta - \nabla^* \nabla$ is a linear endomorphism $\Omega^1(M) \to \Omega^1(M)$. Thus, we need to define an alternative version of the Ricci curvature by ``raising indices''. In coordinates, we consider $g^{jk}\Ric_{ik}$ instead.
+
+We can also define this $\Ric_{ik}$ without resorting to coordinates. Recall that given an $\alpha \in \Omega^1(M)$, we defined $X_\alpha \in \Vect(M)$ to be the unique field such that
+\[
+  \alpha(z) = g(X_\alpha, Z)
+\]
+for all $Z \in \Vect(M)$. Then given $\alpha \in \Omega^1(M)$, we define $\Ric(\alpha) \in \Omega^1(M)$ by
+\[
+  \Ric(\alpha)(X) = \Ric(X, X_\alpha).
+\]
+With this notation, the theorem is
+\begin{thm}[Bochner--Weitzenb\"ock formula]\index{Bochner--Weitzenb\"ock formula}
+  On an oriented Riemannian manifold, we have
+  \[
+    \Delta = \nabla^* \nabla + \Ric.
+  \]
+\end{thm}
+Before we move on to the proof of this formula, we first give an application.
+
+\begin{cor}
   Let $(M, g)$ be a compact connected oriented manifold. Then
   \begin{itemize}
     \item If $\Ric(g) > 0$ at each point, then $H_{\dR}^1(M) = 0$.
     \item If $\Ric(g) \geq 0$ at each point, then $b^1(M) = \dim H_{\dR}^1(M) \leq n$.
     \item If $\Ric(g) \geq 0$ at each point, and $b^1(M) = n$, then $g$ is flat.
   \end{itemize}
-\end{thm}
+\end{cor}
 
 \begin{proof}
-  We use Bochner--Weitzenb\"ock.
-  \begin{itemize}
-    \item For any $\alpha \in \Omega^1(M)$, we have
-      \[
-        g(\delta \alpha, \alpha) = g(\nabla^* \nabla, \alpha) + \Ric(\alpha, \alpha).
-      \]
-      In local coordinates, $\Ric(\alpha, \alpha)$ means
-      \[
-        \Ric_{ij} g^{ik} g^{j\ell} \alpha_k \alpha_\ell.
-      \]
-      Since $M$ is compact, we can integrate over $M$, and we get
-      \begin{align*}
-        \bra \bra \delta \alpha, \alpha\ket\ket &= \bra \bra \nabla^* \nabla \alpha, \alpha\ket \ket + \int_M \Ric(\alpha, \alpha) \omega_g\\
-        &= \|\nabla \alpha\|^2_2 + \int_M \Ric(\alpha, \alpha) \omega_g.
-      \end{align*}
-      By assumption, we have $\Ric(\alpha, \alpha) \geq 0$ and vanishes iff $\alpha = 0$.
+  By Bochner--Weitzenb\"ock, we have
+  \begin{align*}
+    \bra \bra \Delta \alpha, \alpha\ket\ket &= \bra \bra \nabla^* \nabla \alpha, \alpha\ket \ket + \int_M \Ric(\alpha, \alpha)\;\omega_g\\
+    &= \|\nabla \alpha\|^2_2 + \int_M \Ric(\alpha, \alpha)\;\omega_g.
+  \end{align*}
 
-      Now if $\alpha \in \mathcal{H}_M^1 \cong H_{\dR}^1 (M)$, then $\delta \alpha = 0$. So RHS = 0. So by looking at the curvature term, we know $\alpha = 0$.
-    \item If $\delta \alpha = 0$, then by a similar calculation, we know that we must have $\nabla \alpha = 0$. So if we know $\alpha(x)$ for some fixed $x \in M$, then we know the value of $\alpha$ everywhere by parallel transport. Thus $\alpha$ is determined by the initial condition $\alpha(x)$, Thus there are $\leq n = \dim T_x^* M$ linearly independent such $\alpha$.
-    \item If $b^1(M) = n$, then we can pick a basis $\alpha_1, \cdots, \alpha_n$ of $\mathcal{H}^1_M$. Then we can pick a dual basis $X_1, \cdots, X_n \in \Vect(M)$, and they must be parallel, i.e.\ $\nabla X_i = 0$. Indeed, we have
+  \begin{itemize}
+    \item Suppose $\Ric > 0$. If $\alpha \not= 0$, then the RHS is strictly positive. So the left-hand side is non-zero. So $\nabla \alpha \not =0$. So $\mathcal{H}_M^1 \cong H_{\dR}^1(M) = 0$.
+
+    \item Suppose $\alpha$ is such that $\Delta \alpha = 0$. Then the above formula forces $\nabla \alpha = 0$. So if we know $\alpha(x)$ for some fixed $x \in M$, then we know the value of $\alpha$ everywhere by parallel transport. Thus $\alpha$ is determined by the initial condition $\alpha(x)$, Thus there are $\leq n = \dim T_x^* M$ linearly independent such $\alpha$.
+
+    \item If $b^1(M) = n$, then we can pick a basis $\alpha_1, \cdots, \alpha_n$ of $\mathcal{H}^1_M$. Then as above, these are parallel $1$-forms. Then we can pick a dual basis $X_1, \cdots, X_n \in \Vect(M)$. We claim they are also parallel, i.e.\ $\nabla X_i = 0$. To prove this, we note that
       \[
         \bra \alpha_j, \nabla X_i\ket + \bra \nabla \alpha_j, X_i\ket = \nabla \bra \alpha_j, X_i\ket.
       \]
@@ -2885,18 +2833,18 @@ We are now going to understand how Riemannian geometry relates to topology. Prev
       \[
         R(X_i, X_j) X_k = (\nabla_{[X_i, X_j]} - [\nabla X_i, \nabla_{X_j}]) X_k = 0,
       \]
-      Since this is valid for all $I, j, k$, we know $R$ vanishes at each point. So we are done.
+      Since this is valid for all $i, j, k$, we know $R$ vanishes at each point. So we are done.
   \end{itemize}
 \end{proof}
 Bochner--Weitzenb\"ock can be exploited in a number of similar situations.
 
-Note that in the third part of the theorem, we haven't actually proved the optimal statement. We can deduce more than the flatness of the metric, but requires some slightly advanced topology. We will provide a sketch proof of the theorem, making certain assertions about topology.
+In the third part of the theorem, we haven't actually proved the optimal statement. We can deduce more than the flatness of the metric, but requires some slightly advanced topology. We will provide a sketch proof of the theorem, making certain assertions about topology.
 
 \begin{prop}
   In the case of (iii), $M$ is in fact isometric to a flat torus.
 \end{prop}
 
-\begin{proof}[Proof sketch]
+\begin{proof}[Proof sketch] % check this
   We fix $p \in M$ and consider the map $M \to \R^n$ given by
   \[
     x \mapsto \left(\int_p^x \alpha_i\right)_{i = 1, \cdots, n} \in \R^n,
@@ -2906,32 +2854,405 @@ Note that in the third part of the theorem, we haven't actually proved the optim
   In fact, $\int_p^x$ depends only on $\gamma \in H_1(M)$, which is finitely generated. Thus, $\int_p^x \alpha_i$ is a well-defined map to $S^1 = \R/\lambda_i \Z$ for some $\lambda_i \not= 0$. Therefore we obtain a map $M \to (S^1)^n = T^n$. Moreover, a bit of inspection shows this is a local diffeomorphism. But since the spaces involved are compact, it follows by some topology arguments that it must be a covering map. But again by compactness, this is a finite covering map. So $M$ must be a torus. So we are done.
 \end{proof}
 
-Note that Bochner--Weitzenb\"ock, which we proved for $1$-forms, is in fact valid for forms of any degree. To do so, we consider $E = \Lambda^p T^* M$, and then we have a map
+We only proved this for $1$-forms, but this is in fact fact valid for forms of any degree. To do so, we consider $E = \exterior^p T^* M$, and then we have a map
 \[
-  \nabla: \Gamma(E) = \Omega_M^0(E) \to \Omega_M^1(E),
+  \nabla: \Omega_M^0(E) \to \Omega_M^1(E),
 \]
 and this has a formal adjoint
 \[
   \nabla^*: \Omega_M^1(E) \to \Omega_M^0(E).
 \]
-Now if $\alpha \in \Omega^p(M)$, then
+Now if $\alpha \in \Omega^p(M)$, then it can be shown that
 \[
-  \Delta \alpha = \nabla^* \nabla \alpha + \tilde{R}(\alpha),
+  \Delta \alpha = \nabla^* \nabla \alpha + \mathfrak{R}(\alpha),
 \]
-where $\tilde{R}$ is a linear map $\Omega^p(M) \to \Omega^p(M)$ depending on $R^i_{j, k\ell}, \Ric_{ij} g^{ij}$. We can write
-\[
-  \mathfrak{R} = R_{ij, k\ell} \in S^2 \Lambda^2 T^* M.
-\]
-Then we can prove that if $\mathfrak{R} > 0$ at all points, then $\mathcal{H}^k(M) = \{\}$ for all $k = 1, \cdots, n - 1$.
+where $\mathfrak{R}$ is a linear map $\Omega^p(M) \to \Omega^p(M)$ depending on the curvature. Then by the same proof, it follows that if $\mathfrak{R} > 0$ at all points, then $\mathcal{H}^k(M) = 0$ for all $k = 1, \cdots, n - 1$.
 
-If $\mathfrak{R} \geq 0$ only, then we have
+If $\mathfrak{R} \geq 0$ only, which in particular is the case if the space is flat, then we have
 \[
-  b^k(M) \leq \binom{n}{k} = \dim \Lambda^k T^* M,
+  b^k(M) \leq \binom{n}{k} = \dim \exterior^k T^* M,
 \]
 and moreover $\Delta \alpha = 0$ iff $\nabla \alpha = 0$.
 
+\subsubsection*{Proof of Bochner--Weitzenb\"ock}
+We now move on to actually prove Bochner--Weitzenb\"ock. We first produce an explicit formula for $\nabla^*$, and hence $\nabla^* \nabla$.
+
+\begin{prop}
+  Let $e_1, \cdots, e_n$ be an orthonormal frame field, and $\beta \in \Omega^1(T^*M)$. Then we have
+  \[
+    \nabla^* \beta = - \sum_{i = 1}^n i(e_i) \nabla_{e_i}\beta.
+  \]
+\end{prop}
+
+\begin{proof}
+  Let $\alpha \in \Omega^0(T^*M)$. Then by definition, we have
+  \[
+    \bra \nabla \alpha, \beta\ket = \sum_{i = 1}^n \bra \nabla_{e_i} \alpha, \beta(e_i)\ket.
+  \]
+  Consider the $1$-form given by
+  \[
+    \theta(Y) = \bra \alpha, \beta(Y)\ket.
+  \]
+  Then we have
+  \begin{align*}
+    \div X_\theta &= \sum_{i = 1}^n \bra \nabla_{e_i} X_\theta, e_i \ket\\
+    &= \sum_{i = 1}^n \nabla_{e_i}\bra X_\theta, e_i\ket - \bra X_\theta, \nabla_{e_i}e_i\ket\\
+    &= \sum_{i = 1}^n \nabla_{e_i} \bra \alpha, \beta(e_i)\ket - \bra \alpha, \beta(\nabla_{e_i} e_i)\ket\\
+    &= \sum_{i = 1}^n \bra \nabla_{e_i} \alpha, \beta(e_i)\ket + \bra \alpha, \nabla_{e_i}(\beta(e_i))\ket - \bra \alpha, \beta(\nabla_{e_i} e_i)\ket\\
+    &= \sum_{i = 1}^n \bra \nabla_{e_i} \alpha, \beta(e_i)\ket + \bra \alpha, (\nabla_{e_i} \beta) (e_i)\ket.
+  \end{align*}
+  So by the divergence theorem, we have
+  \[
+    \int_M \bra \nabla \alpha, \beta\ket\; \omega_g = \int_M \sum_{i = 1}^n \bra \alpha, (\nabla_{e_i}\beta)(e_i)\ket\; \omega_g.
+  \]
+  So the result follows.
+\end{proof}
+
+\begin{cor}
+  For a local orthonormal frame field $e_1, \cdots, e_n$, we have
+  \[
+    \nabla^* \nabla \alpha = -\sum_{i = 1}^n \nabla_{e_i} \nabla_{e_i} \alpha.
+  \]
+\end{cor}
+
+We next want to figure out more explicit expressions for $\d \delta$ and $\delta \d$. To make our lives much easier, we will pick a normal frame field:
+
+\begin{defi}[Normal frame field]\index{normal frame field}
+  A local orthonormal frame $\{e_k\}$ field is \emph{normal} at $p$ if further
+  \[
+    \nabla e_k|_p = 0
+  \]
+  for all $k$.
+\end{defi}
+It is a fact that normal frame fields exist. From now on, we will fix a point $p \in M$, and assume that $\{e_k\}$ is a normal orthonormal frame field at $p$. Thus, the formulae we derive are only valid at $p$, but this is fine, because $p$ was arbitrary.
+
+The first term $\d \delta$ is relatively straightforward.
+\begin{lemma}
+  Let $\alpha \in \Omega^1(M)$, $X \in \Vect(M)$. Then
+  \[
+    \bra \d \delta \alpha, X \ket = - \sum_{i = 1}^n \bra \nabla_X \nabla_{e_i} \alpha, e_i\ket.
+  \]
+\end{lemma}
+
+\begin{proof}
+  \begin{align*}
+    \bra \d \delta \alpha, X\ket &= X( \delta \alpha) \\
+    &= - \sum_{i = 1}^n X \bra \nabla_{e_i} \alpha, e_i\ket\\
+    &= - \sum_{i = 1}^n \bra \nabla_X \nabla_{e_i} \alpha, e_i\ket.
+  \end{align*}
+\end{proof}
+
+This takes care of one half of $\Delta$ for the other half, we need a bit more work. Recall that we previously found a formula for $\delta$. We now re-express the formula in terms of this local orthonormal frame field.
+
+\begin{lemma}
+  For any $2$-form $\beta$, we have
+  \[
+     (\delta \beta)(X) = \sum_{k = 1}^n -e_k( \beta(e_k, X)) + \beta(e_k, \nabla_{e_k} X).
+  \]
+\end{lemma}
+
+\begin{proof}
+   \begin{align*}
+    (\delta \beta)(X) &= - \sum_{k = 1}^n (\nabla_{e_k} \beta)(e_k, X)\\
+    &= \sum_{k = 1}^n -e_k( \beta(e_k, X)) + \beta(\nabla_{e_k} e_k, X) + \beta(e_k, \nabla_{e_k} X)\\
+    &= \sum_{k = 1}^n -e_k( \beta(e_k, X)) + \beta(e_k, \nabla_{e_k} X).
+  \end{align*}
+\end{proof}
+
+Since we want to understand $\delta \d \alpha$ for $\alpha$ a $1$-form, we want to find a decent formula for $\d \alpha$.
+\begin{lemma}
+  For any $1$-form $\alpha$ and vector fields $X, Y$, we have
+  \[
+    \d \alpha(X, Y) = \bra \nabla_X \alpha, Y\ket - \bra \nabla_Y \alpha, X\ket.
+  \]
+\end{lemma}
+
+\begin{proof}
+  Since the connection is torsion-free, we have
+  \[
+    [X, Y] = \nabla_X Y - \nabla_Y X.
+  \]
+  So we obtain
+  \begin{align*}
+    \d \alpha(X, Y) &= X \bra \alpha, Y\ket - Y \bra \alpha, X\ket - \bra \alpha, [X, Y]\ket \\
+    &= \bra \nabla_X \alpha, Y\ket - \bra \nabla_Y \alpha, X\ket.
+  \end{align*}
+\end{proof}
+
+Finally, we can put these together to get
+\begin{lemma}
+  For any $1$-form $\alpha$ and vector field $X$, we have
+  \[
+    \bra \delta\d \alpha, X\ket = - \sum_{k = 1}^n \bra \nabla_{e_k} \nabla_{e_k} \alpha, X\ket + \sum_{k = 1}^n \bra \nabla_{e_k} \nabla_X \alpha, e_k\ket - \sum_{k = 1}^n \bra \nabla_{\nabla_{e_k} X} \alpha, e_k\ket.
+  \]
+\end{lemma}
+
+\begin{proof}
+    \begin{align*}
+    \bra \delta\d \alpha, X\ket &= \sum_{k = 1}^n \Big[-e_k (\d \alpha(e_k, X)) + \d \alpha(e_k, \nabla_{e_k} X)\Big]\\
+    &= \sum_{k = 1}^n \Big[- e_k(\bra \nabla_{e_k}\alpha, X\ket - \bra \nabla_X \alpha, e_k\ket)\\
+    &\hphantom{aaaaaaaaaaaaaaaaaaaaa}+ \bra \nabla_{e_k}\alpha, \nabla_{e_k} X\ket - \bra\nabla_{\nabla_{e_k}X} \alpha, e_k\ket\Big]\\
+    &= \sum_{k = 1}^n \Big[- \bra \nabla_{e_k}\nabla_{e_k}\alpha, X\ket - \bra \nabla_{e_k}\alpha, \nabla_{e_k}X\ket + \bra \nabla_{e_k}\nabla_X \alpha, e_k\ket)\\
+    &\hphantom{aaaaaaaaaaaaaaaaaaaaa}+ \bra \nabla_{e_k}\alpha, \nabla_{e_k} X\ket - \bra\nabla_{\nabla_{e_k}X} \alpha, e_k\ket\Big]\\
+    &= - \sum_{k = 1}^n \bra \nabla_{e_k} \nabla_{e_k} \alpha, X\ket + \sum_{k = 1}^n \bra \nabla_{e_k} \nabla_X \alpha, e_k\ket - \sum_{k = 1}^n \bra \nabla_{\nabla_{e_k} X} \alpha, e_k\ket.
+  \end{align*}
+\end{proof}
+
+What does this get us? The first term on the right is exactly the $\nabla^* \nabla$ term we wanted. If we add $\d \delta \alpha$ to this, then we get
+\[
+  \sum_{k = 1}^n \bra ([\nabla_{e_k}, \nabla_X] - \nabla_{\nabla_{e_k}X}) \alpha, e_k\ket.
+\]
+We notice that
+\[
+  [e_k, X] = \nabla_{e_k}X - \nabla_X e_k = \nabla_{e_k}X.
+\]
+So we can alternatively write the above as
+\[
+  \sum_{k = 1}^n \bra ([\nabla_{e_k}, \nabla_X] - \nabla_{[e_k, X]}) \alpha, e_k\ket.
+\]
+The differential operator on the left looks just like the Ricci curvature. Recall that
+\[
+  R(X, Y) = \nabla_{[X, Y]} - [\nabla_X, \nabla_Y].
+\]
+\begin{lemma}[Ricci identity]\index{Ricci identity}
+  Let $M$ be any Riemannian manifold, and $X, Y, Z \in \Vect(M)$ and $\alpha \in \Omega^1(M)$. Then
+  \[
+    \bra ([\nabla_X, \nabla_Y] - \nabla_{[X, Y]})\alpha, Z\ket = \bra \alpha, R(X, Y) Z\ket.
+  \]
+\end{lemma}
+
+\begin{proof}
+  We note that
+  \[
+    \bra \nabla_{[X, Y]} \alpha, Z\ket + \bra \alpha, \nabla_{[X, Y]}Z\ket = [X, Y] \bra \alpha, Z\ket = \bra [\nabla_X, \nabla_Y]\alpha, Z\ket + \bra \alpha, [\nabla_X, \nabla_Y] Z\ket.
+  \]
+  The second equality follows from writing $[X, Y] = XY - YX$. We then rearrange and use that $R(X, Y) = \nabla_{[X, Y]} - [\nabla_X, \nabla_Y]$.
+\end{proof}
+
+\begin{cor}
+  For any $1$-form $\alpha$ and vector field $X$, we have
+  \[
+    \bra \Delta \alpha, X\ket = \bra \nabla^* \nabla \alpha, X\ket + \Ric(\alpha)(X).
+  \]
+\end{cor}
+This is the theorem we wanted.
+
+\begin{proof}
+  We have found that
+  \[
+    \bra \Delta \alpha, X\ket = \bra \nabla^* \nabla \alpha, X\ket + \sum_{i = 1}^n \bra \alpha, R(e_k, X) e_k\ket.
+  \]
+  We have
+  \[
+    \sum_{i = 1}^n \bra \alpha, R(e_k, X)e_k\ket = \sum_{i = 1}^n g(X_\alpha, R(e_k, X) e_k) = \Ric(X_\alpha, X) = \Ric(\alpha)(X).
+  \]
+  So we are done.
+\end{proof}
+%We first come up with a more explicit formula for $\nabla^*$. In local coordinates, we write our forms as
+%\[
+%  \alpha = \sum_I \alpha_I \;\d x^I, \beta = \sum_J \beta_J \;\d x^J \in \Omega_M^p(E)
+%\]
+%where $I, J \subseteq \{1, \cdots, n\}$ are indices. Then we can define the Hodge star by
+%\[
+%  \star \beta = \sum_J \beta_J \star \d x^J \in \Omega^{n - p}_M(E).
+%\]
+%\begin{lemma}
+%  We have
+%  \[
+%    \nabla^* = - \star \nabla \star.
+%  \]
+%\end{lemma}
+%
+%\begin{proof}
+%  For $\alpha \in \Gamma(T^* M)$ and $\beta \in \Gamma(T^* M \otimes T^* M)$,
+%  \begin{align*}
+%    -\int_M \bra \alpha, \star\nabla\star \beta \ket_E\; \omega_g &= -\int_M \alpha \wedge \star \star \nabla \star \beta \\
+%    &= (-1)^n \int \alpha \wedge \nabla \star \beta
+%  \end{align*}
+%  \[
+%    \int_M \bra \nabla \alpha, \beta\ket_{E, g}\; \omega_g = \int_M \bra \alpha, \nabla^* \beta\ket_E\; \omega_g
+%  \]
+%\end{proof}
+%
+%Of course, the only case we are interested in is when $E = T^*M$, and $\nabla$ is the Levi-Civita connection of $g$. In this case, we have a rather nice formula for the covariant Laplacian.
+%\begin{thm}
+%  Suppose the connection on the vector bundle is compatible in the sense that
+%  \[
+%    \d(h(\alpha, \beta)) = h(\nabla \alpha, \beta) + h(\alpha, \nabla \beta)
+%  \]
+%  for $\alpha, \beta \in \Gamma(E) = \Omega_M^p(E)$. Then for $\beta \in \Omega_M^p(E)$, we have
+%  \[
+%    \nabla^* \beta = -\sum_{k = 1}^n i(e_k) \nabla_{e_k}\beta.
+%  \]
+%  In particular, when $\alpha \in \Omega^1(M) = \Omega^0_M(T^*M)$, then
+%  \[
+%    \nabla \alpha = \sum_{\ell} \varepsilon_\ell \otimes (\nabla_{e_\ell} \alpha) \in \Gamma(T^* M \otimes T^* M),
+%  \]
+%\end{thm}
+%
+%To understand $\nabla^*$ better, we further assume that the connection is ``compatible'' in the sense that
+% This is true in the case we are interested in.
+%
+%This is something we can do on any vector bundle, but really, we are only going to use it on one particular bundle --- $E = T^*M$, and we just take $\nabla$ to be the (induced) Levi-Civita of $g$. More generally, we can take $E = \exterior^p T^*M$ for any $p$. What we do in this section can be extended to this general case, but is messier and takes more technical work. Thus, we will restrict to the case of $1$-forms only.
+%
+%\begin{prop}
+%  For a local orthonormal frame field $e_1, \cdots, e_n$ on $U \subseteq M$, we have
+%  \[
+%    \nabla^* \nabla \alpha |_U = -\sum_{i = 1}^n \nabla_{e_i} \nabla_{e_i} \alpha.
+%  \]
+%\end{prop}
+%To see this, we recall that
+%\[
+%  \nabla \alpha |_U = \sum_{i = 1}^n (\nabla_{e_i} \alpha) \otimes \varepsilon_i,
+%\]
+%where $\varepsilon_i$ is the dual orthonormal co-frame field. It is an exercise to show that
+%\[
+%  \nabla^* \sum_{i = 1}^n \beta_i \otimes \varepsilon_i = - \sum_{i = 1}^n \nabla_{e_i}\beta_i.
+%\]
+%This will become clearer as we progress, when we prove more general theory.
+%
+%In general, $\nabla^* \nabla$ is different from the Laplace--Beltrami operator $\Delta$, and Bochner's method is about exploiting the difference between the two operators.
+%
+%It turns out that the difference is given by the Ricci curvature. However, the Ricci curvature used to be a bilinear form on $TM^2$, but $\Delta - \nabla^* \nabla$ is a linear endomorphism $\Omega^1(M) \to \Omega^1(M)$. Thus, we need to define an alternative version of the Ricci curvature by ``raising indices'', i.e.\ in coordinates, we consider $g^{jk}\Ric_{ik}$ instead.
+%
+%Without resorting to coordinates, we note that given an $\alpha \in \Omega^1(M)$, we can find a unique $Y_\alpha \in \Vect(M)$ such that
+%\[
+%  \alpha(z) = g(Y_\alpha, Z)
+%\]
+%for all $Z \in \Vect(M)$. Then given $\alpha \in \Omega^1(M)$, we define $\Ric(\alpha) \in \Omega^1(M)$ by
+%\[
+%  \Ric(\alpha)(X) = \Ric(X, Y_\alpha).
+%\]
+%With this notation, we have
+%
+%The proof is a lot of technical work. Recall that we had
+%\[
+%  R(X, Y) = \nabla_{[X, Y]} - [\nabla_X, \nabla_Y].
+%\]
+%We will need a ``form'' version of this.
+%\begin{lemma}[Ricci identity]\index{Ricci identity}
+%  Let $M$ be any Riemannian manifold, and $X, Y, Z \in \Vect(M)$ and $\alpha \in \Omega^1(M)$. Then
+%  \[
+%    \bra ([\nabla_X, \nabla_Y] - \nabla_{[X, Y]})\alpha, Z\ket = \bra \alpha, R(X, Y) Z\ket.
+%  \]
+%\end{lemma}
+%Note that here when we write $\bra \ph, \ph\ket$, we just mean applying the form to the vector, and is not related to genuine inner products.
+%
+%\begin{proof}
+%  We note that
+%  \[
+%    \bra \nabla_{[X, Y]} \alpha, Z\ket + \bra \alpha, \nabla_{[X, Y]}Z\ket = [X, Y] \bra \alpha, Z\ket = \bra [\nabla_X, \nabla_Y]\alpha, Z\ket + \bra \alpha, [\nabla_X, \nabla_Y] Z\ket.
+%  \]
+%  The second equality follows from writing $[X, Y] = XY - YX$. We then rearrange and use that $R(X, Y) = \nabla_{[X, Y]} - [\nabla_X, \nabla_Y]$.
+%\end{proof}
+%
+
+%More generally, if
+%\[
+%  \alpha = \sum_I \alpha_I \;\d x^I, \beta = \sum_J \beta_J \;\d x^J \in \Omega_M^p(E)
+%\]
+%are local $p$ forms, where $I, J \subseteq \{1, \cdots, n\}$ are indices, then we have a Hodge star
+%\[
+%  \star \beta = \sum_J \beta_J \star \d x^J.
+%\]
+%We can then define
+%\[
+%  \nabla^\star = - \star \nabla \star
+%\]
+%when $p = 1$.
+%
+%Similar to scalar forms, we can check that
+%\[
+%  \nabla^* \beta = -\sum_{k = 1}^n i(e_k) \nabla_{e_k}\beta.
+%\]
+%In particular, when $E = T^*M$ with the canonical connection induced by the Levi-Civita connection, when $\alpha \in \Omega^1(M) = \Omega^0_M(T^*M)$, then
+%\[
+%  \nabla \alpha = \sum_{\ell} \varepsilon_\ell \otimes (\nabla_{e_\ell} \alpha) \in \Gamma(T^* M \otimes T^* M),
+%\]
+%where $\varepsilon_\ell$ are the dual orthonormal frame fields. Then we have
+%\[
+%  \nabla^* \nabla_\alpha = - \sum_{k = 1}^n \nabla_{e_k} \nabla_{e_k} \alpha
+%\]
+%Finally, to prove Bochner-Weitzenb\"ock, we need to pick our $e_k$ a bit more cleverly.
+%\begin{thm}
+%  Let $p \in M$. Then there exists a local orthonormal frame field $\{e_i\}$ such that
+%  \[
+%    \nabla_Y e_i|_p = 0
+%  \]
+%  for all $i$ and $Y \in \Vect(M)$. Such a frame field is known as a \term{normal local orthonormal frame field}.
+%\end{thm}
+%
+%\begin{proof}
+%  See example sheet.
+%\end{proof}
+%
+%\begin{proof}[Proof of Bochner--Weitzenb\"ock]
+%  We pick a point $p \in M$, and try to prove Bochner--Weitzenb\"ock at this point. We pick a normal local orthonormal frame field at $p$.
+%  \[
+%    \nabla_Y e_i|_p = 0
+%  \]
+%  Then for any $1$-form $\alpha \in \Omega^1(M)$ and any $X \in \Vect(M)$, we have
+%  \begin{align*}
+%    \bra \d \delta \alpha, X\ket &= X( \delta \alpha) \\
+%    &= - \sum_{i = 1}^n X \bra \nabla_{e_i} \alpha, e_i\ket\\
+%    &= - \sum_{i = 1}^n \bra \nabla_X \nabla_{e_i} \alpha, e_i\ket.
+%  \end{align*}
+%  We also know
+%  \begin{align*}
+%    \d \alpha(X, Y) &= X \bra \alpha, Y\ket - Y \bra \alpha, X\ket - \bra \alpha, [X, Y]\ket \\
+%    &= \bra \nabla_X \alpha, Y\ket - \bra \nabla_Y \alpha, X\ket.
+%  \end{align*}
+%  Recall that our goal is to understand
+%  \[
+%    \Delta \alpha = \d \delta \alpha + \delta \d \alpha
+%  \]
+%  for $\alpha \in \Omega^1(M)$. We have previously managed to understand $\d \delta \alpha$. For a fixed point $p \in M$, pick a normal orthonormal frame field at $p$.
+%  \[
+%    \bra \d \delta \alpha, X\ket = -\sum_{k = 1}^n \bra \nabla_X \nabla_{e_k} \alpha, e_k\ket.
+%  \]
+%  We are going to exploit this normality quite a lot. Since we know
+%  \[
+%    \nabla_Y e_k = 0
+%  \]
+%  for all $Y$ at $p$, we know
+%  \[
+%    \nabla_{e_k} Y = [e_k, Y]
+%  \]
+%  at $p$. Then we have
+%  \[
+%    \bra \d \delta \alpha, X \ket = -\sum_{k = 1}^n (\nabla_{e_k} \d \alpha)(e_k, X).
+%  \]
+%  We now note that for any $\beta \in \Omega^2(M)$, we have
+%  \begin{align*}
+%    (\delta \beta)(X) &= - \sum_{k = 1}^n (\nabla_{e_k} \beta)(e_k, X)\\
+%    &= \sum_{k = 1}^n -e_k( \beta(e_k, X)) + \beta(\nabla_{e_k} e_k, X) + \beta(e_k, \nabla_{e_k} X\\
+%    &= \sum_{k = 1}^n -e_k( \beta(e_k, X)) + \beta(e_k, \nabla_{e_k} X).
+%  \end{align*}
+%  Putting $\beta = \d \alpha$, we obtain
+%  \begin{align*}
+%    \bra \delta(\d \alpha), X\ket &= \sum_{k = 1}^n \Big[-e_k (\d \alpha(e_k, X) + \d \alpha(e_k, \nabla_{e_k} X))\Big]\\
+%    &= \sum_{k = 1}^n \Big[- e_k(e_k \bra \alpha, X\ket- X \bra \alpha, e_k\ket - \bra \alpha, [e_k, X]\ket)\Big] \\
+%    &\hphantom{aaaaaaaaaaaaaaaaaaaaa}+ \bra \nabla_{e_k}\alpha, \nabla_{e_k} X\ket - \bra\nabla_{\nabla_{e_k}X} \alpha, e_k\ket\\
+%    &= - \sum_{k = 1}^n \bra \nabla_{e_k} \nabla_{e_k} \alpha, X\ket + \sum_{k = 1}^n \bra \nabla_{e_k} \nabla_X \alpha, e_k\ket - \sum_{k = 1}^n \bra \nabla_{\nabla_{e_k} X} \alpha, e_k\ket.
+%  \end{align*}
+%  Thus
+%  \begin{align*}
+%    \bra \nabla \alpha, X\ket &= - \sum_{k = 1}^n \bra \nabla_{e_k} \nabla_{e_k} \alpha, X\ket + \sum_{k = 1}^n \nabla_{e_k} \bra (\nabla_X - \nabla_X \nabla_{e_i} - \nabla_{e_i, [X]})\alpha , e_i\ket\\
+%    &= \bra \nabla^* \nabla \alpha, X\ket + \left\bra \alpha, \sum_{k = 1^n} R(e_i, X) e_i\right\ket\\
+%    &= \bra \nabla^* \nabla \alpha, X\ket + g(\alpha, \Ric(X, \ph))\\
+%    &= \bra \nabla^* \nabla \alpha, X\ket + \Ric(\alpha)(X)
+%  \end{align*}
+%  For the last equality, recall that $\Ric(\alpha)(X)$ in coordinates is
+%  \[
+%    \Ric_{ij} g^{ik} a_k X^j.
+%  \]
+%\end{proof}
+%\subsection{Applications of Bochner--\texorpdfstring{Weitzenb\"ock}{Weitzenbock}}
+%We are now going to understand how Riemannian geometry relates to topology. Previously, we mostly used sectional curvature, and exploited properties of geodesics. Here we are going to use Ricci curvature instead.
+%
+
 \section{Riemannian holonomy groups}
-Again let $M$ be a Riemannian manifold, which is always assumed to be connected. Let $x \in M$, and consider a path $\gamma \in \Omega(x, y)$, $\gamma: [0, 1] \to M$. At the rather beginning of the course, we know that $\gamma$ gives us a parallel transport from $T_x M$ to $T_y M$. Explicitly, given any $X_0 \in T_x M$, there exists a unique vector field $X$ along $\gamma$ with
+Again let $M$ be a Riemannian manifold, which is always assumed to be connected. Let $x \in M$, and consider a path $\gamma \in \Omega(x, y)$, $\gamma: [0, 1] \to M$. At the rather beginning of the course, we saw that $\gamma$ gives us a parallel transport from $T_x M$ to $T_y M$. Explicitly, given any $X_0 \in T_x M$, there exists a unique vector field $X$ along $\gamma$ with
 \[
   \frac{\nabla X}{\d t} = 0,\quad X(0) = X_0.
 \]
@@ -2948,7 +3269,7 @@ We know that this map is invertible, and preserves the inner product. In particu
   The group operation is given by composition of linear maps, which corresponds to composition of paths.
 \end{defi}
 
-We note that this group doesn't really depend on the point $x$. Given any other $y \in M$, we can pick a path $\beta \in \Omega(x, y)$. Writing $P_\beta$ instead of $P(` b)$, we have a map
+We note that this group doesn't really depend on the point $x$. Given any other $y \in M$, we can pick a path $\beta \in \Omega(x, y)$. Writing $P_\beta$ instead of $P(\beta)$, we have a map
 \[
   \begin{tikzcd}[cdmap]
     \Hol_x(M) \ar[r] & \Hol_y(M)\\
@@ -2989,7 +3310,7 @@ Of course, $\Hol^0(M) \subseteq \Hol(M)$, and if $\pi_1(M) = 0$, then they are e
   $\Hol^0(M)$ is connected, and thus lies in the connected component of the identity in $\Or(n)$.
 \end{proof}
 
-Note that there is a natural action of $\Hol_x(M)$ and $\Hol^0_x(M)$ on $T^*_x M$, $\Lambda^p T^*M$ for all $p$, and more generally tensor products of $T_xM$.
+Note that there is a natural action of $\Hol_x(M)$ and $\Hol^0_x(M)$ on $T^*_x M$, $\exterior^p T^*M$ for all $p$, and more generally tensor products of $T_xM$.
 
 \begin{fact}\leavevmode
   \begin{itemize}
@@ -3050,7 +3371,7 @@ We will not prove these.
 \begin{eg}
   Let $x \in M$, and suppose
   \[
-    \Hol_x \subseteq H \U(n) = \{g \in \SO(2n): g J_0 g^{-1} = J_0\},
+    \Hol_x(M) \subseteq \U(n) = \{g \in \SO(2n): g J_0 g^{-1} = J_0\},
   \]
   where
   \[
@@ -3074,9 +3395,6 @@ We will not prove these.
       \draw [->-=0.6] (0, 2) -- (2, 2);
       \draw [->>-=0.65] (0, 2) -- (0, 0);
 
-      \node [circ] at (0, 1) {};
-      \node [circ] at (2, 1) {};
-
       \draw (0, 1) -- (2, 1) node [pos=0.5, above] {$\gamma$};
     \end{tikzpicture}
   \end{center}
@@ -3091,7 +3409,7 @@ We will not prove these.
   In fact, we can check that $\Hol(K) = \Z_2$. Note that here $K$ is non-orientable.
 \end{eg}
 
-\subsection{Holonomy and curvature}
+Since we know that $\Hol(M)$ is a Lie group, we can talk about its Lie algebra.
 
 \begin{defi}[Holonomy algebra]\index{holonomy algebra}
   The \emph{holonomy algebra} $\hol(M)$ is the Lie algebra of $\Hol(M)$.
@@ -3133,11 +3451,11 @@ Here $\lambda\in \R$ is some non-zero absolute constant that doesn't depend on a
 
 Differentiating this with respect to $t$ and taking the limit $t\to 0$, we deduce that at for $p \in U$, we have
 \[
-  R_p = (R^i_{j, k\ell})_p \in \Lambda^2 T^*_p M \otimes \hol_p(M),
+  R_p = (R^i_{j, k\ell})_p \in \exterior^2 T^*_p M \otimes \hol_p(M),
 \]
 where we think $\hol_p(M) \subseteq \End T_p M$. Recall we also had the $R_{ij, k\ell}$ version, and because of the nice symmetric properties of $R$, we know
 \[
-  (R_{ij, k\ell})_p \in S^2 \hol_p(M) \subseteq \lambda^2 T^*_p M \otimes \Lambda^2 T_p^* M.
+  (R_{ij, k\ell})_p \in S^2 \hol_p(M) \subseteq \exterior^2 T^*_p M \otimes \exterior^2 T_p^* M.
 \]
 Strictly speaking, we should write
 \[
@@ -3145,29 +3463,25 @@ Strictly speaking, we should write
 \]
 but we can use the metric to go between $T_pM$ and $T^*_p M$.
 
-But there is more to these. So far, we have only been doing something rather tautological.
+So far, what we have been doing is rather tautological. But it turns out this allows us to decompose the de Rham cohomology groups.
 
-Consider a Lie subgroup $G \subseteq \GL_n(\R)$. There is a standard representation $\rho$ of $\GL_n(\R)$ on $\R^n$, which restricts to a representation $(\rho, \R^n)$ of $G$. This induces a representation $(\rho^k, \Lambda^k(\R^*))$ of $G$.
+In general, consider an arbitrary Lie subgroup $G \subseteq \GL_n(\R)$. There is a standard representation $\rho$ of $\GL_n(\R)$ on $\R^n$, which restricts to a representation $(\rho, \R^n)$ of $G$. This induces a representation $(\rho^k, \exterior^k(\R^*))$ of $G$.
 
-This representation is in general not irreducible. We decompose it into irreducible components
+This representation is in general not irreducible. We decompose it into irreducible components $(\rho^k_i, W_i^k)$, so that
 \[
-  (\rho^k_i, W_i^k),
+  \exterior^k(\R^*) = \bigoplus_i W_i^k.
 \]
-where
-\[
-  \Lambda^k(\R^*) = \bigoplus_i W_i^k.
-\]
-We now bring in differential geometry. Consider a manifold $M$ with a $G$-structure, i.e.\ there is an atlas of coordinate neighbourhoods where the transition maps satisfy
+We can do this for bundles instead of just vector spaces. Consider a manifold $M$ with a $G$-structure, i.e.\ there is an atlas of coordinate neighbourhoods where the transition maps satisfy
 \[
   \left(\frac{\partial x_\alpha}{\partial x_\beta'}\right)_p \in G
 \]
 for all $p$. Then we can use this to split our bundle of $k$-forms into well-defined vector sub-bundles with typical fibers $W_i^k$:
 \[
-  \Lambda^k T^* M = \bigoplus \Lambda^k_i.
+  \exterior^k T^* M = \bigoplus \Lambda^k_i.
 \]
 We can furthermore say that every $G$-equivariant linear map $\varphi: W_i^k \to W_j^\ell$ induces a morphism of vector bundles $\phi: \Lambda_i^k \to \Lambda_j^\ell$.
 
-Now suppose further that $\Hol(M) \leq G \leq \Or(n)$. Then by the fundamental principle of Riemannian holonomy, we deduce that parallel transport preserves this decomposition into sub-bundles. So $\nabla$ restricts to a well-defined connection on each $\Lambda^k_i$.
+Now suppose further that $\Hol(M) \leq G \leq \Or(n)$. Then we can show that parallel transport preserves this decomposition into sub-bundles. So $\nabla$ restricts to a well-defined connection on each $\Lambda^k_i$.
 
 Thus, if $\xi \in \Gamma(\Lambda_i^k)$, then $\nabla \xi \in \Gamma(T^* M \otimes \Lambda^k_i)$, and then we have $\nabla^*\nabla \xi \in \Gamma(\Lambda_i^k)$. But we know the covariant Laplacian is related to Laplace--Beltrami via the curvature. We only do this for $1$-forms for convenience of notation. Then if $\xi \in \Omega^1(M)$, then we have
 \[
@@ -3175,27 +3489,15 @@ Thus, if $\xi \in \Gamma(\Lambda_i^k)$, then $\nabla \xi \in \Gamma(T^* M \otime
 \]
 We can check that $\Ric$ also preserves these subbundles. Then it follows that $\Delta: \Gamma(\Lambda_j^1) \to \Gamma(\Lambda^1_j)$ is well-defined.
 
-It follows that $\mathcal{H}^k = \bigoplus \mathcal{H}^k_i$, where $\mathcal{H}^k_i = \ker (\Delta: \Gamma(\Lambda_j^1) \to \Gamma(\Lambda^1_j))$.
-\begin{thm}
-  Suppose $M$ is compact, so $\mathcal{H}^k \cong H^k_{\dR}(M)$. Then
-  \[
-    H_{\dR}^k (M) = \bigoplus H_{i, \dR}^k (M),
-  \]
-  and
-  \[
-    b^k = \sum_i b_i^k.
-  \]
-\end{thm}
-These are the \term{refined Betti numbers}.
-
+Thus, we deduce
 \begin{thm}
   Let $(M, g)$ be a connected and oriented Riemannian manifold, and consider the decomposition of the bundle of $k$-forms into irreducible representations of the holonomy group,
   \[
-    \Lambda^k T^* M = \bigoplus_i \Lambda_i^k.
+    \exterior^k T^* M = \bigoplus_i \Lambda_i^k.
   \]
-  In other words, on each fiber $(\Lambda_i^k)_x \subseteq \Lambda^k T^*_x M$ is an irreducible representation of $\Hol_x(g)$. Then
+  In other words, each fiber $(\Lambda_i^k)_x \subseteq \exterior^k T^*_x M$ is an irreducible representation of $\Hol_x(g)$. Then
   \begin{enumerate}
-    \item For all $\alpha \in \Omega^k_i(M) = \Gamma(\Lambda_i^l)$, we have $\Delta \alpha \in \Omega_i^k(M)$.
+    \item For all $\alpha \in \Omega^k_i(M) \equiv \Gamma(\Lambda_i^l)$, we have $\Delta \alpha \in \Omega_i^k(M)$.
     \item If $M$ is compact, then we have a decomposition
       \[
         H_{\dR}^k (M) = \bigoplus H_{i, \dR}^k (M),
@@ -3205,14 +3507,14 @@ These are the \term{refined Betti numbers}.
         H^k_{i, \dR} (M) = \{[\alpha] : \alpha \in \Omega_i^k(M), \Delta \alpha = 0\}.
       \]
   \end{enumerate}
+  The dimensions of these groups are known as the \term{refined Betti numbers}.
 \end{thm}
 We have only proved this for $k = 1$, but the same proof technique can be used to do it for arbitrary $k$.
 
-\section{Manifolds with non-negative Ricci curvature}
-This is an introduction to Cheeger--Gromoll splitting theorem.
+Our treatment is rather abstract so far. But for example, if we are dealing with complex manifolds, then we know that $\Hol(M) \leq \U(n)$. So this allows us to have a canonical refinement of the de Rham cohomology.
 
-Before we can state the theorem, we need to do a bit of preparation.
-\subsubsection*{Rays and lines on a Riemannian manifold}
+\section{The Cheeger--Gromoll splitting theorem}
+We will talk about the Cheeger--Gromoll splitting theorem. This is a hard theorem, so we will not prove it. However, we will state it, and discuss a bit about it. To state the theorem, we need some preparation.
 
 \begin{defi}[Ray]\index{ray}
   Let $(M, g)$ be a Riemannian manifold. A \emph{ray} is a map $r(t): [0, \infty) \to M$ if $r$ is a geodesic, and minimizes the distance between any two points on the curve.
@@ -3243,7 +3545,7 @@ Note that if $M$ is disconnected at infinity, then it must be unbounded, and in 
 
   Since $K$ is compact, we can pass to a subsequence, and wlog $\gamma_m(0) \to x \in K$ and $\dot{\gamma}_m(0) \to a \in T_xM$ (suitably interpreted).
 
-  Then we claim the geodesic $\gamma_{x, a}(t)$ is the desired line. To see this, since solutions to ODE's depend smoothly on initial conditions, we can let
+  Then we claim the geodesic $\gamma_{x, a}(t)$ is the desired line. To see this, since solutions to ODE's depend smoothly on initial conditions, we can write the line as
   \[
     \ell(t) = \lim_{m \to \infty} \gamma_m(t).
   \]
@@ -3264,7 +3566,7 @@ Let's look at some examples.
 \end{eg}
 
 \begin{eg}
-  For any complete metric $g$ on $S^{n - 1} \times \R$ contains a line since it is disconnected at $\infty$.
+  Any complete metric $g$ on $S^{n - 1} \times \R$ contains a line since it is disconnected at $\infty$.
 \end{eg}
 
 \begin{thm}[Cheeger--Gromoll line-splitting theorem (1971)]\index{Cheeger--Gromoll line-splitting theorem}
@@ -3281,11 +3583,11 @@ Note that if $X$ is zero-dimensional, since we assume all our manifolds are conn
 
 Now suppose that in fact $\Ric(g) = 0$. Then it is not difficult to see from the definition of the Ricci curvature that $\Ric(X) = 0$ as well. If we know $\dim X \leq 3$, then $M$ has to be flat, since in dimensions $\leq 3$, the Ricci curvature determines the full curvature tensor.
 
-Recall (from example sheets) that a manifold is \term{homogeneous} if the group of isometries acts transitively. In other words, for any $p, q \in M$, there exists an isometry $\phi: M \to M$ such that $\phi(p) = q$. This in particular implies the metric is complete. We shall see that if $M$ is homogeneous, then so is $X$.
+We can say a bit more if we assume more about the manifold.  Recall (from example sheets) that a manifold is \term{homogeneous} if the group of isometries acts transitively. In other words, for any $p, q \in M$, there exists an isometry $\phi: M \to M$ such that $\phi(p) = q$. This in particular implies the metric is complete.
 
-Now if $p = (p_0, v)$ and $q = (q_0, v)$ in the splitting, then every minimal geodesic between $p$ and $q$ must lie in $X \times \{v\}$.
+It is not difficult to see that if $M$ is homogeneous, then so is $X$. In this case, $X$ must be compact. Suppose not. Then $X$ is unbounded. We will obtain a line on $X$.
 
-We now show that $X$ is compact. Suppose not. Then $X$ is unbounded. We will obtain a line on $X$. By assumption, for all $n = 1, 2, \cdots$, we can find $p_n, q_n$ with $d(p_n, q_n) \geq 2n$. Since $X$ is complete, we can find a minimal geodesic $\gamma_n$ connecting these two points, parametrized by arc length. By homogeneity, we may assume that the midpoint $\gamma_n(0)$ is at a fixed point $x_0$. By passing to a subsequence, we wlog $\dot{\gamma}_n(0)$ converges to some $a \in T_{x_0}(X$. Then we use $a$ as an initial condition for our geodesic, and this will be a line. The proof is similar to what we have already discussed.
+By assumption, for all $n = 1, 2, \cdots$, we can find $p_n, q_n$ with $d(p_n, q_n) \geq 2n$. Since $X$ is complete, we can find a minimal geodesic $\gamma_n$ connecting these two points, parametrized by arc length. By homogeneity, we may assume that the midpoint $\gamma_n(0)$ is at a fixed point $x_0$. By passing to a subsequence, we wlog $\dot{\gamma}_n(0)$ converges to some $a \in T_{x_0}(X$. Then we use $a$ as an initial condition for our geodesic, and this will be a line.
 
 A similar argument gives
 \begin{lemma}
@@ -3299,10 +3601,10 @@ A similar argument gives
 We do more applications.
 
 \begin{cor}
-  Let $(M, g)$ be a compact, connected manifold with , $\Ric(g) \geq 0$. Then
+  Let $(M, g)$ be a compact, connected manifold with $\Ric(g) \geq 0$. Then
   \begin{itemize}
     \item The universal Riemannian cover is isometric to the Riemannian product $X \times \R^N$, with $X$ compact, $\pi_1(X) = 1$ and $\Ric(g_X) \geq 0$.
-    \item Let $p \in M$ be such that $\Ric(g)_p > 0$. Then $\pi_1(M)$ is finite.
+    \item If there is some $p \in M$ such that $\Ric(g)_p > 0$, then $\pi_1(M)$ is finite.
     \item Denote by $I(\tilde{M})$ the group of isometries $\tilde{M} \to \tilde{M}$. Then $I (\tilde{M}) = I(X) \times E(\R^q)$, where $E(\R^q)$ is the group of rigid Euclidean motions,
       \[
         \mathbf{y} \mapsto A\mathbf{y} + \mathbf{b}
@@ -3315,22 +3617,23 @@ We do more applications.
 \begin{proof}\leavevmode
   \begin{itemize}
     \item This is direct from Cheeger--Gromoll and the previous lemma.
-    \item If $\Ric(g)_p > 0$, then we cannot have any non-trivial splitting. So $\tilde{M} \not\cong X\times \R^q$ with $q \geq 1$. So $\tilde{M}$ must be compact. So by standard topology, $|\pi_1(M)| = |\pi^{-1}(\{p\})|$.
-    \item We use the fact that $E(\R^q) = I(\R^q)$.
+    \item If there is a point with strictly positive Ricci curvature, then the same is true for the universal cover. So we cannot have any non-trivial splitting. So by the previous part, $\tilde{M}$ must be compact. By standard topology, $|\pi_1(M)| = |\pi^{-1}(\{p\})|$.
 
-      Since $g \in I(\tilde{M})$, we know $g$ takes lines to lines. Since all lines in $\tilde{M} \times \R^q$ are of the form $p \times \R$ with $p \in X$ and $\R \subseteq \R^q$ an affine line.
-
-      Then $g(p \times \R) = p' \times \R$, possibly for some other copy of $\R$. By taking unions, we deduce that $g(p \times \R^q) = p' \times \R^q$. Now for any $X \times \mathbf{a}$ with $\mathbf{a} \in \R^q$, we have $X \times \mathbf{a} \perp p \times \R^q$ for all $p \in X$.
-
-      So we know
+    \item We use the fact that $E(\R^q) = I(\R^q)$. Pick a $g \in I(\tilde{M})$. Then we know $g$ takes lines to lines. Now use that all lines in $\tilde{M} \times \R^q$ are of the form $p \times \R$ with $p \in X$ and $\R \subseteq \R^q$ an affine line. Then
       \[
-        g(X \times \mathbf{a}) = g(X \times \mathbf{b}
+        g(p \times \R) = p' \times \R,
       \]
-      for some $\mathbf{b} \in \R^q$. We deduce that $g(p, a) = (q, b)$, with $h_X \in I(X), e \in E(\R^q)$ such that
+      for some $p'$ and possibly for some other copy of $\R$. By taking unions, we deduce that $g(p \times \R^q) = p' \times \R^q$. We write $h(p) = p'$. Then $h \in I(X)$.
+      
+      Now for any $X \times \mathbf{a}$ with $\mathbf{a} \in \R^q$, we have $X \times \mathbf{a} \perp p \times \R^q$ for all $p \in X$. So we must have
       \[
-        h_X(p) = q,\quad e(\mathbf{a}) = \mathbf{b},
+        g(X \times \mathbf{a}) = X \times \mathbf{b}
       \]
-      which are independent of $\mathbf{a}$ and $p$ respectively.
+      for some $\mathbf{b} \in \R^q$. We write $e(\mathbf{a}) = \mathbf{b}$. Then
+      \[
+        g(p, a) = (h(p), e(a)).
+      \]
+      Since the metric of $X$ and $\R^q$ are decoupled, it follows that $h$ and $e$ must separately be isometries.
   \end{itemize}
 \end{proof}
 
@@ -3343,7 +3646,7 @@ We can look at more examples.
   Note that $S^n \times \R$ is disconnected at $\infty$. So any metric contains a line. Then by Cheeger--Gromoll, $\R$ splits as a Riemannian factor. So we obtain $\Ric = 0$ on the $S^n$ factor. Since we are in $n = 2, 3$, we know $S^n$ is flat, as the Ricci curvature determines the full curvature. So $S^n$ is the quotient of $\R^n$ by a discrete group, and in particular $\pi_1(S^n) \not= 1$. This is a contradiction.
 \end{proof}
 
-Let $G$ be a Lie group with a bi-invariant metric $g$. Suppose the center $Z(G)$ is finite. Then the center of $\mathfrak{g}$ is trivial (as of the Lie algebra of $G/Z(G)$, which has trivial center). From sheet 2, we find that $\Ric(g) > 0$ implies $\pi_1(G)$ is finite. The converse is also true, but is harder. This is done on Q11 of sheet 3 --- if $\pi_1(G)$ is finite, then $Z(G)$ is finite.
+Let $G$ be a Lie group with a bi-invariant metric $g$. Suppose the center $Z(G)$ is finite. Then the center of $\mathfrak{g}$ is trivial (since it is the Lie algebra of $G/Z(G)$, which has trivial center). From sheet 2, we find that $\Ric(g) > 0$ implies $\pi_1(G)$ is finite. The converse is also true, but is harder. This is done on Q11 of sheet 3 --- if $\pi_1(G)$ is finite, then $Z(G)$ is finite.
 
 \printindex
 \end{document}
