@@ -16,6 +16,15 @@
 \tikzfeynmanset{/tikzfeynman/momentum/arrow shorten = 0.3}
 \tikzfeynmanset{/tikzfeynman/warn luatex = false}
 
+\usepackage{pgfplots}
+
+\DeclareRobustCommand{\ghost}{\tikz[baseline=.1em,scale=.5]{
+  \draw [fill=yellow] (0, 0) -- (0, 0.45) arc (+180:0:0.3) -- (0.6, 0);
+  \draw [decorate, decoration={snake, amplitude=0.7, segment length=2.3}] (0.6, 0) -- (0, 0);
+  \fill[black] (0.18, 0.45) circle [radius=0.05];
+  \fill[black] (0.44, 0.45) circle [radius=0.05];
+}}
+
 \begin{document}
 \maketitle
 {\small
@@ -290,7 +299,7 @@ Note that we have now reduced the problem of computing an integral for the corre
 \subsection{Interacting theories}
 Physically interesting theories contain interactions, i.e.\ $S(\phi)$ is non-quadratic. Typically, if we are trying to compute
 \[
-  \int \d^n \phi P(\phi) \exp\left(-\frac{S(\phi)}{\hbar}\right),
+  \int \d^n \phi\; P(\phi) \exp\left(-\frac{S(\phi)}{\hbar}\right),
 \]
 these things involve transcendental functions and, except in very special circumstances, is just too hard. We usually cannot perform these integrals analytically.
 
@@ -335,9 +344,9 @@ In Quantum Field Theory last term, the tree diagrams we worked with were just ab
   \begin{align*}
     \mathcal{Z}(\hbar, m, \lambda) &= \int_\R \d \phi \; \exp\left(\frac{-1}{\hbar}\left(\frac{m^2}{2} \phi^2 + \frac{\lambda}{4!}\phi^4\right)\right)\\
     &= \frac{\sqrt{2\hbar}}{m} \int \d \tilde{\phi} \exp\left(-\tilde{\phi}^2 \right) \exp\left( - \frac{4\lambda \hbar}{4! m^4} \tilde{\phi}^4\right)\\
-    &\sim \frac{\sqrt{2\hbar}}{m} \int \d \tilde{\phi}\; e^{- \tilde{\phi}^2}\sum_{n = 0}^N \frac{1}{n!} \left(\frac{-\lambda \hbar}{3! m^4}\right)^n \tilde{\phi}^{4n}\\
-    &= \frac{\sqrt{2\hbar}}{m} \sum_{n = 0}^N \left(\frac{-\lambda \hbar}{3! m^4}\right)^n \frac{1}{n!} \int \d \tilde{\phi}\;e^{- \tilde{\phi}^2}\tilde{\phi}^{4n}\\
-    &= \frac{\sqrt{2\hbar}}{m} \sum_{n = 0}^N \left(\frac{-\lambda \hbar}{3! m^4}\right)^n \frac{1}{n!} \Gamma\left(2n + \frac{1}{2}\right).
+    &\sim \frac{\sqrt{2\hbar}}{m} \int \d \tilde{\phi}\; e^{- \tilde{\phi}^2}\sum_{n = 0}^N \frac{1}{n!} \left(\frac{-4\lambda \hbar}{4! m^4}\right)^n \tilde{\phi}^{4n}\\
+    &= \frac{\sqrt{2\hbar}}{m} \sum_{n = 0}^N \left(\frac{-4\lambda \hbar}{4! m^4}\right)^n \frac{1}{n!} \int \d \tilde{\phi}\;e^{- \tilde{\phi}^2}\tilde{\phi}^{4n}\\
+    &= \frac{\sqrt{2\hbar}}{m} \sum_{n = 0}^N \left(\frac{-4\lambda \hbar}{4! m^4}\right)^n \frac{1}{n!} \Gamma\left(2n + \frac{1}{2}\right).
   \end{align*}
   The last line uses the definition of the Gamma function.
 
@@ -363,6 +372,45 @@ So via a straightforward manipulation, we have
   \frac{1}{(4!)^n n!} \frac{(4n)!}{4^n(2n)!} \sim e^{n \log n}.
 \]
 So the coefficients go faster than exponentially, and thus the series has vanishing radius of convergence.
+
+We can actually plot out the partial sums. For example, we can pick $\hbar = m = 1$, $\lambda = 0.1$, and let $\mathcal{Z}_n$ be the $n$th partial sum of the series. We can start plotting this for $n$ up to $40$ (the red line is the true value):
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[
+        xlabel={$n$},
+        ylabel={$\mathcal{Z}_n$},
+        width=0.95\textwidth,
+        height=0.6\textwidth,
+        axis lines=left
+      ]
+      \addplot [no markers, mblue, thick] plot coordinates {(0,2.506628275) (1,2.4752954215625005) (2,2.477580108792318) (3,2.4772659642982178) (4,2.477329774898582) (5,2.477312599211984) (6,2.4773183602235305) (7,2.477316045531391) (8,2.4773171293377625) (9,2.4773165498024112) (10,2.4773168982480414) (11,2.477316665554994) (12,2.4773168364389506) (13,2.4773166995674734) (14,2.477316818311627) (15,2.477316707384797) (16,2.4773168183982883) (17,2.47731669990227) (18,2.4773168342800465) (19,2.4773166729383083) (20,2.477316877405349) (21,2.4773166046609214) (22,2.477316986658088) (23,2.47731642618797) (24,2.4773172858673957) (25,2.4773159099504745) (26,2.4773182038068415) (27,2.4773142267271684) (28,2.477321387246062) (29,2.477308017857696) (30,2.477333870912449) (31,2.4772821543783246) (32,2.4773890554172873) (33,2.4771609593746824) (34,2.4776628545272517) (35,2.4765250462664925) (36,2.4791803272805764) (37,2.4728067557923787) (38,2.4885303286995017) (39,2.448692237728089) (40,2.5522837236571903)};
+
+      \addplot [mred, no markers] plot coordinates {(0, 2.47732) (40, 2.47732)};
+
+    \end{axis}
+  \end{tikzpicture}
+\end{center}
+
+After the initial few terms, it seems like the sum has converged, and indeed to the true value. Up to around $n = 30$, there is no visible change, and indeed, the differences tend to be of the order $\sim 10^{-7}$. However, after around $33$, the sum starts to change drastically.
+
+We can try to continue plotting. Since the values become ridiculously large, we have to plot this in a logarithmic scale, and thus we plot $|\mathcal{Z}_n|$ instead. Do note that for sufficiently large $n$, the actual sign flips every time we increment $n$! This thing actually diverges really badly.
+
+\begin{center}
+  \begin{tikzpicture}
+    \begin{semilogyaxis}[
+        xlabel={$n$},
+        ylabel={$|\mathcal{Z}_n|$},
+        width=0.95\textwidth,
+        height=0.6\textwidth,
+        axis lines=left
+      ]
+
+      \addplot [no markers, mblue, thick] plot coordinates {(0,2.506628275) (1,2.4752954215625005) (2,2.477580108792318) (3,2.4772659642982178) (4,2.477329774898582) (5,2.477312599211984) (6,2.4773183602235305) (7,2.477316045531391) (8,2.4773171293377625) (9,2.4773165498024112) (10,2.4773168982480414) (11,2.477316665554994) (12,2.4773168364389506) (13,2.4773166995674734) (14,2.477316818311627) (15,2.477316707384797) (16,2.4773168183982883) (17,2.47731669990227) (18,2.4773168342800465) (19,2.4773166729383083) (20,2.477316877405349) (21,2.4773166046609214) (22,2.477316986658088) (23,2.47731642618797) (24,2.4773172858673957) (25,2.4773159099504745) (26,2.4773182038068415) (27,2.4773142267271684) (28,2.477321387246062) (29,2.477308017857696) (30,2.477333870912449) (31,2.4772821543783246) (32,2.4773890554172873) (33,2.4771609593746824) (34,2.4776628545272517) (35,2.4765250462664925) (36,2.4791803272805764) (37,2.4728067557923787) (38,2.4885303286995017) (39,2.448692237728089) (40,2.5522837236571903) (41,2.276008178409487) (42,3.0312435602845316) (43,0.9163649458652577) (44,6.9796177916553654) (45,10.807608126230553) (46,42.558903112730995) (47,121.11259124115857) (48,391.76738051934996) (49,1249.5793658417674) (50,4112.563675624475) (51,13762.560713341785) (52,47017.15911404468) (53,163700.204460477) (54,580883.2573369935) (55,2099786.4286479456) (56,7729934.117066026) (57,2.8969844894070018e7) (58,1.104972247833786e8) (59,4.2880499274407196e8) (60,1.692562750825886e9) (61,6.79334292995877e9) (62,2.7717717706646297e10) (63,1.149348470239874e11) (64,4.842337866737232e11) (65,2.072334275173758e12) (66,9.006611524661889e12) (67,3.9742816962114914e13)};
+
+      \addplot [mred, no markers] plot coordinates {(0, 2.47732) (67, 2.47732)};
+    \end{semilogyaxis}
+  \end{tikzpicture}
+\end{center}
 
 We can also see other weird phenomena here. Suppose we decided that we have $m^2 < 0$ instead (which is a rather weird thing to do). Then it is clear that $\mathcal{Z}(m^2, \lambda)$ still exists, as the $\phi^4$ eventually dominates, and so what happens at the $\phi^2$ term doesn't really matter. However, the asymptotic series is invalid in this region.
 
@@ -1047,11 +1095,11 @@ In the most general setting, we have $n$ variables $\theta_1, \theta_2, \cdots, 
 \[
   V = \left\{\sum a_i \theta_i: a_i \in \F\right\},
 \]
-where $\F = \R$ or $\C$. We define $\Lambda^k V$ to be the $k$th alternating product of $V$, similar to how differential forms are defined. Instead of writing the elements as $v_1 \wedge v_2 \wedge \cdots \wedge v_k$, we simply write them as $v_1v_2 \cdots v_k$. We then define
+where $\F = \R$ or $\C$. We define $\exterior^k V$ to be the $k$th alternating product of $V$, similar to how differential forms are defined. Instead of writing the elements as $v_1 \wedge v_2 \wedge \cdots \wedge v_k$, we simply write them as $v_1v_2 \cdots v_k$. We then define
 \[
-  \Lambda^* = \Lambda^*V = \bigoplus_{k = 0}^\infty \Lambda^k V,
+  \Lambda = \exterior^*V = \bigoplus_{k = 0}^\infty \exterior^k V,
 \]
-which has a natural multiplication structure. Of course, this sum is finite, since $\Lambda^k V = 0$ for all $k > n$. This $\Lambda$ is then the ``space of all functions''. We then define the Berezin integral by
+which has a natural multiplication structure. Of course, this sum is finite, since $\exterior^k V = 0$ for all $k > n$. This $\Lambda$ is then the ``space of all functions''. We then define the Berezin integral by
 \[
   \int \d \theta_1 \cdots \d \theta_n\; \theta_n \theta_{n - 1} \cdots \theta_1 = 1,
 \]
@@ -1068,7 +1116,7 @@ We will need the following formula:
     \mathcal{Z} = \mathcal{Z}(0, 0) = \det B.
   \]
 \end{prop}
-For $f \in \Lambda^*$, we can again define the correlation function
+For $f \in \Lambda$, we can again define the correlation function
 \[
   \bra f(\bar{\theta}, \theta)\ket = \frac{1}{\mathcal{Z}(0, 0)} \int \d^n \theta\; \d^n \bar{\theta}\; e^{-S(\bar{\theta}, \theta)} f(\bar{\theta}, \theta).
 \]
@@ -1413,7 +1461,7 @@ If we just forget about this problem and start to do path integrals, then we wou
 
 Note that we showed that the measure $\D x$ doesn't exist, but what we really need wasn't $\D x$. What we really needed was
 \[
-  \int \D x e^{-S[x]}.
+  \int \D x\; e^{-S[x]}.
 \]
 This is no longer translation invariant, so it is conceivable that it exists. Indeed, in the case of a 1D quantum field theory, it does, and is known as the \term{Wiener measure}.
 
@@ -1757,7 +1805,7 @@ This is the \term{worldline perspective} to QFT, and it was indeed Feynman's ori
 \section{Symmetries of the path integral}
 From now on, we will work with quantum field theory in general, and impose no restrictions on the dimension of our universe. The first subject to study is the notion of symmetries.
 
-In classical field theory, symmetries played a huge role. In particular, Noether's theorem relates symmetries to conservation laws. For simplicity, we will work with the case of a flat space.
+We first review what we had in classical field theory. In classical field theory, Noether's theorem relates symmetries to conservation laws. For simplicity, we will work with the case of a flat space.
 
 Suppose we had a variation
 \[
@@ -1767,13 +1815,15 @@ of the field. The most common case is when $f(\phi, \partial \phi)$ depends on $
 \[
   V_f = \int_M \d^d x \; f(\phi, \partial \phi) \frac{\delta}{\delta \phi(x)}
 \]
-acting on the space of fields. If the function $S[\phi]$ is invariant under $V_f$ when $\varepsilon$ is constant, then for general $\varepsilon(x)$, we must have
+acting on the ``space of fields''.
+
+If the function $S[\phi]$ is invariant under $V_f$ when $\varepsilon$ is constant, then for general $\varepsilon(x)$, we must have
 \[
-  \delta S = \int \d^d x\; j^\mu(x) \partial_\mu \varepsilon.
-\] % see notes for more general thing
-for some field-dependent current $j_\mu(x)$. If we choose $\varepsilon(x)$ to have compact support, then we can write
+  \delta S = \int \d^d x\; j^\mu(x)\; \partial_\mu \varepsilon.
+\]
+for some field-dependent current $j_\mu(x)$ (we can actually find an explicit expression for $j_\mu$). If we choose $\varepsilon(x)$ to have compact support, then we can write
 \[
-  \delta S = - \int \d^d x\; (\partial^\mu j_\mu) \varepsilon(x).
+  \delta S = - \int \d^d x\; (\partial^\mu j_\mu)\;\varepsilon(x).
 \]
 On \emph{solutions} of the field equation, we know the action is stationary under arbitrary variations. So $\delta S = 0$. Since $\varepsilon(x)$ was arbitrary, we must have
 \[
@@ -1795,7 +1845,7 @@ So we find
 \[
   Q[N_0] = Q[N_1].
 \]
-This is the conservation of charge! This is the classical picture.
+This is the conservation of charge!
 
 \subsection{Ward identities}
 The derivation of Noether's theorem used the classical equation of motion. But in a quantum theory, the equation of motion no longer holds. We must re-examine what happens in the quantum theory.
@@ -1806,7 +1856,7 @@ Suppose a transformation $\phi \mapsto \phi'$ of the fields has the property tha
 \]
 In theory, the whole expression $\D \phi\; e^{-S[\phi]}$ is what is important in the quantum theory. In practice, we often look for symmetries where $\D \phi$ and $e^{-S[\phi]}$ are separately conserved. In fact, what we will do is that we look for a symmetry that preserves $S[\phi]$, and then try to find a regularization of $\D \phi$ that is manifestly invariant under the symmetry.
 
-Often, it is not the case that the obvious choice of regularization of $\D \phi$ is manifestly invariant under the symmetry. For example, we might have a $\phi$ that is rotationally invariant. However, if we regularize the path integral measure by picking a lattice and sampling $\phi$ on different points, it is rarely the case that this lattice is rotationally invariant.
+Often, it is \emph{not} the case that the obvious choice of regularization of $\D \phi$ is manifestly invariant under the symmetry. For example, we might have a $S[\phi]$ that is rotationally invariant. However, if we regularize the path integral measure by picking a lattice and sampling $\phi$ on different points, it is rarely the case that this lattice is rotationally invariant.
 
 In general, there are two possibilities:
 \begin{enumerate}
@@ -1821,9 +1871,11 @@ since this is just renaming of variables. But using the fact that the measure is
 \[
   \int \D \phi'\; e^{-S[\phi']} = \int \D \phi\; e^{-S[\phi]} \left(1 - \int_M j_\mu \partial^\mu \varepsilon\; \d^n x\right).
 \]
-in first order in $\varepsilon$. Note that in general, $j_\mu$ can receive contributions from $S[\phi]$ and $\D \phi$. So we know
+in first order in $\varepsilon$. Note that in general, $j_\mu$ can receive contributions from $S[\phi]$ and $\D \phi$. But if it doesn't receive any contribution from $\D \phi$, then it would just be the classical current.
+
+Using this expansion, we deduce that we must have
 \[
-  \int \D \phi e^{-S[\phi]} \int_M j^\mu \partial_\mu \varepsilon \;\d^d x = 0.
+  \int \D \phi \; e^{-S[\phi]} \int_M j_\mu \partial^\mu \varepsilon \;\d^d x = 0.
 \]
 Integrating by parts, and using the definition of the expectation, we can write this as
 \[
@@ -1831,86 +1883,139 @@ Integrating by parts, and using the definition of the expectation, we can write 
 \]
 for any $\varepsilon$ with compact support. Note that we dropped a normalization factor of $\mathcal{Z}$ in the definition of $\bra j_\mu(x)\ket$, because $\mathcal{Z}$ times zero is still zero. So we know that $\bra j_\mu (x)\ket$ is a conserved current, just as we had classically.
 
-One of the main uses of symmetries is to constrain correlation functions.
+\subsubsection*{Symmetries of correlation functions}
+Having a current is nice, but we want to say something about actual observable quantities, i.e.\ we want to look at how how symmetries manifest themselves with correlation functions. Let's look at what we might expect. For example, if our theory is translation invariant, we might expect, say
+\[
+  \bra \phi(x) \phi(y)\ket = \bra \phi(x - a) \phi(y - a)\ket
+\]
+for any $a$. This is indeed the case.
 
-Suppose we have an operator $\mathcal{O}$ that depends only on $\phi$, and not its derivatives. Then under a transformation $\phi \mapsto \phi'$, our operator transforms as
+Suppose we have an operator $\mathcal{O}(\phi)$. Then under a transformation $\phi \mapsto \phi'$, our operator transforms as
 \[
   \mathcal{O}(\phi) \mapsto \mathcal{O}(\phi'),
 \]
-Now we further suppose this transformation is a symmetry. By definition, we can write
+By definition, the correlation function is defined by
 \[
-  \bra \mathcal{O}_1(x_1) \cdots \mathcal{O}_n(x_n)\ket = \frac{1}{\mathcal{Z}} \int \D \phi e^{-S[\phi]} \mathcal{O}_1(\phi(x_1)) \cdots \mathcal{O}_n(\phi(x_n)).
+  \bra \mathcal{O}(\phi)\ket = \frac{1}{\mathcal{Z}} \int \D \phi\;e^{-S[\phi]} \mathcal{O}(\phi).
 \]
-Trivially, by renaming of variables, this is equal to
-\[
-  \frac{1}{\mathcal{Z}} \int \D \phi' e^{-S[\phi']} \mathcal{O}_1(\phi'(x_1)) \cdots \mathcal{O}_n(\phi'(x_n)).
-\]
-Using the invariance of the measure, this is equal to
-\[
-  \frac{1}{\mathcal{Z}} \int \D \phi\;e^{-S[\phi]} \mathcal{O}_1(\phi'(x_1) \cdots \mathcal{O}_n (\phi'(x_n)).
-\]
-Consequently, we find
-\[
-  \bra \mathcal{O}_1(\phi(x_n)) \cdots \mathcal{O}_n(\phi(x_n))\ket = \bra \mathcal{O}_1(\phi'(x_n)) \cdots \mathcal{O}_n(\phi'(x_n))\ket.
-\]
-So the correlation function of the original and transformed operators are the agree \emph{in the same theory}.
+Note that despite the appearance of $\phi$ on the left, it is not a free variable. For example, the correlation $\bra \phi(x_1) \phi(x_2)\ket$ is not a function of $\phi$.
 
-\begin{eg}
-  Suppose we have a transformation $\phi \mapsto \phi' = e^{i\alpha}\phi$ for some $\alpha \in \R/2\pi \Z$, for some complex field $\phi$. Consequently, the conjugate field transforms as
-  \[
-    \bar\phi \mapsto \bar\phi' =e^{-i\alpha} \bar\phi.
-  \]
-  Suppose this transformation preserves the action and measure. For example, the measure will be preserved if we integrate over the same number of $\phi$ and $\bar\phi$ modes. Consider the operators
-  \[
-    \mathcal{O}_i (\phi, \bar\phi) = \bar\phi^{s_i} \bar\phi(x)^{r_i}.
-  \]
-  Then we have
-  \[
-    \mathcal{O}_i(\phi, \bar\phi) \mapsto \mathcal{O}_i (\phi', \bar\phi') = e^{-\alpha (r_i - s_i)} \mathcal{O}_i(\phi, \bar\phi).
-  \]
-  Thus we know that
-  \[
-    \left\bra \prod_{i = 1}^m \mathcal{O}_i(x_i)\right\ket = \exp\left(i \alpha \sum_{i = 1}^m (r_i - s_i)\right) \left\bra \prod_{i = 1}^m \mathcal{O}_i(x_i)\right\ket.
-  \]
-  Consequently, since this is true for all $\alpha$, we know that the correlation function
-  \[
-    \mathcal{O}_i(\phi, \bar\phi) \mapsto \mathcal{O}_i (\phi', \bar\phi')
-  \]
-  must vanish, unless
-  \[
-    \sum_{i = 1}^m r_i = \sum_{i = 1}^m s_i.
-  \]
-  So we need the same number of $\phi$ and $\bar\phi$ insertions in total.
+We suppose the transformation $\phi \mapsto \phi'$ is a symmetry. By a trivial renaming of variables, we have
+\begin{align*}
+  \bra \mathcal{O}(\phi)\ket &= \frac{1}{\mathcal{Z}} \int \D \phi'\; e^{-S[\phi']} \mathcal{O} (\phi')\\
+  \intertext{By assumption, the function $\D \phi\;e^{-S[\phi]}$ is invariant under the transformation. So this is equal to}
+  &= \frac{1}{\mathcal{Z}} \int \D \phi\; e^{-S[\phi]} \mathcal{O}(\phi')\\
+  &= \bra \mathcal{O}(\phi')\ket.
+\end{align*}
+This is, of course, not surprising. To make this slightly more concrete, we look at an example.
 
-  We could also have obtained this result from Feynman graphs. We simply have to note that each propagator join up a $\phi$ and $\bar\phi$ together. So if we don't have equal number of $\phi$ and $\bar\phi$, then we can't draw any Feynman diagrams at all! So the correlator must vanish.
-\end{eg}
+%Now we further suppose this transformation is a symmetry. By definition, we can write
+%\[
+%  \bra \mathcal{O}_1(x_1) \cdots \mathcal{O}_n(x_n)\ket = \frac{1}{\mathcal{Z}} \int \D \phi e^{-S[\phi]} \mathcal{O}_1(\phi(x_1)) \cdots \mathcal{O}_n(\phi(x_n)).
+%\]
+%Trivially, by renaming of variables, this is equal to
+%\[
+%  \frac{1}{\mathcal{Z}} \int \D \phi' e^{-S[\phi']} \mathcal{O}_1(\phi'(x_1)) \cdots \mathcal{O}_n(\phi'(x_n)).
+%\]
+%Using the invariance of the measure, this is equal to
+%\[
+%  \frac{1}{\mathcal{Z}} \int \D \phi\;e^{-S[\phi]} \mathcal{O}_1(\phi'(x_1) \cdots \mathcal{O}_n (\phi'(x_n)).
+%\]
+%Consequently, we find
+%\[
+%  \bra \mathcal{O}_1(\phi(x_n)) \cdots \mathcal{O}_n(\phi(x_n))\ket = \bra \mathcal{O}_1(\phi'(x_n)) \cdots \mathcal{O}_n(\phi'(x_n))\ket.
+%\]
+%So the correlation function of the original and transformed operators are the agree \emph{in the same theory}.
 
 \begin{eg}
   Consider $(M, g) = (\R^4, \delta)$, and consider spacial translation $x \mapsto x' = x - a$ for a constant vector $a$. A scalar field $\phi$ transforms as
   \[
     \phi(x) \mapsto \phi'(x) = \phi(x - a).
   \]
-  In most cases, this is a symmetry. So the scalar operators transform as $\mathcal{O}(\phi(x)) \mapsto \mathcal{O}(\phi(x - a))$. In shorthand, we write $\mathcal{O}(x) \mapsto \mathcal{O}(x - a)$.
+  In most cases, this is a symmetry.
 
-  Thus, we find that.
+  We suppose $\mathcal{O}(\phi)$ can be written as
   \[
-    \bra \mathcal{O}_1(x_1) \cdots \mathcal{O}_n(x_n)\ket = \bra \mathcal{O}_1(x_1 - a) \cdots \mathcal{O}_n(x_n - a)\ket.
+    \mathcal{O}(\phi) = \mathcal{O}_1(\phi(x_1)) \cdots \mathcal{O}_n(\phi(x_n)),
   \]
-  Hence, the correlation function must depend only on the separation $x_{ij} = x_i - x_j$. Similarly, if the action and measure are rotationally or Lorentz invariant, then under a transformation $L$, we find
+  where $\mathcal{O}_i$ depends only on the value of $\phi$ at $x_i$. A canonical example is when $\mathcal{O}(\phi) = \phi(x_1) \cdots \phi(x_n)$ is an $n$-point correlation function.
+
+  Then the above result tells us that
   \[
-    \bra \mathcal{O}(x_1) \cdots \mathcal{O}_n(x_n)\ket = \bra \mathcal{O}_1(L x_1) \cdots \mathcal{O}_n (L x_n)\ket.
+     \bra \mathcal{O}_1(\phi(x_1)) \cdots \mathcal{O}_n(\phi(x_n))\ket = \bra \mathcal{O}_1(\phi(x_1 - a)) \cdots \mathcal{O}_n(\phi(x_n - a))\ket
   \]
-  So the correlation only depends on the Lorentz invariant separations $x_{ij}^2$.
+  So the correlation depends only on the separations $x_i - x_j$. We can obtain similar results if the action and measure are rotationally or Lorentz invariant. 
+%  So the scalar operators transform as $\mathcal{O}(\phi(x)) \mapsto \mathcal{O}(\phi(x - a))$. In shorthand, we write $\mathcal{O}(x) \mapsto \mathcal{O}(x - a)$.
+%
+%  Thus, we find that.
+%  \[
+%    \bra \mathcal{O}_1(x_1) \cdots \mathcal{O}_n(x_n)\ket = \bra \mathcal{O}_1(x_1 - a) \cdots \mathcal{O}_n(x_n - a)\ket.
+%  \]
+%  Hence, the correlation function must depend only on the separation $x_{ij} = x_i - x_j$. Similarly, if the action and measure are rotationally or Lorentz invariant, then under a transformation $L$, we find
+%  \[
+%    \bra \mathcal{O}(x_1) \cdots \mathcal{O}_n(x_n)\ket = \bra \mathcal{O}_1(L x_1) \cdots \mathcal{O}_n (L x_n)\ket.
+%  \]
+%  So the correlation only depends on the Lorentz invariant separations $x_{ij}^2$.
 \end{eg}
 
-\subsubsection*{Ward identity for correlators}
-So far, we have just been talking about properties of symmetries. We haven't used the induced conserved current at all. So let's try to do some Noether's theorem-like manipulations.
+\begin{eg}
+  Suppose we have a complex field $\phi$, and we have a transformation $\phi \mapsto \phi' = e^{i\alpha}\phi$ for some constant $\alpha \in \R/2\pi \Z$. Then the conjugate field transforms as
+  \[
+    \bar\phi \mapsto \bar\phi' = e^{-i\alpha} \bar\phi.
+  \]
+  Suppose this transformation preserves the action and measure. For example, the measure will be preserved if we integrate over the same number of $\phi$ and $\bar\phi$ modes. Consider the operators
+  \[
+    \mathcal{O}_i (\phi, \bar\phi) = \phi(x_i)^{s_i} \bar\phi(x_i)^{r_i}.
+  \]
+  Then the operators transform as
+  \[
+    \mathcal{O}_i(\phi, \bar\phi) \mapsto \mathcal{O}_i (\phi', \bar\phi') = e^{-\alpha (r_i - s_i)} \mathcal{O}_i(\phi, \bar\phi).
+  \]
+  So symmetry entails
+  \[
+    \left\bra \prod_{i = 1}^m \mathcal{O}_i(x_i)\right\ket = \exp\left(i \alpha \sum_{i = 1}^m (r_i - s_i)\right) \left\bra \prod_{i = 1}^m \mathcal{O}_i(x_i)\right\ket.
+  \]
+  Since this is true for all $\alpha$, the correlator must vanish unless
+  \[
+    \sum_{i = 1}^m r_i = \sum_{i = 1}^m s_i.
+  \]
+  So we need the same number of $\phi$ and $\bar\phi$ insertions in total.
 
-Suppose we have an infinitesimal transformation, with $\phi \mapsto \phi + \varepsilon \delta \phi$ that is a symmetry when $\varepsilon$ is constant. Then for general $\varepsilon(x)$ we have
+  We can interpret this in terms of Feynman diagrams ---  each propagator joins up a $\phi$ and $\bar\phi$. So if we don't have equal number of $\phi$ and $\bar\phi$, then we can't draw any Feynman diagrams at all! So the correlator must vanish.
+\end{eg}
+
+%\begin{eg}
+%  Consider $(M, g) = (\R^4, \delta)$, and consider spacial translation $x \mapsto x' = x - a$ for a constant vector $a$. A scalar field $\phi$ transforms as
+%  \[
+%    \phi(x) \mapsto \phi'(x) = \phi(x - a).
+%  \]
+%  In most cases, this is a symmetry. So the scalar operators transform as $\mathcal{O}(\phi(x)) \mapsto \mathcal{O}(\phi(x - a))$. In shorthand, we write $\mathcal{O}(x) \mapsto \mathcal{O}(x - a)$.
+%
+%  Thus, we find that.
+%  \[
+%    \bra \mathcal{O}_1(x_1) \cdots \mathcal{O}_n(x_n)\ket = \bra \mathcal{O}_1(x_1 - a) \cdots \mathcal{O}_n(x_n - a)\ket.
+%  \]
+%  Hence, the correlation function must depend only on the separation $x_{ij} = x_i - x_j$. Similarly, if the action and measure are rotationally or Lorentz invariant, then under a transformation $L$, we find
+%  \[
+%    \bra \mathcal{O}(x_1) \cdots \mathcal{O}_n(x_n)\ket = \bra \mathcal{O}_1(L x_1) \cdots \mathcal{O}_n (L x_n)\ket.
+%  \]
+%  So the correlation only depends on the Lorentz invariant separations $x_{ij}^2$.
+%\end{eg}
+
+\subsubsection*{Ward identity for correlators}
+What we've done with correlators was rather expected, and in some sense trivial. Let's try to do something more interesting.
+
+Again, consider an operator that depends only on the value of $\phi$ at finitely many points, say
+\[
+  \mathcal{O}(\phi) = \mathcal{O}_1(\phi(x_1)) \cdots \mathcal{O}_n(\phi(x_n)).
+\]
+As before, we will write the operators as $\mathcal{O}_i(x_i)$ when there is no confusion.
+
+As in the derivation of Noether's theorem, suppose we have an infinitesimal transformation, with $\phi \mapsto \phi + \varepsilon \delta \phi$ that is a symmetry when $\varepsilon$ is constant. Then for general $\varepsilon(x)$, we have
 \begin{align*}
-  &\hphantom{={}} \int \D \phi\; e^{-S[\phi]} \mathcal{O}_1(\phi(x_1) \cdots \mathcal{O}_n(\phi(x_n)) \\
-  &= \int \D \phi'\; e^{-S[\phi']} \mathcal{O}_1(\phi'(x_1) \cdots \mathcal{O}_n(\phi'(x_n))\\
-  &= \int \D \phi e^{-S[\phi]} \left(1 - \int j^\mu (x) \partial_\mu \varepsilon(x) \;\d x\right)\left(\mathcal{O}_1(\phi(x_1)) \cdots \mathcal{O}_n(\phi(x_n))\vphantom{ + \sum_{i = 1}^n \varepsilon(x_i) \delta \mathcal{O}(x_i) \prod_{j \not= i} \mathcal{O}_j(x_j)}\right.\\
+  &\hphantom{={}} \int \D \phi\; e^{-S[\phi]} \mathcal{O}_1(\phi(x_1)) \cdots \mathcal{O}_n(\phi(x_n)) \\
+  &= \int \D \phi'\; e^{-S[\phi']} \mathcal{O}_1(\phi'(x_1)) \cdots \mathcal{O}_n(\phi'(x_n))\\
+  &= \int \D \phi\; e^{-S[\phi]} \left(1 - \int j^\mu (x) \partial_\mu \varepsilon(x) \;\d x\right)\left(\mathcal{O}_1(\phi(x_1)) \cdots \mathcal{O}_n(\phi(x_n))\vphantom{ + \sum_{i = 1}^n \varepsilon(x_i) \delta \mathcal{O}(x_i) \prod_{j \not= i} \mathcal{O}_j(x_j)}\right.\\
   &\hphantom{= \int \D \phi e^{-S[\phi]} \left(1 - \int j^\mu (x) \partial_\mu \varepsilon(x) \;\d x\right)}\left.+ \sum_{i = 1}^n \varepsilon(x_i) \delta \mathcal{O}_i(x_i) \prod_{j \not= i} \mathcal{O}_j(x_j)\right),
 \end{align*}
 where
@@ -1921,9 +2026,7 @@ Again, the zeroth order piece of the correlation function cancels, and to lowest
 \[
    \int \partial^\mu \varepsilon(x) \left\bra j_\mu(x) \prod_{i = 1}^n \mathcal{O}_i(x_i)\right\ket\;\d^d x = \sum_{i = 1}^m \varepsilon(x_i) \left\bra \delta \mathcal{O}_i(x_i) \prod_{j \not= i} \mathcal{O}_j(x_j)\right\ket.
 \]
-We want to get rid of the $\varepsilon$ dependence, but we can't just strip it off by integrating by parts, as in the first term, it is integrated over all space, while on the right, it is evaluated at specific points.
-
-What we need is a little trick. We integrate the left hand side by parts, and write the right as an integral of $\delta$-functions:
+On the left, we can again integrate by parts to shift the derivative to the current term. On the right, we want to write it in the form $\int \varepsilon(x) \cdots \;\d^d x$, so that we can get rid of the $\varepsilon$ term. To do so, we introduce some $\delta$-functions. Then we obtain
 \begin{multline*}
   \int \varepsilon(x) \partial^\mu \left\bra j_\mu(x) \prod_{i = 1}^n \mathcal{O}_i(x_i)\right\ket\;\d^d x \\
   = - \sum_{i = 1}^m \int \varepsilon(x) \delta^d(x - x_i) \left\bra \delta \mathcal{O}_i(x_i) \prod_{j \not= i} \mathcal{O}_j(x_j)\right\ket \;\d^d x.
@@ -1934,30 +2037,36 @@ Since this holds for arbitrary $\varepsilon(x)$ (with compact support), we must 
 \]
 This is the \term{Ward identity} for correlation functions. It says that the vector field
 \[
-  f_\mu (x, x_i) = \left\bra j_\mu (x) \prod_i \mathcal{O}_i x_i\right\ket
+  f_\mu (x, x_i) = \left\bra j_\mu (x) \prod_i \mathcal{O}_i (x_i)\right\ket
 \]
 is divergence free except at the insertions $x_i$.
 
-To understand this, suppose $M$ is compact without boundary, and integrate the Ward identity over all $M$ (so that we don't worry about boundary terms). Then integrating over all of space, we find that
+This allows us to recover the previous invariance of correlations. Suppose $M$ is compact without boundary. We then integrate the Ward identity over all $M$. By Stokes' theorem, we know the integral of any divergence term vanishes. So we obtain
 \[
   0 = \int_M \partial^\mu f_\mu(x, x_i)\;\d^d x = -\sum_{i = 1}^n \left\bra \delta \mathcal{O}_i(x_i) \prod_{j \not= i} \mathcal{O}_j(x_j)\right\ket = \delta \left\bra \prod_{i = 1}^n \mathcal{O}_i(x_i)\right\ket,
 \]
-where we get the first equality because by Stokes' theorem, the integral of \emph{any} divergence over a compact surface without boundary vanishes.
+Of course, this is what we would obtain if we set $\varepsilon(x) \equiv 1$ above.
 
-In other words, what we have is the correlation function must be invariant under the transformation. This is just the infinitesimal version of what we've seen already.
+That was nothing new, but suppose $M' \subseteq M$ is a region with boundary $N_1 - N_0$.
+\begin{center}
+  \begin{tikzpicture}
+    \draw [thick, mblue] (0, 0) -- (2, 2) -- (4, 0) -- (2, -2) -- cycle;
 
-That was nothing new, but suppose $M' \subseteq M$ is a region with boundary $N_1 - N_0$, and let % picture!
-\[
-  I = \{i \in \{1, \cdots, n\}: x_i \in M'\}.
-\]
-Now integrating over $M'$ gives
+    \draw (0, 0) edge [mred, thick, bend left, fill=morange, fill opacity=0.3] (4, 0);
+    \draw (0, 0) edge [mred, thick, bend right, fill=morange, fill opacity=0.3] (4, 0);
+    \node at (2, 0.6) [above] {$N_1$};
+    \node at (2, -0.6) [below] {$N_0$};
+    \node at (2, 0) {$M'$};
+  \end{tikzpicture}
+\end{center}
+Let's see what integrating the Ward identity over $M'$ gives us. The left hand side gives us
 \begin{align*}
-  \int_{M'} \partial^\mu \left\bra j_\mu (x) \prod_{i = 1}^n \mathcal{O}_i(x_i)\right\ket &= \int_{N_1 - N_0} n^\mu\left\bra j_\mu (x) \prod_{i = 1}^n \mathcal{O}_i(x_i)\right\ket\;\d^{d - 1}x\\
+  \int_{M'} \partial^\mu \left\bra j_\mu (x) \prod_{i = 1}^n \mathcal{O}_i(x_i)\right\ket \;\d^d x &= \int_{N_1 - N_0} n^\mu\left\bra j_\mu (x) \prod_{i = 1}^n \mathcal{O}_i(x_i)\right\ket\;\d^{d - 1}x\\
   &= \left\bra Q[N_1] \prod_{i = 1}^n \mathcal{O}_i(x_i)\right\ket - \left\bra Q[N_0] \prod_{i = 1}^n \mathcal{O}_i(x_i)\right\ket
 \end{align*}
-Thus, by the Ward identity, we find
+The right hand side of Ward's identity just gives us the sum over all points inside $M'$.
 \[
-  \left\bra Q[N_1] \prod_{i = 1}^n \mathcal{O}_i(x_i)\right\ket - \left\bra Q[N_0] \prod_{i = 1}^n \mathcal{O}_i(x_i)\right\ket = - \sum_{i \in I} \left\bra \delta \mathcal{O}_i(x_i) \prod_{j \not= i}^m \mathcal{O}_j(x_j)\right\ket.
+  \left\bra Q[N_1] \prod_{i = 1}^n \mathcal{O}_i(x_i)\right\ket - \left\bra Q[N_0] \prod_{i = 1}^n \mathcal{O}_i(x_i)\right\ket = - \sum_{x_i \in M'} \left\bra \delta \mathcal{O}_i(x_i) \prod_{j \not= i}^m \mathcal{O}_j(x_j)\right\ket.
 \]
 In particular, if $M'$ contains only one point, say $x_1$, and we choose the region to be infinitesimally thin, then in the canonical picture, we have
 \[
@@ -1965,277 +2074,504 @@ In particular, if $M'$ contains only one point, say $x_1$, and we choose the reg
 \]
 where $\bket{\Omega}$ is some (vacuum) state. So in the canonical picture, we find that
 \[
-  \delta \hat{\mathcal{O}} = [\hat{Q}, \hat{\mathcal{O}}]. % sign?
+  \delta \hat{\mathcal{O}} = -[\hat{Q}, \hat{\mathcal{O}}].
 \]
 So we see that the change of $\hat{\mathcal{O}}$ under some transformation is given by the commutator with the charge operator.
 
 \subsection{The Ward--Takahashi identity}
-We focus on an important example of this. The QED action
+We focus on an important example of this. The QED action is given by
 \[
-  S[A, \psi] = \int \frac{1}{4} F_{\mu\nu}F^{\mu\nu} + i \bar\psi \D \psi + m \bar\psi \psi
+  S[A, \psi] = \int \d^d x\; \left(\frac{1}{4} F_{\mu\nu}F^{\mu\nu} + i \bar\psi \slashed\D \psi + m \bar\psi \psi\right).
 \]
-is invariant under the global transformations
+This is invariant under the global transformations
 \[
   \psi (x) \mapsto e^{i\alpha} \psi(x),\quad A_\mu(x) \mapsto A_\mu(x)
 \]
-for $\alpha \in \R/2\pi \Z$. The path integral measure is also invariant under this transformation provided we integrate over equal numbers of $\psi$ and $\bar\psi$ modes in the regularization.
+for constant $\alpha \in \R/2\pi \Z$. The path integral measure is also invariant under this transformation provided we integrate over equal numbers of $\psi$ and $\bar\psi$ modes in the regularization.
 
-To obtain the Ward identity, we do the normal things --- we let $\alpha$ depend on position. So the transformations become
-\[
-  \psi (x) \mapsto e^{i\alpha (x)} \psi(x),\quad A_\mu(x) \mapsto A_\mu(x).
-\]
-Note that this is \emph{not} the gauge transformation, as we don't change the photon field.
-
-Under this transformation, the classical action is no longer invariant, and we obtain
-\[
-  \delta S = \int j^\mu \partial_\mu \alpha \;\d^4 x,
-\]
-where
+In this case, the \emph{classical} current is given by
 \[
   j^\mu (x) = \bar\psi (x) \gamma^\mu \psi(x).
 \]
-is just the current. This leads to a Ward identity
-\[
-  \partial^\mu \bra j_\mu(x) \psi(x_1) \bar\psi(x_2)\ket = - \delta^4(x - x_1) \bra \psi(x_1) \bar\psi(x_2)\ket + \delta^4(x - x_2) \bra \psi(x_1) \bar\psi(x_2)\ket,
-\]
-noting that the infinitesimal change in $\psi$ is just (proportional to) $\psi$ itself. As always, we found that when we computed the insertion of the current, it is divergence free except in at the insertion points $x_1$ and $x_2$.
+We will assume that $\D \psi \D \bar{\psi}$ is invariant under a position-dependent $\alpha$. This is a reasonable assumption to make, if we want our measure to be gauge invariant. In this case, the classical current is also the quantum current.
 
-Let's look at this in momentum space, which is how it is traditionally done. We consider the Fourier transform
+Noting that the infinitesimal change in $\psi$ is just (proportional to) $\psi$ itself, the Ward identity applied to $\bra\psi(x_1) \bar\psi(x_2)\ket$ gives
 \[
-  \int \d^4 x_1 \; \d^4 x_2\; e^{ik_1 \cdot x_1} e^{-ik_2 \cdot x_2} \bra \psi(x_1) \bar\psi(x_2)\ket.
+  \partial^\mu \bra j_\mu(x) \psi(x_1) \bar\psi(x_2)\ket = - \delta^4(x - x_1) \bra \psi(x_1) \bar\psi(x_2)\ket + \delta^4(x - x_2) \bra \psi(x_1) \bar\psi(x_2)\ket.
 \]
-But since the system is translation invariant, the correlation $\bra \psi(x_1) \bar\psi(x_2) \ket$ is only dependent on the separation between $x_1$ and $x_2$. So we can write this as
+We now try to understand what these individual terms mean. We first understand the correlators $\bra \psi(x_1) \bar\psi(x_2)\ket$.
+
+Recall that when we did perturbation theory, the propagator was defined as the Fourier transform of the \emph{free theory} correlator $\bra \psi(x_1) \bar\psi(x_2)\ket$. This is given by
+\begin{align*}
+  D(k_1, k_2) &= \int \d^4 x_1 \; \d^4 x_2\; e^{ik_1 \cdot x_1} e^{-ik_2 \cdot x_2} \bra \psi(x_1) \bar\psi(x_2)\ket\\
+  &= \int \d^4 y \;\d^4 x_2\; e^{i(k_1 - k_2) \cdot x_2} e^{ik_1 \cdot y} \bra \psi(y) \bar\psi(0)\ket\\
+  &= \delta^4(k_1 - k_2) \int \d^4 y\; e^{ik\cdot y} \bra \psi(y) \bar\psi(0)\ket.
+\end{align*}
+
+Thus, we can interpret the interacting correlator $\bra \psi(x_1) \bar\psi(x_2)\ket$ as the propagator with ``quantum corrections'' due to the interacting field.
+\begin{defi}[Exact propagator]\index{exact propagator}
+  The \emph{exact (electron) propagator} is defined by
+  \[
+    S(k) = \int \d^4 y\; e^{ik\cdot y} \bra \psi(y) \bar\psi(0)\ket,
+  \]
+  evaluated in the full, interacting theory.
+\end{defi}
+
+Usually, we don't want to evaluate this directly. Just as we can compute the sum over \emph{all} diagrams by computing the sum over all connected diagrams, then take $\exp$, in this case, one useful notion is a \emph{one-particle irreducible graph}.
+
+\begin{defi}[One-particle irreducible graph]\index{one-particle irreducible graph}\index{1PI}
+  A \emph{one-particle irreducible graph} for $\bra \psi \bar\psi\ket$ is a connected Feynman diagram (in momentum space) with two external vertices $\bar\psi$ and $\psi$ such that the graph cannot be disconnected by the removal of one internal line.
+\end{defi}
+This definition is rather abstract, but we can look at some examples to see what this actually means.
+\begin{eg}
+  The following are one-particle irreducible graphs:
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [white, decorate, decoration={snake}] (0.8, 0) arc(180:360:0.7) node [pos=0.5, above=0.5em] {$\gamma$};
+      \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (3, 0) node [circ] {} node [above] {$\psi$};
+      \draw [decorate, decoration={snake}] (0.8, 0) arc(180:0:0.7) node [pos=0.5, above=0.5em] {$\gamma$};
+    \end{tikzpicture}
+    \begin{tikzpicture}
+      \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (3, 0) node [circ] {} node [above] {$\psi$};
+      \draw [decorate, decoration={snake}] (0.5, 0) arc(180:0:0.7);
+      \draw [decorate, decoration={snake}] (1.2, 0) arc(180:360:0.7);
+    \end{tikzpicture}
+  \end{center}
+  while the following is not:
+  \begin{center}
+    \begin{tikzpicture}
+      \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (4.7, 0) node [circ] {} node [above] {$\psi$};
+      \draw [decorate, decoration={snake}] (0.5, 0) arc(180:0:0.7);
+      \draw [decorate, decoration={snake}] (2.8, 0) arc(180:0:0.7);
+    \end{tikzpicture}
+  \end{center}
+\end{eg}
+
+We will write
 \[
-  \int \d^4 y \;\d^4 x_2\; e^{i(k_1 - k_2) \cdot x_2} e^{ik_1 \cdot y} \bra \psi(y) \bar\psi(0)\ket,
+  \begin{tikzpicture}[eqpic]
+    \draw [fill=white] (1, 0) circle [radius=0.3] node {1PI};
+  \end{tikzpicture}
+  =
+  \Sigma(\slashed{k})
 \]
-where $y = x_1 - x_2$. We write the result as
-\[
-  \delta^4(k_1 - k_2) S(k_1),
-\]
-where
-\[
-  S(k) = \int \d^4 y\; e^{ik\cdot y} \bra \psi(y) \bar\psi(0)\ket
-\]
-is the \term{$2$-point function} of the electron field in momentum space. This definition is an exact object, but if we wanted to compute this in perturbation theory, we can draw the diagram
+for the sum of all contributions due to one-particle irreducible graphs. This is known as the \term{electron self-energy}\index{self-energy!electron}. Note that we do not include the contributions of the propagators connecting us to the external legs. It is not difficult to see that any Feynman diagram with external vertices $\bar\psi$, $\psi$ is just a bunch of 1PI's joined together. Thus, we can expand
 \[\arraycolsep=0.25em\def\arraystretch{2.2}
-  \begin{array}{ccccc} % fix
+  \begin{array}{ccccc}
   S(k) & \sim &
   \begin{tikzpicture}[eqpic]
 
     \draw [fill, white] (0.7, 0.3) rectangle (1.3, -0.3);
     \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (2, 0) node [circ] {} node [above] {$\psi$};
+    \draw [opacity=0] (0, 0) node [circ] {} node [below] {$\bar\psi$} -- (2, 0) node [circ] {} node [below] {$\psi$};
   \end{tikzpicture}
   &+&
   \begin{tikzpicture}[eqpic]
     \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (2, 0) node [circ] {} node [above] {$\psi$};
+    \draw [opacity=0] (0, 0) node [circ] {} node [below] {$\bar\psi$} -- (2, 0) node [circ] {} node [below] {$\psi$};
 
     \draw [fill] (0.7, 0.3) rectangle (1.3, -0.3);
   \end{tikzpicture}\\
   & & \displaystyle\frac{1}{i \slashed{k} + m} &+& \text{quantum corrections}.
 \end{array}
 \]
-Here we are lazy and use a black box to denote all quantum corrections. If we are less lazy, we can write this as
+with the quantum corrections given by
 \[
   \begin{tikzpicture}[eqpic]
     \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (2, 0) node [circ] {} node [above] {$\psi$};
 
     \draw [fill] (0.7, 0.3) rectangle (1.3, -0.3);
+    \draw [opacity=0] (0, 0) node [circ] {} node [below] {$\bar\psi$} -- (2, 0) node [circ] {} node [below] {$\psi$};
   \end{tikzpicture}
   =
   \begin{tikzpicture}[eqpic]
     \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (2, 0) node [circ] {} node [above] {$\psi$};
 
-    \draw [fill=white] (1, 0) circle [radius=0.3] node {IPI};
+    \draw [fill=white] (1, 0) circle [radius=0.3] node {1PI};
+    \draw [opacity=0] (0, 0) node [circ] {} node [below] {$\bar\psi$} -- (2, 0) node [circ] {} node [below] {$\psi$};
   \end{tikzpicture}
   +
   \begin{tikzpicture}[eqpic]
     \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (3, 0) node [circ] {} node [above] {$\psi$};
 
-    \draw [fill=white] (1, 0) circle [radius=0.3] node {IPI};
-    \draw [fill=white] (2, 0) circle [radius=0.3] node {IPI};
+    \draw [fill=white] (1, 0) circle [radius=0.3] node {1PI};
+    \draw [fill=white] (2, 0) circle [radius=0.3] node {1PI};
+    \draw [opacity=0] (0, 0) node [circ] {} node [below] {$\bar\psi$} -- (3, 0) node [circ] {} node [below] {$\psi$};
   \end{tikzpicture}
   + \cdots
 \]
-where IPI is the sum of all \term{one-particle irreducible graphs}\index{IPI}, i.e.\ graphs connected graphs that cannot be disconnected by any single internal line.
-
-For example, the following are one-particle irreducible graphs:
-\begin{center}
-  \begin{tikzpicture}
-    \draw [white, decorate, decoration={snake}] (0.8, 0) arc(180:360:0.7) node [pos=0.5, above=0.5em] {$\gamma$};
-    \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (3, 0) node [circ] {} node [above] {$\psi$};
-    \draw [decorate, decoration={snake}] (0.8, 0) arc(180:0:0.7) node [pos=0.5, above=0.5em] {$\gamma$};
-  \end{tikzpicture}
-  \begin{tikzpicture}
-    \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (3, 0) node [circ] {} node [above] {$\psi$};
-    \draw [decorate, decoration={snake}] (0.5, 0) arc(180:0:0.7);
-    \draw [decorate, decoration={snake}] (1.2, 0) arc(180:360:0.7);
-  \end{tikzpicture}
-\end{center}
-while the following is not:
-\begin{center}
-  \begin{tikzpicture}
-    \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (4.7, 0) node [circ] {} node [above] {$\psi$};
-    \draw [decorate, decoration={snake}] (0.5, 0) arc(180:0:0.7);
-    \draw [decorate, decoration={snake}] (2.8, 0) arc(180:0:0.7);
-  \end{tikzpicture}
-\end{center}
-We denote its contributions by
-\[
-  \begin{tikzpicture}[eqpic]
-    \draw [fill=white] (1, 0) circle [radius=0.3] node {IPI};
-  \end{tikzpicture}
-  =
-  \Sigma(\slashed{k})
-\]
-where $k$ is the momentum following in and out of the end points. Note that this does not include the factors coming from the propagators. This is called the \term{electron self-energy}. For now, we will imagine that we have somehow managed to compute this, and see what we can do. In terms of $\Sigma(\slashed{k})$, the exact propagator is
+This sum is easy to perform. The diagram with $n$ many 1PI's has contributions from $n$ many 1PI's and $n + 1$ many propagators. Also, momentum contribution forces them to all have the same momentum. So we simply have a geometric series
 \begin{align*}
-  S(k) &= \frac{1}{i\slashed{k} + m} + \frac{1}{i\slashed{k} + m} \Sigma(\slashed{k}) \frac{1}{i\slashed{k} + m} + \frac{1}{i\slashed{k} + m} \Sigma(\slashed{k}) \frac{1}{i\slashed{k} + m} \Sigma(\slashed{k}) \frac{1}{i\slashed{k} + m} + \cdots\\
-  &= \frac{1}{i\slashed{k} + m- \Sigma(\slashed{k})}
+  S(k) &\sim \frac{1}{i\slashed{k} + m} + \frac{1}{i\slashed{k} + m} \Sigma(\slashed{k}) \frac{1}{i\slashed{k} + m} + \frac{1}{i\slashed{k} + m} \Sigma(\slashed{k}) \frac{1}{i\slashed{k} + m} \Sigma(\slashed{k}) \frac{1}{i\slashed{k} + m} + \cdots\\
+  &= \frac{1}{i\slashed{k} + m- \Sigma(\slashed{k})}.
 \end{align*}
-by summing the geometric series.
 
-Let's think about this for a moment. In the low-dimensional cases we worked, with, we saw that when we integrated out higher terms, the coupling coefficients shifted. Here, what we have done is essentially integrating out all those virtual photons, and we see a shift in the kinetic term by $\Sigma(\slashed{k})$. It's just that this time we are living in momentum space.
+We can interpret this result as saying integrating out the virtual photons gives us a shift in the kinetic term by $\Sigma(\slashed{k})$.
 
-We now want to look at the other quantity $\bra \psi(x_1) j_\mu(x) \bar\psi(x_2)\ket$ in the Ward identity. This corresponds to the Feynman graphs that connect electron field insertions at $x_1, x_2$ to the current at $x$.
-
-We define the \term{exact electromagnetic vertex} $\Gamma_\mu(k_1, k_2)$ by
-\begin{align*}
-  &\hphantom{={}}\int \d^4 x\; \d^4 x_1\; \d^4 x_2\; \bra j_\mu(x) \psi(x_1) \bar\psi(x_2)\ket e^{ip\cdot x} e^{ik_1 \cdot x_1} e^{-ik_2 \cdot x_2}\\
-  &= \int \d^4 x\; \d^4 x_1\; \d^4 x_2\; \bra j_\mu (x - x_2) \psi(x_1 - x_2) \bar\psi(0) \ket\\
-  &\hphantom{\int \d^4 x\; \d^4 x_1\; \d^4 x_2\; hereissomespacefi} e^{ip\cdot (x - x_2)} e^{ik_1 \cdot (x_1 - x_2)} e^{i(p + k_1 - k_2)\cdot x_2}\\
-  &= \delta^4(p + k_1 - k_2) S(k_1) \Gamma_\mu(k_1, k_2) S(k_2),
-\end{align*}
-where $S$ is what we had before, the exact electron propagator. To understand why we write it in this form, note that since
+We now move on to study the other term. It was the expectation
 \[
-  j_\mu(x) = \bar\psi(x) \gamma_\mu \psi(x),
+  \bra j_\mu(x) \psi(x_1) \bar\psi(x_2)\ket.
 \]
-we know that the quantity
+We note that using the definition of $\D$, our classical action can be written as
 \[
-  \bra \psi(x_1) j_\mu(x) \bar\psi(x_2)\ket
+  S[A, \psi] =  \int \d^d x\; \frac{1}{4} F_{\mu\nu}F^{\mu\nu} + \bar\psi \slashed \partial \psi + j^\mu A_\mu + m \bar\psi \psi.
 \]
-contains diagrams coming from
-\[
-  \bra \psi(x_1) \bar\psi(x)\ket \gamma_\mu \bra \psi(x) \bar\psi(x_2)\ket
-\]
-Once we Fourier transform this, we just get $S(k_1) \gamma_\mu S(k_2)$. This term corresponds to things of the form
+In position space, this gives interaction vertices of the form
 \begin{center}
   \begin{tikzpicture}
-    \draw (0, 0) node [circ] {} node [above] {$\psi(x_1)$} -- (1.5, 0) node [circ] {} node [above] {$\bar\psi(x)$};
-    \node at (2, 0) {$\gamma_\mu$};
+    \node [circ] at (0, 0) {};
+    \node [circ] at (1.5, -0.5) {};
+    \node [circ] at (3, 0) {};
+    \node [above] at (0, 0) {$x_1$};
+    \node [above] at (1.5, -0.5) {$x$};
+    \node [above] at (3, 0) {$x_2$};
 
-    \draw (2.5, 0) node [circ] {} node [above] {$\psi(x)$} -- (4, 0) node [circ] {} node [above] {$\bar\psi(x_2)$};
+    \draw [/tikzfeynman/fermion] (0, 0) -- (1.5, -0.5);
+    \draw [/tikzfeynman/fermion] (1.5, -0.5) -- (3, 0);
+    \draw [/tikzfeynman/photon] (1.5, -0.5) -- (1.5, -2);
   \end{tikzpicture}
 \end{center}
-This is the really boring term. It counts the contributions when virtual interactions happen to the electron from $x_1$ to $x$ ($S(k_1)$), then it meets the current ($\gamma^\mu$), and then as it goes back to $x_2$, some virtual interactions happen again ($S(k_2)$).
+Again, we want to consider quantum corrections to this interaction vertex. It turns out the interesting correlation function is exactly $\bra j_\mu(x) \psi(x_1) \bar\psi(x_2)\ket$.
 
-The interesting terms are those that come from interactions that happen \emph{across} the electromagnetic vertex, such as
+This might seem a bit odd. Why do we not just look at the vertex itself, and just consider $\bra j_\mu\ket$? Looking at $\psi j_\mu \bar\psi$ instead corresponds to including including the propagators coming from the external legs. The point is that there can be photons that stretch \emph{across} the vertex, looking like
 \begin{center}
   \begin{tikzpicture}
-    \draw (-2, 0) node [circ] {} node [above] {$\psi(x_1)$} -- (-0.25, 0) node [circ] {};
+    \node [circ] at (0, 0) {};
+    \node [circ] at (1.5, -0.5) {};
+    \node [circ] at (3, 0) {};
+    \node [above] at (0, 0) {$x_1$};
+    \node [above] at (1.5, -0.5) {$x$};
+    \node [above] at (3, 0) {$x_2$};
 
-    \draw (0.25, 0) node [circ] {} -- (2, 0) node [circ] {} node [above] {$\bar\psi(x_2)$};
-    \draw [decorate, decoration={snake}] (-1.25, 0) arc(180:0:1.25);
-
-    \draw (0, 0) circle [radius=0.25];
-
-    \draw (0.177, 0.177) -- (-0.177, -0.177);
-    \draw (-0.177, 0.177) -- (0.177, -0.177);
+    \draw [/tikzfeynman/fermion] (0, 0) -- (1.5, -0.5);
+    \draw [/tikzfeynman/fermion] (1.5, -0.5) -- (3, 0);
+    \draw [/tikzfeynman/photon] (1.5, -0.5) -- (1.5, -2);
+    \draw (0.75, -0.25) edge [bend left, /tikzfeynman/photon] (2.25, -0.25);
   \end{tikzpicture}
 \end{center}
-Of course, there is nothing preventing us from having crazy photon stuff happening solely before or after $j(x)$. So we have those $S(k)$ terms. Thus
+So when doing computations, we must involve the two external electron propagators as well. (We do not include the photon propagator. We explore what happens when we do that in the example sheet)
+
+We again take the Fourier transform of the correlator, and define
+\begin{defi}[Exact electromagnetic vertex]\index{exact electromagnetic vertex}
+  The \emph{exact electromagnetic vertex} $\Gamma_\mu(k_1, k_2)$ is defined by
+  \begin{multline*}
+   \delta^4(p + k_1 - k_2) S(k_1) \Gamma_\mu(k_1, k_2) S(k_2) \\
+   = \int \d^4 x\; \d^4 x_1\; \d^4 x_2\; \bra j_\mu(x) \psi(x_1) \bar\psi(x_2)\ket e^{ip\cdot x} e^{ik_1 \cdot x_1} e^{-ik_2 \cdot x_2}.
+ \end{multline*}
+\end{defi}
+Note that we divided out the $S(k_1)$ and $S(k_2)$ in the definition of $\Gamma_\mu(k_1, k_2)$, because ultimately, we are really just interested in the vertex itself.
+
+Can we figure out what this $\Gamma$ is? Up to first order, we have
+\[
+  \bra \psi(x_1) j_\mu(x) \bar\psi(x_2)\ket \sim \bra \psi(x_1) \bar\psi(x)\ket \gamma_\mu \bra \psi(x) \bar\psi(x_2)\ket + \text{quantum corrections}.
+\]
+So in momentum space, after dividing out by the exact propagators, we obtain
 \[
   \Gamma_\mu(k_1, k_2) = \gamma_\mu + \text{quantum corrections}.
 \]
-These are the ingredients we need. Let's now go back to the Ward identity, and see what it says. In momentum space, we take the Fourier transform of the whole equation on top. When we differentiate with respect to $x$, we pull down a factor of $p$ when integrating by parts, but we know $p = k_1 - k_2$. So we get
+This first order term corresponds to diagrams that do \emph{not} include photons going across the two propagators, and just corresponds to the classical $\gamma_\mu$ inside the definition of $j_\mu$. The quantum corrections are the interesting parts.
+
+In the case of the exact electron propagator, we had this clever idea of one-particle irreducible graphs that allowed us to simplify the propagator computations. Do we have a similar clever idea here? Unfortunately, we don't. But we don't have to! The Ward identity relates the exact vertex to the exact electron propagator.
+
+Taking the Fourier transform of the Ward identity, and dropping some $\delta$-functions, we obtain
 \[
   (k_1 - k_2)_\mu S(k_1) \Gamma^\mu (k_1, k_2) S(k_2) = i S(k_1) - i S(k_2).
 \]
-We can isolate the correction to the vertex here. Recall that $S(k_i)$ are matrices in spinor space. So we can invert them to get
+Recall that $S(k_i)$ are matrices in spinor space, and we wrote them as $\frac{1}{\cdots}$. So it is easy to invert them, and we find
 \begin{align*}
   (k_1 - k_2)_\mu \Gamma^\mu(k_1, k_2) &= i S^{-1}(k_2) - i S^{-1}(k_1)\\
-  &= i (i \slashed{k}_1 m - \Sigma(\slashed{k}_1) - i \slashed{k}_2 - m + \Sigma(\slashed{k}_2))\\
+  &= -i (i \slashed{k}_1  + m - \Sigma(\slashed{k}_1) - i \slashed{k}_2 - m + \Sigma(\slashed{k}_2))\\
   &= (k_1 - k_2)_\mu \gamma^\mu + i (\Sigma(\slashed{k}_1) - \Sigma(\slashed{k}_2)).
 \end{align*}
-What this really is saying is that the quantum corrections to the electron term $i \bar\psi \slashed \partial \psi$ must be related to quantum corrections to the vertex $\bar\psi \slashed{A} \psi$.
+This gives us an explicit expression for the quantum corrections of the exact vertex $\Gamma^\mu$ in terms of the quantum corrections of the exact propagator $S(k)$.
 
-This is of course important. This identity is an important check of gauge invariance. The fact that quantum corrections treat the covariant kinetic term $i \bar\psi \slashed D \psi$ as a whole tells us that the quantum theory respect gauge transformations. We don't get separate quantum corrections for the kinetic part and the interaction part, or else we would have broken gauge invariance.
+Note that very little of this calculation relied on what field we actually worked with. We could have included more fields in the theory, and everything would still go through. We might obtain a different value of $\Sigma(\slashed{k})$, but this relation between the quantum corrections of $\Gamma^\mu$ and the quantum corrections of $S$ still holds.
 
-How could this fail? There is a subtlety. We assumed that
-\[
-  j_\mu(x) = \bar\psi \gamma_\mu \psi,
-\]
-which is the current we obtained in the classical theory. We didn't allow for a change in path integral measure $\D \psi\;\D \bar\psi$, which would have contributed to the current as well. If this is true, then what we said would go through.
+What is the ``philosophical'' meaning of this? Recall that the contributions to the propagator comes from the $\bar\psi \slashed{\partial} \psi$ term, while the contributions to the vertex comes from the $\bar\psi \slashed{A} \psi$ term. The fact that their quantum corrections are correlated in such a simple way suggests that our quantum theory treats the $\bar\psi \slashed{D} \psi$ term as a whole, and so they receive the ``same'' quantum corrections. In other words, the quantum theory respects gauge transformations. When we first studied QED, we didn't understand renormalization very well, and the Ward identity provided a sanity check that we didn't mess up the gauge invariance of our theory when regularizing.
 
-However, if we regularized $\D \psi\; \D \bar\psi$ by imposing a cutoff in the Fourier modes, asking $k^2 \leq \Lambda_0$, then this is not compatible with $\psi(x) \mapsto e^{i\alpha(x)} \psi(x)$, as doing this transformation will mix low and higher Fourier modes. The Fourier transform of a product is the convolution of the Fourier transform, so we mix different Fourier modes.
+How could we have messed up? In the derivations, there was one crucial assumption we made, namely that $\D \psi \D \bar\psi$ is invariant under \emph{position-dependent} transformations $\psi(x) \mapsto e^{i\alpha(x)} \psi(x)$. This was needed for $j_\mu$ to be the classical current. This is true if we regularized by sampling our field at different points in space, as long as we included the same number of $\psi$ and $\bar\psi$ terms.
 
-Historically, this is the cutoff people used, and that is also what we are going to use in the next few lectures. This works well for scalar field theories, but when we try to do it for gauge theory, we would have broken gauge invariance by doing so. Thus, if we see that the Ward identity holds, this is a good check that we haven't broken things too much.
+However, historically, this is not what we used. Instead, we imposed cutoffs in the Fourier modes, asking $k^2 \leq \Lambda_0$. This is \emph{not} compatible with arbitrary changes $\psi(x) \mapsto e^{i\alpha(x)} \psi(x)$, as we can introduce some really high frequency changes in $\psi$ by picking a wild $\alpha$.
+
+
+%\separator
+%We now want to look at the other quantity $\bra \psi(x_1) j_\mu(x) \bar\psi(x_2)\ket$ in the Ward identity. This corresponds to the Feynman graphs that connect electron field insertions at $x_1, x_2$ to the current at $x$.
+%
+%We define the \term{exact electromagnetic vertex} $\Gamma_\mu(k_1, k_2)$ by
+%\begin{align*}
+%  &\hphantom{={}}\int \d^4 x\; \d^4 x_1\; \d^4 x_2\; \bra j_\mu(x) \psi(x_1) \bar\psi(x_2)\ket e^{ip\cdot x} e^{ik_1 \cdot x_1} e^{-ik_2 \cdot x_2}\\
+%  &= \int \d^4 x\; \d^4 x_1\; \d^4 x_2\; \bra j_\mu (x - x_2) \psi(x_1 - x_2) \bar\psi(0) \ket\\
+%  &\hphantom{\int \d^4 x\; \d^4 x_1\; \d^4 x_2\; hereissomespacefi} e^{ip\cdot (x - x_2)} e^{ik_1 \cdot (x_1 - x_2)} e^{i(p + k_1 - k_2)\cdot x_2}\\
+%  &= \delta^4(p + k_1 - k_2) S(k_1) \Gamma_\mu(k_1, k_2) S(k_2),
+%\end{align*}
+%where $S$ is what we had before, the exact electron propagator. To understand why we write it in this form, note that since
+%\[
+%  j_\mu(x) = \bar\psi(x) \gamma_\mu \psi(x),
+%\]
+%we know that the quantity
+%\[
+%  \bra \psi(x_1) j_\mu(x) \bar\psi(x_2)\ket
+%\]
+%contains diagrams coming from
+%\[
+%  \bra \psi(x_1) \bar\psi(x)\ket \gamma_\mu \bra \psi(x) \bar\psi(x_2)\ket
+%\]
+%Once we Fourier transform this, we just get $S(k_1) \gamma_\mu S(k_2)$. This term corresponds to things of the form
+%\begin{center}
+%  \begin{tikzpicture}
+%    \draw (0, 0) node [circ] {} node [above] {$\psi(x_1)$} -- (1.5, 0) node [circ] {} node [above] {$\bar\psi(x)$};
+%    \node at (2, 0) {$\gamma_\mu$};
+%
+%    \draw (2.5, 0) node [circ] {} node [above] {$\psi(x)$} -- (4, 0) node [circ] {} node [above] {$\bar\psi(x_2)$};
+%  \end{tikzpicture}
+%\end{center}
+%This is the really boring term. It counts the contributions when virtual interactions happen to the electron from $x_1$ to $x$ ($S(k_1)$), then it meets the current ($\gamma^\mu$), and then as it goes back to $x_2$, some virtual interactions happen again ($S(k_2)$).
+%
+%The interesting terms are those that come from interactions that happen \emph{across} the electromagnetic vertex, such as
+%\begin{center}
+%  \begin{tikzpicture}
+%    \draw (-2, 0) node [circ] {} node [above] {$\psi(x_1)$} -- (-0.25, 0) node [circ] {};
+%
+%    \draw (0.25, 0) node [circ] {} -- (2, 0) node [circ] {} node [above] {$\bar\psi(x_2)$};
+%    \draw [decorate, decoration={snake}] (-1.25, 0) arc(180:0:1.25);
+%
+%    \draw (0, 0) circle [radius=0.25];
+%
+%    \draw (0.177, 0.177) -- (-0.177, -0.177);
+%    \draw (-0.177, 0.177) -- (0.177, -0.177);
+%  \end{tikzpicture}
+%\end{center}
+%Of course, there is nothing preventing us from having crazy photon stuff happening solely before or after $j(x)$. So we have those $S(k)$ terms. Thus
+%\[
+%  \Gamma_\mu(k_1, k_2) = \gamma_\mu + \text{quantum corrections}.
+%\]
+%These are the ingredients we need. Let's now go back to the Ward identity, and see what it says. In momentum space, we take the Fourier transform of the whole equation on top. When we differentiate with respect to $x$, we pull down a factor of $p$ when integrating by parts, but we know $p = k_1 - k_2$. So we get
+%\[
+%  (k_1 - k_2)_\mu S(k_1) \Gamma^\mu (k_1, k_2) S(k_2) = i S(k_1) - i S(k_2).
+%\]
+%We can isolate the correction to the vertex here. Recall that $S(k_i)$ are matrices in spinor space. So we can invert them to get
+%\begin{align*}
+%  (k_1 - k_2)_\mu \Gamma^\mu(k_1, k_2) &= i S^{-1}(k_2) - i S^{-1}(k_1)\\
+%  &= i (i \slashed{k}_1 m - \Sigma(\slashed{k}_1) - i \slashed{k}_2 - m + \Sigma(\slashed{k}_2))\\
+%  &= (k_1 - k_2)_\mu \gamma^\mu + i (\Sigma(\slashed{k}_1) - \Sigma(\slashed{k}_2)).
+%\end{align*}
+%What this really is saying is that the quantum corrections to the electron term $i \bar\psi \slashed \partial \psi$ must be related to quantum corrections to the vertex $\bar\psi \slashed{A} \psi$.
+%
+%This is of course important. This identity is an important check of gauge invariance. The fact that quantum corrections treat the covariant kinetic term $i \bar\psi \slashed D \psi$ as a whole tells us that the quantum theory respect gauge transformations. We don't get separate quantum corrections for the kinetic part and the interaction part, or else we would have broken gauge invariance.
+%
+%How could this fail? There is a subtlety. We assumed that
+%\[
+%  j_\mu(x) = \bar\psi \gamma_\mu \psi,
+%\]
+%which is the current we obtained in the classical theory. We didn't allow for a change in path integral measure $\D \psi\;\D \bar\psi$, which would have contributed to the current as well. If this is true, then what we said would go through.
+%
+%However, if we regularized $\D \psi\; \D \bar\psi$ by imposing a cutoff in the Fourier modes, asking $k^2 \leq \Lambda_0$, then this is not compatible with $\psi(x) \mapsto e^{i\alpha(x)} \psi(x)$, as doing this transformation will mix low and higher Fourier modes. The Fourier transform of a product is the convolution of the Fourier transform, so we mix different Fourier modes.
+%
+%Historically, this is the cutoff people used, and that is also what we are going to use in the next few lectures. This works well for scalar field theories, but when we try to do it for gauge theory, we would have broken gauge invariance by doing so. Thus, if we see that the Ward identity holds, this is a good check that we haven't broken things too much.
+%
+%
+%To obtain the Ward identity, we do the normal things --- we let $\alpha$ depend on position. So the transformations become
+%\[
+%  \psi (x) \mapsto e^{i\alpha (x)} \psi(x),\quad A_\mu(x) \mapsto A_\mu(x).
+%\]
+%Note that this is \emph{not} the gauge transformation, as we don't change the photon field.
+%
+%Under this transformation, the classical action is no longer invariant, and we obtain
+%\[
+%  \delta S = \int j^\mu \partial_\mu \alpha \;\d^4 x,
+%\]
+%where
+%\[
+%  j^\mu (x) = \bar\psi (x) \gamma^\mu \psi(x).
+%\]
+%is just the current. This leads to a Ward identity
+%\[
+%  \partial^\mu \bra j_\mu(x) \psi(x_1) \bar\psi(x_2)\ket = - \delta^4(x - x_1) \bra \psi(x_1) \bar\psi(x_2)\ket + \delta^4(x - x_2) \bra \psi(x_1) \bar\psi(x_2)\ket,
+%\]
+%noting that the infinitesimal change in $\psi$ is just (proportional to) $\psi$ itself. As always, we found that when we computed the insertion of the current, it is divergence free except in at the insertion points $x_1$ and $x_2$.
+%
+%Let's look at this in momentum space, which is how it is traditionally done. We consider the Fourier transform
+%\[
+%  \int \d^4 x_1 \; \d^4 x_2\; e^{ik_1 \cdot x_1} e^{-ik_2 \cdot x_2} \bra \psi(x_1) \bar\psi(x_2)\ket.
+%\]
+%But since the system is translation invariant, the correlation $\bra \psi(x_1) \bar\psi(x_2) \ket$ is only dependent on the separation between $x_1$ and $x_2$. So we can write this as
+%\[
+%  \int \d^4 y \;\d^4 x_2\; e^{i(k_1 - k_2) \cdot x_2} e^{ik_1 \cdot y} \bra \psi(y) \bar\psi(0)\ket,
+%\]
+%where $y = x_1 - x_2$. We write the result as
+%\[
+%  \delta^4(k_1 - k_2) S(k_1),
+%\]
+%where
+%\[
+%  S(k) = \int \d^4 y\; e^{ik\cdot y} \bra \psi(y) \bar\psi(0)\ket
+%\]
+%is the \term{$2$-point function} of the electron field in momentum space. This definition is an exact object, but if we wanted to compute this in perturbation theory, we can draw the diagram
+%\[\arraycolsep=0.25em\def\arraystretch{2.2}
+%  \begin{array}{ccccc} % fix
+%  S(k) & \sim &
+%  \begin{tikzpicture}[eqpic]
+%
+%    \draw [fill, white] (0.7, 0.3) rectangle (1.3, -0.3);
+%    \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (2, 0) node [circ] {} node [above] {$\psi$};
+%  \end{tikzpicture}
+%  &+&
+%  \begin{tikzpicture}[eqpic]
+%    \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (2, 0) node [circ] {} node [above] {$\psi$};
+%
+%    \draw [fill] (0.7, 0.3) rectangle (1.3, -0.3);
+%  \end{tikzpicture}\\
+%  & & \displaystyle\frac{1}{i \slashed{k} + m} &+& \text{quantum corrections}.
+%\end{array}
+%\]
+%Here we are lazy and use a black box to denote all quantum corrections. If we are less lazy, we can write this as
+%\[
+%  \begin{tikzpicture}[eqpic]
+%    \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (2, 0) node [circ] {} node [above] {$\psi$};
+%
+%    \draw [fill] (0.7, 0.3) rectangle (1.3, -0.3);
+%  \end{tikzpicture}
+%  =
+%  \begin{tikzpicture}[eqpic]
+%    \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (2, 0) node [circ] {} node [above] {$\psi$};
+%
+%    \draw [fill=white] (1, 0) circle [radius=0.3] node {IPI};
+%  \end{tikzpicture}
+%  +
+%  \begin{tikzpicture}[eqpic]
+%    \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (3, 0) node [circ] {} node [above] {$\psi$};
+%
+%    \draw [fill=white] (1, 0) circle [radius=0.3] node {IPI};
+%    \draw [fill=white] (2, 0) circle [radius=0.3] node {IPI};
+%  \end{tikzpicture}
+%  + \cdots
+%\]
+%where IPI is the sum of all \term{one-particle irreducible graphs}\index{IPI}, i.e.\ graphs connected graphs that cannot be disconnected by any single internal line.
+%
+%For example, the following are one-particle irreducible graphs:
+%\begin{center}
+%  \begin{tikzpicture}
+%    \draw [white, decorate, decoration={snake}] (0.8, 0) arc(180:360:0.7) node [pos=0.5, above=0.5em] {$\gamma$};
+%    \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (3, 0) node [circ] {} node [above] {$\psi$};
+%    \draw [decorate, decoration={snake}] (0.8, 0) arc(180:0:0.7) node [pos=0.5, above=0.5em] {$\gamma$};
+%  \end{tikzpicture}
+%  \begin{tikzpicture}
+%    \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (3, 0) node [circ] {} node [above] {$\psi$};
+%    \draw [decorate, decoration={snake}] (0.5, 0) arc(180:0:0.7);
+%    \draw [decorate, decoration={snake}] (1.2, 0) arc(180:360:0.7);
+%  \end{tikzpicture}
+%\end{center}
+%while the following is not:
+%\begin{center}
+%  \begin{tikzpicture}
+%    \draw (0, 0) node [circ] {} node [above] {$\bar\psi$} -- (4.7, 0) node [circ] {} node [above] {$\psi$};
+%    \draw [decorate, decoration={snake}] (0.5, 0) arc(180:0:0.7);
+%    \draw [decorate, decoration={snake}] (2.8, 0) arc(180:0:0.7);
+%  \end{tikzpicture}
+%\end{center}
+%We denote its contributions by
+%\[
+%  \begin{tikzpicture}[eqpic]
+%    \draw [fill=white] (1, 0) circle [radius=0.3] node {IPI};
+%  \end{tikzpicture}
+%  =
+%  \Sigma(\slashed{k})
+%\]
+%where $k$ is the momentum following in and out of the end points. Note that this does not include the factors coming from the propagators. This is called the \term{electron self-energy}. For now, we will imagine that we have somehow managed to compute this, and see what we can do. In terms of $\Sigma(\slashed{k})$, the exact propagator is
+%\begin{align*}
+%  S(k) &= \frac{1}{i\slashed{k} + m} + \frac{1}{i\slashed{k} + m} \Sigma(\slashed{k}) \frac{1}{i\slashed{k} + m} + \frac{1}{i\slashed{k} + m} \Sigma(\slashed{k}) \frac{1}{i\slashed{k} + m} \Sigma(\slashed{k}) \frac{1}{i\slashed{k} + m} + \cdots\\
+%  &= \frac{1}{i\slashed{k} + m- \Sigma(\slashed{k})}
+%\end{align*}
+%by summing the geometric series.
+%
+%Let's think about this for a moment. In the low-dimensional cases we worked, with, we saw that when we integrated out higher terms, the coupling coefficients shifted. Here, what we have done is essentially integrating out all those virtual photons, and we see a shift in the kinetic term by $\Sigma(\slashed{k})$. It's just that this time we are living in momentum space.
+
 
 \section{Wilsonian renormalization}
 \subsection{Background setting}
 We are now going to study renormalization. Most of the time, we will assume we are talking about a real scalar field $\varphi$, but the ideas and results are completely general.
 
-We will regularize our path integral measure by integrating only over Fourier components with $k^2 < \Lambda_0$. The general action is written as
+Supposed we did some experiments, obtained some results, and figured that we are probably working with a quantum field theory described by some action. But we didn't test our theory to arbitrarily high energies. We don't know how ``real physics'' looks like at high energy scales. So we can't really write down a theory that we can expect is valid to arbitrarily high energies.
+
+However, we have previously seen that ``integrating out'' high energy particles has the same effect as just modifying the coupling constants of our theory. Similarly, even with a single fixed field $\varphi$, we can integrate out the high energy modes of the field $\varphi$, and obtain an effective theory. Suppose we integrate out all modes with $k^2 \geq \Lambda_0$, and obtain an effective action
 \[
-% S_{\Lambda_0} [\varphi] = \int_M \d^d x\; \left[\frac{1}{2}(\partial \varphi)^2 + \frac{m^2}{2} \varphi^2 + \sum_i g_i(\Lambda_0) \Lambda^{d - d_i}_0 \mathcal{O}_i(\varphi , \partial\varphi)\right],
+  S_{\Lambda_0} [\varphi] = \int_M \d^d x\; \left[\frac{1}{2}(\partial \varphi)^2 + \sum_i g_i \mathcal{O}_i(\varphi , \partial\varphi)\right].
+\]
+This, by definition, means the partition function of the theory is now given by
+\[
+  \mathcal{Z} = \int_{C^\infty(M)_{\leq \Lambda_0}} \D \varphi\;e^{-S_{\Lambda_0}[\varphi]},
+\]
+where \term{$C^\infty(M)_{\leq \Lambda_0}$} denotes the space of all functions on $M$ consisting of sums (integrals) of eigenmodes of the Laplacian with eigenvalues $\leq \Lambda_0$ (in ``layman'' terms, these are fields with momentum $k^2 \leq \Lambda_0$). This effective action can answer questions about ``low energy physics'', at scales $< \Lambda_0$, which we can use to test our theory against experiments.
+
+Note that in the case of a compact universe, the Laplacian has discrete eigenvalues. For example, if we work on a flat torus (equivalently, $\R^n$ with periodic boundary conditions), then the possible eigenvalues of the Laplacian lie on a lattice. Then after imposing a cutoff, there are only finitely many energy modes, and we have successfully regularized the theory into something that makes mathematical sense.
+
+In the case of a non-compact universe, this doesn't happen. But still, in perturbation theory, this theory will give finite answers, not infinite ones. The loop integrals will have a finite cut-off, and will thus give finite answers. Of course, we are not saying that summing all Feynman diagrams will give a finite answer --- this doesn't happen even for 0-dimensional QFTs. (This isn't exactly true. There are further subtleties due to ``infrared divergences''. We'll mostly ignore these, as they are not really problems related to renormalization)
+
+Either way, we have managed to find ourselves a theory that we are reasonably confident in, and gives us the correct predictions in our experiments.
+
+Now suppose 10 years later, we got the money and built a bigger accelerator. We can then test our theories at higher energy scales. We can then try to write down an effective action at this new energy scale. Of course, it will be a different action, since we have changed the energy scale. However, the two actions are not unrelated! Indeed, they must give the same answers for our ``low energy'' experiments. Thus, we would like to understand how the action changes when we change this energy scale.
+
+In general, the coupling constants are a function of the energy scale $\Lambda_0$, and we will write them as $g_i(\Lambda_0)$. The most general (local) action can be written as
+\[
   S_{\Lambda_0} [\varphi] = \int_M \d^d x\; \left[\frac{1}{2}(\partial \varphi)^2 + \sum_i g_i(\Lambda_0) \Lambda^{d - d_i}_0 \mathcal{O}_i(\varphi , \partial\varphi)\right],
 \]
-where $\mathcal{O}(\varphi, \partial \varphi)$ are monomials in fields and derivatives, and $d_i$ the mass dimension $[\mathcal{O}_i]$.
+where $\mathcal{O}(\varphi, \partial \varphi)$ are monomials in fields and derivatives, and $d_i$ the mass dimension $[\mathcal{O}_i]$. Note that this expression assumes that the kinetic term does not depend on $\Lambda_0$. This is generally not the case, and we will address this issue later.
 
-Dimensional analysis is going to play a big role when we study normalization. Thus, we try to keep our dimensions as simple as possible. In particular, the powers of the cut-off $\Lambda_0$ are a convention chosen so that the couplings $g_0 = g_i(\Lambda_0)$ are dimensionless.
+We inserted the factor of $\Lambda_0^{d - d_i}$ such that the coupling constants $g_i(\Lambda_0)$ are dimensionless. This is useful, as we are going to use dimensional analysis a lot. However, this has the slight disadvantage that even without the effects of integrating out fields, the coupling constants $g_i$ must change as we change the energy scale $\Lambda_0$.
 
-It is useful to figure out what the dimensions of our terms actually are. We know that $S$ itself is dimensionless, since we want to stick it into an exponential. Thus, any term appearing in the integrand must have mass dimension $d$ (as the measure has mass dimension $-d$).
+To do this, we need to actually figure out the mass dimension of our operators $\mathcal{O}_i$. Thus, we need to figure out the dimensions of $\varphi$ and $\partial$. We know that $S$ itself is dimensionless, since we want to stick it into an exponential. Thus, any term appearing in the integrand must have mass dimension $d$ (as the measure has mass dimension $-d$).
 
-Thus, we deduce that we must have
+By looking at the kinetic term in the Lagrangian, we deduce that we must have
 \[
-  [(\partial \varphi)^2] = d,
+  [(\partial \varphi)^2] = d.
 \]
 as we have to eventually integrate it over space.
 
 Also, we know that $[\partial_\mu] = 1$. Thus, we must have
 \begin{prop}
   \[
-    [\varphi] = \frac{d - 2}{2}.
+    [\partial_\mu] = 1,\quad [\varphi] = \frac{d - 2}{2}.
   \]
 \end{prop}
 
-\begin{eg}
-  If $\mathcal{O}(\varphi, \partial \varphi) = \varphi^4$, then the mass dimension is
-  \[
-    d_{\varphi^4} = [\varphi^4] = 2 (d - 2).
-  \]
-  On the other hand, if $\mathcal{O}(\varphi, \partial \varphi) = \varphi^2 (\partial\varphi)^2$, then
-  \[
-    d_{\varphi^2 (\partial \varphi)^2} [\varphi^2 (\partial \varphi)^2] = 2 (d - 2) + 2.
-  \]
-\end{eg}
-We now construct our regularized path integral.
-\begin{notation}
-  We write
-  \[
-    C^\infty(M)_{\leq \Lambda_0}
-  \]
-  for the space of all functions on $M$ that can be written as the sum of eigenmodes of the Laplacian with eigenvalue $\leq \Lambda_0^2$, i.e.\ modes of ``energy'' $\leq \Lambda_0$.
-\end{notation}
-We can then define a regularized path integral by
-\[
-  \mathcal{Z}(\Lambda_0, g_i(\Lambda_0)) = \int_{C^\infty(M)_{\leq \Lambda_0}} \D \varphi\;e^{-S_{\Lambda_0}[\varphi]},
-\]
-Note that mathematically, once we have fixed our manifold $M$, this is just an ordinary function of the $\Lambda_0$ and the $g_i$. We can disregard physics completely, and are free to plug in any values of $\Lambda_0$ and $g_i$, and try to compute this integral.
-
-Does this regularized path integral actually exist? If $M$ is compact, then $C^\infty(M)_{\leq \Lambda_0}$ is finite-dimensional, and the measure $\D \varphi$ really exists. For example, if $M = T^d = \R^d/L\Z^d$, so that each direction has period $L$, then we can write
-\[
-  \varphi(x) = \sum_{\mathbf{n} \in \Z^d} \hat{\varphi}_\mathbf{n} e^{2\pi i \mathbf{n}\cdot \mathbf{x}/L},
-\]
-and we integrate over modes where
-\[
-  \mathbf{n}^2 \leq \Lambda_0^2 \left(\frac{L}{2\pi}\right)^2.
-\]
-It is an exercise for the reader to show that there are only finitely many $d$-tuples $\mathbf{n}$ that obeys this.
-
-However, if $M$ is non-compact, e.g.\ $\R^4$, then there are further subtleties here due to ``infrared divergence''. We'll mostly ignore these, as they are not really problems related to renormalization. When developing the theory, we can just assume we are working with a compact space $M$, and everything is fine. However, when actually doing computations, we will assume (or pretend) our theory still makes sense in non-compact cases.
+%\begin{eg}
+%  If $\mathcal{O}(\varphi, \partial \varphi) = \varphi^4$, then the mass dimension is
+%  \[
+%    d_{\varphi^4} = [\varphi^4] = 2 (d - 2).
+%  \]
+%  On the other hand, if $\mathcal{O}(\varphi, \partial \varphi) = \varphi^2 (\partial\varphi)^2$, then
+%  \[
+%    d_{\varphi^2 (\partial \varphi)^2} = [\varphi^2 (\partial \varphi)^2] = 2 (d - 2) + 2.
+%  \]
+%\end{eg}
+%We now construct our regularized path integral.
+%\begin{notation}
+%  We write
+%  \[
+%    C^\infty(M)_{\leq \Lambda_0}
+%  \]
+%  for the space of all functions on $M$ that can be written as the sum of eigenmodes of the Laplacian with eigenvalue $\leq \Lambda_0^2$, i.e.\ modes of ``energy'' $\leq \Lambda_0$.
+%\end{notation}
+%We can then define a regularized path integral by
+%\[
+%  \mathcal{Z}(\Lambda_0, g_i(\Lambda_0)) = \int_{C^\infty(M)_{\leq \Lambda_0}} \D \varphi\;e^{-S_{\Lambda_0}[\varphi]},
+%\]
+%Note that mathematically, once we have fixed our manifold $M$, this is just an ordinary function of the $\Lambda_0$ and the $g_i$. We can disregard physics completely, and are free to plug in any values of $\Lambda_0$ and $g_i$, and try to compute this integral.
+%
+%Does this regularized path integral actually exist? If $M$ is compact, then $C^\infty(M)_{\leq \Lambda_0}$ is finite-dimensional, and the measure $\D \varphi$ really exists. For example, if $M = T^d = \R^d/L\Z^d$, so that each direction has period $L$, then we can write
+%\[
+%  \varphi(x) = \sum_{\mathbf{n} \in \Z^d} \hat{\varphi}_\mathbf{n} e^{2\pi i \mathbf{n}\cdot \mathbf{x}/L},
+%\]
+%and we integrate over modes where
+%\[
+%  \mathbf{n}^2 \leq \Lambda_0^2 \left(\frac{L}{2\pi}\right)^2.
+%\]
+%It is an exercise for the reader to show that there are only finitely many $d$-tuples $\mathbf{n}$ that obeys this.
+%
+%However, if $M$ is non-compact, e.g.\ $\R^4$, then there are further subtleties here due to ``infrared divergence''. We'll mostly ignore these, as they are not really problems related to renormalization. When developing the theory, we can just assume we are working with a compact space $M$, and everything is fine. However, when actually doing computations, we will assume (or pretend) our theory still makes sense in non-compact cases.
 
 \subsection{Integrating out modes}
-Suppose, for some magical reason, we know exactly what the theory at the energy scale $\Lambda_0$ is, and they are given by the coupling coefficients $g_i(\Lambda_0)$. We now try to understand what happens when we integrate out a lot of high energy modes, and be left with the low energy theory.
+Suppose, for some magical reason, we know exactly what the theory at the energy scale $\Lambda_0$ is, and they are given by the coupling coefficients $g_i(\Lambda_0)$. What happens when we integrate out some high energy modes?
 
 We pick some $\Lambda < \Lambda_0$, and split our field $\varphi$ into ``low'' and ``high'' energy modes as follows:
 \begin{align*}
@@ -2255,11 +2591,10 @@ Let's consider the effective theory we obtain by integrating out $\chi$. As befo
 \[
   S_\Lambda[\phi] = -\hbar \log \left[\int_{C^\infty(M)_{\Lambda < |\mathbf{p}| < \Lambda_0}} \D \chi\; e^{-S_{\Lambda_0}[\varphi, \chi]/\hbar}\right]. \tag{$*$}
 \]
-Of course, we can iterate this procedure, by picking a new scale $\Lambda' < \Lambda$, and similarly define $S_{\Lambda'}[\phi']$ for the modes with $|\mathbf{p}| < \Lambda'$. For this reason, the equation $(*)$ is known as the \term{Wilsonian renormalization group equation}\index{renormalization group equation} for the effective action. We don't really have a group, because there is no obvious way to invert this process. So it's really a renormalization monoid.
+Of course, this can be done for any $\Lambda < \Lambda_0$, and so defines a map from $[0, \Lambda_0]$ to the ``space of all actions''. More generally, for any $\varepsilon$, this procedure allows us to take a scale $\Lambda$ action and produce a scale $\Lambda - \varepsilon$ effective action from it. This is somewhat like a group (or monoid) action on the ``space of all actions'', and thus the equation $(*)$ is known as the \term{Wilsonian renormalization group equation}\index{renormalization group equation}.
 
 Just as we saw in low-dimensional examples, when we do this, the coupling constants of the interactions will shift. For each $\Lambda < \Lambda_0$, we can define the shifted coefficients $g_i(\Lambda)$, as well as $Z_\Lambda$ and $\delta m^2$, by the equation
 \[
-% S_\Lambda[\phi] = \frac{1}{2} \int_M \d^d x \frac{Z_\Lambda}{2} (\partial \phi)^2 + (m^2 + \delta m^2) \frac{Z_\Lambda}{2} \phi^2 + \sum_i \Lambda^{d - d_i} g_i(\Lambda) \mathcal{O}_i (\phi, \partial \phi).
   S_\Lambda[\phi] = \int_M \d^d x \left[\frac{Z_\Lambda}{2} (\partial \phi)^2 + \sum_i \Lambda^{d - d_i} Z_\Lambda^{n_i/2}g_i(\Lambda) \mathcal{O}_i (\phi, \partial \phi)\right],
 \]
 where $n_i$ is the number of times $\phi$ or $\partial \phi$ appears in $\mathcal{O}_i$.
@@ -2270,13 +2605,15 @@ Note that we normalized the $g_i(\Lambda)$ in terms of the new $\Lambda$ and $Z_
 \]
 The factor $Z_\Lambda$ account from the fact that there could be new contributions to the kinetic term for $\phi$. This \index{$Z_\Lambda$} is called \term{wavefunction renormalization}. The factor $Z_\Lambda$ is not to be confused with the partition function, which we denote by a calligraphic $\mathcal{Z}$ instead. We will explore these in more detail later.
 
-Note that by construction, we have
-\begin{align*}
-  \mathcal{Z}(\Lambda_0, g_i(\Lambda_0)) &= \int_{C^\infty(M)_{\leq \Lambda_0}} \D \varphi\;e^{-S_{\Lambda_0}[\varphi]/\hbar} \\
-  &= \int_{C^\infty(M)_{\leq \Lambda}}\D \phi\; e^{-S_\Lambda[\phi]/\hbar} \\
-  &= \mathcal{Z}(\Lambda, g_i(\Lambda))
-\end{align*}
-This is a completely trivial fact, because we obtained $\mathcal{Z}(\Lambda, g_i(\Lambda))$ simply by doing part of the integral and leaving the others intact.
+We define
+\[
+  \mathcal{Z}(\Lambda, g_i(\Lambda)) = \int_{C^\infty(M)_{\leq \Lambda}} \D \varphi\; e^{-S_{\Lambda}[\varphi]/\hbar}.
+\]
+Then by construction, we must have
+\[
+  \mathcal{Z}(\Lambda_0, g_i(\Lambda_0)) = \mathcal{Z}(\Lambda, g_i(\Lambda))
+\]
+for all $\Lambda < \Lambda_0$. This is a completely trivial fact, because we obtained $\mathcal{Z}(\Lambda, g_i(\Lambda))$ simply by doing part of the integral and leaving the others intact.
 
 We will assume that $\mathcal{Z}$ varies continuously with $\Lambda$ (which is actually not the case when the allowed modes are discrete, but whatever). It is then convenient to write the above expression infinitesimally, by taking the derivative. Instead of the usual $\frac{\d}{\d \Lambda}$, it is more convenient to talk about the operator $\Lambda \frac{\d}{\d \Lambda}$ instead, as this is a dimensionless operator.
 
@@ -2286,6 +2623,7 @@ Differentiating the above equation, we obtain
 \]
 This is the \term{Callan-Symanzik equation}\index{Callan-Symanzik equation!partition function} for the partition function.
 
+It is convenient to refer to the following object:
 \begin{defi}[Beta function]\index{$\beta_i$}\index{beta-function}
   The \emph{beta function} of the coupling $g_i$ is
   \[
@@ -2410,16 +2748,18 @@ where $\gamma_s$ is the anomalous dimension of $\phi$ we defined before.
 
 Classically, we'd expect this correlation function $ \bra \phi(s x_1) \cdots \phi(s x_n)\ket$ to scale with $s$ as
 \[
-  \left(\frac{d - s}{2}\right)n,
+  \left(\frac{d - s}{2}\right)^n,
 \]
-since that's how the field transforms. But quantum mechanically, we see that there is a correction given by $\gamma_\phi$, and what we really have is
+since that's what dimensional analysis would tell us. But quantum mechanically, we see that there is a correction given by $\gamma_\phi$, and what we really have is
 \[
-  \Delta_\phi = \frac{d - 2}{2} + \gamma_\phi.
+  \Delta_\phi^n = \left(\frac{d - 2}{2} + \gamma_\phi\right)^n.
 \]
-So the dependence of the correlation on the distance is not just what we expect from dimensional analysis, but it gains a quantum correction factor.
+So the dependence of the correlation on the distance is not just what we expect from dimensional analysis, but it gains a quantum correction factor. Thus, we say $\gamma_\phi$ is the ``anomalous dimension'' of the field.
 
 \subsection{Renormalization group flow}
-We now study \emph{renormalization group flow}. We want to understand how the coupling constants actually change as we move to the infrared, i.e.\ take $\Lambda \to 0$. The actual computations are difficult, so in this section, we are going to understand the scenario rather qualitatively and geometricly. We have a configuration space whose points are the possible combinations of the $g_i$, and as we take $\Lambda \to 0$, we trace out a trajectory in this configuration space. We want to understand how these trajectories look like.
+We now study the \emph{renormalization group flow}. In other words, we want to understand how the coupling constants actually change as we move to the infrared, i.e.\ take $\Lambda \to 0$. The actual computations are difficult, so in this section, we are going to understand the scenario rather qualitatively and geometrically.
+
+We can imagine that there is a configuration space whose points are the possible combinations of the $g_i$, and as we take $\Lambda \to 0$, we trace out a trajectory in this configuration space. We want to understand how these trajectories look like.
 
 As in most of physics, we start at an equilibrium point.
 \begin{defi}[Critical point]\index{critical point}
@@ -2441,11 +2781,11 @@ In either case, we have some couplings $g_i^*$ that are independent of scale, an
   \[
     \Gamma_\Lambda^{(2)} (x, y, g_i^*) = f(\Lambda|x - y|, g_i^*) \Lambda^{d - 2}
   \]
-  for some function $f$. Feeding this into the RG equation, we find that
+  for some function $f$. Feeding this into the RG equation, we find that $\Gamma$ must be of the form
   \[
-    \Gamma_\Lambda^{(2)} (x, y, g_i^*) = \frac{\Lambda^{d - 2} c(g_i^*)}{ \Lambda^{2 \Delta_\phi} |x - y|^{2 \Delta_\phi}} \propto \frac{c(g_i^*)}{|x - y|^{2 \Delta_\phi}}.
+    \Gamma_\Lambda^{(2)} (x, y, g_i^*) = \frac{\Lambda^{d - 2} c(g_i^*)}{ \Lambda^{2 \Delta_\phi} |x - y|^{2 \Delta_\phi}} \propto \frac{c(g_i^*)}{|x - y|^{2 \Delta_\phi}},
   \]
-  This is an example of what we were saying before. This scales as $|x - y|^{-2 \Delta \phi}$, instead of $|x - y|^{2 - d}$, and the anomalous dimension is the necessary correction.
+  where $c(g_i^*)$ are some constants independent of the points. This is an example of what we were saying before. This scales as $|x - y|^{-2 \Delta \phi}$, instead of $|x - y|^{2 - d}$, and the anomalous dimension is the necessary correction.
 \end{eg}
 
 Now a Gaussian universe is pretty boring. What happens when we start close to a critical point? As in, say, IA Differential Equations, we can try to Taylor expand, and look at the second derivatives to understand the behaviour of the system. This corresponds to Taylor-expanding the $\beta$-function, which is by itself the first derivative.
@@ -2511,7 +2851,7 @@ We can draw a picture. The \term{critical surface $C$} consisting of (the span o
 \end{center}
 A generic QFT will start at scale $\Lambda_0$ with both relevant and irrelevant operators turned on. As we flow along the RG trajectory, we focus towards the critical trajectory. This focusing is called \term{universality}.
 
-This is, in fact, the reason we can do physics! We don't know about the detailed microscopic information about the universe. But at low energies, we don't need to know them. There is only a finite number of possible things we need to know about.
+This is, in fact, the reason we can do physics! We don't know about the detailed microscopic information about the universe. Further, there are infinitely many coupling constants that can be non-zero. But at low energies, we don't need to know them! Most of them are irrelevant, and at low energies, only the relevant operators matter, and there is only finitely many of them.
 
 One thing we left out in our discussion is \term{marginal operators}, i.e.\ those with $\Delta_i = d$. To lowest order, these are unchanged under RG flow, but we have to examine higher order corrections to decide whether these operators are \term{marginally relevant} or \term{marginally irrelevant}, or perhaps \term{exactly marginal}\index{marginally!exactly}.
 
@@ -2523,7 +2863,7 @@ If we use the classical dimension in place of $\Delta_i$, it is straightforward 
     \toprule
     Dimension $d$ & Relevant operators & Marginal operators\\
     \midrule
-    $2$ & $\phi^{2k}$ for all $k > 0$ & $\partial \phi)^2$, $\phi^{2k} (\partial \phi)^2$ for all $k > 0$\\
+    $2$ & $\phi^{2k}$ for all $k > 0$ & $(\partial \phi)^2$, $\phi^{2k} (\partial \phi)^2$ for all $k > 0$\\
     $3$ & $\phi^{2k}$ for $k = 1, 2$ & $(\partial \phi)^2$, $\phi^6$\\
     $4$ & $\phi^2$ & $(\partial \phi)^2$, $\phi^4$\\
     $> 4$ & $\phi^2$ & $(\partial \phi)^2$\\
@@ -2534,12 +2874,12 @@ Of course, there are infinitely many irrelevant operators, and we do not attempt
 
 Thus, with the exception of $d = 2$, we see that there is a short, finite list of relevant and marginal operators, at least if we just use the classical dimension.
 
-Note that here we ignored all quantum corrections, and that sort-of defeats the purpose of doing renormalization. In general, the eigen-operators will not be simple monomials, and can in fact look very complicated.
+Note that here we ignored all quantum corrections, and that sort-of defeats the purpose of doing renormalization. In general, the eigen-operators will not be simple monomials, and can in fact look very complicated!
 
 \subsection{Taking the continuum limit}
 So far, we assumed we started with an effective theory at a high energy scale $\Lambda_0$, and studied the behaviour of the couplings as we flow down to low energies. This is pretty much what we do in, say, condensed matter physics. We have some detailed description of the system, and then we want to know what happens when we zoom out. Since we have a fixed lattice of atoms, there is a natural energy scale $\Lambda_0$ to cut off at, based on the spacing and phonon modes of the lattice.
 
-However, in high energy physics, we want to do the opposite. We instead want to use what we know about the low energy version of the system, and then project and figure out what the high energy theory is. In other words, we are trying to flow along RG trajectories \emph{backwards}, and take the continuum limit $\Lambda_0 \to \infty$.
+However, in high energy physics, we want to do the opposite. We instead want to use what we know about the low energy version of the system, and then project and figure out what the high energy theory is. In other words, we are trying to take the continuum limit $\Lambda_0 \to \infty$.
 
 What do we actually mean by that? Suppose our theory is defined at a critical point $g_i^*$ and some cutoff $\Lambda_0$. Then by definition, in our path integral
 \[
@@ -2566,11 +2906,13 @@ If we think carefully, what we want to do is not to fix our coupling constants a
 %\]
 %is finite. Note that $f(g_i(\Lambda_0)) = 0$ defines the critical surface.
 
-That is in general rather hard. Instead, what we are going to do is to rather (somewhat) arbitrarily introduce counterterms, we have an action
+This is what we are going to do --- we have a fixed action $S_{\Lambda_0}[\phi, g_i]$. Practically speaking, changing the $g_i$ as we change the energy scale is annoying. Instead, we introduce a \emph{counterterm action} $S^{CT}$ that has an \emph{explicit} dependence on $\Lambda_0$ i.e.\ we are allowed to set it to any value according to our our own likings at different energy scales.
+
+Then we can write the general action as
 \[
   S_{\Lambda_0}^{\mathrm{eff}} [\phi] = S_{\Lambda_0}[\phi, g_i] + \hbar S^{CT}[\phi, g_i, \Lambda_0],
 \]
-The $S^{CT}$ has an \emph{explicit} dependence on $\Lambda_0$, i.e.\ we are allowed to set it to any value according to our our own likings at different energy scales. We will come up with some rules for how to choose our counterterms, but the end goal is to choose them so that
+We will come up with some rules for how to choose our counterterms, but the end goal is to choose them so that
 %
 %To achieve this, we modify the action by introducing counter-terms, i.e.
 %\[
@@ -2608,7 +2950,7 @@ Given how we have presented renormalization so far, it might have seemed absurd 
 %Now it's time to actually do this.
 
 \subsection{Calculating RG evolution}
-We now want to actually compute the RG evolution of a theory. To do so, we of course need to make some simplifying assumptions. We note that (in $d > 2$), the only marginal or relevant operators that involves derivatives is the kinetic term $(\partial \varphi)^2$. This suggests we can find a simple truncation of the RG evolution by restricting to actions of the form
+We now want to actually compute the RG evolution of a theory. To do so, we of course need to make some simplifying assumptions, and we will also leave out a lot of details. We note that (in $d > 2$), the only marginal or relevant operators that involves derivatives is the kinetic term $(\partial \varphi)^2$. This suggests we can find a simple truncation of the RG evolution by restricting to actions of the form
 \[
   S[\varphi] = \int \d^d x\; \left(\frac{1}{2} (\partial \varphi)^2 + V(\varphi)\right),
 \]
@@ -2616,7 +2958,7 @@ and write the potential as
 \[
   V(\varphi) = \sum_k\Lambda^{d - k(d - 2)} \frac{g_{2k}}{(2k)!} \varphi^{2k}.
 \]
-This is known as the \term{local potential approximation} (\term{LPA}). As before, we split our field into low and high energy modes,
+In other words, we leave out higher terms that involve derivatives. This is known as the \term{local potential approximation} (\term{LPA}). As before, we split our field into low and high energy modes,
 \[
   \varphi = \phi + \chi,
 \]
@@ -2624,11 +2966,11 @@ and we want to compute the effective action for $\phi$:
 \[
   S_{\Lambda}^{\mathrm{eff}} [\phi] = - \hbar \log \int_{C^\infty(M)_{[\Lambda, \Lambda_0]}} \D \chi\; e^{-S[\phi + \chi]}.
 \]
-This is still a very complicated path integral to do. To make progress, we assume we lower the cutoff just infinitesimally, $\Lambda = \Lambda_0 - \delta \Lambda$.The action at scale $\Lambda$ now becomes
+This is still a very complicated path integral to do. To make progress, we assume we lower the cutoff just infinitesimally, $\Lambda = \Lambda_0 - \delta \Lambda$. The action at scale $\Lambda$ now becomes
 \[
   S[\phi + \chi] = S[\phi] + \int \d^d x\; \left[\frac{1}{2} (\partial \chi)^2 + \frac{1}{2} \chi^2 V''(\phi) + \frac{1}{3!} \chi^3 V'''(\phi) + \cdots\right],
 \]
-where we've chosen $\phi$ so that $V'(\phi) = 0$. % why can we do this?
+where it can be argued that we can leave out the terms linear in $\chi$. % why
 
 Since we're just doing path integral over modes with energies in $(\Lambda - \delta \Lambda, \Lambda]$, each loop integral takes the form
 \[
@@ -2858,7 +3200,7 @@ The eigenvalues and eigenvectors are $\frac{\varepsilon}{3} - 2$ and $\varepsilo
 \]
 Notice that while the mass term itself is an eigenvector, the quartic coupling is not! Using the asymptotic expansion
 \[
-  \Gamma\left(-\frac{\varepsilon}{2}\right) \sim -\frac{2}{t} - \gamma + O(\varepsilon),
+  \Gamma\left(-\frac{\varepsilon}{2}\right) \sim -\frac{2}{\varepsilon} - \gamma + O(\varepsilon),
 \]
 where $\gamma \approx 0.577$ is the Euler--Mascheroni constant, plus fact that $\Gamma(x + 1) = x \Gamma(x)$, we find that in $d = 4 - \varepsilon$, we have
 \[
@@ -3110,7 +3452,7 @@ We see that the second condition forces $\delta Z = 0$, and then we must have
 \end{align*}
 Here to 1-loop, we don't need wavefunction renormalization, but this is merely a coincidence, not a general phenomenon.
 
-\subsubsection*{Dimensional regularization}
+\subsection{Dimensional regularization}
 So far, we have been using ``hard cutoffs'' $|p| < \Lambda_0$. For most diagrams, this is awkward, and in gauge theory, it is (at least naively) incompatible with gauge invariance. Indeed, say in $\U(1)$ gauge theory, a transformation
 \[
   \psi(x) \to e^{i\lambda(x)} \psi(x)
@@ -3188,11 +3530,16 @@ Combining all factors, we find that
   \end{tikzpicture} =
   \frac{gm^2}{2(4\pi)^{d/2}}\left(\frac{\mu}{m}\right)^{4 - d} \Gamma\left(1 - \frac{d}{2}\right).
 \]
-This formula makes sense for any value of $d$ in the complex plane. Let's see what happens when we try to approach $d = 4$. We set $d = 4 - \varepsilon$, and use the asymptotic formula
+This formula makes sense for any value of $d$ in the complex plane. Let's see what happens when we try to approach $d = 4$. We set $d = 4 - \varepsilon$, and use the Laurent series
+\begin{align*}
+  \Gamma(\varepsilon) &= \frac{1}{\varepsilon} - \gamma + O(\varepsilon)\\
+  x^\varepsilon &= 1 + \frac{\varepsilon}{2} \log x + O(\varepsilon^2),
+\end{align*}
+plus the following usual property of the $\Gamma$ function:
 \[
-  \Gamma(\varepsilon) \sim \frac{1}{\varepsilon} - \gamma + O(\varepsilon).
+  \Gamma(x + 1) = x \Gamma(x).
 \]
-Thus, as $d \to 4$, we get
+Then, as $d \to 4$, we can asymptotically expand
 \[
   \begin{tikzpicture}[eqpic]
     \draw [dashed] (0, 0) -- (3, 0);
@@ -3433,7 +3780,7 @@ where $-\Pi_{\rho\sigma}(q)$ is the photon self-energy, given by the one-particl
 
 We will postpone the computation of the self-energy for the moment, and just quote that the result is
 \[
-  \Pi_\rho^\sigma(q) = q^s \left(\delta_\rho^\sigma - \frac{q_\rho q^\sigma}{q^2}\right) \pi(q^2)
+  \Pi_\rho^\sigma(q) = q^2 \left(\delta_\rho^\sigma - \frac{q_\rho q^\sigma}{q^2}\right) \pi(q^2)
 \]
 for some scalar function $\pi(q^2)$. This operator
 \[
@@ -3756,7 +4103,7 @@ This negative sign appears because we are multiplying by $\det (\slashed D + m)$
 \subsection{Some differential geometry}
 To do non-abelian gauge theory (or even abelian gauge theory, really), we need to know some differential geometry.
 
-So far, we had a universe $M$, and our fields took values in some vector space $V$. Then a field is just a (smooth) function $f: M \to V$. However, this requires the field to take values in the \emph{same} vector space at each point. It turns out it is a more natural thing to assign a vector space $V_x$ for each $x \in M$, and then a field $\phi$ would be a function
+So far, we had a universe $M$, and our fields took values in some vector space $V$. Then a field is just a (smooth/continuous/whatever) function $f: M \to V$. However, this requires the field to take values in the \emph{same} vector space at each point. It turns out it is a more natural thing to assign a vector space $V_x$ for each $x \in M$, and then a field $\phi$ would be a function
 \[
   \phi: M \to \coprod_{x \in M} V_x \equiv E,
 \]
@@ -3774,8 +4121,9 @@ Now if we just have a bunch of vector spaces $V_x$ for each $x \in M$, then we l
 \]
 and we require $E$ to be a \emph{manifold} as well. We call these \emph{vector bundles}. There are some technical conditions we want to impose on $E$ so that it is actually possible to work on it.
 
-There is a canonical projection map $\pi: E \to M$ that sends $(x, v)$ to $x$. Then we have $V_x = \pi^{-1}(\{x\})$. A natural requirement is that we require this map to be smooth. Otherwise, we might find someone making $E$ into a manifold in a really stupid way.
+There is a canonical projection map $\pi: E \to M$ that sends $(x, v)$ to $x$. Then we have $V_x = \pi^{-1}(\{x\})$. A natural requirement is that we require this map $\pi$ to be smooth. Otherwise, we might find someone making $E$ into a manifold in a really stupid way.
 
+We now introduce a convenient terminology.
 \begin{defi}[Section]\index{section}
   Let $p: E \to M$ be a map between manifolds. A \emph{section} is a map $s: M \to E$ such that $p \circ s = \id_M$.
 \end{defi}
@@ -3813,17 +4161,68 @@ Recall that for a trivial bundle, a section of the bundle is just a map $M \to V
   \[
     T^*M = \coprod_{x \in M} T_x^* M \to M
   \]
-  is a vector bundle. More generally, we can take \term{tensor products} of bundles, and consider tensor product bundles such as $(TM)^{\otimes n} \otimes (T^*M)^{\otimes m}$. % explain tensor products of bundles
+  is a vector bundle.
+
+  Recall that given vector spaces $V$ and $W$, we can form new vector spaces by taking the \term{direct sum} $V \oplus W$ and the \term{tensor product} $V \otimes W$. There is a natural way to extend this to vector bundles, so that if $E, F \to M$ are vector bundles, then $E \oplus F$ and $E \otimes F$ are vector bundles with fibers $(E \oplus F)_x = E_x \oplus F_x$ and $(E \otimes F)_x = E_x \otimes F_x$. It is an exercise for the reader to actually construct these bundles. We can also similarly extend then notion of exterior product $\exterior^p V$ to vector bundles.
+
+  In particular, applying these to $TM$ and $T^*M$ gives us tensor product bundles of the form $(TM)^{\otimes n} \otimes (T^*M)^{\otimes m}$, whose sections are tensor fields.
 
   In more familiar notation, (in a local trivialization) we write sections of tangent bundles as $X^\mu(x)$, and sections of the cotangent bundle as $Y_\mu(x)$. Sections of the tensor product are written as $X^{\mu_1, \ldots, \mu_n}\!_{\nu_1, \ldots, \nu_m}$.
 \end{eg}
 
-% insert mobius band
+\begin{eg}
+  There is exactly one non-trivial vector bundle we can visualize. Consider the circle $S^1$:
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [thick, mblue, dashed] (1.5, 0) arc(0:180:1.5 and 0.3);
+      \draw [thick, mblue] (-1.5, 0) arc(180:360:1.5 and 0.3);
+    \end{tikzpicture}
+  \end{center}
+  Let's consider \term{line bundles} on $S^1$, i.e.\ vector bundles with fiber $\cong \R$. There is of course the trivial bundle, and it looks like this:
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [thick, mblue, dashed] (1.5, 0) arc(0:180:1.5 and 0.3);
+      \draw [thick, mblue] (-1.5, 0) arc(180:360:1.5 and 0.3);
+      \foreach \theta in {7,27,...,167} {
+        \pgfmathsetmacro\x{1.5*cos(\theta)};
+        \pgfmathsetmacro\y{0.3*sin(\theta)};
+        \draw [dashed, shift={(\x, \y)}] (0, -0.5) -- (0, 0.5);
+      }
+      \foreach \theta in {187,207,...,347} {
+        \pgfmathsetmacro\x{1.5*cos(\theta)};
+        \pgfmathsetmacro\y{0.3*sin(\theta)};
+        \draw [shift={(\x, \y)}] (0, -0.5) -- (0, 0.5);
+      }
+    \end{tikzpicture}
+  \end{center}
+  However, we can also introduce a ``twist'' into this bundle, and obtain the \term{M\"obius band}:
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [thick, mblue, dashed] (1.5, 0) arc(0:180:1.5 and 0.3);
+      \draw [thick, mblue] (-1.5, 0) arc(180:360:1.5 and 0.3);
+      \foreach \theta in {7,27,...,167} {
+        \pgfmathsetmacro\x{1.5*cos(\theta)};
+        \pgfmathsetmacro\y{0.3*sin(\theta)};
+        \draw [dashed, shift={(\x, \y)}, rotate={\theta/2}] (0, -0.5) -- (0, 0.5);
+      }
+      \foreach \theta in {187,207,...,347} {
+        \pgfmathsetmacro\x{1.5*cos(\theta)};
+        \pgfmathsetmacro\y{0.3*sin(\theta)};
+        \draw [shift={(\x, \y)}, rotate={\theta/2}] (0, -0.5) -- (0, 0.5);
+      }
+    \end{tikzpicture}
+  \end{center}
+  This is an example of a non-trivial line bundle. How do we know it is non-trivial? The trivial bundle obviously has a nowhere-vanishing section. However, if we stare at the Mobius band hard enough, we see that any section of the M\"obius band must vanish somewhere. Thus, this cannot be the trivial line bundle.
+
+  In fact, it is a general theorem that a line bundle has a nowhere-vanishing section if and only if it is trivial.
+\end{eg}
+
+We introduce a bit more notation which we will use later.
 
 \begin{notation}
   Let $E \to M$ be a vector bundle. Then we write \term{$\Omega^0_M(E)$} for the vector space of sections of $E \to M$. Locally, we can write an element of this as $X^a$, for $a = 1, \cdots, \dim E_x$.
 
-  More generally, we write \term{$\Omega^p_M(E)$} for sections of $E \otimes \Lambda^pT^*M \to M$, where $\Lambda^p T^*M$ is the bundle of $p$-forms on $M$. Elements can locally be written as $X^a_{\mu_1 \ldots \mu_n}$.
+  More generally, we write \term{$\Omega^p_M(E)$} for sections of $E \otimes \exterior^pT^*M \to M$, where $\exterior^p T^*M$ is the bundle of $p$-forms on $M$. Elements can locally be written as $X^a_{\mu_1 \ldots \mu_n}$.
 
   If $V$ is a vector space, then $\Omega^p_M(V)$ is a shorthand for $\Omega^p_M(V \times M)$. % explain this better.
 \end{notation}
@@ -3865,7 +4264,7 @@ We can further generalize this a bit. Instead of picking a subgroup $G \leq \GL(
   \begin{enumerate}
     \item A vector bundle $E \to M$.
     \item A trivializing cover $\{U_\alpha\}$ with transition functions $t_{\alpha\beta}$.
-    \item A collection of maps $\varphi_{\alpha\beta}: U_{\alpha} \cap U_\beta: \to G$ satisfying the cocycle conditions such that $t_{\alpha\beta} = \rho \circ \varphi_{\alpha\beta}$.
+    \item A collection of maps $\varphi_{\alpha\beta}: U_{\alpha} \cap U_\beta \to G$ satisfying the cocycle conditions such that $t_{\alpha\beta} = \rho \circ \varphi_{\alpha\beta}$.
   \end{enumerate}
 \end{defi}
 Note that to specify a $G$-bundle, we require specifying an element $\varphi_{\alpha\beta}(x) \in G$ for each $x \in M$, instead of just the induced action $\rho(\varphi_{\alpha\beta}(x)) \in \GL(V)$. This is crucial for our story. We are requiring more information than just how the elements in $V$ transform. Of course, this makes no difference if the representation $\rho$ is faithful (i.e.\ injective), but makes a huge difference when $\rho$ is the trivial representation.
@@ -3938,6 +4337,7 @@ Normally, a field with values in a vector space $V$ is is given by a smooth map 
 \end{eg}
 
 \subsection{Connection and curvature}
+\subsubsection*{Connection}
 Let's go back to the general picture of vector bundles, and forget about the structure group $G$ for the moment. Consider a general vector bundle $\pi: E \to M$, and a section $s: M \to E$. We would like to be able to talk about derivatives of this section. However, the ``obvious'' attempt looking like
 \[
   \frac{s(x + \varepsilon) - s(x)}{|\varepsilon|}
@@ -3958,7 +4358,7 @@ Before we meet the full, abstract definition, we first look at an example of a c
 
   In coordinates, we can write this as
   \[
-    \d f_\mu = \frac{\partial f}{\partial \mu} \;\d x^\mu.
+    \d f = \frac{\partial f}{\partial x^\mu} \;\d x^\mu.
   \]
 \end{eg}
 
@@ -4022,12 +4422,23 @@ This expression makes sense if $G$ is a matrix Lie group, and so we can canonica
 \begin{eg}
   In the $\U(1)$ case,our transition functions $g_{\alpha\beta}$ are just multiplication by complex numbers. So if $g = e^{-i\lambda}$, then we have
   \[
-    A_{\beta} = -g \d g^{-1} + g A_\alpha g^{-1} = -g \d g^{-1} + A = i(\d \lambda - iA).
+    A_{\beta} = -g \d g^{-1} + g A_\alpha g^{-1} = -g \d g^{-1} + A_\alpha = i(\d \lambda - iA_\alpha).
   \]
   Note that since $\U(1)$ is abelian, the conjugation by $g$ has no effect on $A$. This is one of the reasons why non-abelian gauge theory is simple.
 \end{eg}
 
+\subsubsection*{Minimal coupling}
+So how do we do gauge coupling? Suppose we had an ``ordinary'' scalar field $\psi : M \to \C$ on our manifold, and we have the usual action
+\[
+  S[\psi] = \int \frac{1}{2} |\partial \psi|^2 + \frac{1}{2} m^2 \psi^2 + \cdots.
+\]
+We previously said that to do gauge theory, we pick a representation of our gauge group $G = \U(1)$ on $\C$, which we can take to be the ``obvious'' action by multiplication. Then given a principal $\U(1)$-bundle $P \to M$, we can form the associated vector bundle, and now our field is a section of this bundle.
 
+But how about the action? As mentioned, the $\partial \psi$ term no longer makes sense. But in the presence of a connection, we can just replace $\partial$ with $\nabla$! Now, the action is given by
+\[
+  S[\psi] = \int \frac{1}{2} |\nabla \psi|^2 + \frac{1}{2} m^2 \psi^2 + \cdots.
+\]
+This is known as \term{minimal coupling}.
 
 %To specify how these $V_y$ glue together to form an $E$, it suffices to describe the local trivializations. We have to specify a bunch of trivializing neighbourhoods $U_\alpha$, such that $\pi^{-1}(U_\alpha)$ is isomorphic to $U_\alpha \times V$. The requirement dictates that
 %\[
@@ -4211,7 +4622,7 @@ This expression makes sense if $G$ is a matrix Lie group, and so we can canonica
 %\]
 %if $g = e^{-i \lambda}$.
 
-\subsection{Curvature}
+\subsubsection*{Curvature}
 Given a connection $\nabla$, we can extend it to a map $\Omega^p_M(E) \to \Omega^{p + 1}_M(E)$ by requiring it to satisfy the conditions
 \begin{align*}
   \nabla (\alpha_1 s_1 + \alpha_2 s_2) &= \alpha_1( \nabla s_1) + \alpha_2 (\nabla s_2),\\
@@ -4248,7 +4659,7 @@ Note that by $A\wedge A$, we mean, locally in coordinates, $A^a\!_b \wedge A^b\!
 Thus, locally, we have
 \begin{align*}
   F &= \d A + A \wedge A \\
-  &= (\partial_\mu A_\nu + A_\mu A_n) \d x^\mu \wedge \d x^\nu\\
+  &= (\partial_\mu A_\nu + A_\mu A_n)\; \d x^\mu \wedge \d x^\nu\\
   &= \frac{1}{2} (\partial_\mu A_\nu - \partial_\nu A_\mu + A_\mu A_\nu - A_\nu A_\mu)\;\d x^\mu \wedge \d x^\nu\\
   &= \frac{1}{2} (\partial_\mu A_\nu - \partial_\nu A_\mu + [A_\mu, A_\nu])\; \d x^\mu \wedge \d x^\nu
 \end{align*}
@@ -4284,13 +4695,13 @@ At the classical level, Yang--Mills is an example of non-abelian gauge theory de
 \]
 where $(\ph, \ph)$ denotes the Killing form on the Lie algebra $\mathfrak{g}$ of the gauge group, and $g^2_{YM}$ is the coupling constant. For flat space, we have $\sqrt{g} = 1$, and we will drop that term.
 
-For example, if $G = \SU(n)$, we can choose
+For example, if $G = \SU(n)$, we usually choose a basis such that
 \[
   (t^a, t^b) = \frac{1}{2} \delta^{ab},
 \]
 and on a local $U \subseteq M$, we have
 \[
-  S[\Delta] = \frac{1}{4 g^2_{YM}} \int F_{\mu\nu}^a F^{b, \mu\nu} \delta_{ab} \; \d^d x,
+  S[\nabla] = \frac{1}{4 g^2_{YM}} \int F_{\mu\nu}^a F^{b, \mu\nu} \delta_{ab} \; \d^d x,
 \]
 with
 \[
@@ -4298,11 +4709,11 @@ with
 \]
 Thus, Yang--Mills theory is the natural generalization of Maxwell theory to the non-Abelian case.
 
-Note that the action is treated as a function of the connection, and not the curvature, just like in Maxwell's theory. Because, schematically,
+Note that the action is treated as a function of the connection, and not the curvature, just like in Maxwell's theory. Schematically, we have
 \[
-  F^2 \sim (\d A + A^2)^2 \sim (\d A)^2 + A^2 \;\d A + A^4,
+  F^2 \sim (\d A + A^2)^2 \sim (\d A)^2 + A^2 \;\d A + A^4.
 \]
-there are non-trivial interactions even in the absence of charged matter. This self-interaction is proportional to the structure constants $f^a_{bc}$. So in the abelian case, these do not appear.
+So as mentioned, there are non-trivial interactions even in the absence of charged matter. This self-interaction is proportional to the structure constants $f^a_{bc}$. So in the abelian case, these do not appear.
 
 At the level of the classical field equations, if we vary our connection by $\nabla \mapsto \nabla + \delta a$, where $\delta a$ is a matrix-valued $1$-form, then
 \[
@@ -4318,7 +4729,7 @@ The Yang--Mills equation we obtain from extremizing with respect to these variat
 \]
 So we get the \term{Yang--Mills equation}
 \[
-  \nabla^\mu F_{\mu\nu} = \partial^\mu F_{\mu\nu} + [A^\mu F_{\mu\nu}] = 0.
+  \nabla^\mu F_{\mu\nu} = \partial^\mu F_{\mu\nu} + [A^\mu, F_{\mu\nu}] = 0.
 \]
 This is just like Gauss' equation. Recall we also had the Bianchi identity
 \[
@@ -4338,25 +4749,27 @@ This is not because Yang--Mills is harder to solve. If you ask anyone who does n
 
 Note that the action contains no mass terms for $A$, i.e.\ there is no $A^2$ term. So $A$ should describe a massless particle, and this gives rise to long-range force, just like Coulomb or gravitational forces. When Yang--Mills first introduced this theory, Pauli objected to this, because we are introducing some new long-range force, but we don't see any!
 
-To sort-of explain this, the coupling constant $g^2_{YM}$ plays no role in the classical (pure) theory. Of course, it will play a role if we couple it to matter. However, in the quantum theory, $g^2_{YM}$ appears together with $\hbar$ as $g^2_{YM} \hbar$. So the classical theory is only a reasonable approximation to the physics if $g^2_{YM} \sim 0$. Skipping ahead of the story, we will see that $g^2_{YM}$ is marginally relevant. So at low energies, the classical theory is not a good approximation for the actual quantum theory.
+To sort-of explain this, the coupling constant $g^2_{YM}$ plays no role in the classical (pure) theory. Of course, it will play a role if we couple it to matter. However, in the quantum theory, $g^2_{YM}$ appears together with $\hbar$ as $g^2_{YM} \hbar$. So the classical theory is only a reasonable approximation to the physics only if $g^2_{YM} \sim 0$. Skipping ahead of the story, we will see that $g^2_{YM}$ is marginally relevant. So at low energies, the classical theory is not a good approximation for the actual quantum theory.
 
 So let's look at quantum Yang--Mills theory.
 \subsection{Quantum Yang--Mills theory}
 Our first thought to construct a path integral for Yang--Mills may be to compute the partition function
 \[
-  \mathcal{Z}^{\mathrm{naive}} \overset{?}{=} \int_\mathcal{A} \D A\; e^{-\frac{1}{i g_{YM}^2 \hbar} \int (F, F) \;\d^d x},
+  \mathcal{Z}_{\mathrm{naive}} \overset{?}{=} \int_\mathcal{A} \D A\; e^{-S_{YM}[A]},
 \]
 where $\mathcal{A}$ is the ``space of all connections'' on some fixed principal $G$-bundle $P \to M$. If we were more sophisticated, we might try to sum over all possible principal $G$-bundles.
 
-But this is not really correct. For any connections $\nabla, \nabla'$, it is straightforward to check that
+But this is not really correct. We claim that no matter how hard we try to make sense of path integrals, this integral must diverge.
+
+We first think about what this path integral can be. For any two connections $\nabla, \nabla'$, it is straightforward to check that
 \[
   \nabla^t = t \nabla + (1 - t) \nabla'
 \]
-is a connection of $P$. Consequently, we can find a path between any two connections on $P$. Furthermore, we saw before that the difference $\nabla' - \nabla \in \Omega_M^1 (\End E)$. This says that $\mathcal{A}$ is an (infinite-dimensional) affine space modelled on $\Omega^1_M(\End E) \cong T_\Delta \mathcal{A}$. This is like a vector space, but there is no preferred origin $0$. There is even a flat metric on $\mathcal{A}$, given by
+is a connection of $P$. Consequently, we can find a path between any two connections on $P$. Furthermore, we saw before that the difference $\nabla' - \nabla \in \Omega_M^1 (\mathfrak{g})$. This says that $\mathcal{A}$ is an (infinite-dimensional) affine space modelled on $\Omega^1_M(\mathfrak{g}) \cong T_\nabla \mathcal{A}$. This is like a vector space, but there is no preferred origin $0$. There is even a flat metric on $\mathcal{A}$, given by
 \[
   \d s^2 _\mathcal{A} = \int_M (\delta A_\mu, \delta A^\mu)\;\d^d x,
 \]
-i.e.\ given any two tangent vectors $a_1, a_2 \in \Omega_M^1(\End E) \cong T_\nabla \mathcal{A}$, we have an inner product
+i.e.\ given any two tangent vectors $a_1, a_2 \in \Omega_M^1(\mathfrak{g}) \cong T_\nabla \mathcal{A}$, we have an inner product
 \[
   \bra a_1, a_2 \ket_\nabla = \int_M (a_{1 \mu}, a^{\mu}_2) \;\d^d x.
 \]
@@ -4364,24 +4777,19 @@ Importantly, this is independent of the choice of $\nabla$.
 
 This all is trying to say that this $\mathcal{A}$ is nice and simple. Heuristically, we imagine the path integral measure is the natural ``$L^2$'' measure on $\mathcal{A}$ as an affine space. Of course, this measure doesn't exist, because it is infinite dimensional. But the idea is that this is just the same as working with a scalar field.
 
-Of course, there is a problem. $S_{YM}[\nabla]$ is degenerate along gauge orbits. So the naive path integral $\mathcal{Z}^{\mathrm{naive}}$ will diverge, even if we can make sense of the path integral. (The group $\mathcal{G}$ of all gauge transformations is an infinite dimensional space that is (locally) $\Maps(M, G)$, and even for compact $M$ and $G$, the volume of this space diverges)
+Despite this niceness, $S_{YM}[\nabla]$ is degenerate along gauge orbits. The action is invariant under gauge transformations (i.e.\ automorphisms of the principal $G$-bundle), and so we are counting each connection \emph{infinitely} many times. In fact, the group $\mathcal{G}$ of all gauge transformations is an infinite dimensional space that is (locally) $\Maps(M, G)$, and even for compact $M$ and $G$, the volume of this space diverges.
 
 Instead, we should take the integral over all connections modulo gauge transformations:
 \[
-  \mathcal{Z}_{YM} = \int_{\mathcal{A}/\mathcal{G}} \d \mu; e^{-S_{YM}[\nabla]/hbar},
+  \mathcal{Z}_{YM} = \int_{\mathcal{A}/\mathcal{G}} \d \mu; e^{-S_{YM}[\nabla]/\hbar},
 \]
-where $\mathcal{A}/\mathcal{G}$ is the space of all connections modulo gauge transformation, and $\d \mu$ is some sort of measure. Note that this means there is \emph{no such thing} as ``gauge symmetry''. Or rather, gauge transformations are a redundancy in our description.
+where $\mathcal{A}/\mathcal{G}$ is the space of all connections modulo gauge transformation, and $\d \mu$ is some sort of measure. Note that this means there is \emph{no such thing} as ``gauge symmetry'' in nature. We have quotiented out by the gauge transformations in the path integral. Rather, gauge transformations are a redundancy in our description.
 
-In electromagnetism, we handled this by ``picking a gauge''. We are going to do exactly the same here, but the non-linearities of our non-abelian theory means this is more involved.
+But we now have a more complicated problem. We have \emph{no idea} what the space $\mathcal{A}/\mathcal{G}$ looks like. Thus, even formally, we don't understand what $\d \mu$ on this space should be.
 
-Note that $\mathcal{A}/\mathcal{G}$ is \emph{not} affine, and a priori, we don't understand, even formally, what $\d \mu$ should be. Under a gauge transformation, we have
-\[
-  A \mapsto A' = g^{-1}\;\d g + g^{-1} A g.
-\]
-So $\delta A$ depends on where we start.
+In electromagnetism, we handled this problem by ``picking a gauge''. We are going to do exactly the same here, but the non-linearities of our non-abelian theory means this is more involved. We need to summon ghosts.
 
-The solution is given by ghosts.
-\subsection{Faddeev--Popov ghosts}
+\subsection{Faddeev--Popov ghosts \texorpdfstring{\ghost}{}}
 To understand how to do this, we will first consider a particular finite-dimensional example. Suppose we have a field $(x, y): \{\mathrm{pt}\} \to \R^2$ on a zero-dimensional universe and an action $S[x, y]$. For simplicity, we will often ignore the existence of the origin in $\R^2$.
 
 The partition function we are interested in is
@@ -4500,7 +4908,7 @@ Of course, we know the former is impossible, and the zero set must look like the
   \]
   and so the integral doesn't change.
 
-  Next, suppose we replace $f$ with some $\tilde{f}$, but they have the zero set. Now notice that $\delta(f)$ and $|\Delta_f|$ depend only on the first-order behaviour of $f$ at $C$. In particular, it depends only on $\frac{\partial f}{\partial \theta}$ on $C$. So for all practical purposes, changing $f$ to $\tilde{f}$ is equivalent to multiplying $f$ by the ratio of their derivatives. So changing the function $f$ while keeping $C$ fixed doesn't affect the value of $(*)$.
+  Next, suppose we replace $f$ with some $\tilde{f}$, but they have the same zero set. Now notice that $\delta(f)$ and $|\Delta_f|$ depend only on the first-order behaviour of $f$ at $C$. In particular, it depends only on $\frac{\partial f}{\partial \theta}$ on $C$. So for all practical purposes, changing $f$ to $\tilde{f}$ is equivalent to multiplying $f$ by the ratio of their derivatives. So changing the function $f$ while keeping $C$ fixed doesn't affect the value of $(*)$.
 
   Finally, suppose we have two arbitrary $f$ and $\tilde{f}$, with potentially different zero sets. Now for each value of $r$, we pick a rotation $R_{\theta(r)} \in \SO(2)$ such that
   \[
@@ -4573,11 +4981,11 @@ Then writing $n = \dim \mathfrak{g}$, we can write
 \]
 We don't really know what to do with these formal expressions. Our strategy is to write this integral in terms of more ``usual'' path integrals, and then we can use our usual tools of perturbation theory to evaluate the integral.
 
-We first take care of the $\delta[f]$ term. We introduce a new field $h \in \Omega^0_M(\mathfrak{g})$.
+We first take care of the $\delta[f]$ term. We introduce a new bosonic field $h \in \Omega^0_M(\mathfrak{g})$.
 \[
   \delta[f] = \int \D h\; \exp\left(-\int (h(x), f(A(x)))\;\d^d x\right),
 \]
-where the $(\ph, \ph)$ denotes the Killing form of the Lie algebra. This $h$ acts as a ``Lagrange multiplier'' that enforces the condition $f(A(x)) = 0$.
+where the $(\ph, \ph)$ denotes the Killing form of the Lie algebra. This $h$ acts as a ``Lagrange multiplier'' that enforces the condition $f(A(x)) = 0$. Heuristically, we see that if $f = 0$, then this path integral certainly gives infinity. If it is non-zero, then we might expect that by symmetry, the integral vanishes. This is somewhat similar to how $\int e^{ikx} \;\d k = \delta(x)$.
 
 To take care of the determinant term, we wanted to have
 \[
@@ -4587,13 +4995,13 @@ where $\lambda^a(y)$ are our gauge parameters, and $A^\lambda$ is the gauge-tran
 
 Now recall that for a finite-dimensional $n \times n$ matrix $M$, we have
 \[
-  \det (M) = \int \d^n c\; \d^n \bar{c}\; e^{- \bar{c} M c},
+  \det (M) = \int \d^n c\; \d^n \bar{c}\; e^{\bar{c} M c},
 \]
-where $c, \bar{c} \in \R^n$. Thus, in our case, we can write the Fadeev---Popov determinant as the path integral
+where $c, \bar{c}$ are $n$-dimensional \emph{fermion} fields. Thus, in our case, we can write the Fadeev---Popov determinant as the path integral
 \[
-  \Delta_f = \int \D \bar{c}\; \D c\;\exp \left(- \int_{M \times M} \d^n x\;\d^n y\; \bar{c}_a(x) \frac{\delta f^a(A^\lambda(x))}{\partial \lambda^b(y)} c^b(y)\right),
+  \Delta_f = \int \D c\; \D \bar{c}\;\exp \left(\int_{M \times M} \d^d x\;\d^d y\; \bar{c}_a(x) \frac{\delta f^a(A^\lambda(x))}{\partial \lambda^b(y)} c^b(y)\right),
 \]
-where $c, \bar{c}$ are \emph{fermionic} scalars, again valued in $\mathfrak{g}$.
+where $c, \bar{c}$ are \emph{fermionic} scalars, again valued in $\mathfrak{g}$ under the adjoint action.
 
 The fermionic fields $c$ and $\bar{c}$ are known as \term{ghosts} and \term{anti-ghosts} respectively. We might find these a bit strange, since they are spin $0$ fermionic fields, which violates the spin statistic theorem. So, if we do canonical quantization with this, then we find that we don't get a Hilbert space, as we get states with negative norm! Fortunately, there is a subspace of \emph{gauge invariant} states that do not involve the ghosts, and the inner product is positive definite in this subspace. When we focus on these states, and on operators that do not involve ghosts, then we are left with a good, unitary theory. These $c$ and $\bar{c}$ aren't ``genuine'' fields, and they are just there to get rid of the extra fields we don't want. The ``physically meaningful'' theory is supposed to happen in $\mathcal{A}/\mathcal{G}$, where no ghosts exist.
 
@@ -4604,58 +5012,50 @@ The fermionic fields $c$ and $\bar{c}$ are known as \term{ghosts} and \term{anti
   \]
   So the matrix appearing in the Fadeev--Popov determinant is
   \[
-    \frac{\partial f^a(A^\lambda)}{\partial \lambda^b(y)} = \partial^\mu\left(\delta^a\!_c \partial_\mu^{(x)} + f^a\!_{bc} A_\mu(x)\right) \delta^d(x - y).
+    \frac{\partial f^a(A^\lambda)}{\partial \lambda^b(y)} = \partial^\mu\left(\delta^a\!_b \partial_\mu^{(x)} + f^a\!_{bc} A_\mu^b(x)\right) \delta^d(x - y).
   \]
   The $\delta$-function tells us the transformation has no effect if we vary $A$ at a point different from $x$. Then the ghost action is
   \begin{align*}
-    S_{gh} &= \int \d^d x\; \d^d y\; \bar{c}(x) \partial^\mu\left(\delta^a\!_c \partial_\mu^{(x)} + f^a\!_{bc} A_\mu^b(x)\right) \delta^{(d)}(x - y) c^b(y)\\
-    &= \int \d^d x\; \bar{c}_a(x) \partial^\mu (\nabla_\mu c)^a.
+    S_{gh} &= -\int \d^d x\; \d^d y\; \bar{c}_a(x) \partial^\mu\left(\delta^a\!_b \partial_\mu^{(x)} + f^a\!_{bc} A_\mu^b(x)\right) \delta^{(d)}(x - y) c^b(y)\\
+    &= -\int \d^d x\; \bar{c}_a(x) \partial^\mu \nabla_\mu c^a.
   \end{align*}
-  Thus, the whole Yang--Mills path integral is
-  \begin{multline*}
-    \mathcal{Z} = \int \D A\; \D \bar{c}\;\D \bar{c} \;\D h\; \exp\left(-\frac{1}{4g^2_{YM}} \int F_{\mu\nu}^a F^{\mu\nu, a} - \int h_a \partial^\mu A_\mu^a\right.\\
-    \left.+ \int \bar{c}_a \partial^\mu(\nabla c)^a \;\d^d x\right).
-  \end{multline*}
+  Thus, the full Yang--Mills action is given by
+  \[
+    S[A, \bar{c}, c, h] =\int \d^d x\; \left( \frac{1}{4g^2_{YM}} F_{\mu\nu}^a F^{a,\mu\nu} + \frac{1}{2} h^a \partial^\mu A_\mu^a - \bar{c}^a \partial^\mu \nabla_\mu c^a\right),
+  \]
+  and the whole Yang--Mills path integral is
+  \[
+    \mathcal{Z} = \int \D A\; \D c\;\D \bar{c} \;\D h\; e^{-S[A, \bar{c}, c, h]}.
+  \]
   All these stuff is just a fake way to say that all we wanted to do was to integrate over the space $\mathcal{A}/\mathcal{G}$, rather than $\mathcal{A}$ itself.
 \end{eg}
 
-Why do we bother to do this? Why didn't we had to bother when we did electrodynamics?
+Why do have to do this? Why didn't we have to bother when we did electrodynamics?
 
-If we did this for the gauge field, then the structure constants were zero. Consequently, all $f^a\!_{bc}$ terms do not exist. So the ghost kinetic operator does not involve the gauge field. So the path integral over the ghosts would be completely independent of the gauge field, and so as long as we worked in a gauge, then we can ignore the ghosts.
+If we did this for an abelian gauge theory, then the structure constants were zero. Consequently, all $f^a\!_{bc}$ terms do not exist. So the ghost kinetic operator does not involve the gauge field. So the path integral over the ghosts would be completely independent of the gauge field, and so as long as we worked in a gauge, then we can ignore the ghosts. However, in a non-abelian gauge theory, this is not true. We cannot just impose a gauge and get away with it. We need to put back the Jacobian to take into account the change of variables, and this is where the ghosts come in.
 
-However, in a non-abelian gauge theory, this is not true. We cannot just impose a gauge and get away with it. We need to put back the Jacobian to take into account the change of variables, and this is where the ghosts come in.
+The benefit of doing all this work is that it now looks very familiar. It seems like something we can tackle using Feynman rules with perturbation theory.
 
-The benefit of doing this is that it now looks very familiar. It seems like something we can tackle using Feynman rules with perturbation theory.
-
-Note that instead of imposing $f[A] = 0$ by the % insert name Nakamishi Lautrug
-term
+In general, we cannot get rid of the ghost fields. However, there is a trick we can use to get rid of the $h$ field. Instead of imposing $f[A] = 0$ by the term
 \[
-  i h_a f^a[A]\;\d^d x,
+  h_a f^a[A]\;\d^d x,
 \]
 we can instead ``smear'' the gauge condition by including a quadratic piece in $h$, i.e.\ we take
 \[
-  S[h, \ph] = i \int \d^d x h_a (\partial^\mu A_\mu^a) + \frac{1}{2 \xi} \int \d^d x\; h^a h_a
+  S[h, \ph] = \int \d^d x\; h_a (\partial^\mu A_\mu^a) + \frac{1}{2 \xi} \int \d^d x\; h^a h_a
 \]
 for some constant $\xi$. Integrating out $h$ now yields a contribution
 \[
   - \frac{\xi}{2} \int\d^d x\; (\partial^\mu A_\mu^a) (\partial^\nu A_\nu^a).
 \]
-So the path integral is a ``Gaussian peaked on $\partial^\mu A_\mu = 0$, rather than localized on it. The real justification for why we are allowed to include this term is part of the BRST story, which we shall not go into.
+So the path integral is a ``Gaussian'' peaked at $\partial^\mu A_\mu = 0$, rather than localized at it. The real justification for why we are allowed to include this term is part of the BRST story, which we shall not go into. Heuristically, we can justify this as follows --- in the finite-dimensional example, we saw that any gauge-fixing curve would do the job, so we might as well ``averaging out'' over many gauge fixing curves.
 
-In the finite-dimensional example, we saw that any gauge-fixing curve would do the job, so we are sort-of ``averaging out'' over many gauge fixing curves.
-
-The complete gauge-fixed Yang--Mills action is then (with coupling to fermions $\psi$)
+Then the complete gauge-fixed Yang--Mills action is then (with coupling to fermions $\psi$)
 \begin{multline*}
-  S[A, \bar{c}, c, \psi] = \frac{1}{4g^2} \int F_{\mu\nu}^a F^{\mu\nu,a}\;\d^d x - \frac{\xi}{2} \int (\partial^\mu A_\mu^a) (\partial^\nu A_\nu^a)\;\d^d x \\
-  + \int \bar{c} \partial^\mu \nabla_\mu c \;\d^d x + \int \d^d x\; \bar\psi (\slashed\nabla + m)\psi,
+  S[A, \bar{c}, c, \bar\psi, \psi]\\
+  = \int\d^d x\; \left(\frac{1}{4} F_{\mu\nu}^a F^{\mu\nu,a} - \frac{\xi}{2} (\partial^\mu A_\mu^a) (\partial^\nu A_\nu^a) -  \bar{c}^a \partial^\mu \nabla_\mu c^a + \bar\psi (\slashed\nabla + m)\psi\right), % check sign of \xi term
 \end{multline*}
-where
-\[
-  \slashed{\nabla} = \gamma^\mu (\partial_\mu A_\mu^a),
-\]
-where the gauge field acts in some representation $R$.
-
-We have corresopnding Feynman rules, with propagators
+where we absorbed the factor of $g_{YM}$ into $A$. We can now write down our Feynman rules. We have three propagators
 \begin{align*}
   \begin{tikzpicture}[eqpic]
     \begin{feynman}
@@ -4665,7 +5065,7 @@ We have corresopnding Feynman rules, with propagators
         (l) -- [gluon, momentum=$p$] (r),
       };
     \end{feynman}
-  \end{tikzpicture} &= \D_{\mu\nu}^{ab} (p) = \frac{\delta^{ab}}{p^2} \left(\delta_{\mu\nu}(1 - \xi) \frac{p_\mu p_\nu}{p^2}\right)\\
+  \end{tikzpicture} &= \D_{\mu\nu}^{ab} (p) = - \frac{\delta^{ab}}{p^2} \left(\delta_{\mu\nu} - (1 - \xi) \frac{p_\mu p_\nu}{p^2}\right)\\
   \begin{tikzpicture}[eqpic]
     \begin{feynman}
       \vertex (l);
@@ -4683,24 +5083,23 @@ We have corresopnding Feynman rules, with propagators
         (l) -- [scalar, momentum=$p$] (r),
       };
     \end{feynman}
-  \end{tikzpicture} &= C^{ab}(p) = \frac{\delta^{ab}}{ip^2}
+  \end{tikzpicture} &= C^{ab}(p) = \frac{\delta^{ab}}{p^2}
 \end{align*}
-and interaction vertices
+We also have interaction vertices given by
 \begin{align*}
   \begin{tikzpicture}[eqpic]
     \begin{feynman}
       \vertex (c);
-      \vertex [above left=of c] (tl) {$A_\mu^a$};
-      \vertex [above right=of c] (tr) {$A_\nu^b$};
-      \vertex [below=of c] (b) {$A_\lambda^c$};
+      \vertex [above left=0.5cm and 1cm of c] (tl) {$A_\mu^a$};
+      \vertex [above right=0.5cm and 1cm of c] (tr) {$A_\nu^b$};
+      \vertex [below=1.12cm of c] (b) {$A_\lambda^c$};
       \diagram*{
         (c) -- [gluon, momentum=$p$] (tl),
-        (c) -- [gluon, momentum=$q$] (tr), % fix directions
+        (c) -- [gluon, momentum'=$q$] (tr),
         (c) -- [gluon, momentum=$k$] (b),
       };
     \end{feynman}
-  \end{tikzpicture} &= \Gamma^{abc}_{\mu\nu\lambda} (k, p, q) = g_{YM} \delta^d(k + p + q)\\
-  &\hphantom{={}} f^{abc} \left((k - p)_\lambda \delta_{\mu\nu} + (p - q)_\mu \delta_{\nu\lambda} + (q - k) \delta_{\mu\lambda}\right)\\
+  \end{tikzpicture} &= g_{YM} f^{abc} \left((k - p)_\lambda \delta_{\mu\nu} + (p - q)_\mu \delta_{\nu\lambda} + (q - k) \delta_{\mu\lambda}\right)\\
   \begin{tikzpicture}[eqpic]
     \begin{feynman}
       \vertex (c);
@@ -4709,245 +5108,382 @@ and interaction vertices
       \vertex [below left=of c] (bl) {$A_\lambda^c$};
       \vertex [below right=of c] (br) {$A_\sigma^d$};
       \diagram*{
-        (c) -- [gluon, momentum=$p$] (tl),
-        (c) -- [gluon, momentum=$p$] (tr), % fix directions
-        (c) -- [gluon, momentum=$p$] (bl),
-        (c) -- [gluon, momentum=$p$] (br), % no explicit momentum dependence because no derivative
+        (c) -- [gluon] (tl),
+        (c) -- [gluon] (tr),
+        (c) -- [gluon] (bl),
+        (c) -- [gluon] (br),
       };
     \end{feynman}
-  \end{tikzpicture} &= (-g_{YM}^2 f^{abe}f^{cde} (\delta_{\mu\lambda} \delta_{\nu\sigma} - \delta_{\mu\sigma} \delta_{\nu\lambda}) \\
-  &\hphantom{={}}- g_{YM}^2 f^{ace} f^{bde} (\delta_{\mu\nu} \delta_{\sigma\lambda} - \delta_{\mu\sigma} \delta_{\nu\lambda}) \\
-  &\hphantom{={}}- g^2_{YM} f^{ade} f^{bce} (\delta_{\mu\nu} \delta_{\sigma\lambda} - \delta_{\mu\lambda} \delta_{\nu\sigma})) \delta^d(l + p + q + \ell)\\
+  \end{tikzpicture} &=
+   \begin{tikzpicture}[eqpic]
+     \node at (0, 0.5) {$-g_{YM}^2 f^{abe}f^{cde} (\delta_{\mu\lambda} \delta_{\nu\sigma} - \delta_{\mu\sigma} \delta_{\nu\lambda})$};
+     \node at (0, 0) {$- g_{YM}^2 f^{ace} f^{bde} (\delta_{\mu\nu} \delta_{\sigma\lambda} - \delta_{\mu\sigma} \delta_{\nu\lambda})$};
+     \node at (0, -0.5) {$- g^2_{YM} f^{ade} f^{bce} (\delta_{\mu\nu} \delta_{\sigma\lambda} - \delta_{\mu\lambda} \delta_{\nu\sigma})$};
+  \end{tikzpicture}\\
   \begin{tikzpicture}[eqpic]
     \begin{feynman}
       \vertex (c);
-      \vertex [above left=of c] (tl) {$\bar{c}$};
-      \vertex [above right=of c] (tr) {$c$};
-      \vertex [below=of c] (b) {$A_\mu(p)$}; % reflect this
+      \vertex [above left=0.5cm and 1cm of c] (tl) {$\bar{c}^b$};
+      \vertex [above right=0.5cm and 1cm of c] (tr) {$c^c$};
+      \vertex [below=1.12cm of c] (b) {$A_\mu^a(p)$};
       \diagram*{
-        (c) -- [scalar] (tl),
-        (c) -- [scalar] (tr), % fix directions
+        (c) -- [anti charged scalar] (tl),
+        (c) -- [charged scalar] (tr),
         (c) -- [gluon, momentum=$p$] (b),
       };
     \end{feynman}
-  \end{tikzpicture} &= \Gamma^{abc}(p) = g_{YM} f^{abc} p_\mu\\
+  \end{tikzpicture} &= g_{YM} f^{abc} p_\mu\\
   \begin{tikzpicture}[eqpic]
     \begin{feynman}
       \vertex (c);
-      \vertex [above left=of c] (tl) {$\bar{\psi}$};
-      \vertex [above right=of c] (tr) {$\psi$};
-      \vertex [below=of c] (b) {$A_\mu(p)$}; % reflect this
+      \vertex [above left=0.5cm and 1cm of c] (tl) {$\bar{\psi}$};
+      \vertex [above right=0.5cm and 1cm of c] (tr) {$\psi$};
+      \vertex [below=1.12cm of c] (b) {$A_\mu^a(p)$};
       \diagram*{
-        (c) -- [fermion] (tl),
-        (c) -- [fermion] (tr), % fix directions
-        (c) -- [gluon, momentum=$p$] (b),
+        (c) -- [anti fermion] (tl),
+        (c) -- [fermion] (tr),
+        (c) -- [gluon] (b),
       };
     \end{feynman}
-  \end{tikzpicture} &= -g_{YM} \gamma^\mu(t^a_f). % t is generator of fundamental rep?
+  \end{tikzpicture} &= -g_{YM} \gamma^\mu t^a_f.
 \end{align*}
-Conclusion: Yick! This is horrible! Perturbation theory is not going to be the right way to think about Yang--Mills, and GR is worse!
+What is the point of writing all this out? The point is not to use them. The point is to realize these are horrible! It is a complete pain to work with these Feynman rules. For example, a $gg \to ggg$ scattering process involves $\sim 10000$ terms when we expand it in terms of Feynman diagrams, at \emph{tree level}! Perturbation theory is \emph{not} going to right way to think about Yang--Mills. And GR is only worse.
 
-Then what is a good way to do Yang--Mills? We don't know. Some people try to use lattice regularization and put it on a computer. Alternatively, we might just accept the life is hard.
+Perhaps this is a sign that our theory is wrong. Surely a ``correct'' theory must look nice. But when we try to do actual computations, despite these horrific expressions, the end results tends to be very nice. So it's not really Yang--Mills' fault. It's just perturbation theory that is bad.
 
-However, it turns out when we try to do computations, the answer looks very nice. So there must be some hidden structure of Yang--Mills we are missing. But we don't really know.
+Indeed, there is no reason to expect perturbation theory to look good. We formulated Yang--Mills in terms of a very nice geometric picture, about principal $G$-bundles. From this perspective, everything is very natural and simple. However, to do perturbation theory, we needed to pick a trivialization, and then worked with this object $A$. The curvature $F_{\mu\nu}$ was a natural geometric object to study, but breaking it up into $\d A + A \wedge A$ is not. The individual terms that give rise to the interaction vertices have no geometric meaning --- only $\nabla$ and $F$ do. The brutal butchering of the connection and curvature into these non-gauge-invariant terms is bound to make our theory look messy.
 
-The only thing we can do now is to work with this.
+Then what \emph{is} a good way to do Yang--Mills? We don't know. One rather successful approach is to use lattice regularization, and use a computer to actually compute partition functions and correlations directly. But this is very computationally intensive, and it's difficult to do complicated computations with this. Some people try to understand Yang--Mills in terms of string theory, or twistor theory. But we don't really know.
 
-\subsection{Background fields}
-To compute the $\beta$-function of Yang--Mills, we expand the action around a classical solution $A_\mu$ with all other fields $\psi, \bar\psi, \bar{c}, c = 0$. We set
+The only thing we can do now is to work with this mess.
+
+\subsection{Renormalization of Yang--Mills theory}
+To conclude the course, we compute the $\beta$-function of Yang--Mills theory. We are mostly interested in the case of $\SU(N)$. While a lot of the derivations (or lack of) we do are general, every now and then, we use the assumption that $G = \SU(N)$, and that the fermions live in the fundamental representation.
+
+Usually, to do perturbation theory, we expand around a vacuum, where all fields take value $0$. However, this statement doesn't make much sense for gauge theory, because $A_\mu$ is only defined up to gauge transformations, and it doesn't make sense to ``set it to zero''. Instead, what we do is that we fix any classical solution $A_\mu^0$ to the Yang--Mills equation, and take this as the ``vacuum'' for $A_\mu$. This is known as the \term{background field}. We write
 \[
-  A^{\mathrm{full}}_\mu = A_\mu + a_\mu,
+  A_\mu = A_\mu^0 + a_\mu.
 \]
-so that
+Whenever we write $\nabla_\mu$, we will be using the background field, so that
 \[
-  \nabla = \nabla^0 + a.
+  \nabla_\mu = \partial_\mu + A^0_\mu.
 \]
-We then have
+We can compute
+\begin{align*}
+  F_{\mu\nu} &= \partial_\mu A_\nu - \partial_\nu A_\mu + [A_\mu, A_\nu]\\
+  &= F_{\mu\nu}^0 + \partial_\mu a_\nu - \partial_\nu a_\mu + [a_\mu, a_\nu] + [A_\mu^0, a_\nu] + [a_\mu, A_\nu^0]\\
+  &= F_{\mu\nu}^0 + \nabla_\mu a_\nu - \nabla_\nu a_\mu + [a_\mu, a_\nu].
+\end{align*}
+
+Thus, if we compute the partition function, we would expect to obtain something of the form
 \[
-  F_{\mu\nu} = F_{\mu\nu}^0 + \nabla_{[\mu} A_{\nu]} + [a_\mu, a_\nu].
+  \mathcal{Z} \equiv e^{-S_{\mathrm{eff}}[A]} = \exp\left(-\frac{1}{2g_{YM}^2} \int (F_{\mu\nu}^0, F^{0, \mu\nu})\;\d^d x\right) \text{(something)}.
 \]
-We treat $(a, \psi, \bar{\psi}, \bar{c}, c)$ as fluctuations, and compute the path integral to $1$-loop accuracy. Again, since we always have $P - V = L - 1$, at 1-loop, we must have $P = V$, and since only the fluctuations propagator, we also have
+A priori, the ``something'' will be a function of $A$, and also the energy scale $\mu$. Then since the result shouldn't actually depend on $\mu$, this allows us to compute the $\beta$-function. % say something about this
+
+We will work in Feynman gauge, where we pick $\xi = 1$. So we have
+\begin{multline*}
+  S[a, \bar{c}, c, \bar\psi, \psi] =  \int\;\d^d x\; \left(\frac{1}{4g^2}(F_{\mu\nu}^0 + \nabla_{[\mu}a_{\nu]} + [a_\mu, a_\nu])^2\right. \\
+  \left.\vphantom{\frac{1}{4g^2}}- \frac{1}{2g^2} (\partial^\mu A_\mu + \partial^\mu a_\mu)^2 - \bar{c}\partial^\mu \nabla_\mu c - \bar{c} \partial^\mu a_\mu c + \bar\psi (\slashed \nabla + m) \psi + \bar\psi \slashed a \psi\right).
+\end{multline*}
+This allows us to rewrite the original action in terms of the new field $a_\mu$. We will only compute the $\beta$-function up to 1-loop, and it turns out this implies we don't need to know about the whole action. We claim that we only need to know about quadratic terms.
+
+Let $L$ be the number of loops, $V$ the number of vertices, and $P$ the number of propagators. Then, restricting to connected diagrams, Euler's theorem says
 \[
-  2P = \sum_{\text{vertices $i$}} n_{q, i},
+  P - V = L - 1.
 \]
-where $n_{q, i}$ is the number of vertices at the node $i$, and $q$ says we just count over the quantum (non-background) fields. So we know that
+By restricting to 1-loop diagrams, this means we only care about diagrams with $P = V$.
+
+For each node $i$, we let $n_{q, i}$ be the number of ``quantum'' legs coming out of the vertex, i.e.\ we do not count background fields. Then since each propagator connects two vertices, we must have
+\[
+  2P = \sum_{\text{vertices $i$}} n_{q, i}.
+\]
+Also, almost by definition, we have
+\[
+  V = \sum_{\text{vertices $i$}} 1.
+\]
+So this implies we only care about fields with
 \[
   0 = \sum (n_{q, i} - 2).
 \]
-If the background field $A_\mu^0$ satisfies the Yang--Mills equation, then we can ignore all vertices with $n_{q, i} = 1$, since the sum of all these terms is proportional to the field equations. So we must have $n_{q, i} = 2$ for all $i$. So at $1$-loop, we only need to consider vertices that are quadratic. We saw exactly the same situation when we were looking at local potentials previously.
+It can be argued that since $A^0_\mu$ satisfies the Yang--Mills equations, we can ignore all linear terms. So this means it suffices to restrict to the quadratic terms. % why can ignore?
 
-We'll also work in ``background field gauge'', where $\nabla^\mu a_\mu = 0$. The $\nabla^\mu$ uses the background term $A_\mu^0$. In Feynman gauge ($\xi = 1$), we have
-\begin{align*}
-  &\phantom{={}}S^{\mathrm{quad}} [a, \bar{c}, c, \bar\psi, \psi]\\
-  &= - \frac{1}{4 g_{YM}^2} \int \d^d x\; \left((\nabla_\mu a_\nu^a - \nabla_\nu a_\mu^a)^2 - 2 F_{\nabla^0}^{\mu\nu} [a_\mu, a_\nu] + 2 (\nabla^{0, \mu}_{a_\mu} \nabla^{0, \nu} a_\nu)\right) \\
-  &\hphantom{={}}+ \int\ d^d x\; \bar{c} \nabla^\mu \nabla_\mu^0 c + \int \d^d x\; \bar\psi (i \slashed{\Delta}^0 + m)\psi.
-\end{align*}
-Let's first look at the fluctuations in $a_\mu$, we have % all derivatives are wrt background gauge field
-\begin{align*}
-  4g_{YM} \mathcal{L}^{\mathrm{quad}} &= (\nabla_\mu a_\nu - \nabla_\nu a_\mu)^2 - 2F^{\mu\nu} [a_\mu, a_\nu] + 2 (\nabla^\mu a_\mu)^2\\
-  &= a_\mu \left[-\delta^{\mu\nu} \nabla^2 + \nabla^\nu \nabla^\mu - \nabla^\mu \nabla^\nu \right] a_\nu - 2 F^{\mu\nu} [a_\mu, a_\nu]\\
-  &= a_\mu^a \left(- \delta^{\mu\nu} ((\nabla)^2)^c_a + 2 \left(\frac{1}{2} F_{\rho\sigma}^b \mathcal{J}^{\rho\sigma}\right)^{\mu\nu} (t_b)^c_a\right) a_{\nu, c},
-\end{align*}
-where
+Restricting to the quadratic terms, for each of $c, \psi, a$, we have a term that looks like, say
 \[
-  (\mathcal{J}^{\rho\sigma})_{\mu\nu} = i \left(\delta^\rho_\mu \delta^\sigma_\nu - \delta^\rho_\nu \delta^\sigma_\mu\right)
+  \int \D c \;\D \bar{c}\; e^{\int \d^d x\; \bar{c} \Delta c}
 \]
-are the $\SO(d)$ generators acting on the vector representation, and
-\[
-  (t_b)^c_a = f^c_{ba}
-\]
-are the structure constants of $g$ generated by the adjoint representation.
+for some operator $\Delta$. Then the path integral will give $\det \Delta$. If the field is a boson, then we obtain $\frac{1}{\det}$ instead, but ultimately, the goal is to figure out what this $\Delta$ is.
 
-Similarly, for the Dirac field $\psi$, we get $\det(\slashed{\nabla} + m)$, and it will be helpful to use $(\det M)^2 = \det (M^2)$ to write this as follows:
-\begin{align*}
-  \slashed{\nabla}^2 &= \gamma^\mu \gamma^\nu \nabla_\mu \nabla_\nu \\
-  &= \left(\frac{1}{2} [\gamma^\mu, \gamma^\nu] + \frac{1}{2} \{\gamma^\mu \gamma^\nu\}\right) \nabla_\mu \nabla_\nu\\
-  &= \nabla^2 - \frac{1}{4} [\gamma^\mu \gamma^\nu] (\nabla_\mu \nabla_\nu - \nabla_\nu \nabla_\mu)\\
-  &= \nabla^2 + 2\left(\frac{1}{2} F_{\mu\nu}^a S^{\mu\nu} (t^a_R)\right),
-\end{align*}
-where
+Note that each particle comes with a representation of $\SO(d)$ (or rather, the spin group) and the gauge group $G$. For our purposes, all we need to know about the representations of $\SO(d)$ is the spin, which may be $0$ (trivial), $\frac{1}{2}$ (spinor) or $1$ (vector). We will refer to the representation of $G$ as ``$R$'', and the spin as $j$. We then define the operator
 \[
-  S^{\mu\nu} = \frac{1}{4} [\gamma^\mu, \gamma^\nu].
+  \Delta_{R, j} = \nabla^2 + 2 \left(\frac{1}{2} F_{\mu\nu}^a J^{\mu\nu}_{(j)}\right) t_R^a,
 \]
-Finally, the ghost Lagrangian is easier. it is just
+where $\{t_R^a\}$ are the images of the generators of $\mathfrak{g}$ in the representation, and $J^{\mu\nu}_{(j)}$ are the generators of $\so(d)$ in the spin $j$ representation. In particular,
 \[
-  \mathcal{L}_{\mathrm{ghosts}} = \bar{c}_a (\nabla^2 c)^a.
+  J_{(0)}^{\mu\nu} = 0,\quad J_{(\frac{1}{2})}^{\mu\nu} = S^{\mu\nu} = \frac{1}{4} [\gamma^\mu, \gamma^\nu],\quad J_{(1)}^{\mu\nu} = i(\delta^\rho_\mu \delta^\sigma_\nu - \delta_\nu^\rho \delta_\mu^\sigma).
 \]
-All together, integrating out these fluctuations gives, to one-loop accuracy,
-\[
-  \frac{(\det \Delta_{R, 1/2})^{n/2}}{ (\det \Delta_{\mathrm{adj}, 1})^{1/2}} (\det \Delta_{\mathrm{adj}, 0}),
-\]
-where
-\[ % point is that we got every operator in the same form.
-  \Delta_{R, j} = \nabla^2 + 2\left(\frac{1}{2} F_{\mu\nu}^a J^{\mu\nu}_{(j)}\right)t^a_R,
-\]
-and we have $n$ flavours of massless Dirac fermions. We can think of the second term as the ``magnetic moment''.
+For simplicity, we will assume the fermion masses $m = 0$. Then we claim that (up to a constant factor), the $\Delta$ of the $c$, $\psi$ and $a$ fields are just $\Delta_{\mathrm{adj}, 0}$, $\sqrt{\Delta_{R, \frac{1}{2}}}$ and $\Delta_{\mathrm{adj}, 1}$ respectively. This is just a computation, which we shall omit. % include; what about the constant factor?
 
-Everything here depends on the background gauge field. We now see what this looks like in terms of the background gauge field. The effective action for the background field $\nabla^{(0)} = \partial + A$ is
+Thus, if there are $n$ many fermions, then we find that we have % explain what $n$ is.
 \[
-  e^{-S_{\mathrm{eff}}[A]} = \exp\left(- \frac{1}{4g_{YM}^2} \int (F_{\mu\nu}, F^{\mu\nu})\;\d^d x\right) \frac{(\det \Delta_{\mathrm{adj}, 0}) (\det \Delta_{R, \frac{1}{2}})^{n/2}}{(\det \Delta_{\mathrm{adj}, 1})^{1/2}},
+  \mathcal{Z} = \exp\left(-\frac{1}{2g_{YM}^2} \int (F_{\mu\nu}^0, F^{0, \mu\nu})\;\d^d x\right) \frac{(\det \Delta_{\mathrm{adj}, 0}) (\det \Delta_{R, \frac{1}{2}})^{n/2}}{(\det \Delta_{\mathrm{adj}, 1})^{1/2}}.
 \]
-We can write out $\Delta$ explicitly, we have
+We are going to view these extra terms as being quantum corrections to the effective action of $A_\mu$, and we will look at the corrections to the coupling $g_{YM}^2$ they induce. Thus, we are ultimately interested in the logarithm of these extra terms.
+
+%We first look at the quadratic terms in $a_\mu$. This is given by
+%\begin{align*}
+%  &\hphantom{={}} -\frac{1}{4g^2}\Big((\nabla_\mu a_\nu - \nabla_\nu a_\mu)^2 + 2 (F^0)^{\mu\nu} [a_\mu, a_\nu] + 2 (\partial^\mu a_\mu)^2\Big)\\
+%  &= -\frac{1}{4g^2}\Big(-a^\nu \nabla^2 a_\nu - a^\mu \nabla^2 a_\mu + 2a^\nu \nabla^\mu \nabla_\nu a_\mu\Big)
+%\end{align*}
+%\separator
+%
+%To compute the $\beta$-function of Yang--Mills, we expand the action around a classical solution $A_\mu$ with all other fields $\psi, \bar\psi, \bar{c}, c = 0$. We set
+%\[
+%  A^{\mathrm{full}}_\mu = A_\mu + a_\mu,
+%\]
+%so that
+%\[
+%  \nabla = \nabla^0 + a.
+%\]
+%We then have
+%\[
+%  F_{\mu\nu} = F_{\mu\nu}^0 + \nabla_{[\mu} A_{\nu]} + [a_\mu, a_\nu].
+%\]
+%We treat $(a, \psi, \bar{\psi}, \bar{c}, c)$ as fluctuations, and compute the path integral to $1$-loop accuracy. Again, since we always have $P - V = L - 1$, at 1-loop, we must have $P = V$, and since only the fluctuations propagator, we also have
+%\[
+%  2P = \sum_{\text{vertices $i$}} n_{q, i},
+%\]
+%where $n_{q, i}$ is the number of vertices at the node $i$, and $q$ says we just count over the quantum (non-background) fields. So we know that
+%\[
+%  0 = \sum (n_{q, i} - 2).
+%\]
+%If the background field $A_\mu^0$ satisfies the Yang--Mills equation, then we can ignore all vertices with $n_{q, i} = 1$, since the sum of all these terms is proportional to the field equations. So we must have $n_{q, i} = 2$ for all $i$. So at $1$-loop, we only need to consider vertices that are quadratic. We saw exactly the same situation when we were looking at local potentials previously.
+%
+%We'll also work in ``background field gauge'', where $\nabla^\mu a_\mu = 0$. The $\nabla^\mu$ uses the background term $A_\mu^0$. In Feynman gauge ($\xi = 1$), we have
+%\begin{align*}
+%  &\phantom{={}}S^{\mathrm{quad}} [a, \bar{c}, c, \bar\psi, \psi]\\
+%  &= - \frac{1}{4 g_{YM}^2} \int \d^d x\; \left((\nabla_\mu a_\nu^a - \nabla_\nu a_\mu^a)^2 - 2 F_{\nabla^0}^{\mu\nu} [a_\mu, a_\nu] + 2 (\nabla^{0, \mu}_{a_\mu} \nabla^{0, \nu} a_\nu)\right) \\
+%  &\hphantom{={}}+ \int\ d^d x\; \bar{c} \nabla^\mu \nabla_\mu^0 c + \int \d^d x\; \bar\psi (i \slashed{\Delta}^0 + m)\psi.
+%\end{align*}
+%Let's first look at the fluctuations in $a_\mu$, we have % all derivatives are wrt background gauge field
+%\begin{align*}
+%  4g_{YM} \mathcal{L}^{\mathrm{quad}} &= (\nabla_\mu a_\nu - \nabla_\nu a_\mu)^2 - 2F^{\mu\nu} [a_\mu, a_\nu] + 2 (\nabla^\mu a_\mu)^2\\
+%  &= a_\mu \left[-\delta^{\mu\nu} \nabla^2 + \nabla^\nu \nabla^\mu - \nabla^\mu \nabla^\nu \right] a_\nu - 2 F^{\mu\nu} [a_\mu, a_\nu]\\
+%  &= a_\mu^a \left(- \delta^{\mu\nu} ((\nabla)^2)^c_a + 2 \left(\frac{1}{2} F_{\rho\sigma}^b \mathcal{J}^{\rho\sigma}\right)^{\mu\nu} (t_b)^c_a\right) a_{\nu, c},
+%\end{align*}
+%where
+%\[
+%  (\mathcal{J}^{\rho\sigma})_{\mu\nu} = i \left(\delta^\rho_\mu \delta^\sigma_\nu - \delta^\rho_\nu \delta^\sigma_\mu\right)
+%\]
+%are the $\SO(d)$ generators acting on the vector representation, and
+%\[
+%  (t_b)^c_a = f^c_{ba}
+%\]
+%are the structure constants of $g$ generated by the adjoint representation.
+%
+%Similarly, for the Dirac field $\psi$, we get $\det(\slashed{\nabla} + m)$, and it will be helpful to use $(\det M)^2 = \det (M^2)$ to write this as follows:
+%\begin{align*}
+%  \slashed{\nabla}^2 &= \gamma^\mu \gamma^\nu \nabla_\mu \nabla_\nu \\
+%  &= \left(\frac{1}{2} [\gamma^\mu, \gamma^\nu] + \frac{1}{2} \{\gamma^\mu \gamma^\nu\}\right) \nabla_\mu \nabla_\nu\\
+%  &= \nabla^2 - \frac{1}{4} [\gamma^\mu \gamma^\nu] (\nabla_\mu \nabla_\nu - \nabla_\nu \nabla_\mu)\\
+%  &= \nabla^2 + 2\left(\frac{1}{2} F_{\mu\nu}^a S^{\mu\nu} (t^a_R)\right),
+%\end{align*}
+%where
+%\[
+%  S^{\mu\nu} = \frac{1}{4} [\gamma^\mu, \gamma^\nu].
+%\]
+%Finally, the ghost Lagrangian is easier. it is just
+%\[
+%  \mathcal{L}_{\mathrm{ghosts}} = \bar{c}_a (\nabla^2 c)^a.
+%\]
+%All together, integrating out these fluctuations gives, to one-loop accuracy,
+%\[
+%  \frac{(\det \Delta_{R, 1/2})^{n/2}}{ (\det \Delta_{\mathrm{adj}, 1})^{1/2}} (\det \Delta_{\mathrm{adj}, 0}),
+%\]
+%where
+%\[ % point is that we got every operator in the same form.
+%  \Delta_{R, j} = \nabla^2 + 2\left(\frac{1}{2} F_{\mu\nu}^a J^{\mu\nu}_{(j)}\right)t^a_R,
+%\]
+%and we have $n$ flavours of massless Dirac fermions. We can think of the second term as the ``magnetic moment''.
+%
+%Everything here depends on the background gauge field. We now see what this looks like in terms of the background gauge field. The effective action for the background field $\nabla^{(0)} = \partial + A$ is
+%\[
+%  e^{-S_{\mathrm{eff}}[A]} = \exp\left(- \frac{1}{4g_{YM}^2} \int (F_{\mu\nu}, F^{\mu\nu})\;\d^d x\right) \frac{(\det \Delta_{\mathrm{adj}, 0}) (\det \Delta_{R, \frac{1}{2}})^{n/2}}{(\det \Delta_{\mathrm{adj}, 1})^{1/2}},
+%\]
+
+To proceed, write write out $\Delta$ explicitly:
 \[
-  \Delta_{R, j} = - \partial^2 + \underbrace{\{\partial^\mu, A_\mu^a\} t^a_{(R)}}_{\Delta^{(1)}} + \underbrace{A^{\mu, a} A_\mu^b t^a_R t^b_R}_{\Delta^{(2)}} + \underbrace{2 \left(\frac{1}{2} F^a_{\mu\nu} J^{\mu\nu}_{(j)}\right) t^a_{(R)}}_{\Delta^{(J)}}.
+  \Delta_{R, j} = - \partial^2 + \underbrace{(\partial^\mu A_\mu^a + A_\mu^a \partial^\mu) t^a_{(R)}}_{\Delta^{(1)}} + \underbrace{A^{\mu, a} A_\mu^b t^a_R t^b_R}_{\Delta^{(2)}} + \underbrace{2 \left(\frac{1}{2} F^a_{\mu\nu} J^{\mu\nu}_{(j)}\right) t^a_{(R)}}_{\Delta^{(J)}}.
 \]
-The effective action involves
+Then we can write the logarithm as
 \begin{align*}
   \log \det \Delta_{R, j} &= \log \det (- \partial^2 + \Delta^{(1)} + \Delta^{(2)} + \Delta^{(J)})\\
-  &= \log \det (- \partial^2) + \tr \log (1 - (\partial^2)^{-1} (\Delta^{(1)} + \delta^{(2)} + \Delta^{(J)})).
+  &= \log \det (- \partial^2) + \tr \log (1 - (\partial^2)^{-1} (\Delta^{(1)} + \Delta^{(2)} + \Delta^{(J)})).
 \end{align*}
-Again, the first term is a constant, and we will ignore it. We want to know the correction to the coupling $\frac{1}{4 g_{YM}^2}$. Since everything is covariant with respect to the background field $\nabla^{(0)}$, it is enough to just compute the quadratic terms in $A_\mu$, because all the other terms are required to behave accordingly.
+Again, the first term is a constant, and we will ignore it. We want to know the correction to the coupling $\frac{1}{4 g_{YM}^2}$. Since everything is covariant with respect to the background field $A^0$, it is enough to just compute the quadratic terms in $A_\mu$, because all the other terms are required to behave accordingly.
 
-We see that $\Delta^{(2)}$ is already quadratic. So we only need it up to linear order, and this contributes
+We now see what quadratic terms we obtain in the series expansion of $\log$. In the case of $G = \SU(N)$, We have $\tr t^a = \tr J_{\mu\nu} = 0$. So certain cross terms vanish, and the only quadratic terms are
 \[
-  \tr (-(\partial^2)^{-1} \Delta^{(2)}).
+  \log \det \Delta_{R, j} \sim \underbrace{\vphantom{\frac{1}{2}}\tr (- \partial^{-2} \Delta^{(2)})}_{(a)} + \underbrace{\frac{1}{2} \tr (\partial^{-2} \Delta^{(1)} \partial^{-2} \Delta^{(1)})}_{(b)} + \underbrace{\frac{1}{2} \tr (\partial^{-2} \Delta^{(J)} \partial^{-2} \Delta^{(J)})}_{(c)}.
 \]
-The $\Delta^{(1)}$ term is first-order. So we need the square term, and this contributes
-\[
-  -\frac{1}{2} \tr ((-\partial^2)^{-1} \Delta^{(1)} (-\partial^2)^{-1} \Delta^{(1)}).
-\]
-Similarly, the last term contributes
-\[
-  - \frac{1}{2} \tr ((-\partial^2)^{-1} \Delta^{(J)} (-\partial^2)^{-1} \Delta^{(J)})
-\]
-All other cross terms vanish, at least in the case $G = \SU(N)$, using the fact that $\tr t^a = \tr J_{\mu\nu} = 0$ for $J \in \so(d)$.
-
-The first term can be interpreted as the Feynman diagram
-\begin{center}
-  \begin{tikzpicture}
-    \begin{feynman}
-      \vertex (l);
-      \node [left] at (l){$A_\mu^a(k)$};
-      \vertex [right=of l] (c);
-      \vertex [above=1cm of c] (t);
-      \vertex [right=of c] (r) {$A_\nu^b(-k)$};
-
-      \diagram*{
-        (l) -- [gluon, momentum'=$k$] (c) -- [gluon] (r),
-        (c) -- [half left, momentum=$p$] (t) -- [half left] (c), % loop
-      };
-    \end{feynman}
-  \end{tikzpicture}
-\end{center}
-The second term is
-\begin{center}
-  \begin{tikzpicture}
-    \begin{feynman}
-      \vertex (l);
-      \node [left] at (l){$A_\mu^a(k)$};
-      \vertex [right=of l] (c1);
-      \vertex [right=of c1] (c2);
-      \vertex [right=of c2] (r) {$A_\nu^b(-k)$};
-
-      \diagram*{
-        (l) -- [gluon, momentum'=$k$] (c1),
-        (c2)-- [gluon] (r),
-        (c1) -- [half left, momentum=$p + k$] (c2),
-        (c1) -- [half right, reversed momentum'=$p$] (c2),
-      };
-    \end{feynman}
-  \end{tikzpicture}
-\end{center}
-The last one looks the same, but we have a different vertex structure, depending on what is going on in $J$.
-
-The first term gives
-\[
-  \tr ((-\partial^2)^{-1} \Delta^{(2)}) = \int \frac{\d^d k}{(2\pi)^d} A_\mu^a(k) A_\nu^b(-k) \int \frac{\d^d p}{(2\pi)^d} \frac{\tr_R(t^a t^b)}{p^2} \delta^{\mu\nu} d(j),
-\]
-where
-\[
-  d(j) =
-  \begin{cases}
-    1 & \mathrm{scalar}\\
-    4 & \mathrm{dirac}\\
-    4 & \text{4-vector}
-  \end{cases}
-\]
-denotes the number of spin components running around the loop. Similarly,
 \begin{align*}
-  \frac{1}{2} \tr ((-\partial^2)^{-1} \Delta^{(1)} (-\partial^2)^{-1} \Delta^{(1)}) \\
-  = \int \frac{\d^d k}{(2\pi)^d} \frac{\d^d p}{(2\pi)^d} \frac{(k + 2p)_\mu (k + 2p)_\nu\tr(t^a t^b) A_\mu^a(k) A_\nu^b(k)}{p^2 (p + k)^2}
+  (a) &= \int \frac{\d^d k}{(2\pi)^d} A_\mu^a(k) A_\nu^b(-k) \int \frac{\d^d p}{(2\pi)^d} \frac{\tr_R(t^a t^b)}{p^2} \delta^{\mu\nu} d(j)\\
+  (b) &= \int \frac{\d^d k}{(2\pi)^d} \frac{\d^d p}{(2\pi)^d} \frac{(k + 2p)_\mu (k + 2p)_\nu\tr(t^a t^b) A_\mu^a(k) A_\nu^b(k)}{p^2 (p + k)^2}\\
+  (c) &= \int \frac{\d^d k}{(2\pi)^d} \frac{\d^d p}{(2\pi)^d} A_\mu^a(k) A_\nu^b(-k) (k^2 \delta_{\mu\nu} - k_\mu k_\nu) \frac{1}{p^2(p + k)^2} C(j) \tr (t^a t^b).
 \end{align*}
-In dimensional regularization, these two diagrams combine to give
-\[
-  \int\frac{\d^d k}{(2\pi)^d} A^a_\mu(k) A^bb_\nu(-k) (k^2 \delta_{\mu\nu} - k_\mu k_\nu) \pi(k^2),
-\]
-where
-\[ % details in Osborn notes.
-  \pi(k^2) = - \frac{1}{d - 1} d(j) \tr_R (t^a t^b) \frac{\Gamma\left(2 - \frac{d}{2}\right) \Gamma\left(\frac{d}{2} - 1\right)^2}{\Gamma(d - 2)} \frac{(k^2)^{(d - 4)/2}}{2(\pi)^{d/2}}.
-\]
-We have
+where $d(j)$ is the number of spin components of the field and $C(j)$ is some constant depending on $j$. Explicitly, they are given by
+\begin{center}
+  \begin{tabular}{cccc}
+    \toprule
+    & scalar & Dirac & 4-vector\\
+    \midrule
+    $d(j)$ & 1 & 4 & 4\\
+    $C(j)$ & 0 & 1 & 2\\
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+In terms of Feynman diagrams, we can interpret $(a)$ as being given by the loop diagram
+\begin{center}
+  \begin{tikzpicture}
+    \draw [/tikzfeynman/gluon, /tikzfeynman/momentum'=$k$] (0, 0) node [left] {$A_\mu^a$} -- (2, 0.5);
+    \draw [/tikzfeynman/gluon] (2, 0.5) -- (4, 0) node [right] {$A_\nu^b$};
+    \draw [/tikzfeynman/fermion] (2, 1) circle [radius=0.5];
+    \node [left] at (1.5, 1) {$p$};
+  \end{tikzpicture}
+\end{center}
+while $(b)$ and $(c)$ are given by diagrams that look like
+\begin{center}
+  \begin{tikzpicture}
+    \draw [/tikzfeynman/gluon, /tikzfeynman/momentum'=$k$] (0, 0) node [left] {$A_\mu^a$} -- (2, 0);
+    \draw [/tikzfeynman/gluon] (3, 0) -- (5, 0) node [right] {$A_\nu^b$};
+    \draw [/tikzfeynman/fermion] (3, 0) arc (0:180:0.5);
+    \draw (2, 0) arc (180:360:0.5);
+  \end{tikzpicture}
+\end{center}
+
+We now define the quantity $C(R)$ by
 \[
   \tr_R (t^a t^b) = C(R) \delta^{ab},
 \]
-where $C(R)$ is the index of the representation. For $G = \SU(N)$, we have $C(\mathrm{adj}) = N$ and $C(\mathrm{fund}) = \frac{1}{2}$.
-
-Finally, we have
+where the trace is to be taken in the representation $R$. For $G = \SU(N)$, we have
+\[
+  C(\mathrm{adj}) = N,\quad C(\mathrm{fund}) = \frac{1}{2}.
+\]
+Then, evaluating all those integrals, we find that, in dimensional regularization, we have
+\[
+  \log \Delta_{R, j} = \frac{\Gamma(2 - \frac{d}{2})}{4} \int \d^d x\; \mu^{4 - d}(-\partial^2)^{\frac{d - 4}{2}} F_{\mu\nu}^a  F^{a, \mu\nu} \cdot \frac{C(R)}{(4\pi)^2} \left(\frac{d(j)}{3} - 4 C(j)\right).
+\]
+%We see that $\Delta^{(2)}$ is already quadratic. So we only need it up to linear order, and this contributes
+%\[
+%  \tr (-(\partial^2)^{-1} \Delta^{(2)}).
+%\]
+%The $\Delta^{(1)}$ term is first-order. So we need the square term, and this contributes
+%\[
+%  -\frac{1}{2} \tr ((-\partial^2)^{-1} \Delta^{(1)} (-\partial^2)^{-1} \Delta^{(1)}).
+%\]
+%Similarly, the last term contributes
+%\[
+%  - \frac{1}{2} \tr ((-\partial^2)^{-1} \Delta^{(J)} (-\partial^2)^{-1} \Delta^{(J)})
+%\]
+%All other cross terms vanish, at least in the case $G = \SU(N)$, using the fact that $\tr t^a = \tr J_{\mu\nu} = 0$ for $J \in \so(d)$.
+%
+%The first term can be interpreted as the Feynman diagram
+%\begin{center}
+%  \begin{tikzpicture}
+%    \begin{feynman}
+%      \vertex (l);
+%      \node [left] at (l){$A_\mu^a(k)$};
+%      \vertex [right=of l] (c);
+%      \vertex [above=1cm of c] (t);
+%      \vertex [right=of c] (r) {$A_\nu^b(-k)$};
+%
+%      \diagram*{
+%        (l) -- [gluon, momentum'=$k$] (c) -- [gluon] (r),
+%        (c) -- [half left, momentum=$p$] (t) -- [half left] (c), % loop
+%      };
+%    \end{feynman}
+%  \end{tikzpicture}
+%\end{center}
+%The second term is
+%\begin{center}
+%  \begin{tikzpicture}
+%    \begin{feynman}
+%      \vertex (l);
+%      \node [left] at (l){$A_\mu^a(k)$};
+%      \vertex [right=of l] (c1);
+%      \vertex [right=of c1] (c2);
+%      \vertex [right=of c2] (r) {$A_\nu^b(-k)$};
+%
+%      \diagram*{
+%        (l) -- [gluon, momentum'=$k$] (c1),
+%        (c2)-- [gluon] (r),
+%        (c1) -- [half left, momentum=$p + k$] (c2),
+%        (c1) -- [half right, reversed momentum'=$p$] (c2),
+%      };
+%    \end{feynman}
+%  \end{tikzpicture}
+%\end{center}
+%The last one looks the same, but we have a different vertex structure, depending on what is going on in $J$.
+%
+%The first term gives
+%\[
+%  \tr ((-\partial^2)^{-1} \Delta^{(2)}) = \int \frac{\d^d k}{(2\pi)^d} A_\mu^a(k) A_\nu^b(-k) \int \frac{\d^d p}{(2\pi)^d} \frac{\tr_R(t^a t^b)}{p^2} \delta^{\mu\nu} d(j),
+%\]
+%where
+%\[
+%  d(j) =
+%  \begin{cases}
+%    1 & \mathrm{scalar}\\
+%    4 & \mathrm{dirac}\\
+%    4 & \text{4-vector}
+%  \end{cases}
+%\]
+%denotes the number of spin components running around the loop. Similarly,
+%\begin{multline*}
+%  \frac{1}{2} \tr ((-\partial^2)^{-1} \Delta^{(1)} (-\partial^2)^{-1} \Delta^{(1)}) \\
+%  = \int \frac{\d^d k}{(2\pi)^d} \frac{\d^d p}{(2\pi)^d} \frac{(k + 2p)_\mu (k + 2p)_\nu\tr(t^a t^b) A_\mu^a(k) A_\nu^b(k)}{p^2 (p + k)^2}
+%\end{multline*}
+%In dimensional regularization, these two diagrams combine to give
+%\[
+%  \int\frac{\d^d k}{(2\pi)^d} A^a_\mu(k) A^bb_\nu(-k) (k^2 \delta_{\mu\nu} - k_\mu k_\nu) \pi(k^2),
+%\]
+%where
+%\[ % details in Osborn notes.
+%  \pi(k^2) = - \frac{1}{d - 1} d(j) \tr_R (t^a t^b) \frac{\Gamma\left(2 - \frac{d}{2}\right) \Gamma\left(\frac{d}{2} - 1\right)^2}{\Gamma(d - 2)} \frac{(k^2)^{(d - 4)/2}}{2(\pi)^{d/2}}.
+%\]
+%We have
+%\[
+%  \tr_R (t^a t^b) = C(R) \delta^{ab},
+%\]
+%where $C(R)$ is the index of the representation. For $G = \SU(N)$, we have $C(\mathrm{adj}) = N$ and $C(\mathrm{fund}) = \frac{1}{2}$.
+%
+%Finally, we have
+%\begin{multline*}
+%  \frac{1}{2} \tr ((-\partial^2) \Delta^{(J)} (-\partial^2) \Delta^{(J)}) \\
+%  = \int \frac{\d^d k}{(2\pi)^d} \frac{\d^d p}{(2\pi)^d} A_\mu^a(k) A_\nu^b(-k) (k^2 \delta_{\mu\nu} - k_\mu k_\nu) \frac{1}{p^2(p + k)^2} C(j) \tr (t^a t^b),
+%\end{multline*}
+%where $C(j)$ is defined by
+%\[
+%  \tr_j (J_{\mu\nu} J_{\kappa\lambda}) = C(j) (\delta_{\mu\kappa} \delta_{\nu\lambda} - \delta_{\mu\lambda} \delta_{\nu\kappa}).
+%\]
+%Explicitly, we have
+%\[
+%  C(j) =
+%  \begin{cases}
+%    0 & \mathrm{scalar}\\
+%    1 & \mathrm{Dirac}\\
+%    2 & \mathrm{4-vector}
+%  \end{cases}
+%\]
+%Performing this again in dimensional regularization, we have
+%\[
+%  \frac{1}{2} \int \frac{\d^d k}{(2\pi)^d} A_\mu^a (k) A_\nu^a (k^2 \delta_{\mu\nu} - k_\mu k_\nu) (k^2)^{(d - 4)/2} \Gamma\left(2 - \frac{d}{2}\right) \frac{4}{(4\pi)^{d/2}} C(R) C(j).
+%\]
+Thus, combining all the pieces, we obtain % return to this
 \begin{multline*}
-  \frac{1}{2} \tr ((-\partial^2) \Delta^{(J)} (-\partial^2) \Delta^{(J)}) \\
-  = \int \frac{\d^d k}{(2\pi)^d} \frac{\d^d p}{(2\pi)^d} A_\mu^a(k) A_\nu^b(-k) (k^2 \delta_{\mu\nu} - k_\mu k_\nu) \frac{1}{p^2(p + k)^2} C(j) \tr (t^a t^b),
-\end{multline*}
-where $C(j)$ is defined by
-\[
-  \tr_j (J_{\mu\nu} J_{\kappa\lambda}) = C(j) (\delta_{\mu\kappa} \delta_{\nu\lambda} - \delta_{\mu\lambda} \delta_{\nu\kappa}).
-\]
-Explicitly, we have
-\[
-  C(j) =
-  \begin{cases}
-    0 & \mathrm{scalar}\\
-    1 & \mathrm{Dirac}\\
-    2 & \mathrm{4-vector}
-  \end{cases}
-\]
-Performing this again in dimensional regularization, we have
-\[
-  \frac{1}{2} \int \frac{\d^d k}{(2\pi)^d} A_\mu^a (k) A_\nu^a (k^2 \delta_{\mu\nu} - k_\mu k_\nu) (k^2)^{(d - 4)/2} \Gamma\left(2 - \frac{d}{2}\right) \frac{4}{(4\pi)^{d/2}} C(R) C(j).
-\]
-Combining all the pieces, the effective action for the background field $A_\mu$ is
-\begin{multline*}
-  S_{\mathrm{eff}}[A] = \frac{1}{4 g_{YM}^2}\int \d^d x\; (F_{\mu\nu}, F^{\mu\nu}) \\
-  - \frac{\Gamma\left(2 - \frac{d}{2}\right)}{4} \int\d^d x\; (-\partial^2)^{\frac{d - 4}{2}} F_{\mu\nu}^a F^{\mu\nu}_a \times \left(\frac{1}{2} C_{\mathrm{adj}, 1} - C_{\mathrm{adj}, 0} - \frac{n}{2} C_{R, 1/2}\right),
+  S_{\mathrm{eff}}[A] = \frac{1}{4 g_{YM}^2}\int \d^d x\; F_{\mu\nu}^a F^{a, \mu\nu} \\
+  - \frac{\Gamma\left(2 - \frac{d}{2}\right)}{4} \int\d^d x\; \mu^{4 - d}(-\partial^2)^{\frac{d - 4}{2}} F_{\mu\nu}^a F^{\mu\nu}_a \times \left(\frac{1}{2} C_{\mathrm{adj}, 1} - C_{\mathrm{adj}, 0} - \frac{n}{2} C_{R, 1/2}\right),
 \end{multline*}
 where
 \[
@@ -4955,7 +5491,7 @@ where
 \]
 Explicitly, we have
 \[
-  C_{R, j} = \frac{C9R)}{(4\pi)^2} \times
+  C_{R, j} = \frac{C(R)}{(4\pi)^2} \times
   \begin{cases}
     \frac{1}{3} & \mathrm{scalars}\\
     -\frac{8}{3} & \mathrm{Dirac}\\
@@ -4964,7 +5500,7 @@ Explicitly, we have
 \]
 As always, the $\Gamma$ function diverges as we take $d \to 4$, and we need to remove the divergence using counterterms. In the \textoverline{MS} scheme with scale $\mu$ (with $g_{YM}^2 = \mu^{4 - d} g^2(\mu)$), we are left with logarithmic dependence on $\mu^2$. The independence of $\mu$ gives the condition
 \[
-  \mu\frac{\d}{\d \mu}\left(\frac{1}{g^2(\mu)} + \log \left(\frac{\mu^2}{\cdots}\right)\left(\frac{1}{2} C_{\mathrm{adj}, 1} - C_{\mathrm{adj}, 0} - \frac{n}{2} C_{R, \frac{1}{2}}\right)\right) = 0.
+  \mu\frac{\d}{\d \mu}\left(\frac{1}{g^2(\mu)} + \log \left(\frac{\mu^2}{\text{something}}\right)\left(\frac{1}{2} C_{\mathrm{adj}, 1} - C_{\mathrm{adj}, 0} - \frac{n}{2} C_{R, \frac{1}{2}}\right)\right) = 0.
 \]
 So
 \[
@@ -4972,17 +5508,16 @@ So
 \]
 In other words, we find
 \begin{align*}
-  \beta(g) &= g^3(\mu) \left(\frac{1}{2} C_{\mathrm{adj}, 1} - C_{\mathrm{adj}, 0} - \frac{n_f}{2} C_{R, 1}\right)\\
+  \beta(g) &= g^3(\mu) \left(\frac{1}{2} C_{\mathrm{adj}, 1} - C_{\mathrm{adj}, 0} - \frac{n}{2} C_{R, 1}\right)\\
   &= - \frac{g^3(\mu)}{(4\pi)^2} \left(\frac{11}{3} C(\mathrm{adj}) - \frac{4n}{3} C(R)\right)\\
-  &= - \frac{g^3}{(4\pi)^2} \left(\frac{11}{3} N - \frac{2n}{3}\right),
+  &= - \frac{g^3}{(4\pi)^2} \left(\frac{11}{3} N - \frac{2n}{3}\right).
 \end{align*}
-where we take $G = \SU(N)$ and $R = \mathrm{fund}$.
 
-Thus, for $n_f$ sufficiently small, the $\beta$-function is negative! Hence, at least for small values of $g$, where we can trust perturbation theory, this coupling now \emph{increases} as $\Lambda \to 0$, and decreases as $\Lambda \to \infty$.
+Thus, for $n$ sufficiently small, the $\beta$-function is negative! Hence, at least for small values of $g$, where we can trust perturbation theory, this coupling now \emph{increases} as $\Lambda \to 0$, and decreases as $\Lambda \to \infty$.
 
 The first consequence is that this theory has a sensible continuum limit! The coupling is large at low energies, and after a long story, this is supposed to lead to the confinement of quarks.
 
-In fact, in 1973, Gross--Coleman showed that the \emph{only} non-trivial QFT's in $d = 4$ with a continuum limit are non-abelian gauge theories. The proof was by \emph{exhaustion}! They just considered the most general kind of QFT we can have, and then computed the $\beta$-functions etc, and figured the only ones that existed were non-abelian gauge theories.
+In fact, in 1973, Gross--Coleman showed that the \emph{only} non-trivial QFT's in $d = 4$ with a continuum limit are non-abelian gauge theories. The proof was by \emph{exhaustion}! They just considered the most general kind of QFT we can have, and then computed the $\beta$-functions etc., and figured the only ones that existed were non-abelian gauge theories.
 
 
 \printindex
