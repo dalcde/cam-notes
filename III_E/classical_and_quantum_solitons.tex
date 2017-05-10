@@ -167,7 +167,7 @@ However, as we mentioned, when we want to study solitons, we have to involve \em
 \begin{center}
   \begin{tikzpicture}
     \draw [->] (-3, 0) -- (3, 0) node [right] {$x$};
-    \draw [->] (0, -2) -- (0, 2) node [above] {$m$};
+    \draw [->] (0, -2) -- (0, 2) node [above] {$\phi$};
 
     \draw [mblue, thick, domain=-3:3] plot [smooth] (\x, {tanh(1.5*(\x + 1))});
 
@@ -964,6 +964,599 @@ Note that the topological current we had appears naturally here!
 %\]
 %and if we think about this carefully, this the change in argument of $f(z) - w$ around the curve.
 %
+\subsection{Global \texorpdfstring{$U(1)$}{U(1)} Ginzburg--Landau vortices}
+We begin by studying the simplest case of a Ginzburg--Landau vortex. Our field is a complex-valued function $\Phi: V \to \C$, with potential given by
+\[
+  V(\Phi) = \frac{1}{2} \int \R^2 \left((\nabla \Phi, \nabla \Phi) + \frac{\lambda}{4} (1 - (\Phi, \Phi))^2 \right)\;\d x^1 \;\d x^2.
+\]
+where $\lambda > 0$.
+
+Recall that the inner product is given by
+\[
+  V(a, b) = \frac{\bar{a} b + a \bar{b}}{2},
+\]
+and is invariant under phase rotation, i.e.\ $(e^{i\chi} a, e^{i\chi b}) = (a, b)$ for $\chi \in \R$. So in particular, $V(e^{i\chi}\Phi) = V(\Phi)$. Thus, our theory has a global $\U(1)$ symmetry.
+
+We will restrict to fields satisfying $|\Phi| \in [0, 1]$. To justify this, we first note that the Euler--Lagrange equations says if we have a static solution, then we must have
+\[
+  - \Delta \Phi = \frac{\lambda}{2}(1 - |\Phi|^2) \Phi.
+\]
+This is the \term{ungauged Ginzburg--Landau} \emph{equation}\index{Ginzburg--Landau!ungauged}.
+\begin{lemma}
+  At any maximum point of $|\Phi|$, we have $|\Phi| \leq 1$.
+\end{lemma}
+
+\begin{proof}
+  Consider the function
+  \[
+    W(x) = 1 - |\Phi(x)|^2.
+  \]
+  Then we want to show that $W \geq 0$ when $W$ is minimized. We note that if $W$ is at a minima, then the Hessian matrix must have non-negative eigenvalues. So, taking the trace, we must have $\Delta W \geq 0$. Now we can compute $\Delta W$ directly. We have
+  \begin{align*}
+    \nabla W &= -2 (\Phi, \nabla \Phi)\\
+    \Delta W &= \nabla^2 W \\
+    &= - 2(\Phi, \Delta \Phi) - 2(\nabla \Phi, \nabla \Phi)\\
+    &= \lambda |\Phi|^2 W - 2 |\nabla \Phi|^2.
+  \end{align*}
+  Thus, we can rearrange to write this to say
+  \[
+    2 |\nabla \Phi|^2 + \Delta W = \lambda |\Phi|^2 W.
+  \]
+  But we know $2 |\nabla \Phi|^2 \geq 0$, and $\Delta W \geq 0$. So we must have $W \geq 0$.
+\end{proof}
+
+By itself, this doesn't force $|\Phi| \in [0, 1]$, since we could imagine $\Phi$ having no maximum. However, if we prescribe boundary conditions such that $|\Phi| = 1$ on the boundary, then this would indeed for $|\Phi| \leq 1$ everywhere.
+
+Often, we can think of $\Phi$ as some ``complex order parameter'', and so $|\Phi|$ represents some sort of proportion. Then the condition $|\Phi| \leq 1$ is very natural.
+
+We can now define vortices.
+
+\begin{defi}[Gintzburg--Landau vortex]\index{Gintzburg--Landau vortex}
+  A basic \emph{Ginzburg--Landau vortex} of charge $N$ is a (smooth) solution of the form
+  \[
+    \Phi = f_N(r) e^{iN\theta}
+  \]
+  in polar coordinates $(r, \theta)$. Moreover, we require that $f_N(r) \to 1$ as $r \to \infty$.
+\end{defi}
+Note that for $\Phi$ to be a smooth solution, we must have $f_N(0) = 0$. In fact, a bit more analysis shows that we must have $f_N = O(r^N)$ as $r \to 0$. Solutions for $f_N$ do exist, and they look roughly like this:
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-0.5, 0) -- (5, 0) node [right] {$x$};
+    \draw [->] (0, -0.5) -- (0, 3) node [above] {$m$};
+
+    \draw [mblue, thick, domain=0:5] plot [smooth] (\x, {2 * \x^4 / (1 + \x^4)});
+
+    \draw [dashed] (-1, 2) -- (5, 2);
+
+  \end{tikzpicture}
+\end{center}
+
+In the case of $N = 1$, we can visualize the field $\Phi$ as a vector field on $\C$.. Then it looks like
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-3, 0) -- (3, 0);
+    \draw [->] (0, -3) -- (0, 3);
+
+    \foreach \t in {0,30,60,90,120,150,180,210,240,270,300,330,360} {
+      \begin{scope}[rotate=\t]
+        \foreach \x in {0.5, 1, 1.5, 2, 2.5} {
+          \pgfmathsetmacro\arlen{0.5 * (\x^4 / (1 + \x^4))^2}
+          \draw [-latex'] (\x, 0) -- +(\arlen, 0);
+        }
+      \end{scope}
+    }
+  \end{tikzpicture}
+\end{center}
+This is known as a \emph{$3$-dimensional hedgehog}.
+
+For general $N$, it might be more instructive to look at how the current looks like. Recall that the current is defined by $j = (i\Phi, \nabla \Phi)$. We can write this more explicitly as
+\begin{align*}
+  (i\Phi, \nabla \Phi) &= (if_N e^{iN\theta}, (\nabla f_N) e^{iN\theta} + i f_N N \nabla \theta e^{iN\theta})\\
+  &= (if_N, \nabla f_N + i f_N N \nabla \theta).
+\end{align*}
+We see that $if_N$ and $\nabla f_N$ are orthogonal, while $i f_N$ and $i f_N N \nabla \theta$ are parallel. So the final result is
+\[
+  j = (i\Phi, \nabla \Phi) = f_N^2 N \nabla \theta.
+\]
+So the current just looks like spirals
+
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-3, 0) -- (3, 0);
+    \draw [->] (0, -3) -- (0, 3);
+
+    \foreach \t in {0,30,60,90,120,150,180,210,240,270,300,330,360} {
+      \begin{scope}[rotate=\t]
+        \foreach \x in {0.5, 1, 1.5, 2, 2.5} {
+          \pgfmathsetmacro\arlen{0.5 * (\x^4 / (1 + \x^4))^2}
+          \draw [-latex'] (\x, 0) -- +(0, \arlen);
+        }
+      \end{scope}
+    }
+  \end{tikzpicture}
+\end{center}
+
+As $|x| \to \infty$, we have $f_N \to 1$. So the winding number is given by As before, we can compute the winding number of this system to be
+\[
+  \frac{1}{2\pi} \lim_{R \to \infty} \oint j^0 \;\d \theta = N.
+\]
+Since the winding number of these systems are discrete quantities, it makes the vortex system stable.
+
+It turns out this model has a problem --- the energy is infinite! If we look at $V(f_N e^{iN \theta})$, then there are many different terms, all of which are positive. We will focus on the $\frac{\partial}{\partial \theta}$ term. Then we have
+\begin{align*}
+  V(f_N e^{iN\theta}) &\geq \int \frac{1}{r^2} \left|\frac{\partial \Phi}{\partial \theta}\right|^2 r\;\d r\;\d \theta\\
+  &= N^2 \int \frac{1}{r^2} f_N^2 r\;\d r\;\d \theta \\
+  &= 2\pi N \int_0^\infty \frac{f_N^2}{r}\;\d r.
+\end{align*}
+Since $f_N \to 1$ as $r \to \infty$, we see that the integral diverges logarithmically.
+
+This is bad. We can heuristically understand this by decomposing $\Phi$ into two components. At each fixed point, we can decompose $\Phi$ into a mode parallel to $\Phi$ and a mode perpendicular to $\Phi$. These correspond to the radial and angular modes directly. Moreover, we will see that the parallel mode is massive, while the perpendicular mode is massless.
+
+We saw that the energy divergence is due to the angular part of the action, so we see that it is the massless mode that leads to problems.
+
+We can also see the difference between massless and massive modes in a different setting. Consider the equation
+\[
+  -\Delta u + M^2 u = f.
+\]
+Working in three dimensions, the solution is given by
+\[
+  u(x) = \frac{1}{4\pi} \int \frac{e^{-M|x - y|}}{|x - y|} f(y)\;\d y.
+\]
+Thus, the Green's function is given by
+\[
+  G(x) = \frac{e^{-M|x|}}{|x|}.
+\]
+If the system is massless, i.e.\ $M = 0$, then this decays as $\frac{1}{|x|}$. However, if the system is massive with $M > 0$, then this decays exponentially as $|x| \to \infty$.
+
+So how do we figure out the massive and massless modes? We do not have a genuine decomposition of $\Phi$ into ``parallel'' and ``perpendicular'' modes, because what is parallel and what is perpendicular depends on the current value of $\Phi$.
+
+Thus, to make sense of this, we have to consider small fluctuations around a fixed configuration $\Phi$. We suppose $\Phi$ is a solution to the field equations. Then $\frac{\delta V}{\delta \Phi} = 0$. Thus, for small variations $\Phi \mapsto \Phi + \varepsilon \varphi$, we have
+\[
+  V(\Phi + \varepsilon \varphi) = V(\Phi)  + \varepsilon^2 \int \left(|\nabla \varphi|^2 + \lambda (\varphi, \Phi)^2 - \frac{2\lambda}{4}(1 - |\Phi|^2)|\varphi|^2\right) \;\d x + O(\varepsilon^3).
+\]
+Ultimately, we are interested in the asymptotic behaviour $|x| \to \infty$, in which case $1 - |\Phi|^2 \to 0$. Moreover, $|\Phi| \to 1$ implies $(\varphi, \Phi)$ becomes a projection into the direction of $\Phi$ Then the potential becomes
+\[
+  V(\Phi + \varepsilon \varphi) = V(\Phi) + \int \left(|\nabla \varphi|^2 + \lambda |\varphi^{\mathrm{parallel}}|^2\right)\;\d x + O(\varepsilon^3).
+\]
+Thus, the parallel mode is massive, while the perpendicular mode is massless.
+
+%
+%The divergence of energy arises because if we consider fluctuations $\Phi + \varepsilon \varphi$, and look at the energy
+%\[
+%  V(\Phi + \varepsilon \varphi) = V(\Phi) + \varepsilon \int \frac{\delta V}{\delta \Phi}  (\varphi) + \varepsilon^2 \int |\Delta \varphi|^2  + \text{something}.
+%\]
+%The first order term vanishes because $V$ solves the equations of motion.
+%
+%We look carefully at what the ``something'' is. We have
+%\[
+%  (1 - (\Phi + \varepsilon \varphi, \Phi + \varepsilon \varphi))^2 = (1 - |\Phi|^2 - 2 \varepsilon (\varphi, \Phi) - \varepsilon ^2 |\varphi|^2)^2.
+%\]
+%The order $\varepsilon^2$ part is given by
+%\[
+%  4 \varepsilon^2 (\varphi, \Phi)^2 - 2 \varepsilon^2 (1 - |\phi|^2)|\varphi|^2
+%\]
+%So we find
+%\[
+%  V(\Phi + \varepsilon \varphi) = V(\Phi)  + \varepsilon^2 \int \left(|\nabla \varphi|^2 + \lambda (\varphi, \Phi)^2 - \frac{2\lambda}{4}(1 - |\Phi|^2)|\varphi|^2\right) \;\d x + O(\varepsilon^3).
+%\]
+%We now remember something about Green's functions, and the difference between massless and massive fields. We consider the ordinary Poisson equation
+%\[
+%  - \Delta u = f.
+%\]
+%We can write down the solution to this in terms of Green's functions. In three dimensions, this is
+%\[
+%  u(x) = \frac{1}{4\pi} \int \frac{f(y)}{|x - y|}\;\d y.
+%\]
+%This Green's function $\frac{1}{4\pi|x|}$ decays very slowly with $x$, and this is a sign that we have a massless field.
+%
+%If we change our integral equation instead to
+%\[
+%  (-\Delta u + M^2 u) = f,
+%\]
+%then we find that
+%\[
+%  u(x) + \frac{1}{4\pi} \int_{\R^3} \frac{e^{-M|x - y|}}{|x - y|} f(y) \;\d y.
+%\]
+%The Green's function is now exponentially decaying with $|x|$ if $M > 0$. This is characteristic for the behaviour of static Green's functions for massive fields.
+%
+%We now look at our change in $V$ above. We look at the quadratic fluctuation energy as $|x| \to \infty$. For $x$ very large, we have $(1 - |\Phi|^2) \to 0$ by the boundary conditions. Then we are left with the first two terms
+%\[
+%  |\nabla \varphi|^2 + \lambda (\Phi, \varphi)^2.
+%\]
+%What does this mean? $\Phi$ and $\varphi$ are complex numbers, and in the second term, we are essentially projecting in the direction to $\Phi$. We write
+%\[
+%  \varphi = \varphi^{||} + \varphi^{\perp}.
+%\]
+%Then we have
+%\[
+%  \varphi^{||} \frac{(\Phi, \varphi)\Phi}{|\Phi|^2}.
+%\]
+%Thus, heuristically, this term is
+%\[
+%  |\nabla \varphi^{||}|^2 + \lambda |\varphi^{||}|^2 + |\Delta \varphi^\perp|^2.
+%\]
+%So the parallel part behaves like a massive particle with quick decay, and the perpendicular part behaves like a massless particle with slow decay.
+
+When we study vortices that are gauged, i.e.\ coupled to the electromagnetic field, we will see that all components are massive, and we don't have this problem. This is the Higgs mechanics.
+
+This is all slightly heuristic, but is a good way to think about it.
+
+\subsection{Abelian Higgs/Gauged Ginzburg--Landau vortices}
+We now consider a theory where the complex scalar field $\Phi$ is coupled to a magnetic field. This is a $\U(1)$ gauge theory, with gauge potential given by a $1$-form
+\[
+  A = A_1 \;\d x^1 + A_2 \;\d x^2.
+\]
+The coupling between $\Phi$ and $A$ is given by \term{minimal coupling}. To do minimal coupling, we define the \term{covariant derivative}\index{$\D$}\index{$\D_A$}
+\[
+  \D \Phi = \D_A \Phi = \d \Phi - i A \Phi = \sum_{j = 1}^2 (\nabla_A)_j \Phi \;\d x^j = \sum_{j = 1}^2 (\partial_j \Phi - i A \phi) \;\d x^j.
+\]
+To proceed, it is convenient to have a list of identities about the covariant derivative. 
+\begin{prop}
+  If $f(x) \in \R$, then
+  \[
+    (\nabla_A)_j (f \Phi) = (\partial_j f) \Phi + f (\nabla_A)_j \Phi.
+  \]
+  If $\Phi$ and $\Psi$ are complex scalar fields, then
+  \[
+    \partial_j (\Phi, \Psi) = (\D_j \Phi, \Psi) + (\Phi, \D_j \Psi).
+  \]
+\end{prop}
+The proofs just involve writing all terms out. The second rule is analogous to fact that
+\[
+  \partial_k g(V, W) = g(\nabla_k V, W) + g(V, \nabla_k W)
+\]
+for the Levi-Civita connection.
+
+\begin{prop}
+  We have
+  \[
+    -((\nabla_A)_1 (\nabla_A)_2 - (\nabla_A)_2 (\nabla_A)_1) \Phi = - i B \Phi,
+  \]
+  where
+  \[
+    B = \partial_1 A_2 - \partial_2 A_1.
+  \]
+  In geometry, this \term{$B$} is known as the \term{curvature}, and in electromagnetism, this is the \term{magnetic field}.
+\end{prop}
+
+The proof is again writing it out.
+
+The point of introducing the covariant derivative is that we can turn the global $\U(1)$ invariance into a local one. Previously, we had a global $\U(1)$ symmetry, where our field is unchanged when we replace $\Phi \mapsto \Phi e^{i \chi}$ for some constant $\chi \in \R$. With the covariant derivative, we can promote this to a \emph{global} symmetry.
+
+Consider the simultaneous \term{gauge transformations}
+\begin{align*}
+  \Phi(x) &\mapsto e^{i\chi(x)} \Phi(x)\\
+  A(x) &\mapsto A(x) + \d \chi(x).
+\end{align*}
+Then the covariant derivative of $\Phi$ transforms as
+\begin{align*}
+  \D \Phi &\mapsto (\d -  i (A + \d \chi)) (\Phi e^{i \chi}) \\
+  &= (\d \Phi + i \Phi \d \chi - i (A + \d \chi) \Phi) e^{i\chi} \\
+  &= e^{i \chi} (\d - iA) \Phi.
+\end{align*}
+Similarly, the magnetic field is also invariant under gauge transformations.
+
+As a consequence, we can write down energy functionals that are invariant under these gauge transformations. In particular, we have
+\[
+  (\D \Phi, \D \Phi) \mapsto (e^{i\chi} \D \Phi, e^{i\chi} \D \Phi) = (\D \Phi, \D \Phi).
+\]
+So we can now write down the \term{gauged Ginzburg--Landau} \emph{energy}\index{Ginzburg--Landau!gauged}
+\[
+  V_\lambda(A, \Phi) = \frac{1}{2} \int_{\R^2} \left(B^2 + |\D \Phi|^2 + \frac{\lambda}{4} (1 - |\Phi|^2)^2\right)\;\d^2 x,
+\]
+%where
+%\[
+%  B^2 = \partial_1 A_2 - \partial_2 A_1,
+%\]
+%which can be shown to be gauge-invariant.
+%
+%Thus, $V(\lambda)$ is invariant under gauge transformations. In other words,
+%\[
+%  V_\lambda(A + \d \chi, \Phi e^{i\chi}) = V_\lambda (A, \Phi).
+%\]
+%To proceed, it is convenient to have a list of identities about the covariant derivative. 
+%\begin{prop}
+%  If $f(x) \in \R$, then
+%  \[
+%    (\nabla_A)_j (f \Phi) = (\partial_j f) \Phi + f (\nabla_A)_j \Phi.
+%  \]
+%  If $\Phi$ and $\Psi$ are complex scalar fields, then
+%  \[
+%    \partial_j (\Phi, \Psi) = (\D_j \Phi, \Psi) + (\Phi, \D_j \Psi).
+%  \]
+%\end{prop}
+%The proofs just involve writing all terms out. The second rule is analogous to fact that
+%\[
+%  \partial_k g(V, W) = g(\nabla_k V, W) + g(V, \nabla_k W)
+%\]
+%for the Levi-Civita connection.
+%
+%\begin{prop}
+%  We have
+%  \[
+%    -((\nabla_A)_1 (\nabla_A)_2 - (\nabla_A)_2 (\nabla_A)_1) \Phi = - i B \phi,
+%  \]
+%  where
+%  \[
+%    B = \partial_1 A_2 - \partial_2 A_1.
+%  \]
+%  In geometry, this \term{$B$} is known as the \term{curvature}, and in electromagnetism, this is the \term{magnetic field}.
+%\end{prop}
+%
+%The proof is again writing it out.
+%
+%Our theory now has gauge invariance. In the ungauged Ginzburg--Landau theory, there was an invariance under a $\U(1)$ action $\Phi \mapsto \Phi e^{i\chi}$ for $\chi \in \R$ constant. This is \emph{global} gauge invariance, because it is constant everywhere.
+%
+%This invariance is now localized to
+%\[
+%  \Phi(x) \mapsto \Phi(x) e^{i \chi(x)},
+%\]
+%where $\chi(x) \in \R$ is a smooth function, as long as our $A$ transforms accordingly as
+%\[
+%  A \mapsto A + \d \chi.
+%\]
+%Then the covariant derivative changes as
+%\[
+%  \D \Phi \mapsto (\D \Phi)e^{i \chi}.
+%\]
+%Finally, we check that the magnetic field is invariant,
+%\[
+%  B \mapsto B.
+%\]
+%therefore the abelian Higgs energy functional
+%\[
+%  V_\lambda (A, \Phi) = \frac{1}{2} \int \left(B^2 + |\D \Phi|^2 + \frac{\lambda}{4} (1 - |\Phi|^2)\right)\;\d^2 x
+%\]
+%satisfies
+%\[
+%  V_\lambda(A + \d \chi, \Phi e^{i \chi}) = V_\lambda (A, \Phi)
+%\]
+%for all $\chi \in C^1(\R^2)$. So we now have an infinite degeneracy for all solutions.
+The Euler--Lagrange equations for $\Phi$ are
+\[
+  - (\D_1^2 + \D_2^2) \Phi  - \frac{\lambda}{2} (1 - |\Phi|^2)\Phi = 0,
+\]
+as well as
+\begin{align*}
+  \partial_2 B &= (i \Phi, \D_1 \Phi)\\
+  -\partial_1 B &= (i \Phi, \D_2 \Phi)
+\end{align*}
+The last two equations are similar to Maxwell's equation, saying the curl of the magnetic filed is given by the current. The first equation is like the previous vortex equation in the ungauged case, but since we have the covariant derivative, this is a coupled equation.
+
+It is again an exercise to derive these. It is helpful to use the previous identities such as
+\[
+  \partial_j (\Phi, \Psi) = (\D_j \Psi, \Psi) + (\Phi, \D_j \Psi).
+\]
+So we get the integration by parts formula
+\[
+  \int_{\R^2} (\D_j \Phi, \Psi)\;\d^2 x = - \int (\Phi, \D_j \Psi)\;\d^2 x
+\]
+under suitable boundary conditions.
+
+Recall that in the ungauged Gintzburg--Landau theory, we proved that we always had $|\Phi| \leq 1$. This is again true. The same proof works, with $\nabla$ replaced with $\D$.
+\begin{lemma}
+  At any maximum point of $|\Phi|$, we have $|\Phi| \leq 1$.
+\end{lemma}
+
+\begin{proof}
+  Consider the function
+  \[
+    W(x) = 1 - |\Phi(x)|^2.
+  \]
+  Then we want to show that $W \geq 0$ when $W$ is minimized. We note that if $W$ is at a minima, then the Hessian matrix must have non-negative eigenvalues. So, taking the trace, we must have $\Delta W \geq 0$. Now we can compute $\Delta W$ directly. We have
+  \begin{align*}
+    \partial_j W &= -2 (\Phi, \D_j \Phi)\\
+    \Delta W &= \partial_j^2 W \\
+    &= - 2(\Phi, \D_j^2 \Phi) - 2(\D_j \Phi, \D_j \Phi)\\
+    &= \lambda |\Phi|^2 W - 2 |\D \Phi|^2.
+  \end{align*}
+  Thus, we can rearrange to write this to say
+  \[
+    2 |\D \Phi|^2 + \Delta W = \lambda |\Phi|^2 W.
+  \]
+  But we know $2 |\D \Phi|^2 \geq 0$, and $\Delta W \geq 0$. So we must have $W \geq 0$.
+\end{proof}
+
+One application of this is for modeling superconductors. We can think of such a fluid as being a combination of ``normal'' matter and superconducting matter, and $|\Phi|$ measures how much superconducting matter we've got. When we apply a weak magnetic field, then it is not able to penetrate the superconductor. As we increase the magnetic field, it begins to penetrate, and produces some vortices in the matter. In the core of these vortices, we have $|\Phi| = 0$, and then we are left completely regular matter. However, far away from the vortices, we have $|\Phi| \approx 1$.
+
+Let's try to look at the solutions. For $\lambda > 0$, there exists vortex solutions of the form
+\begin{align*}
+  \Phi &= f_N(r) e^{iN\theta}\\
+  A &= N \alpha_N(r) \;\d \theta.
+\end{align*}
+The boundary conditions $f_N, \alpha_N \to 1$ as $r \to \infty$ and $\to 0$ as $r \to 0$.
+
+Let's say a few words about why these are sensible boundary conditions from the point of view of energy. We want
+\[
+  \lambda \int_{\R^2} (1 - |\Phi|)^2 < \infty,
+\]
+and this is possible only for $f_N \to 1$. What is less obvious is that we also need $\alpha_N \to 1$. We note that we have
+\[
+  \D_\theta \Phi = \frac{\partial \Phi}{\partial \theta} - i A_\theta \Phi = (iN f_N - iN \alpha_N f) e^{iN\theta}.
+\]
+We want this to $\to 0$ as $r \to \infty$. Since $f_N \to 1$, we also need $\alpha_N \to 1$. 
+
+The boundary conditions at $0$ can be argued as before, so that the functions are regular at $0$.
+
+Let's calculate the topological charge. We have
+\begin{align*}
+  N &= \frac{1}{\pi} \int_{\R^2} j^0(\Phi)\;\d x \\
+  &= \lim_{R \to \infty} \frac{1}{2\pi} \oint_{|x| = R} (i \Phi, \d \Phi) \\
+  &= \lim_{R \to \infty} \frac{1}{2\pi} \oint (if_N e^{iN\theta}, iN f_N e^{iN\theta})\;\d \theta\\
+  &= \frac{1}{2\pi} \cdot N \lim_{R \to \infty} \int_0^{2\pi} f_N^2 \;\d \theta\\
+  &= N
+\end{align*}
+As we change $N$, we think of the structure as winding around more. What we see next time, though, is that we can think of this as superpositions of multiple vortices.
+
+We can also compute the magnetic field. Note that we have
+\[
+  B\;\d x^1 \wedge \d x^2 = \d A.
+\]
+This allows us to conveniently calculate
+\[
+  B \;\d x^1 \wedge \;\d x^2 = \d A = N \alpha_N'(r) \;\d r \wedge \d \theta = \frac{1}{r} N \alpha_N' \d x^1 \wedge \d x^2.
+\]
+Thus it follows that
+\[
+  B = \partial_1 A_2 - \partial_2 A_1 = \frac{N}{r} \alpha_N'.
+\]
+Now suppose that $|\Phi|^2 \to 1$ as $r \to \infty$, and also that $\D_\theta \Phi = o(r^{-1})$. 
+We now make the assumption that the angular part of the covariant derivative is $o(r^{-1})$ Then we find that
+\[
+  (\d \Phi_\theta = i A_\theta \Phi + o(r^{-1}).
+\]
+Then if we integrate around a circular contour, since only the angular part contributes, we obtain 
+\[
+  \oint_{|x| = R} (i \Phi, \d \Phi) = \oint_{|x| = R} (i \Phi, i A \Phi)\;\d \theta = \oint_{|x| = R} A + o(1).
+\]
+Note that here we are explicitly viewing $A$ as a differential form so that we can integrate it. We can then note that $|x| = R$ is the boundary of the disk $|x| \leq R$. So we can apply Stokes' theorem and obtain
+\[
+  \oint_{|x| = R} (i \Phi, \d \Phi) = \int_{|x| \leq R} \d A = \int_{|x| \leq R} B\;\d x^1 \;\d x^2.
+\]
+
+%
+%Now suppose that the covariant derivative
+%\[
+%  \D_\theta \Phi = (\nabla_A)_\theta \Phi = \left(\frac{\partial \Phi}{\partial \theta} - A_\theta \Phi\right) = (iN f_n - iN \alpha_N f_N) e^{iN\theta}
+%\]
+%is rapidly decreasing as $r \to \infty$, then we know
+%\[
+%  A_\theta - \left(i \Phi, \frac{\partial \Phi}{\partial \theta}\right) \to 0.
+%\]
+%quickly as $r \to \infty$. Therefore we obtain
+%\[
+%  \oint_{|x| = R} (i \Phi, \d \Phi) = \oint_{|x| = R} \left(i \Phi, \frac{\partial \Phi}{\partial \theta}\right)\;\d \theta = \oint_{|x| = R} A_\theta \;\d \theta + o(1).
+%\]
+%We now apply Stokes theorem. We note that $A$ only has a $\theta$ direction. So we have
+%\[
+%  A_\theta \;\d \theta = A_1 \;\d x^1 + A_2\;\d x^2.
+%\]
+%Thus we obtain
+%\[
+%  \oint_{|x| = R} A_1 \;\d x^1 + A_2\;\d x^2 = \int_{|x| \leq R} (\partial_1 A_2 - \partial_2 A_1)\;\d x^1 \wedge \d x^2 = \int_{|x| \leq R} B\;\d x^1 \;\d x^2.
+%\]
+Now we let $R \to \infty$. Then we get
+\[
+  \int_{\R^2} B\;\d x^1 \;\d x^2 = \lim_{R \to \infty}  \oint_{|x| = R} A  = \lim_{R \to \infty} \oint (i \Phi, \d \Phi) = 2 \int_{\R^2} j^0.
+\]
+%If we analyze our derivation of this, it didn't exactly require that we had a radial vortex. It only required that
+%\[
+%  |\D \Phi| \leq \frac{\text{constant}}{r^{1 + \varepsilon}}
+%\]
+%for some $\varepsilon > 0$.
+
+Physically, what this tells us then is that there is a relation between the topological winding number and the magnetic flux. This is a common property of topological gauge theories. In mathematics, this is already well known --- it is the fact that we can compute characteristic classes of vector bundles by integrating the curvature, as discovered by Chern.
+
+\subsubsection*{Behaviour as $r \to 0$}
+We saw last time that for reasons of regularity, it was necessary that $f_N, \alpha_N \to 0$ as $r \to 0$.
+
+But actually, we must have $f_N \sim r^N$ as $r \to 0$. This has a consequence that $\Phi \sim (r e^{i\theta})^N = z^N$. So the local appearance of the vortex is the zero of an analytic function with multiplicity $N$.
+
+To see this, we need to compute that the Euler--Lagrange equations are
+\[
+  -f_N'(R) - \frac{1}{r} f_N'(r) + \frac{(N - \alpha_N)^2}{r^2} f_N = \frac{\lambda}{2} f_N(1 - f_N^2).
+\]
+With the boundary condition that $f_N$ and $\alpha_N$ vanish at $r = 0$, we expect
+\[
+  - f_N'' - \frac{1}{r} f_N' + \frac{N^2}{r^2} f_N = 0.
+\]
+to give a good approximation to $f_N$, since we have a $\frac{1}{r^2}$ on the left hand side. This equation is homogeneous, and then the solutions are just
+\[
+  f_N = r^{\pm N}.
+\]
+So for regularity, we want the one that $\to 0$. So we take $f_N \sim r^N$.
+
+This gives us a bit of idea of how to think about vortices, namely as zeroes of analytic functions.
+
+\subsection{Bogomolny/self-dual vortices and Taubes' theorem}
+We can think of this solution as a collection of $N$ vortices all superposed at the origin. Is it possible to have separated vortices all over the plane? Naively, we would expect that the vortices exert forces on each other, and so we don't get a static solution. However, it turns out in the $\lambda = 1$ case, we do get static, separated solutions.
+
+So we restrict to $\lambda = 1$. We shall come up with a complete description of all solutions. Recall that when we did the sine-Gordon kinks, we wanted
+\[
+  \theta'' = \sin \theta,
+\]
+with boundary conditions $\theta(x) \to 0$ or $2\pi$ as $x \to \pm \infty$. The only solutions we found were
+\[
+  \theta_K (x - X)
+\]
+for any $X \in \R$. This $X$ is interpreted as the location of the kink. So the moduli space of solutions is $\mathcal{M} = \R$.
+
+We shall get a similar but more interesting description for the $\lambda = 1$ vortices.
+
+This time, the moduli space will be $\C^N$, given by $N$ complex parameters describing the equilibrium. % quotient by S^n
+\begin{thm}[Taubes' theorem] % or taubes' ?
+  For $\lambda = 1$, the space of (gauge equivalence classes of) solutions of the Euler--Lagrangian equations $\delta V_1 = 0$ is $\mathcal{M} \cong \C^N$, where $N$ is the winding number. To be precise, given $N \in \N$ and an unordered set of points $\{Z_1, \cdots, Z_N\}$, there exists a solution $A(x; Z_1, \cdots, Z_N)$ and $\Phi(x; Z_1, \cdots, Z_n)$ which solves the Euler-Lagrange equations $\delta V = 0$, and also
+  \[
+    B = \frac{1}{2} (1 - |\Phi|^2),\quad \D_1 \Phi + i \D_2 \Phi 0.
+  \]
+  These are known as the \term{Bogomolny equations}. Moreover, $\Phi$ has exactly $N$ zeroes $Z_1, \cdots, Z_n$ counted with multiplicity, where
+  \[
+    \Phi(x; Z_1, \cdots, Z_N) \sim c_j (z - Z_j)^{n_j}
+  \]
+  as $z \to Z_j$, where $n_j = |\{k: Z_k = Z_j\}|$ is the multiplicity.
+
+  This solution is unique up to gauge equivalence invariance.
+
+  Furthermore,
+  \[
+    V_1(A(\ph, Z_1, \cdots, Z_N), \Phi(\ph; Z_1, \cdots, Z_n)) = \pi N\index{$*$}
+  \]
+  and
+  \[
+    \frac{1}{2\pi} \int_{\R^2} B\;\d x^1 \;\d x^2 = N = \text{winding number}.
+  \]
+\end{thm}
+Let's try to interpret some of these statements. The equation $(*)$ says the energy is just a function of the number of particles, and does not depend on where they are.  This means there is no force between the vortices. In situations like this, people say the Bogomolny bound is saturated.
+
+The final statement tells us topology is what is driving the vortices, as we have already seen.
+
+What is the mathematical structure that allows this to happen? It is in the Bogomolny equations, which are \emph{first order} equations. The Euler--Lagrange equations themselves are second order, but the Bogomolny equations are just first-order. This is a mathematical signature that suggests these interesting structures are present.
+
+We'll discuss three crucial ingredients in this, but we will not do the full proof, because it is too much analysis.
+
+\subsubsection*{Holomorphic structure}
+When we get these structures, there is often some complex analysis lurking behind. We can explicitly write the second Bogomolny equation as
+\[
+  \D_1 \Phi + i \D_2 \Phi = \frac{\partial \Phi}{\partial x_1} + \frac{\partial \Phi}{\partial x_2} - i(A_1 + i A_2) \Phi = 0.
+\]
+Recall that in complex analysis, holomorphic functions are characterized by
+\[
+  \frac{\partial f}{\partial \bar{z}} = \frac{1}{2} \left(\frac{\partial f}{\partial x^1} + i \frac{\partial f}{\partial x^2}\right) = 0.
+\]
+So we think of the second Bogomolny equation as a covariant Cauchy--Riemann equations. It is possible to convert this into the Cauchy--Riemann equations to deduce the local behaviour at $\Phi$.
+
+To do so, we write
+\[
+  \Phi = e^{\omega f}.
+\]
+Then
+\begin{align*}
+  \frac{\partial f}{\partial \bar{z}} &= e^{-\omega} \left(\frac{\partial \Phi}{\partial \bar{z}} - \frac{\partial \omega}{\partial \bar{z}} \Phi\right)\\
+  &= e^{-\omega} \left(\frac{i(A_i + i A_2)}{2} - \frac{\partial \omega}{\partial \bar{z}}\right)\Phi.
+\end{align*}
+This is equal to $0$ if $\omega$ satisfies
+\[
+  \frac{\partial \omega}{\partial \bar{z}} = i \frac{A_1 + iA_2}{2}.
+\]
+So the question is --- can we solve this equation? It turns out we can always solve this equation, and there is an explicit formula for this. In general, for the equation
+\[
+  \frac{\partial w}{\partial \bar{z}} = \beta,
+\]
+the solution is given by
+\[
+  \omega(z) = \frac{1}{2\pi i} \int_{|w| < r} \frac{\beta(w)}{w - z}\;\d w \wedge \d \bar{w}.
+\]
+A proof can be found in a book on algebraic geometry, namely \emph{Griffiths and Harris}. Fortunately, the proof of this result is on page 5, and you do not have to go through hundreds of pages of algebraic geometry to get to this result!
+
+Then we can write
+\[
+  \Phi = e^{\omega} f
+\]
+where $f$ is holomorphic. Since $e^{\omega}$ is never zero, we can apply all our knowledge of holomorphic functions to $f$, and deduce something about $\Phi$.
+
+Thus, we know that $\Phi$ has isolated zeroes, where $\Phi \sim (z - Z_j)^{n_j}$ for some power $n_j$.
+
 
 \printindex
 \end{document}
