@@ -54,6 +54,7 @@ Currently, the notes for the following subjects are available.
  - Logic and Set Theory (2015, I. B. Leader)
  - Number Fields (2016, I. Grojnowski)
  - Representation Theory (2016, S. Martin)
+ - Statistical Physics (2017, H. S. Reall)
 
 ## Part III
 ### Michaelmas Term
@@ -63,3 +64,19 @@ Currently, the notes for the following subjects are available.
  - Quantum Computation (2016, R. Jozsa)
  - Quantum Field Theory (2016, B. Allanach)
  - Symmetries, Fields and Particles (2016, N. Dorey)
+
+### Lent Term
+ - Advanced Quantum Field Theory (2017, D. B. Skinner)
+ - Algebras (2017, C. J. B. Brookes)
+ - Logic (2017, T. E. Forster)
+ - Modular Forms and L-functions (2017, A. J. Scholl)
+ - Ramsey Theory (2017, B. P. Narayanan)
+ - Riemannian Geometry (2017, A. G. Kovalev)
+ - The Standard Model (2017, C. E. Thomas)
+
+### Easter Term
+ - Classical and Quantum Solitons (2017, N. S. Manton and D. Stuart)
+
+## Part IV
+### Easter Term
+ - Bounded Cohomology (2017, M. Burger)
