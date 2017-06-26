@@ -1,6 +1,6 @@
 # Cambridge Mathematics Lecture Notes
 
-These are the notes I took during lectures in Cambridge. These notes are also available (in compiled form) at https://dec41.user.srcf.net/ and mirrored at https://dalcde.github.io/srcf-web/. The notes on the website are generally more up to date with the latest corrections, as I only git commit and push when I feel like doing so. The usual disclaimers can also be found on the website.
+These are the notes I took during lectures in Cambridge. These notes are also available (in compiled form) at https://dec41.user.srcf.net/. The notes on the website are generally more up to date with the latest corrections, as I only git commit and push when I feel like doing so. The usual disclaimers can also be found on the website.
 
 # Available Subjects
 
