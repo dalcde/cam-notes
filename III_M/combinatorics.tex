@@ -1,0 +1,348 @@
+\documentclass[a4paper]{article}
+
+\def\npart {III}
+\def\nterm {Michaelmas}
+\def\nyear {2017}
+\def\nlecturer {B. Bollobas}
+\def\ncourse {Combinatorics}
+
+\input{header}
+
+\begin{document}
+\maketitle
+{\small
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+What can one say about a collection of subsets of a finite set satisfying certain conditions in terms of containment, intersection and union? In the past fifty years or so, a good many fundamental results have been proved about such questions: in the course we shall present a selection of these results and their applications, with emphasis on the use of algebraic and probabilistic arguments.
+
+The topics to be covered are likely to include the following:
+\begin{itemize}
+ \item The de Bruijn--Erd\"os theorem and its extensions.
+ \item The Graham--Pollak theorem and its extensions.
+ \item The theorems of Sperner, EKR, LYMB, Katona, Frankl and F\"uredi. % check Furedi
+ \item Isoperimetric inequalities: Kruskal--Katona, Harper, Bernstein, BTBT, and their applications.
+ \item Correlation inequalities, including those of Harris, van den Berg and Kesten, and the Four Functions Inequality.
+ \item Alon's Combinatorial Nullstellensatz and its applications.
+ \item LLLL and its applications.
+\end{itemize}
+
+\subsubsection*{Pre-requisites}
+The main requirement is mathematical maturity, but familiarity with the basic graph theory course in Part II would be helpful.
+}
+\tableofcontents
+
+\section{Hall's theorem}
+We shall begin with a discussion of Hall's theorem. Ideally, you've already met it in IID Graph Theory. We shall see that this has some interesting combinatorial implications. We shall start with some rather elementary definitions.
+
+\begin{defi}[Bipartite graph]\index{bipartite graph}
+  We say $G = (X, Y; E)$ is a \emph{bipartite graph} with bipartition $X$ and $Y$ if $(X \coprod Y, E)$ is a graph such that every edge is between a vertex in $X$ and a vertex in $Y$.
+
+  We say such a bipartite graph is \term{$(k, \ell)$-regular} if every vertex in $X$ has degree $k$ and every vertex in $Y$ has degree $\ell$.
+\end{defi}
+
+\begin{defi}[Complete matching]\index{complete matching}
+  Let $G = (X, Y; E)$ be a bipartite graph with bipartition $X$ and $Y$. A \emph{complete matching} from $X$ to $Y$ is an injection $f: X \to Y$ such that $x\, f(x)$ is an edge for every $x \in X$.
+\end{defi}
+
+Hall's theorem gives us a necessary and sufficient condition for the existence of a complete matching. Let's try to first come up with a necessary condition. If there is a complete matching, then for any subset $S \subseteq X$, we certainly have $|\Gamma(S)| \geq |S|$, where \term{$\Gamma(S)$} is the set of neighbours of $S$. It turns out this is also sufficient.
+
+\begin{thm}[Hall, 1935]\index{Hall's theorem}
+  A bipartite graph $G = (X, Y; E)$ has a complete matching from $X$ to $Y$ if and only if $|\Gamma(S)| \geq |S|$ for all $S \subseteq X$.
+\end{thm}
+This condition is known as \term{Hall's condition}.
+
+\begin{proof}
+  We may assume $G$ is edge-minimal satisfying Hall's condition. We show that $G$ is a complete matching from $X$ to $Y$. For $G$ to be a complete matching, we need the following two properties:
+  \begin{enumerate}
+    \item Every vertex in $X$ has degree $1$
+    \item Every vertex in $Y$ has degree $0$ or $1$.
+  \end{enumerate}
+
+  We first examine the second condition. Suppose $y \in Y$ is such that there exists edges $x_1 y, x_2 y \in E$. Then the minimality of $G$ implies there are sets, $X_1, X_2 \subseteq X$ such that $x_i \in X_i$ such that $|\Gamma(X_i)| = |X_i|$ and $x_i$ is the only neighbour of $y$ in $X_i$.
+
+  Now consider the set $X_1 \cap X_2$. We know $\Gamma(X_1 \cap X_2) \subseteq \Gamma(X_1) \cap \Gamma(X_2)$. Moreover, this is strict, as $y$ is in the RHS but not the LHS. So we have
+  \[
+    \Gamma(X_1 \cap X_2) \leq |\Gamma(X_i) \cap \Gamma(X_2)| - 1.
+  \]
+  But also
+  \begin{align*}
+    |X_1 \cap X_2| &\leq |\Gamma(X_1 \cap X_2)|\\
+    &\leq |\Gamma(X_1) \cap \Gamma(X_2)| - 1 \\
+    &= |\Gamma(X_1)| + |\Gamma(X_2)| - |\Gamma(X_1) \cup \Gamma(X_2)| - 1\\
+    &= |X_1| + |X_2| - |\Gamma(X_1\cup X_2)| - 1\\
+    &\leq |X_1| + |X_2| - |X_1 \cup X_2| - 1\\
+    &= |X_1 \cap X_2| - 1,
+  \end{align*}
+  which contradicts Hall's condition.
+
+  One then sees that the first condition is also satisfied --- if $x \in X$ is a vertex, then the degree of $x$ certainly cannot be $0$, or else $|\Gamma(\{x\})| < |\{x\}|$, and we see that $d(x)$ cannot be $>1$ or else we can just remove an edge from $x$ without violating Hall's condition.
+\end{proof}
+
+We shall now describe some consequences of Hall's theorem. They will be rather straightforward applications, but we shall later see they have some interesting consequences.
+
+Let $\mathcal{A} = \{A_1, \ldots, A_m\}$ be a set system. All sets are finite. A set of \term{distinct representatives} of $\mathcal{A}$ is a set $\{a_1, \ldots a_m\}$ of distinct elements $a_i \in A_i$.
+
+Under what condition do we have a set of distinct representatives? If we have one, then for any $I \subseteq [m] = \{1, 2, \ldots, m\}$, we have
+\[
+  \left|\bigcup_{i \in I} A_i \right| \geq |I|.
+\]
+We might hope this is sufficient.
+\begin{thm}
+  $\mathcal{A}$ has a set of distinct representatives iff for all $\mathcal{B} \subseteq \mathcal{A}$, we have
+  \[
+    \left|\bigcup_{B \in \mathcal{B}} B\right| \geq |\mathcal{B}|.
+  \]
+\end{thm}
+
+This is an immediate consequence of Hall's theorem.
+
+\begin{proof}
+  Define a bipartite graph as follows --- we let $X = \mathcal{A}$, and $Y = \bigcup_{i \in [m]} A_i$. Then draw an edge from $x$ to $A_i$ if $x \in A_i$. Then there is a complete matching of this graph iff $\mathcal{A}$ has a set of distinct representations, and the condition in the theorem is exactly Hall's condition. So we are done by Hall's theorem.
+\end{proof}
+
+\begin{thm}
+  Let $G = (X, Y; E)$ be a bipartite graph such that $d(x) \geq d(y)$ for all $x \in X$ and $y \in Y$. Then there is a complete matching from $X$ to $Y$.
+\end{thm}
+
+\begin{proof}
+  Let $d$ be such that $d(x) \geq d \geq d(y)$ for all $x \in X$ and $y \in Y$. For $S \subseteq X$ and $T \subseteq Y$, we let $e(S, T)$ be the number of edges between $S$ and $T$. Let $S \subseteq X$, and $T = \Gamma(S)$. Then we have
+  \[
+    e(S, T) = \sum_{x \in S} d(x) \geq d |S|,
+  \]
+  but on the other hand, we have
+  \[
+    e(S, T) \leq \sum_{y \in T} d(y) \leq d |T|.
+  \]
+  So we find that $|T| \geq |S|$. So Hall's condition is satisfied.
+\end{proof}
+
+\begin{cor}
+  If $G = (X, Y; E)$ is a $(k, \ell)$-regular bipartite graph with $1 \leq \ell \leq k$, then there is a complete matching from $X$ to $Y$.
+\end{cor}
+
+\begin{defi}[Biregular graph]\index{biregular graph}
+  A graph is \emph{biregular} if it is bipartite and $(k,\ell)$-regular for some $k, \ell \geq 1$.
+\end{defi}
+Then by really basic counting arguments, we hahve
+\[
+  |E| = |X| k = |Y| \ell,
+\]
+and so
+\[
+  \frac{k}{\ell} = \frac{|Y|}{|X|}.
+\]
+\begin{thm}
+  Let $G = (X, Y; E)$ be biregular and $A \subseteq X$. Then
+  \[
+    \frac{|\Gamma(A)|}{|Y|}\geq \frac{|A|}{|X|}.
+  \]
+\end{thm}
+
+\begin{proof}
+  Suppose $G$ is $(k, \ell)$-regular. The idea is to look at the subgraph containing $A$ and $\Gamma(A)$. Then
+  \[
+    k|A| = e(A, \Gamma(A)) \leq \ell |\Gamma(A)|.
+  \]
+  Thus
+  \[
+    \frac{|\Gamma(A)|}{|Y|} \geq \frac{k|A|}{\ell |Y|} = \frac{|A|}{|X|}.
+  \]
+\end{proof}
+Briefly, this says biregular graphs ``expand''.
+
+\begin{cor}
+  Let $G = (X, Y; E)$ be biregular and let $|X| \leq |Y|$. Then there is a complete matching of $X$ into $Y$.
+\end{cor}
+
+\begin{notation}\index{$X^{(r)}$}\index{$X^{(\leq r)}$}\index{$X^{\geq r}$}
+  Given a set $X$, we write $X^{(r)}$ for the set of all subsets of $X$ with $r$ elements, and similarly for $X^{(\geq r)}$ and $X^{(\leq r)}$.
+\end{notation}
+
+If $|X| = n$, then $|X^{(r)}| = \binom{n}{r}$.
+
+Now given a set $X$ and two numbers $r < s$, we can construct a biregular graph $(X^{(r)}, X^{(s)}; E)$, where $A \in X^{(r)}$ is joined to $B \in X^{(s)}$ if $A \subseteq B$.
+
+\begin{cor}
+  Let $1 \leq r < s \leq |X| = n$. Suppose $|\frac{n}{2} -r | \geq |\frac{n}{2} - s|$. Then there exists an injection $f: X^{(r)} \to X^{(s)}$ such that $A \subseteq f(A)$ for all $A \in X^{(r)}$.
+
+  if $|n/2 - r| \leq |n/2 - s|$, then there exists an injection $g: X^{(s)} \to X^{(r)}$ such that $A \supseteq g(A)$ for all $A \in X^{(s)}$. 
+\end{cor}
+
+\begin{proof}
+  Note that $|n/2 - r| \leq |n/2 - s|$ iff $\binom{n}{r} \geq \binom{n}{s}$.
+\end{proof}
+
+\section{Sperner systems}
+We'll consider posets $\mathcal{P} = (S, <)$.
+\begin{defi}[Chain]\index{chain}
+  A subset $C \subseteq S$ of a poset is a \emph{chain} if any two of its elements are comparable.
+\end{defi}
+
+\begin{defi}[Anti-chain]\index{anti-chain}
+  A subset $A \subseteq S$ is an \emph{anti-chain} if no two of its elements are comparable.
+\end{defi}
+
+Given a set $X$, we will write $\mathcal{P}(X)$ for the power set of $X$, thought of as a Boolean lattice. This is a poset by saying $A < B$ if $A \subsetneq B$.
+
+\begin{defi}[Graded poest]\index{graded poset}
+  We say $\mathcal{P} = (S, <$ is a \emph{graded poset} if we can write $S$ as a disjoint union
+  \[
+    S = \coprod_{i = 0}^n S_i % union with dot on top
+  \]
+  such that 
+  \begin{itemize}
+    \item $S_i$ is an anti-chain; and
+    \item $x < y$ iff there exists elements $x = z_i < z_{i + 1}  < \cdots < z_j = y$ such that $z_h \in S_h$.
+  \end{itemize}
+\end{defi}
+\begin{eg}
+  If $X$ is a set, $\mathcal{P}(X)$ is an anti-chain with $X_i = X^{(i)}$.
+\end{eg}
+\begin{thm}[Sperner, 1928]
+  For $|X| = n$, the maximal size of an antichain in $\mathcal{P}(X)$ is $\binom{n}{\lfloor n/2\rfloor}$, witnessed by $X^{\lfloor n/2\rfloor}$.
+\end{thm}
+
+\begin{proof}
+  If $\mathcal{C}$ is a chain and $\mathcal{A}$ is an antichain, then $|\mathcal{A} \cap \mathcal{C}| \leq 1$. So it suffices to partition $\mathcal{P}(X)$ into
+  \[
+    m = \max_{k} \binom{n}{k} = \binom{n}{\lfloor n/2\rfloor} = \binom{n}{\lceil n/2 \rceil}
+  \]
+  many chains. We can do so using the injections constructed at the end of the previous section.
+
+  Indeed, we can use them to partition $X^{(\geq \lfloor n/2 \rfloor)}$ into $m$ chains with each ending in $X^{(\lfloor n/2\rfloor)}$, and similarly, we can partition $X^{(\leq \lfloor n/2\rfloor)}$ into $m$ chains with each chain ending in $X^{(\lfloor n/2\rfloor)}$. Then glue them together.
+
+  % insert picture
+
+\end{proof}
+
+\begin{thm}[LYM inequality]
+  Let $\mathcal{A}$ be an antichain in $\mathcal{P}(X)$ with $|X| = n$. Then
+  \[
+    \sum_{r = 0}^n \frac{|\mathcal{A} \cap X^{(r)}|}{\binom{n}{r}} \leq 1.
+  \]
+  In particular, $|\mathcal{A}| \leq \max_r \binom{n}{r} = \binom{n}{\lfloor n\rfloor}$, as we already know.
+\end{thm}
+
+\begin{proof}
+  A chain $C_0 \subseteq C_1 \subseteq \cdots \subseteq C_m$ is maximal if it has $n + 1$ elements. Moreover, there is a bijection by a maximal chains with maps $[n] \to X$, sending $i$ to the element in $C_i \setminus C_{i - 1}$. Therefore there are $n!$ maximal chains.
+
+  For ever maximal chain $\mathcal{C}$, we have $|\mathcal{C} \cap \mathcal{A}| \leq 1$. Moreover, every set of $k$ elements appears in $k! (n - k)!$ maximal chains. So
+  \[
+    \sum_{A \in \mathcal{A}} |A|! (n - |A|)! \leq n!.
+  \]
+  Then the result follows.
+\end{proof}
+
+\begin{defi}[Shadow]\index{shadow}
+  Given $A \subseteq S_i$, the \emph{shadow} at level $i - 1$ is
+  \[
+    \partial A = \{x \in S_{i - 1}: x < y\text{ for some }y \in A\}.
+  \]
+\end{defi}
+
+\begin{defi}[Downward-expanding poset]\index{downward-expanding poset}
+  A graded poset $P = (S, <)$ is \emph{downward-expanding} if $|\partial A|/|S_{i - 1}| \geq |A|/|S_i|$ for all $A \subseteq A_i$.
+
+  We similarly define\term{upward-expanding}, and say a poset is \term{expanding} if it is upward or downward expanding. % check
+\end{defi}
+\begin{defi}[Weight]\index{weight}
+  The \emph{weight} of a set $A \subseteq S$ is
+  \[
+    w(A) = \sum_{i = 0}^n \frac{|A \cap S_i|}{|S_i|}.
+  \]
+\end{defi}
+
+\begin{thm}
+  If $P$ is downward expanding and $A$ is an anti-chain, then $w(A) \leq 1$. In particular, $|A| \leq \max_i |S_i|$.
+
+  Since each $S_i$ is an anti-chain, the largest anti-chain has size $\max_i |S_i|$.
+\end{thm}
+
+\begin{proof}
+  We define the \emph{span} of $A$ to be
+  \[
+    \spn A = \max_{A_j \not= \emptyset} j - \min_{A_i \not= \emptyset} i.
+  \]
+  We do induction on $\spn A$.
+
+  If $\spn A = 0$, then we are done. Otherwise, let $h_i = \max_{A_j \not= 0} j$, and set $B_{h - 1} = \partial A_h$. Then since $A$ is an anti-chain, we know $A_{h - 1} \cap B_{h - 1} = \emptyset$.
+
+  We set $A' = A \setminus A_h \cup B_{h - 1}$. This is then another anti-chain, by the transitivity of $<$. We then have
+  \[
+    w(A) = w(A') + w(A_h) - w(B_{h - 1}) \leq w(A') \leq 1,
+  \]
+  where the first inequality uses the downward-expanding hypothesis and the second is the triangle inequality.
+\end{proof}
+
+We now investigate posets that have even nicer properties.
+\begin{defi}[Regular poset]\index{regular poset}\index{poset!regular}
+  We say a graded poset $(S, <)$ is \emph{regular} if there exists $r_i, s_i$ such that if $x \in A_i$, then $x$ dominates $r_i$ elements are level $i - 1$, and is dominated by $s_i$ elements at level $i + 1$.
+\end{defi}
+Note that being regular implies being expanding. So we know
+
+\begin{cor}
+  An anti-chain in a regular poset has weight $\leq 1$.
+\end{cor}
+
+We can give a second proof of this.
+\begin{proof}
+  Let $M$ be the number of maximal chains of length $(n + 1)$, and for each $x$, let $m(x)$ be the number of maximal chains through $x$. Then
+  \[
+    m(x) = \prod_{i = 1}^k r_i \prod_{i = k}^{n - 1} s_i.
+  \]
+  So if $x, y \in S_i$, then $m(x) = m(y)$.
+
+  So let $A$ be an anti-chain. Then $A$ meets each chain in $\leq 1$ elements. Then
+  \[
+    M = \sum_{x \in S_i} m(x) = |S_i| m(x),
+  \]
+  where $x \in S_i$. So for $x \in S_i$, we have
+  \[
+    m(x) = \frac{M}{|S_i|}.
+  \]
+  So we have
+  \[
+    M = \sum_{\mathrm{maximal chains}} 1 \geq \sum_{x \in A} m(x) = \sum_{i = 0}^n |A \cap S_i| \cdot \frac{M}{|S_i|}.
+  \]
+  So it follows that
+  \[
+    \sum \frac{|A \cap S_i|}{|S_i|} \leq 1.
+  \]
+\end{proof}
+
+\subsection{Littlewood--Offord problem}
+In the 1930s and 1940s, people were studying roots of random polynomials of the form
+\[
+  \sum_{k = 0}^n \varepsilon_k x^k, 
+\]
+where $\varepsilon_k = 0, 1$. Given some $x_1, \cdots, x_n \in \C$, each $|x_i| \geq 1$, let $\mathcal{A}eacubseteq \mathcal{P}(n)$ be such that
+\[
+  \left\{x_A = \sum_{i \in A} x_i \right\}
+\]
+is so that $|x_A - x_B| < 1$ for all $A, B \in \mathcal{A}$. How large can $|\mathcal{A}|$ be?
+
+if we don't think very hard, then we might want to choose $x_i = 1$ for all $i$. Then we can take $\mathcal{A} = [n]^{\lfloor n/2\rfloor}$, and then we have $|\mathcal{A}| = \binom{n}{\lfloor n/2\rfloor}$.
+
+Erd\"os noticed this is the best bound if we require the $x_i$ to be real.
+
+\begin{thm}[Erd\"os, 1945]
+  Let $x_i$ be all real, $|x_i| \geq 1$. For $A \subseteq [n]$, let
+  \[
+    x_A = \sum_{i \in A} x_i.
+  \]
+  Let $\mathcal{A} \subseteq \mathcal{P}(n)$. Then $|\mathcal{A}| \leq \binom{n}{\lfloor n/2\rfloor}$.
+\end{thm}
+
+\begin{proof}
+  We may wlog $x_i \geq 1$ for all $i$. Indeed, say $x_i = -2$. Then whether or not $i \in A$ determines whether $x_A$ should include $0$ or $-2$ in the sum. If we replace $x_i$ with $2$, then whether or not $i \in A$ determines whether $x_A$ should include $0$ or $2$, and so we just shifted all terms.
+
+  But then $\mathcal{A}$ is a Sperner system since if $A, B \in \mathcal{P}(n)$ and $A \subseteq B$, $A \not= B$, then $x_B - x_A = x_{B\setminus A} \geq 1$.
+\end{proof}
+
+Doing it for complex numbers is considerably harder. In 1970, Kleitman found a gorgeous proof for every normed space.
+
+We say a chain $\mathcal{C} = \{C_i, C_{i + 1}, \ldots, C_{n - i}\}$ is \emph{symmetric} if $|C_j| = j$ for all $j$. Does $\mathcal{P}(n)$ have a symmetric chain decomposition?
+
+\printindex
+\end{document}

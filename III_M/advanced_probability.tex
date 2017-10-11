@@ -1,0 +1,326 @@
+\documentclass[a4paper]{article}
+
+\def\npart {III}
+\def\nterm {Michaelmas}
+\def\nyear {2017}
+\def\nlecturer {M. Lis}
+\def\ncourse {Advanced Probability}
+
+\input{header}
+
+% Example Sheets -- on James Norris website, latest friday before, W/X pigeon hole, Mo Dick Wong, mdw46
+% 1: 1.3, 2.3
+% 2: 3.8, 3.10
+% 3: 6.1, 7.4
+% 4: 7.10, 9.2
+
+\begin{document}
+\maketitle
+{\small
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+The aim of the course is to introduce students to advanced topics in modern probability theory. The emphasis is on tools required in the rigorous analysis of stochastic processes, such as Brownian motion, and in applications where probability theory plays an important role.
+
+\noindent\textbf{Review of measure and integration:} sigma-algebras, measures and filtrations; integrals and expectation; convergence theorems; product measures, independence and Fubini's theorem.\\
+\noindent\textbf{Conditional expectation:} Discrete case, Gaussian case, conditional density functions; existence and uniqueness; basic properties.\\
+\noindent\textbf{Martingales:} Martingales and submartingales in discrete time; optional stopping; Doob's inequalities, upcrossings, martingale convergence theorems; applications of martingale techniques.\\
+\noindent\textbf{Stochastic processes in continuous time:} Kolmogorov's criterion, regularization of paths; martingales in continuous time.\\
+\noindent\textbf{Weak convergence:} Definitions and characterizations; convergence in distribution, tightness, Prokhorov's theorem; characteristic functions, L\'evy's continuity theorem.\\
+\noindent\textbf{Sums of independent random variables:} Strong laws of large numbers; central limit theorem; Cram\'er's theory of large deviations.\\
+\noindent\textbf{Brownian motion:} Wiener's existence theorem, scaling and symmetry properties; martingales associated with Brownian motion, the strong Markov property, hitting times; properties of sample paths, recurrence and transience; Brownian motion and the Dirichlet problem; Donsker's invariance principle.\\
+\noindent\textbf{Poisson random measures:} Construction and properties; integrals.\\
+\noindent\textbf{L\'evy processes:} L\'evy-Khinchin theorem.
+
+\subsubsection*{Pre-requisites}
+A basic familiarity with measure theory and the measure-theoretic formulation of probability theory is very helpful. These foundational topics will be reviewed at the beginning of the course, but students unfamiliar with them are expected to consult the literature (for instance, Williams' book) to strengthen their understanding.
+}
+\tableofcontents
+
+\section{Introduction}
+In some other places in the world, this course might be known as ``Stochastic Processes''. In addition to doing probability, a new component studied in the course is \emph{time}. We are going to study how things change over time.
+
+In the first half of the course, we will focus on discrete time. We will have a discrete sequence of points, and we assign some random values to each of these points. The point, of course, is that there will be dependencies between the different points. 
+
+In the second half of the course, we will look at continuous time. There is a fundamental difference between the two, in that there is a nice topology on the interval. This allows us to say things like we want our trajectories to be continuous. However, we will see that to understand continuous time, we start with the corresponding discrete situation, and then try to ``take the limit'' as the sample points become closer and closer to each other. An important example is Brownian motion.
+
+There are two main objects that appear in this course. The first is the conditional expectation. Recall that if we have a random variable $X$, we can obtain a number $\E[X]$, the expectation of $X$. We can think of this as integrating out all the randomness of the system. Conditional expectation will be some subtle modification of this construction, where we don't actually get a number, but another random variable. The idea behind this is that we want to integrate out some of the randomness in our random variable.
+
+Another main object is \emph{stopping time}. For example, if we have a production line that produces random number of outputs at each point, then we can ask how much time it takes to produce a fixed number of goods, and this is a nice random time, which we call a stopping time. The niceness follows from the fact that if the time comes, we know it. An example that is not nice is, for example, the last day it rains in Cambridge in a particular month, since on that last day, we don't necessarily know that it is in fact the last day.
+
+\section{A review of measure theory}
+\begin{defi}[$\sigma$-algebra]\index{$\sigma$-algebra}
+  Let $E$ be a set (which we will also call a space). A subset $\mathcal{E}$ of the power set $\mathcal{P}(E)$ is called a \emph{$\sigma$-algebra} (or \term{$\sigma$-field}) if
+  \begin{enumerate}
+    \item $\emptyset \in \mathcal{E}$
+    \item If $A \in \mathcal{E}$, then $A^C = E \setminus A \in \mathcal{E}$
+    \item If $A_1, A_2, \ldots \in \mathcal{E}$, then $\bigcup_{n = 1}^\infty A_n \in \mathcal{E}$.
+  \end{enumerate}
+\end{defi}
+
+\begin{defi}[Measurable space]\index{measurable space}
+  A \emph{measurable space} is a set with a $\sigma$-algebra.
+\end{defi}
+
+\begin{defi}[Borel $\sigma$-algebra]\index{Borel $\sigma$-algebra}\index{$\sigma$-algebra!Borel}
+  Let $E$ be a topological space with topology $\mathcal{T}$. Then the \emph{Borel $\sigma$-algebra} $\mathcal{B}(E)$ on $E$ is the $\sigma$-algebra generated by $\mathcal{T}$, i.e.\ the smallest $\sigma$-algebra containing $\mathcal{T}$.
+\end{defi}
+
+We are often going to look at $\mathcal{B}(\R)$, and we will just write $\mathcal{B}$ for it.
+
+\begin{defi}[Measure]\index{measure}
+  A function $\mu: \mathcal{E} \to [0, \infty]$ is a \emph{measure} if
+  \begin{itemize}
+    \item $\mu(\emptyset) = 0$
+    \item If $A_1, A_2, \ldots \in \mathcal{E}$ are disjoint, then
+      \[
+        \mu \left(\bigcup_{i = 1}^\infty A_i \right) = \sum_{i = 1}^\infty \mu(A_i).
+      \]
+  \end{itemize}
+\end{defi}
+
+\begin{defi}[Measure space]\index{measure space}
+  A \emph{measure space} is a measurable space with a measure.
+\end{defi}
+
+\begin{defi}[Measurable function]\index{measurable function}
+  Let $(E_1, \mathcal{E}_1)$ and $(E_2, \mathcal{E}_2)$ be measurable spaces. Then $f: E_1 \to E_2$ is said to be \emph{measurable} if $A \in \mathcal{E}_2$ implies $f^{-1}(A) \in \mathcal{E}_1$.
+\end{defi}
+This is similar to the definition of a continuous function.
+
+\begin{notation}\index{$m\mathcal{E}$}\index{$m\mathcal{E}^+$}
+  For $(E, \mathcal{E})$ a measurable space, we write $m\mathcal{E}$ for the set of measurable functions $E \to \R$.
+  
+  We write $m\mathcal{E}^+$ to be the positive measurable functions, which are allowed to take value $\infty$.
+\end{notation}
+Note that we do \emph{not} allow taking the values $\pm \infty$ in the first case.
+
+\begin{thm}
+  Let $(E, \mathcal{E}, \mu)$ be a measure space. Then there exists a unique function $\tilde{\mu}: m\mathcal{E}^+ \to [0, \infty]$ satisfying
+  \begin{itemize}
+    \item $\tilde{\mu}(\mathbf{1}_A) = \mu(A)$, where $\mathbf{1}_A$ is the indicator function of $A$.
+    \item Linearity: $\tilde{\mu}(\alpha f + \beta g) = \alpha \tilde{\mu}(f) + \beta \tilde{\mu}(g)$ if $\alpha, \beta \in \R_{\geq 0}$ and $f, g \in m\mathcal{E}^+$.
+    \item Monotone convergence: iff $f_1, f_2, \ldots \in m\mathcal{E}^+$ are such that $f_n \nearrow f \in m\mathcal{E}^+$ pointwise a.e.\ as $n \to \infty$, then
+      \[
+        \lim_{n \to \infty} \tilde{\mu}(f_n) = \tilde{\mu} (f).
+      \]
+  \end{itemize}
+  We call $\tilde{\mu}$ the \term{integral} with respect to $\mu$, and we will write it as $\mu$ from now on.
+\end{thm}
+
+\begin{defi}[Simple function]\index{simple function}
+  A function $f$ is \emph{simple} if there exists $\alpha_n \in \R_{\geq 0}$ and $A_n \in \mathcal{E}$ for $1 \leq n \leq k$ such that
+  \[
+    f = \sum_{n = 1}^k \alpha_n \mathbf{1}_{A_n}.
+  \]
+\end{defi}
+From the first two properties of the measure, we see that
+\[
+  \mu(f) = \sum_{n = 1}^k \alpha_n \mu(A_n).
+\]
+One convenient observation is that a function is simple iff it takes on only finitely many values. We then see that if $f \in m \mathcal{E}^+$, then
+\[
+  f_n = 2^{-n}\lfloor 2^n f\rfloor \wedge n
+\]
+is a sequence of simple functions approximating $f$ from below. Thus, given monotone convergence, this shows that
+\[
+  \mu(f) = \lim \mu(f_n),
+\]
+and this proves the uniqueness part of the theorem.
+
+Recall that
+\begin{defi}[Almost everywhere]\index{almost everywhere}
+  We say $f = g$ almost everywhere if 
+  \[
+    \mu(\{x \in E: f(x) \not= g(x)\}) = 0.
+  \]
+  We say $f$ is a \term{version} of $g$.
+\end{defi}
+
+\begin{eg}
+  Let $\ell_n = \mathbf{1}_{[n, n + 1]}$. Then $\mu(\ell_n) = 1$ for all $1$, but also $f_n \to 0$ and $\mu(0) = 0$. So the ``monotone'' part of monotone convergence is important.
+\end{eg}
+
+So if the sequence is not monotone, then the measure does not preserve limits, but it turns out we still have an inequality.
+
+\begin{lemma}[Fatou's lemma]\index{Fatou's lemma}
+  Let $f_i \in m \mathcal{E}^+$. Then
+  \[
+    \mu\left(\liminf_n f_n\right) \leq \liminf_n \mu(f_n).
+  \]
+\end{lemma}
+
+\begin{proof}
+  Apply monotone convergence to the sequence $\inf_{m \geq n} f_m$
+\end{proof}
+
+Of course, it would be useful to extend integration to functions that are not necessarily positive.
+\begin{defi}[Integrable function]\index{integrable function}
+  We say a function $f \in m\mathcal{E}$ is \emph{integrable} if $\mu(|f|) \leq \infty$. We write \term{$L^1(E)$} (or just $L^1$) for the space of integrable functions.
+
+  We extend $\mu$ to $L^1$ by
+  \[
+    \mu(f) = \mu(f^+) - \mu(f^-),
+  \]
+  where $f^{\pm} = (\pm f) \wedge 0$.
+\end{defi}
+
+If we want to be explicit about the measure and the $\sigma$-algebra, we can write $L^1(E, \mathcal{E} \mu)$.
+
+\begin{thm}[Dominated convergence theorem]\index{dominated convergence theorem}
+  If $f_i \in m\mathcal{E}$ and $f_i \to f$ a.e., such that there exists $g \in L^1$ such that $|f_i| \leq g$ a.e. Then
+  \[
+    \mu(f) = \lim \mu(f_n).
+  \]
+\end{thm}
+
+\begin{proof}
+  Apply Fatou's lemma to $g - f_n$ and $g + f_n$.
+\end{proof}
+
+\begin{defi}[Product $\sigma$-algebra]\index{product $\sigma$-algebra}\index{$\sigma$-algebra!product}
+  Let $(E_1, \mathcal{E}_1)$ and $(E_2 , \mathcal{E}_2)$ be measure spaces. Then the product $\sigma$-algebra$ \mathcal{E}_1 \otimes \mathcal{E}_2$ is the smallest $\sigma$-algebra on $E_1 \times E_2$ containing all sets of the form $A_1 \times A_2$, where $A_i \in \mathcal{E}_i$. 
+\end{defi}
+
+\begin{thm}
+  If $(E_1, \mathcal{E}_1, \mu_1)$ and $(E_2, \mathcal{E}_2, \mu_2)$ are $\sigma$-finite measure spaces, then there exists a unique measure $\mu$ on $\mathcal{E}_1 \otimes \mathcal{E}_2)$ satisfying
+  \[
+    \mu(A_1 \times A_2) = \mu_1(A_1) \mu_2(A_2)
+  \]
+  for all $A_i \in \mathcal{E}_i$.
+
+  This is called the \term{product measure}\index{measure!product}.
+\end{thm}
+
+\begin{thm}[Fubini's/Tonelli's theorem]\index{Fubini's theorem}\index{Tonelli's theorem}
+  If $f = f(x_1, x_2) \in m\mathcal{E}^+$ with $\mathcal{E} = \mathcal{E}_1 \otimes \mathcal{E}_2$, then the functions
+  \begin{align*}
+    x_1 \mapsto \int f(x_1, x_2) \d \mu_2(x_2) \in m \mathcal{E}_1^+\\
+    x_2 \mapsto \int f(x_1, x_2) \d \mu_1(x_1) \in m \mathcal{E}_2^+
+  \end{align*}
+  and
+  \begin{align*}
+    \int_E f \;\d u &= \int_{E_1} \left(\int_{E_2} f(x_1, x_2)\;\d \mu_2(x_2)\right) \d \mu_1(x_1)\\
+    &= \int_{E_2} \left(\int_{E_1} f(x_1, x_2)\;\d \mu_1(x_1)\right) \d \mu_2(x_2)
+  \end{align*}
+\end{thm}
+\subsection{Probability theory}
+In probability theory, we always have $\mu(E) = 1$. It is also common to change notation to $E = \omega$, $\mu = \P$ and $\int\;\d \mu = \E$. Measurable functions will be written as $X, Y, Z$, and will be called \term{random variables}.
+
+We will also wrote $\mathcal{E}$ as $\mathcal{F}$, and call its elements \term{events}.
+
+An element in $\omega \in \Omega$ is known as a \term{realization}.
+
+We want to talk about conditional expectation. There are several ways we can think about it:
+\begin{itemize}
+  \item Probabilistic: Partial expectation yielding a random variable (with ``less information'')
+  \item Functional analytic: It's the projection operator in some Hilbert space on $L^2$.
+  \item Geometric/Combinatorial: A coarse-graining procedure.
+\end{itemize}
+
+\begin{eg}
+  Suppose $B \in \mathcal{F}$, with $\P(B) > 0$. Then the conditional probability of the event $A$ given $B$ is
+  \[
+    \P(A \mid B) = \frac{\P(A \cap B)}{\P(B)}.
+  \]
+  The interpretation is that we assume $B$ happened. This tells us we should restrict our attention to things happening inside $B$. To make a probability measure, we have to scale the probability by $\P(B)$, and this gives the formula.
+
+  More generally, if $X$ is a random variable, the conditional expectation of $f$ given $B$ is just the expectation under this new probability measure,
+  \[
+    \E[X \mid B] = \frac{\E[X \mathbf{1}_B]}{\P[B]}.
+  \]
+\end{eg}
+
+What we want to do is to allow $B$ to vary. So let $G_1, G_2, \ldots \in \mathcal{F}$ be disjoint events such that $\bigcup_n G_n = \Omega$. Let
+\[
+  \mathcal{G} = \sigma(G_1, G_2, \ldots) = \left\{\bigcup_{n \in I} G_n: I \subseteq \N\right\}. % coarse graining
+\]
+Let $X \in L^1$.We then define
+\[
+  Y = \sum_{n = 1}^\infty \E(X \mid G_n) \mathbf{1}_{G_n}.
+\]
+We will call this the conditional expectation of $X$ with respect to $\mathcal{G}$.
+
+Note that
+\begin{lemma}\leavevmode
+  \begin{itemize}
+    \item $Y$ is $\mathcal{G}$-measurable
+    \item We have $Y \in L^1$, and
+      \[
+        \E Y \mathbf{1}_A = \E X \mathbf{1}_A
+      \]
+      for all $A \in \mathcal{G}$.
+  \end{itemize}
+\end{lemma}
+
+\begin{proof}
+  We need to show that $\E[|Y|] <\infty$. We have
+  \begin{align*}
+    \E[|Y|] &= \E \left|\sum_{n = 1}^\infty \E(X \mid G_n) \mathbf{1}_{G_n}\right|\\
+    &\leq \E \sum_{n =1 }^\infty \E(|X| \mid G_n) \mathbf{1}_{G_n} \\
+    &= \sum \E \left( \E(|X| \mid G_n) \mathbf{1}_{G_n}\right)\\
+    &= \sum \E  |X| \mathbf{1}_{G_n}\\
+    &= \E \sum |X| \mathbf{1}_{G_n}\\
+    &= \E |X|\\
+    &< \infty,
+  \end{align*}
+  where we used monotone convergence twice to swap the expectation and the sum.
+
+  The rest is an exercise.
+\end{proof}
+
+We now want to show the existence and uniqueness of conditional expectation.
+
+\begin{thm}[Existence and uniqueness of conditional expectation]
+  Let $X \in L^1$, and $\mathcal{G} \subseteq \mathcal{F}$. Then there exists a random variable $Y$ such that
+  \begin{itemize}
+    \item $Y$ is $\mathcal{G}$-measurable
+    \item $Y \in L^1$, and $\E X \mathbf{1}_A = \E Y \mathbf{1}_A$ for all $A \in \mathcal{G}$.
+  \end{itemize}
+  Moreover, if $Y'$ is another random variable satisfying these conditions, then $Y' = Y$ almost surely.
+
+  We call $Y$ a (version of) the conditional expectation given $\mathcal{G}$.
+\end{thm}
+
+We will write the condition expectation as $\E(X \mid \mathcal{G})$, and if $X = \mathbf{1}_A$, we will write $\E(A \mid \mathcal{G}) = \E(\mathbf{1}_A \mid \mathcal{G})$.
+
+Recall also that if $Z$ is a random variable, then $\sigma(Z) = \{Z^{-1}(B): B \in \mathcal{B}\}$. In this case, we will write $\E[X \mid Z) = \E(X \mid \sigma(Z))$.
+
+By, say, bounded convergence, it follows from the second condition that $\E XZ = \E YZ$ for all bounded $\mathcal{G}$-measurable functions $Z$.
+\begin{proof}
+  We first consider the case where $X \in L^2(\Omega, \mathcal{F}, \mu)$. Then we know from functional analysis that for any $\mathcal{G} \subseteq \mathcal{F}$, the space $L^2(\mathcal{G})$ is a Hilbert space with inner product
+  \[
+    \langle X, Y \rangle = \mu (X Y).
+  \]
+  In particular, $L^2(\mathcal{G})$ is a closed subspace of $L^2(\mathcal{F})$. We can then define $Y$ to be the orthogonal projection of $X$ onto $L^2(\mathcal{G})$. It is immediate that $Y$ is $\mathcal{G}$-measurable. For the second part, we use that $X - Y$ is orthogonal to $L^2(\mathcal{G})$, since that's what orthogonal projection is supposed to be. So $\E(X - Y)Z = 0$ for all $Z \in L^2(\mathcal{G})$. In particular, since the measure space is finite, the indicator function of any measurable subset is $L^2$. So we are done.
+
+  We next focus on the case where $X \in m\mathcal{E}^+$. We define
+  \[
+    X_n = X \wedge n
+  \]
+  We want to use monotone convergence to obtain our result. To do so, we need the following result:
+
+  \begin{claim}
+    If $(X, Y)$ and $(X', Y')$ satisfy the conditions of the theorem, and $X' \geq X$ a.s., then $Y' \geq Y$ a.s.
+  \end{claim}
+
+  \begin{proof}
+    Define the event $A = \{Y' \leq Y\} \in \mathcal{G}$. Consider the event $Z = (Y - Y')\mathbf{1}_A$. Then $Z \geq 0$.  We then have
+    \[
+      \E Y' \mathbf{1}_A = \E X' \mathbf{1}_A \geq \E X \mathbf{1}_A = \E Y \mathbf{1}_A.
+    \]]
+    So it follows that we also have $\E(Y - Y')\mathbf{1}_A \leq 0$. So in fact $\E Z = 0$. So $Y' \geq Y$ a.s.
+  \end{proof}
+  We can now define $Y_n = \E(X_n \mid \mathcal{G})$, picking them so that $\{Y_n\}$ is increasing. We then take $Y_\infty = \lim Y_n$. Then $Y_\infty$ is certainly $\mathcal{G}$-measurable, and by monotone convergence, if $A \in \mathcal{G}$, then
+  \[
+    \E X \mathbf{1}_A = \lim \E X_n \mathbf{1}_A = \lim \E Y_n \mathbf{1}_A = \E Y_\infty \mathbf{1}_A.
+  \]
+  Now if $\E X < \infty$, then $\E Y_\infty = \E X < \infty$. So we know $Y_\infty$ is finite a.s., and we can define $Y = Y_\infty \mathbf{1}_{Y_\infty < \infty}$.
+
+  Finally, we work with arbitrary $X \in L^1$. We can write $X = X^+ - X^-$, and then define $Y^\pm = \E (X^\pm \mid \mathcal{G})$, and take $Y = Y^+ - Y^-$.
+
+  Uniqueness is then clear.
+\end{proof}
+
+\printindex
+\end{document}

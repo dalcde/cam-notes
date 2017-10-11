@@ -1,0 +1,400 @@
+\documentclass[a4paper]{article}
+
+\def\npart {III}
+\def\nterm {Michaelmas}
+\def\nyear {2017}
+\def\nlecturer {C. Warnick}
+\def\ncourse {Analysis of Partial Differential Equations}
+
+% example classes : https://tinyurl.com/partiiiPDE
+
+\input{header}
+
+\begin{document}
+\maketitle
+{\small
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+This course serves as an introduction to the mathematical study of Partial Differential Equations (PDEs). The theory of PDEs is nowadays a huge area of active research, and it goes back to the very birth of mathematical analysis in the 18th and 19th centuries. The subject lies at the crossroads of physics and many areas of pure and applied mathematics.
+
+The course will mostly focus on four prototype linear equations: Laplace's equation, the heat equation, the wave equation and Schr\"odinger's equation. Emphasis will be given to modern functional analytic techniques, relying on a priori estimates, rather than explicit solutions, although the interaction with classical methods (such as the fundamental solution and Fourier representation) will be discussed. The following basic unifying concepts will be studied: well-posedness, energy estimates, elliptic regularity, characteristics, propagation of singularities, group velocity, and the maximum principle. Some non-linear equations may also be discussed. The course will end with a discussion of major open problems in PDEs.
+
+\subsubsection*{Pre-requisites}
+There are no specific pre-requisites beyond a standard undergraduate analysis background, in particular a familiarity with measure theory and integration. The course will be mostly self-contained and can be used as a first introductory course in PDEs for students wishing to continue with some specialised PDE Part III courses in the Lent and Easter terms.
+}
+\tableofcontents
+
+\section{Introduction}
+This is a course on partial differential equations. So it might be wise to define what a partial differential equation is.
+
+\begin{defi}[Partial differential equation]
+  Suppose $U \subseteq \R^n$ is open. A \term{partial differential equation} (\term{PDE}) of \emph{order}\index{order of PDE}\index{PDE!order} $k$ is a relation of the form
+  \[
+    F(x, U(x), \D U(x), \ldots, \D^k u(x)) = 0,\tag{$*$}
+  \]
+  where $F: U \times \R \times \R^n \times \R^{n^2} \times \cdots \times \R^{n^k} \to \R$ is a given function, and $u: U \to \R$ is the ``unknown''.
+\end{defi}
+
+\begin{defi}[Classical solution]
+  We say $u \in C^k(U)$ is a \term{classical solution} of a PDE if in fact the PDE is identically satisfied on $U$ when $u, \D u, \ldots, \D^k u$ are substituted in.
+\end{defi}
+
+More generally, we can allow $u$ and $F$ to take values in a vector space. In this case, we say it is a \term{system of PDEs}\index{PDE!system}\index{partial differential equation!system}.
+
+We can now entertain ourselves by writing out a large list of PDEs that are naturally found in physics and mathematics.
+\begin{eg}[Transport equation]\index{transport equation}
+  Suppose $v: \R^4 \times \R \to \R^3$ and $j: \R^4 \to \R$ are given. The \emph{transport equation} is
+  \[
+    \frac{\partial u}{\partial t}(x, t) + v(x, t, u(x, t)) \cdot \D_x u(x, t) = f(x, t)
+  \]
+  where we think of $x \in \R^3$ and $t \in \R$. This describes the evolution of the density $u$ of some chemical being advected by a flow $v$ and produced at a rate $f$.
+
+  We see that this is a PDE of order $1$, and a relatively straightforward solution method exists, namely the \term{method of characteristics}.
+\end{eg}
+
+\begin{eg}[Laplace's and Poissson's equations]\index{Laplace's equation}\index{Poisson's equation}
+  Taking $u: \R^n \to \R$, Laplace's equation is
+  \[
+    \Delta u(x) = \sum_{i = 1}^n \frac{\partial^2 u}{\partial x_i \partial x_i} (x) = 0.
+  \]
+  This describes, for example, the electrostatic potential in vacuum and the static distribution of heat inside a uniform solid body. it also has applications to steady flows in 2d fluids.
+
+  There is an inhomogeneous version of this:
+  \[
+    \Delta u(x) = f(x),
+  \]
+  where $f: \R^n \to \R$ is a fixed function. This is known as \emph{Poisson's equation}, and describes, for example, the electrostatic field due to a charge distribution, and the gravitational field in Newtonian gravity.
+\end{eg}
+
+\begin{eg}[Heat/diffusion equation]\index{heat equation}\index{diffusion equation}
+  This is given by
+  \[
+    \frac{\partial u}{\partial t} = \Delta u,
+  \]
+  where $u: \R^n \times \R \to \R$ is now a function of space and time. This describes the evolution of temperature inside a uniform body, or equivalently the diffusion of some chemical (where $u$ is the density).
+\end{eg}
+
+\begin{eg}[Wave equation]\index{wave equation}
+  The wave equation is given by
+  \[
+    \frac{\partial^2 u}{\partial t^2} = \Delta u,
+  \]
+  where $u: \R^n \times \R \to \R$ is again a function of space and time. This describes oscillations of
+  \begin{itemize}
+    \item strings ($n = 1$)
+    \item membrane/drum ($n = 2$)
+    \item air density in a sound wave ($n = 3$)
+  \end{itemize}
+\end{eg}
+
+\begin{eg}[Schr\"odinger's equation]\index{Schr\"odinger's equation}
+  Let $u: \R^n \times \R \to \C \cong \R^2$. Up to choices of units and convention, the \emph{Schr\"odinger's equation} is
+  \[
+    i\frac{\partial u}{\partial t} + \Delta u - Vu = 0.
+  \]
+  Here $u$ is the wavefunction of a particle moving in a potential $V: \R^n \to \R$.
+\end{eg}
+
+\begin{eg}[Maxwell's equations]\index{Maxwell's equation}
+  The unknowns here are $\mathbf{E}, \mathbf{B}: \R^3 \times \R \to \R^3$. They satisfy \emph{Maxwell's equations}
+  \begin{align*}
+    \nabla \cdot \mathbf{E} &= 0 & \nabla \cdot \mathbf{B} &= 0\\
+    \nabla \times \mathbf{E} + \frac{\partial \mathbf{B}}{\partial t} &= 0 & \nabla \times \mathbf{B} - \frac{\partial \mathbf{E}}{\partial t} &= \mathbf{J},
+  \end{align*}
+  where $\rho$ is the electric charge density, $\mathbf{J}$ is the electric current, $\mathbf{E}$ is the electric field and $\mathbf{B}$ is the magnetic field.
+
+  This is a system of 6 equations and 6 unknowns.
+\end{eg}
+
+\begin{eg}[Einstein's equations]\index{Einstein's equations}
+  The \emph{Einstein's equation} in vacuum are
+  \[
+    R_{\mu\nu}[g] = 0,
+  \]
+  where $g$ is a Lorentzian metric (encoding the gravitational field), and $R_{\mu\nu}[g]$ is the Ricci curvature of $g$.
+
+  Since we haven't said what $g$ and $R_{\mu\nu}$ are, it is not clear that this is a partial differential equation, but it is.
+\end{eg}
+
+\begin{eg}[Minimal surface equation]\index{minimal surface equation}
+  The \emph{minimal surface equation is}
+  \[
+    \mathrm{Div}\left(\frac{\D u}{\sqrt{1 + |\D u|^2}}\right) = 0,
+  \]
+  where $u: \R^n \to \R$ is some function. This is the condition that the graph of $u$, $\{(x, u(x)\}\subseteq \R^n \times \R$, is locally an extremizer of area.
+\end{eg}
+
+\begin{eg}[Ricci flow]\index{Ricci flow}
+  Let $g$ be a Riemannian metric on some manifold. The \emph{Ricci flow} is a PDE that evolves this metric:
+  \[
+    \frac{\partial g_{ij}}{\partial t} = R_{ij}[g],
+  \]
+  where $R_{ij}$ is again the Ricci curvature.
+
+  The most famous application is in proving the Poincar\'e conjecture, which is a topological conjecture about $3$-manifolds.
+\end{eg}
+
+So what do want to know about PDEs? The first thing to note is that these PDEs exhibit a wide variety of behaviours. For example, waves behave very differently from the evolution of temperature. This means it is unlikely that we can say anything about PDEs as a whole, since everything we say must be true for both the heat equation and the wave equation. We must restrict to some particular classes of PDEs to say something useful.
+
+\subsection{Data and well-posedness}
+In all the examples, we need some additional information to even hope for a unique solution. For example, in the case of Laplace's equation, we might need to know the boundary values of $u$; For the heat equation, we need to know the initial temperature distribution. We broadly refer to these information as the \term{data}. An important part of studying PDE is to understand what data we need for a certain PDE problem. Roughly speaking, we want enough data so that we can solve the problem, and not too much data that there is no solution.
+
+A guiding principle in this regard is \emph{well-posedness}.
+\begin{defi}[Well-posed problem]\index{well-posed problem}
+  We say a PDE problem (equation plus data) is \term{well-posed} if
+  \begin{enumerate}
+    \item A solution exists;
+    \item The solution is unique; and
+    \item The solution depends continuously on the data.
+  \end{enumerate}
+\end{defi}
+We should make this more precise. To say whether a solution exists, we need to first specify a function space, and ask if there is a solution in that function space. The same goes for the uniqueness problem. To ask whether the solution depends continuously, we must put the solution and data in appropriate function spaces that come with a topology.
+
+There is a certain freedom for us to choose which function space we are looking at, and there is no god-given choice. There is some tension between our requirements --- if we want our solution to exist, it is better to work with a larger function space; if we want it to be unique, we want it to be smaller. The details of whether a problem is well-posed can depend on the choice of function space.
+
+In this course, the natural numbers start at $0$.
+\begin{notation}[Multi-index/Schwartz notation]\index{multi-index notation}\index{Schwartz notation}
+  We say an element $\alpha \in \N^n$ is a \emph{multi-index}. Writing $\alpha = (\alpha_1, \ldots, \alpha_n)$. We write
+  \[
+    |\alpha| = \alpha_1 + \alpha_2 + \cdots + \alpha_n.
+  \]
+  Also, we have
+  \[
+    \D^\alpha f(x) = \frac{\partial^{|\alpha|}f}{\partial x_1^{\alpha_1} \partial x_2^{\alpha_2} \cdots \partial x_n^{\alpha_n}}.
+  \]
+  If $x = (x_1, \ldots, x_n) \in \R^n$, then
+  \[
+    x^\alpha = x_1^{\alpha_1} x_2^{\alpha_2} \cdots x_n^{\alpha_n}.
+  \]
+  We also write
+  \[
+    \alpha! = \alpha_1! \alpha_2! \cdots \alpha_n!.
+  \]
+\end{notation}
+
+We now try to crudely classify the PDEs we have written down. Recall that our PDEs take the general form
+\[
+  F(x, U(x), \D U(x), \ldots, \D^k u(x)) = 0.
+\]
+
+\begin{defi}[Linear PDE]\index{linear PDE}\index{PDE!linear}
+  We say a PDE is \emph{linear} if $F$ is a linear function of $u$ and its derivatives. In this case, we can re-write it as
+  \[
+    \sum_{|\alpha| \leq k} a_\alpha(x) \D^\alpha u = 0.
+  \]
+\end{defi}
+
+\begin{defi}[Semi-linear PDE]\index{semi-linear PDE}\index{PDE!semi-linear}
+  We say a PDE is \emph{semi-linear} if it is of the form
+  \[
+    \sum_{|\alpha| = k} a_\alpha(x) \D^\alpha u(x) + a_0[x, u, \D u, \ldots, \D^{k - 1} u] = 0.
+  \]
+  In other words, the terms involving the highest order derivatives are linear.
+\end{defi}
+Generalizing further, we have
+\begin{defi}[Quasi-linear PDE]\index{quasi-linear PDE}\index{PDE!quasi-linear}
+  We say a PDE is \emph{quasi-linear} if it is of the form
+  \[
+    \sum_{|\alpha| = k} a_\alpha [x, u, \D u, \ldots, \D^{k - 1} u] \D^\alpha u(x) + a_0[x, u, \ldots, \D^{k - 1} u] = 0.
+  \]
+\end{defi}
+So the highest order derivative still appears linearly, but the coefficients can depend on lower-order derivatives of $u$.
+
+Finally, we have
+\begin{defi}[Fully non-linear PDE]\index{fully non-linear PDE}\index{PDE!fully non-linear}
+  A PDE is \emph{fully non-linear} if it is not quasi-linear.
+\end{defi}
+
+\begin{eg}
+  Laplace's equation $\Delta u = 0$ is linear.
+\end{eg}
+
+\begin{eg}
+  The equation $u_{xx} + u_{yy} = u_x^2$ is semi-linear.
+\end{eg}
+
+\begin{eg}
+  The equation $uu_{xx} u_{yy} = u_x^2$ is quasi-linear.
+\end{eg}
+
+\begin{eg}
+  The equation $u_{xx} u_{yy} - u_{xy}^2 = 0$ is fully non-linear.
+\end{eg}
+
+\section{The Cauchy--Kovalevskaya theorem}
+Before we begin talking about PDEs, let's recall what we already know about ODEs.
+
+Fix some $U \subseteq \R^n$ an open subset, and assume $f: U \to \R^n$ is given. Consider the ODE
+\[
+  \dot{u}(t) = f(u(t)).
+\]
+This is an \term{autonomous ODE}\index{ODE!autonomous} because there is no explicit $t$ dependence on the right. Here $u: (a, b) \to U$ is the unknown, where $a < 0 < b$.
+
+The \term{Cauchy problem} for this equation is to find a solution to the ODE satisfying $u(0) = u_0 \in U$ for any $u_0$.
+
+\begin{thm}[Picard--Lindel\"of theorem]
+  Suppose that there exists $r, K > 0$ such that $B_r(u_0) \subseteq U$, and
+  \[
+    \|f(x) - f(y)\| \leq K \|x - u\|
+  \]
+  for all $x, y \in B_r(u_0)$. Then there exists an $\varepsilon > 0$ depending on $K, r$ and a unique $C^1$ function $u: (-\varepsilon, \varepsilon) \to U$ solving the Cauchy problem.
+\end{thm}
+
+It is instructive to give a quick proof sketch of the result.
+
+\begin{proof}[Proof sketch]
+  If $u$ is a solution, then by the fundamental theorem of calculus, we have
+  \[
+    u(t) = u_0 + \int_0^t f(u(s))\;\d s.
+  \]
+  Conversely, if $u$ is a $C^0$ solution to this integral equation, then it solves the ODE. Crucially, this only requires $u$ to be $C^0$. Indeed, if $u$ is $C^0$ and satisfies the integral equation, then $u$ is automatically $C^1$. So we can work in a larger function space when we seek for $u$.
+
+  Thus, we have reformulated our initial problem into an integral equation. In particular, we reformulated it in a way that assumes less about the function. In the case of PDEs, this is what is known as a weak formulation.
+
+  Returning to the proof, we have reformulated our problem as looking for a fixed point of the map
+  \[
+    B: w \mapsto u_0+ \int_0^t f(w(s))\;\d s
+  \]
+  acting on
+  \[
+    \mathcal{C} = \{w: [-\varepsilon, \varepsilon] \to \overline{B_{r/2}(u_0)} : w\text{ is continuous}\}.
+  \]
+  This is a complete metric space when we equip it with the supremum norm (in fact, it is a closed ball in a Banach space).
+
+  We shall show that for $\varepsilon$ small enough, this map $B: \mathcal{C} \to \mathcal{C}$ is a contraction map. There are two parts --- to show that it actually lands in $\mathcal{C}$, and that it is a contraction.
+
+  If we managed to show these, then by the contraction mapping theorem, there is a unique fixed point, and we are done.
+\end{proof}
+
+The idea of formulating our problem as a fixed point problem is a powerful technique that allows us to understand many PDEs, especially non-linear ones. This theorem tells us that a unique $C^1$ solution exists locally. It is not reasonable to believe it can exist globally, as we might run out of $U$ in finite time. However, if $f$ is better behaved, we might expect $u$ to be more regular, and indeed this is the case.
+
+Recall that to prove the contraction mapping theorem, what we do is that we arbitrarily pick a point in $\mathcal{C}$, keep applying $\mathcal{B}$, and by the contraction, we must approach the fixed point. This gives us a way to construct an approximation to the ODE.
+
+Let us consider an alternative approach to solve our Cauchy problem. Suppose that $f \in C^\infty$. We can take the ``physicist's approach'' by attempting to construct a Taylor series of the solution near the origin. First we note that for any solution $u$, we must have
+\[
+   u(0) = u_0,\quad \dot{u}(0) = f(u_0).
+\]
+Assuming $u$ is in fact a smooth solution, we can differentiate the ODE and obtain
+\[
+  \ddot{u}(t) = \frac{\d}{\d t} \dot{u}(t) = \frac{\d}{\d t} f(u(t)) = \D f(u(t)) \dot{u}(t) \equiv f_2(u(t), \dot{u}(t)).
+\]
+At the origin, we already know what $u$ and $\dot{u}$. We can proceed iteratively to determine
+\[
+  u^{(k)}(t) = f_k (u, \dot{u}, \ldots, u^{(k - 1)}).
+\]
+So in particular, we can in principle determine $u_k \equiv u^{(k)} = 0$. At least formally, we can write
+\[
+  u(t) = \sum_{k = 0}^\infty u_k \frac{t^k}{k!}.
+\]
+If we were physicists, we would say we are done. But being honest mathematicians, in order to claim that we have a genuine solution, we need to at least show that this converges. Under suitable circumstances, this is given by the Cauchy--Kovalevskaya theorem.
+
+\begin{thm}[Cauchy--Kovalevskaya for ODEs]\index{Cauchy--Kovalevskaya theorem!for ODEs}\index{ODE!Cauchy--Kovalevskaya theorem}
+  The series
+  \[
+    u(t) = \sum_{k = 0}^\infty u_k \frac{t^k}{k!}.
+  \]
+  converges to the Picard--Lindel\"of solution of the Cauchy problem if $f$ is real analytic in a neighbourhood of $u_0$.
+\end{thm}
+
+Recall that being real analytic means being equal to its Taylor series:
+\begin{defi}[Real analytic]\index{real analytic}\index{analytic!real}
+  Let $U \subseteq \R^n$ be open, and suppose $f: U \to \R$. We say $f$ is \emph{real analytic} near $x_0 \in U$ if there exists $r > 0$ and constants $f_\alpha \in \R$ for each multi-index $\alpha$ such that
+  \[
+    f(x) = \sum_\alpha f_\alpha (x - x_0)^\alpha
+  \]
+  for $|x - x_0| < r$.
+\end{defi}
+
+Note that if $f$ is real analytic near $x_0$, then it is in fact $C^\infty$ in the corresponding neighbourhood. Furthermore, the constants $f_\alpha$ are given by
+\[
+  f_\alpha = \frac{1}{\alpha!} \D^\alpha f(x_0).
+\]
+In other words, $f$ equals its Taylor expansion. Of course, by translation, we can usually assume $x_0 = 0$.
+
+\begin{eg}
+  If $r > 0$, set
+  \[
+    f(x) = \frac{r}{r - (x_1 + x_2 + \cdots + x_n)}
+  \]
+  for $|x| < \frac{r}{\sqrt{n}}$. Then this is real analytic, since we have
+  \[
+    f(x) = \frac{1}{1 - (x_1 + \cdots + x_n)/r} = \sum_{k = 0}^\infty \left(\frac{x_1 + \cdots + x_n}{r}\right)^k.
+  \]
+  We can then expand out each term to see that this is given by a power series. Explicitly, it  si given by
+  \[
+    f(x) = \sum_\alpha \frac{1}{r^{|\alpha|}}\binom{|\alpha|}{\alpha} x^\alpha,
+  \]
+  where
+  \[
+    \binom{|\alpha|}{\alpha} = \frac{|\alpha|!}{\alpha!}.
+  \]
+  One sees that this series is absolutely convergent for $|x| < \frac{r}{\sqrt{n}}$.
+\end{eg}
+This example is important as it allows us to confirm convergence of other power series.
+
+\begin{defi}[Majorant]\index{majorant}\index{majorize}
+  Let
+  \[
+    f = \sum_\alpha f_\alpha x^\alpha,\quad g = \sum_\alpha g_\alpha x^\alpha
+  \]
+  be formal power series. We say $g$ majorizes $F$ (or $g$ is a majorant of $f$), written $g \gg f$, if $g_\alpha \geq |f_\alpha|$ for all multi-indices $\alpha$.
+
+  If $f$ and $A$ are vector-valued, then this means $g^i \gg f^i$ for all indices $i$.
+\end{defi}
+
+\begin{lemma}\leavevmode
+  \begin{enumerate}
+    \item If $g \gg f$ and $g$ converges for $|x| < r$, then $f$ converges for $|x| < r$.
+    \item If $f(x) = \sum_\alpha f_\alpha x^\alpha$ converges for $x < r$ and $0 < s\sqrt{n} < r$, then $f$ has a majorant which converges on $|x| < s$. % check
+  \end{enumerate}
+\end{lemma}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item Given $x$, define $\tilde{x} = (|x_1|, |x_2|, \ldots, |x_n|)$. We then note that
+      \begin{align*}
+        \sum_\alpha |f_\alpha x^\alpha| &= \sum_\alpha |f_\alpha| \tilde{x}^\alpha\\
+        &\leq \sum_\alpha g_\alpha \tilde{x}^\alpha\\
+        &= g(\tilde{x}).
+      \end{align*}
+      Since $|\tilde{x}| = |x| < r$, we know $G$ converges at $\tilde{x}$.
+    \item Let $0 < s\sqrt{n} < r$ and set $y = s(1, 1, \ldots, 1)$. Then we have
+      \[
+        |y| = s \sqrt{n} < r.
+      \]
+      So by assumption, we know
+      \[
+        \sum_\alpha f_\alpha y^\alpha
+      \]
+      converges. A convergent series has bounded terms, so there exists $C$ such that
+      \[
+        |f_\alpha y^\alpha| \leq C
+      \]
+      for all $\alpha$. But $y^\alpha = s^{|\alpha|}$. So we know
+      \[
+        |f_\alpha| \leq \frac{C}{s^{|\alpha|}} \leq \frac{C}{s^{|\alpha|}} \frac{|\alpha|!}{\alpha!}.
+      \]
+      But then if we set
+      \[
+        g(x) = \frac{Cs}{s - (x_1 + \cdots + x_n)} = C \sum_\alpha \frac{|\alpha|!}{s^{|\alpha|}\alpha!} x^\alpha,
+      \]
+      we are done, since this converges for $|x| < \frac{s}{\sqrt{n}}$.
+  \end{enumerate}
+\end{proof}
+
+We are nearly ready to tackle an actual PDE. What we are going to look at now is the Cauchy--Kovalevskaya theorem for first-order systems.
+
+We start by looking at a class of problems similar to the Cauchy problem for ODEs. We consider $\R^n$ with coordinates $(x^1, \ldots, x^n) = (x', x^n)$, where $x' = (x_1, \ldots, x^{n - 1}) \in \R^{n - 1}$. We consider a system of equations for an unknown $\mathbf{u}(x) \in \R^m$. We seek a solution to
+\[
+  \mathbf{u}_{x^n} = \sum_{j = 1}^{n - 1}bb(\mathbf{u}, x') \mathbf{u}_{x_j} + \mathbf{C}(\mathbf{u}, x')
+\]
+on $|x'|^2 + (x^n)^2 < r$, subject to $\mathbf{u} = 0$ when $x^n = 0$.
+
+We assume the functions $B: \R^m \times \R^{n - 1} \to \Mat(m \times m)$ and $\mathcal{C}: \R^m \times \R^{n - 1} \to \R^m$ are given, real analytic functions. Note that both are independent of $x^n$.
+
+Note that we assumed $B$ and $\mathcal{C}$ do not depend on $x^n$, but this is not a restriction, since we can always introduce a new variable $u^{m + 1} = x^n$, and enlarge the target space.
+
+
+\printindex
+\end{document}

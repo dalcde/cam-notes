@@ -1,0 +1,312 @@
+\documentclass[a4paper]{article}
+
+\def\npart {III}
+\def\nterm {Michaelmas}
+\def\nyear {2017}
+\def\nlecturer {D.\ Shah}
+\def\ncourse {Modern Statistical Methods}
+\def\nofficial {https://www.statslab.cam.ac.uk/~rds37/modern_statistical_methods}
+\input{header}
+
+\DeclareMathOperator*\argmin{argmin}
+\begin{document}
+\maketitle
+{\small
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+The remarkable development of computing power and other technology now allows scientists and businesses to routinely collect datasets of immense size and complexity. Most classical statistical methods were designed for situations with many observations and a few, carefully chosen variables. However, we now often gather data where we have huge numbers of variables, in an attempt to capture as much information as we can about anything which might conceivably have an influence on the phenomenon of interest. This dramatic increase in the number variables makes modern datasets strikingly different, as well-established traditional methods perform either very poorly, or often do not work at all.
+
+Developing methods that are able to extract meaningful information from these large and challenging datasets has recently been an area of intense research in statistics, machine learning and computer science. In this course, we will study some of the methods that have been developed to analyse such datasets. We aim to cover some of the following topics.
+
+\begin{itemize}
+ \item Kernel machines: the kernel trick, the representer theorem, support vector machines, the hashing trick.
+ \item Penalised regression: Ridge regression, the Lasso and variants.
+ \item Graphical modelling: neighbourhood selection and the graphical Lasso. Causal inference through structural equation modelling; the PC algorithm.
+ \item High-dimensional inference: the closed testing procedure and the Benjamini--Hochberg procedure; the debiased Lasso
+\end{itemize}
+
+\subsubsection*{Pre-requisites}
+Basic knowledge of statistics, probability, linear algebra and real analysis. Some background in optimisation would be helpful but is not essential.
+}
+\tableofcontents
+
+\section{Introduction}
+In recent years, there has been a rather significant change in what sorts of data we have to handle and what questions we ask about them. Hence, new methods have to be developed to analyze them. For example, in classical statistics, we often have very few variables, and a very large data set. However, nowadays, we have a lot of different variables, and perhaps not as much data. This is known as high-dimensional statistics.
+
+Of course, we cannot cover absolutely everything, and we are going to cover $4$ different topics of different size:
+\begin{itemize}
+  \item Kernel machines
+  \item The Lasso and its extensions
+  \item Graphical modeling and causal inference
+  \item Multiple testing and high-dimensional inference
+\end{itemize}
+The four topics are rather disjoint, and they draw on different mathematical skills.
+
+\section{Classical statistics}
+This is a course on \emph{modern} statistical methods. Before we study methods, we give a brief summary of what we are \emph{not} going to talk about, namely classical statistics. 
+
+So suppose we are doing regression. We have some \term{predictors} $x_i \in \R^p$ and \term{responses} $Y_i \in \R$, and we hope to find a model that describes $Y$ as a function of $x$. For convenience, define the vectors
+\[
+  X = \begin{pmatrix} x_1^T \\ \vdots \\ x_n^T\end{pmatrix},\quad
+  Y = \begin{pmatrix} Y_1^T \\ \vdots \\ Y_n^T\end{pmatrix}.
+\]
+The linear model then assumes there is some $\beta^0 \in \R^p$ such that 
+\[
+  Y = X \beta^0 + \varepsilon,
+\]
+where $\varepsilon$ is some (hopefully small) error random variable. Our goal is then to estimate $\beta^0$ given the data we have.
+
+If $X$ has full column rank, so that $X^TX$ is invertible, then we can use \term{ordinary least squares} to estimate $\beta^0$, with estimate
+\[
+  \hat{\beta}^{OLS} = \argmin_{\beta \in \R^p} \|Y - x \beta\|_2^2 = (X^TX)^{-1} X^TY.
+\]
+This assumes nothing about $\varepsilon$ itself, but if we assume that $\E \varepsilon = 0$ and $\var (\mathcal{E}) = \sigma^2 I$, then this estimate satisfies
+\begin{itemize}
+  \item $\E_\beta \hat{\beta}^{OLS} = (X^T X)^{-1} X^T X \beta^0 = \beta^0$
+  \item $\var_\beta(\hat{\beta}^{OLS}) = (X^T X^{-1}) X^T \var(\varepsilon) X (X^T X)^{-1} = \sigma^2 (X^T X)^{-1}$.
+\end{itemize}
+In particular, this is an unbiased estimator. Even better, this is the best linear unbiased estimator. More precisely, the Gauss--Markov theorem says any other linear estimator $\tilde{\beta} = AY$ has $\var(\tilde{\beta}) - \var(\hat{\beta}^{OLS})$ positive semi-definite.
+
+Of course, ordinary least squares is not the only way to estimate $\beta^0$. Another common method for estimating parameters is maximum likelihood estimation, and this works for more general models than linear regression. For people who are already sick of meeting likelihoods, this will be the last time we meet likelihoods in this course.
+
+Suppose we want to estimate a parameter $\theta$ via knowledge of some data $Y$. We assume $Y$ has density $f(y; \theta)$. We define the \term{log-likelihood} by
+\[
+  \ell(\theta) = \log f(Y, \theta).
+\]
+The \term{maximum likelihood estimator} then maximize $\ell(\theta)$ over $\theta$ to get $\hat{\theta}$.
+
+Similar to ordinary least squares, there is a theorem that says maximum likelihood estimation is the ``best''. To do so, we introduce the \term{Fisher information matrix}. This is a family of $d \times d$ matrices indexed by $\theta$, defined by
+\[
+  I_{jk}(\theta) = - E_\theta\left[\frac{\partial^2}{\partial \theta_j \partial \theta_j} \ell(\theta)\right].
+\]
+The relevant theorem is
+\begin{thm}[Cram\'er--Rao bound]\index{Cram\'er--Rao bound}
+  If $\tilde{\theta}$ is an unbiased estimator for $\theta$, then $\var(\tilde{\theta}) - I^{-1}(\theta)$ is positive semi-definite.
+
+  Moreover, asymptotically, as $n \to \infty$, the maximum likelihood estimator is unbiased and achieves the Carm\'er--Rao bound.
+\end{thm}
+
+Another wonderful fact about the maximum likelihood estimator is that asymptotically, it is normal distributed, and so it is something we unerstand well.
+
+This might seem very wonderful, but there are a few problems here. The results we stated are asymptotic, but what we actually see in real life is that as $n \to \infty$, the value of $p$ also increases. In these contexts, the asymptotic property doesn't tell us much. Another issue is that these all talk about unbiased estimators. In a lot of situations of interest, it turns out biased methods do much much better than these methods we have.
+
+Another thing we might be interested is that as $n$ gets large, we might want to use more complicated models that simple parametric models, as we have much more data to mess with. This is not something ordinary least squares provides us with.
+
+\section{Kernel machines}
+We are going to start a little bit slowly, and think about our linear model $Y = X\beta^0 + \varepsilon$, where $\E(\varepsilon) = 0$ and $\var(\varepsilon) = \sigma^2 I$. Ordinary least squares is an unbiased estimator, so let's look at biased estimators.
+
+For a biased estimator, $\tilde{\beta}$, we should not study the variance, but
+\begin{align*}
+  \E[(\tilde{\beta} - \beta^0)(\tilde{\beta} - \beta^0)^T]
+  &= \E(\tilde{\beta} - \E \tilde{\beta} + E \tilde{\beta} - \beta^0)(\tilde{\beta} - \E \tilde{\beta} + E \tilde{\beta} - \beta^0)^T \\ &= \var(\tilde{\beta})+ (\E \tilde{\beta} - \beta^0)(\E \tilde{\beta} - \beta^0)^T
+\end{align*}
+The first term is, of course, just the variance, and the second is the squared bias. So the point is that if we pick a clever biased estimator with a tiny variance, then this might do better than unbiased estimators with large variance.
+ 
+\subsection{Ridge regression}
+This is probably one of the oldest methods we are going to discuss in this course, introduced in around 1970. The idea of Ridge regression, as well as the Lasso, is that we want to shrink our estimator a bit, so that the variance will be smaller, even though we have introduced a bias. An extreme case is when we always estimate $\beta$ by $0$, in which case there is no variance but a (potentially) large bias. 
+
+The \term{Ridge regression} solves
+\[
+  (\hat{\mu}^R_\lambda, \hat{\beta}^R_\lambda) = \argmin_{(\mu, \beta) \in \R \times \R^p} \{ \|Y - \mu \mathbf{1} - X \beta\|_2^2 + \lambda \| + \lambda \|\beta\|_2^2\},
+\]
+where $\mathbf{1}$ is a vector of all $1$'s. Here $\lambda \geq 0$ is a tuning parameter, and it controls how much we penalize a large choice of $\beta$.
+
+We explicitly have an intercept term. Usually, we introduce this by adding a column of $1$'s in $X$. But here we want to separate that out, since we do not want give a penalty for large $\mu$.
+
+For example, if the parameter is temperature, then if we decide to measure in degrees Celsius rather than Kelvins, where we add a linear shift to all terms, we don't want the resulting $\hat{\mu}, \hat{\beta}$ to change.  More precisely, if we make the modification
+\[
+  Y' = c\mathbf{1} + Y,
+\]
+then we have
+\[
+  \hat{\mu}^R_\lambda(Y') = \hat{\mu}_\lambda^R(Y) + c.
+\]
+Note also that this formula makes sense only if each entry in $\beta$ have the same order of magnitude, or else the penalty will only have a significant effect on the terms of large magnitude. Standard practice is to subtract from each column of $X$ its mean, and then scale it to have $\ell_2$ norm $\sqrt{n}$. The actual number is not important here, but it will in the case of the Lasso.
+
+In example sheet 1, we will show that this gives
+\begin{align*}
+  \hat{\mu}_\lambda^R &= \bar{Y} = \frac{1}{n} \sum Y_i\\
+  \hat{\beta}^R_\lambda &= (X^T X + \lambda I)^{-1} X^T Y.
+\end{align*}
+A first thing to note that we can always pick $\lambda$ such that the matrix $(X^T X + \lambda I)$ is invertible. In particular, this can work even if we have more parameters than data points.
+\begin{thm}
+  Suppose $\rank(X) = p$. Then for $\lambda > 0$ sufficiently small, we have that
+  \[
+    \E(\hat{\beta}^{OLS} - \beta^0)(\hat{\beta}^{OLS} - \beta^0)^T - \E(\hat{\beta}^{R}_\lambda - \beta^0)(\hat{\beta}^{R}_\lambda - \beta^0)^T \tag{$*$}
+  \]
+  is positive definite.
+\end{thm}
+The ``sufficiently small'' depends on $\beta_0$ and $\sigma^2$.
+
+The proof is a computation.
+\begin{proof}
+  We know that the first term is just $\sigma^2(X^T X)^{-1}$. The right-hand-side has a variance term and a bias term. We first look at the bias:
+  \begin{align*}
+    \E [\hat{\beta} - \beta^0] &= (X^T X + \lambda I)^{-1} X^T X \beta^0 - \beta^0\\
+    &= (X^T X + \lambda I)^{-1}(X^T X + \lambda I - \lambda I) \beta^0- \beta^0\\
+    &= \lambda (X^T X + \lambda I)^{-1} \beta^).
+  \end{align*}
+  We can also compute the variance
+  \[
+    \var(\hat{\beta}) = \sigma^2(X^T X + \lambda I)^{-1} X^T X (X^T X + \lambda I)^{-1}.
+  \]
+  Note that both terms appearing in the squared error look like
+  \[
+    (X^T X + \lambda I)^{-1}\text{something}(X^T X + \lambda I)^{-1}.
+  \]
+  So let's try to write $\sigma^2 (X^T X)^{-1}$ in this form. Note that
+  \begin{align*}
+    (X^T X)^{-1} &= (X^T X + \lambda I)^{-1} (X^T X + \lambda I) (X^T X)^{-1} (X^T X + \lambda I) (X^T X + \lambda I)^{-1}\\
+    &= (X^T X + \lambda I)^{-1}(X^T X + 2 \lambda I + \lambda^2 (X^T X)^{-1}) (X^T X + \lambda I)^{-1}.
+  \end{align*}
+  Thus, we can write $(*)$ as
+  \begin{align*}
+    &\hphantom{ {} = {} }(X^T X + \lambda I)^{-1} \Big( \sigma^2(X^T X + 2 \lambda I + \lambda^2(X^T X)^{-1}) - \sigma^2 X^T X - \lambda^2 \beta^0 (\beta^0)^T\Big) (X^T X + \lambda I)^{-1}\\
+    &= \lambda (X^T X + \lambda I)^{-1} \Big( 2 \sigma^2 I + \lambda(X^T X)^{-1} - \lambda \beta^0 (\beta^0)^T\Big) (X^T X + \lambda I)^{-1}\\
+  \end{align*}
+  Since $\lambda > 0$, this is positive definite iff 
+  \[
+    2 \sigma^2 I + \sigma^2 \lambda (X^T X)^{-1} - \lambda \beta^0 (\beta^0)^T
+  \]
+  is positive definite, which is true for $0 < \lambda < \frac{2\sigma^2}{\|\beta^0\|_2^2}$.
+\end{proof}
+While this is nice, this is not really telling us much, because we don't know how to pick the correct $\lambda$. It also doesn't tell us when we should expect a big improvement from Ridge regression.
+
+To understand this better ,we need to use the \emph{singular value decomposition}
+\subsection{The singular value decomposition (SVD)}
+
+\begin{thm}[Singular value decomposition]\index{singular value decomposition}\index{SVD}
+  Let $X \in \R^{n \times p}$ be any matrix. Then it has a \emph{singular value decomposition} (SVD)
+  \[
+    \underset{n \times p}{X} = \underset{n \times n}{U} D\underset{n \times p}D \underset{p \times p}{V^T},
+  \]
+  where $U, V$ are orthogonal matrices, and $D_{nn} \leq D_{22} \leq \cdots \leq D_{mm} \geq 0$, where $m = \min (n, p)$, and all other entries are zero.
+\end{thm}
+
+When $n > p$, there is an alternative version where $U$ is an $n \times p$ matrix with orthogonal columns, and $D$ is a $p \times p$ diagonal matrix. This is done by replacing $U$ by its first $p$ columns and $D$ by its first $p$ rows. This is known as the \term{thin singular value decomposition}\index{thin SVD}. In this case, $U^T U = I_p$ but $UU^T$ is not the identity.
+
+Let's now apply try to understand Ridge regressions a little better. Suppose $n > p$. Then using the thin SVD, the fitted values from ridge regression are
+\begin{align*}
+  X \hat{\beta}_\lambda^R &= X (X^T X + \lambda I)^{-1} X^T Y\\
+  &= UDV^T (VD^2 V^T + \lambda I)^{-1} VDU^T Y.
+\end{align*}
+We now note that $VD^2 V^T + \lambda I = V(D^2 + \lambda I)V^T$, since $V$ is still orthogonal. We then have
+\[
+  (V (D^2 + \lambda I)V^T)^{-1} = V(D^2 + \lambda I)^{-1} V^T
+\]
+Since $D^2$ and $\lambda I$ are both diagonal, it is easy to compute their inverses as well. We then have
+\[
+  X\hat{\beta}_\lambda^R = UD^2 (D^2 + \lambda I)^{-1} U^T Y = \sum_{j = 1}^p U_j \frac{D_{jj}^2}{ D_{jj}^2 + \lambda} U_j^T Y
+\]
+Here $U_j$ refers to the $j$th column of $U$.
+
+Now note that the columns of $U$ form an orthonormal basis for the column space of $X$. If $\lambda = 0$, then this is just a fancy formula for the projection of $Y$ onto the column space of $X$. Thus, what this formula is telling us is that we look at this projection, look at the coordinates in terms of the basis given by the columns of $U$, and scale accordingly.
+
+We can now concretely see the effect of our $\lambda$. The shrinking depends on the size of $D_{jj}$, and the larger $D_{jj}$ is, the less shrinking we do. What is special about the columns of $U$ is that they are exactly the normalized principal components of $X$.
+
+Take $u \in \R^p$, $\|u\|_2 = 1$. The sample variance of $Xu \in \R^n$ is
+\[
+  \frac{1}{n} \|Xu\|_2^2 = \frac{1}{n} u^T X^T X u = \frac{1}{n} u^T VD^2 V^t u.
+\]
+We write $w = V^T u$. Then $\|w\|_2 = 1$ since $V$ is orthogonal. We then have
+\[
+  \frac{1}{n} \|Xu\|_2^2 = \frac{1}{n} w^T D^2 w = \frac{1}{n} \sum_j w_j^2 D_{jj^2} \leq \frac{1}{n} D_{11}^2,
+\]
+and this bound is achieved when $w = e_1$. So we need $u = V e_1 = V_1$. Thus, $V_1$ gives the coefficients of the linear combination of columns of $X$ that has largest sample variance subject to the coefficient vector having $\ell_2$ norm $1$. The result is then
+\[
+  X V_1 = U DV^T V_1 = U_1 D_{11}.
+\]
+We can extend this to a description of the other columns of $U$, which is done in the example sheet. Roughly, the subsequent principle components obey the same optimality conditions with the added constraint of being orthogonal to all earlier principle components.
+
+The conclusion is that Ridge regression works best if $\E Y$ lies in the space spanned by the large principal components of $X$. % insert example?
+
+\subsection{\texorpdfstring{$v$}{v}-fold cross-validation}
+In practice, if we are given a data set, how do we know what $\lambda$ we should pick? $v$-fold cross-validation is a very general technique to do so, which allows us to pick a regression method from a variety of options. We are explaining our method in terms of Ridge regression, where our regression methods are parametrized by a single parameter $\lambda$. However, our method in fact allows us to compare vastly different regression methods.
+
+Suppose we are given data $(Y_i, x_i)_{i = 1}^n$ and a new data point $(Y^*, x^*) \in \R \times \R^p$ are iid, and $Y^*$ is not observed. We may want to pick $\lambda$ to minimize the following quantity:
+\[
+  \E \left\{ (Y^* - (x^*)^T \hat{\beta}_\lambda^R(X, Y))^2 \mid X, Y \right\}.
+\]
+It is difficult to actually do this, and so an easier target to minimize is the expected prediction error
+\[
+  \E\left[\E \left\{ (Y^* - (x^*)^T \hat{\beta}_\lambda^R(\tilde{X}, \tilde{Y}))^2 \mid \tilde{X}, \tilde{Y} \right\}\right]
+\]
+One thing to note about this is that we are thinking of $\tilde{X}$ and $\tilde{Y}$ as arbitrary data sets of size $n$, as opposed to the one we have actually got.
+
+This might be a more tractable problem, since we are not working with our actual data set, but general data sets.
+
+The method of cross-validation estimates this by splitting the data into $v$ folds.
+\begin{center}
+  \begin{tikzpicture}
+    \draw (0, 0) rectangle +(3, 1);
+    \draw (0, 5) rectangle +(3, 1);
+
+    \draw [dashed] (0, 1) -- (0, 5);
+    \draw [dashed] (3, 1) -- (3, 5);
+
+    \node at (4, 0.5) {$(X^{(1)}, Y^{(1)})$};
+    \node at (6, 0.5) {$A_1$};
+
+    \node at (4, 5.5) {$(X^{(v)}, Y^{(v)})$};
+    \node at (6, 5.5) {$A_v$};
+  \end{tikzpicture}
+\end{center}
+$A_i$ is called the \term{observation indices}, which is the set of all indices $i$ so that the $i$th data point lies in the $i$th fold.
+
+We let $(X^{(-k)}, Y^{(-k)})$ be all data except that in the $k$th fold. We define
+\[
+  CV(\lambda) = \frac{1}{n} \sum_{k = 1}^v \sum_{i \in A_k} (Y_i - x_I^T \hat{\beta}_\lambda^R (X^{(-k)}, Y^{(-k)}))^2
+\]
+We write $\lambda_{CV}$ for the minimizer of this, and pick $\hat{\beta}^R_{\lambda_{CV}}(X, Y)$ as our estimate. This tends to work very will in practice.
+
+But we can ask ourselves --- why do we have to pick a single $\lambda$ to make the estimate? We can instead average over a range of different $\lambda$. Suppose we have computed $\hat{\beta}_\lambda^R$ on a grid of $\lambda$-values $\lambda_1 > \lambda_2 > \cdots > \lambda_L$. Our plan is to take a good weighted average of the $\lambda$. Concretely, we want to minimize
+\[
+  \frac{1}{n} \sum_{k = 1}^v \sum_{i \in A_k} \left(Y_i - \sum_{i = 1}^L w_i x_i^T \hat{\beta}_{\lambda_i}^R (X^{(-k)}, Y^{(-k)})\right)^2
+\]
+over $w \in [0, \infty)^L$. This is known as \term{stacking}. This tends to work better than simply $v$-fold cross-validation. Indeed, it must --- cross-validation is just a special case where we restrict $w_i$ to be zero in all but one entries. Of course, one disadvantage of this approach is that after solving this minimization problem, whenever we want to make our prediction, we need to compute a lot of different $\hat{\beta}_{\lambda}^R$ in order to do so.
+
+\subsection{The kernel trick}
+We start with a very simple observation. An alternative way of writing the fitted values from Ridge regression is
+\[
+  (X^T X + \lambda I) X^T = X^T(X^T + \lambda I).
+\]
+One should be careful that the $\lambda I$ are different matrices on both sides, as they have different dimensions. Inverting the matrices, we have
+\[
+  X^T(XX^T + \lambda I)^{-1} = (X^T X + \lambda I)^{-1} X^T.
+\]
+We can multiply the right-hand-side by $Y$ to obtain the $\hat{\beta}$ by Ridge regression, and multiply on the left to obtain the fitted values. So we have
+\[
+  XX^T(XX^T + \lambda I)^{-1}Y = X (X^T X + \lambda I)^{-1} X^T Y = X \hat{\beta}^R_\lambda.
+\]
+Note that $X^T X$ is a $p \times p$ matrix, and takes $O(np^2)$ time to compute. On the other hand, $XX^T$ is an $n \times n$ matrix, and takes $O(n^2 p)$ time to compute. If $p \gg n$, then this would be faster to compute.
+
+The key point to make is that the fitted values from Ridge regression only depends on $K = XX^T$ (and $Y$). Why is this important?
+
+Suppose we believe we have a quadratic signal
+\[
+  Y_i = x_i^T \beta + \sum_{k, \ell} x_{ik} x_{i\ell} \theta_{k\ell} + \varepsilon_i
+\]
+Of course, we can do Ridge regression, as long as we add the products $x_{ik} x_{i\ell}$ as predictors. But this requires $O(p^2)$ many predictors. Even if we use the $XX^T$ way, this has a cost of $O(n^2  p^2)$, and if we were really naive, it would require $O(np^4)$ operations.
+
+We need to do better than this. The idea is that we might be able to compute $k$ directly. Consider
+\[
+  (1 + x_i^T x_j)^2 = 1 + 2 x_i^T x_j + \sum_{k, \ell} x_{ik} x_{i\ell} x_{jk}x_{j\ell}.
+\]
+This is equal to the inner product between vectors of the form
+\[
+  (1, \sqrt{2} x_{i1}, \ldots, \sqrt{2}x_{ip}, x_{i1} x_{i1}, \ldots, x_{i1} x_{ip}, x_{i2} x_{i1}, \ldots, x_{ip} x_{ip})\tag{$*$} % arrange this better
+\]
+If we set $K_{ij} = (1 + x_i^T x_j)^2$ and form $K(K + \lambda I)^{-1} Y$, this is equivalent to forming ridge regression with $(*$) as our predictors. Note that here we don't scale our columns to have the same $\ell_2$ norm.
+
+This is pretty interesting, because computing this is only $O(n^2p)$. We managed to kill a factor of $p$ in this computation.
+
+More generally, since the Ridge fitted values only depends on inner products between different observations, if we want to try to fit some other complicated model, instead of fitting non-linear models by first mapping each $\{x_i\} \mapsto \phi(x_i) \in \R^d$ using some ``feature map'' $\phi$, we can instead aim to directly compute
+\[
+  \bra \phi(x_i), \phi(x_j)\ket = k(x_i, x_j).
+\]
+But we can also try to go in the other direction. We don't need to know $\phi$ itself, but we simply have to find some appropriate $k(x_i, x_j)$, which should be some ``similarity measure'' between $x_i$ and $x_j$, and then set $K_{ij} = k(x_i, x_j)$.
+
+
+\printindex
+\end{document}

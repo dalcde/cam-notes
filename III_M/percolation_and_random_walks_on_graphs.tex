@@ -1,0 +1,372 @@
+\documentclass[a4paper]{article}
+
+\def\npart {III}
+\def\nterm {Michaelmas}
+\def\nyear {2017}
+\def\nlecturer {P. Sousi}
+\def\ncourse {Percolation and Random Walks on Graphs}
+\def\nofficial {http://www.statslab.cam.ac.uk/~ps422/percolation.html}
+
+\input{header}
+
+\renewcommand\L{\mathbb{L}}
+\newcommand\Pci[1]{\P_{#1}(|\mathcal{C}(0)| = \infty)}
+\begin{document}
+\maketitle
+{\small
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
+A phase transition means that a system undergoes a radical change when a continuous parameter passes through a critical value. We encounter such a transition every day when we boil water. The simplest mathematical model for phase transition is percolation. Percolation has a reputation as a source of beautiful mathematical problems that are simple to state but seem to require new techniques for a solution, and a number of such problems remain very much alive. Amongst connections of topical importance are the relationships to so-called Schramm--Loewner evolutions (SLE), and to other models from statistical physics. The basic theory of percolation will be described in this course with some emphasis on areas for future development.
+
+Our other major topic includes random walks on graphs and their intimate connection to electrical networks; the resulting discrete potential theory has strong connections with classical potential theory. We will develop tools to determine transience and recurrence of random walks on infinite graphs. Other topics include the study of spanning trees of connected graphs. We will present two remarkable algorithms to generate a uniform spanning tree (UST) in a finite graph $G$ via random walks, one due to Aldous-Broder and another due to Wilson. These algorithms can be used to prove an important property of uniform spanning trees discovered by Kirchhoff in the 19th century: the probability that an edge is contained in the UST of $G$, equals the effective resistance between the endpoints of that edge.
+
+\subsubsection*{Pre-requisites}
+There are no essential pre-requisites beyond probability and analysis at undergraduate levels, but a familiarity with the measure-theoretic basis of probability will be helpful.
+}
+\tableofcontents
+
+\section{Introduction}
+The course is naturally divided into two parts --- percolation, and random walks on graphs. Percolation is one of the simplest models that experience phase transition --- an abrupt change in quantitative feature due to a continuous change of a parameter. Examples include the boiling of water, and the loss of long-range correlation in magnets when temperature increases.
+
+For example, consider an $n \times n$ lattice connected by edges:
+\begin{center}
+  \begin{tikzpicture}
+    \draw (0, 0) rectangle (6, 6);
+    \foreach \x in {1,2,3}{
+      \draw (\x, 0) -- (\x, 6);
+      \draw (0, \x) -- (6, \x); % draw nodes as well
+    }
+  \end{tikzpicture}
+\end{center}
+We now fix some $p \in [0, 1]$, and for each edge in the graph, we either keep it or remove it with probability $p$. We can define, for example, the quantity $f_n(p)$, the probability that there is an left-to-right crossing of open edges: % example
+
+For example, we have $f_n(0) = 0$ and $f_n(1) = 1$.
+
+How about $p = \frac{1}{2}$? ``By symmetry'', this must be $\frac{1}{2}$. To see this, we consider the \term{dual lattice}, where we put a vertex in the middle of each square, and put an edge between squares that share a common edge. This is again isomorphic to $\Z^2$. We can do the same procedure with the dual lattice. We see that if there is a left-right crossing of open edges, then there cannot be a top-bottom crossing in the dual graph. But since the two graphs are isomorphic, we are done. % Explain this much better
+
+This is a very important property that is only true in $2$ dimensions. We shall see later that a lot of things we can figure out in $2$ dimensions cannot be extended to higher dimensions.
+
+What about other values of $p$? We might think it should be linear, but that is not the case. If $n$ is large, then the graph looks approximately like
+
+% show example
+
+As $n \to \infty$, this converges to the step function:
+
+% insert example
+
+Now suppose we do a percolation, and we obtain a graph. Suppose this graph is such that $0$ is in an infinite component, i.e.\ $0$ is connected to $\infty$. But we want to know more about the properties of this resulting graph. One way to do so is to perform a random walk on this graph, and see what we can say about this graph. Questions we can ask involve hitting times or transience or recurrence.
+
+In IB Markov Chains, we proved the null recurrence of a random walk on $\Z^2$ by rather direct means. Here we are going to use a rather different approach, where we think of our graph as an electric network. We can then interpret the original question in terms of properties of the electric circuits, which provides powerful tools to understand random walks.
+
+We will also look at the theory of uniform spanning trees, and how they connect to electric networks.
+
+\section{Percolation}
+There are two models of percolation --- \term{bond percolation} and \term{site percolation}. In this course, we will focus on bond percolation, but we will look at site percolation in the example sheets.
+
+The very basic set up of percolation theory involves picking a \term{graph} $G = (V, E)$, where \term{$V$} is the set of \term{vertices} and \term{$E$} is the set of \term{edges}. We also pick a \term{percolation probability} $p \in [0, 1]$. For each edge $e \in E$, we keep it with probability $p$ and throw it with probability $1 - p$. In the first case, we say the edge is \emph{open}\index{open edge}\index{edge!open}, and in the latter, we say it is \emph{closed}\index{closed edge}\index{edge!closed}.
+
+More precisely, we define the probability space to be $\Omega= \{0, 1\}^E$, where $0$ denotes a closed edge and $1$ denotes an open one (in the case of site percolation, we have $\Omega = \{0, 1\}^V$). We endow $\Omega$ with the $\sigma$-algebra generated by \term{cylinder sets}
+\[
+  \{\omega \in \Omega: \omega(e) = x_e \text{ for all }e \in A\},
+\]
+where $A$ is a finite set and $x_e \in \{0, 1\}$ for all $e$. In other words, this is the product $\sigma$-algebra. As probability measure, we take the product measure $\P_p$, i.e.\ every edge is $1$ with probability $p$ and $0$ with probability $1 - p$. We will write \index{$\eta_p$}$\eta_p \in \{0, 1\}^E$ for the state of the system.
+
+Now what can we say about the graph resulting from this process? One question we may ask is if we can connect two points in the graphs via the edges that remain. To further the discussion, we introduce some notation.
+
+\begin{notation}
+  We write \term{$x \leftrightarrow y$} if there is an open path of edges from $x$ to $y$.
+\end{notation}
+
+\begin{notation}
+  We write $\mathcal{C}(x) = \{y \in V: y \leftrightarrow x\}$\index{$\mathcal{C}(x)$}, the \term{cluster} of $x$.
+\end{notation}
+
+\begin{notation}
+  We write $x \leftrightarrow \infty$ if $|\mathcal{C}(x)| = \infty$.
+\end{notation}
+
+From now on, we shall take $G = \L^d = (\Z^d, E(\Z^d))$, the $d$-dimensional integer lattice.\index{$\L^d$} Then by translation invariance, $|\mathcal{C}(x)|$ has the same distribution as $|\mathcal{C}(0)|$ for all $x$. We now introduce a key piece of notation:
+\begin{defi}[$\theta(p)$]\index{$\theta_p$}
+  We define $\theta(p) = \P_p(|\mathcal{C}(0)| = \infty)$.
+\end{defi}
+
+Most of the questions we ask surround this $\theta(p)$. We first make the most elementary observations:
+\begin{eg}
+  $\theta(0) = 0$ and $\theta(1) = 1$.
+\end{eg}
+
+The most basic question to ask is:
+\begin{question}
+  Is there $p \in (0, 1)$ such that $\theta(p) > 0$?
+\end{question}
+
+In the degenerate case $d = 1$, we immediately see that we have
+\begin{eg}
+  Take $d = 1$. Then for any $p < 1$, we have $\theta(p) = 0$.
+\end{eg}
+
+If $\theta(p)$ is not always zero, then there is an immediate follow-up question we can ask:
+\begin{question}
+  Is $\theta(p)$ increasing?
+\end{question}
+Intuitively, this must be the case, and indeed we will show that it is true.
+
+\begin{question}
+  Suppose $\theta(p) > 0$. Then how many infinite components are there?
+\end{question}
+
+We first answer question $2$. What we are going to use is \emph{coupling}. The definition will look a little abstract, but we will use it a lot, and we shall see how it is useful in practice.
+
+\begin{defi}[Coupling]\index{coupling}
+  Let $\mu$ and $\nu$ be two probability measures on (potentially) different probability spaces. A \emph{coupling} is a pair of random variables $(X, Y)$ defined on the same probability space such that the marginal distribution of $X$ is $\mu$ and the marginal distribution of $Y$ is $\nu$.
+\end{defi}
+We have already seen coupling in IB Markov Chains, where we used it to prove the convergence to the invariant distribution under suitable conditions. Here we are going to couple all percolation processes for different values of $P$.
+
+We let $(U(e))_{e \in E(\Z^d)}$ be iid $\sim U[0, 1]$ random variables. For each $p \in [0, 1]$, we define
+\[
+  \eta_p(e) =
+  \begin{cases}
+    1 & U(e) \leq p\\
+    0 & \text{otherwise}
+  \end{cases}
+\]
+Then $\P(\eta_p(e) = 1) = \P(U(e) < p) = p$. So by independence of $U(e)$, we know that $\eta_p$ is independent over different edges, and thus $\eta_p$ has the law of bond percolation with probability $p$. This is a concrete example of coupling.
+
+Why is this useful? If $p \leq q$, then $\eta_p(e) \leq \eta_q(e)$. This implies
+\begin{lemma}
+  $\theta(p)$ is an increasing function.
+\end{lemma}
+
+\begin{defi}[Critical probability]\index{Critical probability}
+  We define $p_c(d) = \sup \{p \in [0, 1]: \theta(p) = 0\}$.
+\end{defi}
+
+So if $p > p_c$, and $\theta(p) > 0$; if $p < p_c$, then $\theta(p) = 0$.
+
+It is known that $\theta(p)$ is a $C^\infty$ function on $(p_c, 1]$, but it is not even known if $\theta$ is continuous at $p_c$ in $d = 3$.
+
+We shall see that $p_c = \frac{1}{2}$ in $d = 2$, but this is not known in higher dimensions.
+
+We have already seen that
+\begin{thm}
+  $p_c(1) = 1$.
+\end{thm}
+
+We can now prove our first non-trivial result about $p_c(d)$.
+\begin{thm}
+  For all $d \geq 2$, we have $p_c(d) \in (0, 1)$.
+\end{thm}
+
+We can, of course, break this into two parts.
+\begin{lemma}
+  For $d \geq 2$, $p_c(d) > 0$.
+\end{lemma}
+
+\begin{proof}
+  We first show that $p_c(d) > 0$. We write $\Sigma_n$ for the number of open self-avoiding paths of length $n$ starting at $0$. We now note that
+  \[
+    \P_p(|\mathcal{C}(0)| = \infty) = \P_p(\forall n \geq 1: \Sigma_n \geq 1) = \lim_{n \to \infty} \P_p(\Sigma_n \geq 1) \leq \lim_{n \to \infty} \E_p[\Sigma_n] % check this
+  \]
+  We can now compute $\E_p[\Sigma_n]$. The point is that expectation is linear, which makes this much easier to compute. We let $\sigma_n$ be the number of self-avoiding paths of length $n$ from $0$. Then we simply have
+  \[
+    \E_p[\Sigma_n] = \sigma_n p^n.
+  \]
+  We now bound $\sigma_n$ by $2d \cdot (2d - 1)^{n - 1}$, since we have $2d$ choices of the first step, and at most $2d - 1$ choices in each subsequent step. So we have
+  \[
+    \E_p[\Sigma_n] \leq 2d (2d - 1)^{n - 1} p^n = \frac{2d}{2d - 1} (p(2d - 1))^n.
+  \]
+  So if $p (2d - 1) < 1$, then $\theta(p) = 0$. So we know that
+  \[
+    p_c(d) \geq \frac{1}{2d - 1}.\qedhere
+  \]
+\end{proof}
+
+Let's now talk a bit more about self-avoiding paths. We only needed a very crude bound for the proof, but there is more we can say. Again, we write \term{$\sigma_n$} for the number of \term{self-avoiding path}\emph{s} of length $n$ starting from $0$.
+
+\begin{lemma}
+  We have $\sigma_{n + m} \leq \sigma_n \sigma_m$
+\end{lemma}
+
+\begin{proof}
+  A self-avoiding path of length $n + m$ can be written as a concatenation of self-avoiding paths of length $n$ starting from $0$ and another one of length $m$.
+\end{proof}
+Taking the logarithm, we know that $\log \sigma_n$ is a \term{subadditive sequence}.
+
+A rather convenient lemma is
+\begin{lemma}[Fekete's lemma]\index{Fekete's lemma}
+  If $(a_n)$ is a subadditive sequence of real numbers, then
+  \[
+    \lim_{n \to \infty} \frac{a_n}{n} = \inf\left\{\frac{a_k}{k}: k \geq 1\right\} \in [-\infty, \infty).
+  \]
+  In particular, the limit exists.
+\end{lemma}
+
+\begin{cor}
+  The limit $\lambda = \lim_{n \to \infty} \frac{\log \sigma_n}{n}$ exists.
+\end{cor}
+Thus, we have
+\[
+  \sigma_n= e^{n \lambda (1 + o(1))}
+\]
+as $n \to \infty$. The quantity \index{$\kappa$}$\kappa = e^\lambda$ is the \term{connective constant}. We don't know the value of $\kappa$ for the Euclidean lattice, and the value for the hexagonal lattice has only been found recently:
+\begin{thm}[Duminil-Copin, Smirnov] % insert year
+  The hexagonal lattice has
+  \[
+    \kappa_{\mathrm{hex}} = \sqrt{2 + \sqrt{2}}.
+  \]
+\end{thm}
+We can try to say more precisely about how $\sigma_n$ grows.
+\begin{conjecture}
+  \[
+    \sigma_n \approx
+    \begin{cases}
+      n^{11/32} \kappa^n & d = 2\\
+      n^\gamma \kappa^n & d = 3\\
+      (\log n)^{1/4} \kappa^n & d = 4
+    \end{cases}
+  \]
+\end{conjecture}
+
+For larger $d$, we have an actual theorem
+\begin{thm}[Hara and Slade] % check and year
+  For $d \geq 5$, we have
+  \[
+    \sigma_n \approx \kappa^n
+  \]
+\end{thm}
+
+We also have a theorem
+\begin{thm}[Hammersley and Welsh]
+  For all $d \geq 2$, we have
+  \[
+    \sigma_n \leq C \kappa^n \exp(c' \sqrt{n})
+  \]
+  for some constants $C$ and $c'$.
+\end{thm}
+
+In fact, a better bound was recently found:
+\begin{thm}[Hutchcroft]
+  For $d \geq 2$, we have
+  \[
+     \sigma_n \leq C \kappa^n \exp(o(\sqrt{n})).
+  \]
+\end{thm}
+This will be proved in the example sheet. % check
+
+Fixing an $n$, there are only finitely many self-avoiding walks of length $n$. So we can sample such a self-avoiding walk uniformly at random. We would like to study the scaling limit, namely what happens when we increase $n$ while simlutaneously shrinking space by a factor of $\frac{1}{\sqrt{n}}$. We would expect the result to tend towards some Brownian-motion-like thing, but we want a more precise description.
+
+It is conjectured that for $d = 2$, the scaling limit is given by $SLE(\frac{8}{3})$.
+
+On the other hand, this was proved for self-avoiding walks on a random surface by Gwynne--Miller. % check
+
+Now let's return to our problem of udnerstading $p_c(d)$. We have yet to show that it is $ < 1$. To do so, we introduce the notion of a dual lattice.
+
+\begin{defi}[Planar graph]\index{planar graph}\index{graph!planar}
+  A graph $G$ is called planar if it can be embedded on the plane in such a way that no two edges cross.
+\end{defi}
+
+\begin{defi}[Dual graph]\index{dual graph}\index{graph!dual}
+  Let $G$ be a planar graph (which we call the \term{primal graph}\index{graph!primal}). We define the \emph{dual graph} by placing a vertex in each face of $G$, and connecting $2$ vertices if their faces share a boundary edge.
+\end{defi}
+
+\begin{eg}
+  The dual of $\Z^2$ is isomorphic to $\Z^2$ % insert picture
+\end{eg}
+The dual lattice will help us prove a lot of properties for percolation in $\Z^2$.
+
+\begin{lemma}
+  $p_c(d) < 1$ for all $d \geq 2$.
+\end{lemma}
+
+\begin{proof}
+  It suffices to show this for $d = 2$, since $\Z^d$ embeds in $\Z^{d + 1}$ for all $d$, and if there is an infinite cluster in $Z^d$, the same is true for $\Z^{d + 1}$ 
+
+  In order to show that $p_c(2) < 1$, we need to find $\varepsilon, \delta > 0$ such that $\P_p(|\mathcal{C}(0)| < \infty) < 1 - \varepsilon$ for $p < 1 - \delta$.
+
+  Consider the dual of $\Z^2$, and perform bond percolation. We declare an edge of the dual open if it crosses an open edge of $\Z^2$, and closed otherwise.
+
+  Suppose $|\mathcal{C}(0)| < \infty$. This means we can find a closed circuit in the dual lattice, namely the ``boundary'' of $\mathcal{C}(0)$.
+
+  We let $D_n$ be the number of closed dual circuits of length $n$ that surround $0$. So
+  \[
+    \P_p(|\mathcal{C}(0)| < \infty) = \P_p(\exists n \geq D_n \geq 1) \leq \sum_{n = 4}^\infty \E_p[D_n],
+  \]
+  using the union bound and Markov's inequality.
+
+  By simple counting, we find that
+  \begin{ex}
+    Show that the number of dual circuits of length $n$ that contain $0$ is at most $n \cdot 4^n$.
+  \end{ex}
+  It then follows that
+  \[
+    \P_p(|\mathcal{C}(0)| < \infty) \leq \sum_{n = 4}^\infty n \cdot 4^n (1 - p)^n.
+  \]
+  So we find that if $1 - p < \delta$ for a suitable $\delta$, then $\P_p(|\mathcal{C}(0)| < \infty) < 1 - \varepsilon$.
+\end{proof}
+
+Now we know that if $p > p_c(d)$, then $\theta(p) > 0$; if $p < p_c(d)$, then $\theta(p) = 0$.
+
+In the first case, it is of courrse not necessarily the case that with probability $1$, $0$ is connected to $\infty$. However, it turns out it is true that there will almost surely be an infinite cluster, and there is a unique one.
+
+\begin{prop}
+  Let $A_\infty$ be the event that there is an infinite cluster. 
+  \begin{enumerate}
+    \item If $\theta(p) = 0$, then $\P_p(A_\infty) = 0$.
+    \item If $\theta(p) > 0$, then $\P_p(A_\infty) = 1$.
+  \end{enumerate}
+\end{prop}
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item We have
+      \[
+        \P_p(A_\infty) = \P_p(\exists x: |\mathcal{C}(x)| = \infty) \leq \sum_{x \in \Z^d} \P_p(|\mathcal{C}(x)| = \infty) = \sum \theta(p) = 0.
+      \]
+    \item We need to apply the Kolmogorov 0-1 law. Recall that if $X_1, X_2, \ldots$ are independent random variables, and $\mathcal{F}_n = \sigma(X_k: k \geq n)$, $\mathcal{F}_\infty = \bigcap_{n \geq 0} \mathcal{F}_n$. Then $\mathcal{F}_\infty$ is trivial, i.e. for all $A \in \mathcal{F}_\infty$, $\P(A) \in \{0, 1\}$.
+
+      So we order the edges of $\Z^d$ as $e_1, e_2, \ldots$ and denote their states $w(e_1), w(e_2), \ldots$. These are iid random varaibles. We certainly have $\P_p(A_\infty) \geq \theta(p) > 0$. So if we can show that $A_\infty \in \mathcal{F}_\infty$, then we are done. But this is clear, since changing the states of a finite number of edges does not affect the occurrence of $A_\infty$.
+  \end{enumerate}
+\end{proof}
+
+We can make a stronger statement:
+\begin{thm}[Burton and Keane] % check
+  If $p > p_c$, then there exists a unique infinite cluster with probability $1$.
+\end{thm}
+
+\begin{proof}
+  Let $N$ be the number of infinite clusters. We need to show that $\P_p(N = 1) = 1$. Now note that $\{N = k\}$ is not in $\mathcal{F}_\infty$ when $k \not= 0, \infty$, since changing a finite number of edges can break up or join together infinite clusters. So the Kolmogorov 0-1 law does not apply. 
+
+  However, we do note that $N$ is translation invariant. It is an exercise to show that if $N$ is translation invariant, then $N$ is constant with probability $1$.
+
+  Thus, we know that there is some $k \in \{0, 1, \ldots\} \cup \{\infty\}$ such that $\P_p(N = k) = 1$.
+
+  First of all, we know that $k \not= 0$, since $\theta(p) > 0$. We will exclude $k \geq 2$ and $k = \infty$.
+
+  We first show that we cannot have $2 \leq k < \infty$. Assume that $k < \infty$. We have to show that $k = 1$. We let $B(n) = [-n, n]^d \cap \Z^d$, and let $\partial B(n)$ be its boundary. We know that
+  \[
+    \P_p(N = k, \text{all $k$ clusters intersect $\partial B(n)$}) \to 1
+  \]
+  as $n \to \infty$.
+
+  Take an $n$ sufficiently large, such that
+  \[
+    \P_p(\text{all infinite clusters intersect }\partial B(n)) \geq \frac{1}{2}.
+  \]
+  We then have
+  \[
+    \P_p(N = 1) \geq \P_p(\text{all infinite clusters intersect }\partial B(n)\text{ and all edges in $B(n)$ are open})
+  \]
+  Finally, note that the two events in there are independent, since they involve different edges.
+
+  But the probability that all edges in $B(n)$ are open is just $p^{E(B(n))}$. So
+  \[
+    \P_p(N = 1) \geq \frac{1}{2} p^{E(B(n))} > 0.
+  \]
+  So we are done, since $N$ is a constant.
+
+\end{proof}
+
+
+\printindex
+\end{document}

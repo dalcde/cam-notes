@@ -1,0 +1,226 @@
+\documentclass[a4paper]{article}
+
+\def\npart {III}
+\def\nterm {Michaelmas}
+\def\nyear {2017}
+\def\nlecturer {A.\ G.\ Thomason}
+\def\ncourse {Extremal Graph Theory}
+
+\input{header}
+
+\renewcommand\ex{\mathrm{ex}}
+\begin{document}
+\maketitle
+{\small
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+Tur\'an's theorem, giving the maximum size of a graph that contains no complete $r$-vertex subgraph, is an example of an extremal graph theorem. Extremal graph theory is an umbrella title for the study of how graph and hypergraph properties depend on the values of parameters. This course builds on the material introduced in the Part II Graph Theory course, which includes Tur\'an's theorem and also the Erd\"os--Stone theorem.
+
+The first few lectures will cover the Erd\"os--Stone theorem and stability. Then we shall treat Szemer\'edi's Regularity Lemma, with some applications, such as to hereditary properties. Subsequent material, depending on available time, might include: hypergraph extensions, the flag algebra method of Razborov, graph containers and applications
+
+\subsubsection*{Pre-requisites}
+A knowledge of the basic concepts, techniques and results of graph theory, as afforded by the Part II Graph Theory course, will be assumed. This includes Tur\'an's theorem, Ramsey's theorem, Hall's theorem and so on, together with applications of elementary probability.
+}
+\tableofcontents
+
+\section{The \texorpdfstring{Erd\"os--Stone}{Erdos--Stone} theorem}
+The starting point of extremal graph theory is perhaps Tur\'an's theorem, which you hopefully learnt from the IID Graph Theory course. To state the theory, we need the following preliminary definition:
+\begin{defi}[Tur\'an graph]\index{Tur\'an graph}
+  The \emph{Tur\'an graph} \term{$T_r(n)$} is the complete $r$-partite graph on $n$ vertices with class sizes $\lfloor n/r\rfloor$ or $\lceil n/r\rceil$. We write $t_r(n)$ for the number of edges in $T_r(n)$.\index{$t_r(n)$}
+\end{defi}
+
+The theorem then says
+\begin{thm}[Tur\'an's theorem]\index{Tur\'an's theorem}
+  If $G$ is a graph with $|G| = n$, $e(G) \geq t_r(n)$ and $G \not \supseteq K_{r+1}$. Then $G = T_r(n)$.
+\end{thm}
+This is an example of an \emph{extremal theorem}. More generally, given a fixed graph $F$, we seek
+\[
+  \ex(n, F) = \max \{e(G): |G| = n, G \not\supseteq F\}.
+\]
+Tur\'an's theorem tells us $\ex(n, K_{r + 1}) = t_r(n)$. We cannot find a nice expression for the latter number, but we have
+\[
+  \ex(n, K_{r + 1}) = t_r(n) \approx \left(1 - \frac{1}{r}\right)\binom{n}{2}.
+\]
+Tur\'an's theorem is a rather special case. First of all, we actually know the exact value of $\ex(n, F)$. Moreover, there is a unique \term{extremal graph} realizing the bound. Both of these properties do not extend to other choices of $F$.
+
+By definition, if $e(G) > \ex(n, K_{r + 1})$, then $G$ contains a $K_{r + 1}$. The Erd\"os--Stone theorem tells us that as long as $|G| = n$ is big enough, this condition implies $G$ contains a much larger graph than $K_{r + 1}$.
+
+\begin{notation}\index{$K_r(t)$}
+  We denote by $K_r(t)$ the complete $r$-partite graph with $t$ vertices in each class.
+\end{notation}
+So $K_r(1) = K_r$ and $K_r(t) = T_r(rt)$.
+
+\begin{thm}[Erd\"os--Stone, 1946]\index{Erd\"os--Stone theorem}
+  Let $r \geq 1$ be an integer and $\varepsilon > 0$. Then there exists $d = d(r, \varepsilon)$ and $n_0 = n_0(r, \varepsilon)$ such that if $|G| = n \geq n_0$ and
+  \[
+    e(G) \geq \left(1 - \frac{1}{r} + \varepsilon \right) \binom{n}{2},
+  \]
+  then $G \supseteq K_{r + 1}(t)$, where $t = \lfloor d \log n\rfloor$.
+\end{thm}
+Note that we can remove $n_0$ from the statement simply by reducing $d$, since for sufficiently small $d$, whenever $n < n_0$, we have $\lfloor d \log n\rfloor = 0$.
+
+One corollary of the theorem, and a good way to think about the theorem is that given numbers $r, \varepsilon, t$, whenever $|G| = n$ is sufficiently large, the inequality $e(G) \geq \left(1 - \frac{1}{r} + \varepsilon\right) \binom{n}{2}$ implies $G \subseteq K_{r + 1}(t)$.
+
+To prove the Erd\"os--Stone theorem, a natural strategy is to try to throw away vertices of small degree, and so that we can bound the \emph{minimal degree} of the graph instead of the total number of edges. We will make use of the following lemma to do so:
+\begin{lemma}
+  Let $c, \varepsilon > 0$. Then there exists $n_1 = n_1(c, \varepsilon)$ such that if $|G| = n \geq n_1$ and $e(G) \geq (c + \varepsilon) \binom{n}{2}$, then $G$ has a subgraph $H$ where $\delta(H) \geq c |H|$ and $|H| \geq \sqrt{\varepsilon} n$.
+\end{lemma}
+
+\begin{proof}
+  The idea is that we can keep removing the vertex of smallest degree and then we must eventually get the $H$ we want. Suppose this doesn't gives us a suitable graph even after we've got $\sqrt{\varepsilon}n$ vertices left. That means we can find a sequence
+  \[
+    G = G_n \supseteq G_{n - 1} \supseteq G_{n - 2} \supseteq \cdots G_s,
+  \]
+  where $s = \lfloor \varepsilon^{1/2}n \rfloor$, $|G_j| = j$ and the vertex in $G_j \setminus G_{j - 1}$ has degree $< cj$ in $G_j$.
+
+  We can then calculate
+  \begin{align*}
+    e(G_s) &> (c + \varepsilon) \binom{n}{2} - c \sum_{j = s + 1}^n j \\
+    &= (c + \varepsilon) \binom{n}{2} - c \left\{\binom{n+1}{2} - \binom{s + 1}{2}\right\} \\
+    &\sim \frac{\varepsilon n^2}{2}
+  \end{align*}
+  as $n$ gets large (since $c$ and $s$ are fixed numbers). In particular, this is $> \binom{s}{2}$. But $G_s$ only has $s$ vertices, so this is impossible.
+\end{proof}
+
+Using this, we can reduce the Erd\"os--Stone theorem to a version that talks about the minimum degree instead.
+\begin{lemma}
+  Let $r \geq 1$ be an integer and $\varepsilon > 0$. Then there exists a $d_1 = d_1(r, \varepsilon)$ and $n_2 = n_2(r, \varepsilon)$ such that if $|G| = n \geq n_2$ and
+  \[
+    \delta(G) \geq \left(1 - \frac{1}{r} + \varepsilon\right)n,
+  \]
+  then $G \supseteq K_{r + 1}(t)$, where $t = \lfloor d_1 \log n\rfloor$.
+\end{lemma}
+We first see how this implies the Erd\"os--Stone theorem:
+
+\begin{proof}[Proof of Erd\"os--Stone theorem]
+  Provided $n_0$ is large, say $n_0 > n_1\left(1 - \frac{1}{r} + \frac{\varepsilon}{2}, \frac{\varepsilon}{2}\right)$, we can apply the first lemma to $G$ to obtain a subgraph $H \subseteq G$ where $|H| > \sqrt{\frac{\varepsilon}{2}} n$, and $\delta(H) \geq \left(1 - \frac{1}{r} + \frac{\varepsilon}{2}\right) |H|$.
+
+  We can finally apply our final lemma as long as $\sqrt{\frac{\varepsilon}{2}} n$ is big enough, and obtain $K_{r + 1}(t) \subseteq H \subseteq G$, with $t > \left\lfloor d_1(r, \varepsilon/2) \log \left(\sqrt{\frac{\varepsilon}{2}} n\right)\right\rfloor$.
+\end{proof}
+
+We can now prove the lemma.
+
+\begin{proof}[Proof of lemma]
+  If $r = 0$ or $\varepsilon \geq \frac{1}{r}$, the theorem is trivial. We proceed by induction on $r$.
+
+  By the induction hypothesis, we may assume $G \supseteq K_r(T)$ for
+  \[
+    T = \left\lfloor \frac{2t}{\varepsilon r}\right\rfloor.
+  \]
+  Call it $K = K_r(T)$. This is always possible, as long as
+  \[
+    d_1(r, \varepsilon) < \frac{\varepsilon r}{2} d_1\left(r - 1, \frac{1}{r(r - 1)}\right).
+  \]
+  The exact form is not important. The crucial part is that $\frac{1}{r(r - 1)} = \frac{1}{r - 1} - \frac{1}{r}$, which is how we chose the $\varepsilon$ to put into $d_1(r - 1, \varepsilon)$.
+
+  Each vertex of $K$ sends at least $\left(1 - \frac{1}{r} + \varepsilon\right)n - |K|$ edges to $G - K$, by the minimum degree condition. Let $U$ be the set of vertices having $\left(1 - \frac{1}{r} + \frac{\varepsilon}{2}\right)|K|$ neighbours in $K$.
+
+  Writing $(e, K, G - K)$ for the number of edges between $K$ and $G - K$. Then
+  \[
+    |K| \left\{\left(1 - \frac{1}{r} + \varepsilon\right)n - |K|\right\} \leq e(K, G - K)  \leq |U||K| + (n - U) \left(1 - \frac{1}{r} + \frac{\varepsilon}{2}\right)|K|.
+  \]
+  Rearranging, we find that we have
+  \[
+    \frac{\varepsilon n}{2} - |K| \leq |U| \left(\frac{1}{r} - \frac{\varepsilon}{2}\right).
+  \]
+  If $n$ is large, since $|K|$ is just of order $\log n$, we can write
+  \[
+    \frac{\varepsilon n}{3} \leq \frac{|U|}{r}.
+  \]
+  Then we have
+  \[
+    U \geq \frac{r\varepsilon n}{3}.
+  \]
+  In particular, it is of order $n$.
+
+  Each vertex $u \in U$ has at least
+  \[
+    \left(1 - \frac{1}{r} + \frac{\varepsilon}{2}\right) |K| = \left(1 - \frac{1}{r} + \frac{\varepsilon}{2}\right) rT = (r - 1)T \frac{\varepsilon r}{2}T \geq (r - 1)T + t.
+  \]
+  neighbours in $K$, so is joined to at least $t$ in each class, so is joined to some $K_r(t) \subseteq K$.
+
+  But there are $\binom{T}{t}^r$ many $K_r(t)$'s in $K$. We use the simple inequality
+  \[
+    \binom{n}{k} \leq \left(\frac{e n}{k}\right)^k.
+  \]
+  Then we have
+  \[
+    \binom{T}{t}^r \leq \left(\frac{eT}{t}\right)^{rt} \leq \left(\frac{3e}{\varepsilon r}^{rt}\right) \leq \left(\frac{3e}{\varepsilon r}\right)^{rd\log n} \leq \frac{\varepsilon r n}{3t} \leq \frac{|U|}{t},
+  \]
+  where the second-to-last inequality holds whenever $d$ is sufficiently small and $n_2(r, \varepsilon)$ is large, since $t$ grows as $\log n$, and we just need to pick $d$ such that $\left(\frac{3e}{\varepsilon r}\right)^{rd} < e$.
+
+  But then by the pigeonhole principle, there must be a set $W \subseteq U$ of size $t$ joined to the same $K_r(t)$, giving a $K_{r + 1}(t)$.
+\end{proof}
+
+% check name
+
+Erd\"os and Simonovits in the 60s noticed that Erd\"os--Stone allows us to find $\ex(n, F)$ asymptotically for all $F$.
+
+\begin{thm}
+  Let $F$ be a fixed graph with chromatic number $\chi(F) = r + 1$. Then
+  \[
+    \lim_{n \to \infty} \frac{\ex(n, F)}{\binom{n}{2}} = 1 - \frac{1}{r}.
+  \]
+\end{thm}
+
+\begin{proof}
+  Since $\chi(F) = r + 1$, we know $F$ cannot be embedded in an $r$-partite graph. So in particular, $F \not\subseteq T_r(n)$. So
+  \[
+    \ex(n, F) \geq t_r(n) \geq \left(1 - \frac{1}{r}\right)\binom{n}{2}.
+  \]
+  On the other hand, given any $\varepsilon > 0$, if $|G| = n$ and
+  \[
+    e(G) \geq \left(1 - \frac{1}{r} + \varepsilon\right) \binom{n}{2},
+  \]
+  then by the Erd\"os--Stone theorem, we have $G \supseteq K_{r + 1}(|F|) \supseteq F$ provided $n$ is large. So we know that for every $\varepsilon > 0$, we have
+  \[
+    \limsup \frac{\ex(n, F)}{\binom{n}{2}} \leq 1 - \frac{1}{r} + \varepsilon.
+  \]
+  So we are done.
+\end{proof}
+In particular, if $F$ is a bipartite graph, i.e.\ $r = 1$, then this just tells us
+\[
+  \ex(n, F) = o\left(\binom{n}{2}\right).
+\]
+If $r > 1$, then this tells us something more useful.
+
+Now can we strengthen the Erd\"os--Stone theorem to obtain a larger $t$?
+\begin{thm}
+  Given $r \in \N$, there exists $\varepsilon_r > 0$ such that if $0 < \varepsilon < \varepsilon_r$, then there exists $n_3(r, \varepsilon)$ so that if $n > n_3$, there exists a graph $G$ of order $n$ such that
+  \[
+    e(G) \geq \left(1 - \frac{1}{r} + \varepsilon\right) \binom{n}{2}
+  \]
+  but $K_{r + 1}(t) \not\subseteq G$, where
+  \[
+    t = \left\lceil \frac{3 \log n}{\log 1/\varepsilon}\right\rceil.
+  \]
+\end{thm}
+So this tells us we cannot get better than $t \sim \log n$, and this gives us some bound on $d(r, \varepsilon)$.
+
+\begin{proof}
+  Let $W$ be a largest class of $T_r(n)$ with $|W| = m = \left\lceil \frac{n}{r}\right\rceil$. We form $G$ by adding $\varepsilon \binom{n}{2}$ edges inside $W$ so that $G[W]$ (the subgroup of $G$ formed by $W$) does not contain $K_2(t)$, and hence $G \not\supseteq K_{r + 1}(t)$. Then
+  \[
+    e(G) \geq t_r(n) + \varepsilon \binom{n}{2} \geq \left(1 - \frac{1}{r} +\varepsilon \right) \binom{n}{2},
+  \]
+  as desired.
+
+  To see that such an addition is possible, choose edges inside $W$ independently with probability $p = 3 \varepsilon r^2$. This is possible as long as $\varepsilon_r$ is small enough. Let $X$ be the number of edges chosen, and $Y$ be the number of $K_2(t)$ created. Then
+  \[
+    \E[X - Y] = \E[X] - \E[Y] = p\binom{n}{2} - \frac{1}{2}\binom{m}{t} \binom{m - t}{t} p^{t^2}.
+  \]
+  The point is we want the second term to be smaller than the first term. We have
+  \[
+    m^{2t - 2}p^{t^2 - 1} = (m^2 p^{t + 1})^{t - 1}
+  \]
+  If we pick $\varepsilon_r = (3r^2)^{-6}$, so that $p < \varepsilon^{5/6}$, then this is
+  \[
+    m^2 \varepsilon^{5/6 (t + 1)} < (m^2 m^{-5/2})^{t - 1} < \frac{1}{2}.
+  \]
+  Hence, we find that
+  \[
+    \E[x - y] \geq \frac{1}{2} p \binom{m}{2}.
+  \]
+  So there is some choice of edges with $X - Y > \frac{1}{2} p \binom{m}{2}$. We're now done, since we can just remove an edge from each $K_2(t)$ to leave a $K_2(t)$-free graph with at least $X - Y > \frac{1}{2}p \binom{m}{2} > \varepsilon \binom{n}{2}$ edges, recalling that $m \approx \frac{n}{r}$.
+\end{proof}
+\printindex
+\end{document}
