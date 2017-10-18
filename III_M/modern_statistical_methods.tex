@@ -44,14 +44,14 @@ Of course, we cannot cover absolutely everything, and we are going to cover $4$ 
 The four topics are rather disjoint, and they draw on different mathematical skills.
 
 \section{Classical statistics}
-This is a course on \emph{modern} statistical methods. Before we study methods, we give a brief summary of what we are \emph{not} going to talk about, namely classical statistics. 
+This is a course on \emph{modern} statistical methods. Before we study methods, we give a brief summary of what we are \emph{not} going to talk about, namely classical statistics.
 
 So suppose we are doing regression. We have some \term{predictors} $x_i \in \R^p$ and \term{responses} $Y_i \in \R$, and we hope to find a model that describes $Y$ as a function of $x$. For convenience, define the vectors
 \[
   X = \begin{pmatrix} x_1^T \\ \vdots \\ x_n^T\end{pmatrix},\quad
   Y = \begin{pmatrix} Y_1^T \\ \vdots \\ Y_n^T\end{pmatrix}.
 \]
-The linear model then assumes there is some $\beta^0 \in \R^p$ such that 
+The linear model then assumes there is some $\beta^0 \in \R^p$ such that
 \[
   Y = X \beta^0 + \varepsilon,
 \]
@@ -102,9 +102,9 @@ For a biased estimator, $\tilde{\beta}$, we should not study the variance, but
   &= \E(\tilde{\beta} - \E \tilde{\beta} + E \tilde{\beta} - \beta^0)(\tilde{\beta} - \E \tilde{\beta} + E \tilde{\beta} - \beta^0)^T \\ &= \var(\tilde{\beta})+ (\E \tilde{\beta} - \beta^0)(\E \tilde{\beta} - \beta^0)^T
 \end{align*}
 The first term is, of course, just the variance, and the second is the squared bias. So the point is that if we pick a clever biased estimator with a tiny variance, then this might do better than unbiased estimators with large variance.
- 
+
 \subsection{Ridge regression}
-This is probably one of the oldest methods we are going to discuss in this course, introduced in around 1970. The idea of Ridge regression, as well as the Lasso, is that we want to shrink our estimator a bit, so that the variance will be smaller, even though we have introduced a bias. An extreme case is when we always estimate $\beta$ by $0$, in which case there is no variance but a (potentially) large bias. 
+This is probably one of the oldest methods we are going to discuss in this course, introduced in around 1970. The idea of Ridge regression, as well as the Lasso, is that we want to shrink our estimator a bit, so that the variance will be smaller, even though we have introduced a bias. An extreme case is when we always estimate $\beta$ by $0$, in which case there is no variance but a (potentially) large bias.
 
 The \term{Ridge regression} solves
 \[
@@ -114,7 +114,7 @@ where $\mathbf{1}$ is a vector of all $1$'s. Here $\lambda \geq 0$ is a tuning p
 
 We explicitly have an intercept term. Usually, we introduce this by adding a column of $1$'s in $X$. But here we want to separate that out, since we do not want give a penalty for large $\mu$.
 
-For example, if the parameter is temperature, then if we decide to measure in degrees Celsius rather than Kelvins, where we add a linear shift to all terms, we don't want the resulting $\hat{\mu}, \hat{\beta}$ to change.  More precisely, if we make the modification
+For example, if the parameter is temperature, then if we decide to measure in degrees Celsius rather than Kelvins, where we add a linear shift to all terms, we don't want the resulting $\hat{\mu}, \hat{\beta}$ to change. More precisely, if we make the modification
 \[
   Y' = c\mathbf{1} + Y,
 \]
@@ -163,9 +163,9 @@ The proof is a computation.
   Thus, we can write $(*)$ as
   \begin{align*}
     &\hphantom{ {} = {} }(X^T X + \lambda I)^{-1} \Big( \sigma^2(X^T X + 2 \lambda I + \lambda^2(X^T X)^{-1}) - \sigma^2 X^T X - \lambda^2 \beta^0 (\beta^0)^T\Big) (X^T X + \lambda I)^{-1}\\
-    &= \lambda (X^T X + \lambda I)^{-1} \Big( 2 \sigma^2 I + \lambda(X^T X)^{-1} - \lambda \beta^0 (\beta^0)^T\Big) (X^T X + \lambda I)^{-1}\\
+    &= \lambda (X^T X + \lambda I)^{-1} \Big( 2 \sigma^2 I + \lambda(X^T X)^{-1} - \lambda \beta^0 (\beta^0)^T\Big) (X^T X + \lambda I)^{-1}
   \end{align*}
-  Since $\lambda > 0$, this is positive definite iff 
+  Since $\lambda > 0$, this is positive definite iff
   \[
     2 \sigma^2 I + \sigma^2 \lambda (X^T X)^{-1} - \lambda \beta^0 (\beta^0)^T
   \]
@@ -287,7 +287,7 @@ Suppose we believe we have a quadratic signal
 \[
   Y_i = x_i^T \beta + \sum_{k, \ell} x_{ik} x_{i\ell} \theta_{k\ell} + \varepsilon_i
 \]
-Of course, we can do Ridge regression, as long as we add the products $x_{ik} x_{i\ell}$ as predictors. But this requires $O(p^2)$ many predictors. Even if we use the $XX^T$ way, this has a cost of $O(n^2  p^2)$, and if we were really naive, it would require $O(np^4)$ operations.
+Of course, we can do Ridge regression, as long as we add the products $x_{ik} x_{i\ell}$ as predictors. But this requires $O(p^2)$ many predictors. Even if we use the $XX^T$ way, this has a cost of $O(n^2 p^2)$, and if we were really naive, it would require $O(np^4)$ operations.
 
 We need to do better than this. The idea is that we might be able to compute $k$ directly. Consider
 \[
@@ -307,6 +307,134 @@ More generally, since the Ridge fitted values only depends on inner products bet
 \]
 But we can also try to go in the other direction. We don't need to know $\phi$ itself, but we simply have to find some appropriate $k(x_i, x_j)$, which should be some ``similarity measure'' between $x_i$ and $x_j$, and then set $K_{ij} = k(x_i, x_j)$.
 
+\subsection{Kernels}
+We'll aim to characterize the similarity measures $k: X \times X \to \R$ for which there exists a feature map $\phi: X \to \mathcal{H}$, where $\mathcal{H}$ is a real inner product space, with% use $\mathcal{X}$
+\[
+  k(x, x') = \bra \phi(x), \phi(x')\ket.
+\]
+We are being slightly more general than we were last time, where we allow $\mathcal{H}$ to be fancy.
+
+Recall that an inner product space is a real vector space $\mathcal{H}$ endowed with a map $\bra \ph, \ph \ket: \mathcal{H} \times \mathcal{H} \to \R$ and obeys
+\begin{itemize}
+  \item Symmetry: $\bra u, v \ket = \bra v, u\ket$
+  \item Linearity: If $a, b \in \R$, then $\bra au + bw, v\ket = a \bra u, v\ket + b \bra w, v\ket$.
+  \item Positive definiteness: $\bra u, u \ket \geq 0$ with $\bra u, u \ket = 0$ iff $u = 0$.
+\end{itemize}
+
+\begin{defi}[Positive-definite kernel]\index{positive-definite kernel}\index{kernel}
+  A \emph{positive-definite kernel} (or simply \emph{kernel}) is a symmetric map $k: X \times X \to \R$ such that for all $n \in \N$ and $x_1, \ldots, x_n \in X$, the matrix $K \in \R^n \times \R^n$ with entries
+  \[
+    K_{ij} = k(x_i, x_j)
+  \]
+  is positive semi-definite.
+\end{defi}
+Note that our definition of ``positive semi-definite'' includes being symmetric.
+
+It turns out the Cauchy--Schwarz inequality still holds for positive semi-definite matrices
+\begin{prop}[Cauchy--Schwarz inequality]\index{Cauchy--Schwarz inequality}
+  We have
+  \[
+    k(x, x')^2 \leq k(x, x) k(x', x')
+  \]
+\end{prop}
+
+\begin{proof}
+  The matrix
+  \[
+    \begin{pmatrix}
+      k(x, x) & k(x, x')\\
+      k(x', x) & k(x', x')
+    \end{pmatrix}
+  \]
+  has to be positive semi-definite by assumption, and expanding out, we are done.
+\end{proof}
+
+\begin{prop}
+  $k$ defined by
+  \[
+    k(x,  x') = \bra \phi(x), \phi(x')\ket
+  \]
+  is a kernel.
+\end{prop}
+
+\begin{proof}
+  Let $x_1, \ldots, x_n \in X$, and $\alpha \in \R^n$. Consider
+  \begin{align*}
+    \sum_{i, j} \alpha_i k(x_i, x_j) \alpha_jh &= \sum_{i, j} \alpha_i \bra \phi(x_i), \phi(x_j)\ket\\
+    &= \left\bra \sum_i \alpha_i \phi(x_i), \sum_j \alpha_j \phi(x_j)\right\ket\\
+    &\geq 0
+  \end{align*}
+  since the inner product is positive definite.
+\end{proof}
+
+It would be nice to have a way to construct new kernels from old kernels.
+\begin{eg}
+  Suppose $k_1, k_2, \ldots, k_n$ are kernels. Then
+  \begin{itemize}
+    \item If $\alpha_1, \alpha_2 \geq 0$, then $\alpha_1 k_1 + \alpha_2 k_2$ is a kernel.
+
+    If $\lim_{m \to \infty} k_m(x, x') \equiv k(x, x')$ exists, then $k$ is a kernel.
+    \item The pointwise product $k_1k_2$ is a kernel (where $(k_1 k_2)(x, x') = k_1(x, x') k_2(x, x')$)
+  \end{itemize}
+\end{eg}
+Proofs are left as an exercise on the example sheet.
+
+\begin{eg}
+  The \term{linear kernel} is $k(x, x') = x^T x'$. To see this, we see that this is given by the feature map $\phi = \id$ and taking the standard inner product on $\R^p$.
+\end{eg}
+
+\begin{eg}
+  The \term{polynomial kernel} is $k(x, x') = (1 + x^T x')^d$ for all $d \in \N$.
+
+  We saw this last time with $d = 2$. This is a kernel since both $1$ and $x^T x'$ are kernels, and sums and products preserve kernels.
+\end{eg}
+
+\begin{eg}
+  The \term{Gaussian kernel} is
+  \[
+    k(x, x') = \exp\left(- \frac{\|x- x'\|^2_2}{2\sigma^2}\right).
+  \]
+  The quantity $\sigma$ is known as the \term{bandwidth}.% $\sigma$ or $\sigma^2$?
+
+  To show that it is a kernel, we decompose
+  \[
+    \|x - x'\|_2^2 = \|x\|_2^2 + \|x'\|_2^2 - 2 x^T x'.
+  \]
+  We define
+  \[
+    k_1(x, x') = \exp\left(-\frac{\|x\|_2^2}{2\sigma^2}\right)\exp\left(-\frac{\|x'\|_2^2}{2\sigma^2}\right).
+  \]
+  This is a kernel by taking $\phi(\ph) = \exp\left(-\frac{\|\ph\|_2^2}{2\sigma^2}\right)$.
+
+  Next, we can define
+  \[
+    k_2(x, x') = \exp\left(\frac{x^T x'}{\sigma^2}\right) = \sum_{r = 0}^\infty \frac{1}{r!} \left(\frac{x^T x'}{\sigma^2}\right)^r.
+  \]
+  We see that this is the infinite linear combination of powers of kernels, hence is a kernel.
+
+  Thus, it follows that $k = k_1 k_2$ is a kernel.
+
+  Note also that any feature map giving this $k$ must take values in an infinite dimensional inner product space. Roughly speaking, this is because we have arbitrarily large powers of $x$ and $x'$ in the expansion of $k$.
+\end{eg}
+
+\begin{eg}
+  The \term{Sobolev kernel} is defined as follows: we take $\mathcal = [0, 1]$, and let
+  \[
+    k(x, x') = \min(x, x').
+  \]
+  This is the covariance function of Brownian motion, so must be a kernel. 
+\end{eg}
+
+\begin{eg}
+  The \term{Jaccard similarity} is defined as follows: Take $X$ to be the set of all subsets of $\{1, \ldots, p\}$. For $x, x' \in X$, define
+  \[
+    k(x, x') = 
+    \begin{cases}
+      \frac{|x \cap x'|}{|x \cup x'|} & x \cup x' \not= \emptyset\\
+      1 & \text{otherwise}
+    \end{cases}.
+  \]
+\end{eg}
 
 \printindex
 \end{document}

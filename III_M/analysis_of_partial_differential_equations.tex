@@ -321,7 +321,7 @@ In other words, $f$ equals its Taylor expansion. Of course, by translation, we c
   \[
     f(x) = \frac{1}{1 - (x_1 + \cdots + x_n)/r} = \sum_{k = 0}^\infty \left(\frac{x_1 + \cdots + x_n}{r}\right)^k.
   \]
-  We can then expand out each term to see that this is given by a power series. Explicitly, it  si given by
+  We can then expand out each term to see that this is given by a power series. Explicitly, it si given by
   \[
     f(x) = \sum_\alpha \frac{1}{r^{|\alpha|}}\binom{|\alpha|}{\alpha} x^\alpha,
   \]
@@ -383,18 +383,298 @@ This example is important as it allows us to confirm convergence of other power 
   \end{enumerate}
 \end{proof}
 
-We are nearly ready to tackle an actual PDE. What we are going to look at now is the Cauchy--Kovalevskaya theorem for first-order systems.
+With this lemma in mind, we can now prove the Cauchy--Kovalevskaya theorem for first-order PDEs. This concerns a class of problems similar to the Cauchy problem for ODEs. We first set up our notation.
 
-We start by looking at a class of problems similar to the Cauchy problem for ODEs. We consider $\R^n$ with coordinates $(x^1, \ldots, x^n) = (x', x^n)$, where $x' = (x_1, \ldots, x^{n - 1}) \in \R^{n - 1}$. We consider a system of equations for an unknown $\mathbf{u}(x) \in \R^m$. We seek a solution to
+We shall consider functions $\mathbf{u}: \R^n \to \R^m$. Writing $\mathbf{x} = (x^1, \ldots, x^n) \in \R^n$, we will consider the last variable $x^n$ as being the ``time variable'', and the others as being space. However, for notational convenience, we will not write it as $t$. We will adopt the shorthand $x' = (x^1, \ldots, x^{n - 1})$, so that $\mathbf{x} = (x', x^n)$.
+
+Suppose we are given two real analytic functions
+\begin{align*}
+  B: \R^m \times \R^{n - 1} &\to \Mat_{m \times m}(\R)\\
+  \mathbf{c}: \R^m \times \R^{n - 1} &\to \R^m.
+\end{align*}
+We seek a solution to the PDE
 \[
-  \mathbf{u}_{x^n} = \sum_{j = 1}^{n - 1}bb(\mathbf{u}, x') \mathbf{u}_{x_j} + \mathbf{C}(\mathbf{u}, x')
+  \mathbf{u}_{x^n} = \sum_{j = 1}^{n - 1}B(\mathbf{u}, x') \mathbf{u}_{x_j} + \mathbf{c}(\mathbf{u}, x')
 \]
-on $|x'|^2 + (x^n)^2 < r$, subject to $\mathbf{u} = 0$ when $x^n = 0$.
+subject to $\mathbf{u} = 0$ when $x^n = 0$. We shall not require a solution on all of $\R^n$, but only on an open neighbourhood of the origin. Consequently, we will allow for $B$ and $\mathbf{c}$ to not be everywhere defined, but merely conergent on some neighbourhood of the identity.
 
-We assume the functions $B: \R^m \times \R^{n - 1} \to \Mat(m \times m)$ and $\mathcal{C}: \R^m \times \R^{n - 1} \to \R^m$ are given, real analytic functions. Note that both are independent of $x^n$.
+Note that we assumed $B$ and $\mathbf{c}$ do not depend on $x^n$, but this is not a restriction, since we can always introduce a new variable $u^{m + 1} = x^n$, and enlarge the target space.
 
-Note that we assumed $B$ and $\mathcal{C}$ do not depend on $x^n$, but this is not a restriction, since we can always introduce a new variable $u^{m + 1} = x^n$, and enlarge the target space.
+\begin{thm}
+  Given the above assumptions, there exists a real analystic function $\mathbf{u} = \sum_\alpha \mathbf{u}_\alpha x^\alpha$ solving the PDE in a neighbourhood of the origin. Moreover, it is unique among real analytic functions.
+\end{thm}
 
+The uniqueness part of the proof is not difficult. If we write out $\mathbf{u}$, $B$ and $\mathbf{c}$ in power series and plug them into the PDE, we can then simply collect terms and come up with an expression for what $\mathbf{u}$ must be. This is the content of the following lemma:
+
+\begin{lemma}
+  For $k = 1, \ldots, m$ and $\alpha$ a multi-index in $\N^n$, there exists a polynomial $q_\alpha^k$ in the power series coefficients of $B$ and $\mathbf{c}$ such that any analytic solution to the PDE must be given by
+  \[
+    \mathbf{u} = \sum_{\alpha} \mathbf{q}_\alpha(B, \mathbf{c}) x^\alpha,
+  \]
+  where $\mathbf{q}_\alpha$ is the vector with entries $q_\alpha^k$.
+
+  Moreover, all coefficients of $q_\alpha$ are non-negative.
+\end{lemma}
+Note that despite our notation, $\mathbf{q}$ is not a function of $B$ and $\mathbf{c}$ (which are themselves functions of $\mathbf{u}$ and $x$). It is a function of the coefficients in the power series expansion of $B$ and $\mathbf{c}$, which are some fixed constants.
+
+This lemma proves uniqueness. To prove existence, we must show that this converges in a neighbourhood of the origin, and for this purpose, the fact that the coefficients of $q_\alpha$ are non-negative is crucial. After we have established this, we will use the comparison test to reduce the theorem to the case of a single, particular PDE, which we can solve by hand.
+
+\begin{proof}
+%  By assumption, we can expand $B$ and $\mathbf{c}$ as power series:
+%  \begin{align*}
+%    B_j(\mathbf{z}, x') &= \sum_{\gamma, \delta} B_{j, \gamma, \delta} z^\gamma x^\delta\\
+%    \mathbf{c}(\mathbf{z}, x') &= \sum_{\gamma, \delta} \mathbf{c}_{\gamma, \delta} z^\gamma x^\delta
+%  \end{align*}
+%  and we can write the individual components as
+%  \[
+%    B_{j, \gamma, \delta} = (b^{k\ell}_{j, \gamma, \delta}),\quad \mathbf{c}_{\gamma, \delta} = (c^1_{\gamma, \delta}, \ldots, c^m_{\gamma, \delta}),
+%  \]
+%  for $j = 1, \ldots, n - 1$ and $k, \ell = 1, \ldots, m$.
+%
+%  Thus, in components, the PDE reads
+%  \[
+%    u^k_{x^n} = \sum_{j = 1}^{n - 1} \sum_{i = 1}^m b_j^{k\ell} (\mathbf{u}, x') u_{x_j}^\ell + c^k(\mathbf{u}, x')
+%  \]
+%  with the initial condition $u^k(x) = 0$.
+  We construct the polynomials $q_\alpha^k$ by induction on $\alpha_n$. If $\alpha_n = 0$, then since $\mathbf{u} = 0$ on $\{x_n = 0\}$, we conclude that we must have
+  \[
+    u_\alpha = \frac{\D^\alpha \mathbf{u}(0)}{\alpha!} = 0.
+  \]
+  For $\alpha_n = 1$, we note that whenever $x^n = 0$, we have $\mathbf{u}_{x_j} = 0$ for $j = 1, \ldots, n - 1$. So the PDE reads
+  \[
+    \mathbf{u}_{x_n}(x', 0) = \mathbf{c}(0, x').
+  \]
+  Differentiating this relation in directions tangent to $x_n = 0$, we find that if $\alpha = (\alpha', 1)$, then
+  \[
+    \D^\alpha \mathbf{u}(0) = \D^{\alpha'} \mathbf{c}(0, 0).
+  \]
+  So $q_\alpha^k$ is a polynomial in the power series coefficients of $\mathbf{c}$, and has non-negative coefficients.
+
+  Now suppose $\alpha_n = 2$, so that $\alpha = (\alpha', 2)$. Then
+  \begin{align*}
+    \D^\alpha \mathbf{u} &= \D^{\alpha'} (\mathbf{u}_{x^n})_{x^n}\\
+    &= \D^{\alpha'} \left(\sum_j B_j \mathbf{u}_{x^j} + \mathbf{c}\right)_{x^n}\\
+    &= \D^{\alpha'} \left(\sum_j \left(B_j \mathbf{u}_{x^j, x^n} + \sum_p \left(B_{u_p} \mathbf{u}_{x^j}\right) u^p_{x^n}\right) + \sum_p \mathbf{c}_{u_p} u^p_{x^n}\right)
+  \end{align*}
+  We don't really care what this looks like. The point is that when we evaluate at $0$, and expand all the terms out, we get a polynomial in the derivatives of $B_j$ and $\mathbf{c}$, and also $\D^\beta \mathbf{u}$ with $\beta_n < 2$. The derivatives of $B_j$ and $\mathbf{c}$ are just the coefficients of the power series expansion of $B_j$ and $\mathbf{c}$, and by the induction hypothesis, we can also express the $\D^\beta \mathbf{u}$ in terms of these power series coefficients. Thus, we can use this to construct $\mathbf{q}_\alpha$. By inspecting what the formula looks like, we see that all coefficients in $\mathbf{q}_\alpha$ are non-negative.
+
+  We see that we can continue doing the same computations to obtain all $\mathbf{q}_\alpha$.
+%
+%  \begin{align*}
+%    \D^\alpha u^k &= \D^{\alpha'}(u^k_{x_n})_{x_n}\\
+%    &= \D^{\alpha'}\left(\sum_{j = 1}^{n - 1} \sum_{\ell = 1}^m b_j^{k\ell} u_{x_j}^\ell + c^k\right)_{x_n}\\
+%    &= \D^{\alpha'}\left(\sum_{j = 1}^{n - 1} \sum_{\ell = 1}^m \left(b^{k\ell} u_{x_i x_n}^\ell + \sum_{p = 1}^m b^{k\ell}_{j, z_p} u^p_{x_n} u_{x_j}^{\ell}\right) + \sum_{p = 1}^m c_{z_p}^k u_{x_n}^p\right).
+%  \end{align*}
+%  Thus, we find that
+%  \[
+%     \D^{\alpha'} \left(\sum_{j = 1}^{n - 1} \sum_{\ell = 1}^m b_j^{k\ell} u_{x, x_n}^{\ell} + \sum_{p = 1}^m c_{z_p}^k u_{x_n}^p\right),
+%  \]
+%  evaluated at $0$.
+%
+%  We still have to expand out the right hand side. When we do so, it will be a polynomial with non-negative integer coefficients, involving derivatives of $B_j, \mathbf{c}$, and the derivatives $\D^\beta \mathbf{u}$, where $\beta_n \leq 1$. But we already know how to express $\D^\beta \mathbf{u}(0)$ in terms of the coefficients of $B$ and $\mathbf{c}$ 
+
+%  In principle, we can keep on going, making the same (unpleasant) computations for each $\alpha$ and each $k = \{1, \ldots, m\}$. We find that $\D^\alpha u^k(0)$ is a polynomial in arbitrary derivatives of $B$ and $\mathbf{c}$, and derivatives $\D^\beta u^k$ with $\beta_n < \alpha_n$, and further the coefficients are non-neative integers.
+
+%  Plugging it into the series expansion of $u$, and we can decide the same statement holds for $u^k_\alpha$ as well.
+\end{proof}
+
+%\begin{eg}
+%  Consider the equations
+%  \begin{align*}
+%    u_y &= v_x - f\\
+%    v_y &= - u_x,
+%  \end{align*}
+%  subject to the condition $u = v = 0$ on $y = 0$. This implies $u_x = v_x = 0$ on $y = 0$. In general,
+%  \[
+%      (\partial_x)^n u(x, 0) = (\partial_x)^n v(x, 0) = 0.
+%  \]
+%  In the other direction, we have
+%  \[
+%    u_y(x, 0) = - f(x, 0),\quad v_y(x, 0) = 0.
+%  \]
+%  So we find that
+%  \begin{align*}
+%    (\partial_x)^n \partial_y u(x, 0) &= -(\partial_x)^n y(x, 0)\\
+%    (\partial_x)^n \partial_y v(x, 0) &= 0
+%  \end{align*}
+%  Going further, we find that
+%  \begin{align*}
+%    u_{yy} &= v_{xy} - f_y\\
+%    v_{yy} &= u_{xy}
+%  \end{align*}
+%  and we can keep going on.
+%\end{eg}
+
+An immediate consequence of the non-negativity is that
+\begin{lemma}
+  If $\tilde{B}_j \gg B_j$ and $\tilde{\mathbf{c}} \gg \mathbf{c}$, then
+  \[
+    q_\alpha^k(\tilde{B}, \tilde{\mathbf{c}}) > q_\alpha^k(B, \mathbf{c}).
+  \]
+  for all $\alpha$. In particular, $\tilde{\mathbf{u}} \gg \mathbf{u}$.
+\end{lemma}
+
+%\begin{proof}[Proof continued]
+%  What we have found is that if an analytic solution
+%  \[
+%    \mathbf{u} = \sum_{\alpha} \mathbf{u}_\alpha x^\alpha
+%  \]
+%  exists, then it must be given by
+%  \[
+%    u_\alpha^k = q_\alpha^k(\ldots, B_{j, \gamma, \delta}, \ldots, \mathbf{c}_{\gamma, \delta}, \ldots, \mathbf{u}_\beta, \ldots),
+%  \]
+%  where $q_\alpha^k$ is a \emph{universal} polynomial, i.e.\ it doesn't depend on $B, cb$ except through its arguments. Moreovver, $q_\alpha^k$ has \emph{non-negative} coefficients further, $\beta_n \leq \alpha_n - 1$ for any mlti-index on the RHS.
+%
+%  It remains to show that the series
+%  \[
+%    \mathbf{u} = \sum_\alpha \mathbf{u}_\alpha x^\alpha
+%  \]
+%  for the above choice of $\mathbf{u}_\alpha$ converges near $x = 0$. Let us first suppose that
+%  \[
+%    B_j^*  \gg B_j,\quad \mathbf{c}^* \gg \mathbf{c},
+%  \]
+%  where
+%  \begin{align*}
+%    B_j^*(z, x) &= \sum_{\gamma, \delta} B^*_{j, \gamma, \delta} z^\gamma x^\delta,\\
+%    c^*(z, x) &= \sum_{\gamma, \delta} c^*_{\gamma, \delta} z^\gamma x^\delta.
+%  \end{align*}
+%  We assume all these series converge for $|z| + |x'| < s$. This is possible by a previous lemma.
+%
+%  By definition, we have
+%  \begin{align*}
+%    |B_{j, \gamma, \delta}^{k\ell}| &\leq  (B_{j, \gamma, \delta}^*)^{k\ell}\\
+%    0 \leq |c_{\gamma, \delta}^k| \leq (C_{\gamma, \delta}^*)^k.
+%  \end{align*}
+%  We consider the modified problem
+%  \[
+%    \mathbf{u}^*_{x_n} = \sum_{j = 1}^{n - 1} B_j^*(\mathbf{u}^*, x') \mathbf{u}^*_{x_j} + \mathbf{c}^*(\mathbf{u}^*, x').
+%  \]
+%  on $|x'|^2 + x_n^2 < r$, and $\mathbf{u}^* = 0$ on $x_n = 0$. We might need to reduce $r$ so that $B_j^*$ and $\mathbf{c}^*$ converges, but that's okay.
+%
+%  Again, we seek a real analytic solution
+%  \[
+%    \mathbf{u}^* = \sum_\alpha \mathbf{u}_\alpha^* x^\alpha.
+%  \]
+%  We claim that $\mathbf{u}^* \gg \mathbf{u}$. We will then show that $\mathbf{u}^*$ converges, and hence we are done.
+%
+%  In other words, we want to show that
+%  \[
+%    0 \leq |u_\alpha^k| \leq (u_\alpha^*)^k. \tag{$\dagger$}
+%  \]
+%  We prove this by induction on $\alpha_n$. For $\alpha_n = 0$, we note htat
+%  \[
+%    u_\alpha^k = (u_\alpha^*)^k = 0.
+%  \]
+%  So this is good.
+%
+%  For the induction step, assume that $(\dagger)$ holds for $\alpha_n \leq a - 1$, and suppose $\alpha_n = a$. We then have
+%  \begin{align*}
+%    |u_\alpha^*| &= |q_\alpha^k(\ldots, B_{j, \gamma, \delta}^{k\ell}, \ldots, \mathbf{c}_{\gamma, \delta}^k, \ldots, \mathbf{u}_\beta^k)\\
+%    &\leq q^k_\alpha (\ldots, |B_{j, \gamma, \delta}^{k\ell}|, \ldots, |\mathbf{c}_{\gamma, \delta}^k|, \ldots, |\mathbf{u}_\beta^k|)\\
+%    &\leq q^k_\alpha (\ldots, (B_{j, \gamma, \delta}^*)^{k\ell}, \ldots, (\mathbf{c}_{\gamma, \delta}^*)^k, \ldots, (\mathbf{u}_\beta^*)^k)\\
+%    &= (u^*_\alpha)^k,
+%  \end{align*}
+%  where we use the fact that $q_\alpha$ only has non-negative coefficients.
+%
+%  This gives $\mathbf{u}^* \gg \mathbf{u}$.
+%
+%  To show that $\mathbf{u}^*$ converges, we will make a particular choice for $B^*$ and $\mathbf{c}^*$, and solve the equation explicitly. Recall that when we proved the existence of majorizer, we actually wrote down an explicit choice of majorizors. They are given by
+%\end{proof}
+
+So given any $B$ and $\mathbf{c}$, if we can find some $\tilde{B}$ and $\tilde{\mathbf{c}}$ that majorizes $B$ and $\mathbf{c}$ respectively, and show that the corresponding series converges for $\tilde{B}$ and $\tilde{\mathbf{c}}$, then we are done.
+
+But we previously saw that every power series is majorized by
+\[
+  \frac{Cr}{r - (x^1 + \cdots + x^n)}
+\]
+for $C$ sufficiently large and $r$ sufficiently small. So we have reduced the problem to the following case:
+\begin{lemma}
+  For any $C$ and $r$, define
+  \[
+    h(z, x') = \frac{Cr}{r - (x_1 + \cdots + x_{n - 1}) - (z_1 + \cdots + z_m)}
+  \]
+  If $B$ and $\mathbf{c}$ are given by
+  \[
+    B^*_j(z, x') = h(z, x') \begin{pmatrix}
+      1 & \cdots & 1\\
+      \vdots & \ddots & \vdots\\
+      1 & \cdots & 1
+    \end{pmatrix},\quad \mathbf{c}^*(z, x') = h(z, x')
+    \begin{pmatrix}
+      1 \\ \vdots \\ 1
+    \end{pmatrix},
+  \]
+  then the power series
+  \[
+    \mathbf{u} = \sum_{\alpha} \mathbf{q}_\alpha(B, \mathbf{c}) x^\alpha
+  \]
+  converges in a neighbourhood of the origin.
+\end{lemma}
+
+We'll provide a rather cheap proof, by just writing down a solution of the corresponding PDE. The solution itself can be found via the method of characteristics, which we will learn about soon. However, the proof itself only requires the existence of the solution, not how we got it.
+\begin{proof}
+  We define
+  \[
+    v(x) = \frac{1}{mn} \left(r - (x^1 + \cdots + x^{n - 1}) - \sqrt{(r - (x^1 + \cdots + x^{n - 1}))^2 - 2mn Cr x^n}\right),
+  \]
+  whcih is real analytic around the origin, and vanishes when $x^n = 0$. We then observe that
+  \[
+    \mathbf{u}(x) = v(x)
+    \begin{pmatrix}
+      1\\\vdots\\1
+    \end{pmatrix}
+  \]
+  gives a solution to the corresponding PDE, and is real analytic around the origin. Hence it must be given by that power series, and in particular, the power series must converge.
+\end{proof}
+
+%  which majorize $B_j$ and $\mathbf{c}$ provided $C$ is large enough and converge whenever $|x'| + |z| < s$ for some small $s$.
+%
+%  With these choices, the modified equation becomes
+%  \[
+%    (u_{x_n}^*)^k = \frac{C r}{ r - (x_1 + \cdots + x_n) - ((u^*)^1 + \cdots + (u^*)^n)} \left(\sum_{j = 1}^{k - 1} \sum_{\ell = 1}^m (u_{x_j}^*)^\ell + 1\right).
+%  \]
+%  It turns out this thing has an explicit solution
+%  where
+%  which we can check is real analytic near the origin.
+
+
+Very few equations naturally come in the form required by the Cauchy--Kovalevskaya theorem, but it turns out a lot of PDEs can be cast into this form after some work. We shall demonstrate this via some examples.
+\begin{eg}
+  Consider the problem
+  \begin{align*}
+    u_{tt} &= uu_{xy} - u_{xx} + u_t\\
+    u|_{t = 0} &= u_0\\
+    u_t|_{t = 0} &= u_1.,
+  \end{align*}
+  where $u_0, u_1$ are some real analytic functions near the origin. We define
+  \[
+    f = u_0 + t u_1.
+  \]
+  This is then real analytic near $0$, and $f|_{t = 0} = u_0$ and $f_t|_{t = 0} = u_1$. Set
+  \[
+    w = u - f.
+  \]
+  Then $w$ satisfies
+  \[
+    w_{tt} = ww_{xy} - w_{xx} + w_t + f w_{xy} + f_{xy}w + F,
+  \]
+  where
+  \[
+    F = ff_{xy} - f_{xx} + f_t,
+  \]
+  and
+  \[
+    w|_{t = 0} = w_t|_{t = 0} = 0.
+  \]
+  We let $(x, y, t) = (x^1, x^2, x^3)$ and set $\mathbf{u} = (w, w_x, w_y, w_t)$. Then our PDE becomes
+  \begin{align*}
+    u^1_t &= w_t = u^4\\
+    u^2_t &= w_{xt} = u^4_x \\
+    u^3_t &= w_{yt} = u^4_y\\
+    u^4_t &= w_{tt} = u^1 u^2_{x_2} - u^2_{x_1} + u^4 + f u_{x_2}^2 + f_{xy}u^1 + F,
+  \end{align*}
+  and the initial condition is $\mathbf{u}(x^1, x^2, 0) = 0$. This is not quite autonomous, but we can solve that problem simply by introducing a further new variable.
+\end{eg}
 
 \printindex
 \end{document}

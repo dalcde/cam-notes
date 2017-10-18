@@ -26,6 +26,7 @@ There are no essential pre-requisites beyond probability and analysis at undergr
 }
 \tableofcontents
 
+\setcounter{section}{-1}
 \section{Introduction}
 The course is naturally divided into two parts --- percolation, and random walks on graphs. Percolation is one of the simplest models that experience phase transition --- an abrupt change in quantitative feature due to a continuous change of a parameter. Examples include the boiling of water, and the loss of long-range correlation in magnets when temperature increases.
 
@@ -96,83 +97,91 @@ Most of the questions we ask surround this $\theta(p)$. We first make the most e
   $\theta(0) = 0$ and $\theta(1) = 1$.
 \end{eg}
 
-The most basic question to ask is:
-\begin{question}
-  Is there $p \in (0, 1)$ such that $\theta(p) > 0$?
-\end{question}
+A natural question to ask is then if we can find $p \in (0, 1)$ such that $\theta(p) > 0$. But even before answering that question, we can ask a more elementary one --- is $\theta$ an increasing function of $p$?
 
-In the degenerate case $d = 1$, we immediately see that we have
-\begin{eg}
-  Take $d = 1$. Then for any $p < 1$, we have $\theta(p) = 0$.
-\end{eg}
+Intuitively, it must be. And we can prove it. The proof strategy is known as \term{coupling}. We have already seen coupling in IB Markov Chains, where we used it to prove the convergence to the invariant distribution under suitable conditions. Here we are going to couple all percolation processes for different values of $P$.
 
-If $\theta(p)$ is not always zero, then there is an immediate follow-up question we can ask:
-\begin{question}
-  Is $\theta(p)$ increasing?
-\end{question}
-Intuitively, this must be the case, and indeed we will show that it is true.
+\begin{lemma}
+  $\theta$ is an increasing function of $p$.
+\end{lemma}
 
-\begin{question}
-  Suppose $\theta(p) > 0$. Then how many infinite components are there?
-\end{question}
+\begin{proof}
+  We let $(U(e))_{e \in E(\Z^d)}$ be iid $U[0, 1]$ random variables. For each $p \in [0, 1]$, we define
+  \[
+    \eta_p(e) =
+    \begin{cases}
+      1 & U(e) \leq p\\
+      0 & \text{otherwise}
+    \end{cases}
+  \]
+  Then $\P(\eta_p(e) = 1) = \P(U(e) < p) = p$. Since the $U(e)$ are independent, so are $\eta_p$. Thus $\eta_p$ has the law of bond percolation with probability $p$.
 
-We first answer question $2$. What we are going to use is \emph{coupling}. The definition will look a little abstract, but we will use it a lot, and we shall see how it is useful in practice.
+  Moreover, if $p \leq q$, then $\eta_p(e) \leq \eta_q(e)$. So the result follows.
+\end{proof}
+Note that this is not only useful as a theoretical tool. If we want to simulate percolation with different probabilities $p$, we can simply generate a set of $U[0, 1]$ variables, and use it to produce a percolation for all $p$.
 
+If we wish, we can provide an abstract definition of what coupling is, but the detailed definition is not of much practical use:
 \begin{defi}[Coupling]\index{coupling}
   Let $\mu$ and $\nu$ be two probability measures on (potentially) different probability spaces. A \emph{coupling} is a pair of random variables $(X, Y)$ defined on the same probability space such that the marginal distribution of $X$ is $\mu$ and the marginal distribution of $Y$ is $\nu$.
 \end{defi}
-We have already seen coupling in IB Markov Chains, where we used it to prove the convergence to the invariant distribution under suitable conditions. Here we are going to couple all percolation processes for different values of $P$.
 
-We let $(U(e))_{e \in E(\Z^d)}$ be iid $\sim U[0, 1]$ random variables. For each $p \in [0, 1]$, we define
-\[
-  \eta_p(e) =
-  \begin{cases}
-    1 & U(e) \leq p\\
-    0 & \text{otherwise}
-  \end{cases}
-\]
-Then $\P(\eta_p(e) = 1) = \P(U(e) < p) = p$. So by independence of $U(e)$, we know that $\eta_p$ is independent over different edges, and thus $\eta_p$ has the law of bond percolation with probability $p$. This is a concrete example of coupling.
+%The obvious first question to ask is then:
+%\begin{question}
+%  Is there $p \in (0, 1)$ such that $\theta(p) > 0$?
+%\end{question}
+%
+%In the degenerate case $d = 1$, we immediately see that we have
+%\begin{eg}
+%  Take $d = 1$. Then for any $p < 1$, we have $\theta(p) = 0$.
+%\end{eg}
+%
+%If $\theta(p)$ is not always zero, then there is an immediate follow-up question we can ask:
+%\begin{question}
+%  Is $\theta(p)$ increasing?
+%\end{question}
+%Intuitively, this must be the case, and indeed we will show that it is true.
+%
+%Finally, a questions we can ask is:
+%\begin{question}
+%  Suppose $\theta(p) > 0$. Then how many infinite components are there?
+%\end{question}
+%
+%We first answer question $2$. What we are going to use is \emph{coupling}. The definition will look a little abstract, but we will use it a lot, and we shall see how it is useful in practice.
 
-Why is this useful? If $p \leq q$, then $\eta_p(e) \leq \eta_q(e)$. This implies
-\begin{lemma}
-  $\theta(p)$ is an increasing function.
-\end{lemma}
-
+With the lemma, we can make the definition
 \begin{defi}[Critical probability]\index{Critical probability}
   We define $p_c(d) = \sup \{p \in [0, 1]: \theta(p) = 0\}$.
 \end{defi}
 
-So if $p > p_c$, and $\theta(p) > 0$; if $p < p_c$, then $\theta(p) = 0$.
+Recall we initially asked whether $\theta(p)$ can be non-zero for $p \in (0, 1)$. We can now rephrase and strengthen this question by asking for the value of $p_c(d)$. There are a lot more questions we can ask about $p_c$ and $\theta(p)$.
 
-It is known that $\theta(p)$ is a $C^\infty$ function on $(p_c, 1]$, but it is not even known if $\theta$ is continuous at $p_c$ in $d = 3$.
+For example, we know that $\theta(p)$ is a $C^\infty$ function on $(p_c, 1]$. However, we do not know if $\theta$ is continuous at $p_c$ in $d = 3$. We will see soon that $p_c = \frac{1}{2}$ in $d = 2$, but the exact value of $p_c$ is not known in higher dimensions.
 
-We shall see that $p_c = \frac{1}{2}$ in $d = 2$, but this is not known in higher dimensions.
-
-We have already seen that
-\begin{thm}
+Let's start actually proving things about $p_c$. We previously noted that
+\begin{prop}
   $p_c(1) = 1$.
-\end{thm}
+\end{prop}
 
-We can now prove our first non-trivial result about $p_c(d)$.
+The first actually interesting theorem is the following:
 \begin{thm}
   For all $d \geq 2$, we have $p_c(d) \in (0, 1)$.
 \end{thm}
 
-We can, of course, break this into two parts.
+We shall break this up into two natural parts:
 \begin{lemma}
   For $d \geq 2$, $p_c(d) > 0$.
 \end{lemma}
 
 \begin{proof}
-  We first show that $p_c(d) > 0$. We write $\Sigma_n$ for the number of open self-avoiding paths of length $n$ starting at $0$. We now note that
+  Write $\Sigma_n$ for the number of open self-avoiding paths of length $n$ starting at $0$. We then note that
   \[
-    \P_p(|\mathcal{C}(0)| = \infty) = \P_p(\forall n \geq 1: \Sigma_n \geq 1) = \lim_{n \to \infty} \P_p(\Sigma_n \geq 1) \leq \lim_{n \to \infty} \E_p[\Sigma_n] % check this
+    \P_p(|\mathcal{C}(0)| = \infty) = \P_p(\forall n \geq 1: \Sigma_n \geq 1) = \lim_{n \to \infty} \P_p(\Sigma_n \geq 1) \leq \lim_{n \to \infty} \E_p[\Sigma_n].
   \]
   We can now compute $\E_p[\Sigma_n]$. The point is that expectation is linear, which makes this much easier to compute. We let $\sigma_n$ be the number of self-avoiding paths of length $n$ from $0$. Then we simply have
   \[
     \E_p[\Sigma_n] = \sigma_n p^n.
   \]
-  We now bound $\sigma_n$ by $2d \cdot (2d - 1)^{n - 1}$, since we have $2d$ choices of the first step, and at most $2d - 1$ choices in each subsequent step. So we have
+  We can bound $\sigma_n$ by $2d \cdot (2d - 1)^{n - 1}$, since we have $2d$ choices of the first step, and at most $2d - 1$ choices in each subsequent step. So we have
   \[
     \E_p[\Sigma_n] \leq 2d (2d - 1)^{n - 1} p^n = \frac{2d}{2d - 1} (p(2d - 1))^n.
   \]
@@ -254,13 +263,13 @@ In fact, a better bound was recently found:
 \end{thm}
 This will be proved in the example sheet. % check
 
-Fixing an $n$, there are only finitely many self-avoiding walks of length $n$. So we can sample such a self-avoiding walk uniformly at random. We would like to study the scaling limit, namely what happens when we increase $n$ while simlutaneously shrinking space by a factor of $\frac{1}{\sqrt{n}}$. We would expect the result to tend towards some Brownian-motion-like thing, but we want a more precise description.
+Fixing an $n$, there are only finitely many self-avoiding walks of length $n$. So we can sample such a self-avoiding walk uniformly at random. We would like to study the scaling limit, namely what happens when we increase $n$ while simultaneously shrinking space by a factor of $\frac{1}{\sqrt{n}}$. We would expect the result to tend towards some Brownian-motion-like thing, but we want a more precise description.
 
 It is conjectured that for $d = 2$, the scaling limit is given by $SLE(\frac{8}{3})$.
 
 On the other hand, this was proved for self-avoiding walks on a random surface by Gwynne--Miller. % check
 
-Now let's return to our problem of udnerstading $p_c(d)$. We have yet to show that it is $ < 1$. To do so, we introduce the notion of a dual lattice.
+Now let's return to our problem of understanding $p_c(d)$. We have yet to show that it is $ < 1$. To do so, we introduce the notion of a dual lattice.
 
 \begin{defi}[Planar graph]\index{planar graph}\index{graph!planar}
   A graph $G$ is called planar if it can be embedded on the plane in such a way that no two edges cross.
@@ -280,7 +289,7 @@ The dual lattice will help us prove a lot of properties for percolation in $\Z^2
 \end{lemma}
 
 \begin{proof}
-  It suffices to show this for $d = 2$, since $\Z^d$ embeds in $\Z^{d + 1}$ for all $d$, and if there is an infinite cluster in $Z^d$, the same is true for $\Z^{d + 1}$ 
+  It suffices to show this for $d = 2$, since $\Z^d$ embeds in $\Z^{d + 1}$ for all $d$, and if there is an infinite cluster in $Z^d$, the same is true for $\Z^{d + 1}$
 
   In order to show that $p_c(2) < 1$, we need to find $\varepsilon, \delta > 0$ such that $\P_p(|\mathcal{C}(0)| < \infty) < 1 - \varepsilon$ for $p < 1 - \delta$.
 
@@ -307,10 +316,10 @@ The dual lattice will help us prove a lot of properties for percolation in $\Z^2
 
 Now we know that if $p > p_c(d)$, then $\theta(p) > 0$; if $p < p_c(d)$, then $\theta(p) = 0$.
 
-In the first case, it is of courrse not necessarily the case that with probability $1$, $0$ is connected to $\infty$. However, it turns out it is true that there will almost surely be an infinite cluster, and there is a unique one.
+In the first case, it is of course not necessarily the case that with probability $1$, $0$ is connected to $\infty$. However, it turns out it is true that there will almost surely be an infinite cluster, and there is a unique one.
 
 \begin{prop}
-  Let $A_\infty$ be the event that there is an infinite cluster. 
+  Let $A_\infty$ be the event that there is an infinite cluster.
   \begin{enumerate}
     \item If $\theta(p) = 0$, then $\P_p(A_\infty) = 0$.
     \item If $\theta(p) > 0$, then $\P_p(A_\infty) = 1$.
@@ -323,7 +332,7 @@ In the first case, it is of courrse not necessarily the case that with probabili
       \[
         \P_p(A_\infty) = \P_p(\exists x: |\mathcal{C}(x)| = \infty) \leq \sum_{x \in \Z^d} \P_p(|\mathcal{C}(x)| = \infty) = \sum \theta(p) = 0.
       \]
-    \item We need to apply the Kolmogorov 0-1 law. Recall that if $X_1, X_2, \ldots$ are independent random variables, and $\mathcal{F}_n = \sigma(X_k: k \geq n)$, $\mathcal{F}_\infty = \bigcap_{n \geq 0} \mathcal{F}_n$. Then $\mathcal{F}_\infty$ is trivial, i.e. for all $A \in \mathcal{F}_\infty$, $\P(A) \in \{0, 1\}$.
+    \item We need to apply the Kolmogorov 0-1 law. Recall that if $X_1, X_2, \ldots$ are independent random variables, and $\mathcal{F}_n = \sigma(X_k: k \geq n)$, $\mathcal{F}_\infty = \bigcap_{n \geq 0} \mathcal{F}_n$. Then $\mathcal{F}_\infty$ is trivial, i.e.\ for all $A \in \mathcal{F}_\infty$, $\P(A) \in \{0, 1\}$.
 
       So we order the edges of $\Z^d$ as $e_1, e_2, \ldots$ and denote their states $w(e_1), w(e_2), \ldots$. These are iid random varaibles. We certainly have $\P_p(A_\infty) \geq \theta(p) > 0$. So if we can show that $A_\infty \in \mathcal{F}_\infty$, then we are done. But this is clear, since changing the states of a finite number of edges does not affect the occurrence of $A_\infty$.
   \end{enumerate}
@@ -335,7 +344,7 @@ We can make a stronger statement:
 \end{thm}
 
 \begin{proof}
-  Let $N$ be the number of infinite clusters. We need to show that $\P_p(N = 1) = 1$. Now note that $\{N = k\}$ is not in $\mathcal{F}_\infty$ when $k \not= 0, \infty$, since changing a finite number of edges can break up or join together infinite clusters. So the Kolmogorov 0-1 law does not apply. 
+  Let $N$ be the number of infinite clusters. We need to show that $\P_p(N = 1) = 1$. Now note that $\{N = k\}$ is not in $\mathcal{F}_\infty$ when $k \not= 0, \infty$, since changing a finite number of edges can break up or join together infinite clusters. So the Kolmogorov 0-1 law does not apply.
 
   However, we do note that $N$ is translation invariant. It is an exercise to show that if $N$ is translation invariant, then $N$ is constant with probability $1$.
 
@@ -365,8 +374,274 @@ We can make a stronger statement:
   \]
   So we are done, since $N$ is a constant.
 
+  What remains to be shown is that $k$ has to be finite. Suppose $k$ were infinite, i.e.\ $\P_p(N = \infty) = 1$. The idea of the proof is define what it means for a vertex to be a \emph{trifurcation}. We then prove that $\P_p(0\text{ is a trifurcation}) \geq c > 0$. We next show that the number of trifurcations inside $B(n)$ is $\leq |\partial B(n)|$. These two are contradictory, since the first tells us the expected number of trifurctaions is $O(n^d)$, but the latter shows us it is bounded by $O(n^{d - 1})$.
+
+  We say a vertex $x$ is a \term{trifurcation} if the following three conditions hold:
+  \begin{enumerate}
+    \item $x$ is in an infinite open cluster $\mathcal{C}_\infty$;
+    \item there exist exactly three open edges adjacent to $x$;
+    \item $\mathcal{C} \infty \setminus \{x\}$ contains exactly three infinite clusters and no finite ones.
+  \end{enumerate}
+  This is clearly a translation invariant notion. So $\P_p(0 \text{ is a trifurcation}) = \P_p(x \text{ is a trifurcation})$ for all $x \in \Z^d$.
+
+  \begin{claim}
+    $\P_p(0\text{ is a trifurcation})\geq c > 0$.
+  \end{claim}
+   We let $S(n) = \{x \in \Z^d: \|x\|_1 \leq n\}$. This looks like a diamond. A crucial property of this is that for any $x_1, x_2, x_3 \in \partial S(n)$, there exist three disjoint self-avoiding paths joining $x_i$ to $0$ (exercise!). For each triple $x_1, x_2, x_3$, we fix a set of three such paths, and define
+   \[
+     J(x_1, x_2, x_3) = \{\text{all edges on these 3 paths are open and everything else inside $S(n)$ is closed}\}.
+   \]
+   Then
+   \[
+     \P_p(0 \text{ is a trifurcation}) \geq \P_p(\exists \mathcal{C}_\infty^1, \mathcal{C}_\infty^2, \mathcal{C}_\infty^3 \subseteq \Z^d \setminus S(n) \text{ infinite clusters which intersect $\partial S(n)$ at $x_1, x_2, x_3$, and $J(x_1, x_2, x_3)$} % can have multiple intersections; pick one randomly
+   \]
+   We can then write this as $\P_p(J(x_1, x_2, x_3) \mid\exists \mathcal{C}_\infty^1, \mathcal{C}_\infty^2, \mathcal{C}_\infty^3 \subseteq \Z\text{ intersecting }\partial S(n)) \times \P_p(\exists \mathcal{C}_\infty^1, \mathcal{C}_\infty^2, \mathcal{C}_\infty^3 \subseteq \Z^d \setminus \partial S(n))$. We can bound the first term by
+   \[
+     \min(p, 1 - p)^{E(S(n))}.
+   \]
+   To bound the second probability, we have already assumed that $\P_p(N = \infty) = 1$. So $\P_p(\exists \mathcal{C}_\infty^1, \mathcal{C}_\infty^2, \mathcal{C}_\infty^3 \subseteq \Z^d \setminus S(n)\text{ intersecting }\partial S(n)) \to 1$ as $n \to \infty$. We can then take $n$ large enough such that $\P_p( \cdots ) \geq \frac{1}{2}$. So we have shown that $\P_p(0\text{ is a trifurcation}) \geq c > 0$.
+
+   From this, it follows that
+   \[
+     \E_p[\text{number of trifurcations inside $B(n)$})] \geq c |B(n)| \sim n^d.
+   \]
+   So if we can show that the number of trifuractions in $B(n) \leq |\partial B(n)|$, then we arrive at a contradiction, since $|\partial B(n) \sim n^{d - 1}$.
+
+   Indeed, suppose $x_1$ is a trifurcation in $B(n)$. By definition, there exists $3$ open paths to $\partial B(n)$. Let $x_2$ be another trifurcation. Then its paths to the boundary could intersect those of $x_1$, but cannot create a cycle, by definition of a trifurcation.
+
+   For simplicity, we add the rule that when we produce the paths for $x_2$, once we intersect the path of $x_1$, we continue following the path of $x_1$.
+
+   Exploring all trifurcations this way, we obtain a forest inside $B(n)$, and the boundary points will be the leaves of the forest. Now the trifurcations have degree $3$ in this forest. The rest is just combinatorics.
+   \begin{claim}
+     For any tree, the number of degree $3$ vertices is always less than the number of leaves. % prove this
+   \end{claim}
 \end{proof}
 
+\subsection{Correlation inequalities}
+Suppose again we perform bond percolation. We want to know the probabilities
+\[
+  \P_p(x \leftrightarrow y \mid u \leftrightarrow v).
+\]
+Intuitively, we expect this to be greater than $\P_p(x \leftrightarrow y)$, since $u \leftrightarrow v$ tells us there are some open edges around, which is helpful. The proof of this will follow from the FKG inequality.
+
+Again, let $G = (V, E)$ be a graph, let $\Omega = \{0, 1\}^E$, $\mathcal{F}$ the product $\sigma$-algebra, and $\P_p$ the product measure.
+
+\begin{defi}[$\leq$]\index{$\leq$}
+  Given $\omega, \omega' \in \Omega$, we write $\omega \leq \omega'$ if $\omega(e) \leq \omega'(e)$ for all $e \in E$.
+\end{defi}
+This defines a partial order on $\Omega$.
+
+\begin{defi}[Increasing random variable]\index{increasing random variable}\index{random variable!increasing}\index{decreasing random variable}\index{random variable!decreasing}
+  A random variable $X$ is increasing if $X(\omega) \leq X(\omega')$ whenever $\omega \leq \omega'$, and is decreasing if $-X$ is increasing
+\end{defi}
+
+\begin{defi}[Increasing event]\index{increasing event}\index{event!increasing}\index{event!decreasing}\index{decreasing event}
+  An event $A$ is increasing (resp.\ decreasing) if the indicator $1(A)$ is increasing (resp.\ decreasing)
+\end{defi}
+
+\begin{eg}
+  $\{|\mathcal{C}(0)|= \infty\}$ is an increasing event.
+\end{eg}
+
+\begin{thm}
+  If $N$ is an increasing random variable and $p_1 \leq p_2$, then
+  \[
+    \E_{p_1} [N] \leq \E_{p_2} [N],
+  \]
+  and if an event $A$ is increasing, then
+  \[
+    \P_{p_1}(A) \leq \P_{p_2}(A).
+  \]
+\end{thm}
+
+\begin{proof}
+  Immediate from coupling.
+\end{proof}
+
+\begin{thm}[FKG inequality]\index{FKG inequality} % insert name
+  let $X$ and $Y$ be increasing random variables with $\E_p[X^2], \E_p[Y^2] < \infty$. Then
+  \[
+    \E_p[XY] \geq \E_p[X] \E_p[Y].
+  \]
+  In particular, if $A$ and $B$ are increasing events, then
+  \[
+    \P_p(A \cap B) \geq \P_p(A) \P_p(B).
+  \]
+  Equivalently,
+  \[
+    \P_p(A \mid B) \geq \P_p(A).
+  \]
+\end{thm}
+This in fact holds on a greater generality than the product measure.
+
+We will actually use the FKG inequality quite a lot.
+\begin{proof}
+  We assume first that $X$ and $Y$ depend on the state of a finite number of edges. We induct on the number of edges on this number. If $X$ and $Y$ depend on $\omega(e_1)$ only. Then for any $\omega_1, \omega_2 \in \{0, 1\}$, we claim that
+  \[
+    (X(\omega_1) - X(\omega_2))(Y(\omega_1) - Y(\omega_2)) \geq 0.
+  \]
+  Indeed, $X$ and $Y$ are both increasing. So if $\omega_1 > \omega_2$, then both terms are positive; if $\omega < \omega_2$, then both terms are negative, and there is nothing to do if they are equal.
+
+  We then have
+  \[
+    \sum_{\omega_1, \omega_2 \in \{0, 1\}} (X(\omega_1) - X(\omega_2)) (Y(\omega_1) - Y(\omega_2)) \P_p( \omega(e_1) = \omega_1) \P_p(\omega(e_1) = \omega_2) \geq 1.
+  \]
+  Expanding this, we find that the LHS is $\E_p[XY] - \E_p[X] \E_p[Y]$, and we are done.
+
+  Now suppose the claim holds for $X$ and $Y$ that depend on $n < k$ edges. We shall prove the result when they depend on $k$ edges $\omega(e_1), \ldots, \omega(e_k)$. We have
+  \[
+    \E_p[XY] = \E_p[\E_p[XY \mid \omega(e_1), \ldots, \omega(e_{k - 1})]].
+  \]
+  Now after conditioning on $\omega(e_1), \ldots, \omega(e_{k - 1})$, the random variables $X$ and $Y$ become increasing random variables of $\omega(e_k)$. Applying the first step, we get
+  \[
+    \E_p[X Y \mid \omega(1_, \ldots, \omega(e_{k - 1})] \geq \E_p[X \mid \omega(e_1), \ldots, \omega(e_{k - 1})] \E_p[Y \mid \omega(e_1), \ldots, \omega(e_{k - 1})].
+  \]
+  But $\E_p[X \mid \omega(e_1), \ldots, \omega(e_{k - 1})]$ is a random variable depending on the edges $e_1, \ldots, e_{k - 1}$, and moreover it is increasing. So applying the induction hypothesis, we obtain
+  \[
+    \E_p[\E_p[X \mid \omega(e_1), \ldots, \omega(e_{k - 1})] \E_p[Y \mid \omega(e_1), \ldots, \omega(e_{k - 1})]] \geq \E_p[\E_p[X \mid \omega(e_1), \ldots, \omega(e_{k - 1})]] \E_p[\E_p[Y \mid \omega(e_1), \ldots, \omega(e_{k - 1})]]
+  \]
+  Now suppose $X$ and $Y$ depend on the states of a countable set of edges $e_1, e_2, \ldots$. Let's define
+  \begin{align*}
+    X_n &= \E_p [X \mid \omega(e_1), \ldots, \omega(e_n)]\\
+    Y_n &= \E_p [Y \mid \omega(e_1), \ldots, \omega(e_n)]
+  \end{align*}
+  Then $X_n$ and $Y_n$ are martingales, and depend only on the states of only finitely many edges. So we know that
+  \[
+    \E_p[X_n Y_n] \geq \E_p [X_n] \E_p[Y_n] = \E_p[X] \E_p[Y].
+  \]
+  By the $\mathcal{L}^2$-martingale convergence theorem, $X_n \to X$, $Y_n \to Y$ in $L^2$ and almost surely. So taking the limit $n \to \infty$, we get
+  \[
+    \E_p[XY] \geq \E_p[X] \E_p[Y].
+  \]
+\end{proof}
+
+\begin{eg}
+  Suppose we perform bond percolation on $\Z^d$. Let $x, y, z, w$ be $4$ vertices and $\{x \leftrightarrow y\}$ and $\{z \leftrightarrow w\}$ disjointly, i.e.\ there are $2$ disjoint paths of open edges, one joining $x$ to $y$ and the other one joining $z$ to $w$.
+\end{eg}
+
+We want to formulate this scenario generally:
+\begin{defi}[Disjoint occurrence]\index{disjoint occurrence}
+  Let $F$ be a set and $\Omega = \{0, 1\}^F$. Let $S \subseteq F$. We define
+  \[
+    [\omega]_S = \{\omega' \in \Omega: \omega'(e) = \omega(e)\text{ for all }e \in S\}.
+  \]
+  If $A$ and $B$ are $w$ events, then
+  \[
+    A \circ B = \{\omega \in \Omega : \exists S \subseteq F\text{ s.t. } [\omega]_S \subseteq A \text{ and } [\omega]_{F\setminus S} \subseteq B\}.
+  \]
+\end{defi}
+
+\begin{thm}[BK inequality]\index{BK inequality} % van den Berg and Kesten
+  Let $F$ be a finite set and $\Omega = \{0, 1\}^F$. Let $A$ and $B$ be $2$ increasing events. Then
+  \[
+    \P_p(A \circ B) \leq \P_p(A) \P_p(B).
+  \]
+\end{thm}
+
+\begin{proof}[Proof (Bollob\'as and Leader)]
+  We prove by induction on the size $n$ of the set $F$. For $n = 0$, it is trivial.
+
+  Suppose it holds for $n - 1$. We want to show it holds for $n$. For $D \subseteq \{0, 1\}^F$ and $i =0, 1$, set
+  \[
+    D_i = \{(\omega_1, \ldots, \omega_{n - 1}) : (\omega_1, \ldots, \omega_{n - 1}, i) \in D\}.
+  \]
+  Let $A, B \subseteq \{0, 1\}^F$, and $C = A \circ B$. We check that
+  \[
+    C_0 = A_0 \circ B_0,\quad C_1 = (A_0 \circ B_1) \cup (A_1 \circ B_0).
+  \]
+  Since $A$ and $B$ are increasing, $A_0 \subseteq A_1$ and $B_0 \subseteq B_1$, and $A_i$ and $B_i$ are also increasing events. So
+  \begin{align*}
+    C_0 &\subseteq (A_0 \circ B_1) \cap  (A_1 \circ B_0)\\
+    C_1 &\subseteq A_1 \circ B_1.
+  \end{align*}
+  By the induction hypothesis, we have
+  \begin{align*}
+    \P_p(C_0) &= \P_p(A_0 \circ B_0) \leq \P_p(A_0) \P_p(B_0)\\
+    \P_p(C_1) &\leq \P_p(A_1 \circ B_1) \leq \P_p(A_1) \P_p(B_1)\\
+    \P_p(C_0) + \P_p(C_1) \leq \P_p((A_0 \circ B_1) \cap (A_1 \circ B_0)) + \P_p((A \circ B_1) \cup (A_1 \circ B_0))\\
+    &= \P_p(A_0 \circ B_1) + \P_p(A_1 \circ B_0)\\
+    &\leq \P_p(A_0) \P_p(B_1) + \P_p(A_1) \P_p(B_0).
+  \end{align*}
+  Now note that for any $D$, we have
+  \[
+    \P_p(D) = p \P_p(D_1) + (1 - p) \P_p(D_0).
+  \]
+  By some black magic, we multipy the first inequality by $(1 - p)^2$, the second by $p^2$ and the third by $p(1 - p)$. This gives
+  \[
+    p\P_p(C_1) + (1 - p)\P_p(C_0) \leq (p\P_p(A_1) + (!- p)\P_p(A_0))(p\P_p(B_1) + (1 - p) \P_p(B_0)).
+  \]
+  So we are done.
+\end{proof}
+
+It turns out the increasing hypothesis is not necessary:
+\begin{thm}[Reimer]
+  For all events $A, B$ depending on a finite set, we have $\P_p(A \circ B) \leq \P_p(A) \P_p(B)$.
+\end{thm}
+But the proof is much harder, and in all the case where we want to apply this, the variables are increasing.
+
+Recall we defined
+\[
+  \theta(p) = \P_p( |\mathcal{C}(0)| = \infty).
+\]
+We also define
+\[
+  \chi(p) = \E_p[|\mathcal{C}(0)|].
+\]
+If $\chi(p)$ is finite, then of course $\theta(p) = 0$. However, the converse need not hold. So finiteness of $\chi(p)$ is a stronger condition than the vanishing of $\theta(p)$.
+
+Recall that $B(n) = [-n, n]^d \cap \Z^d$. % consnstent notation
+\begin{thm}
+  If $\chi(p) < \infty$, then there exists a positive constant $c$ such that for all $n \geq 1$,
+  \[
+    \P_p(0 \leftrightarrow \partial B(n)) \leq e^{-cn}.
+  \]
+\end{thm}
+We will later prove it under the assumption of $p < p_c$. % application of BK inequality
+
+The idea of the proof is that for there to be a path from, say, $0$ to $B(2n)$, the path must hit a point on $\partial B(n)$. So there is a path from $0$ to a point on $\partial B(n)$, and a path from that point to $\partial B(2n)$. Moreover, these two paths are disjoint, which allows us to apply the BK inequality.
+\begin{proof}
+  Let
+  \[
+    X_n = \sum_{x \in \partial B(n)} 1(0 \leftrightarrow x).
+  \]
+  Now consider
+  \[
+    \sum_{n = 0}^\infty \E[X_n] = \sum_n \sum_{x \in \partial B_n} \P_p(0 \leftrightarrow x) = \sum_{x \in \Z^d} \P_p(0 \leftrightarrow x) = \chi(p).
+  \]
+  Since $\chi(p)$ is finite, we in particular have $\E_p[X_n] \to 0$ as $n \to \infty$. Take $m$ large enough such that $\E_p[X_m] < \delta < 1$.
+
+  Now we have
+  \begin{align*}
+    \P_p( 0 \leftrightarrow \partial B_{m + k}) &= \P_p(\exists \in \partial B_m : 0 \leftrightarrow x \text{ and } x \to \partial B_{m + k}\text{ disjointly })\\
+    &\leq \sum_{x \in \partial B_m} \P_p(0 \leftrightarrow) \P_p(x \leftrightarrow \partial B_{m + k}) \tag{union bound + BK}\\
+    &\leq \sum_{x \in \partial B_m} \P_p(0 \leftrightarrow) \P_p(x \leftrightarrow \partial B_{k}) \tag{trans. inv.}\\
+    &\leq \P_p(0 \leftrightarrow B_k) \E_p[X_m].
+  \end{align*}
+  So for any $n > m$, write $n = qm + r$, where $r \in [0, m - 1]$. Then interating the above result, we have
+  \[
+    \P_p(0 \leftrightarrow \partial B_n) \leq \P_p(0 \leftrightarrow B_{mq}) \leq \delta^q \leq \delta^{-1 + \frac{n}{m}} \leq e^{-cn}.
+  \]
+\end{proof}
+
+We know that $\theta(p)$ is an increasing function of $p$. But at what rate does it increase? In other words, we want to look at $\frac{\d \theta}{\d p}$, if this even makes sense. For these, we need the notion of a pivotal edge. Suppose the cluster of $0$ looks as follows:
+
+\begin{center}
+  \begin{tikzpicture}
+    \node [circ] at (0, 0) {};
+    \node [below] at (0, 0) {$0$};
+    \draw (-0.5, 0) circle [radius=0.5];
+    \draw (0, 0) -- (1, 0.3) node [pos=0.5, above] {$e$}; % some random paths spawning from this edge
+  \end{tikzpicture}
+\end{center}
+Here if we remove the single edge $e$, then we no longer have an infinite cluster.
+
+\begin{defi}[Pivotal edge]\index{pivotal edge}
+  Let $A$ be an event and $w$ a percolation configuration. The edge $e$ is \emph{pivotal} for $(A, w)$ if $1(\omega \in A) \not= 1(\omega' \in A)$, where $\omega'(f) = \omega(f)$ for all $f \not= e$, and $\omega'(e) \not= \omega(e)$.
+  \[
+    \{e \text{ is pivotal for $A$}\} = \{\omega: e\text{ is pivotal for $(A, \omega)$}
+  \]
+\end{defi}
+The occurrence of the event $A$ depends crucially on the edge $e$.
 
 \printindex
 \end{document}
