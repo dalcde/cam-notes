@@ -9,6 +9,27 @@
 
 \input{header}
 
+\pgfdeclaredecoration{penciline}{initial}{
+    \state{initial}[width=+\pgfdecoratedinputsegmentremainingdistance,auto corner on length=1mm,]{
+        \pgfpathcurveto%
+        {% From
+            \pgfqpoint{\pgfdecoratedinputsegmentremainingdistance}
+                            {\pgfdecorationsegmentamplitude}
+        }
+        {%  Control 1
+        \pgfmathrand
+        \pgfpointadd{\pgfqpoint{\pgfdecoratedinputsegmentremainingdistance}{0pt}}
+                        {\pgfqpoint{-\pgfdecorationsegmentaspect\pgfdecoratedinputsegmentremainingdistance}%
+                                        {\pgfmathresult\pgfdecorationsegmentamplitude}
+                        }
+        }
+        {%TO
+        \pgfpointadd{\pgfpointdecoratedinputsegmentlast}{\pgfpoint{3pt}{3pt}}
+        }
+    }
+    \state{final}{}
+}
+
 \renewcommand\L{\mathbb{L}}
 \newcommand\Pci[1]{\P_{#1}(|\mathcal{C}(0)| = \infty)}
 \begin{document}
@@ -63,6 +84,7 @@ In IB Markov Chains, we proved the null recurrence of a random walk on $\Z^2$ by
 We will also look at the theory of uniform spanning trees, and how they connect to electric networks.
 
 \section{Percolation}
+\subsection{The critical probability}
 There are two models of percolation --- \term{bond percolation} and \term{site percolation}. In this course, we will focus on bond percolation, but we will look at site percolation in the example sheets.
 
 The very basic set up of percolation theory involves picking a \term{graph} $G = (V, E)$, where \term{$V$} is the set of \term{vertices} and \term{$E$} is the set of \term{edges}. We also pick a \term{percolation probability} $p \in [0, 1]$. For each edge $e \in E$, we keep it with probability $p$ and throw it with probability $1 - p$. In the first case, we say the edge is \emph{open}\index{open edge}\index{edge!open}, and in the latter, we say it is \emph{closed}\index{closed edge}\index{edge!closed}.
@@ -177,7 +199,7 @@ We shall break this up into two natural parts:
   \[
     \P_p(|\mathcal{C}(0)| = \infty) = \P_p(\forall n \geq 1: \Sigma_n \geq 1) = \lim_{n \to \infty} \P_p(\Sigma_n \geq 1) \leq \lim_{n \to \infty} \E_p[\Sigma_n].
   \]
-  We can now compute $\E_p[\Sigma_n]$. The point is that expectation is linear, which makes this much easier to compute. We let $\sigma_n$ be the number of self-avoiding paths of length $n$ from $0$. Then we simply have
+  We can now compute $\E_p[\Sigma_n]$. The point is that expectation is linear, which makes this much easier to compute. We let $\sigma_n$ be the number of self-avoiding paths\index{self-avoiding paths} of length $n$ from $0$. Then we simply have
   \[
     \E_p[\Sigma_n] = \sigma_n p^n.
   \]
@@ -191,18 +213,25 @@ We shall break this up into two natural parts:
   \]
 \end{proof}
 
-Let's now talk a bit more about self-avoiding paths. We only needed a very crude bound for the proof, but there is more we can say. Again, we write \term{$\sigma_n$} for the number of \term{self-avoiding path}\emph{s} of length $n$ starting from $0$.
+Before we move on to the other half of the theorem, we talk a bit more about \term{self-avoiding paths}.
+\begin{defi}[$\sigma_n$]\index{$\sigma_n$}
+  We write $\sigma_n$ for the number of self-avoiding paths of length $n$ starting from $0$.
+\end{defi}
+In the proof, we used the rather crude bound
+\[
+  \sigma_n \leq 2d \cdot (2d - 1)^{n - 1}.
+\]
+More generally, we can make the following bound:
 
 \begin{lemma}
-  We have $\sigma_{n + m} \leq \sigma_n \sigma_m$
+  We have $\sigma_{n + m} \leq \sigma_n \sigma_m$.
 \end{lemma}
 
 \begin{proof}
   A self-avoiding path of length $n + m$ can be written as a concatenation of self-avoiding paths of length $n$ starting from $0$ and another one of length $m$.
 \end{proof}
-Taking the logarithm, we know that $\log \sigma_n$ is a \term{subadditive sequence}.
+Taking the logarithm, we know that $\log \sigma_n$ is a \term{subadditive sequence}. It turns out this property alone is already quite useful. It is an exercise in analysis to prove the following lemma:
 
-A rather convenient lemma is
 \begin{lemma}[Fekete's lemma]\index{Fekete's lemma}
   If $(a_n)$ is a subadditive sequence of real numbers, then
   \[
@@ -211,21 +240,40 @@ A rather convenient lemma is
   In particular, the limit exists.
 \end{lemma}
 
-\begin{cor}
-  The limit $\lambda = \lim_{n \to \infty} \frac{\log \sigma_n}{n}$ exists.
-\end{cor}
+This allows us to define
+\begin{defi}[$\lambda$ and $\kappa$]\index{$\lambda$}\index{$\kappa$}
+  We define
+  \[
+    \lambda = \lim_{n \to \infty} \frac{\log \sigma_n}{n},\quad \kappa = e^\lambda
+  \]
+  $\kappa$ is known as the \term{connective constant}.
+\end{defi}
+
 Thus, we have
 \[
-  \sigma_n= e^{n \lambda (1 + o(1))}
+  \sigma_n= e^{n \lambda (1 + o(1))} = \kappa^{n + o(n)}.
 \]
-as $n \to \infty$. The quantity \index{$\kappa$}$\kappa = e^\lambda$ is the \term{connective constant}. We don't know the value of $\kappa$ for the Euclidean lattice, and the value for the hexagonal lattice has only been found recently:
-\begin{thm}[Duminil-Copin, Smirnov] % insert year
+as $n \to \infty$.
+
+Thus, asymptotically, the growth rate of $\sigma_n$ is determined by $\kappa$. It is natural to then seek for the value of $\kappa$, but unfortunately we don't know the value of $\kappa$ for the Euclidean lattice. A bit more on the positive side, the value for the hexagonal lattice has been found recently:
+\begin{thm}[Duminil-Copin, Smirnov, 2010]
   The hexagonal lattice has
   \[
     \kappa_{\mathrm{hex}} = \sqrt{2 + \sqrt{2}}.
   \]
 \end{thm}
-We can try to say more precisely about how $\sigma_n$ grows.
+
+We might want to be a bit more precise about how $\sigma_n$ grows. For $d \geq 5$, we have the following theorem:
+\begin{thm}[Hara and Slade, 1991]
+  For $d \geq 5$, there exists a constant $A$ such that
+  \[
+    \sigma_n = A \kappa^n (1 + O(n^{-\varepsilon}))
+  \]
+  for any $\varepsilon < \frac{1}{2}$.
+\end{thm}
+
+We don't really know what happens when $d < 5$, but we have the following conjecture:
+
 \begin{conjecture}
   \[
     \sigma_n \approx
@@ -237,16 +285,8 @@ We can try to say more precisely about how $\sigma_n$ grows.
   \]
 \end{conjecture}
 
-For larger $d$, we have an actual theorem
-\begin{thm}[Hara and Slade] % check and year
-  For $d \geq 5$, we have
-  \[
-    \sigma_n \approx \kappa^n
-  \]
-\end{thm}
-
-We also have a theorem
-\begin{thm}[Hammersley and Welsh]
+One can also instead try to bound $\sigma_n$ from above. We have the following classic theorem:
+\begin{thm}[Hammersley and Welsh, 1962]
   For all $d \geq 2$, we have
   \[
     \sigma_n \leq C \kappa^n \exp(c' \sqrt{n})
@@ -255,21 +295,19 @@ We also have a theorem
 \end{thm}
 
 In fact, a better bound was recently found:
-\begin{thm}[Hutchcroft]
+\begin{thm}[Hutchcroft, 2017]
   For $d \geq 2$, we have
   \[
      \sigma_n \leq C \kappa^n \exp(o(\sqrt{n})).
   \]
 \end{thm}
-This will be proved in the example sheet. % check
+This will be proved in the example sheet.
 
-Fixing an $n$, there are only finitely many self-avoiding walks of length $n$. So we can sample such a self-avoiding walk uniformly at random. We would like to study the scaling limit, namely what happens when we increase $n$ while simultaneously shrinking space by a factor of $\frac{1}{\sqrt{n}}$. We would expect the result to tend towards some Brownian-motion-like thing, but we want a more precise description.
+What would be a good way to understand self-avoiding walks? Fixing an $n$, there are only finitely many self-avoiding walks of length $n$. So we can sample such a self-avoiding walk uniformly at random. In general, we would expect the total displacement of the walk to be $\sim \sqrt{n}$. Thus, what we can try to do is to take $n \to \infty$ while simultaneously shrinking space by a factor of $\frac{1}{\sqrt{n}}$. We would then hope that the result converges toward some Brownian motion-like trajectory. If we can characterize the precise behaviour of this \term{scaling limit}, then we might be able to say something concrete about $\kappa$ and the asymptotic behaviour of $\sigma_n$.
 
-It is conjectured that for $d = 2$, the scaling limit is given by $SLE(\frac{8}{3})$.
+But we don't really know what the scaling limit is. In the case $d = 2$, it is conjectured to be $SLE(\frac{8}{3})$. Curiously, it was proven by Gwynne and Miller in 2016 that if we instead looked at self-avoiding walks on a \emph{random surface}, then the scaling limit is $SLE(\frac{8}{3})$.
 
-On the other hand, this was proved for self-avoiding walks on a random surface by Gwynne--Miller. % check
-
-Now let's return to our problem of understanding $p_c(d)$. We have yet to show that it is $ < 1$. To do so, we introduce the notion of a dual lattice.
+That's enough of a digression. Let's finish our proof and show that $p_c(d) < 1$. A first observation is that it suffices to show this for $d = 2$. Indeed, since $\Z^d$ embeds into $\Z^{d + 1}$ for all $d$, if we can find an infinite cluster in $\Z^d$, then the same is true for $\Z^{d + 1}$. Thus, it is natural to restrict to the case of $d = 2$, where \emph{duality} will be prove to be an extremely useful tool.
 
 \begin{defi}[Planar graph]\index{planar graph}\index{graph!planar}
   A graph $G$ is called planar if it can be embedded on the plane in such a way that no two edges cross.
@@ -281,6 +319,26 @@ Now let's return to our problem of understanding $p_c(d)$. We have yet to show t
 
 \begin{eg}
   The dual of $\Z^2$ is isomorphic to $\Z^2$ % insert picture
+  \begin{center}
+    \begin{tikzpicture}[scale=0.5]
+      \draw (0, 0) grid (5, 5);
+      \begin{scope}[shift={(0.5, 0.5)}]
+        \clip (-0.5, -0.5) rectangle (4.5, 4.5);
+        \draw [mblue, opacity=0.5, step=1] (-1, -1) grid (5, 5);
+      \end{scope}
+      \foreach \x in {0.5, 1.5, 2.5, 3.5, 4.5} {
+        \foreach \y in {0.5, 1.5, 2.5, 3.5, 4.5} {
+          \node [mblue, opacity=0.5, circ] at (\x, \y) {};
+        }
+      }
+      \foreach \x in {0, 1, 2, 3, 4, 5} {
+        \foreach \y in {0, 1, 2, 3, 4, 5} {
+          \node [circ] at (\x, \y) {};
+        }
+      }
+
+    \end{tikzpicture}
+  \end{center}
 \end{eg}
 The dual lattice will help us prove a lot of properties for percolation in $\Z^2$.
 
@@ -289,34 +347,26 @@ The dual lattice will help us prove a lot of properties for percolation in $\Z^2
 \end{lemma}
 
 \begin{proof}
-  It suffices to show this for $d = 2$, since $\Z^d$ embeds in $\Z^{d + 1}$ for all $d$, and if there is an infinite cluster in $Z^d$, the same is true for $\Z^{d + 1}$
+  It suffices to show this for $d = 2$. Suppose we perform percolation on $\Z^2$. Then this induces a percolation on the dual lattice by declaring an edge of the dual is open if it crosses an open edge of $\Z^2$, and closed otherwise.
 
-  In order to show that $p_c(2) < 1$, we need to find $\varepsilon, \delta > 0$ such that $\P_p(|\mathcal{C}(0)| < \infty) < 1 - \varepsilon$ for $p < 1 - \delta$.
-
-  Consider the dual of $\Z^2$, and perform bond percolation. We declare an edge of the dual open if it crosses an open edge of $\Z^2$, and closed otherwise.
-
-  Suppose $|\mathcal{C}(0)| < \infty$. This means we can find a closed circuit in the dual lattice, namely the ``boundary'' of $\mathcal{C}(0)$.
-
-  We let $D_n$ be the number of closed dual circuits of length $n$ that surround $0$. So
+  Suppose $|\mathcal{C}(0)| < \infty$ in the primal lattice. Then there is a closed circuit in the dual lattice, given by the ``boundary'' of $\mathcal{C}(0)$. Let $D_n$ be the number of closed dual circuits of length $n$ that surround $0$. Then the union bound plus Markov's inequality tells us
   \[
     \P_p(|\mathcal{C}(0)| < \infty) = \P_p(\exists n \geq D_n \geq 1) \leq \sum_{n = 4}^\infty \E_p[D_n],
   \]
   using the union bound and Markov's inequality.
 
-  By simple counting, we find that
+  It is a simple exercise to show that
   \begin{ex}
     Show that the number of dual circuits of length $n$ that contain $0$ is at most $n \cdot 4^n$.
   \end{ex}
-  It then follows that
+  From this, it follows that
   \[
     \P_p(|\mathcal{C}(0)| < \infty) \leq \sum_{n = 4}^\infty n \cdot 4^n (1 - p)^n.
   \]
-  So we find that if $1 - p < \delta$ for a suitable $\delta$, then $\P_p(|\mathcal{C}(0)| < \infty) < 1 - \varepsilon$.
+  Thus, if $p$ is sufficiently near $1$, then $\P_p(|\mathcal{C}(0)| < \infty)$ is bounded away from $1$.
 \end{proof}
 
-Now we know that if $p > p_c(d)$, then $\theta(p) > 0$; if $p < p_c(d)$, then $\theta(p) = 0$.
-
-In the first case, it is of course not necessarily the case that with probability $1$, $0$ is connected to $\infty$. However, it turns out it is true that there will almost surely be an infinite cluster, and there is a unique one.
+By definition, if $p < p_c(d)$, then $0$ is almost surely not contained in an infinite cluster. If $p > p_c(d)$, then there is a positive probability that $0$ is contained in an infinite cluster. However, it is of course not necessarily the case that $0$ is connected to $\infty$ with probability $1$. In fact, there is at least $(1 - p)^{2d}$ probability that $0$ is not connected to $\infty$, since $0$ cannot be connected to $\infty$ if all its neighbouring edges are closed. However, it is still possible that there is some infinite cluster somewhere. It's just that it does not contain $0$.
 
 \begin{prop}
   Let $A_\infty$ be the event that there is an infinite cluster.
@@ -332,107 +382,137 @@ In the first case, it is of course not necessarily the case that with probabilit
       \[
         \P_p(A_\infty) = \P_p(\exists x: |\mathcal{C}(x)| = \infty) \leq \sum_{x \in \Z^d} \P_p(|\mathcal{C}(x)| = \infty) = \sum \theta(p) = 0.
       \]
-    \item We need to apply the Kolmogorov 0-1 law. Recall that if $X_1, X_2, \ldots$ are independent random variables, and $\mathcal{F}_n = \sigma(X_k: k \geq n)$, $\mathcal{F}_\infty = \bigcap_{n \geq 0} \mathcal{F}_n$. Then $\mathcal{F}_\infty$ is trivial, i.e.\ for all $A \in \mathcal{F}_\infty$, $\P(A) \in \{0, 1\}$.
+    \item We need to apply the \term{Kolmogorov 0-1 law}. Recall that if $X_1, X_2, \ldots$ are independent random variables, and $\mathcal{F}_n = \sigma(X_k: k \geq n)$, $\mathcal{F}_\infty = \bigcap_{n \geq 0} \mathcal{F}_n$, Then $\mathcal{F}_\infty$ is trivial, i.e.\ for all $A \in \mathcal{F}_\infty$, $\P(A) \in \{0, 1\}$.
 
-      So we order the edges of $\Z^d$ as $e_1, e_2, \ldots$ and denote their states $w(e_1), w(e_2), \ldots$. These are iid random varaibles. We certainly have $\P_p(A_\infty) \geq \theta(p) > 0$. So if we can show that $A_\infty \in \mathcal{F}_\infty$, then we are done. But this is clear, since changing the states of a finite number of edges does not affect the occurrence of $A_\infty$.
+      So we order the edges of $\Z^d$ as $e_1, e_2, \ldots$ and denote their states
+      \[
+        w(e_1), w(e_2), \ldots.
+      \]
+      These are iid random variables. We certainly have $\P_p(A_\infty) \geq \theta(p) > 0$. So if we can show that $A_\infty \in \mathcal{F}_\infty$, then we are done. But this is clear, since changing the states of a finite number of edges does not affect the occurrence of $A_\infty$.
   \end{enumerate}
 \end{proof}
 
-We can make a stronger statement:
-\begin{thm}[Burton and Keane] % check
+The next follow up questions is how many infinite clusters do we expect to get?
+\begin{thm}[Burton and Keane]
   If $p > p_c$, then there exists a unique infinite cluster with probability $1$.
 \end{thm}
+This proof is considerably harder than the ones we have previously done. We might think we can use the Kolmogorov 0-1 law, but we can't, since changing a finite number of edges can break up or join together infinite clusters, so the event that there are $k$ infinite clusters for $k > 0$ is not in $\mathcal{F}_\infty$. However, we can exploit the fact that $N$ is translation invariant.
+
+\begin{ex}
+  Let $A$ be an event that is translation invariant. Then $\P_p(A) = 0$ or $1$ almost surely. % prove this
+\end{ex}
 
 \begin{proof}
-  Let $N$ be the number of infinite clusters. We need to show that $\P_p(N = 1) = 1$. Now note that $\{N = k\}$ is not in $\mathcal{F}_\infty$ when $k \not= 0, \infty$, since changing a finite number of edges can break up or join together infinite clusters. So the Kolmogorov 0-1 law does not apply.
+  Let $N$ be the number of infinite clusters. Then by the lemma, we know $N$ is constant almost surely. So there is some $k \in \N \cup \{\infty\}$ such that $\P_p(N = k) = 1$. First of all, we know that $k \not= 0$, since $\theta(p) > 0$. We shall first exclude $2 \leq k < \infty$, and then exclude $k = \infty$.
 
-  However, we do note that $N$ is translation invariant. It is an exercise to show that if $N$ is translation invariant, then $N$ is constant with probability $1$.
+  Assume that $k < \infty$. We will show that $\P_p(n = 1) > 0$, and hence it must be the case that $\P_p(n = 1) = 1$.
 
-  Thus, we know that there is some $k \in \{0, 1, \ldots\} \cup \{\infty\}$ such that $\P_p(N = k) = 1$.
-
-  First of all, we know that $k \not= 0$, since $\theta(p) > 0$. We will exclude $k \geq 2$ and $k = \infty$.
-
-  We first show that we cannot have $2 \leq k < \infty$. Assume that $k < \infty$. We have to show that $k = 1$. We let $B(n) = [-n, n]^d \cap \Z^d$, and let $\partial B(n)$ be its boundary. We know that
+  To bound this probability, we let $B(n) = [-n, n]^d \cap \Z^d$\index{$B(n)$} (which we will sometimes write as \term{$B_n$}), and let $\partial B(n)$ be its boundary. We know that
   \[
-    \P_p(N = k, \text{all $k$ clusters intersect $\partial B(n)$}) \to 1
+    \P_p(\text{all infinite clusters intersect $\partial B(n)$}) \to 1
   \]
-  as $n \to \infty$.
+  as $n \to \infty$. This is since with probability $1$, there are only finitely many clusters by assumption, and for each of these configurations, all infinite clusters intersect $\partial B(n)$ for sufficiently large $n$.
 
-  Take an $n$ sufficiently large, such that
+  In particular, we can take $n$ large enough such that
   \[
     \P_p(\text{all infinite clusters intersect }\partial B(n)) \geq \frac{1}{2}.
   \]
-  We then have
-  \[
-    \P_p(N = 1) \geq \P_p(\text{all infinite clusters intersect }\partial B(n)\text{ and all edges in $B(n)$ are open})
-  \]
-  Finally, note that the two events in there are independent, since they involve different edges.
-
-  But the probability that all edges in $B(n)$ are open is just $p^{E(B(n))}$. So
+  We can then bound
+  \begin{multline*}
+    \P_p(N = 1) \geq \P_p(\text{all infinite clusters intersect }\partial B(n)\\
+    \text{ and all edges in $B(n)$ are open}).
+  \end{multline*}
+  Finally, note that the two events in there are independent, since they involve different edges. But the probability that all edges in $B(n)$ are open is just $p^{E(B(n))}$. So
   \[
     \P_p(N = 1) \geq \frac{1}{2} p^{E(B(n))} > 0.
   \]
-  So we are done, since $N$ is a constant.
+  So we are done.
 
-  What remains to be shown is that $k$ has to be finite. Suppose $k$ were infinite, i.e.\ $\P_p(N = \infty) = 1$. The idea of the proof is define what it means for a vertex to be a \emph{trifurcation}. We then prove that $\P_p(0\text{ is a trifurcation}) \geq c > 0$. We next show that the number of trifurcations inside $B(n)$ is $\leq |\partial B(n)|$. These two are contradictory, since the first tells us the expected number of trifurctaions is $O(n^d)$, but the latter shows us it is bounded by $O(n^{d - 1})$.
+  We now have to show that $k \not= \infty$. This involves the notion of a trifurcation. The idea is that we will show that if $k = \infty$, then the probability that a vertex is a trifurcation is positive. This implies the expected number of trifurcations is $\sim n^d$. We will then show deterministically that the number of trifurcations inside $B(n)$ must be $\leq |\partial B(n)|$, and so there are $O(n^{d - 1})$ trifurcations, which is a contradiction.
 
   We say a vertex $x$ is a \term{trifurcation} if the following three conditions hold:
   \begin{enumerate}
     \item $x$ is in an infinite open cluster $\mathcal{C}_\infty$;
-    \item there exist exactly three open edges adjacent to $x$;
-    \item $\mathcal{C} \infty \setminus \{x\}$ contains exactly three infinite clusters and no finite ones.
+    \item There exist exactly three open edges adjacent to $x$;
+    \item $\mathcal{C}_\infty \setminus \{x\}$ contains exactly three infinite clusters and no finite ones.
   \end{enumerate}
-  This is clearly a translation invariant notion. So $\P_p(0 \text{ is a trifurcation}) = \P_p(x \text{ is a trifurcation})$ for all $x \in \Z^d$.
+  This is clearly a translation invariant notion. So
+  \[
+    \P_p(0 \text{ is a trifurcation}) = \P_p(x \text{ is a trifurcation})
+  \]
+  for all $x \in \Z^d$.
 
   \begin{claim}
-    $\P_p(0\text{ is a trifurcation})\geq c > 0$.
+    $\P_p(0\text{ is a trifurcation}) > 0$.
   \end{claim}
-   We let $S(n) = \{x \in \Z^d: \|x\|_1 \leq n\}$. This looks like a diamond. A crucial property of this is that for any $x_1, x_2, x_3 \in \partial S(n)$, there exist three disjoint self-avoiding paths joining $x_i$ to $0$ (exercise!). For each triple $x_1, x_2, x_3$, we fix a set of three such paths, and define
-   \[
-     J(x_1, x_2, x_3) = \{\text{all edges on these 3 paths are open and everything else inside $S(n)$ is closed}\}.
-   \]
-   Then
-   \[
-     \P_p(0 \text{ is a trifurcation}) \geq \P_p(\exists \mathcal{C}_\infty^1, \mathcal{C}_\infty^2, \mathcal{C}_\infty^3 \subseteq \Z^d \setminus S(n) \text{ infinite clusters which intersect $\partial S(n)$ at $x_1, x_2, x_3$, and $J(x_1, x_2, x_3)$} % can have multiple intersections; pick one randomly
-   \]
-   We can then write this as $\P_p(J(x_1, x_2, x_3) \mid\exists \mathcal{C}_\infty^1, \mathcal{C}_\infty^2, \mathcal{C}_\infty^3 \subseteq \Z\text{ intersecting }\partial S(n)) \times \P_p(\exists \mathcal{C}_\infty^1, \mathcal{C}_\infty^2, \mathcal{C}_\infty^3 \subseteq \Z^d \setminus \partial S(n))$. We can bound the first term by
-   \[
-     \min(p, 1 - p)^{E(S(n))}.
-   \]
-   To bound the second probability, we have already assumed that $\P_p(N = \infty) = 1$. So $\P_p(\exists \mathcal{C}_\infty^1, \mathcal{C}_\infty^2, \mathcal{C}_\infty^3 \subseteq \Z^d \setminus S(n)\text{ intersecting }\partial S(n)) \to 1$ as $n \to \infty$. We can then take $n$ large enough such that $\P_p( \cdots ) \geq \frac{1}{2}$. So we have shown that $\P_p(0\text{ is a trifurcation}) \geq c > 0$.
+  We need to use something slightly different from $B(n)$. We define $S(n) = \{x \in \Z^d: \|x\|_1 \leq n\}$.
+  \begin{center}
+    \begin{tikzpicture}[scale=0.5]
+      \draw [mblue, fill opacity=0.2, fill=mblue] (-3, 0) -- (0, 3) -- (3, 0) -- (0, -3) -- cycle;
+      \foreach \x in {-4,..., 4} {
+        \foreach \y in {-4,..., 4} {
+          \node [circ, opacity=0.3] at (\x, \y) {};
+        }
+      }
+      \foreach \x in {-3,..., 3} {
+        \pgfmathsetmacro\n{3-abs(\x)};
+        \foreach \y in {-\n, ..., \n} {
+          \node [circ] at (\x, \y) {};
+        }
+      }
+    \end{tikzpicture}
+  \end{center}
+  The crucial property of this is that for any $x_1, x_2, x_3 \in \partial S(n)$, there exist three disjoint self-avoiding paths joining $x_i$ to $0$ (exercise!). For each triple $x_1, x_2, x_3$, we arbitrarily pick a set of three such paths, and define the event
+  \begin{multline*}
+    J(x_1, x_2, x_3) = \{\text{all edges on these 3 paths are open}\\\text{ and everything else inside $S(n)$ is closed}\}.
+  \end{multline*}
+  Next, for every possible infinite cluster in $\Z^d \setminus S(n)$ that intersects $\partial S(n)$ at at least one point, we pick a designated point of intersection arbitrarily.
 
-   From this, it follows that
-   \[
-     \E_p[\text{number of trifurcations inside $B(n)$})] \geq c |B(n)| \sim n^d.
-   \]
-   So if we can show that the number of trifuractions in $B(n) \leq |\partial B(n)|$, then we arrive at a contradiction, since $|\partial B(n) \sim n^{d - 1}$.
+  Then we can bound
+  \begin{multline*}
+    \P_p(0 \text{ is a trifurcation}) \geq \P_p(\exists \mathcal{C}_\infty^1, \mathcal{C}_\infty^2, \mathcal{C}_\infty^3 \subseteq \Z^d \setminus S(n)\\ \text{ infinite clusters which intersect $\partial S(n)$ at $x_1, x_2, x_3$, and $J(x_1, x_2, x_3)$}).
+  \end{multline*}
+  Rewrite the right-hand probability as
+  \begin{multline*}
+    \P_p(J(x_1, x_2, x_3) \mid\exists \mathcal{C}_\infty^1, \mathcal{C}_\infty^2, \mathcal{C}_\infty^3 \subseteq \Z\text{ intersecting }\partial S(n))\\
+    \times \P_p(\exists \mathcal{C}_\infty^1, \mathcal{C}_\infty^2, \mathcal{C}_\infty^3 \subseteq \Z^d \setminus \partial S(n))
+  \end{multline*}
+  We can bound the first term by
+  \[
+    \min(p, 1 - p)^{E(S(n))}.
+  \]
+  To bound the second probability, we have already assumed that $\P_p(N = \infty) = 1$. So $\P_p(\exists \mathcal{C}_\infty^1, \mathcal{C}_\infty^2, \mathcal{C}_\infty^3 \subseteq \Z^d \setminus S(n)\text{ intersecting }\partial S(n)) \to 1$ as $n \to \infty$. We can then take $n$ large enough such that the probability is $\geq \frac{1}{2}$. So we have shown that $c \equiv \P_p(0\text{ is a trifurcation}) > 0$.
 
-   Indeed, suppose $x_1$ is a trifurcation in $B(n)$. By definition, there exists $3$ open paths to $\partial B(n)$. Let $x_2$ be another trifurcation. Then its paths to the boundary could intersect those of $x_1$, but cannot create a cycle, by definition of a trifurcation.
+  Using the linearity of expectation, it follows that
+  \[
+    \E_p[\text{number of trifurcations inside $B(n)$})] \geq c |B(n)| \sim n^d.
+  \]
+  On the other hand, we can bound the number of trifurcations in $B(n)$ by $|\partial B(n)|$. To see this, suppose $x_1$ is a trifurcation in $B(n)$. By definition, there exists $3$ open paths to $\partial B(n)$. Fix three such paths. Let $x_2$ be another trifurcation. It also has $3$ open paths to the $\partial B(n)$, and its paths to the boundary could intersect those of $x_1$. However, they cannot create a cycle, by definition of a trifurcation. For simplicity, we add the rule that when we produce the paths for $x_2$, once we intersect the path of $x_1$, we continue following the path of $x_1$.
 
-   For simplicity, we add the rule that when we produce the paths for $x_2$, once we intersect the path of $x_1$, we continue following the path of $x_1$.
-
-   Exploring all trifurcations this way, we obtain a forest inside $B(n)$, and the boundary points will be the leaves of the forest. Now the trifurcations have degree $3$ in this forest. The rest is just combinatorics.
-   \begin{claim}
-     For any tree, the number of degree $3$ vertices is always less than the number of leaves. % prove this
-   \end{claim}
+  Exploring all trifurcations this way, we obtain a forest inside $B(n)$, and the boundary points will be the leaves of the forest. Now the trifurcations have degree $3$ in this forest. The rest is just combinatorics.
+  \begin{ex}
+    For any tree, the number of degree $3$ vertices is always less than the number of leaves.\qedhere % prove this
+  \end{ex}
 \end{proof}
 
 \subsection{Correlation inequalities}
-Suppose again we perform bond percolation. We want to know the probabilities
+In this section, we are going to prove some useful inequalities and equalities, and use them to prove some interesting results about $\theta(p)$ and the decay of $\P_p(0 \leftrightarrow \partial B_n)$.
+
+To motivate our first inequality, suppose we have $4$ points $x, y, u, v$, and we want to ask for the conditional probability
 \[
   \P_p(x \leftrightarrow y \mid u \leftrightarrow v).
 \]
-Intuitively, we expect this to be greater than $\P_p(x \leftrightarrow y)$, since $u \leftrightarrow v$ tells us there are some open edges around, which is helpful. The proof of this will follow from the FKG inequality.
+Intuitively, we expect this to be greater than $\P_p(x \leftrightarrow y)$, since $u \leftrightarrow v$ tells us there are some open edges around, which is potentially helpful. The key property underlying this intuition is that having more edges is beneficial to both of the events. To quantify this, we need the notion of an increasing random variable.
 
-Again, let $G = (V, E)$ be a graph, let $\Omega = \{0, 1\}^E$, $\mathcal{F}$ the product $\sigma$-algebra, and $\P_p$ the product measure.
+Again, let $G = (V, E)$ be a graph and $\Omega = \{0, 1\}^E$. We shall assume that $E$ is countable.
 
-\begin{defi}[$\leq$]\index{$\leq$}
+\begin{notation}[$\leq$]\index{$\leq$}
   Given $\omega, \omega' \in \Omega$, we write $\omega \leq \omega'$ if $\omega(e) \leq \omega'(e)$ for all $e \in E$.
-\end{defi}
+\end{notation}
 This defines a partial order on $\Omega$.
 
 \begin{defi}[Increasing random variable]\index{increasing random variable}\index{random variable!increasing}\index{decreasing random variable}\index{random variable!decreasing}
-  A random variable $X$ is increasing if $X(\omega) \leq X(\omega')$ whenever $\omega \leq \omega'$, and is decreasing if $-X$ is increasing
+  A random variable $X$ is increasing if $X(\omega) \leq X(\omega')$ whenever $\omega \leq \omega'$, and is decreasing if $-X$ is increasing.
 \end{defi}
 
 \begin{defi}[Increasing event]\index{increasing event}\index{event!increasing}\index{event!decreasing}\index{decreasing event}
@@ -443,6 +523,7 @@ This defines a partial order on $\Omega$.
   $\{|\mathcal{C}(0)|= \infty\}$ is an increasing event.
 \end{eg}
 
+An immediate consequence of the definition is that
 \begin{thm}
   If $N$ is an increasing random variable and $p_1 \leq p_2$, then
   \[
@@ -458,8 +539,9 @@ This defines a partial order on $\Omega$.
   Immediate from coupling.
 \end{proof}
 
-\begin{thm}[FKG inequality]\index{FKG inequality} % insert name
-  let $X$ and $Y$ be increasing random variables with $\E_p[X^2], \E_p[Y^2] < \infty$. Then
+What we want to prove is the following result, which will be extremely useful.
+\begin{thm}[Fortuin--Kasteleyn--Ginibre (FKG) inequality]\index{FKG inequality}
+  Let $X$ and $Y$ be increasing random variables with $\E_p[X^2], \E_p[Y^2] < \infty$. Then
   \[
     \E_p[XY] \geq \E_p[X] \E_p[Y].
   \]
@@ -472,35 +554,39 @@ This defines a partial order on $\Omega$.
     \P_p(A \mid B) \geq \P_p(A).
   \]
 \end{thm}
-This in fact holds on a greater generality than the product measure.
 
-We will actually use the FKG inequality quite a lot.
 \begin{proof}
-  We assume first that $X$ and $Y$ depend on the state of a finite number of edges. We induct on the number of edges on this number. If $X$ and $Y$ depend on $\omega(e_1)$ only. Then for any $\omega_1, \omega_2 \in \{0, 1\}$, we claim that
+  The plan is to first prove this in the case where $X$ and $Y$ depend on a finite number of edges, and we do this by induction. Afterwards, the desired result can be obtained by an application of the martingale convergence theorem. In fact, the ``real work'' happens when we prove it for $X$ and $Y$ depending on a single edge. Everything else follows from messing around with conditional probabilities.
+
+  If $X$ and $Y$ depend only on a single edge $e_1$, then for any $\omega_1, \omega_2 \in \{0, 1\}$, we claim that
   \[
     (X(\omega_1) - X(\omega_2))(Y(\omega_1) - Y(\omega_2)) \geq 0.
   \]
   Indeed, $X$ and $Y$ are both increasing. So if $\omega_1 > \omega_2$, then both terms are positive; if $\omega < \omega_2$, then both terms are negative, and there is nothing to do if they are equal.
 
-  We then have
+  In particular, we have
   \[
-    \sum_{\omega_1, \omega_2 \in \{0, 1\}} (X(\omega_1) - X(\omega_2)) (Y(\omega_1) - Y(\omega_2)) \P_p( \omega(e_1) = \omega_1) \P_p(\omega(e_1) = \omega_2) \geq 1.
+    \sum_{\omega_1, \omega_2 \in \{0, 1\}} (X(\omega_1) - X(\omega_2)) (Y(\omega_1) - Y(\omega_2)) \P_p( \omega(e_1) = \omega_1) \P_p(\omega(e_1) = \omega_2) \geq 0.
   \]
-  Expanding this, we find that the LHS is $\E_p[XY] - \E_p[X] \E_p[Y]$, and we are done.
+  Expanding this, we find that the LHS is $2(\E_p[XY] - \E_p[X] \E_p[Y])$, and so we are done.
 
-  Now suppose the claim holds for $X$ and $Y$ that depend on $n < k$ edges. We shall prove the result when they depend on $k$ edges $\omega(e_1), \ldots, \omega(e_k)$. We have
+  Now suppose the claim holds for $X$ and $Y$ that depend on $n < k$ edges. We shall prove the result when they depend on $k$ edges $e_1, \ldots, e_k$. We have
   \[
     \E_p[XY] = \E_p[\E_p[XY \mid \omega(e_1), \ldots, \omega(e_{k - 1})]].
   \]
   Now after conditioning on $\omega(e_1), \ldots, \omega(e_{k - 1})$, the random variables $X$ and $Y$ become increasing random variables of $\omega(e_k)$. Applying the first step, we get
-  \[
-    \E_p[X Y \mid \omega(1_, \ldots, \omega(e_{k - 1})] \geq \E_p[X \mid \omega(e_1), \ldots, \omega(e_{k - 1})] \E_p[Y \mid \omega(e_1), \ldots, \omega(e_{k - 1})].
-  \]
-  But $\E_p[X \mid \omega(e_1), \ldots, \omega(e_{k - 1})]$ is a random variable depending on the edges $e_1, \ldots, e_{k - 1}$, and moreover it is increasing. So applying the induction hypothesis, we obtain
-  \[
-    \E_p[\E_p[X \mid \omega(e_1), \ldots, \omega(e_{k - 1})] \E_p[Y \mid \omega(e_1), \ldots, \omega(e_{k - 1})]] \geq \E_p[\E_p[X \mid \omega(e_1), \ldots, \omega(e_{k - 1})]] \E_p[\E_p[Y \mid \omega(e_1), \ldots, \omega(e_{k - 1})]]
-  \]
-  Now suppose $X$ and $Y$ depend on the states of a countable set of edges $e_1, e_2, \ldots$. Let's define
+  \begin{multline*}
+    \E_p[X Y \mid \omega(e_1), \ldots, \omega(e_{k - 1})]\\
+    \geq \E_p[X \mid \omega(e_1), \ldots, \omega(e_{k - 1})] \E_p[Y \mid \omega(e_1), \ldots, \omega(e_{k - 1})].\tag{$*$}
+  \end{multline*}
+  But $\E_p[X \mid \omega(e_1), \ldots, \omega(e_{k - 1})]$ is a random variable depending on the edges $e_1, \ldots, e_{k - 1}$, and moreover it is increasing. So the induction hypothesis tells us
+  \begin{multline*}
+    \E_p\big[\E_p[X \mid \omega(e_1), \ldots, \omega(e_{k - 1})] \E_p[Y \mid \omega(e_1), \ldots, \omega(e_{k - 1})]\big] \\
+    \geq \E_p\big[\E_p[X \mid \omega(e_1), \ldots, \omega(e_{k - 1})]\big] \E_p\big[\E_p[Y \mid \omega(e_1), \ldots, \omega(e_{k - 1})]\big]
+  \end{multline*}
+  Combining this with (the expectation of) ($*$) then gives the desired result.
+
+  Finally, suppose $X$ and $Y$ depend on the states of a countable set of edges $e_1, e_2, \ldots$. Let's define
   \begin{align*}
     X_n &= \E_p [X \mid \omega(e_1), \ldots, \omega(e_n)]\\
     Y_n &= \E_p [Y \mid \omega(e_1), \ldots, \omega(e_n)]
@@ -515,33 +601,35 @@ We will actually use the FKG inequality quite a lot.
   \]
 \end{proof}
 
-\begin{eg}
-  Suppose we perform bond percolation on $\Z^d$. Let $x, y, z, w$ be $4$ vertices and $\{x \leftrightarrow y\}$ and $\{z \leftrightarrow w\}$ disjointly, i.e.\ there are $2$ disjoint paths of open edges, one joining $x$ to $y$ and the other one joining $z$ to $w$.
-\end{eg}
+What we want to consider next is the notion of disjoint occurrence. For example, we want to able to ask the probability that there exists two disjoint paths connecting a pair of points.
 
-We want to formulate this scenario generally:
+To formulate this disjointness, suppose we have an event $A$, and let $\omega \in A$. To ask whether this occurrence of $A$ depends only on some set $S \subseteq E$ of edges, we can look at the set
+\[
+  [\omega]_S = \{\omega' \in \Omega: \omega'(e) = \omega(e)\text{ for all }e \in S\}.
+\]
+If $[\omega]_S \subseteq A$, then we can rightfully say this occurrence of $A$ depends only on the edges in $S$. Note that this depends explicitly and importantly on $\omega$, i.e.\ the ``reason'' $A$ happened. For example, if $A = \{x \leftrightarrow y\}$, and $\omega \in A$, then we can take $S$ to be the set of all edges in a chosen path from $x$ to $y$ in the configuration of $\omega$. This choice will be different for different values of $\omega$.
+
+Using this, we can define what it means for two events to occur disjointly.
 \begin{defi}[Disjoint occurrence]\index{disjoint occurrence}
-  Let $F$ be a set and $\Omega = \{0, 1\}^F$. Let $S \subseteq F$. We define
-  \[
-    [\omega]_S = \{\omega' \in \Omega: \omega'(e) = \omega(e)\text{ for all }e \in S\}.
-  \]
-  If $A$ and $B$ are $w$ events, then
+  Let $F$ be a set and $\Omega = \{0, 1\}^F$. If $A$ and $B$ are events, then the event that $A$ and $B$ occurs \emph{disjointly} is
   \[
     A \circ B = \{\omega \in \Omega : \exists S \subseteq F\text{ s.t. } [\omega]_S \subseteq A \text{ and } [\omega]_{F\setminus S} \subseteq B\}.
   \]
 \end{defi}
 
 \begin{thm}[BK inequality]\index{BK inequality} % van den Berg and Kesten
-  Let $F$ be a finite set and $\Omega = \{0, 1\}^F$. Let $A$ and $B$ be $2$ increasing events. Then
+  Let $F$ be a finite set and $\Omega = \{0, 1\}^F$. Let $A$ and $B$ be increasing events. Then
   \[
     \P_p(A \circ B) \leq \P_p(A) \P_p(B).
   \]
 \end{thm}
+This says if $A$ and $B$ are both events that ``needs'' edges to occur, then requiring that they occur disjointly is more difficult than them occurring individually.
 
+The proof is completely magical. There exist saner proofs of the inequality, but they are rather longer.
 \begin{proof}[Proof (Bollob\'as and Leader)]
   We prove by induction on the size $n$ of the set $F$. For $n = 0$, it is trivial.
 
-  Suppose it holds for $n - 1$. We want to show it holds for $n$. For $D \subseteq \{0, 1\}^F$ and $i =0, 1$, set
+  Suppose it holds for $n - 1$. We want to show it holds for $n$. For $D \subseteq \{0, 1\}^F$ and $i = 0, 1$, set
   \[
     D_i = \{(\omega_1, \ldots, \omega_{n - 1}) : (\omega_1, \ldots, \omega_{n - 1}, i) \in D\}.
   \]
@@ -551,14 +639,14 @@ We want to formulate this scenario generally:
   \]
   Since $A$ and $B$ are increasing, $A_0 \subseteq A_1$ and $B_0 \subseteq B_1$, and $A_i$ and $B_i$ are also increasing events. So
   \begin{align*}
-    C_0 &\subseteq (A_0 \circ B_1) \cap  (A_1 \circ B_0)\\
+    C_0 &\subseteq (A_0 \circ B_1) \cap (A_1 \circ B_0)\\
     C_1 &\subseteq A_1 \circ B_1.
   \end{align*}
   By the induction hypothesis, we have
   \begin{align*}
     \P_p(C_0) &= \P_p(A_0 \circ B_0) \leq \P_p(A_0) \P_p(B_0)\\
     \P_p(C_1) &\leq \P_p(A_1 \circ B_1) \leq \P_p(A_1) \P_p(B_1)\\
-    \P_p(C_0) + \P_p(C_1) \leq \P_p((A_0 \circ B_1) \cap (A_1 \circ B_0)) + \P_p((A \circ B_1) \cup (A_1 \circ B_0))\\
+    \P_p(C_0) + \P_p(C_1) &\leq \P_p((A_0 \circ B_1) \cap (A_1 \circ B_0)) + \P_p((A \circ B_1) \cup (A_1 \circ B_0))\\
     &= \P_p(A_0 \circ B_1) + \P_p(A_1 \circ B_0)\\
     &\leq \P_p(A_0) \P_p(B_1) + \P_p(A_1) \P_p(B_0).
   \end{align*}
@@ -568,9 +656,9 @@ We want to formulate this scenario generally:
   \]
   By some black magic, we multipy the first inequality by $(1 - p)^2$, the second by $p^2$ and the third by $p(1 - p)$. This gives
   \[
-    p\P_p(C_1) + (1 - p)\P_p(C_0) \leq (p\P_p(A_1) + (!- p)\P_p(A_0))(p\P_p(B_1) + (1 - p) \P_p(B_0)).
+    p\P_p(C_1) + (1 - p)\P_p(C_0) \leq (p\P_p(A_1) + (1- p)\P_p(A_0))(p\P_p(B_1) + (1 - p) \P_p(B_0)).
   \]
-  So we are done.
+  Expand and we are done.
 \end{proof}
 
 It turns out the increasing hypothesis is not necessary:
@@ -579,26 +667,25 @@ It turns out the increasing hypothesis is not necessary:
 \end{thm}
 But the proof is much harder, and in all the case where we want to apply this, the variables are increasing.
 
-Recall we defined
+As an application of the BK inequality, we first prove a preliminary result about the decay of $\P_p(0 \leftrightarrow \partial B(n))$. To prove our result, we will need a stronger condition than $p < p_c$. Recall that we defined
 \[
   \theta(p) = \P_p( |\mathcal{C}(0)| = \infty).
 \]
-We also define
+We also define\index{$\chi(p)$}
 \[
   \chi(p) = \E_p[|\mathcal{C}(0)|].
 \]
-If $\chi(p)$ is finite, then of course $\theta(p) = 0$. However, the converse need not hold. So finiteness of $\chi(p)$ is a stronger condition than the vanishing of $\theta(p)$.
+If $\chi(p)$ is finite, then of course $\theta(p) = 0$. However, the converse need not hold.
 
-Recall that $B(n) = [-n, n]^d \cap \Z^d$. % consnstent notation
 \begin{thm}
   If $\chi(p) < \infty$, then there exists a positive constant $c$ such that for all $n \geq 1$,
   \[
     \P_p(0 \leftrightarrow \partial B(n)) \leq e^{-cn}.
   \]
 \end{thm}
-We will later prove it under the assumption of $p < p_c$. % application of BK inequality
+Later, we will show that in fact this holds under the assumption that $p < p_c$. However, that requires a bit more technology, which we will develop after this proof.
 
-The idea of the proof is that for there to be a path from, say, $0$ to $B(2n)$, the path must hit a point on $\partial B(n)$. So there is a path from $0$ to a point on $\partial B(n)$, and a path from that point to $\partial B(2n)$. Moreover, these two paths are disjoint, which allows us to apply the BK inequality.
+The idea of the proof is that if we want a path from, say, $0$ to $B(2n)$, then the path must hit a point on $\partial B(n)$. So there is a path from $0$ to a point on $\partial B(n)$, and a path from that point to $\partial B(2n)$. Moreover, these two paths are disjoint, which allows us to apply the BK inequality.
 \begin{proof}
   Let
   \[
@@ -606,42 +693,672 @@ The idea of the proof is that for there to be a path from, say, $0$ to $B(2n)$, 
   \]
   Now consider
   \[
-    \sum_{n = 0}^\infty \E[X_n] = \sum_n \sum_{x \in \partial B_n} \P_p(0 \leftrightarrow x) = \sum_{x \in \Z^d} \P_p(0 \leftrightarrow x) = \chi(p).
+    \sum_{n = 0}^\infty \E[X_n] = \sum_n \sum_{x \in \partial B(n)} \P_p(0 \leftrightarrow x) = \sum_{x \in \Z^d} \P_p(0 \leftrightarrow x) = \chi(p).
   \]
   Since $\chi(p)$ is finite, we in particular have $\E_p[X_n] \to 0$ as $n \to \infty$. Take $m$ large enough such that $\E_p[X_m] < \delta < 1$.
 
   Now we have
   \begin{align*}
-    \P_p( 0 \leftrightarrow \partial B_{m + k}) &= \P_p(\exists \in \partial B_m : 0 \leftrightarrow x \text{ and } x \to \partial B_{m + k}\text{ disjointly })\\
-    &\leq \sum_{x \in \partial B_m} \P_p(0 \leftrightarrow) \P_p(x \leftrightarrow \partial B_{m + k}) \tag{union bound + BK}\\
-    &\leq \sum_{x \in \partial B_m} \P_p(0 \leftrightarrow) \P_p(x \leftrightarrow \partial B_{k}) \tag{trans. inv.}\\
-    &\leq \P_p(0 \leftrightarrow B_k) \E_p[X_m].
+    \P_p( 0 \leftrightarrow \partial B(m + k)) &= \P_p(\exists x \in \partial B(m) : 0 \leftrightarrow x \text{ and } x \leftrightarrow \partial B(m + k)\text{ disjointly})\\
+    &\leq \sum_{x \in \partial B(m)} \P_p(0 \leftrightarrow x) \P_p(x \leftrightarrow \partial B(m + k)) \tag{union bound + BK}\\
+    &\leq \sum_{x \in \partial B(m)} \P_p(0 \leftrightarrow x) \P_p(0 \leftrightarrow \partial B(k)) \tag{trans. inv.}\\
+    &\leq \P_p(0 \leftrightarrow B(k)) \E_p[X_m].
   \end{align*}
-  So for any $n > m$, write $n = qm + r$, where $r \in [0, m - 1]$. Then interating the above result, we have
+  So for any $n > m$, write $n = qm + r$, where $r \in [0, m - 1]$. Then iterating the above result, we have
   \[
-    \P_p(0 \leftrightarrow \partial B_n) \leq \P_p(0 \leftrightarrow B_{mq}) \leq \delta^q \leq \delta^{-1 + \frac{n}{m}} \leq e^{-cn}.
+    \P_p(0 \leftrightarrow \partial B(n)) \leq \P_p(0 \leftrightarrow B(mq)) \leq \delta^q \leq \delta^{-1 + \frac{n}{m}} \leq e^{-cn}.
   \]
 \end{proof}
 
-We know that $\theta(p)$ is an increasing function of $p$. But at what rate does it increase? In other words, we want to look at $\frac{\d \theta}{\d p}$, if this even makes sense. For these, we need the notion of a pivotal edge. Suppose the cluster of $0$ looks as follows:
+To replace the condition with the weaker condition $p < p_c$, we need to understand how $\theta(p)$ changes with $p$. We know $\theta(p)$ is an increasing function in $p$. It would be great if it were differentiable, and even better if we could have an explicit formula for $\frac{\d \theta}{\d p}$.
 
-\begin{center}
-  \begin{tikzpicture}
-    \node [circ] at (0, 0) {};
-    \node [below] at (0, 0) {$0$};
-    \draw (-0.5, 0) circle [radius=0.5];
-    \draw (0, 0) -- (1, 0.3) node [pos=0.5, above] {$e$}; % some random paths spawning from this edge
-  \end{tikzpicture}
-\end{center}
-Here if we remove the single edge $e$, then we no longer have an infinite cluster.
+To do so, suppose we again do coupling, and increase $p$ by a really tiny bit. Then perhaps we would expect that exactly one of the edges switches from being closed to open. Thus, we want to know if the state of this edge is \emph{pivotal} to the event $|\mathcal{C}(0)| = \infty$, and this should determine the rate of change of $\theta$.
 
 \begin{defi}[Pivotal edge]\index{pivotal edge}
-  Let $A$ be an event and $w$ a percolation configuration. The edge $e$ is \emph{pivotal} for $(A, w)$ if $1(\omega \in A) \not= 1(\omega' \in A)$, where $\omega'(f) = \omega(f)$ for all $f \not= e$, and $\omega'(e) \not= \omega(e)$.
+  Let $A$ be an event and $\omega$ a percolation configuration. The edge $e$ is \emph{pivotal} for $(A, \omega)$ if
   \[
-    \{e \text{ is pivotal for $A$}\} = \{\omega: e\text{ is pivotal for $(A, \omega)$}
+    1(\omega \in A) \not= 1(\omega' \in A),
   \]
+  where $\omega'$ is defined by
+  \[
+    \omega'(f) = 
+    \begin{cases}
+      \omega(f) & f \not= e\\
+      1 - \omega(f) & f = e
+    \end{cases}.
+  \]
+  The event that $e$ is pivotal for $A$ is defined to be the set of all $\omega$ such that $e$ is pivotal for $(A, \omega)$.
 \end{defi}
-The occurrence of the event $A$ depends crucially on the edge $e$.
+Note that whether or not $e$ is pivotal for $(A, \omega)$ is independent of $\omega(e)$.
+
+\begin{thm}[Russo's formula]
+  Let $A$ be an increasing event that depends on the states of a finite number of edges. Then
+  \[
+    \frac{\d}{\d p} \P_p(A) = \E_p[N(A)],
+  \]
+  where $N(A)$ is the number of pivotal edges for $A$.
+\end{thm}
+
+\begin{proof}
+  Assume that $A$ depends the states of $m$ edges $e_1, \ldots, e_m$. The idea is to let each $e_i$ be open with probability $p_i$, whree the $\{p_i\}$ may be distinct. We then vary the $p_i$ one by one and see what happens.
+
+  Writing $\bar{p} = (p_1, \ldots, p_m)$, we define
+  \[
+    f(p_1, \ldots, p_m) = \P_{\bar{p}} (A),
+  \]
+  Now $f$ is the sum of the probability of all configurations of $\{e_1, \ldots, e-m\}$ for which $A$ happens, and is hence a finite sum of polynomials. So in particular, it is differentaible.
+
+  We now couple all percolation process. Let $(X(e): e \in \L^d)$ be iid $U[0, 1]$ random variables. For a vector $\bar{p} = (p(e): e \in \L^d)$, we write
+  \[
+    \eta_{\bar{p}}(e) = 1 (X(e) \leq p(e)).
+  \]
+  Then we have $\P_{\bar{p}}(A) = \P(\eta_{\bar{p}} \in A)$.
+
+  Fix an edge $f$ and let $\bar{p}' = (p'(e))$ be such that $p'(e) = p(e)$ for all $e \not= f$, and $p'(f) = p(f) + \delta$ for some $\delta > 0$. Then
+  \begin{align*}
+    \P_{\bar{p}'}(A) - \P_{\bar{p}}(A) &= \P(\eta_{\bar{p}'} \in A) - \P(\eta_{\bar{p}} \in A)\\
+    &= \P(\eta_{\bar{p}'} \in A, \eta_{\bar{p}} \in A) + \P(\eta_{\bar{p}'} \in A, \eta_{\bar{p}} \in A) - \P(\eta_{\bar{p}} \in A).
+  \end{align*}
+  But we know $A$ is increasing, so $\P(\eta_{\bar{p}'} \in A, \eta_{\bar{p}} \in A) = \P(\eta_{\bar{p}} \in A)$. So the first and last terms cancel, and we have
+  \[
+    \P_{\bar{p}'}(A) - \P_{\bar{p}}(A) = \P(\eta_{\bar{p}'} \in A, \eta_{\bar{p}} \not \in A).
+  \]
+  But we observe that we simply have
+  \[
+    \P (\eta_{\bar{p}'} \in A, \eta_{\bar{p}} \not \in A) = \delta \cdot \P_{\bar{p}} (f \text{ is pivotal for $A$}).
+  \]
+  Indeed, we by definition of pivotal edges, we have
+  \[
+    \P(\eta_{\bar{p}'} \in A, \eta_{\bar{p}} \not \in A) = \P_{\bar{p}}(f \text{ is pivotal for $A$, }p(f) < X(f) \leq p(f) + \delta).
+  \]
+  Since the event $\{f \text{ is pivotal for A}\}$ is independent of the state of the edge $f$, we obtain
+  \[
+    \P_{\bar{p}}(f\text{ is pivotal}, p(f) < X(f) \leq p(f) + \delta) = \P_{\bar{p}}(f\text{ is pivotal}) \cdot \delta.
+  \]
+  Therefore we have
+  \[
+    \frac{\partial}{\partial p(f)} \P_{\bar{p}}(A) = \lim_{\delta \to 0} \frac{\P_{\bar{p}'}(A) - \P_{\bar{p}}(A)}{\delta} = \P_{\bar{p}}(\text{$f$ is pivotal for $A$}).
+  \]
+  The desired result then follows from the chain rule:
+  \begin{align*}
+    \frac{\d}{\d p} \P_p(A) &= \left.\sum_{i = 1}^m \frac{\partial}{\partial p(e_i)} \P_{\bar{p}}(A)\right|_{\bar{p} = (p, \ldots, p)} \\
+    &= \sum_{i = 1}^m \P_p(\text{$e_i$ is pivotal for $A$})\\
+    &= \E_p[N(A)].
+  \end{align*}
+\end{proof}
+If $A$ depends on an infinite number of edges, then the best we can say is that
+\[
+  \liminf_{\delta \downarrow 0} \frac{\P_{p + \delta}(A) - \P_p(A)}{\delta} \geq \E_p[N(A))].
+\]
+To see this, again set $B(n) = [-n, n]^d \cap \Z^d$. Define $\bar{p}_n$ by
+\[
+  \bar{p}_n(e) =
+  \begin{cases}
+    p & e \not \in B(n)\\
+    p + \delta & e \in B(n)
+  \end{cases}.
+\]
+Then since $a$ is increasing, we know
+\[
+  \frac{\P_{p + \delta}(A) - \P_p(A)}{\delta} \geq \frac{\P_{\bar{p}_n} (A) - \P_p(A)}{\delta}.
+\]
+We can then apply the previous claim, take successive differences, and take $n \to \infty$.
+
+\begin{cor}
+  Let $A$ be an increasing event that depends on $m$ edges. Let $p \leq q \in [0, 1]$. Then $\P_q(A) \leq \P_p(A) \left(\frac{q}{p}\right)^m$.
+\end{cor}
+
+\begin{proof}
+  We know that $\{f\text{ is pivotal for A}\}$ is independent of the state of $f$, and so
+  \[
+    \P_p(\omega(f) = 1, f\text{ is pivotal for $A$}) = p\P_p(f\text{ is pivotal for $A$}).
+  \]
+  But since $A$ is increasing, if $\omega(f) = 1$ and $f$ is pivotal for $A$, then $A$ occurs. Conversely, if $f$ is pivotal and $A$ occurs, then $\omega(f) = 1$.
+
+  Thus, by Russo's formula, we have
+  \begin{align*}
+    \frac{\d}{\d p} \P_p(A) &= \E_p[N(A)] \\
+    &= \sum_e \P_p(e\text{ is pivotal for $A$})\\
+    &= \sum_e \frac{1}{p}\P_p(\omega(e) = 1,\text{$e$ is pivotal for $A$})\\
+    &= \sum_e \frac{1}{p}\P_p(\text{$e$ is pivotal} \mid A) \P_p(A)\\
+    &= \P_p(A) \frac{1}{p} \E_p[N(A) \mid A].
+  \end{align*}
+  So we have
+  \[
+    \frac{\frac{\d}{\d p} \P_p(A)}{\P_p(A)} = \frac{1}{p} \E_p[N(A) \mid A].
+  \]
+  Integrating, we find that
+  \[
+    \log \frac{\P_q(A)}{\P_p(A)} = \int_{p}^q \frac{1}{u} \E_u[N(A) \mid A]\;\d u.
+  \]
+  Bounding $\E_u [N(A) \mid A] \leq m$, we obtain the desired bound.
+\end{proof}
+
+With Russo's formula, we can now prove the desired theorem.
+\begin{thm}
+  Let $d \geq 2$ and $B_n = [-n, n]^d \cap \Z^d$.
+  \begin{enumerate}
+    \item If $p < p_c$, then there exists a positive constant $c$ for all $n \geq 1$, $\P_p(0 \leftrightarrow \partial B_n) \leq e^{-cn}$.
+    \item If $p > p_c$, then
+      \[
+        \theta(p) = \P_p(0 \leftrightarrow \infty) \geq \frac{p - p_c}{p(1 - p_c)}.
+      \]
+  \end{enumerate}
+\end{thm}
+This was first proved by Aizenman and Barsky who looked at the more general framework of long-range percolation. Menshikov gave an alternative proof by analyzing the geometry of pivotal edges.
+
+The proof we will see is by Duminil-Copin and Tassion. Recall that we defined
+\[
+  \chi(p) = \E_p[|\mathcal{C}(0)|].
+\]
+We saw that if $\chi(p) < \infty$, then $\P_p(0 \leftrightarrow \partial B_n) \leq e^{-cn}$. We now see that $\chi(p) < \infty$ iff $p < p_c$.
+
+The strategy of the proof is to define a new percolation probability $\tilde{p}_c$, whose definition makes it easier to prove the theorem. Once we have established the two claims, we see that (i) forces $\tilde{p}_c \leq p_c$, and (ii) forces $\tilde{p}_c \geq p_c$. So they must be equal.
+
+\begin{proof}[Proof (Duminil-Copin and Tassion)]
+  If $S \subseteq V$ is finite, we write $\partial S = \{(x, y) \in E: x \in S, y \not \in S\}$. We write $x \overset{S}{\leftrightarrow} y$ if there exists an open path of edges from $x$ to $y$ all of whose end points lie in $S$.
+
+  Now suppose that $0 \in S$. We define
+  \[
+    \varphi_p(S) = p \sum_{(x, y) \in \partial S} \P_p(0 \overset{S}{\leftrightarrow} x).
+  \]
+  Define
+  \[
+    \tilde{p}_c = \sup \{p \in [0, 1]: \text{exists a finite set $S$ with $0 \in S$ and $\varphi_p(S) < 1$}\}.
+  \]
+  \begin{claim}
+    It suffices to prove (i) and (ii) with $p_c$ replaced by $\tilde{p}_c$.
+  \end{claim}
+%  Indeed, $\{p \in [0, 1]: \text{exists a finite set $S$ with $0 \in S$ and $\varphi_p(S) < 1$}\}$ is an open subset of $[0, 1]$, since for any fixed finite set $S$, $\varphi_p(S)$ is a continuous function in $p$. Thus, $\tilde{p}_c > 0$.
+
+  Indeed, from (i), if $p < \tilde{p}_c$, then $\P_p(0 \leftrightarrow \partial B_n) \leq e^{-cn}$. So taking the limit $n \to \infty$, we see $\theta(p) = 0$. So $\tilde{p}_c \leq p_c$. From (ii), if $p > \tilde{p}_c$, then $\theta(p) > 0$. So $p_c \leq \tilde{p}_c$. So $p_c = \tilde{p}_c$.
+
+  We now prove (i) and (ii):
+  \begin{enumerate}
+    \item Let $p < \tilde{p}_c$. Then there exists a finite set $S$ containing $0$ with $\varphi_p(S) < 1$. Since $S$ is finite, we can pick $L$ large enough so that $S \subseteq B_{L - 1}$. We will prove that $\P_p(0 \leftrightarrow \partial B_{kL}) \leq (\varphi_p(S))^{k - 1}$ for $k \geq 1$.
+
+      Define $\mathcal{C} = \{x \in S: 0 \overset{S}{\leftrightarrow} x\}$. Since $S \subseteq B_{L - 1}$, we know $S \cap \partial B_{kL} = \emptyset$.
+
+      Now if we have an open path from $0$ to $\partial B_{kL}$, we let $x$ be the last element on the path that lies in $\mathcal{C}$. We can then replace the path up to $x$ by a path that lies entirely in $S$, by assumption. This is then a path that lies in $\mathcal{C}$ up to $x$, then takes an edge on $\partial S$, and then lies entirely outside of $\mathcal{C}^c$. Thus,
+      \[
+        \P_p(0 \leftrightarrow \partial B_{kL}) \leq \sum_{A \subseteq S, 0\in A} \sum_{(x, y) \in \partial A} \P_p(0 \overset{A}{\leftrightarrow} x, (x, t)\text{ is open}, \mathcal{C} = A, y \overset{A^C}{\leftrightarrow} \partial B_{kL}).
+      \]
+      Now observe that the events $\{\mathcal{C} = A, 0 \overset{S}{\leftrightarrow}\}$, $\{(x, y)\text{ is open}\}$ and $\{y \overset{A^c}{\leftrightarrow} \partial B_{kL}\}$ are independent. So we obtain
+      \[
+        \P_p(0 \leftrightarrow \partial B_{kL}) \leq \sum_{A \subseteq S, 0 \in A} \sum_{(x, y) \in \partial S} \P_p(0\overset{S}{\leftrightarrow} x, \mathcal{C} = A) \cdot p \cdot \P_p(y \overset{A^c}{\leftrightarrow} \partial B_{kL}).
+      \]
+      Since we know that $y \in B_L$, we can bound
+      \[
+        \P_p(y \overset{A^c}{\leftrightarrow}\partial B_{kL}) \leq \P_p(0 \leftrightarrow \partial B_{(k - 1)L}).
+      \]
+      So we have
+      \begin{align*}
+        \P_p(0 \leftrightarrow \partial B_{kL}) &\leq \P_p(0 \leftrightarrow \partial B_{(k-1)L}) p \sum_{A \subseteq S, 0 \in A} \sum_{(x, y) \in \partial S} \P_p(0 \overset{S}{x} x, \mathcal{C} = A)\\
+        &= \P_p(0 \leftrightarrow \partial B_{(k - 1)L}) \cdot p \cdot \sum_{(x, y) \in \partial S} \P_p(0 \overset{S}{\leftrightarrow} x)\\
+        &= \P_p(0 \leftrightarrow \partial B_{(k - 1)L}) \varphi_p(S).
+      \end{align*}
+      Iterating, we obtain the deseired result.
+    \item We want to use Russo's formula. We claim that it suffices to prove that
+      \[
+        \frac{\d}{\d p} \P_p(0 \leftrightarrow \partial B_n) \geq \frac{1}{p(1 - p)} \inf_{S \subseteq B_n, 0 \in S} \varphi_p(S) (1 - \P_p(0 \leftrightarrow \partial B_n)).
+      \]
+      Indeed, if $p > \tilde{p}_c$, we integrate from $\tilde{p}_c$ to $p$, use in this range $\varphi_p(S) \geq 1$, and then take the limit as $n \to \infty$.
+
+      The event $\{0 \leftrightarrow \partial B_n\}$ is increasing and only dependson a finite number of edges. So we can apply Russo's formula
+      \begin{align*}
+        \frac{\d}{\d p} \P_p(0 \leftrightarrow \partial B_n) &= \sum_{e \in B_n} \P_p(e\text{ is pivotal for }\{0 \leftrightarrow \partial B_n\})\\
+        \intertext{Since being pivotal and being open/closed are independent, we can write this as}
+        &= \sum_{e \in B_n} \frac{1}{1 - p} \P_p(e\text{ is pivotal for }-\{0 \leftrightarrow \partial B_n\}, e\text{ is closed})\\
+        &= \sum_{e \in B_n} \frac{1}{1 - p} \P_p(e\text{ is pivotal for }-\{0 \leftrightarrow \partial B_n\}, 0 \not\leftrightarrow \partial B_n)
+      \end{align*}
+      Define $\mathcal{S} = \{x \in B_n: x \not\leftrightarrow \partial B_n\}$. Then $\{0 \not\leftrightarrow \partial B_n\}$ implies $0 \in S$. So
+      \[
+        \frac{\d}{\d p} \P_p(0 \leftrightarrow \partial B_n) = \frac{1}{1 - p} \sum_{e \in B_n} \sum_{A \subseteq B_n, 0 \in A} \P_p(e\text{ is pivotal}, \mathcal{S} = A)
+      \]
+      Given that $\mathcal{S} = A$, an edge $e = (x, y)$ is pivotal iff $e \in \partial A$ and $0 \overset{A}{\leftrightarrow} x$. So we know
+      \[
+        \frac{\d}{\d p} \P_p(0 \leftrightarrow \partial B_n) = \frac{1}{1 - p} \sum_{A \subseteq B_n, 0 \in A} \sum_{(x, y) \in \partial A} \P_p(0 \overset{A}{\leftrightarrow} x, \mathcal{S} = A).
+      \]
+      Observe that $\{0 \overset{A}{\leftrightarrow} x\}$ and $\{\mathcal{S} = A\}$ are independent, since to determine if $\mathcal{S} = A$, we only look at the edges on the boundary of $A$. So the above is equal to % check
+      \begin{align*}
+        &\hphantom{{}={}}\frac{1}{1 - p} \sum_{A \subseteq B_n, 0 \in A} \sum_{(x, y) \in \partial A} \P_p(0 \overset{A}{\leftrightarrow} x)\P_p(\mathcal{S} = A)\\
+        &= \frac{1}{p(1 - p)} \sum_{A \subseteq B_n, 0 \in A} \varphi_p(A) \P_p(\mathcal{S} = A)\\
+        &\geq \frac{1}{p(1 - p)} \inf_{S \subseteq B_n, 0 \in S} \varphi_P(S) \P_p(0 \not\leftrightarrow \partial B_n),
+      \end{align*}
+      as desired.
+  \end{enumerate}
+\end{proof}
+Note that in (i), the proof uses that $p < p_c$, and not $\theta(p) = 0$. Later, we see that in $\Z^2$, for $p = p_c = \frac{1}{2}$, $\theta(p)$ does not have exponential decay.
+
+We might ask if $\P_p(0 \leftrightarrow \partial B_n) \leq e^{-cn}$ is the best convergence rate when $p < p_c$, but we cannot, since $\P_p(0 \leftrightarrow \partial B_n) \geq p^n$.
+
+Also, if $p < p_c$, then we can easily bound
+\[
+  \P_p(|\mathcal{C}(0)| \geq n) \leq \P_p(0 \leftrightarrow \partial B_{n^{1/d}}) \leq \exp(-c n^{1/d}).
+\]
+However, this is not a good bound. In fact, $n^{1/d}$ can be bounded by $n$, but we will not prove it here.
+
+What is this saying? This tells us the largest cluster in $B_n$ will have size of order $\log n$ with high probability.
+
+\subsection{Two dimensions}
+We now focus on $2$ dimensions, where a lot of things are known due to the duality property.
+
+\begin{thm}
+  In $\Z^2$, we have $\theta \left(\frac{1}{2}\right) = 0$ and $p_c = \frac{1}{2}$.
+\end{thm}
+It is conjectured that for all $d \geq 2$, we have $\theta(p_c(d)) = 0$. It is known to be true only in $d = 2$ and $d \geq 11$.
+
+This was proved first by Harris, Kesten, Russo, Seymour, Welsh in several iterations.
+\begin{proof}
+  First we prove that $\theta\left(\frac{1}{2}\right) = 0$. This will imply that $p_c \geq \frac{1}{2}$.
+
+  Suppose not, and $\theta\left(\frac{1}{2}\right) > 0$. Consider the box $S_n = [0, n]^2$. Then we know that there exists a unique infinite cluster almost surely. So
+  \[
+    \P_{\frac{1}{2}}(\partial S_n \leftrightarrow \infty) \to 1.
+  \]
+  Take $n$ large enough such that $\P_{\frac{1}{2}} (\partial S_n \leftrightarrow \infty) \geq 1 - \frac{1}{8^4}$. Let $A_\ell$/$A_r$/$A_t$/$A_b$/ be the event that the left/right/top/bottom side of $S_n$ is connected to $\infty$ via an open path of edges.
+
+  Consider the dual box $T(n) = [0, n]^2 + \left(\frac{1}{2}, \frac{1}{2}\right)$. We let $D_\ell$ be the event that the left of $T(n)$ is connected to $\infty$ via a closed path, and similarly define $D_r, D_r, D_b$.
+
+  By symmetry, we see that
+  \[
+    \P_{\frac{1}{2}}(A_i) = \P_{\frac{1}{2}} (D_j)
+  \]
+  for $i, j \in \{\ell, r, t, b\}$. We now have
+  \begin{align*}
+    \P_{\frac{1}{2}}(\partial S_n \not\leftrightarrow \infty) &= \P_{\frac{1}{2}} (A_\ell^c \cap A_r^c \cap A_t^c \cap A_b^c)\\
+    &\geq (\P_{\frac{1}{2}}(A_\ell^c))^4 \tag{FKG}\\
+    &= \left(1 - \P_{\frac{1}{2}}(A_\ell)\right)^4.
+  \end{align*}
+  By assumption on $n$, we know that
+  \[
+    \left(1 - \P_{\frac{1}{2}}(A_\ell)\right)^{4} \leq \frac{1}{8^4}.
+  \]
+  So we know that
+  \[
+    \P_{\frac{1}{2}} (A_\ell) \geq \frac{7}{8}.
+  \]
+  Now let $G = A_\ell \cap A_r \cap D_t \cap D_b$. Then
+  \[
+    \P_{\frac{1}{2}} (G^c) \leq \P_{\frac{1}{2}}(A_\ell^c) + \P_{\frac{1}{2}}(A_r^c) + \P_{\frac{1}{2}}(D_t^c) + \P_{\frac{1}{2}}(D_b^c) \leq \frac{1}{2}.
+  \]
+  So we know that
+  \[
+    \P_{\frac{1}{2}}(G) \geq \frac{1}{2}.
+  \]
+  On $G$, there are two infinite open clusters of primal lattice, uniqueness, of $\infty$ clusters, these two must connect inside the box. But if this happens, this creates a barrier for the two infinite closed clusters of the dual to join. This means that there are $2$ infinite disjoint closed clusters of the dual, but again this is impossible by uniqueness. So we have reached a contradiction.
+
+  So we have $p_c \geq \frac{1}{2}$. It remains to prove that $p_c \leq \frac{1}{2}$. Suppose for contradiction that $p_c > \frac{1}{2}$. Let
+  \[
+    B_n = [-n, n]^d \cap \Z^d.
+  \]
+  By exponential decay in subcritical regime, there exists a $c > 0$ such that for all $n \geq 1$,
+  \[
+    \P_{\frac{1}{2}}(0 \leftrightarrow \partial B_n) \leq e^{-cn}.
+  \]
+  Consider $C_n = [0, n + 1] \times [0, n]$, and define $A_n$ to be the event that there exists a left-right crossing of $C_n$ by open edges.
+
+  Again consider the dual box $D_n = [0, n] \times [-1, n] + \left(\frac{1}{2}, \frac{1}{2}\right)$.
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [thick, mblue] (0, 0) rectangle (6, 5);
+      \draw [dashed, mred, thick] (0.5, -0.5) rectangle (5.5, 5.5);
+      \node [right, mblue] at (6, 2.5) {$C_n$};
+      \node [above, mred] at (3, 5.5) {$D_n$};
+      \draw [mblue, decorate, decoration=penciline] (0, 2.5) -- (6, 2.4);
+      \draw [mred, decorate, decoration=penciline] (3, -0.5) -- (2.9, 5.5);
+    \end{tikzpicture}
+  \end{center}
+  Define $B_n$ to be the event that there is a top-bottom crossing of $D_n$ by closed edges of the dual.
+
+  Observe that it cannot be the case that $A_n$ and $B_n$ both occur, or else there must be an open edge of the primal lattice crossed by a closed edge of the dual, which is impossible. In fact, $A_n$ and $B_n$ partition the whole space, since if $A_n$ does not hold, then every path from left to right of $C_n$ is blocked by a closed path of the dual.
+
+  Thus, we know
+  \[
+    \P_p(A_n) + \P_p(B_n) = 1
+  \]
+  for any $p$. But by duality, we have $\P_p(A_n) = \P_{1 - p}(B_n)$. So
+  \[
+    \P_{\frac{1}{2}} (A_n) = \frac{1}{2}.
+  \]
+  On the other hand, for any point on the left edge, the probability of it reaching the right edge decays exponentially with $n$. Thus,
+  \[
+    \P_{\frac{1}{2}}(A_n) \leq n (n + 1) \P_{\frac{1}{2}}(0 \leftrightarrow \partial B_n) \leq (n + 1) e^{-cn}
+  \]
+  which is a contradiction. So we are done.
+\end{proof}
+
+\subsection{Russo--Symour--Welsh}
+In the previous proof, we proved that $\P_{\frac{1}{2}}(A_n) = \frac{1}{2}$. We might ask what happens if we ask the same question with boxes of different sizes. Define
+\begin{align*}
+  B(k\ell, \ell) &= [-\ell, (2k - 1)\ell] \times [-\ell, \ell]\\
+  B(\ell, \ell) &= B(\ell) = [-\ell, \ell]^2\\
+  A(\ell) &= B(3\ell) \setminus B(\ell)\\
+  LR(k\ell ,\ell) &= \{\text{there exists left-right crossing of $B(\ell, \ell)$ of open edges}\}\\
+  LR(\ell, \ell) &= LR(\ell)\\
+  O(\ell) &= \{\text{there exists open circuit in $A(\ell)$ that contains $0$ in its interior}\}.
+\end{align*}
+
+\begin{thm}[Russo--Symour--Welsh (RSW) theorem]\index{Russo--Symour--Welsh}\index{RSW}
+  If $\P_p(LR(\ell)) = \alpha$, then
+  \[
+    \P_p(O(\ell)) \geq \left(\alpha \left(1 - \sqrt{1 - \alpha}\right)^4\right)^{12}.
+  \]
+\end{thm}
+Usually, it is not so important what the number on the right is. The important part is that it is positive.
+
+\begin{lemma}
+  \begin{align*}
+    \P_p(LR(2\ell ,\ell)) \geq \P_p(LR(\ell)) \left(\P_p\left(LR\left(\frac{3}{2}\ell, \ell\right)\right)\right)^2\\
+    \P_p(LR(3\ell ,\ell)) \geq \P_p(LR(\ell)) \left(\P_p\left(LR\left(2\ell, \ell\right)\right)\right)^2\\
+    \P_p(O(\ell)) \geq \P_p(LR(3\ell, \ell))^4
+  \end{align*}
+\end{lemma}
+
+\begin{proof}\leavevmode
+  To prove the first inequality, consider the box $[0, 4\ell] \times [-\ell, \ell]$.
+  \begin{center}
+    \begin{tikzpicture}[scale=0.6]
+      \draw (0, 0) rectangle (2, 4);
+      \draw (2, 0) rectangle (4, 4);
+      \draw (4, 0) rectangle (6, 4);
+      \draw (6, 0) rectangle (8, 4);
+      \node [below] at (6, 0) {$3\ell$};
+      \node [below] at (2, 0) {$\ell$};
+
+      \draw [mblue, decorate, decoration=penciline] (0, 3) -- (6, 2.9);
+      \draw [mblue, decorate, decoration=penciline] (2, 1) -- (8, 1.1);
+      \draw [mblue, decorate, decoration=penciline] (3, 0) -- (3.1, 4);
+    \end{tikzpicture}
+  \end{center} % insert paths
+  We let
+  \begin{align*}
+    LR_1 &= \{LR\text{ of }[0, 3\ell] \times [-\ell, \ell]\}\\
+    LR_2 &= \{LR\text{ of }[\ell, 4\ell] \times [-\ell, \ell]\}\\
+    TB_1 &= \{LR\text{ of }[\ell, 3\ell] \times [-\ell, \ell]\}.
+  \end{align*}
+  Then by FKG, we find that
+  \[
+    \P_p(LR(2\ell, \ell)) \geq \P_p(LR_1 \cap LR_2 \cap TB_1) \geq \P_p(LR_1) \P_p(LR_2) \P_p(TB_1).
+  \]
+  The others are similar.
+\end{proof}
+
+The other ingredient in the proof of RSW is the following:
+\begin{lemma}
+  If $\P_p(LR(\ell)) = \alpha$, then
+  \[
+    \P_p\left(LR\left(\frac{3}{2}\ell, \ell\right)\right) \geq (1 - \sqrt{1 - \alpha})^3.
+  \]
+\end{lemma}
+
+\begin{proof}[Proof sketch]
+  Let $\mathcal{A}$ be the set of left-right crossings of $B(\ell) = [-\ell, \ell]^2$. Define a partial order on $\mathcal{A}$ by $\pi_1 \leq \pi_2$ if $\pi_1$ is contained in the closed bounded region of $B(\ell)$ below $\pi_2$.
+
+  If a set of left-right crossings is non-empty, then there exists a lowest one. Since $\mathcal{A}$ must be finite, it suffices to show that meets exist in this partial order, which is left as an exercise for the reader.
+
+  For a left-right crossing $\pi$, let $(0, y_\pi)$ be the last vertex on the vertical axis where $\pi$ intersects.
+  \begin{center}
+    \begin{tikzpicture}
+       \draw (-2, -2) rectangle (2, 2);
+       \draw [dashed] (0, -2) -- (0, 2);
+       \draw [dashed] (-2, 0) -- (2, 0);
+       \node [circ] at (0, 0) {};
+       \node [anchor = north east] {$O$};
+
+       \draw plot [smooth] coordinates {(-2, 1) (-0.5, 1.2) (0, 0.8) (-0.4, -1) (0, -1.3) (2, -1.1)};
+       \node [circ] at (0, -1.3) {};
+       \node [anchor = north east] {$(0, y_\pi)$};
+    \end{tikzpicture}
+  \end{center}
+  Let % insert picture
+  \begin{align*}
+    \mathcal{A}_- &= \{\pi \in \mathcal{A}: y_\pi < 0\}\\
+    \mathcal{A}_+ = \{\pi \in \mathcal{A}: y_\pi \geq 0\}
+  \end{align*}
+  Let $\pi_r$ be the path of the path that connects $(0, y_\pi)$ to the right. Let $\pi_r'$ be the reflection of $\pi_r$ on $\{(\ell, k): k \in \Z\}$.
+
+  We define $B(\ell)' = [0, 2\ell] \times [-\ell, \ell]$.
+\{
+  In general, for $\pi \in \mathcal{A}$, we define the events
+  \begin{align*}
+    V_\pi &= \{\text{all edges of $\pi$ are open}\}\\
+    M_\pi &= \{\text{exists open crossing from top of $B(\ell)'$ to $\pi_r \cup \pi_r'$}\}\\
+    M_\pi^- &= \{\text{exists open crossing from top of $B(\ell)'$ to $\pi_r$}\}\\
+    M_\pi^+ &= \{\text{exists open crossing from top of $B(\ell)'$ to $\pi_r'$}\}\\\
+    L^+ &= \{\text{exists open crossing in $\mathcal{A}_+$}\}\\
+    L^- &= \{\text{exists open crossing in $\mathcal{A}_-$}\}\\
+    L_\pi &= \{\text{$\pi$ is the lowest open LR crossing of $B(\ell)$}\}\\
+    N &= \{\text{exists open LR crossing of $B(\ell)'$}\}\\
+    N^+ &= \{\text{exists open LR crossing in $B(\ell)'$ starting from positive vertical axis}\}\\
+    N^- &= \{\text{exists open LR crossing in $B(\ell)'$ starting from negative vertical axis}\}
+  \end{align*}
+  Now note that
+  \[
+    \underbrace{\bigcup_{\pi \in \mathcal{A}_-}(V_\pi \cap M_{\pi}^-)}_{G} \cap N^+ \subseteq LR\left(\frac{3}{2} \ell, \ell\right)
+  \]
+  So we know that
+  \[
+    \P_p\left(LR\left(\frac{3}{2}\ell, \ell\right)\right) \geq \P_p(G \cap N') \geq \P_p(G) \P_p(N^+),
+  \]
+  using FKG.
+
+  Now by the ``square root trick'', we know
+  \[
+    \P_p(N^+) \geq 1 - \sqrt{1 - \P_p(N^+ \cup N^-)}.
+  \]
+  Of course, we have $\P_p(N^+ \cup N^-) = \P_p(LR(\ell)) = \alpha$. So we know that
+  \[
+    \P_p(N^+) \geq 1 - \sqrt{1 - \alpha}.
+  \]
+  We now have to understand $G$. To bound its probability, we try to bound it by the union of some disjoint events. We have
+  \begin{align*}
+    \P_p(G) &= \P_p\left(\bigcup_{\pi \in \mathcal{A}} (V_\pi \cap M_\pi^-)\right)\\
+    &\geq \P_p\left(\bigcup_{\pi \in A_-} (M_\pi^- \cap L_\pi)\right)\\
+    &= \sum_{\pi \in \mathcal{A}_-} \P_p(M_\pi^- \mid L_\pi) \P_p(L_\pi).
+  \end{align*}
+  \begin{claim}
+    \[
+      \P_p(M_\pi^- \mid L_\pi) \geq 1 - \sqrt{1 - \alpha}.
+    \]
+  \end{claim}
+  Note that if $\pi$ intersects the vertical axis in one point, then $\P_p(M_\pi^- \mid L_\pi) = \P_p(M_\pi^- \mid V_\pi)$, since $L_\pi^-$ tells us what happens below $\pi$, and this does not affect the occurrence of $M_\pi^-$.
+
+  Since $M_\pi^-$ and $V_\pi$ are increasing events, by FKG, we have
+  \[
+    \P_p(M_\pi^- \mid V_\pi) \geq \P_p(M_\pi^-) \geq 1 - \sqrt{1 - \P_p(M_\pi^- \cup M_\pi^+)} = 1 - \sqrt{1 - \P_p(M_\pi)}.
+  \]
+  Since $\P_p(M_\pi) \geq \P_p(LR(\ell)) = \alpha$, the claim follows.
+
+  In the case where $\pi$ is more complicated, we will need an extra argument, which we will not provide.
+
+  Finally, we have
+  \[
+    \P_p(G) \geq \sum_{\pi \in \mathcal{A}_-} \P_p(L_\pi) (1 - \sqrt{1 - \alpha}) = (1 - \sqrt{1 - \alpha})\P_p(L^-).
+  \]
+  But again by the square root trick,
+  \[
+    \P_p(L^-) \geq 1 - \sqrt{1 - \P_p(L^+ \cup L^-)} = 1 - \sqrt{1 - \alpha},
+  \]
+  and we are done.
+\end{proof}
+
+\subsection{Applications of RSW to critical exponents}
+\begin{thm}
+  There exists positive constants $A_1, \alpha_1, A_2, \alpha_2, \alpha_3, A_4, \alpha^4$ such that
+  \begin{align*}
+    \frac{1}{2\sqrt{n}} \leq \P_{\frac{1}{2}} (0 \leftrightarrow \partial B(n)) &\leq A_1 \cdot n^{-\alpha_n}\\
+    \frac{1}{2\sqrt{n}} \leq \P_{\frac{1}{2}} (|\mathcal{C}(0)| \geq n) &\leq A_2 n^{-\alpha_2}\\
+    \E(|\mathcal{C}(0)|^{\alpha_3}) \leq \infty\\
+    \theta(p) &\leq A_4 \left(p - \frac{1}{2}\right)^{\alpha_4}
+  \end{align*}
+\end{thm}
+To prove the first part, the idea is that if we want the origin to be connected to $\partial B(n)$, then we need to forbid the existence of closed circuits around the origin in the dual lattice.
+
+\begin{lemma}
+  There exists $\zeta > 0$ such that $\P_{\frac{1}{2}}(O(\ell)) \geq \zeta$ for all $\ell > 1$.
+\end{lemma}
+
+\begin{proof}
+  By RSW, it suffices to prove that there exists $\alpha > 0$ such that $\P_{\frac{1}{2}} (LR \ell) \geq \alpha$ for all $\ell$.
+
+  Let $A_n$ be the event that there is a left-right crossing of $[0, n + 1] \times [0, n]$. Using duality, we showed that $\P_{\frac{1}{2}}(A_n) = \frac{1}{2}$. So in particular, the probability that there is a left-right crossing of $[0, n] \times [0, n] \geq \frac{1}{2}$. So we are done.
+  
+%  If there exists a left-right crossing of $[0, n + 1] \times [0, n]$, then there also exists a left-right crossing of $[0, n + 1] \times [-1, n + 1]$. Then
+%  \[
+%    \P_{\frac{1}{2}}(\text{LR of }[0, n + 2] \times [-1, n + 1]) \P_p(\text{LR of }[0, n + 1] \times [-1, n + 1], \text{last edge open})
+%  \]
+\end{proof}
+
+\begin{proof}[Proof of upper bound]
+  Define dual boxes
+  \[
+    B(k)_d = B(k) + \left(\frac{1}{2}, \frac{1}{2}\right).
+  \]
+  The dual annuli $A(\ell)_d$ are defined by
+  \[
+    A(\ell)_d = B(3\ell)_d \setminus B(\ell)_d.
+  \]
+  We let $O(\ell)_d$ be the event that there is a closed dual circuit in $A(\ell)_d$ containing $\left(\frac{1}{2}, \frac{1}{2}\right)$.
+
+  Then
+  \[
+    \P_{\frac{1}{2}} (0 \leftrightarrow \partial B(3^k + 1)) \leq \P_p(O(3^r)_d\text{ does not occur for all }r < k).
+  \]
+  The annuli $(A(3^r)_d)$ are disjoint, so the events above are independent. By RSW (since the dual is isomorphic to $\Z^2$), we get
+  \[
+    \P_{\frac{1}{2}}(O(\ell)_d) \geq \zeta
+  \]
+  for some $\zeta > 0$, independent of $\ell$. So it follows that
+  \[
+    \P_{\frac{1}{2}}(0 \leftrightarrow \partial B(3^k + 1)) \leq (1 - \zeta)^k.\qedhere
+  \]
+\end{proof}
+
+The second inequality follows from this.
+
+To show that $\E_{\frac{1}{2}}[|\mathcal{C}(0)|^\gamma] < \infty$ for some $\gamma$, we observe that this expectation is just
+\[
+  \sum_n \P_{\frac{1}{2}}(|\mathcal{C}(0)|^\gamma \geq n).
+\]
+To prove the last part, note that
+\[
+  \theta(p) = \P_p(|\mathcal{C}(0)| = \infty) \leq \P_p(0 \leftrightarrow \partial B_n)
+\]
+for all $n$. By the easy corollary of Russo's formula, and since $\{0 \leftrightarrow \partial B_n\}$ only depends on the edges in $B_n$, which are $\leq 18 n^2$, we get that
+\[
+  \P_{\frac{1}{2}}(0 \leftrightarrow \partial B_n) \geq \left(\frac{1}{2p}\right)^{18n^2}\P_p(0 \leftrightarrow \partial B_n).
+\]
+So
+\[
+  \theta(p) \leq (2p)^{12n^2} \P_{\frac{1}{2}}(0 \leftrightarrow \partial B_n)  \leq A_1 (2p)^{18n^2} n^{-\alpha_1}.
+\]
+Now take $n = \lfloor (\log 2p)^{-1/2} \rfloor $. Then as $p \downarrow \frac{1}{2}$, we have
+\[
+  n \sim \frac{1}{(2p - 1)^{\frac{1}{2}}}.
+\]
+Substituting this, we get
+\[
+  \theta(p) \leq C \left(p - \frac{1}{2}\right)^{1/2}.
+\]
+% format this properly
+
+By similar methods, we can prove that
+\begin{thm}
+  When $d = 2$ and $p > p_c$, there exists a positive constant $c$ such that
+  \[
+    \P_p(0 \leftrightarrow, |\mathcal{C}(0)| < \infty) \leq e^{-cn}.
+  \]
+\end{thm}
+
+It is natural to ask if we have a similar result in higher dimensions. In higher dimensions, all the techniques in $\Z^2$ don't work.
+
+\subsubsection*{Grimmett--Marstrand theorem}
+% slab percolation
+
+\index{slab percolation}In $d \geq 3$, define $S_k = \Z^2 \times \{0, 1, \ldots, k\}^{d - 2}$. Then $S_k \subseteq S_{k + 1} \subseteq \Z^d$.
+
+In general, for a graph $G$, we let $p_c(G)$ be the critical probability of bond percolation in $G$. Then we have
+\[
+  p_c(S_k) \geq p_c(S_{k + 1}) \geq p_c.
+\]
+So the sequence $(p_c(S_k))$ must converge to a limit. Call this limit\index{$p_c^{slab}$}
+\[
+  p_c^{slab} = \lim_{k \to \infty} p_c(S_k).
+\]
+We know that $p_c^{slab} \geq p_c$.
+
+A lot of the results we can prove for $\Z^2$ can be proven for $p_c^{slab}$ instead of $p_c$. So the natural question is how $p_c^{slab}$ is related to $p_c$, and in particular, if they are equal. This has been an open question for a long time, until Grimmett and Marstrand proved it.
+
+\begin{thm}[Grimmett--Marstrand]\index{Grimmett--Marstrand theorem}
+  Let $F$ be an infinite-connected subset of $\Z^d$ with $p_c(F) < 1$. Then for all $\eta > 0$, there exists $k \in \N$ such that
+  \[
+    p_c(2k F + B_k) \leq p_c + \eta.
+  \]
+  In particular, for all $d \geq 3$, $p_c^{slab} = p_c$.
+\end{thm}
+We shall not prove the theorem, but we shall indicate how the ``in particular'' part works.
+
+We take $F = \Z^2 \times \{0\}^{d - 2}$. Then
+\[
+  2kF + B_k = \Z^2 \times ([-k, k]^{d - 2} \cap \Z^{d - 2}),
+\]
+a translate of $S_{2k}$. So $p_c(S_{2k}) = p_c(2kF + B_k) \to p_c$ as $k \to \infty$.
+
+A consequence of Grimmett-Marstrand is that
+\begin{thm}
+  If $d \geq 3$ and $p > p_c$, then there exists $c > 0$ such that
+  \[
+    \P_p(0 \leftrightarrow \partial B_n, |\mathcal{C}(0)| < \infty) \leq e^{-cn}.
+  \]
+\end{thm}
+
+\subsection{Conformal invariance and SLE in \texorpdfstring{$d = 2$}{d = 2}}
+Instead of working on $\Z^2$, we will now work on the triangular lattice $\T$. We consider \term{site percolation}. So every vertex is open (black) with probability $p$ and closed (white) with probability $1 - p$, independently for different vertices.
+
+Like for $\Z^2$, we can show that $p = p_c(\T) = \frac{1}{2}$.
+
+Let $D$ be an open simply connected domain in $\R^2$ with $\partial D$ a Jordan curve. Let $a, b, c \in \partial D$ be $3$ points labeled in anti-clockwise order. Consider the triangle $T$ with vertices $A = 0$, $B = 1$ and $C = e^{i\pi/3}$. By the Riemann mapping theorem, there exists a conformal map $\varphi: D \to T$ that maps $a \mapsto A$, $b \mapsto B$, $c \mapsto C$.
+
+Moreover, this can be extended to $\partial D$ such that $\varphi: \bar{D} \to \bar{T}$ is a homeomorphism. If $x$ is in the arc $bc$, then it will be mapped to $X = \varphi(x)$ on the edge $BC$ of $T$.
+
+Focus on the case $p = \frac{1}{2}$. We can again put a triangular lattice inside $D$, with mesh size $\delta$. We let $ac \leftrightarrow bx$ to mean the event that there is an open path in $D$ joining the arc $ac$ to $bx$.
+
+Then by RSW (for $\T$), we get that
+\[
+  \P_\delta(ac \leftrightarrow bx) \geq c > 0,
+\]
+independent of $\delta$. We might ask what happens when $\delta \to 0$. In particular, does it converge, and what does it converge to?
+
+Cardy, a physicist studying conformal field theories, conjectured that $\lim_{\delta \to 0} \P_\delta(ac \leftrightarrow bx) = |BX|$. He didn't really write it this way, but expressed it in terms of hypergeometric functions. It was Carlesson who expressed it in this form.
+
+In 2001, Smirnov proved this conjecture.
+
+\begin{thm}[Smirnov, 2001]
+  Suppose $(\Omega, a, b, c, d)$ and $(\Omega', a', b', c', d')$ are conformally equivalent. Then
+  \[
+    \P(ac \leftrightarrow bd\text{ in }\Omega) = \P(a' c' \leftrightarrow b' d'\text{ in }\Omega').
+  \]
+\end{thm}
+This says percolation at criticality on the triangular lattice is conformally invariant.
+
+If we take the dual of the triangular lattice, which is the hexagonal lattice. % insert picture
+
+Colour a hexagon black if the center is black, and similarly for whites. Suppose we impose the boundary condition on the upper half plane that the hexagons are black when $x > 0, y = 0$, and white when $x < 0, y = 0$.
+
+Starting at $(x, y) = (0, 0)$, we explore the interface between the black and white by always keeping a black to your right and white on your right. We can again take the limit $\delta \to 0$. What is this exploration path going to look like in the limit $\delta \to 0$? It turns out this is an SLE(6) curve.
+
+This exploration curve satisfies the \emph{locality property}, namely that if we want to know where we will be in the next step, we only need to know where we currently are.
+
+Let $\gamma_t$ be a continuous curve in $\H$, and let $K_t$ be the unbounded component of $\H \setminus \gamma [0, t]$. Then there is a conformal map $g_t: \H \setminus K_t \to \H$ such that
+\[
+  \frac{\d}{\d t} g_t(x) = \frac{2}{g_t(z) - a(t)},
+\]
+and $a(t) = g_t(\gamma_t)$, $g_0(z) = z$.
+
+This is known as \term{Loewner's equation}.
+
+If we take $a(t) = \sqrt{\kappa} B_t$, where $B_t$ is a standard Brownian motion, this gives us SLE($\kappa$).
 
 \printindex
 \end{document}
