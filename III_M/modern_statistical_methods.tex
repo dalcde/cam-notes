@@ -20,10 +20,10 @@ The remarkable development of computing power and other technology now allows sc
 Developing methods that are able to extract meaningful information from these large and challenging datasets has recently been an area of intense research in statistics, machine learning and computer science. In this course, we will study some of the methods that have been developed to analyse such datasets. We aim to cover some of the following topics.
 
 \begin{itemize}
- \item Kernel machines: the kernel trick, the representer theorem, support vector machines, the hashing trick.
- \item Penalised regression: Ridge regression, the Lasso and variants.
- \item Graphical modelling: neighbourhood selection and the graphical Lasso. Causal inference through structural equation modelling; the PC algorithm.
- \item High-dimensional inference: the closed testing procedure and the Benjamini--Hochberg procedure; the debiased Lasso
+  \item Kernel machines: the kernel trick, the representer theorem, support vector machines, the hashing trick.
+  \item Penalised regression: Ridge regression, the Lasso and variants.
+  \item Graphical modelling: neighbourhood selection and the graphical Lasso. Causal inference through structural equation modelling; the PC algorithm.
+  \item High-dimensional inference: the closed testing procedure and the Benjamini--Hochberg procedure; the debiased Lasso
 \end{itemize}
 
 \subsubsection*{Pre-requisites}
@@ -87,7 +87,7 @@ The relevant theorem is
   Moreover, asymptotically, as $n \to \infty$, the maximum likelihood estimator is unbiased and achieves the Carm\'er--Rao bound.
 \end{thm}
 
-Another wonderful fact about the maximum likelihood estimator is that asymptotically, it is normal distributed, and so it is something we unerstand well.
+Another wonderful fact about the maximum likelihood estimator is that asymptotically, it is normal distributed, and so it is something we understand well.
 
 This might seem very wonderful, but there are a few problems here. The results we stated are asymptotic, but what we actually see in real life is that as $n \to \infty$, the value of $p$ also increases. In these contexts, the asymptotic property doesn't tell us much. Another issue is that these all talk about unbiased estimators. In a lot of situations of interest, it turns out biased methods do much much better than these methods we have.
 
@@ -96,7 +96,7 @@ Another thing we might be interested is that as $n$ gets large, we might want to
 \section{Kernel machines}
 We are going to start a little bit slowly, and think about our linear model $Y = X\beta^0 + \varepsilon$, where $\E(\varepsilon) = 0$ and $\var(\varepsilon) = \sigma^2 I$. Ordinary least squares is an unbiased estimator, so let's look at biased estimators.
 
-For a biased estimator, $\tilde{\beta}$, we should not study the variance, but
+For a biased estimator, $\tilde{\beta}$, we should not study the variance, but the \term{mean squared error}
 \begin{align*}
   \E[(\tilde{\beta} - \beta^0)(\tilde{\beta} - \beta^0)^T]
   &= \E(\tilde{\beta} - \E \tilde{\beta} + E \tilde{\beta} - \beta^0)(\tilde{\beta} - \E \tilde{\beta} + E \tilde{\beta} - \beta^0)^T \\ &= \var(\tilde{\beta})+ (\E \tilde{\beta} - \beta^0)(\E \tilde{\beta} - \beta^0)^T
@@ -104,17 +104,19 @@ For a biased estimator, $\tilde{\beta}$, we should not study the variance, but
 The first term is, of course, just the variance, and the second is the squared bias. So the point is that if we pick a clever biased estimator with a tiny variance, then this might do better than unbiased estimators with large variance.
 
 \subsection{Ridge regression}
-This is probably one of the oldest methods we are going to discuss in this course, introduced in around 1970. The idea of Ridge regression, as well as the Lasso, is that we want to shrink our estimator a bit, so that the variance will be smaller, even though we have introduced a bias. An extreme case is when we always estimate $\beta$ by $0$, in which case there is no variance but a (potentially) large bias.
+Ridge regression was introduced in around 1970. The idea of Ridge regression is to try to shrink our estimator a bit in order to lessen the variance, at the cost of introducing a bias. We would hope then that this will result in a smaller mean squared error.
 
-The \term{Ridge regression} solves
-\[
-  (\hat{\mu}^R_\lambda, \hat{\beta}^R_\lambda) = \argmin_{(\mu, \beta) \in \R \times \R^p} \{ \|Y - \mu \mathbf{1} - X \beta\|_2^2 + \lambda \| + \lambda \|\beta\|_2^2\},
-\]
-where $\mathbf{1}$ is a vector of all $1$'s. Here $\lambda \geq 0$ is a tuning parameter, and it controls how much we penalize a large choice of $\beta$.
+\begin{defi}[Ridge regression]
+  \term{Ridge regression} solves
+  \[
+    (\hat{\mu}^R_\lambda, \hat{\beta}^R_\lambda) = \argmin_{(\mu, \beta) \in \R \times \R^p} \{ \|Y - \mu \mathbf{1} - X \beta\|_2^2 + \lambda \|\beta\|_2^2\},
+  \]
+  where $\mathbf{1}$ is a vector of all $1$'s. Here $\lambda \geq 0$ is a tuning parameter, and it controls how much we penalize a large choice of $\beta$.
+\end{defi}
 
-We explicitly have an intercept term. Usually, we introduce this by adding a column of $1$'s in $X$. But here we want to separate that out, since we do not want give a penalty for large $\mu$.
+Here we explicitly have an intercept term. Usually, we eliminate this by adding a column of $1$'s in $X$. But here we want to separate that out, since we do not want give a penalty for large $\mu$. For example, if the parameter is temperature, then if we decide to measure in degrees Celsius rather than Kelvins, then we don't want the resulting $\hat{\mu}, \hat{\beta}$ to change.
 
-For example, if the parameter is temperature, then if we decide to measure in degrees Celsius rather than Kelvins, where we add a linear shift to all terms, we don't want the resulting $\hat{\mu}, \hat{\beta}$ to change. More precisely, if we make the modification
+More precisely, our formulation of Ridge regression is so that if we make the modification
 \[
   Y' = c\mathbf{1} + Y,
 \]
@@ -122,30 +124,30 @@ then we have
 \[
   \hat{\mu}^R_\lambda(Y') = \hat{\mu}_\lambda^R(Y) + c.
 \]
-Note also that this formula makes sense only if each entry in $\beta$ have the same order of magnitude, or else the penalty will only have a significant effect on the terms of large magnitude. Standard practice is to subtract from each column of $X$ its mean, and then scale it to have $\ell_2$ norm $\sqrt{n}$. The actual number is not important here, but it will in the case of the Lasso.
+Note also that the Ridge regression formula makes sense only if each entry in $\beta$ have the same order of magnitude, or else the penalty will only have a significant effect on the terms of large magnitude. Standard practice is to subtract from each column of $X$ its mean, and then scale it to have $\ell_2$ norm $\sqrt{n}$. The actual number is not important here, but it will in the case of the Lasso.
 
-In example sheet 1, we will show that this gives
+By differentiating, one sees that the solution to the optimization problem is
 \begin{align*}
   \hat{\mu}_\lambda^R &= \bar{Y} = \frac{1}{n} \sum Y_i\\
   \hat{\beta}^R_\lambda &= (X^T X + \lambda I)^{-1} X^T Y.
 \end{align*}
-A first thing to note that we can always pick $\lambda$ such that the matrix $(X^T X + \lambda I)$ is invertible. In particular, this can work even if we have more parameters than data points.
+Note that we can always pick $\lambda$ such that the matrix $(X^T X + \lambda I)$ is invertible. In particular, this can work even if we have more parameters than data points. This will be important when we work with the Lasso later on.
+
+If some god-like being told us a suitable value of $\lambda$ to use, then Ridge regression always work better than ordinary least squares.
 \begin{thm}
-  Suppose $\rank(X) = p$. Then for $\lambda > 0$ sufficiently small, we have that
+  Suppose $\rank(X) = p$. Then for $\lambda > 0$ sufficiently small (depending on $\beta^0$ and $\sigma^2$), we have that
   \[
     \E(\hat{\beta}^{OLS} - \beta^0)(\hat{\beta}^{OLS} - \beta^0)^T - \E(\hat{\beta}^{R}_\lambda - \beta^0)(\hat{\beta}^{R}_\lambda - \beta^0)^T \tag{$*$}
   \]
   is positive definite.
 \end{thm}
-The ``sufficiently small'' depends on $\beta_0$ and $\sigma^2$.
 
-The proof is a computation.
 \begin{proof}
   We know that the first term is just $\sigma^2(X^T X)^{-1}$. The right-hand-side has a variance term and a bias term. We first look at the bias:
   \begin{align*}
     \E [\hat{\beta} - \beta^0] &= (X^T X + \lambda I)^{-1} X^T X \beta^0 - \beta^0\\
     &= (X^T X + \lambda I)^{-1}(X^T X + \lambda I - \lambda I) \beta^0- \beta^0\\
-    &= \lambda (X^T X + \lambda I)^{-1} \beta^).
+    &= - \lambda (X^T X + \lambda I)^{-1} \beta^0.
   \end{align*}
   We can also compute the variance
   \[
@@ -162,7 +164,8 @@ The proof is a computation.
   \end{align*}
   Thus, we can write $(*)$ as
   \begin{align*}
-    &\hphantom{ {} = {} }(X^T X + \lambda I)^{-1} \Big( \sigma^2(X^T X + 2 \lambda I + \lambda^2(X^T X)^{-1}) - \sigma^2 X^T X - \lambda^2 \beta^0 (\beta^0)^T\Big) (X^T X + \lambda I)^{-1}\\
+    &\hphantom{ {} = {} }(X^T X + \lambda I)^{-1} \Big( \sigma^2(X^T X + 2 \lambda I + \lambda^2(X^T X)^{-1})\\
+    &\hphantom{adasdfafdasfdfadsfasdf}- \sigma^2 X^T X - \lambda^2 \beta^0 (\beta^0)^T\Big) (X^T X + \lambda I)^{-1}\\
     &= \lambda (X^T X + \lambda I)^{-1} \Big( 2 \sigma^2 I + \lambda(X^T X)^{-1} - \lambda \beta^0 (\beta^0)^T\Big) (X^T X + \lambda I)^{-1}
   \end{align*}
   Since $\lambda > 0$, this is positive definite iff
@@ -173,15 +176,14 @@ The proof is a computation.
 \end{proof}
 While this is nice, this is not really telling us much, because we don't know how to pick the correct $\lambda$. It also doesn't tell us when we should expect a big improvement from Ridge regression.
 
-To understand this better ,we need to use the \emph{singular value decomposition}
-\subsection{The singular value decomposition (SVD)}
+To understand this better, we need to use the \emph{singular value decomposition}.
 
 \begin{thm}[Singular value decomposition]\index{singular value decomposition}\index{SVD}
   Let $X \in \R^{n \times p}$ be any matrix. Then it has a \emph{singular value decomposition} (SVD)
   \[
-    \underset{n \times p}{X} = \underset{n \times n}{U} D\underset{n \times p}D \underset{p \times p}{V^T},
+    \underset{n \times p}{X} = \underset{n \times n}{U}\;\;\underset{n \times p}{D}\;\;\underset{p \times p}{V^T},
   \]
-  where $U, V$ are orthogonal matrices, and $D_{nn} \leq D_{22} \leq \cdots \leq D_{mm} \geq 0$, where $m = \min (n, p)$, and all other entries are zero.
+  where $U, V$ are orthogonal matrices, and $D_{11} \geq D_{22} \geq \cdots \geq D_{mm} \geq 0$, where $m = \min (n, p)$, and all other entries are zero.
 \end{thm}
 
 When $n > p$, there is an alternative version where $U$ is an $n \times p$ matrix with orthogonal columns, and $D$ is a $p \times p$ diagonal matrix. This is done by replacing $U$ by its first $p$ columns and $D$ by its first $p$ rows. This is known as the \term{thin singular value decomposition}\index{thin SVD}. In this case, $U^T U = I_p$ but $UU^T$ is not the identity.
@@ -203,17 +205,19 @@ Here $U_j$ refers to the $j$th column of $U$.
 
 Now note that the columns of $U$ form an orthonormal basis for the column space of $X$. If $\lambda = 0$, then this is just a fancy formula for the projection of $Y$ onto the column space of $X$. Thus, what this formula is telling us is that we look at this projection, look at the coordinates in terms of the basis given by the columns of $U$, and scale accordingly.
 
-We can now concretely see the effect of our $\lambda$. The shrinking depends on the size of $D_{jj}$, and the larger $D_{jj}$ is, the less shrinking we do. What is special about the columns of $U$ is that they are exactly the normalized principal components of $X$.
+We can now concretely see the effect of our $\lambda$. The shrinking depends on the size of $D_{jj}$, and the larger $D_{jj}$ is, the less shrinking we do.
 
-Take $u \in \R^p$, $\|u\|_2 = 1$. The sample variance of $Xu \in \R^n$ is
+This is not very helpful if we don't have a concrete interpretation of the $D_{jj}$, or rather, the columns of $U$. It turns out the columns of $U$ are what are known as the \term{normalized principal components} of $X$.
+
+Take $u \in \R^p$, $\|u\|_2 = 1$. The sample variance of $Xu \in \R^n$ is then
 \[
   \frac{1}{n} \|Xu\|_2^2 = \frac{1}{n} u^T X^T X u = \frac{1}{n} u^T VD^2 V^t u.
 \]
-We write $w = V^T u$. Then $\|w\|_2 = 1$ since $V$ is orthogonal. We then have
+We write $w = V^T u$. Then $\|w\|_2 = 1$ since $V$ is orthogonal. So we have
 \[
   \frac{1}{n} \|Xu\|_2^2 = \frac{1}{n} w^T D^2 w = \frac{1}{n} \sum_j w_j^2 D_{jj^2} \leq \frac{1}{n} D_{11}^2,
 \]
-and this bound is achieved when $w = e_1$. So we need $u = V e_1 = V_1$. Thus, $V_1$ gives the coefficients of the linear combination of columns of $X$ that has largest sample variance subject to the coefficient vector having $\ell_2$ norm $1$. The result is then
+and the bound is achieved when $w = e_1$, or equivalently, $u = V e_1 = V_1$. Thus, $V_1$ gives the coefficients of the linear combination of columns of $X$ that has largest sample variance. We can then write the result as
 \[
   X V_1 = U DV^T V_1 = U_1 D_{11}.
 \]
@@ -222,9 +226,11 @@ We can extend this to a description of the other columns of $U$, which is done i
 The conclusion is that Ridge regression works best if $\E Y$ lies in the space spanned by the large principal components of $X$. % insert example?
 
 \subsection{\texorpdfstring{$v$}{v}-fold cross-validation}
-In practice, if we are given a data set, how do we know what $\lambda$ we should pick? $v$-fold cross-validation is a very general technique to do so, which allows us to pick a regression method from a variety of options. We are explaining our method in terms of Ridge regression, where our regression methods are parametrized by a single parameter $\lambda$. However, our method in fact allows us to compare vastly different regression methods.
+In practice, the above analysis is not very useful, since it doesn't actually tell us what $\lambda$ we should pick. If we are given a concrete data set, how do we know what $\lambda$ we should pick?
 
-Suppose we are given data $(Y_i, x_i)_{i = 1}^n$ and a new data point $(Y^*, x^*) \in \R \times \R^p$ are iid, and $Y^*$ is not observed. We may want to pick $\lambda$ to minimize the following quantity:
+One common method is to use \term{$v$-fold cross-validation}. This is a very general technique that allows us to pick a regression method from a variety of options. We shall explain the method in terms of Ridge regression, where our regression methods are parametrized by a single parameter $\lambda$, but it should be clear that this is massively more general.
+
+Suppose we have some data set $(Y_i, x_i)_{i = 1}^n$, and we are asked to predict the value of $Y^*$ given a new predictors $x^*$. We may want to pick $\lambda$ to minimize the following quantity:
 \[
   \E \left\{ (Y^* - (x^*)^T \hat{\beta}_\lambda^R(X, Y))^2 \mid X, Y \right\}.
 \]
@@ -232,13 +238,11 @@ It is difficult to actually do this, and so an easier target to minimize is the 
 \[
   \E\left[\E \left\{ (Y^* - (x^*)^T \hat{\beta}_\lambda^R(\tilde{X}, \tilde{Y}))^2 \mid \tilde{X}, \tilde{Y} \right\}\right]
 \]
-One thing to note about this is that we are thinking of $\tilde{X}$ and $\tilde{Y}$ as arbitrary data sets of size $n$, as opposed to the one we have actually got.
-
-This might be a more tractable problem, since we are not working with our actual data set, but general data sets.
+One thing to note about this is that we are thinking of $\tilde{X}$ and $\tilde{Y}$ as arbitrary data sets of size $n$, as opposed to the one we have actually got. This might be a more tractable problem, since we are not working with our actual data set, but general data sets.
 
 The method of cross-validation estimates this by splitting the data into $v$ folds.
 \begin{center}
-  \begin{tikzpicture}
+  \begin{tikzpicture}[yscale=0.5]
     \draw (0, 0) rectangle +(3, 1);
     \draw (0, 5) rectangle +(3, 1);
 
@@ -252,11 +256,11 @@ The method of cross-validation estimates this by splitting the data into $v$ fol
     \node at (6, 5.5) {$A_v$};
   \end{tikzpicture}
 \end{center}
-$A_i$ is called the \term{observation indices}, which is the set of all indices $i$ so that the $i$th data point lies in the $i$th fold.
+$A_i$ is called the \term{observation indices}, which is the set of all indices $j$ so that the $j$th data point lies in the $i$th fold.
 
 We let $(X^{(-k)}, Y^{(-k)})$ be all data except that in the $k$th fold. We define
 \[
-  CV(\lambda) = \frac{1}{n} \sum_{k = 1}^v \sum_{i \in A_k} (Y_i - x_I^T \hat{\beta}_\lambda^R (X^{(-k)}, Y^{(-k)}))^2
+  CV(\lambda) = \frac{1}{n} \sum_{k = 1}^v \sum_{i \in A_k} (Y_i - x_i^T \hat{\beta}_\lambda^R (X^{(-k)}, Y^{(-k)}))^2
 \]
 We write $\lambda_{CV}$ for the minimizer of this, and pick $\hat{\beta}^R_{\lambda_{CV}}(X, Y)$ as our estimate. This tends to work very will in practice.
 
@@ -264,63 +268,101 @@ But we can ask ourselves --- why do we have to pick a single $\lambda$ to make t
 \[
   \frac{1}{n} \sum_{k = 1}^v \sum_{i \in A_k} \left(Y_i - \sum_{i = 1}^L w_i x_i^T \hat{\beta}_{\lambda_i}^R (X^{(-k)}, Y^{(-k)})\right)^2
 \]
-over $w \in [0, \infty)^L$. This is known as \term{stacking}. This tends to work better than simply $v$-fold cross-validation. Indeed, it must --- cross-validation is just a special case where we restrict $w_i$ to be zero in all but one entries. Of course, one disadvantage of this approach is that after solving this minimization problem, whenever we want to make our prediction, we need to compute a lot of different $\hat{\beta}_{\lambda}^R$ in order to do so.
+over $w \in [0, \infty)^L$. This is known as \term{stacking}. This tends to work better than just doing $v$-fold cross-validation. Indeed, it must --- cross-validation is just a special case where we restrict $w_i$ to be zero in all but one entries. Of course, this method comes with some heavy computational costs.
 
 \subsection{The kernel trick}
-We start with a very simple observation. An alternative way of writing the fitted values from Ridge regression is
+We now come to the actual, main topic of the chapter. We start with a very simple observation. An alternative way of writing the fitted values from Ridge regression is
 \[
-  (X^T X + \lambda I) X^T = X^T(X^T + \lambda I).
+  (X^T X + \lambda I) X^T = X^T(XX^T + \lambda I).
 \]
-One should be careful that the $\lambda I$ are different matrices on both sides, as they have different dimensions. Inverting the matrices, we have
+One should be careful that the $\lambda I$ are different matrices on both sides, as they have different dimensions. Multiplying inverses on both sides, we have
 \[
   X^T(XX^T + \lambda I)^{-1} = (X^T X + \lambda I)^{-1} X^T.
 \]
-We can multiply the right-hand-side by $Y$ to obtain the $\hat{\beta}$ by Ridge regression, and multiply on the left to obtain the fitted values. So we have
+We can multiply the right-hand-side by $Y$ to obtain the $\hat{\beta}$ from Ridge regression, and multiply on the left to obtain the fitted values. So we have
 \[
   XX^T(XX^T + \lambda I)^{-1}Y = X (X^T X + \lambda I)^{-1} X^T Y = X \hat{\beta}^R_\lambda.
 \]
-Note that $X^T X$ is a $p \times p$ matrix, and takes $O(np^2)$ time to compute. On the other hand, $XX^T$ is an $n \times n$ matrix, and takes $O(n^2 p)$ time to compute. If $p \gg n$, then this would be faster to compute.
-
-The key point to make is that the fitted values from Ridge regression only depends on $K = XX^T$ (and $Y$). Why is this important?
+Note that $X^T X$ is a $p \times p$ matrix, and takes $O(np^2)$ time to compute. On the other hand, $XX^T$ is an $n \times n$ matrix, and takes $O(n^2 p)$ time to compute. If $p \gg n$, then this way of computing the fitted values would be much quicker. The key point to make is that the fitted values from Ridge regression only depends on $K = XX^T$ (and $Y$). Why is this important?
 
 Suppose we believe we have a quadratic signal
 \[
-  Y_i = x_i^T \beta + \sum_{k, \ell} x_{ik} x_{i\ell} \theta_{k\ell} + \varepsilon_i
+  Y_i = x_i^T \beta + \sum_{k, \ell} x_{ik} x_{i\ell} \theta_{k\ell} + \varepsilon_i.
 \]
-Of course, we can do Ridge regression, as long as we add the products $x_{ik} x_{i\ell}$ as predictors. But this requires $O(p^2)$ many predictors. Even if we use the $XX^T$ way, this has a cost of $O(n^2 p^2)$, and if we were really naive, it would require $O(np^4)$ operations.
+Of course, we can do Ridge regression, as long as we add the products $x_{ik} x_{i\ell}$ as predictors. But this requires $O(p^2)$ many predictors. Even if we use the $XX^T$ way, this has a cost of $O(n^2 p^2)$, and if we used the naive method, it would require $O(np^4)$ operations.
 
-We need to do better than this. The idea is that we might be able to compute $k$ directly. Consider
+We can do better than this. The idea is that we might be able to compute $K$ directly. Consider
 \[
   (1 + x_i^T x_j)^2 = 1 + 2 x_i^T x_j + \sum_{k, \ell} x_{ik} x_{i\ell} x_{jk}x_{j\ell}.
 \]
 This is equal to the inner product between vectors of the form
 \[
-  (1, \sqrt{2} x_{i1}, \ldots, \sqrt{2}x_{ip}, x_{i1} x_{i1}, \ldots, x_{i1} x_{ip}, x_{i2} x_{i1}, \ldots, x_{ip} x_{ip})\tag{$*$} % arrange this better
+  (1, \sqrt{2} x_{i1}, \ldots, \sqrt{2}x_{ip}, x_{i1} x_{i1}, \ldots, x_{i1} x_{ip}, x_{i2} x_{i1}, \ldots, x_{ip} x_{ip})\tag{$*$}
 \]
-If we set $K_{ij} = (1 + x_i^T x_j)^2$ and form $K(K + \lambda I)^{-1} Y$, this is equivalent to forming ridge regression with $(*$) as our predictors. Note that here we don't scale our columns to have the same $\ell_2$ norm.
+If we set $K_{ij} = (1 + x_i^T x_j)^2$ and form $K(K + \lambda I)^{-1} Y$, this is equivalent to forming ridge regression with $(*$) as our predictors. Note that here we don't scale our columns to have the same $\ell_2$ norm. This is pretty interesting, because computing this is only $O(n^2p)$. We managed to kill a factor of $p$ in this computation. The key idea here was that the fitted values depend only on $K$, and not on the values of $x_{ij}$ itself.
 
-This is pretty interesting, because computing this is only $O(n^2p)$. We managed to kill a factor of $p$ in this computation.
+Consider the general scenario where we try to predict the value of $Y$ given a predictor $x \in \mathcal{X}$. In general, we don't even assume $\mathcal{X}$ has some nice linear structure where we can do linear regression.
 
-More generally, since the Ridge fitted values only depends on inner products between different observations, if we want to try to fit some other complicated model, instead of fitting non-linear models by first mapping each $\{x_i\} \mapsto \phi(x_i) \in \R^d$ using some ``feature map'' $\phi$, we can instead aim to directly compute
+If we want to do Ridge regression, then one thing we can do is that we can try to construct some map $\phi: \mathcal{X} \to \R^D$ for some $D$, and then run Ridge regression using $\{\phi(x_i)\}$ as our predictors. If we want to fit some complicated, non-linear model, then $D$ can potentially be very huge, and this can be costly. The observation above is that instead of trying to do this, we can perhaps find some magical way of directly computing
 \[
-  \bra \phi(x_i), \phi(x_j)\ket = k(x_i, x_j).
+  K_{ij} = k(x_i, x_j) = \bra \phi(x_i), \phi(x_j)\ket.
 \]
-But we can also try to go in the other direction. We don't need to know $\phi$ itself, but we simply have to find some appropriate $k(x_i, x_j)$, which should be some ``similarity measure'' between $x_i$ and $x_j$, and then set $K_{ij} = k(x_i, x_j)$.
+If we can do so, then we can simply use the above formula to obtain the fitted values (we shall discuss the problem of making new predictions later).
 
-\subsection{Kernels}
-We'll aim to characterize the similarity measures $k: \mathcal{X} \times \mathcal{X} \to \R$ for which there exists a feature map $\phi: \mathcal{X} \to \mathcal{H}$, where $\mathcal{H}$ is a real inner product space, with% use $\mathcal{X}$
-\[
-  k(x, x') = \bra \phi(x), \phi(x')\ket.
-\]
-We are being slightly more general than we were last time, where we allow $\mathcal{H}$ to be fancy.
+Since it is only the function $k$ that matters, perhaps we can specify a ``regression method'' simply by providing a suitable function $k: \mathcal{X} \times \mathcal{X} \to \R$. If we are given such a function $k$, when would it arise from a ``feature map'' $\phi: \mathcal{X} \to \R^D$?
 
-Recall that an inner product space is a real vector space $\mathcal{H}$ endowed with a map $\bra \ph, \ph \ket: \mathcal{H} \times \mathcal{H} \to \R$ and obeys
-\begin{itemize}
-  \item Symmetry: $\bra u, v \ket = \bra v, u\ket$
-  \item Linearity: If $a, b \in \R$, then $\bra au + bw, v\ket = a \bra u, v\ket + b \bra w, v\ket$.
-  \item Positive definiteness: $\bra u, u \ket \geq 0$ with $\bra u, u \ket = 0$ iff $u = 0$.
-\end{itemize}
+More generally, we will find that it is convenient to allow for $\phi$ to take values in infinite-dimensional vector spaces instead (since we don't actually have to compute $\phi$!).
+\begin{defi}[Inner product space]\index{inner product space}
+  an inner product space is a real vector space $\mathcal{H}$ endowed with a map $\bra \ph, \ph \ket: \mathcal{H} \times \mathcal{H} \to \R$ and obeys
+  \begin{itemize}
+    \item Symmetry: $\bra u, v \ket = \bra v, u\ket$
+    \item Linearity: If $a, b \in \R$, then $\bra au + bw, v\ket = a \bra u, v\ket + b \bra w, v\ket$.
+    \item Positive definiteness: $\bra u, u \ket \geq 0$ with $\bra u, u \ket = 0$ iff $u = 0$.
+  \end{itemize}
+\end{defi}
 
+If we want $k$ to come from a feature map $\phi$, then an immediate necessary condition is that $k$ has to be symmetric. There is also another condition that corresponds to the positive-definiteness of the inner product.
+
+\begin{prop}
+  Given $\phi: \mathcal{X} \times \mathcal{X} \to \mathcal{H}$, define $k: \mathcal{X} \times \mathcal{X} \to \R$ by
+  \[
+    k(x, x') = \bra \phi(x), \phi(x')\ket.
+  \]
+  Then for any $x_1, \ldots, x_n \in \mathcal{X}$, the matrix $K \in \R^n \times \R^n$ with entries
+  \[
+    K_{ij} = k(x_i, x_j)
+  \]
+  is positive semi-definite.
+\end{prop}
+
+\begin{proof}
+  Let $x_1, \ldots, x_n \in \mathcal{X}$, and $\alpha \in \R^n$. Then
+  \begin{align*}
+    \sum_{i, j} \alpha_i k(x_i, x_j) \alpha_j &= \sum_{i, j} \alpha_i \bra \phi(x_i), \phi(x_j)\ket\\
+    &= \left\bra \sum_i \alpha_i \phi(x_i), \sum_j \alpha_j \phi(x_j)\right\ket\\
+    &\geq 0
+  \end{align*}
+  since the inner product is positive definite.
+\end{proof}
+
+%More generally, since the Ridge fitted values only depends on inner products between different observations, if we want to try to fit some other complicated model, instead of fitting non-linear models by first mapping each $x_i \mapsto \phi(x_i) \in \R^D$ using some ``feature map'' $\phi$, we can instead aim to directly compute
+%\[
+%  k(x_i, x_j) = \bra \phi(x_i), \phi(x_j)\ket.
+%\]
+%
+%Consider a general scenario, where we are trying to predict the value of $Y$ given some $x \in \mathcal{X}$, where $\mathcal{X}$ is any set.
+%
+%We don't need to know $\phi$ itself, but simply have to find some appropriate function $k(x_i, x_j)$, and then set $K_{ij} = k(x_i, x_j)$.
+%
+%
+%
+%We'll aim to characterize the similarity measures $k: \mathcal{X} \times \mathcal{X} \to \R$ for which there exists a feature map $\phi: \mathcal{X} \to \mathcal{H}$, where $\mathcal{H}$ is a real inner product space, with% use $\mathcal{X}$
+%\[
+%  k(x, x') = \bra \phi(x), \phi(x')\ket.
+%\]
+%We are being slightly more general than we were last time, where we allow $\mathcal{H}$ to be fancy.
+
+This suggests the following definition:
 \begin{defi}[Positive-definite kernel]\index{positive-definite kernel}\index{kernel}
   A \emph{positive-definite kernel} (or simply \emph{kernel}) is a symmetric map $k: \mathcal{X} \times \mathcal{X} \to \R$ such that for all $n \in \N$ and $x_1, \ldots, x_n \in \mathcal{X}$, the matrix $K \in \R^n \times \R^n$ with entries
   \[
@@ -328,56 +370,59 @@ Recall that an inner product space is a real vector space $\mathcal{H}$ endowed 
   \]
   is positive semi-definite.
 \end{defi}
-Note that our definition of ``positive semi-definite'' includes being symmetric.
 
-It turns out the Cauchy--Schwarz inequality still holds for positive semi-definite matrices
-\begin{prop}[Cauchy--Schwarz inequality]\index{Cauchy--Schwarz inequality}
-  We have
-  \[
-    k(x, x')^2 \leq k(x, x) k(x', x')
-  \]
-\end{prop}
+%It turns out the Cauchy--Schwarz inequality still holds for positive semi-definite matrices
+%\begin{prop}[Cauchy--Schwarz inequality]\index{Cauchy--Schwarz inequality}
+%  We have
+%  \[
+%    k(x, x')^2 \leq k(x, x) k(x', x')
+%  \]
+%\end{prop}
+%
+%\begin{proof}
+%  The matrix
+%  \[
+%    \begin{pmatrix}
+%      k(x, x) & k(x, x')\\
+%      k(x', x) & k(x', x')
+%    \end{pmatrix}
+%  \]
+%  has to be positive semi-definite by assumption, and expanding out, we are done.
+%\end{proof}
+%
+%\begin{prop}
+%  $k$ defined by
+%  \[
+%    k(x, x') = \bra \phi(x), \phi(x')\ket
+%  \]
+%  is a kernel.
+%\end{prop}
+%
+%\begin{proof}
+%  Let $x_1, \ldots, x_n \in \mathcal{X}$, and $\alpha \in \R^n$. Consider
+%  \begin{align*}
+%    \sum_{i, j} \alpha_i k(x_i, x_j) \alpha_jh &= \sum_{i, j} \alpha_i \bra \phi(x_i), \phi(x_j)\ket\\
+%    &= \left\bra \sum_i \alpha_i \phi(x_i), \sum_j \alpha_j \phi(x_j)\right\ket\\
+%    &\geq 0
+%  \end{align*}
+%  since the inner product is positive definite.
+%\end{proof}
 
-\begin{proof}
-  The matrix
-  \[
-    \begin{pmatrix}
-      k(x, x) & k(x, x')\\
-      k(x', x) & k(x', x')
-    \end{pmatrix}
-  \]
-  has to be positive semi-definite by assumption, and expanding out, we are done.
-\end{proof}
-
-\begin{prop}
-  $k$ defined by
-  \[
-    k(x, x') = \bra \phi(x), \phi(x')\ket
-  \]
-  is a kernel.
-\end{prop}
-
-\begin{proof}
-  Let $x_1, \ldots, x_n \in \mathcal{X}$, and $\alpha \in \R^n$. Consider
-  \begin{align*}
-    \sum_{i, j} \alpha_i k(x_i, x_j) \alpha_jh &= \sum_{i, j} \alpha_i \bra \phi(x_i), \phi(x_j)\ket\\
-    &= \left\bra \sum_i \alpha_i \phi(x_i), \sum_j \alpha_j \phi(x_j)\right\ket\\
-    &\geq 0
-  \end{align*}
-  since the inner product is positive definite.
-\end{proof}
-
-It would be nice to have a way to construct new kernels from old kernels.
+We will prove that every positive-definite kernel comes from a feature map. However, before that, let's look at some examples.
 \begin{eg}
   Suppose $k_1, k_2, \ldots, k_n$ are kernels. Then
   \begin{itemize}
-    \item If $\alpha_1, \alpha_2 \geq 0$, then $\alpha_1 k_1 + \alpha_2 k_2$ is a kernel.
-
-    If $\lim_{m \to \infty} k_m(x, x') \equiv k(x, x')$ exists, then $k$ is a kernel.
-    \item The pointwise product $k_1k_2$ is a kernel (where $(k_1 k_2)(x, x') = k_1(x, x') k_2(x, x')$)
+    \item If $\alpha_1, \alpha_2 \geq 0$, then $\alpha_1 k_1 + \alpha_2 k_2$ is a kernel. Moreover, if
+      \[
+        k(x, x') = \lim_{m \to \infty} k_m(x, x')
+      \]
+      exists, then $k$ is a kernel.
+    \item The pointwise product $k_1k_2$ is a kernel, where
+      \[
+        (k_1 k_2)(x, x') = k_1(x, x') k_2(x, x').
+      \]
   \end{itemize}
 \end{eg}
-Proofs are left as an exercise on the example sheet.
 
 \begin{eg}
   The \term{linear kernel} is $k(x, x') = x^T x'$. To see this, we see that this is given by the feature map $\phi = \id$ and taking the standard inner product on $\R^p$.
@@ -394,7 +439,7 @@ Proofs are left as an exercise on the example sheet.
   \[
     k(x, x') = \exp\left(- \frac{\|x- x'\|^2_2}{2\sigma^2}\right).
   \]
-  The quantity $\sigma$ is known as the \term{bandwidth}.% $\sigma$ or $\sigma^2$?
+  The quantity $\sigma$ is known as the \term{bandwidth}.
 
   To show that it is a kernel, we decompose
   \[
@@ -410,9 +455,7 @@ Proofs are left as an exercise on the example sheet.
   \[
     k_2(x, x') = \exp\left(\frac{x^T x'}{\sigma^2}\right) = \sum_{r = 0}^\infty \frac{1}{r!} \left(\frac{x^T x'}{\sigma^2}\right)^r.
   \]
-  We see that this is the infinite linear combination of powers of kernels, hence is a kernel.
-
-  Thus, it follows that $k = k_1 k_2$ is a kernel.
+  We see that this is the infinite linear combination of powers of kernels, hence is a kernel. Thus, it follows that $k = k_1 k_2$ is a kernel.
 
   Note also that any feature map giving this $k$ must take values in an infinite dimensional inner product space. Roughly speaking, this is because we have arbitrarily large powers of $x$ and $x'$ in the expansion of $k$.
 \end{eg}
@@ -422,7 +465,7 @@ Proofs are left as an exercise on the example sheet.
   \[
     k(x, x') = \min(x, x').
   \]
-  This is the covariance function of Brownian motion, so must be a kernel.
+  A slick proof that this is a kernel is to notice that this is the covariance function of Brownian motion.
 \end{eg}
 
 \begin{eg}
@@ -436,7 +479,6 @@ Proofs are left as an exercise on the example sheet.
   \]
 \end{eg}
 
-\subsection{Reproducing kernel Hilbert spaces}
 \begin{thm}[Moore--Aronszajn theorem]\index{Moore--Aronszajn theorem}
   For every kernel $k: \mathcal{X} \times \mathcal{X} \to \R$, there exists an inner product space $\mathcal{H}$ and a feature map $\phi: \mathcal{X} \to \mathcal{H}$ such that
   \[
@@ -448,7 +490,7 @@ This is not actually the full Moore--Aronszajn theorem, but a simplified version
 \begin{proof}
   Let $\mathcal{H}$ denote the vector space of functions $f: \mathcal{X} \to \R$ of the form
   \[
-    f(\ph) = \sum_{i = 1}^n \alpha_i k(\cdot, x_i)\tag{$*$}
+    f(\ph) = \sum_{i = 1}^n \alpha_i k(\ph, x_i)\tag{$*$}
   \]
   for some $n \in \N$, $\alpha_1, \ldots, \alpha_n \in \R$ and $x_1, \ldots, x_n \in \mathcal{X}$. If
   \[
@@ -468,7 +510,7 @@ This is not actually the full Moore--Aronszajn theorem, but a simplified version
   \[
     \bra f, f \ket = \sum_{i = 1}^n \sum_{j = 1}^m \alpha_i k(x_i, x_j) \alpha_j \geq 0
   \]
-  since the kernel is positive semi-definite. It remains to check that if $\bra f, f\ket = 0$, then $f = 0$ as a function. To this end, note the important reproducing property: by $(\dagger)$, we have
+  since the kernel is positive semi-definite. It remains to check that if $\bra f, f\ket = 0$, then $f = 0$ as a function. To this end, note the important \term{reproducing property}: by $(\dagger)$, we have
   \[
     \bra k(\ph, x), f\ket = f(x).
   \]
@@ -491,17 +533,17 @@ This is not actually the full Moore--Aronszajn theorem, but a simplified version
   as desired.
 \end{proof}
 
-How can we boost this theorem up to its full strength, where we say there is a ``unique'' inner product space with such a feature map. Of course, it will not be unique unless we impose appropriate quantifiers, since we can just throw in some random elements into $\mathcal{H}$.
+We shall boost this theorem up to its full strength, where we say there is a ``unique'' inner product space with such a feature map. Of course, it will not be unique unless we impose appropriate quantifiers, since we can just throw in some random elements into $\mathcal{H}$.
 
 Recall (or learn) from functional analysis that any inner product space $\mathcal{B}$ is a normed space, with norm
 \[
-  \|f\|^2 = \bra f,f \ket_\mathbf{B}.
+  \|f\|^2 = \bra f,f \ket_\mathcal{B}.
 \]
-We say sequence $(f_m)$ in a normed space $\mathcal{B}$ if $\|f_m - f_n\|_\mathcal{B} \to 0$ as $n, m \to \infty$. An inner product space is \emph{complete}\index{complete inner product space} if every Cauchy sequence has a limit (in the space), and a complete inner product space is called a \term{Hilbert space}.
+We say sequence $(f_m)$ in a normed space $\mathcal{B}$ is \emph{Cauchy}\index{Cauchy sequence} if $\|f_m - f_n\|_\mathcal{B} \to 0$ as $n, m \to \infty$. An inner product space is \emph{complete}\index{complete inner product space} if every Cauchy sequence has a limit (in the space), and a complete inner product space is called a \term{Hilbert space}.
 
 One important property of a Hilbert space $\mathcal{B}$ is that if $V$ is a closed subspace of $\mathcal{B}$, then every $f \in \mathcal{B}$ has a unique representation as $f = v + w$, where $v \in V$ and
 \[
-  w \in V^\perp = \{u \in \mathcal{B}: \bra u, y\ket = 0 \forall y \in V\}.
+  w \in V^\perp = \{u \in \mathcal{B}: \bra u, y\ket = 0 \text{ for all } y \in V\}.
 \]
 By adding limits of Cauchy sequences to $\mathcal{H}$, we can obtain a Hilbert space. Indeed, if $(f_m)$ is Cauchy in $\mathcal{H}$, then
 \[
@@ -537,7 +579,7 @@ We know the reproducing kernel associated with an RKHS is a positive-definite ke
   \]
   By definition, we have
   \[
-    \mathcal{H} = \{f:\R^p \to \R \mid f(x) = \sum_{i = 1}^n \alpha_i x_i^T x\}
+    \mathcal{H} = \left\{f:\R^p \to \R \mid f(x) = \sum_{i = 1}^n \alpha_i x_i^T x\right\}
   \]
   for some $n \in \N$, $x_1, \ldots, x^n \in \R^p$. We then see that this is equal to
   \[
@@ -572,7 +614,6 @@ We know the reproducing kernel associated with an RKHS is a positive-definite ke
   \[
     \int_0^x 1^2 \;\d t = x.
   \]
-  The proof is quite tricky.
 \end{eg}
 
 In general, it is difficult to understand the RKHS, but if we can do so, this provides a lot of information on what we are regularizing in the kernel trick.
@@ -805,13 +846,13 @@ Since the objective function is invariant to any positive scaling of $\beta$, we
 \[
   \frac{1}{\|\beta\|_2} - \lambda \sum_{i = 1}^n (1 - Y_i x-i^T \beta)_+.
 \]
-Replacing $\max \frac{1}{\|\beta\|_2}$ with minimizing $\|\beta\|_2^2$ and adding instead of subtracting the penalty part, we write  this as
+Replacing $\max \frac{1}{\|\beta\|_2}$ with minimizing $\|\beta\|_2^2$ and adding instead of subtracting the penalty part, we write this as
 \[
-  \min_{\beta \in \R^p} \left(\|\beta\|_2^2  + \lambda \sum_{i = 1}^n (1 - Y_i x_i^T \beta)_+\right).
+  \min_{\beta \in \R^p} \left(\|\beta\|_2^2 + \lambda \sum_{i = 1}^n (1 - Y_i x_i^T \beta)_+\right).
 \]
 The final change we make is that we replace $\lambda$ with $\frac{1}{\lambda}$, and multiply the whole equation by $\lambda$ to get
 \[
-  \min_{\beta \in \R^p} \left(\lambda \|\beta\|_2^2  + \sum_{i = 1}^n (1 - Y_i x_i^T \beta)_+\right).
+  \min_{\beta \in \R^p} \left(\lambda \|\beta\|_2^2 + \sum_{i = 1}^n (1 - Y_i x_i^T \beta)_+\right).
 \]
 This looks much more like what we've seen before, with $\lambda \|\beta\|_2^2$ being the penalty term and $\sum_{i = 1}^n (1 - Y_i x_i^T \beta)_+$ being the loss function.
 
@@ -831,7 +872,7 @@ Note that in our original model, given a new observation $x$, predictions are ob
 
 We let $\mathcal{H}$ be the RKHS corresponding to the linear kernel. We can then write $(*)$ as
 \[
-  (\hat{\mu}_\lambda, \hat{f}_\lambda) = \argmin_{(\mu, f) \in \R \times \mathcal{H}} \sum_{i = 1}^n (1 - Y_i( f(x_i) + \mu))_+  + \lambda \|f\|_{\mathcal{H}}^2.
+  (\hat{\mu}_\lambda, \hat{f}_\lambda) = \argmin_{(\mu, f) \in \R \times \mathcal{H}} \sum_{i = 1}^n (1 - Y_i( f(x_i) + \mu))_+ + \lambda \|f\|_{\mathcal{H}}^2.
 \]
 The representer theorem (or rather, a slight variant of it) tells us that the above optimization problem is equivalent to the \term{support vector machine}
 \[
@@ -1161,7 +1202,7 @@ In general, bounded random variables are sub-Gaussian.
 Recall that the sum of two independent Gaussians is still a Gaussian. This continues to hold for sub-Gaussian random variables.
 
 \begin{prop}
-  Let $(W_i)_{i = 1}^n$ be a collection of independent mean-zero sub-Gaussian random variables with parameters $(\sigma_i)_{i = 0}^n$, and let $\gamma \in \R^n$. Then $\gamma^T W$ is sub-Gaussian with parameter
+  Let $(W_i)_{i = 1}^n$ be independent mean-zero sub-Gaussian random variables with parameters $(\sigma_i)_{i = 0}^n$, and let $\gamma \in \R^n$. Then $\gamma^T W$ is sub-Gaussian with parameter
   \[
     \left(\sum (\gamma_i \sigma_i)^2\right)^{1/2}.
   \]
@@ -1181,7 +1222,7 @@ Recall that the sum of two independent Gaussians is still a Gaussian. This conti
   \[
     \lambda = A \sigma \sqrt{\frac{\log p}{n}}.
   \]
-  Let $X$ be a matrix whose columns all have norm $\sqrt{n}$. Then 
+  Let $X$ be a matrix whose columns all have norm $\sqrt{n}$. Then
   \[
     \P\left(\frac{1}{n} \|X^T \varepsilon\|_{\infty} \leq \lambda\right) \geq 1 - 2p^{-(A^2/2 - 1)}. % define what X is.
   \]
@@ -1245,7 +1286,7 @@ Note that for large $t$, the bound goes as $e^{-t}$ instead of $e^{-t^2}$.
     \E \exp\left(\frac{1}{n} \sum_{i = 1}^n \alpha (W_i - \mu)\right) &= \prod_{i = 1}^n \E \exp\left(\frac{\alpha}{n} (W_i - \mu)\right)\\
     &\leq \exp \left(n \frac{\left(\frac{\alpha}{n}\right)^2 \sigma^2/2}{1 - b \left|\frac{\alpha}{n}\right|}\right),
   \end{align*}
-  assuming $\left|\frac{\alpha}{n}\right| < \frac{1}{n}$.  So it follows that
+  assuming $\left|\frac{\alpha}{n}\right| < \frac{1}{n}$. So it follows that
   \[
     \P \left(\frac{1}{n} \sum_{i = 1}^n W_i - \mu \geq t\right) \leq e^{-\alpha t}.
   \]
@@ -1305,8 +1346,479 @@ Note that for large $t$, the bound goes as $e^{-t}$ instead of $e^{-t^2}$.
   \[
     \E W^{2k} = 2^{k + 1} \sigma_W^{2k} k \sigma_W^2 \int_0^\infty x^{k - 1} e^{-x}\;\d x = 4 \cdot k! \sigma_W^2.
   \]
-  Then we are done.
+  Plugging this back in, we have
+  \begin{align*}
+    \E|WZ - \E WZ|^k &\leq 2^k 2^{k + 1} k! \sigma_W^k \sigma_Z^k \sigma_Z^k\\
+    &= \frac{1}{2} k! 2^{2k + 2} \sigma_W^k \sigma_Z^k\\
+    &= \frac{1}{2} k! (8 \sigma_W \sigma_Z)^2 (4 \sigma_W \sigma_Z)^{k - 2}.
+  \end{align*}
 \end{proof}
 
+We'll leave these estimates aside for a bit, and give more background on convex analysis and convex optimization.
+
+\subsection{Convex analysis and optimization theory}
+Recall the following definition:
+\begin{defi}[Convex set]\index{convex set}
+  A set $A \subseteq \R^d$ is convex if for any $x, y \in A$ and $t \in [0, 1]$, we have
+  \[
+    (1 - t)x + ty \in A.
+  \]
+\end{defi}
+\begin{center}
+  \begin{tikzpicture}
+    \begin{scope}[shift={(-2, 0)}]
+      \draw [fill=gray!50!white] plot [smooth cycle, tension=0.7] coordinates {(0, 1) (-0.7, 0.7) (-1, 0) (-0.6, -1) (0, 0) (0.6, -1) (1, 0) (0.7, 0.7)};
+      \draw (-0.5, -0.5) node [circ] {} -- (0.5, -0.5) node [circ] {};
+
+      \node at (0, -1.5) {non-convex};
+    \end{scope}
+
+    \begin{scope}[shift={(2, 0)}]
+      \draw [fill=gray!50!white] plot [smooth cycle, tension=0.7] coordinates {(0, 1) (-0.7, 0.7) (-1, 0) (-0.6, -1) (0.6, -1) (1, 0) (0.7, 0.7)};
+      \node at (0, -1.5) {convex};
+    \end{scope}
+  \end{tikzpicture}
+\end{center}
+
+We are actually more interested in convex functions. Let $\bar{\R} = \R \cup \{\infty\}$. We shall allow our functions to take value $\infty$. The point is that if we want our function to be defined in $[a, b]$, then it is convenient to extend it to be defined on all of $\R$ by setting the function to be $\infty$ outside of $[a, b]$.
+
+\begin{defi}[Convex function]\index{convex function}
+  A function $f: \R^d \to \bar{\R}$ is \emph{convex} iff
+  \[
+    f((1 - t)x + ty) \leq (1 - t) f(x) + t f(y)
+  \]
+  for all $x, y \in \R^d$ and $t \in (0, 1)$. Moreover, we require that $f(x) < \infty$ for at least one $x$.
+
+  We say it is \emph{strictly convex} if the inequality is strict for all $x, y$ and $t \in (0, 1)$.
+\end{defi}
+\begin{center}
+  \begin{tikzpicture}
+    \draw(-2, 4) -- (-2, 0) -- (2, 0) -- (2, 4);
+    \draw (-1.3, 0.1) -- (-1.3, -0.1) node [below] {$x$};
+    \draw (1.3, 0.1) -- (1.3, -0.1) node [below] {$y$};
+    \draw (-1.7, 2) parabola bend (-.2, 1) (1.7, 3.3);
+    \draw [dashed] (-1.3, 0) -- (-1.3, 1.53) node [circ] {};
+    \draw [dashed] (1.3, 0) -- (1.3, 2.42) node [circ] {};
+    \draw (-1.3, 1.53) -- (1.3, 2.42);
+    \draw [dashed] (0, 0) node [below] {\tiny $(1 - t) x + t y$} -- (0, 1.975) node [above] {\tiny$(1 - t) f(x) + t f(y)\quad\quad\quad\quad\quad\quad$} node [circ] {};
+  \end{tikzpicture}
+\end{center}
+
+\begin{defi}[Domain]\index{domain}
+  Define the \emph{domain} of a function $f: \R^d \to \bar{\R}$ to be
+  \[
+    \dom f = \{x : f(x) < \infty\}.
+  \]
+\end{defi}
+One sees that the domain of a convex function is always convex.
+
+\begin{prop}\leavevmode
+  \begin{enumerate}
+    \item Let $f_1, \ldots, f_m: \R^d \to \bar{\R}$ be convex with $\dom f_1 \cap \cdots \cap \dom f_m \not = \emptyset$, and let $c_1, \ldots, c_m \geq 0$. Then $c_1 + \cdots + c_m f_m$ is a convex function.
+    \item If $f: \R^d \to \R$ is twice continuously differentiable, then
+      \begin{enumerate}
+        \item $f$ is convex iff its Hessian is positive semi-definite everywhere.
+        \item $f$ is strictly convex if its Hessian positive definite everywhere.
+      \end{enumerate}
+  \end{enumerate}
+\end{prop}
+Note that having a positive definite Hessian is not necessary for strict convexity, e.g.\ $x^4$ is strictly convex but has vanishing Hessian at $0$.
+
+Now consider a constrained optimization problem
+\begin{center}
+  minimize $f(x)$ subject to $g(x) = 0$
+\end{center}
+where $x \in \R^d$ and $g: \R^d \to \R^b$. The \term{Lagrangian} for this problem is
+\[
+  L(x, \theta) = f(x) + \theta^T g(x).
+\]
+Why is this helpful? Suppose the optimum value is $c^*$. Now note that for any $\theta$, we have
+\[
+  \inf_{x \in \R^d} L(x, \theta) \leq \inf_{x: g(x) = 0} L(x, \theta) = c^*.
+\]
+The Lagrangian method involves finding a $\theta^*$ such that the $x^*$ minimizing $L(x, \theta^*)$ satisfies $g(x^*) = 0$. This $x^*$ must then be optimal for the original problem. % fix this
+
+\subsubsection*{Subgradients}
+We would like to come up with some sort of derivative for functions that are not necessarily differentiable. This is useful for our purposes, because in the Lasso, the $\ell_1$ norm is not differentiable.
+
+\begin{defi}[Subgradient]\index{subgradient}
+  A vector $v \in \R^d$ is a \emph{subgradient} of a convex function at $x$ if $f(y) \geq f(x) + v^T(y - x)$ for all $y \in \R^d$.
+
+  The set of subgradients of $f$ at $x$ is denoted $\partial f(x)$, and is called the \term{subdifferential}.
+\end{defi}
+
+% insert picture, P&M
+
+Observe that
+\begin{prop}
+  Let $f$ be convex and differentiable at $x \in \int(\dom f)$. Then $\partial f(x) = \{\nabla f(x)\}$.
+\end{prop}
+
+\begin{prop}
+  Suppose $f$ and $g$ are convex with $\int(\dom f) \cap \int (\dom g) \not= \emptyset$, and $\alpha > 0$. Then
+  \begin{align*}
+    \partial (\alpha f)(x) &= \alpha \partial f(x) = \{\alpha v: v \in \partial f(x)\}\\
+    \partial (f + g)(x) &= \partial g(x) + \partial f(x).
+  \end{align*}
+\end{prop}
+
+\begin{prop}
+  If $f$ is convex, then
+  \[
+    x^* \in \argmin_{x \in \R^d} f(x) \Leftrightarrow 0 \in \partial f(x^*).
+  \]
+\end{prop}
+
+\begin{proof}
+  Both sides are equivalent to the requirement that $f(y) \geq f(x^*)$ for all $y$.
+\end{proof}
+
+We are interested in applying this to the Lasso. So we want to compute the subdifferential of the $\ell_1$ norm. Let's first introduce some notation.
+
+\begin{notation}\index{$x_A$}\index{$x_{-j}$}
+  For $x \in \R^d$ and $A \subseteq \{1 \ldots, d\}$, we write $x_A$ for the sub-vector of $x$ formed by the components of $x$ induced by $A$. We write $x_{-j} = x_{\{j\}^c} = x_{\{1, \ldots, d\} \setminus j}$. Similarly, we write $x_{-jk} = x_{\{jk\}^c}$ etc.
+
+  We write\index{$\sgn$}
+  \[
+    \sgn(x_i) =
+    \begin{cases}
+      -1 & x_i < 0\\
+      1 & x_i > 0\\
+      0 & \text{otherwise}
+    \end{cases},
+  \]
+  and $\sgn(x) = (\sgn(x_1), \ldots, \sgn(x_d))^T$.
+\end{notation}
+
+First note that $\|\ph\|_1$ is convex, as it is a norm.
+
+\begin{prop}
+  For $x \in \R^d$ and $A \in \{j: x_j \not= 0\}$. Then
+  \[
+    \partial \|x\|_1 = \{v \in \R^d: \|v\|_\infty \leq 1, v_A = \sgn (x_A)\}.
+  \]
+\end{prop}
+
+\begin{proof}
+  It suffices to look at the subdifferential of the absolute value function, and then add them up.
+
+  For $j = 1, \ldots, d$, we define $g_j: \R^d \to \R$ by sending $x$ to $|x_j|$. If $x_j \not= 0$, then $g_j$ is differentiable at $x$, and so we know $\partial g_j (x) = \{\sgn(x_j) e_j\}$, with $e_j$ the $j$th standard basis vector.
+
+  When $x_j = 0$, if $v \in \partial g_j(x_j)$, then
+  \[
+    g_j(y) \geq g_j(x) + v^T(y - x).
+  \]
+  So
+  \[
+    |y_j| \geq v^T (y - x).
+  \]
+  We claim this holds iff $v_j \in [-1, 1]$ and $v_{-j} = 0$. The $\Leftarrow$ direction is an immediate calculation, and to show $\Rightarrow$, we pick $y_{-j} = v_{-j} + x_{-j}$, and $y_j = 0$. Then we have
+  \[
+    0 \geq v_{-j}^T v_{-j}.
+  \]
+  So we know that $v_{-j} = 0$. Once we know this, the condition says
+  \[
+    |y_j| \geq v_j y_j
+  \]
+  for all $y_j$. This is then true iff $v_j \in [-1, 1]$. Forming the set sum of the $\partial g_j(x)$ gives the result.
+\end{proof}
+
+\subsection{Properties of Lasso solutions}
+Recall that the Lasso objective was
+\[
+  Q_\lambda (\beta) = \frac{1}{2n} \|Y - X \beta\|_2^2 + \lambda \|\beta\|_1.
+\]
+We know this is a convex function in $\beta$. So we know $\hat{\beta}_\lambda^L$ is a minimizer of $Q_\lambda(\beta)$ iff $0 \in \partial Q_\lambda(\hat{\beta})$.
+
+Let's subdifferentiate $Q_\lambda$ and see what this amounts to. We have
+\[
+  \partial Q_\lambda(\hat{\beta}) = \left\{-\frac{1}{n}X^T(Y - X \beta)\right\} + \lambda \{\hat{\nu} \in \R^d: \|\hat{\nu}\|_\infty \leq 1, \hat{\nu}|_{\hat{\rho}_\lambda^l} = \sgn (\hat{\beta}_{\lambda, \hat{\rho}_\lambda^L}^L)\},
+\]
+where $\hat{\rho}_\lambda^L = \{j : \hat{\beta}_{\lambda, j}^L \not= 0\}$. % the \rho is probably an S
+
+Thus, $0 \in \partial Q_\lambda (\hat{\beta}_\lambda)$ is equivalent to
+\[
+  \frac{1}{n} X^T (Y - X \hat{\beta}_\lambda) = \lambda \hat{\nu}
+\]
+for some $\hat{\nu}$ with $\|\hat{\nu}\|_{\infty} \leq 1$ and $\hat{\nu}_{\hat{\rho}_\lambda^L} = \sgn (\hat{\beta}_{\lambda, \hat{\rho}^L_\lambda}^L)$. These are known as the \term{KKT conditions} for the Lasso.
+
+In principle, there could be several solutions to the Lasso. However, at least the fitted values are always unique.
+
+\begin{prop}
+  $X \hat{\beta}_\lambda^L$ is unique.
+\end{prop}
+\begin{proof}
+  Fix $\lambda > 0$ and stop writing it. Suppose $\hat{\beta}^{(1)}$ and $\hat{\beta}^{(2)}$ are two Lasso solutions at $\lambda$.
+  \[
+    Q(\hat{\beta}^{(1)} = Q(\hat{\beta}^{(2)}) = c^*.
+  \]
+ Then since $Q$ is convex, we know
+  \[
+    c^* = Q\left(\frac{1}{2} \hat{\beta}^{(1)} + \frac{1}{2} \hat{\beta}^{(2)}\right) \leq \frac{1}{2} Q(\hat{\beta}^{(1)}) + \frac{1}{2} Q(\hat{\beta}^{(2)}) = c^*.
+  \]
+  So $\frac{1}{2} \hat{\beta}^{(1)} + \frac{1}{2} \hat{\beta}^{(2)}$ is also a minimizer.
+
+  Since the two terms in $Q(\beta)$ are individually convex, it must be the case that
+  \begin{align*}
+    \norm{\frac{1}{2} (Y - X\hat{\beta}^{(1)}) + \frac{1}{2} (Y - X \hat{\beta}^{(2)}}_2^2 &= \frac{1}{2} \norm{Y - X \hat{\beta}^{(1)}}_2^2 + \frac{1}{2} \norm{Y - X \hat{\beta}^{(2)}}_2^2\\
+    \norm{\frac{1}{2} (\hat{\beta}^{(1)} + \hat{\beta}^{(2)})}_1 &= \frac{1}{2} \|\hat{\beta}^{(1)}\|_1 + \frac{1}{2} \|\hat{\beta}^{(2)}\|_1.
+  \end{align*}
+  Moreover, since $\|\ph\|_2^2$ is strictly convex, we can have equality only if $X \hat{\beta}^{(1)} = X \hat{\beta}^{(2)}$. So we are done.
+\end{proof}
+
+\begin{defi}[Equicorrelation set]\index{equicorrelation set}
+  Define the \emph{equicorrelation set} $\hat{E}_\lambda$ to be the set of $k$ such that
+  \[
+    \frac{1}{n} |X_k^T(Y - X \hat{\beta}_\lambda^L)| = \lambda,
+  \]
+  which is well-defined since it depends only on the fitted values.
+\end{defi}
+By the KKT conditions, $\hat{E}_\lambda$ contains the set of non-zeroes of Lasso solutions.
+
+If $\rk(X_{\hat{E}_\lambda} = |\hat{E}_\lambda|$, then the Lasso solution must be unique since
+\[
+  X_{\hat{E}_\lambda} (\hat{\beta}^{(1)} - \hat{\beta}^{(2)}) = 0.
+\]
+So $\hat{\beta}^{(1)} = \hat{\beta}^{(2)}$.
+
+\subsection{Variable selection}
+The point of using the Lasso was to pick out some ``important'' variables and discard the rest. How well does it do the job?
+
+Consider a noiseless linear model
+\[
+  Y = X \beta^0.
+\]
+It is still not a trivial problem to figure out
+\[
+  S = \{k: \beta_k^0 \not= 0\}.
+\]
+We may wlog assume $S = \{1, \ldots, s\}$, and $N = \{1 \ldots p\} \setminus S$ (as usual $X$ is $n \times p$).
+
+We assume that $\rk (X_s) = s$. Even if we know $|S|$, it is still not clear how we can practically find out the actual set $S$. It turns out the Lasso still need some special properties of the design matrix for it to work.
+
+\begin{thm}
+  Let $\lambda > 0$, and define
+  \[
+    \Delta = X_N^T X_S (X_S^T X_S)^{-1} \sgn (\beta^0_S).
+  \]
+  Then
+  \begin{enumerate}
+    \item If $\|\Delta\|_\infty \leq 1$, or equivalently
+      \[
+        \max_{k \in N} |\sgn(\beta^0_S)^T (X^T_S X_S)^{-1} X^T_S X_k| \leq 1,
+      \]
+      and
+      \[
+        |\beta^0_k| > \lambda \left|\sgn(\beta^0_S)^T \left(\frac{1}{n} X_j^T X_j\right)^{-1}_k\right|
+      \]
+      for all $k \in S$, then there exists a Lasso solution $\hat{\beta}^L_\lambda$ with $\sgn(\hat{\beta}_\lambda^L) = \sgn(\beta^0)$.
+    \item If there exists a Lasso solution with $\sgn (\hat{\beta}_\lambda^L) = \sgn(\beta^0)$, then $\|\Delta\|_\infty \leq 1$.
+  \end{enumerate}
+\end{thm}
+We are going to make heavy use of the KKT conditions.
+\begin{proof}
+  Write $\hat{\beta} = \hat{\beta}^L_\lambda$, and write $\hat{S} = \{k: \hat{\beta}_k \not= 0\}$. Then the KKT conditions are that
+  \[
+    \frac{1}{n} X^T (\beta^0 - \hat{\beta}) = \lambda \hat{\nu},
+  \]
+  where $\|\hat{\nu}\|_{\infty} \leq 1$ and $\hat{\nu}_{\hat{S}} = \sgn (\hat{\beta}_{\hat{S}})$.
+
+  We write the LHS as
+  \[
+    \frac{1}{n}
+    \begin{pmatrix}
+      X_S^T X_S & X_S^T X_N\\
+      X_N^T X_S & XN^T X_N
+    \end{pmatrix}
+    \begin{pmatrix}
+      \beta^0_S - \hat{\beta}_S\\
+      -\hat{\beta}_N
+    \end{pmatrix} = \lambda
+    \begin{pmatrix}
+      \hat{\nu}_S\\
+      \hat{\nu}_N
+    \end{pmatrix}.
+  \]
+  Call the top and bottom equations (1) and (2) respectively.
+
+  It is easier to prove (ii) first. If there is such a solution, then $\hat{\beta}_N = 0$. So from (1), we must have
+  \[
+    \frac{1}{n} X_S^T X_S (\beta^0_S - \hat{\beta}_S) = \lambda \hat{\nu}_S.
+  \]
+  Inverting $\frac{1}{n} X_S^T X_S$, we learn that
+  \[
+    \beta^0_S - \hat{\beta}_S = \lambda \left(\frac{1}{n} X_S^T X_S\right)^{-1} \sgn (\beta^0_S).
+  \]
+  Substitute this into (2) to get
+  \[
+    \lambda \frac{1}{n} X_N^T X_S \left(\frac{1}{n} X_S^T X_S\right)^{-1} \sgn (\beta^0_S) = \lambda \hat{\nu}_N.
+  \]
+  By the KKT conditions, we know $\|\hat{\nu}_N\|_\infty \leq 1$., and the LHS is exactly $\lambda\Delta$.
+
+  To prove (1), we need to exhibit a $\hat{\beta}$ that agrees in sign with $\hat{\beta}$ and satisfies the equations (1) and (2). In particular, $\hat{\beta}_N = 0$. So we try
+  \begin{align*}
+    (\hat{\beta}_S, \hat{\nu}_S) &= \left(\beta^0_S - \lambda \left(\frac{1}{n} X_S^T X_S\right)^{-1} \sgn (\beta^0_S), \sgn (\beta^0_S)\right)\\
+    (\hat{\beta}_N, \nu_N) &= (0, \Delta).
+  \end{align*}
+  This is by construction a solution. We then only need to check that
+  \[
+    \sgn (\hat{\beta}_S) = \sgn (\beta^0_S),
+  \]
+  which follows from the second condition.
+\end{proof}
+
+\subsubsection*{Prediction and estimation}
+Now consider $Y = X \beta^0 + \varepsilon - \bar{\varepsilon} 1$, where the $\varepsilon_i$ are independent and have common sub-Gaussian parameter $\sigma$. Let $S, s, N$  be as before.
+
+\begin{defi}[Compatibility factor]\index{compatibility factor}
+  Define the \emph{compatibility factor} to be
+  \begin{align*}
+    \phi^2 &= \inf_{\beta \in \R^p, \|\beta_N\|_1 \leq 3 \|\beta_S\|_1, \beta_S \not= 0} \frac{\frac{1}{n} \|X \beta\|_2^2}{ \frac{1}{s} \|\beta_S\|^2_1}\\
+    &= \inf_{\beta \in \R^p: \|\beta_S\| = 1, \|\beta_N\|_1 \leq 3} \frac{s}{n} \|X_s \beta_s - X_N \beta_N\|_2^2.
+  \end{align*}
+\end{defi}
+Note that we are free to use a minus sign inside the norm since the problem is symmetric in $\beta_N \leftrightarrow -\beta_N$.
+
+In some sense, this $\phi$ measures how well we can approximate $X_S \beta_S$ just with the noise variables.
+\begin{defi}[Compatibility condition]\index{compatibility condition}
+  The \emph{compatibility condition} is $\phi > 0$.
+\end{defi}
+
+Note that if $\hat{\Sigma} = \frac{1}{n} X^T X$ has minimum eigenvalue $c_{min} > 0$, then we have $\phi^2 \geq c_{min}$. Indeed,
+\[
+  \|\beta_S\|_1 = \sgn (\beta_S)^T \beta_S \leq \sqrt{s} \|\beta_S\|_2 \leq \sqrt{s} \|\beta\|_2,
+\]
+and so
+\[
+  \phi^2 \geq \inf_{\beta \not= 0} \frac{\frac{1}{n} \|X \beta\|_2^2}{\|\beta\|_2^2\|} = c_{min}.
+\]
+Of course, we don't expect the minimum eigenvalue to be positive, but we have the restriction in infimum in the definition of $\phi^2$ and we can hope to have a positive value of $\phi^2$.
+
+\begin{thm}
+  Assume $\phi^2 > 0$, and let $\hat{\beta}$ be the Lasso solution with
+  \[
+    \lambda = A \sigma \sqrt{\log p/n}.
+  \]
+  Then with probability at least $1 - 2p^{-(A^2/8 - 1)}$, we have
+  \[
+    \frac{1}{n} \|X (\beta^0 - \hat{\beta})\|_2^2 + \lambda\|\hat{\beta} - \beta^0\|_1 \leq \frac{16 \lambda^2 s}{\phi^2} = \frac{16 A^2 \log p}{\phi^2} \frac{s \sigma^2}{n}.
+  \]
+\end{thm}
+This is actually two bounds. This simultaneously bounds the error in the fitted values, and a bound on the error in predicting $\hat{\beta} - \beta^0$.
+
+Recall that in our previous bound, we had a bound of $\sim \frac{1}{\sqrt{n}}$, and now we have $\sim \frac{1}{n}$. Note also that $\frac{s \sigma^2}{n}$ is the error we would get if we magically knew which were the non-zero variables and did ordinary least squares on those variables.
+
+This also tells us that if $\beta^0$ has a component that is large, then $\hat{\beta}$ must be non-zero in that component as well. So while the Lasso cannot predict exactly which variables are non-zero, we can at least get the important ones.
+
+\begin{proof}
+  Start with the ``basic inequality'' $Q_\lambda(\hat{\beta}) \leq Q_\lambda(\beta^0)$, which gives us
+  \[
+    \frac{1}{2n} \|X (\beta^0 - \hat{\beta})\|_2^2 + \lambda \|\hat{\beta}\|_1 \leq \frac{1}{n} \varepsilon^T X(\hat{\beta} - \beta^0) + \lambda \|\beta^0\|_1.
+  \]
+  We work on the event
+  \[
+    \Omega = \left\{\frac{1}{n} \|X^T \varepsilon \|_\infty \leq \frac{1}{2} \lambda\right\},
+  \]
+  where after applying H\"older's inequality, we get
+  \[
+    \frac{1}{n} \|X(\beta^0 - \hat{\beta})\|_2^2 + 2 \lambda \|\hat{\beta}\|_1 \leq \lambda \|\hat{\beta} - \beta^0\|_1 + 2 \lambda \|\beta^0\|_1.
+  \]
+  We can move $2 \lambda \|\hat{\beta}\|_1$ to the other side, and applying the triangle inequality, we have
+  \[
+    \frac{1}{n} \|X(\hat{\beta} - \beta^0)\|_2^2 \leq 3 \lambda \|\hat{\beta} - \beta^0\|.
+  \]
+  If we manage to bound the RHS from above as well, so that
+  \[
+    3\lambda \|\hat{\beta} - \beta^0\| \leq c \lambda \frac{1}{\sqrt{n}} \|X (\hat{\beta} - \beta^0)\|_2
+  \]
+  for some $c$, then we obtain the bound
+  \[
+    \frac{1}{n} \|X (\beta - \beta^0)\|_2^2 \leq c^2 \lambda^2.
+  \]
+  Plugging this back into the second bound, we also have
+  \[
+    3 \lambda \|\hat{\beta} - \beta^0\|_1 \leq c^2 \lambda^2.
+  \]
+  To obtain these bounds, we want to apply the definition of $\phi^2$ to $\hat{\beta} - \beta^0$. We thus need to show that the $\hat{\beta} - \beta^0$ satisfies the conditions required in the infimum taken.
+
+  Write
+  \[
+    a = \frac{1}{n\lambda} \|X (\hat{\beta} - \beta^0)\|_2^2.
+  \]
+  Then we have
+  \[
+    a + 2 (\|\hat{\beta}_n\|_1 + \|\hat{\beta}_S\|_1) \leq \|\hat{\beta}_S - \beta^0_S \|_1 + \|\hat{\beta}_N\|_1 + 2 \|\beta^0_S\|_1.
+  \]
+  Simplifying, we obtain
+  \[
+    a + \|\hat{\beta}_N\|_1 \leq \|\hat{\beta}_S - \beta^0_S\|_1 + 2 \|\beta^0_S\|_1 - 2 \|\hat{\beta}_S\|_1.
+  \]
+  Using the triangle inequality, we write this as
+  \[
+    a + \|\hat{\beta}_N - \beta^0\|_N \leq 3 \|\hat{\beta}_S - \beta_S^0\|_1.
+  \]
+  So we immediately know we can apply the compatibility condition, which gives us
+  \[
+    \phi^2 \leq \frac{\frac{1}{n} \|X (\hat{\beta} - \beta^0)\|_2^2}{\frac{1}{s} \|\hat{\beta}_S - \beta^0_S\|_1^2}.
+  \]
+  Also, we have
+  \[
+    \frac{1}{n} \|X(\hat{\beta} -\beta^0)\|_2^2 + \lambda \|\hat{\beta} - \beta^0\|_1 \leq 4 \lambda\|\hat{\beta}_S - \beta^0_S\|_1.
+  \]
+  Thus, using the compatibility condition, we have
+  \[
+    \frac{1}{n} \|X (\hat{\beta} - \beta^0)\|^2_2 + \lambda \|\hat{\beta} - \beta^0\| \leq \frac{4 \lambda}{\phi} \sqrt{\frac{s}{n}} \|X (\hat{\beta} - \beta^0)\|_2.
+  \]
+  Thus, dividing through by $\frac{1}{\sqrt{n}} \|X(\hat{\beta} - \beta^0)\|_2$, we obtain
+  \[
+    \frac{1}{\sqrt{n}} \|X(\hat{\beta} - \beta^0)\|_2 \leq \frac{4 \lambda \sqrt{s}}{\phi}.\tag{$*$}
+  \]
+  So we substitute into the RHS $(*)$ and obtain
+  \[
+    \frac{1}{n} \|X (\hat{\beta} - \beta^0)\|_2^2 + \lambda \|\hat{\beta} - \beta^0\|_1 \leq \frac{16 \lambda^2 s}{\phi^2}.
+  \]
+\end{proof}
+If we want to be impressed by this result, then we should make sure that the compatibility condition is a reasonable assumption to make on the design matrix.
+
+\subsubsection*{The compatibility condition and random design}
+Define
+\[
+  \phi_{\Sigma}^2(S) = \inf_{\beta: \|\beta_N\|_1 \leq 3 \|\beta_S\|_1, \beta_s \not= 0} \frac{\beta^T \Sigma \beta}{\|\beta_S\|_1^2/|S|}
+\]
+for $\Sigma \in \R^{p \times p}$. Note that our original $\phi^2$ was the same as $\phi^2_{\hat{\Sigma}}(S)$.
+
+If we want to analyze how $\phi^2_{\Sigma}(S)$ behaves for a ``random'' $\Sigma$, then we had better make sure this depends continuously on $\Sigma$. For our purposes, the following lemma suffices:
+\begin{lemma}
+  Let $\Theta, \Sigma \in \R^{p \times p}$. Suppose $\phi^2_\Theta(S) > 0$ and
+  \[
+    \max_{j, k} |\Theta_{jk} - \Sigma_{jk}| \leq \frac{\phi^2_{\Theta}(S)}{32|S|}.
+  \]
+  Then
+  \[
+    \phi^2_\Sigma(S) \geq \frac{1}{2} \phi^2_\Theta(S).
+  \]
+\end{lemma}
+
+\begin{proof}
+  We suppress the dependence on $S$ for notational convenience. Let $s = |S|$ and
+  \[
+    t = \frac{\phi^2_\Theta(S)}{32s}.
+  \]
+  We have
+  \[
+    |\beta^T (\Sigma - \Theta) \beta| \leq \|\beta\|_\infty \|(\Sigma - \Theta) \beta\|_\infty \leq t\|\beta\|_1^2,
+  \]
+  where we applied H\"older twice.
+
+  If $\|\beta_N\| \leq 3 \|\beta_S\|_1$, then we have
+  \[
+    \|\beta\|_1 \leq 4 \|\beta_S\|_1 \leq 4\frac{\sqrt{\beta^T \Theta \beta}}{\phi_\Theta/\sqrt{s}}.
+  \]
+  Thus, we have
+  \[
+    \beta^T \Theta \beta - \frac{\phi^2_\Theta}{32 s} \cdot \frac{16 \beta^T \Theta \beta}{\phi^2_\Theta /s} = \frac{1}{2} \beta^T \Theta \beta \leq \beta^T \Sigma \beta.
+  \]
+  So we are done.
+\end{proof}
 \printindex
 \end{document}

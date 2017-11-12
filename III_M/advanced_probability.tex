@@ -525,17 +525,20 @@ We shall end with the following key lemma. We will later use it to show that man
 \end{proof}
 
 \section{Martingales in discrete time}
-To define a martingale in the appropriate generality, we need the notion of a filtration.
+\subsection{Filtrations and martingales}
+We would like to model some random variable that ``evolves with time''. For example, in a simple random walk, $X_n$ could be the position we are at time $n$. To do so, we would like to have some $\sigma$-algebras $\mathcal{F}_n$ that tells us the ``information we have at time $n$''. This structure is known as a \emph{filtration}.
+
 \begin{defi}[Filtration]\index{filtration}
-  A \emph{filtration} is a sequence of $\sigma$-algebras $(\mathcal{F}_n)_{n \geq 0}$ such that $\mathcal{F} \supseteq \mathcal{F}_{n + 1} \supseteq \mathcal{F}_n$. We define $\mathcal{F}_\infty = \sigma(\mathcal{F}_0, \mathcal{F}_1, \ldots) \subseteq \mathcal{F}$.
+  A \emph{filtration} is a sequence of $\sigma$-algebras $(\mathcal{F}_n)_{n \geq 0}$ such that $\mathcal{F} \supseteq \mathcal{F}_{n + 1} \supseteq \mathcal{F}_n$ for all $n$. We define $\mathcal{F}_\infty = \sigma(\mathcal{F}_0, \mathcal{F}_1, \ldots) \subseteq \mathcal{F}$.
 \end{defi}
 
-This is supposed to model the evolution of time, where $\mathcal{F}_n$ consists of the information we have at time $t = n$. We will from now on assume $(\Omega, \mathcal{F}, \P)$ is equipped with a filtration $(\mathcal{F}_n)_{n \geq 0}$.
+We will from now on assume $(\Omega, \mathcal{F}, \P)$ is equipped with a filtration $(\mathcal{F}_n)_{n \geq 0}$.
 
 \begin{defi}[Stochastic process in discrete time]\index{discrete stochastic process}\index{stochastic process!discrete}
   A \emph{stochastic process} (in discrete time) is a sequence of random variables $(X_n)_{n \geq 0}$.
 \end{defi}
 
+This is a very general definition, and in most cases, we would want $X_n$ to interact nicely with our filtration.
 \begin{defi}[Natural filtration]\index{natural filtration}\index{filtration!natural}
   The \emph{natural filtration} of $(X_n)_{n \geq 0}$ is given by
   \[
@@ -544,15 +547,14 @@ This is supposed to model the evolution of time, where $\mathcal{F}_n$ consists 
 \end{defi}
 
 \begin{defi}[Adapted process]\index{adapted process}\index{stochastic process!adapted}
-  We say that $(X_n)_{n \geq 0}$ is \emph{adapted} (to $(\mathcal{F}_n)_{n \geq 0}$) if $X_n$ is $\mathcal{F}_n$-measurable for all $n \geq 0$.
-
-  This is equivalent to saying that $\mathcal{F}^X_n \subseteq \mathcal{F}_n$.
+  We say that $(X_n)_{n \geq 0}$ is \emph{adapted} (to $(\mathcal{F}_n)_{n \geq 0}$) if $X_n$ is $\mathcal{F}_n$-measurable for all $n \geq 0$. Equivalently, if $\mathcal{F}^X_n \subseteq \mathcal{F}_n$.
 \end{defi}
 
 \begin{defi}[Integrable process]\index{integrable process}\index{stochastic process!integrable}
   A process $(X_n)_{n \geq 0}$ is \emph{integrable} if $X_n \in L^1$ for all $n \geq 0$.
 \end{defi}
 
+We can now write down the definition of a martingale.
 \begin{defi}[Martingale]\index{martingale}
   An integrable adapted process $(X_n)_{n \geq 0}$ is a \emph{martingale} if for all $n \geq m$, we have
   \[
@@ -567,10 +569,14 @@ This is supposed to model the evolution of time, where $\mathcal{F}_n$ consists 
     \E(X_n \mid \mathcal{F}_m) \geq X_m,
   \]
 \end{defi}
-
 Note that it is enough to take $m = n - 1$ for all $n \geq 0$, using the tower property.
 
+The idea of a martingale is that we cannot predict whether $X_n$ will go up or go down in the future even if we have all the information up to the present. For example, if $X_n$ denotes the wealth of a gambler in a gambling game, then in some sense $(X_n)_{n \geq 0}$ being a martingale means the game is ``fair'' (in the sense of a fair dice).
+
+Note that $(X_n)_{n \geq 0}$ is a super-martingale iff $(-X_n)_{n \geq 0}$ is a sub-martingale, and if $(X_n)_{n \geq 0}$ is a martingale, then it is both a super-martingale and a sub-martingale. Often, what these extra notions buy us is that we can formulate our results for super-martingales (or sub-martingales), and then by applying the result to both $(X_n)_{n \geq 0}$ and $(-X_n)_{n \geq 0}$, we obtain the desired, stronger result for martingales.
+
 \subsection{Stopping time and optimal stopping}
+The optional stopping theorem says the definition of a martingale in fact implies an \emph{a priori} much stronger property. To formulate the optional stopping theorem, we need the notion of a stopping time.
 
 \begin{defi}[Stopping time]\index{stopping time}
   A \emph{stopping time} is a random variable $T: \Omega \to \N_{ \geq 0} \cup \{\infty\}$ such that
@@ -579,7 +585,17 @@ Note that it is enough to take $m = n - 1$ for all $n \geq 0$, using the tower p
   \]
   for all $n \geq 0$.
 \end{defi}
-This means to know that at time $n$, if we want to know if $T$ has come, we can determine it using the information we have at $T$.
+This means that at time $n$, if we want to know if $T$ has occurred, we can determine it using the information we have at time $n$.
+
+Note that $T$ is a stopping time iff $\{t = n \} \in \mathcal{F}_n$ for all $n$, since if $T$ is a stopping time, then
+\[
+  \{T = n\} = \{T \leq n\} \setminus \{T \leq n - 1\},
+\]
+and $\{T \leq n- 1\} \in \mathcal{F}_{n - 1} \subseteq \mathcal{F}_n$. Conversely,
+\[
+  \{T \leq n \} = \bigcup_{k = 1}^n \{T = k\} \in \mathcal{F}_n.
+\]
+This will not be true in the continuous case.
 
 \begin{eg}
   If $B \in \mathcal{B}(\R)$, then we can define
@@ -595,18 +611,7 @@ This means to know that at time $n$, if we want to know if $T$ has come, we can 
   is not a stopping time (in general).
 \end{eg}
 
-\begin{defi}[$\mathcal{F}_T$]\index{$\mathcal{F}_T$}
-  For a stopping time $T$, define
-  \[
-    \mathcal{F}_T = \{A \in \mathcal{F}_\infty : A \cap \{T \leq n\} \in \mathcal{F}_n\}.
-  \]
-\end{defi}
-One sees that this is a $\sigma$-algebra.
-
-\begin{eg}
-  If $T \equiv n$ is constant, then $F\mathcal{F}_T = \mathcal{F}_n$.
-\end{eg}
-
+Given a stopping time, we can make the following definition:
 \begin{defi}[$X_T$]\index{$X_T$}
   For a stopping time $T$, we define the random variable $X_T$ by
   \[
@@ -614,27 +619,31 @@ One sees that this is a $\sigma$-algebra.
   \]
   on $\{T < \infty\}$, and $0$ otherwise.
 \end{defi}
+Later, for suitable martingales, we will see that the limit $X_\infty = \lim_{n \to \infty} X_n$ makes sense. In that case, We define $X_T(\omega)$ to be $X_\infty(\omega)$ if $T = \infty$.
 
+Similarly, we can define
 \begin{defi}[Stopped process]\index{stopped process}
   The \emph{stopped process} is defined by
   \[
     (X_n^T)_{n \geq 0} = (X_{T(\omega) \wedge n}(\omega))_{n \geq 0}.
   \]
 \end{defi}
-So we stop the process once $T$ happens.
+This says we stop evolving the random variable $X$ once $T$ has occurred.
 
-Note that $T$ is a stopping time iff $\{t = n \} \in \mathcal{F}_n$ for all $n$, since if $T$ is a stopping time, then
-\[
-  \{T = n\} = \{T \leq n\} \setminus \{T \leq n - 1\},
-\]
-and $\{T \leq n- 1\} \in \mathcal{F}_{n - 1} \subseteq \mathcal{F}_n$. Conversely,
-\[
-  \{T \leq n \} = \cup_{k = 1}^n \{T = k\} \in \mathcal{F}_n.
-\]
-This will not be true in the continuous case.
+We would like to say that $X_T$ is ``$\mathcal{F}_T$-measurable'', i.e.\ to compute $X_T$, we only need to know the information up to time $T$. After some thought, we see that the following is the correct definition of $\mathcal{F}_T$:
+\begin{defi}[$\mathcal{F}_T$]\index{$\mathcal{F}_T$}
+  For a stopping time $T$, define
+  \[
+    \mathcal{F}_T = \{A \in \mathcal{F}_\infty : A \cap \{T \leq n\} \in \mathcal{F}_n\}.
+  \]
+\end{defi}
+This is easily seen to be a $\sigma$-algebra.
 
-Let's now start writing down properties of these things.
+\begin{eg}
+  If $T \equiv n$ is constant, then $F\mathcal{F}_T = \mathcal{F}_n$.
+\end{eg}
 
+There are some fairly immediate properties of these objects, whose proof is left as an exercise for the reader:
 \begin{prop}\leavevmode
   \begin{enumerate}
     \item If $T, S, (T_n)_{n \geq 0}$ are all stopping times, then
@@ -646,35 +655,40 @@ Let's now start writing down properties of these things.
     \item If $S \leq T$, then $\mathcal{F}_S \subseteq \mathcal{F}_T$.
     \item $X_T \mathbf{1}_{T < \infty}$ is $\mathcal{F}_T$-measurable.
     \item If $(X_n)$ is an adapted process, then so is $(X^T_n)_{n \geq 0}$ for any stopping time $T$.
-    \item If $(X_n)$ is an integrable process, then so is $(X^T_n)_{n \geq 0}$ for any stopping time $T$.
+    \item If $(X_n)$ is an integrable process, then so is $(X^T_n)_{n \geq 0}$ for any stopping time $T$.\qedsym
   \end{enumerate}
 \end{prop}
 
-\begin{proof}
-  Exercise.
-\end{proof}
 We now come to the fundamental property of martingales.
 \begin{thm}[Optional stopping theorem]\index{optional stopping theorem}
   Let $(X_n)_{n \geq 0}$ be a super-martingale and $S \leq T$ \emph{bounded} stopping times. Then
   \[
-    \E(X_T) \leq \E(X_S).
+    \E X_T \leq \E X_S.
   \]
 \end{thm}
 
 \begin{proof}
-  See proof of the next theorem.
+  Follows from the next theorem.
 \end{proof}
 What does this theorem mean? If $X$ is a martingale, then it is both a super-martingale and a sub-martingale. So we can apply this to both $X$ and $-X$, and so we have
 \[
-  \E(X_T) = \E(X_S) = \E(X_0),
+  \E(X_T) = \E(X_S).
 \]
-using the fact that $0$ is a stopping time. Martingales are supposed to model fair games. If we think of a stopping time as telling us when the game should end, and $X$ as are score, then this says there is no way of picking when the game ends that changes our expected value.
-
-What if we look at the stopping time
+In particular, since $0$ is a stopping time, we see that
 \[
-  T = \inf \{n : X_n = 1\},
+  \E X_T = \E X_0
 \]
-and take $X$ such that $\E X_0 = 0$. Then clearly we have $\E X_T = 1$. So this tells us $T$ is not a bounded stopping time.
+for \emph{any} bounded stopping time $T$.
+
+Recall that martingales are supposed to model fair games. If we again think of $X_n$ as the wealth at time $n$, and $T$ as the time we stop gambling, then this says no matter how we choose $T$, as long as it is bounded, the expected wealth at the end is the same as what we started with.
+
+\begin{eg}
+  Consider the stopping time
+  \[
+    T = \inf \{n : X_n = 1\},
+  \]
+  and take $X$ such that $\E X_0 = 0$. Then clearly we have $\E X_T = 1$. So this tells us $T$ is not a bounded stopping time!
+\end{eg}
 
 \begin{thm}
   The following are equivalent:
@@ -697,15 +711,15 @@ In particular, (iv) implies (i).
   \begin{itemize}
     \item (ii) $\Rightarrow$ (iii): Consider $(X_n^{T'})_{ \geq 0}$ for a stopping time $T'$. To check if this is a super-martingale, we need to prove that whenever $m \leq n$,
       \[
-        \E(X_{n \wedge T} \mid \mathcal{F}_m) \leq X_{m \wedge T}.
+        \E(X_{n \wedge T'} \mid \mathcal{F}_m) \leq X_{m \wedge T'}.
       \]
       But this follows from (ii) above by taking $S = m$ and $T = T' \wedge n$.
     \item (ii) $\Rightarrow$ (iv): Clear by the tower law.
     \item (iii) $\Rightarrow$ (i): Take $T = \infty$.
-    \item (i) $\Rightarrow$ (ii): Assume $T \leq n$.
+    \item (i) $\Rightarrow$ (ii): Assume $T \leq n$. Then
       \begin{align*}
-        X_T &= X_{S \wedge T} + \sum_{S \leq k < T} (X_{k + 1} - X_T)\\
-        &= X_{S \wedge T} + \sum_{n = 0}^n (X_{k + 1} - X_k) \mathbf{1}_{S \leq k < T} \tag{$*$}
+        X_T &= X_{S \wedge T} + \sum_{S \leq k < T} (X_{k + 1} - X_k)\\
+        &= X_{S \wedge T} + \sum_{k = 0}^n (X_{k + 1} - X_k) \mathbf{1}_{S \leq k < T} \tag{$*$}
       \end{align*}
       Now note that $\{S \leq k < T\} = \{S \leq k\} \cap \{T \leq k\}^c \in \mathcal{F}_k$. Let $A \in \mathcal{F}_S$. Then $A \cap \{S \leq k\} \in \mathcal{F}_k$ by definition of $\mathcal{F}_S$. So $A \cap \{S \leq k < T\} \in \mathcal{F}_k$.
 
@@ -735,14 +749,17 @@ In particular, (iv) implies (i).
         X_T = X_m \mathbf{1}_{A} + X_n \mathbf{1}_{A^C}.
       \]
       So we have
-      \[
-        0 \geq \E(X_n) - \E(X_T) = \E(X_n) - \E(X_n \mathbf{1}_A) - \E(X_m \mathbf{1}_!).
-      \]
+      \begin{align*}
+        0 &\geq \E(X_n) - \E(X_T) \\
+        &= \E(X_n) - \E(X_n \mathbf{1}_{A^c}) - \E(X_m \mathbf{1}_A) \\
+        &= \E (X_n \mathbf{1}_A) - \E (X_m \mathbf{1}_A).
+      \end{align*}
       Then the same argument as before gives the result.\qedhere
   \end{itemize}
 \end{proof}
 
-\subsection{Almost sure convergence of martingales}
+\subsection{Martingale convergence theorems}
+One particularly nice property of martingales is that they have nice convergence properties. We shall begin by proving a pointwise version of martingale convergence.
 
 \begin{thm}[Almost sure martingale convergence theorem]\index{martingale convergence theorem!almost sure}
   Suppose $(X_n)_{n \geq 0}$ is a super-martingale that is bounded in $L^1$, i.e.\ $\sup_n \E|X_n| < \infty$. Then there exists an $\mathcal{F}_\infty$-measurable $X_\infty \in L^1$ such that
@@ -751,35 +768,33 @@ In particular, (iv) implies (i).
   \]
 \end{thm}
 
-To prove this, we start with a deterministic lemma;
+To begin, we need a convenient characterization of when a series converges.
+\begin{defi}[Upcrossing]\index{upcrossing}
+  Let $(x_n)$ be a sequence and $(a, b)$ an interval. An \emph{upcrossing} of $(a, b)$ by $(x_n)$ is a sequence $j, j + 1, \ldots, k$ such that $x_j \leq a$ and $x_k \geq b$. We define\index{$U_n[a, b, (x_n)]$}\index{$U[a, b, (x_n)$}
+  \begin{align*}
+    U_n[a, b, (x_n)] &= \text{number of disjoint upcrossings contained in }\{1, \ldots, n\}\\
+    U[a, b, (x_n)] &= \lim_{n \to \infty} U_n[a, b, x].
+  \end{align*}
+\end{defi}
+
+We can then make the following elementary observation:
 \begin{lemma}
   Let $(x_n)_{n \geq 0}$ be a sequence of numbers. Then $x_n$ converges in $\R$ if and only if
   \begin{enumerate}
-    \item $\liminf |x_n| < \infty$
-    \item For all $a, b \in \Q$ with $a < b$, the number of upcrossings of $(a, b)$ by $(x_n)$ is finite.\hfill\qedsymbol
+    \item $\liminf |x_n| < \infty$.
+    \item For all $a, b \in \Q$ with $a < b$, we have $U[a, b, (x_n)] < \infty$.
   \end{enumerate}
 \end{lemma}
-An upcrossing of $(a, b)$ by $(x_n)$ is a sequence $j, j + 1, \ldots, k$ such that $x_j \leq a$ and $x_k \geq b$. Define
-\[
-  U_n[a, b, x] = \text{number of disjoint upcrossings contained in }\{1, \ldots, n\},
-\]
-and define
-\[
-  U[a, b, x] = \lim_{n \to \infty} U_n[a, b, x].
-\]
-This is what we call the number of upcrossings.
+For our martingales, since they are bounded in $L^1$, Fatou's lemma tells us $\E \liminf |X_n| < \infty$. So $\liminf |X_n| = 0$ almost surely. Thus, it remains to show that for any fixed $a < b \in \Q$, we have $\P(U[a, b, (X_n)] = \infty) = 0$. This is a consequence of Doob's upcrossing lemma.
 
-\begin{lemma}[Doob's upcrossing lemma]
+\begin{lemma}[Doob's upcrossing lemma]\index{Doob's upcrossing lemma}
   If $X_n$ is a supermartingale, then
   \[
     (b - a) \E(U_n[a, b(X_n)]) \leq \E(X_n - a)^-
   \]
 \end{lemma}
-If $\E|X| < \infty$, then $X$ is finite surely. We can then use stopping times to count upcrossings, and then use optional stopping.
 
 \begin{proof}
-%  If $X$ is a martingale, then $|X|$ is a positive supermartingale by Jensen's inequality.
-
   Assume that $X$ is a positive supermartingale. We define stopping times $S_k, T_k$ as follows:
   \begin{itemize}
     \item $T_0 = 0$
@@ -789,60 +804,68 @@ If $\E|X| < \infty$, then $X$ is finite surely. We can then use stopping times t
   Given an $n$, we want to count the number of upcrossings before $n$. There are two cases we might want to distinguish:
   \begin{center}
     \begin{tikzpicture}
-      \draw (0, 0) node [left] {$b$} -- (4, 0);
-      \draw (0, -2) node [left] {$a$} -- (4, -2);
+      \draw (-0.1, 0) node [left] {$b$} -- (4, 0);
+      \draw (-0.1, -2) node [left] {$a$} -- (4, -2);
       \draw (3, -2.5) node [below] {$n$} -- (3, 0.5);
 
       \draw plot [smooth] coordinates {(0, -2.2) (0.5, 0.2) (1.1, -0.5) (1.3, 0.1) (2.2, -2.3) (2.8, 0.4) (3.5, 0.4)};
-    \end{tikzpicture}
-    \quad
-    and
-    \quad
-    \begin{tikzpicture}
-      \draw (0, 0) node [left] {$b$} -- (4, 0);
-      \draw (0, -2) node [left] {$a$} -- (4, -2);
-      \draw (3, -2.5) node [below] {$n$} -- (3, 0.5);
 
-      \draw plot [smooth] coordinates {(0, -2.2) (0.5, 0.2) (1.1, -0.5) (1.3, 0.1) (2.2, -2.3) (3.6, 0.4)};
+      \begin{scope}[shift={(6, 0)}]
+        \draw (-0.1, 0) node [left] {$b$} -- (4, 0);
+        \draw (-0.1, -2) node [left] {$a$} -- (4, -2);
+        \draw (3, -2.5) node [below] {$n$} -- (3, 0.5);
+
+        \draw plot [smooth] coordinates {(0, -2.2) (0.5, 0.2) (1.1, -0.5) (1.3, 0.1) (2.2, -2.3) (3.6, 0.4)};
+      \end{scope}
     \end{tikzpicture}
   \end{center}
-  We inspect the two cases and observe that in both cases, we have
+  Now consider the sum
   \[
-    \sum_{k = 1}^n X_{T_k \wedge n} - X_{S_k \wedge n} \geq (b - a) U_n + (X_n - X_{S_{U_n + 1} \wedge n}),
+    \sum_{k = 1}^n X_{T_k \wedge n} - X_{S_k \wedge n}.
   \]
-  where the second term on the right is needed for the second case.
-
-  By super-martingale optional stopping, we have
+  In the first case, this is equal to
+  \[
+    \sum_{k = 1}^{U_n} X_{T_k} - X_{S_k} + \sum_{k = U_n + 1}^n X_n - X_n \geq (b - a) U_n.
+  \]
+  In the second case, it is equal to
+  \[
+    \sum_{k = 1}^{U_n} X_{T_k} - X_{S_k} + (X_n - X_{S_{U_n + 1}}) + \sum_{k = U_n + 2}^n X_n - X_n \geq (b - a) U_n + (X_n - X_{S_{U_n + 1}}).
+  \]
+  Thus, in general, we have
+  \[
+    \sum_{k = 1}^n X_{T_k \wedge n} - X_{S_k \wedge n} \geq (b - a) U_n + (X_n - X_{S_{U_n + 1} \wedge n}).
+  \]
+  By definition, $S_k < T_k \leq n$. So the expectation of the LHS is always non-negative by super-martingale convergence, and thus
   \[
     0 \geq (b - a) \E U_n + \E(X_n - X_{S_{U_n + 1} \wedge n}).
   \]
   Then observe that
   \[
-    \E(X_n- X_{S_{U_n + 1}}) \geq - (X_n - a)^-.
+    X_n- X_{S_{U_n + 1}} \geq - (X_n - a)^-.
   \]
 \end{proof}
+%
+%\begin{proof}[Proof of theorem]
+%  Define
+%  \[
+%    \Omega_\infty = \{\omega: \limsup (X_n(\omega))< \infty\}.
+%  \]
+%  Moreover, for all $a < b \in \R$, define
+%  \[
+%    \Omega_{a, b} = \{\omega: U[a, b, (X_n)] < \infty\}.
+%  \]
+%  By our lemma, we know that $X_n$ converges on
+%  \[
+%    \Omega_\infty \cap \left(\cap_{a < b \in \Q} \Omega_{a, b}\right).
+%  \]
+%  Moreover, by Doob's upcrossings lemma, we know
+%  \[
+%    \P\left(\Omega_\infty \cap \left(\cap_{a < b \in \Q} \Omega_{a, b}\right)\right) = 1
+%  \]
+%  since we are taking a countable intersection.
+%\end{proof}
 
-\begin{proof}[Proof of theorem]
-  Define
-  \[
-    \Omega_\infty = \{\omega: \limsup (X_n(\omega))< \infty\}.
-  \]
-  Moreover, for all $a < b \in \R$, define
-  \[
-    \Omega_{a, b} = \{\omega: U[a, b, (X_n)] < \infty\}.
-  \]
-  By our lemma, we know that $X_n$ converges on
-  \[
-    \Omega_\infty \cap \left(\cap_{a < b \in \Q} \Omega_{a, b}\right).
-  \]
-  Moreover, by Doob's upcrossings lemma, we know
-  \[
-    \P\left(\Omega_\infty \cap \left(\cap_{a < b \in \Q} \Omega_{a, b}\right)\right) = 1
-  \]
-  since we are taking a countable intersection.
-\end{proof}
-
-This is one of the nicest theorems in this course. It says that the constraints we put on (super-)martingales are rather strong. But this is not the strongest result we will get in this course. Often, we want to have convergence of moments as well.
+The almost-sure martingale convergence theorem is very nice, but often it is not good enough. For example, we might want convergence in $L^p$ instead. The following example shows this isn't always possible:
 
 \begin{eg}
   Suppose $(\rho_n)_{n \geq 0}$ is a sequence of iid random variables and
@@ -856,8 +879,9 @@ This is one of the nicest theorems in this course. It says that the constraints 
   Then this is a martingale, and $\E X_n = 1$. On the other hand, $X_n \to 0$ almost surely. So $\|X_n - X_\infty\|_1$ does not converge to $0$.
 \end{eg}
 
-To prove statements about convergence of moments, we need some inequalities.
-\subsection{Doob's inequalities}
+For $p > 1$, if we want convergence in $L^p$, it is not surprising that we at least need the sequence to be $L^p$ bounded. We will see that this is in fact sufficient. For $p = 1$, however, we need a bit more than being bounded in $L^1$. We will need uniform integrability.
+
+To prove this, we need to establish some inequalities.
 \begin{lemma}[Maximal inequality]\index{maximal inequality}
   Let $(X_n)$ be a submartingale that is non-negative, or a martingale. Define
   \[
@@ -867,7 +891,7 @@ To prove statements about convergence of moments, we need some inequalities.
   \[
     \lambda \P(X_n^* \geq \lambda) \leq \E[|X_n|\mathbf{1}_{X_n^* \geq \lambda}].
   \]
-  In particular, since $X_n \geq 0$, we have
+  In particular, we have
   \[
     \lambda \P(X_n^* \geq \lambda) \leq \E[|X_n|].
   \]
@@ -881,14 +905,14 @@ Markov's inequality says almost the same thing, but has $\E[|X_n^*|]$ instead of
   \]
   By optional stopping,
   \begin{align*}
-    \E X_n &\geq \E X_{T \wedge n} \\
+    \E X_n &\geq \E X_{T \wedge n} \\\qedhere
     &= \E X_T \mathbf{1}_{T \leq n} + \E X_n \mathbf{1}_{T > n}\\
     &\geq \lambda \P(T \leq n) + \E X_n \mathbf{1}_{T > n}\\
-    &= \lambda \P(X_n^* \geq \lambda) + \E X_n \mathbf{1}_{T > n}.
+    &= \lambda \P(X_n^* \geq \lambda) + \E X_n \mathbf{1}_{T > n}.\qedhere
   \end{align*}
 \end{proof}
 
-\begin{lemma}[$L^p$ inequality]\index{$L^p$ inequality}
+\begin{lemma}[Doob's $L^p$ inequality]\index{Doob's $L^p$ inequality}\index{$L^p$ inequality}
   For $p > 1$, we have
   \[
     \|X_n^*\|_p \leq \frac{p}{p - 1} \|X_n\|_p
@@ -911,7 +935,7 @@ Markov's inequality says almost the same thing, but has $\E[|X_n^*|]$ instead of
     &= \E \int_0^{X_n^* \wedge k} p x^{p - 1}\;\d x\\
     &= \E \int_0^k p x^{p - 1} \mathbf{1}_{X_n^* \geq x}\;\d x\\
     &= \int_0^k p x^{p - 1} \P(X_n^* \geq x)\;\d x\tag{Fubini}\\
-    &\leq \int_0^k px^{p - 2} \E X_n \mathbf{1}_{\{x_n^* \geq x\}} \;\d x\tag{maximal inequality}\\
+    &\leq \int_0^k px^{p - 2} \E X_n \mathbf{1}_{X_n^* \geq x} \;\d x\tag{maximal inequality}\\
     &= \E X_n \int_0^k p x^{p - 2} \mathbf{1}_{X_n^* \geq x}\;\d x \tag{Fubini}\\
     &= \frac{p}{p - 1} \E X_n (X_n^* \wedge k) ^{p - 1}\\
     &\leq \frac{p}{p - 1} \|X_n\|_p \left(\E(X_n^* \wedge k)^p\right)^{\frac{p - 1}{p}}\tag{H\:older}\\
@@ -949,16 +973,16 @@ This gives a bijection between martingales bounded in $L^p$ and $L^p(\mathcal{F}
       So by dominated convergence, we know that $X_n \to X_\infty$ in $L^p$.
     \item (ii) $\Rightarrow$ (iii): Take $Z = X_\infty$. We want to prove that
       \[
-        X_m = \E(X-\infty \mid \mathcal{F}_m).
+        X_m = \E(X_\infty \mid \mathcal{F}_m).
       \]
-      To do so, we show that $\|X_m - \E(X_\infty \mid \mathcal{F}_m)\|_p$. For $n \geq m$, we know this is equal to
+      To do so, we show that $\|X_m - \E(X_\infty \mid \mathcal{F}_m)\|_p = 0$. For $n \geq m$, we know this is equal to
       \[
         \|E(X_n \mid \mathcal{F}_m) - \E(X_\infty \mid \mathcal{F}_m)\|_p = \|\E(X_n - X_\infty \mid \mathcal{F}_m)\|_p \leq \|X_n - X_\infty\|_p \to 0
       \]
       as $n \to \infty$, where the last step uses Jensen's. But it is also a constant. So we are done.
-    \item (iii) $\Rightarrow$ (i): We need to show that if $Z \in L^p$, then $(X_n)_{n \geq 0}$ is bounded in $L^p$. % what are we actually doing?
+    \item (iii) $\Rightarrow$ (i): Since expectation decreases $L^p$ norms, we already know that $(X_n)_{n \geq 0}$ is $L^p$-bounded.
 
-      Note that $\bigcup_{n \geq 0} \mathcal{F}_n$ is a $\pi$-system that generates $\mathcal{F}_\infty$. So it is enough to prove that
+      To show the ``moreover'' part, note that $\bigcup_{n \geq 0} \mathcal{F}_n$ is a $\pi$-system that generates $\mathcal{F}_\infty$. So it is enough to prove that
       \[
         \E X_\infty \mathbf{1}_A = \E(\E(Z \mid \mathcal{F}_\infty) \mathbf{1}_A).
       \]
@@ -972,8 +996,8 @@ This gives a bijection between martingales bounded in $L^p$ and $L^p(\mathcal{F}
   \end{itemize}
 \end{proof}
 
-When $p = 1$, we cannot apply Doob's inequality. It turns out we need to impose a stronger condition.
-\begin{thm}[Convergence in $L^1$]
+We finally finish off the $p = 1$ case with the additional uniform integrability condition.
+\begin{thm}[Convergence in $L^1$]\index{martingale convergence theorem!$L^1$}
   Let $(X_n)_{n \geq 0}$ be a martingale. Then the following are equivalent:
   \begin{enumerate}
     \item $(X_n)_{n \geq 0}$ is uniformly integrable.
@@ -986,21 +1010,17 @@ When $p = 1$, we cannot apply Doob's inequality. It turns out we need to impose 
 The proof is very similar to the $L^p$ case.
 \begin{proof}\leavevmode
   \begin{itemize}
-    \item (i) $\Rightarrow$ (ii): Let $(X_n)_{n \geq 0}$ is uniformly integrable, then $(X_n)_{n \geq 0}$ is bounded in $L^1$. So the $(X_n)_{n \geq 0}$ converges to $X_\infty$ almost surely. Then by measure theory, uniform integrability implies that in fact $X_n \to L^1$.
+    \item (i) $\Rightarrow$ (ii): Let $(X_n)_{n \geq 0}$ be uniformly integrable. Then $(X_n)_{n \geq 0}$ is bounded in $L^1$. So the $(X_n)_{n \geq 0}$ converges to $X_\infty$ almost surely. Then by measure theory, uniform integrability implies that in fact $X_n \to L^1$.
     \item (ii) $\Rightarrow$ (iii): Same as the $L^p$ case.
     \item (iii) $\Rightarrow$ (i): For any $Z \in L^1$, the collection $\E(Z \mid \mathcal{G})$ ranging over all $\sigma$-subalgebras $\mathcal{G}$ is uniformly integrable.
   \end{itemize}
 \end{proof}
-Thus, note that there is a bijection between uniformly integrable martingales and $L^1(\mathcal{F}_\infty)$.
+Thus, there is a bijection between uniformly integrable martingales and $L^1(\mathcal{F}_\infty)$.
 
 We now revisit optional stopping for uniformly integrable martingales. Recall that in the statement of optional stopping, we needed our stopping times to be bounded. It turns out if we require our martingales to be uniformly integrable, then we can drop this requirement.
 
 \begin{thm}
-  If $(X_n)_{n \geq 0}$ is a uniformly integrable martingale, and $S, T$ are arbitrary stopping times, then
-  \begin{enumerate}
-    \item $\E(X_T \mid \mathcal{F}_S) = X_{S \wedge T}$
-    \item $\E X_T = X_0$.
-  \end{enumerate}
+  If $(X_n)_{n \geq 0}$ is a uniformly integrable martingale, and $S, T$ are arbitrary stopping times, then $\E(X_T \mid \mathcal{F}_S) = X_{S \wedge T}$. In particular $\E X_T = X_0$.
 \end{thm}
 Note that we are now allowing arbitrary stopping times, so $T$ may be infinite with non-zero probability. Hence we define
 \[
@@ -1008,39 +1028,38 @@ Note that we are now allowing arbitrary stopping times, so $T$ may be infinite w
 \]
 
 \begin{proof}
-  We'll prove that the stopped process $(X^T_n)_{n \geq 0} = (X_{T \wedge n})_{n \geq 0}$ is uniformly integrable. To see this, first note that since $(X_n)_{n \geq 0}$ is uniformly integrable, it in particular converges almost surely and in $L^1$ to $X_\infty$. Moreover, we know that$X_n = \E(X_\infty \mid \mathcal{F}_n)$. By optional stopping, we have
+  By optional stopping, for every $n$, we know that
+  \[
+    \E (X_{T \wedge n} \mid \mathcal{F}_S) = X_{S \wedge T \wedge n}.
+  \]
+  We want to be able to take the limit as $n \to \infty$. To do so, we need to show that things are uniformly integrable. First, we apply optional stopping to write $X_{T \wedge n}$ as
   \begin{align*}
     X_{T\wedge n} &= \E(X_n \mid \mathcal{F}_{T \wedge n})\\
     &= \E(\E(X_\infty \mid \mathcal{F}_n) \mid \mathcal{F}_{T \wedge n})\\
     &= \E(X_\infty \mid \mathcal{F}_{T \wedge n}).
   \end{align*}
-  So we know $(X_n^T)_{n \geq 0}$ is uniformly integrable. We know $X_{n \wedge T} \to X_T$, and hence this converges in $L^1$ as well.
+  So we know $(X_n^T)_{n \geq 0}$ is uniformly integrable, and hence $X_{n \wedge T} \to X_T$ almost surely and in $L^1$.
 
-  We know that
+  To understand $\E (X_{T \wedge n} \mid \mathcal{F}_S)$, we note that
   \[
     \|\E(X_{n \wedge T} - X_T \mid \mathcal{F}_S)\|_1 \leq \|X_{n \wedge T} - X_T \|_1 \to 0\text{ as }n \to \infty.
   \]
   So it follows that $\E(X_{n \wedge T} \mid \mathcal{F}_S) \to \E(X_T \mid \mathcal{F}_S)$ as $n \to \infty$.
-
-  By optional stopping again, we know
-  \[
-    \E(X_{n \wedge T} \mid \mathcal{F}_S) = X_{S \wedge T \wedge n}.
-  \]
-  Then take the limit as $n \to \infty$.
 \end{proof}
 
-Before we go into applications, we consider the notion of a \emph{backwards martingale}.
+\subsection{Applications of martingales}
+Having developed the theory, let us move on to some applications. Before we do that, we need the notion of a \emph{backwards martingale}.
 \begin{defi}[Backwards filtration]\index{backwards filtration}\index{filtration!backwards}
   A \emph{backwards filtration} on a measurable space $(E, \mathcal{E})$ is a sequence of $\sigma$-algebras $\hat{\mathcal{F}}_n \subseteq \mathcal{E}$ such that $\hat{F}_{n + 1} \subseteq \hat{F}_n$. We define
   \[
-    \hat{F}_\infty = \bigcap_{n \geq 0} \hat{F}_n.
+    \hat{\mathcal{F}}_\infty = \bigcap_{n \geq 0} \hat{\mathcal{F}}_n.
   \]
 \end{defi}
 
 \begin{thm}
   Let $Y \in L^1$, and let $\hat{\mathcal{F}}_n$ be a backwards filtration. Then
   \[
-    \E(Y \mid \hat{F}_n) \to \E(Y \mid \hat{F}_\infty)
+    \E(Y \mid \hat{\mathcal{F}}_n) \to \E(Y \mid \hat{\mathcal{F}}_\infty)
   \]
   almost surely and in $L^1$.
 \end{thm}
@@ -1071,21 +1090,21 @@ A process of this form is known as a \term{backwards martingale}.
   \end{align*}
 \end{proof}
 
-\subsection{Applications of martingales}
+
 \begin{thm}[Kolmogorov 0-1 law]\index{Kolmogorov 0-1 law}
   Let $(X_n)_{n \geq 0}$ be independent random variables. Then, let
   \[
     \hat{\mathcal{F}}_n = \sigma (X_{n + 1}, X_{n + 2}, \ldots).
   \]
-  $\hat{\mathcal{F}}_\infty$ is the \term{tail $\sigma$-algebra}, and th theorem is that it is trivial, i.e.\ $\P(A) \in \{0, 1\}$ for all $A \in \hat{\mathcal{F}}_\infty$.
+  Then the \term{tail $\sigma$-algebra} $\hat{\mathcal{F}}_{\infty}$ is trivial\index{trivial $\sigma$-algebra}\index{$\sigma$-algebra!trivial}, i.e.\ $\P(A) \in \{0, 1\}$ for all $A \in \hat{\mathcal{F}}_\infty$.
 \end{thm}
 
 \begin{proof}
-  Let $\mathcal{F}_n = \sigma(X_1, \ldots, X_n)$. Then $\mathcal{F}_n$ and $\hat{\mathcal{F}}_n$ are independent. The for all $A \in \hat{\mathcal{F}}_\infty$, we have
+  Let $\mathcal{F}_n = \sigma(X_1, \ldots, X_n)$. Then $\mathcal{F}_n$ and $\hat{\mathcal{F}}_n$ are independent. Then for all $A \in \hat{\mathcal{F}}_\infty$, we have
   \[
-    \E(A \mid \mathcal{F}_n) = \P(A).
+    \E(\mathbf{1}_A \mid \mathcal{F}_n) = \P(A).
   \]
-  But the LHS is a martingale. So It converges almost surely and in $L^1$ to a random variable $Y_\infty \in \mathcal{F}_\infty$. So this is just $\E(A \mid \mathcal{F}_\infty)$. But $A$ is $\mathcal{F}_\infty$-measurable, since $\hat{\mathcal{F}}_\infty \subseteq \mathcal{F}_\infty$. So this is just $\mathbf{1}_A$. So $\mathbf{1}_A = \P(A)$, and we are done.
+  But the LHS is a martingale. So it converges almost surely and in $L^1$ to $\E(\mathbf{1}_A \mid \mathcal{F}_\infty)$. But $\mathbf{1}_A$ is $\mathcal{F}_\infty$-measurable, since $\hat{\mathcal{F}}_\infty \subseteq \mathcal{F}_\infty$. So this is just $\mathbf{1}_A$. So $\mathbf{1}_A = \P(A)$ almost surely, and we are done.
 \end{proof}
 
 \begin{thm}[Strong law of large numbers]
@@ -1113,13 +1132,13 @@ A process of this form is known as a \term{backwards martingale}.
   \]
   where $\tau_n = \sigma(X_{n + 1}, X_{n + 2}, \ldots)$. We now use the property of conditional expectation that we've never used so far, that adding independent information to a conditional expectation doesn't change the result. Since $\tau_n$ is independent of $\sigma(X_1, S_n)$, we know
   \[
-    \frac{S_n}{n} = \E(X_1 \mid S_n) = \E(\hat{\mathcal{F}}_n).
+    \frac{S_n}{n} = \E(X_1 \mid S_n) = \E(X_1 \mid \hat{\mathcal{F}}_n).
   \]
   Thus, by backwards martingale convergence, we know
   \[
-    \frac{S_n}{n} \to \E(X_1 \mid \hat{F}_{\infty}).
+    \frac{S_n}{n} \to \E(X_1 \mid \hat{\mathcal{F}}_{\infty}).
   \]
-  But by the Kolmogorov 0-1 law, we know $\hat{F}_{\infty}$ is trivial. So we know that $\E(X_1 \mid \hat{F}_{\infty})$ is almost constant, which as to be $\E(\E(X_1 \mid \hat{F}_{\infty})) = \E(X_1) = \mu$.
+  But by the Kolmogorov 0-1 law, we know $\hat{\mathcal{F}}_{\infty}$ is trivial. So we know that $\E(X_1 \mid \hat{\mathcal{F}}_{\infty})$ is almost constant, which has to be $\E(\E(X_1 \mid \hat{\mathcal{F}}_{\infty})) = \E(X_1) = \mu$.
 \end{proof}
 
 Recall that if $(E, \mathcal{E}, \mu)$ is a measure space and $f \in m\mathcal{E}^+$, then
@@ -1127,9 +1146,10 @@ Recall that if $(E, \mathcal{E}, \mu)$ is a measure space and $f \in m\mathcal{E
   \nu(A) = \mu(f \mathbf{1}_A)
 \]
 is a measure on $\mathcal{E}$. We say $f$ is a density of $\nu$ with respect to $\mu$.
+
 We can ask an ``inverse'' question -- given two different measures on $\mathcal{E}$, when is it the case that one is given by a density with respect to the other?
 
-A first observation is that if $\nu(A) = \mu(f \mathbf{1}_A)$, then whenever $\mu(A) = 0$, we have $\nu(A) = 0$. There is another condition which is perhaps a bit less natural. Let $\mu$ be a counting measure on $\R$, and $\nu$ the Lebesgue measure. Then our first condition is satisfied. However, if $\nu$ is given by a density $f$ with respect to $\nu$, we must have
+A first observation is that if $\nu(A) = \mu(f \mathbf{1}_A)$, then whenever $\mu(A) = 0$, we must have $\nu(A) = 0$. However, this is not sufficient. For example, let $\mu$ be a counting measure on $\R$, and $\nu$ the Lebesgue measure. Then our condition is satisfied. However, if $\nu$ is given by a density $f$ with respect to $\nu$, we must have
 \[
   0 = \nu(\{x\}) = \mu(f \mathbf{1}_{\{x\}}) = f(x).
 \]
@@ -1137,10 +1157,10 @@ So $f \equiv 0$, but taking $f \equiv 0$ clearly doesn't give the Lebesgue measu
 
 The problem with this is that $\mu$ is not a $\sigma$-finite measure.
 
-\begin{thm}[Radon--Nikodym]
+\begin{thm}[Radon--Nikodym]\index{Radon--Nikodym theorem}
   Let $(\Omega, \mathcal{F})$ be a measurable space, and $\Q$ and $\P$ be two probability measures on $(\Omega, \mathcal{F})$. Then the following are equivalent:
   \begin{itemize}
-    \item $\Q$ is absolutely continuous with respect to $\P$, i.e.\ for any $A \in \mathcal{F}$, if $\P(A) = 0$, then $\Q(A) = 0$
+    \item $\Q$ is absolutely continuous with respect to $\P$, i.e.\ for any $A \in \mathcal{F}$, if $\P(A) = 0$, then $\Q(A) = 0$.
     \item For any $\varepsilon > 0$, there exists $\delta > 0$ such that for all $A \in \mathcal{F}$, if $\P(A) \leq \delta$, then $\Q(A) \leq \varepsilon$.
     \item There exists a random variable $X \geq 0$ such that
       \[
@@ -1151,33 +1171,37 @@ The problem with this is that $\mu$ is not a $\sigma$-finite measure.
 \end{thm}
 Note that this theorem works for all finite measures by scaling, and thus for $\sigma$-finite measures by partitioning $\Omega$ into sets of finite measure.
 
-We only treat the case where $\mathcal{F}$ is \emph{countably generated}\index{countably generated $\sigma$-algebra}\index{$\sigma$-algebra!countably generated}, i.e.\ $\mathcal{F} = \sigma(F_1, F_2, \ldots)$ for some sets $F_i$. For example, any second-countable topological space is countably generated.
-\begin{proof}\leavevmode
+\begin{proof}
+  We shall only treat the case where $\mathcal{F}$ is \emph{countably generated}\index{countably generated $\sigma$-algebra}\index{$\sigma$-algebra!countably generated}, i.e.\ $\mathcal{F} = \sigma(F_1, F_2, \ldots)$ for some sets $F_i$. For example, any second-countable topological space is countably generated.
   \begin{itemize}
+    \item (iii) $\Rightarrow$ (i): Clear.
     \item (ii) $\Rightarrow$ (iii): Define the filtration
       \[
         \mathcal{F}_n = \sigma(F_1, F_2, \ldots, F_n).
       \]
       Since $\mathcal{F}_n$ is finite, we can write it as
       \[
-        \mathcal{F}_n = \sigma(A_{n, 1}, \ldots, A_{n, m_n}), 
+        \mathcal{F}_n = \sigma(A_{n, 1}, \ldots, A_{n, m_n}),
       \]
-      where each $A_{n, i}$ is an \term{atom}, i.e.\ if $B \subsetneq A_{n, i}$ and $b \in \mathcal{F}_n$, then $B = \emptyset$. We define
+      where each $A_{n, i}$ is an \term{atom}, i.e.\ if $B \subsetneq A_{n, i}$ and $B \in \mathcal{F}_n$, then $B = \emptyset$. We define
       \[
         X_n = \sum_{n = 1}^{m_n} \frac{\Q(A_{n, i})}{\P(A_{n, i})} \mathbf{1}_{A_{n, i}},
       \]
-      where we skip over the terms where $\P(A_{n, i}) = 0$. We see that $(X_n)_{n \geq 0}$ are adapted. Notice that $(X_n)_{n \geq 0}$ is a martingale. Indeed, take $A \in \mathcal{F}_n$. Then (taking expectations with respect to $\P$)
-      \begin{align*}
-        \E X_{n + 1} \mathbf{1}_A &= \E \sum_{A_{n + 1, i} \subseteq A} \frac{\Q(A_{n + 1, i}}{\P(A_{n + 1, i})} \mathbf{1}_{n + 1, i} \\
-        &= \Q(A)\\
-        &= \E \sum_{A_{n, 1} \subseteq A} \frac{\Q(A_n, 1)}{\P(A_n, 1)} \mathbf{1}_{A_{n, i}}\\
-        &= \E X_n \mathbf{1}_A.
-      \end{align*}
+      where we skip over the terms where $\P(A_{n, i}) = 0$. Note that this is exactly designed so that for any $A \in \mathcal{F}_n$, we have
+      \[
+        \E_\P (X_n \mathbf{1}_A) = \E_\P \sum_{A_{n, i} \subseteq A} \frac{\Q(A_{n, i})}{\P(A_n, i)} \mathbf{1}_{A_{n, i}} = \Q(A).
+      \]
+      Thus, if $A \in \mathcal{F}_n \subseteq \mathcal{F}_{n + 1}$, we have
+      \[
+        \E X_{n + 1} \mathbf{1}_A = \Q(A) = \E X_n \mathbf{1}_A.
+      \]
       So we know that
       \[
         \E(X_{n + 1} \mid \mathcal{F}_n) = X_n.
       \]
-      We shall show that $(X_n)_{n \geq 0}$ are uniformly integrable. By Markov's inequality, we have
+      It is also immediate that $(X_n)_{n \geq 0}$ is adapted. So it is a martingale.
+
+      We next show that $(X_n)_{n \geq 0}$ is uniformly integrable. By Markov's inequality, we have
       \[
         \P(X_n \geq \lambda) \leq \frac{\E X_n}{\lambda} = \frac{1}{\lambda}\leq \delta
       \]
@@ -1185,7 +1209,7 @@ We only treat the case where $\mathcal{F}$ is \emph{countably generated}\index{c
       \[
         \E(X_n \mathbf{1}_{X_n \geq \lambda}) = \Q(X_n \geq \lambda) \leq \varepsilon.
       \]
-      So we have shown uniform integrability, and so we know $X_n \to X$ almost surely and in $L^1$. Then for all $A \in \bigcup_{n \geq 0} \mathcal{F}_n$, we have
+      So we have shown uniform integrability, and so we know $X_n \to X$ almost surely and in $L^1$ for some $X$. Then for all $A \in \bigcup_{n \geq 0} \mathcal{F}_n$, we have
       \[
         \Q(A) = \lim_{n \to \infty} \E X_n \mathbf{1}_A = \E X \mathbf{1}_A.
       \]
@@ -1205,19 +1229,20 @@ We only treat the case where $\mathcal{F}$ is \emph{countably generated}\index{c
         &\geq \lim_{k \to \infty} \Q \left(\bigcup_{m = k}^\infty A_k\right)\\
         &\geq \varepsilon.
       \end{align*}
-      This is a contradiction.
+      This is a contradiction.\qedhere
   \end{itemize}
 \end{proof}
 
-\subsection{Markov chains}
-Let $E$ be a countable space, and $\mu$ a measure on $E$. We write $\mu_x = \mu(\{x\})$, and then $\mu(f) = \mu \cdot f$.
+Finally, we end the part on discrete time processes by relating what we have done to Markov chains.
+
+Let's first recall what Markov chains are. Let $E$ be a countable space, and $\mu$ a measure on $E$. We write $\mu_x = \mu(\{x\})$, and then $\mu(f) = \mu \cdot f$.
 
 \begin{defi}[Transition matrix]\index{transition matrix}
   A \emph{transition matrix} is a matrix $P = (p_{xy})_{x, y \in E}$ such that each $p_x = (p_{x, y})_{y \in E}$ is a probability measure on $E$.
 \end{defi}
 
 \begin{defi}[Markov chain]\index{Markov chain}
-  An adapted process $(X_n)$ is called a \emph{Markov chain} if for any $n$ and $A \in \mathcal{F}_n$ and $\{x_n = x\} \supseteq A$, then
+  An adapted process $(X_n)$ is called a \emph{Markov chain} if for any $n$ and $A \in \mathcal{F}_n$ such that $\{x_n = x\} \supseteq A$, we have
   \[
     \P(X_{n + 1} = y\mid A) = p_{xy}.
   \]
@@ -1238,11 +1263,11 @@ We then observe that
 \begin{eg}
   Let $(X_n)_{n \geq 0}$ be iid $\Z$-valued random variables in $L^1$, and $\E[X_i] = 0$. Then
   \[
-    S_n = X_0 + \cdots + _n
+    S_n = X_0 + \cdots + X_n
   \]
   is a martingale and a Markov chain.
 
-  However, if $Z$ is a $\Z$-valued random variable, consider the random variable $(ZS_n)_{n \geq 0}$ and $\mathcal{F}_n = \sigma(\mathcal{F}_n^\times, \Z)$. Then this is a martingale but not a Markov chain.
+  However, if $Z$ is a $\Z$-valued random variable, consider the random variable $(ZS_n)_{n \geq 0}$ and $\mathcal{F}_n = \sigma(\mathcal{F}_n, Z)$. Then this is a martingale but not a Markov chain.
 \end{eg}
 
 \section{Continuous time stochastic processes}
@@ -1306,7 +1331,7 @@ The important observation is that if we know all finite-dimensional distribution
   \]
   for all $t, s \in I$.
 
-  Then there exists a continuous process $(X_t)_{t \in I}$ such that for all $t \in I$, 
+  Then there exists a continuous process $(X_t)_{t \in I}$ such that for all $t \in I$,
   \[
     X_t = \rho_t \text{ almost surely},
   \]
@@ -1369,7 +1394,7 @@ The idea is to reduce the problem to a countable problem.
   \end{align*}
   Then define
   \[
-    X_t = 
+    X_t =
     \begin{cases}
       \lim_{q \in D} \rho_q & K_\alpha < \infty\\
       0 & \text{otherwise}.
@@ -1445,7 +1470,7 @@ Let's focus on a particular class of stopping times --- hitting times, or first-
 
 This is not always a stopping time. For example, consider the process $X_t$ such that with probability $\frac{1}{2}$, it is given by $X_t = t$, and with probability $\frac{1}{2}$, it is given by
 \[
-  X_t = 
+  X_t =
   \begin{cases}
     t & t \leq 1\\
     2 - t & t > 1
@@ -1461,7 +1486,7 @@ This is not always a stopping time. For example, consider the process $X_t$ such
 
     \draw (1, -0.02) node [below] {$1$} -- (1, 0.02);
     \draw (-0.02, 1) node [left] {$1$} -- (0.02, 1);
-    
+
     \node [circ] at (1, 1){};
   \end{tikzpicture}
 \end{center}
@@ -1583,15 +1608,15 @@ We can now prove theorems we already know in the discrete case.
 \end{thm}
 
 \begin{proof}
-  Let
-  \[
-    X^* = \sup_{t \geq 0} |X_t|,\quad X_{(n)}^* = \sup_{t \in D_n} |X_t|.
-  \]
-  Since $X_t$ is cadlag, and since $D_n$ are are monotone (in $n$), we can write
-  \[
-    X^* = \lim_{n \to \infty} X_n^*.
-  \]
-  Since $(X_t^{(n), *}) = (X_t)_{t \in D_n}$ is a super-martingale bounded in $L^1$, we know $X^*_{(n)}$ is bounded almost surely. So $X^*$ is finite almost surely.
+%  Let
+%  \[
+%    X^* = \sup_{t \geq 0} |X_t|,\quad X_{(n)}^* = \sup_{t \in D_n} |X_t|.
+%  \]
+%  Since $X_t$ is cadlag, and since $D_n$ are are monotone (in $n$), we can write
+%  \[
+%    X^* = \lim_{n \to \infty} X_n^*.
+%  \]
+%  Since $(X_t^{(n), *}) = (X_t)_{t \in D_n}$ is a super-martingale bounded in $L^1$, we know $X^*_{(n)}$ is bounded almost surely. So $X^*$ is finite almost surely.
 
   Define $U_s[a, b, (x_t)_{t \geq 0}]$ be the number of upcrossings of $[a, b]$ by $(x_t)_{t \geq 0}$ up to time $s$, and
   \[
@@ -1603,11 +1628,396 @@ We can now prove theorems we already know in the discrete case.
   \]
   By monotone convergence and Doob's upcrossing lemma, we have
   \[
-    \E U_s[a, b, (X_t)_{t \geq 0}] = \lim_{n \to \infty} \E U_s[a, b, (X_t)_{t \in D_n}] \leq \frac{\E(X_s - a]^-}{b - 1} \leq \frac{\E |X_s| + a}{b - a}. % second X_t should be something else
+    \E U_s[a, b, (X_t)_{t \geq 0}] = \lim_{n \to \infty} \E U_s[a, b, (X_t)_{t \in D_n}] \leq \frac{\E(X_s - a)^-}{b - 1} \leq \frac{\E |X_s| + a}{b - a}. % second X_t should be something else
   \]
-  We are then done by taking the supremum over $s$.
+  We are then done by taking the supremum over $s$. Then finish the argument as in the discrete case.
 
-  Then finish the argument as in the discrete case.
+  This shows we have pointwise convergence in $\R \cup \{\pm \infty\}$, and by Fatou's lemma, we know that
+  \[
+    \E |X_\infty| = \E \liminf_{t_n \to \infty} |X_{t_n}| \leq \liminf_{t_n \to \infty} \E |X_{t_n}| < \infty.
+  \]
+  So $X_\infty$ is finite almost surely.
 \end{proof}
+
+We shall now state without proof some results we already know for the discrete case. The proofs are straightforward generalizations of the discrete version.
+
+\begin{lemma}[Maximal inequality]\index{maximal inequality}
+  Let $(X_t)_{t \geq 0}$ be a cadlag martingale or a non-negative sub-martingale. Then for all $t \geq 0$, $\lambda \geq 0$, we have
+  \[
+    \lambda \P (X^*_t \geq \lambda)\leq \E |X_t|.
+  \]
+\end{lemma}
+
+\begin{lemma}[Doob's $L^p$ inequality]\index{Doob's $L^p$ inequality}\index{$L^p$ inequality}
+  Let $(X_t)_{t \geq 0}$ be as above. Then
+  \[
+    \|X_t^*\|_p \leq \frac{p}{p - 1} \|X_t\|_p.
+  \]
+\end{lemma}
+
+\begin{defi}[Version]\index{version}
+  We say a process $(Y_t)_{t \geq 0}$ is a \emph{version} of $(X_t)_{t \geq 0}$ if $(Y_t = X_t) = 1$ for all $t$.
+\end{defi}
+
+Note that this not the same as saying $\P(\forall_t Y_t = X_t) = 1$.
+
+\begin{eg}
+  Take $X_t \equiv 0$ for all $t$ and take $U$ be a uniform random variable on $[0, 1]$. Define
+  \[
+    Y_t =
+    \begin{cases}
+      1 & t = U\\
+      0 & \text{otherwise}
+    \end{cases}.
+  \]
+  Then for all $t$, we have $X_t = Y_t$ almost surely. So $(Y_t)$ is a version of $(X_t)$. However, $X_t$ is continuous but $Y_t$ is not.
+\end{eg}
+\begin{thm}[Regularization of martingales]\index{regularization}
+  Let $(X_t)_{t \geq 0}$ be a martingale with respect to $(\mathcal{F}_t)$, and suppose $\mathcal{F}_t$ satisfies the usual conditions. Then there exists a version $(\tilde{X}_t)$ of $(X_t)$ which is cadlag.
+\end{thm}
+
+\begin{proof}
+  For all $M > 0$, define
+  \[
+    \Omega_0^M = \{\sup_{q \in D \cap [0, M]} |X_q| < \infty\} \cap \bigcap_{a < b \in \Q} \{U_M[a, b, (X_t)_{t \in D \cap [0, M]} < \infty]\}
+  \]
+  Then we see that $\P(\Omega_0^M) = 1$. Now define
+  \[
+    \tilde{X}_t = \lim_{s \geq t, s \to t, s \in \D} X_s \mathbf{1}_{\Omega^t_0}.
+  \]
+  Then this is $\mathcal{F}_t$ measurable because $\mathcal{F}_t$ satisfies the usual conditions.
+
+  Take a sequence $t_n \searrow t$. Then $(X_{t_n})$ is a backwards martingale. So it converges almost surely in $L^1$ to $\tilde{X}_t$. But we can write
+  \[
+    X_t = \E (X_{t_n} \mid \mathcal{F}_t).
+  \]
+  Since $X_{t_n} \to \tilde{X}_t$ in $L^1$, and $\tilde{X}_t$ is $\mathcal{F}_t$-measurable, we know $X_t = \tilde{X}_t$ almost surely.
+
+  The fact that it is cadlag is an exercise.
+\end{proof}
+
+\begin{thm}[$L^p$ convergence of martingales]\index{martingale convergence theorem!$L^p$}
+  Let $(X_t)_{t \geq 0}$ be a cadlag martingale. Then the following are equivalent:
+  \begin{enumerate}
+    \item $(X_t)_{t \geq 0}$ is bounded in $L^p$.
+    \item $(X_t)_{t \geq 0}$ converges almost surely and in $L^p$
+    \item There exists $Z \in L^p$ such that $X_t = \E (Z \mid \mathcal{F}_t)$ almost surely.
+  \end{enumerate}
+\end{thm}
+
+\begin{thm}[$L^1$ convergence of martingales]\index{martingale convergence theorem!$L^1$}
+  Let $(X_t)_{t \geq 0}$ be a cadlag martingale. Then the folloiwng are equivalent:
+  \begin{enumerate}
+    \item $(X_t)_{t \geq 0}$ is uniformly integrable
+    \item $(X_t)_{t \geq 0}$ converges almost surely and in $L^1$ to $X_\infty$
+    \item There exists $Z \in L^1$ such that $\E(Z \mid \mathcal{F}_t) = X_t$ almost surely.
+  \end{enumerate}
+\end{thm}
+
+\begin{thm}[Optional stopping theorem]
+  Let $(X_t)_{t \geq 0}$ be a uniformly integrable martingale, and let $S, T$ b e any stopping times. Then
+  \[
+    \E (X_T \mid \mathcal{F}_s) = X_{S \wedge T}.
+  \]
+\end{thm}
+
+\section{Weak convergence of measures}
+Often, we may want to consider random variables defined on different spaces. Since we cannot directly compare them, a sensible approach would be to use them to push our measure forward to $\R$, and compare them on $\R$.
+
+\begin{defi}[Law]\index{law}
+  Let $X$ be a random variable on $(\Omega, \mathcal{F}, \P)$. The \emph{law} of $X$ is the probability measure $\mu$ on $(\R, \mathcal{B}(\R))$ defined by
+  \[
+    \mu(A) = \P(X^{-1}(A)).
+  \]
+\end{defi}
+
+\begin{eg}
+  For $x \in X$, we have the \term{Dirac $\delta$ measure}
+  \[
+    \delta_x(A) = \mathbf{1}_{\{x \in A\}}.
+  \]
+  This is the law of a random variable that constantly takes the value $x$.
+\end{eg}
+Now if we have a sequence $X_n \to x$, then we would like to say $\delta_{x_n} \to \delta_x$. In what sense is this true? Suppose $f$ is continuous. Then
+\[
+  \int f \d \delta_{x_n} = f(x_n) \to f(x) = \int f \d \delta_x.
+\]
+So we do have some sort of convergence if we pair it with a continuous function.
+
+\begin{defi}[Weak convergence]\index{weak convergence}
+  Let $(\mu_n)_{n \geq 0}$, $\mu$ be probability measures on a metric space $(M, d)$ with the Borel measure. We say that $\mu_n \Rightarrow \mu$, or $\mu_n$ \emph{converges weakly} to $\mu$ if
+  \[
+    \mu_n(f) \to \mu(f)
+  \]
+  for all $f$ bounded and continuous.
+\end{defi}
+Note that in general, weak convergence does not say anything about how measures of subsets behave.
+\begin{eg}
+  If $x_n \to x$, then $\delta_{x_n} \to \delta_x$ weakly. However, if $x_n \not= x$ for all $n$, then $\delta_{x_n} (\{x\}) = 0$ but $\delta_x(\{x\}) = 1$. So
+  \[
+    \delta_{x_n}(\{x\}) \not\to \delta_n(\{x\}).
+  \]
+\end{eg}
+
+\begin{eg}
+  Pick $X = [0, 1]$. Let $\mu_n = \frac{1}{n} \sum_{k = 1}^n \delta_{\frac{k}{n}}$. Then
+  \[
+    \mu_n(f) = \frac{1}{n} \sum_{k = 1}^n f\left(\frac{k}{n}\right).
+  \]
+  So $\mu_n$ converges to the Lebesgue measure.
+\end{eg}
+
+\begin{prop}
+  Let $(\mu_n)_{n \geq 0}$ be as above. Then, the following are equivalent:
+  \begin{enumerate}
+    \item $(\mu_n)_{n \geq 0}$ converges weakly to $\mu$.
+    \item For all open $G$, we have
+      \[
+        \liminf_{n \to \infty} \mu_n(G) \geq \mu(G).
+      \]
+    \item For all closed $A$, we have
+      \[
+        \limsup_{n \to \infty} \mu_n(A) \leq \mu(A).
+      \]
+    \item For all $A$ such that $\mu(\partial A) = 0$, we have
+      \[
+        \lim_{n \to \infty}\mu_n(A) = \mu(A)
+      \]
+    \item (when $M = \R$) $F_{\mu_n}(x) \to F_\mu(x)$ for all $x$ at which $F_\mu$ is continuous, where $F_\mu$ is the \term{distribution function} of $\mu$, defined by $F_\mu(x) = \mu_n((-\infty, t])$.
+  \end{enumerate}
+\end{prop}
+al
+\begin{proof}\leavevmode
+  \begin{itemize}
+    \item (i) $\Rightarrow$ (ii): The idea is to approximate the open set by continuous functions. We know $A^c$ is closed. So we can define
+      \[
+        f_N(x) = 1 \wedge (N \cdot \mathrm{dist}(x, A^c)).
+      \]
+      This has the property that for all $N > 0$, we have
+      \[
+        f_N \leq \mathbf{1}_A,
+      \]
+      and moreover $f_N \nearrow \mathbf{1}_A$ as $N \to \infty$. Now by definition of weak convergence,
+      \[
+        \liminf_{n \to \infty} \mu(A)\geq \liminf_{n \to \infty} \mu_n(f_N) = \mu(F_N) \to \mu(A)
+      \]
+      as $N \to \infty$.
+    \item (ii) $\Leftrightarrow$ (iii): Take complements.
+    \item (iii) and (ii) $\Rightarrow$ (iv): Take $A$ such that $\mu(\partial A) = 0$. Then
+      \[
+        \mu(A) = \mu(\mathring{A}) = \mu(\bar{A}).
+      \]
+      So we know that
+      \[
+        \liminf_{n \to \infty} \mu_n(A) \geq \liminf_{n \to \infty} \mu_n(\mathring{A}) \geq \mu(\mathring{A}) = \mu(A).
+      \]
+      Similarly, we find that
+      \[
+        \mu(A) \geq \limsup_{n \to \infty} \mu_n(A).
+      \]
+      So we are done.
+    \item (iv) $\Rightarrow$ (i): We have
+      \begin{align*}
+        \mu(f) &= \int_M f(x) \;\d \mu_n(x)\\
+        &= \int_M \int_0^\infty \mathbf{1}_{f(x) \geq t}\;\d t \;\d \mu_n(x)\\
+        &= \int_0^\infty \mu_n(\{f \geq t\})\;\d t.
+      \end{align*}
+      Since $f$ is continuous, $\partial \{f \leq t\} \subseteq \{f = t\}$. Now there can be only countably many $t$'s such that $\mu(\{f = t\}) > 0$. So we conclude using (iv) and bounded convergence theorem. % think about this
+
+    \item (iv) $\Rightarrow$ (v): Assume $t$ is a continuity point of $F_\mu$. Then we have
+      \[
+        \mu(\partial(-\infty, t]) = \mu(\{t\}) = F_\mu(t) - F_\mu(t_-) = 0.
+      \]
+      So $\mu_n(\partial_n(-\infty, t]) \to \mu((-\infty, t])$.
+    \item (v) $\Rightarrow$ (ii): if $A = (a, b)$, then
+      \[
+        \mu_n(A) = F_{\mu_n}(b-) - F_{\mu_n}(a) \geq F_{\mu_n} (b') - F_{\mu_n}(a')
+      \]
+      for any $a \leq a' \leq b' \leq b$ with $a', b'$ continuity points of $F_\mu$. So we know that
+      \[
+        \liminf_{n \to \infty} \mu_n(A) \geq F_\mu(b') - F_\mu(a') = \mu(a', b').
+      \]
+      By taking supremum over all such $a', b'$, we find that
+      \[
+        \liminf_{n \to \infty} \mu_n(A) \geq \mu(A).
+      \]
+  \end{itemize}
+\end{proof}
+
+\begin{defi}[Tight probability measures]\index{tight probability measures}
+  A sequence of probability measures $(\mu_n)_{n \geq 0}$ on a metric space $(M, e)$ is \emph{tight} if for all $\varepsilon > 0$, there exists compact $K \subseteq M$ such that
+  \[
+    \sup_n \mu_n (M \setminus K) \leq \varepsilon.
+  \]
+\end{defi}
+Note that this is always satisfied for compact metric spaces.
+
+\begin{thm}[Prokhorov's theorem]\index{Prokhorov's theorem}
+  If $(\mu_n)_{n \geq 0}$ is a sequence of tight probability measures, then there is a subsequence $(\mu_{n_k})_{k \geq 0}$ and a measure $\mu$ such that $\mu_{n_k} \Rightarrow \mu$.
+\end{thm}
+
+We shall prove this only in the case $M = \R$.
+
+\begin{proof}
+  Take $\Q\subseteq \R$, which is dense and countable. Let $x_1, x_2, \ldots$ be an enumeration of $\Q$. Define $F_n = F_{\mu_n}$. By Bolzano--Weierstrass, and some fiddling around with sequences, we can find some $F_{n_k}$ such that
+  \[
+    F_{n_k}(x_i) \to y_i \equiv F(x_i)
+  \]
+  as $k \to \infty$, for each fixed $x_i$.
+
+  Since $F$ is non-decreasing on $\Q$, it has left and right limits everywhere. We extend $F$ to $\R$ by taking right limits. This implies $F$ is cadlag.
+
+  Take $x$ a continuity point of $F$. Then for each $\varepsilon > 0$, there exists $s < x < t$ rational such that
+  \[
+    |F(s) - F(t)| < \frac{\varepsilon}{2}.
+  \]
+  Take $n$ large enough such that $|F_n(s) - F(s)| < \frac{\varepsilon}{4}$, and same for $t$. Then by monotonicty of $F$ and $F_n$, we have
+  \[
+    |F_n(x) - F(x) \leq |F(s) - F(t)| + |F_n(s) - F(s) | + |F_n(t) - F(t)| \leq \varepsilon.
+  \]
+  It remains to show that $F(x) \to 1$ as $x \to \infty$ and $F(x) \to 0$ as $x \to -\infty$. By tightness, for all $\varepsilon > 0$, there exists $N > 0$ such that
+  \[
+    \mu_n((-\infty, N]) \leq \varepsilon,\quad \mu_n((N, \infty) \leq \varepsilon.
+  \]
+  This then implies what we want.
+\end{proof}
+
+\begin{defi}[Characteristic function]\index{characteristic function}
+  Let $X$ be a random variable taking values in $\R^d$. The \emph{characteristic function} of $X$ is
+  \[
+    \varphi_X(t) = \E e^{i \bra t, x\ket} = \int_{\R^d} e^{i\bra t, x\ket}\;\d \mu_X(x)
+  \]
+  for all $t \in \R^d$.
+\end{defi}
+Note that $\varphi_X$ is continuous by bounded convergence, and $\varphi_X(0) = 1$.
+
+\begin{prop}
+  If $\varphi_X = \varphi_Y$, then $\mu_X = \mu_Y$.
+\end{prop}
+
+\begin{thm}[L\'evy's convergence theroem]\index{L\'evy's convergence theorem}
+  Let $(X_n)_{n \geq 0}$, $X$ be random variables taking values in $\R^d$. Then the following are equivalent:
+  \begin{enumerate}
+    \item $\mu_{X_n} \Rightarrow \mu_X$ as $n \to \infty$.
+    \item $\varphi_{X_n} \to \varphi_X$ pointwise.
+  \end{enumerate}
+\end{thm}
+We will in fact prove a stronger theorem.
+\begin{thm}[L\'evy]
+  Let $(X_n)_{n \geq 0}$ be as above, and let $\varphi_{X_n}(t) \to \psi(t)$ for all $t$. Suppose $\psi$ is continuous at $0$ and $\psi(0) = 1$. Then there exists a random variable $X$ such that $\varphi_X = \psi$ and $\mu_{X_n} \Rightarrow \mu_X$ as $n \to \infty$.
+\end{thm}
+We will only prove the case $d= 1$.
+\begin{lemma}
+  Let $X$ be a real random variable. Then for all $\lambda > 0$,
+  \[
+    \mu_X( |x| \geq \lambda) \leq c \lambda \int_0^{1/\lambda} (1 - \Re \varphi_X(t)) \;\d t,
+  \]
+  where $C = (1 - \sin 1)^{-1}$.
+\end{lemma}
+
+\begin{proof}
+  For $M \geq 1$, we have
+  \[
+    \int_0^M (1 - \cos t)\;\d t = M - \sin M \geq M(1 - \sin 1).
+  \]
+  By setting $M = \frac{|x|}{\lambda}$, we have
+  \[
+    \mathbf{1}_{|X| \geq \lambda} \leq C \frac{\lambda}{|X|} \int_0^{|X|/\lambda} (1 - \cos t)\;\d t.
+  \]
+  By a change of variables with $t \mapsto Xt$, we have
+  \[
+    \mathbf{1}_{|X| \geq \lambda} \leq c\lambda \int_0^1 (1 - \cos Xt)\;\d t.
+  \]
+  Apply $\mu_X$, and use the fact that $\Re \varphi_X(t) = \E \cos (Xt)$.
+\end{proof}
+
+We can now return to proving L\'evy's theorem.
+\begin{proof}[Proof of theorem]
+  It is clear that weak convergence implies convergence in characteristic functions.
+
+  Now observe that if $\mu_n \Rightarrow \mu$ iff from every subsequence $(n_k)_{k \geq 0}$, we can choose a further subsequence $(n_{k_\ell})$ such that $\mu_{n_{k_{\ell}}} \Rightarrow \mu$ as $\ell \to \infty$. Indeed, $\Rightarrow$ is clear, and suppose $\mu_n \not \Rightarrow \mu$ but satisfies the subsequence property. Then we can fhoose a bounded and continuous function $f$ such that
+  \[
+    \mu_n(f) \not \Rightarrow \mu(f).
+  \]
+  Then there is a subsequence $(n_k)_{k \geq 0}$ such that $|\mu_{n_k}(f) - \mu(f)| > \varepsilon$. Then there is no further subsequence that converges.
+
+  Thus, to show $\Leftarrow$, we need to prove the existence of subsequential limits (uniqueness follows from convergence of characteristic functions). It is enough to prove tightness of the whole sequence.
+
+  By the mean value theorem, we can choose $\lambda$ so large that
+  \[
+    c \lambda \int_0^{1/\lambda} (1 - \Re \varphi_X(t)) \;\d t < \frac{\varepsilon}{2}.
+  \]
+  By bounded convergence, we can choose $\lambda$ so large that
+  \[
+    c \lambda \int_0^{1/\lambda} (1 - \Re \varphi_{x_n}(t)\;\d t \leq \varepsilon
+  \]
+  for all $n$.  Thus, by our previous lemma, we know $(\mu_{x_n})_{n \geq 0}$ is tight. So we are done.
+\end{proof}
+
+\section{Brownian motion}
+Brownian motion was first observed by the botanist Robert Brown in 1827, when he looked at the random movement of pollen grains in water. In 1905, Albert Einstein provided the first mathematical description of this behaviour. In 1923, Norbert Wiener provided the first rigorous construction of Brownian motion. 
+
+\begin{defi}[Brownian motion]\index{Brownian motion}
+  A continuous process $(B_t)_{t \geq 0}$ taking values in $\R^d$ is called a \emph{Brownian motion} in $\R^d$ started at $x \in \R^d$ if
+  \begin{enumerate}
+    \item $B_0 = x$ almost surely.
+    \item For all $s < t$, the \term{increment} $B_t - B_s \sim N(0, (t - s) I)$.
+    \item Increments are independent. More precisely, for all $t_1 < t_2 < \cdots < t_k$, the random variables
+      \[
+        B_{t_1}, B_{t_2} - B_{t_1}, \ldots, B_{t_k} - B_{t_{k - 1}}
+      \]
+      are independent.
+  \end{enumerate}
+\end{defi}
+
+\begin{thm}[Wiener's theorem]\index{Wiener's theorem}
+  There exists a Brownian motion on some probability space.
+\end{thm}
+
+\begin{proof}
+  We first prove existence on $[0, 1]$ and in $d = 1$.
+
+  Recall that $D_n = \{\frac{k}{2^n}, k = 0, \ldots, 2^n\}$ and $D = \bigcup D_n$ are the dyadic numbers. Let $(Z_d)_{d \in D}$ be iid $N(0, 1)$ random variables on some probability space. We will define a process on $D_n$ inductively on $n$ with the required properties. We wlog assume $x = 0$.
+
+  In step $0$, we put
+  \[
+    B_0 = 0,\quad B_1 = Z_1.
+  \]
+  Assume that we have already constructed $(B_d)_{d \in D_{n - 1}}$ satisfying the properties. Take $d \in D_n \setminus D_{n - 1}$, and set
+  \[
+    d^{\pm} = d \pm 2^{-n}.
+  \]
+  These are the two consecutive numbers in $D_{n - 1}$ such that $d_- < d < d_+$. Define
+  \[
+    B_d = \frac{B_{d_+} + B_{d_-}}{2} + \frac{1}{2^{(n + 1)/2}} Z_d.
+  \]
+  The condition (i) is trivially satisfied. We now have to check the other two conditions.
+
+  Consider
+  \begin{align*}
+    B_{d_+} - B_d &= \frac{B_{d_+} - B_{d_-}}{2} - \frac{1}{2^{(n + 1)/2}} Z_d\\
+    B_d - B_{d_-} &= \underbrace{\frac{B_{d_+} - B_{d_-}}{2}}_N + \underbrace{\frac{1}{2^{(n + 1)/2}} Z_d}_{N'}.
+  \end{align*}
+  Notice that $N$ and $N'$ are normal with variance $\var(N') = \var(N) = \frac{1}{2^{n + 1}}$. In particular, we have
+  \[
+    \cov(N - N', N + N') = \var(N) - \var(N') = 0.
+  \]
+  So $B_{d_+} - B_d$ and $B_d - B_{d_-}$ are independent.
+
+  Now note that the vector of increments of $(B_d)_{d \in D_n}$ between consecutive numbers in $D_n$ is Gaussian, since after dotting with any vector, we obtain a linear combination of independent Gaussians. Thus, to prove independence, it suffice to prove that pairwise correlation vanishes.
+
+  We already proved this for the case of increments between $B_d$ and $B_{d_{\pm}}$, and this is the only case that is tricky, since they both involve the same $Z_d$. The other cases are straightforward, and are left as an exercise for the reader.
+
+  Inductively, we can construct $(B_d)_{d \in D}$, satisfying (i), (ii) and (iii). Note that for all $s, t \in D$, we have
+  \[
+    \E |B_t - B_s|^p = |t - s|^{p/2} \E |N|^p
+  \]
+  for $N \sim N(0, 1)$. Since $\E |N|^p < \infty$ for all $p$, by Kolmogorov's criterion, we can extend $(B_d)_{d \in D}$ to $(B_t)_{t \in [0, 1]}$.
+
+  In fact, this is $\alpha$-H\"older continuous for all $\alpha < \frac{1}{2}$.
+
+  Since this is a continuous process and satisfies the desired properties on a dense set, it remains to show that the properties are preserved by taking continuous limits.
+\end{proof}
+
 \printindex
 \end{document}

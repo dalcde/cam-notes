@@ -8,6 +8,7 @@
 
 \input{header}
 
+\usepackage{mathabx}
 \newcommand\Cay{\mathrm{Cay}}
 \newcommand{\qi}{\underset{qi}{\simeq}}
 \DeclareMathOperator\Area{Area}
@@ -598,7 +599,7 @@ Since we understand $F(S)$ quite explicitly, it would be nice if we have a solid
   A \emph{finitely-presented group} is a group $\Gamma$ equipped $S$ and $R$ such that $\Gamma \cong \bra S \mid R \ket$.
 \end{defi}
 
-Presentations give us ways to geometrically understand a group. Given a presentation $\mathcal{P} = \langle S \mid R \rangle$, we can construct space \term{$X_\mathcal{P}$} such that $\pi_1 X_\mathcal{P} \cong \bra S \mid R\ket$ 
+Presentations give us ways to geometrically understand a group. Given a presentation $\mathcal{P} = \langle S \mid R \rangle$, we can construct space \term{$X_\mathcal{P}$} such that $\pi_1 X_\mathcal{P} \cong \bra S \mid R\ket$
 
 To do so, we first construct a rose with $|S|$ many petals, each labeled by an element of $S$. For each $r \in R$, glue a disk onto the rose along the path specified by $r$. The \term{Seifert--van Kampen theorem} then tells us $\pi_1 X_{\mathcal{P}} \cong \Gamma$.
 
@@ -654,6 +655,7 @@ For a general finitely-presented group, this is more difficult. We can first ref
 
 This tells us the set of elements in $S^*$ that represent the identity is \term{recursively enumerable}, i.e.\ there is an algorithm that lists out all words that represent the identity. However, this is not very helpful when we want to identify whether a word represents the identity. If it does, then our algorithm will eventually tell us it is (maybe after 3 trillion years), but if it doesn't, the program will just run forever, and we will never know that it doesn't represent the identity.
 
+It turns out the answer to this question has some geometric interpretations. Let's first look at the example.
 \begin{eg}
   Let $\Gamma = \Z^2 \cong \bra a, b \mid [a, b]\ket$. Consider the word
   \[
@@ -663,37 +665,67 @@ This tells us the set of elements in $S^*$ that represent the identity is \term{
   \[
     \prod_{i = 1}^d g_i r_i^{\pm 1} g_i^{-1}?
   \]
-  We can draw a picture. Our element in $[a, b]$ looks like
+  We can draw a picture. Our element $[a, b]$ looks like
   \begin{center}
     \begin{tikzpicture}
       \draw (0, 0) rectangle (1, 1);
-      \node [right] at (1, 0.5) {$a$};
-      \node [left] at (0, 0.5) {$a$};
-      \node [below] at (0, 0.5) {$b$};
-      \node [above] at (1, 0.5) {$b$};
+      \node [right] at (1, 0.5) {$b$};
+      \node [left] at (0, 0.5) {$b$};
+      \node [below] at (0.5, 0) {$a$};
+      \node [above] at (0.5, 1) {$a$};
     \end{tikzpicture}
   \end{center}
-  If, say, $n = 3$, then $w$ is given by
+  If, say, $n = 2$, then $w$ is given by
   \begin{center}
     \begin{tikzpicture}
-      \draw [step=1, gray] (0, 0) grid (3, 3);
-      \draw (0, 0) rectangle (1, 1);
-      \foreach \x in {0.5,1.5,2.5} {
+      \draw [step=1, gray] (0, 0) grid (2, 2);
+      \foreach \x in {0.5,1.5} {
          \node [below] at (\x, 0) {$a$};
-         \node [above] at (\x, 3) {$a$};
-         \node [right] at (3, \x) {$b$};
+         \node [above] at (\x, 2) {$a$};
+         \node [right] at (2, \x) {$b$};
          \node [left] at (0, \x) {$b$};
       }
     \end{tikzpicture}
   \end{center}
-  If we think about it hard, then we see that what we need to do is to find out how to fill in this big square with the small squares, and we see we need $9$ squares. So we need $d = n^2 = 9$ squares.
+  If we think about it hard, then we see that what we need to do is to find out how to fill in this big square with the small squares, and we need $4$ squares. Indeed, we can read off the sequence
+  \[
+    w = [a, b] \cdot (b [a, b] b^{-1}) \cdot (b^2 a b^{-1} [a, b] ba^{-1} b^{-2}) \cdot (b^2 a^2 b^{-1}a^{-1}b^{-1}[a, b]baba^{-2}b^{-2}),
+  \]
+  which corresponds to filling in the square one by one as follows:
+  \begin{center}
+    \begin{tikzpicture}
+      \fill [opacity=0.3, morange] (0, 0) rectangle +(1, 1);
+      \draw [step=1, gray!50!white] (0, 0) grid (2, 2);
+      \draw (0, 0) rectangle (1, 1);
+      \draw [-latex'] (0.58, 0) -- +(0.001, 0);
+
+      \begin{scope}[shift={(3, 0)}]
+        \fill [opacity=0.3, morange] (0, 1) rectangle +(1, 1);
+        \draw [step=1, gray!50!white] (0, 0) grid (2, 2);
+        \draw (0, 0) -- (0, 2) -- (1, 2) -- (1, 1) -- (0.05, 1) -- (0.05, 0);
+
+        \draw [-latex'] (0.58, 1) -- +(0.001, 0);
+      \end{scope}
+      \begin{scope}[shift={(6, 0)}]
+        \fill [opacity=0.3, morange] (1, 1) rectangle +(1, 1);
+        \draw [step=1, gray!50!white] (0, 0) grid (2, 2);
+        \draw (0, 0) -- (0, 2) -- (1, 2) -- (1, 1) -- (1.05, 1) -- (1.05, 2) -- (2, 2) -- (2, 0.95) -- (0.95, 0.95) -- (0.95, 1.95) -- (0.05, 1.95) -- (0.05, 0);
+        \draw [-latex'] (1.58, 0.95) -- +(0.001, 0);
+      \end{scope}
+      \begin{scope}[shift={(9, 0)}]
+        \fill [opacity=0.3, morange] (1, 0) rectangle +(1, 1);
+        \draw [step=1, gray!50!white] (0, 0) grid (2, 2);
+
+        \draw (0.05, 0) -- (0.05, 1.95) -- (1.95, 1.95) -- (1.95, 1.05) -- (0.95, 1.05) -- (0.95, 0) -- (2, 0) -- (2, 0.95) -- (1.05, 0.95) -- (1.05, 0.05) -- (1, 0.05) -- (1, 1) -- (2, 1) -- (2, 2) -- (0, 2) -- (0, 0);
+        \draw [-latex'] (1.58, 0) -- +(0.001, 0);
+      \end{scope}
+    \end{tikzpicture}
+  \end{center}
 \end{eg}
 
-The point is that in general, it is quite difficult to show that $w$ represents the identity, and we might need to use rather large $d$.
+Of course, this is fine if we know very well what the Cayley graph of the group looks like, but in general it is quite hard. Indeed, solving the word problem is part of what you do if you want to draw the Cayley graph, since you need to know when two words give the same element.
 
-If we want to actually solve the word problem, one way to do so is to figure out how long we have to run the program for. If we can look at a $w$ and know if it represents the identity, it must be represented by something of a bounded length, then we can just check all the elements in $\ker \{F(S) \to \Gamma\}$ of length less than that, and if we don't find $w$, we can stop.
-
-Can we actually do this?
+So how do we solve the word problem? Our previous partial algorithm would make a good, full solution if we knew how far we had to search. If we know that we will only need at most $d = 10^{10^{100}}$, then if we searched for all expressions of the form $\prod_{i = 1}^d g_i r_i^{\pm} g_i^{-1}$ for $d < 10^{10^{100}}$, and didn't find $w$, then we know $w$ does not represent the identity element (we will later argue that we don't have to worry about there being infinitely many $g_i$'s to look through).
 
 \begin{defi}[Null-homotopic]\index{null-homotopic}
   We say $w \in S^*$ is \emph{null-homotopic} if $w = 1$ in $\Gamma$.
@@ -714,8 +746,8 @@ Let us use $|\ph|_S$ to denote word length in $F(S)$, while $\ell_S$ continues t
   \[
     n \mapsto \max \left\{ \mathrm{Area}_{a, \mathcal{P}} (w) \mid |w|_S \leq n, w \text{ is null-homotopic}\right\}.
   \]
-  This Dehn function in some sense measures then difficulty of the word problem in $\mathcal{P}$.
 \end{defi}
+This Dehn function measures the difficulty of the word problem in $\mathcal{P}$.
 
 \begin{prop}
   The word problem for $\mathcal{P}$ is solvable iff $\delta_{\mathcal{P}}$ is a computable function.
@@ -723,7 +755,7 @@ Let us use $|\ph|_S$ to denote word length in $F(S)$, while $\ell_S$ continues t
 
 We will postpone the proof. The hard part of the proof is that we don't have to worry about the infinitely many possible $g_i$ that may be used to conjugate.
 
-As usual, we don't want to talk about groups-with-a-presentation. We want something that belongs to the group itself. To do so, we need to come up with a notion of equivalence relation on functions $\N \to [0, \infty)$ (or $[0, \infty) \to [0, \infty)$).
+It would be really nice if the Dehn function can be viewed as a property of the group, and not the presentation. This requires us to come up with a notion of equivalence relation on functions $\N \to [0, \infty)$ (or $[0, \infty) \to [0, \infty)$).
 
 \begin{defi}[$\preccurlyeq$]\index{$\preccurlyeq$}
   We write $f \preccurlyeq g$ iff for some $C > 0$, we have
@@ -746,7 +778,7 @@ This captures the (super-linear) asymptotic behaviour of $f$.
 
 We start with two special cases, and then show that we can reduce everything else to these two special cases.
 \begin{lemma}
-  If $R' \subseteq \bra bra R \ket \ket$ is a finite set, and
+  If $R' \subseteq \bra \bra R \ket \ket$ is a finite set, and
   \[
     \mathcal{P} = \bra S \mid R \ket,\quad \mathcal{Q} = \bra S \mid R \cup R'\ket,
   \]
@@ -805,31 +837,31 @@ We start with two special cases, and then show that we can reduce everything els
   \[
     \Area_{\mathcal{P}}(w) \leq d = \Area_{\mathcal{Q}}(w).
   \]
-  We next prove that $\delta_{\mathcal{Q}} \preccurlyeq \delta_r$. It is unsurprising that some constants will appear this time, instead of just inequality on the nose. We let
+  We next prove that $\delta_{\mathcal{Q}} \preccurlyeq \delta_{\mathcal{P}}$. It is unsurprising that some constants will appear this time, instead of just inequality on the nose. We let
   \[
     C = \max_{t \in T} |w_t|_S.
   \]
-  Consider a null-homotopic word $w \in F(S \coprod T)$. This word looks like
+  Consider a null-homotopic word $w \in F(S \amalg T)$. This word looks like
   \[
-    w = s_{i_1}^{\pm} s_{i_2}^{\pm } \cdots t_{j_1} \cdots s \cdots t \cdots \in F(S \coprod T).
+    w = s_{i_1}^{\pm} s_{i_2}^{\pm } \cdots t_{j_1} \cdots s \cdots t \cdots \in F(S \amalg T).
   \]
   We want to turn these $t$'s into $s$'s, and we need to use the relators to do so.
 
-  We apply relatoins from $R'$ to write this as
+  We apply relations from $R'$ to write this as
   \[
     w' = s_{i_1}^{\pm} s_{i_2}^{\pm } \cdots w_{t_{j_1}} \cdots s \cdots w_t \cdots \in F(S).
   \]
-  We certainly have $|w'|_S \leq C |w|_{S \coprod T}$. With a bit of thought, we see that
+  We certainly have $|w'|_S \leq C |w|_{S \amalg T}$. With a bit of thought, we see that
   \begin{align*}
-    \Area_{\mathcal{Q}}(w) &\leq \Area_{\mathcal{P}}(w') + |w|_{S \coprod T}\\
-    &\leq \delta_{\mathcal{P}}(C|w|_{S \coprod T} ) + |w|_{S \coprod T}.
+    \Area_{\mathcal{Q}}(w) &\leq \Area_{\mathcal{P}}(w') + |w|_{S \amalg T}\\
+    &\leq \delta_{\mathcal{P}}(C|w|_{S \amalg T} ) + |w|_{S \amalg T}.
   \end{align*}
   So it follows that
   \[
     \delta_{\mathcal{Q}}(n) \leq \delta_{\mathcal{P}}(Cn) + n.\qedhere
   \]
 \end{proof}
-Note that
+
 \begin{proof}[Proof of proposition]
   Let $\mathcal{P} = \bra S \mid R \ket$ and $\mathcal{Q} = \bra S' \mid R'\ket$. If $\mathcal{P}, \mathcal{Q}$ present isomorphic groups, then we can write
   \[
@@ -846,7 +878,7 @@ Note that
   \end{align*}
   We then let
   \[
-    \mathcal{M} = \bra S \coprod S' \mid R \cup R' \cup T \cup T'\ket.
+    \mathcal{M} = \bra S \amalg S' \mid R \cup R' \cup T \cup T'\ket.
   \]
   We can then apply our lemmas several times to show that $\delta_{\mathcal{P}} \approx \delta_{\mathcal{M}} \approx \delta_{\mathcal{Q}}$.
 \end{proof}
@@ -858,49 +890,59 @@ Now we can talk about $\delta_{\Gamma}$, the Dehn function of $\Gamma$, as long 
 \end{fact}
 The proof is rather delicate, and we shall not attempt to reproduce it.
 
-\section{Van Kampen diagrams and the filling theorem}
-Let's now try to give a slightly more geometric perspective on these Dehn functions. Can we actually compute it?
+\section{Van Kampen diagrams}
+Recall we previously tried to understand the Dehn function of $\Z^2$ in terms of filling in squares on a grid. In this chapter, we pursue this idea further, and come up with an actual theorem.
 
-\begin{eg}
-  Take $\Gamma = \Z^2 \cong \bra a, b \mid [a, b]\ket$. Drawing this out:
-  \begin{center}
-    \begin{tikzpicture}
-      \draw [step=1, opacity=0.5] (-2, -2) grid (4, 4);
+To make this more precise, recall that in the case of $\Z^2$, we could embed a null-homotopic word into the plane of the form
+\begin{center}
+  \begin{tikzpicture}
+    \draw [step=1, opacity=0.5] (0, 0) grid (3, 3);
 
-      \draw [->] (-2, 0) -- (4, 0);
-      \draw [->] (0, -2) -- (0, 4);
-
-      \draw [->-=0.5] (0, 0) -- (1, 0) node [pos=0.5, below] {$a$};
-      \draw [->-=0.5] (0, 0) -- (0, 1) node [pos=0.5, left] {$b$};
-    \end{tikzpicture}
-  \end{center}
-  A null-homotopic word $w$ is then a loop in this diagram:
-  \begin{center}
-    \begin{tikzpicture}
-      \draw [step=1, opacity=0.5] (-2, -2) grid (4, 4);
-
-      \draw [->] (-2, 0) -- (4, 0);
-      \draw [->] (0, -2) -- (0, 4);
-
-      \draw [->-=0.5] (0, 0) -- (1, 0) node [pos=0.5, below] {$a$};
-      \draw [->-=0.5] (0, 0) -- (0, 1) node [pos=0.5, left] {$b$};
-
-      \draw [thick, mblue] (0, 0) -- (1, 0) -- (1, 1) -- (2, 1) -- (2, 2) -- (3, 2) -- (3, 3) -- (1, 3) -- (1, 2) -- (0, 2) -- (0, 1) -- (1, 1) -- (1, 0) -- (0, 0);
-    \end{tikzpicture}
-  \end{center}
-  The area of $W$ is just the area we have to fill in, $\Area(w) \leq 4$.
-
-  So to compute the Dehn function, we need to know what is the largest region we can fill with a path of length $n$. But this is just some classical geometry. We know that the most optimal way of doing so is by using a circle. In this case a loop of length $\ell$ can be filled in with area $\preccurlyeq \ell^2$. This is the \term{isoperimetric inequality}.
-
-  Of course, we cannot really draw a circle in $\Z^2$, but if we view the Dehn function only up to $\approx$, then it doesn't really matter, and $\delta_{\Z^2} \approx n^2$.
-
-\end{eg}
-
-\begin{eg}
-  In the same $\Z^2 \cong \bra a, b \mid [a, b] \ket$, and $w = [a, b]^2$, then $w$ is not embedded in $\R^2$, and we have to use the cell of $\R^2$ twice.
-\end{eg}
-
-How can we make this more rigorous? The key concept here is that of a \emph{singular disk diagram}.
+    \draw [thick, mblue, fill=morange, fill opacity=0.3] (0, 0) -- (1, 0) -- (1, 1) -- (2, 1) -- (2, 2) -- (3, 2) -- (3, 3) -- (1, 3) -- (1, 2) -- (0, 2) -- (0, 1) -- (1, 1) -- (1, 0) -- (0, 0);
+  \end{tikzpicture}
+\end{center}
+We saw, at least heuristically, the algebraic area of $w$ is just the geometric area of this figure. Of course, sometimes it is slightly more complicated. For example, if we have the word $w = [a, b]^2$, then we have to use the cell $[a, b]$ twice.
+%
+%\begin{eg}
+%  Take $\Gamma = \Z^2 \cong \bra a, b \mid [a, b]\ket$. Drawing this out:
+%  \begin{center}
+%    \begin{tikzpicture}
+%      \draw [step=1, opacity=0.5] (-2, -2) grid (4, 4);
+%
+%      \draw [->] (-2, 0) -- (4, 0);
+%      \draw [->] (0, -2) -- (0, 4);
+%
+%      \draw [->-=0.5] (0, 0) -- (1, 0) node [pos=0.5, below] {$a$};
+%      \draw [->-=0.5] (0, 0) -- (0, 1) node [pos=0.5, left] {$b$};
+%    \end{tikzpicture}
+%  \end{center}
+%  A null-homotopic word $w$ is then a loop in this diagram:
+%  \begin{center}
+%    \begin{tikzpicture}
+%      \draw [step=1, opacity=0.5] (-2, -2) grid (4, 4);
+%
+%      \draw [->] (-2, 0) -- (4, 0);
+%      \draw [->] (0, -2) -- (0, 4);
+%
+%      \draw [->-=0.5] (0, 0) -- (1, 0) node [pos=0.5, below] {$a$};
+%      \draw [->-=0.5] (0, 0) -- (0, 1) node [pos=0.5, left] {$b$};
+%
+%      \draw [thick, mblue] (0, 0) -- (1, 0) -- (1, 1) -- (2, 1) -- (2, 2) -- (3, 2) -- (3, 3) -- (1, 3) -- (1, 2) -- (0, 2) -- (0, 1) -- (1, 1) -- (1, 0) -- (0, 0);
+%    \end{tikzpicture}
+%  \end{center}
+%  The area of $W$ is just the area we have to fill in, $\Area(w) \leq 4$.
+%
+%  So to compute the Dehn function, we need to know what is the largest region we can fill with a path of length $n$. But this is just some classical geometry. We know that the most optimal way of doing so is by using a circle. In this case a loop of length $\ell$ can be filled in with area $\preccurlyeq \ell^2$. This is the \term{isoperimetric inequality}.
+%
+%  Of course, we cannot really draw a circle in $\Z^2$, but if we view the Dehn function only up to $\approx$, then it doesn't really matter, and $\delta_{\Z^2} \approx n^2$.
+%
+%\end{eg}
+%
+%\begin{eg}
+%  In the same $\Z^2 \cong \bra a, b \mid [a, b] \ket$, and $w = [a, b]^2$, then $w$ is not embedded in $\R^2$, and we have to use the cell of $\R^2$ twice.
+%\end{eg}
+%
+%How can we make this more rigorous? The key concept here is that of a \emph{singular disk diagram}.
 
 \begin{defi}[Singular disc diagram]\index{singular disc diagram}\index{disc diagram}
   A \emph{(singular) disc diagram} is a compact, contractible subcomplex of $\R^2$, e.g.
@@ -912,8 +954,8 @@ How can we make this more rigorous? The key concept here is that of a \emph{sing
       \draw (1, 1) -- (1.5, 2);
       \fill (1.5, 2) -- (2, 2) -- (2.5, 2.5) -- (2.5, 3) -- (2, 3) -- (2, 2.5) -- (1.5, 2.5) -- (1.5, 2);
 
-      \draw (0, 1) -- (-1, 2);
-      \fill (-1.5, 2.5) circle [radius=1.414];
+      \draw (0, 1) -- (-0.5, 1.5);
+      \fill (-0.5, 1.5) circle [radius=0.414];
 
       \fill (-0.5, -0.5) circle [radius=0.707];
     \end{tikzpicture}
@@ -924,16 +966,13 @@ How can we make this more rigorous? The key concept here is that of a \emph{sing
   \]
   and
   \[
-    \Diam_(D) = \text{length of the longest embedded path in $D^{(1)}$, starting at $p$}.
+    \Diam_p(D) = \text{length of the longest embedded path in $D^{(1)}$, starting at $p$}.
   \]
+  If we orient $\R^2$, then $D$ has a well-defined boundary cycle. A disc diagram is \emph{labelled} if each (oriented) edge is labelled by an element $s \in S^{\pm}$. The set of \term{face labels} is the set of boundary cycles of the $2$-cells.
+
+  If all the face labels are elements of $R^{\pm}$, then we say $D$ is a \emph{diagram} over $\bra S \mid R\ket$.
 \end{defi}
-If we orient $\R^2$, then $D$ has a well-defined boundary cycle. % insert picture
 
-A disc diagram is \emph{labelled} if each (oriented) edge is labelled by an element $s \in S^{\pm}$.
-
-The set of \emph{face labels} is the set of boundary cycles of the $2$-cells.
-
-If the set of cyclic conjugates of $R^{\pm}$ contains the face labels of $D$, then we say that $D$ is a \emph{diagram} over $\bra S \mid R\ket$.
 
 \begin{defi}[van Kampen diagram]\index{van Kampen diagram}
   If $w \in \bra \bra R \ket \ket$, and $w$ is the boundary cycle of a singular disc diagram $D$ over the presentation $\bra S \mid R\ket$, we say that $D$ is a \emph{van Kampen diagram} for $w$.
@@ -942,21 +981,18 @@ If the set of cyclic conjugates of $R^{\pm}$ contains the face labels of $D$, th
   The diagram
   \begin{center}
     \begin{tikzpicture}
-      \draw [step=1, opacity=0.5] (-2, -2) grid (4, 4);
+      \draw [step=1, opacity=0.5] (0, 0) grid (3, 3);
 
-      \draw [->] (-2, 0) -- (4, 0);
-      \draw [->] (0, -2) -- (0, 4);
+      \draw [thick, mblue, fill=morange, fill opacity=0.3] (0, 0) -- (1, 0) -- (1, 1) -- (2, 1) -- (2, 2) -- (3, 2) -- (3, 3) -- (1, 3) -- (1, 2) -- (0, 2) -- (0, 1) -- (1, 1) -- (1, 0) -- (0, 0);
 
-      \draw [->-=0.5] (0, 0) -- (1, 0) node [pos=0.5, below] {$a$};
-      \draw [->-=0.5] (0, 0) -- (0, 1) node [pos=0.5, left] {$b$};
-
-      \draw [thick, mblue] (0, 0) -- (1, 0) -- (1, 1) -- (2, 1) -- (2, 2) -- (3, 2) -- (3, 3) -- (1, 3) -- (1, 2) -- (0, 2) -- (0, 1) -- (1, 1) -- (1, 0) -- (0, 0);
+      \draw [-latex'] (0.58, 0) -- +(0.001, 0) node [below] {$a$};
+      \draw [-latex'] (0, 0.58) -- +(0, 0.001) node [left] {$b$};
     \end{tikzpicture}
   \end{center}
   is a van Kampen diagram for $abababa^{-2}b^{-1} a^{-1}b^{-1}ab^{-1}a^{-1}$.
 \end{eg}
 
-Note that in this case, the map $S^1 X_{\mathcal{P}}$ that represents $w$ factors through a map $D \to X_\mathcal{P}$.
+Note that in this case, the map $S^1 \to X_{\mathcal{P}}$ that represents $w$ factors through a map $D \to X_\mathcal{P}$.
 
 \begin{lemma}[van Kampen's lemma]\index{van Kampen's lemma}
   Let $\mathcal{P} = \bra S \mid R\ket$ be a presentation and $w \in S^*$. Then the following are equivalent:
@@ -971,8 +1007,7 @@ Note that in this case, the map $S^1 X_{\mathcal{P}}$ that represents $w$ factor
 \end{lemma}
 
 \begin{proof}
-  First observe that we may assume that $w$ is reduced, since if we have a non-reduced word, then in the van Kampen diagram, there must be a path segment that immediately backtracks itself, and we can just cancel them. This does not affect the area of the diagram.
-
+%  First observe that we may assume that $w$ is reduced, since if we have a non-reduced word, then in the van Kampen diagram, there must be a path segment that immediately backtracks itself, and we can just cancel them. This does not affect the area of the diagram.
   In one direction, given
   \[
     w = \prod_{i = 1}^n g_i r_i^{\pm} g_i^{-1} \in F(S)
@@ -982,75 +1017,85 @@ Note that in this case, the map $S^1 X_{\mathcal{P}}$ that represents $w$ factor
     \begin{tikzpicture}
       \node [circ] {};
 
-      \draw (0, 0) -- (-2, 2) node [pos=0.5] {$g_1$};
-      \draw (0, 0) -- (-1, 2) node [pos=0.5] {$g_2$};
-      \draw (0, 0) -- (0, 2) node [pos=0.5] {$g_3$};
-      \draw (0, 0) -- (1, 2) node [pos=0.5] {$g_4$}; % replace with \ldots
-      \draw (0, 0) -- (2, 2) node [pos=0.5] {$g_d$};
+      \foreach \x/\lab in {-60/d,0/3,30/2,60/1} {
+        \begin{scope}[rotate=\x]
+          \draw (0, 0) -- (0, 2);
 
-      \draw (-2, 2.3) circle [radius=0.3]; % label as r_i^{\pm}
-      \draw (-1, 2.3) circle [radius=0.3];
-      \draw (0, 2.3) circle [radius=0.3];
-      \draw (1, 2.3) circle [radius=0.3];
-      \draw (2, 2.3) circle [radius=0.3];
+          \node at (0.3, 1.4) {$g_\lab$};
+          \draw (0, 2.3) circle [radius=0.3];
+          \node [above] at (0, 2.6) {$r_\lab^{\pm}$};
+        \end{scope}
+      }
+
+      \node at (0.9, 1.3) {$\ddots$};
     \end{tikzpicture}
   \end{center}
-  This defines a diagram for a word $w' \underset{F(S)}{=} w$. Note that $\Area(D') = d$. We next need to define moves on diagrams to transform $w'$ to $w$. These are
-  \begin{itemize}
-    \item Pruning: We replace
-      \begin{center}
-        \begin{tikzpicture}
-          \fill [gray] circle [radius=0.5];
-          \draw [->-=0.5] (0.5, 0) -- (1.5, 0) node [pos=0.5, above] {$s$};
-        \end{tikzpicture}
-      \end{center}
-      with
-      \begin{center}
-        \begin{tikzpicture}
-          \fill [gray] circle [radius=0.5];
-        \end{tikzpicture}
-      \end{center}
-    \item Folding: If we see
-      \begin{center}
-        \begin{tikzpicture}
-          \draw [->-=0.5] (0, 0) -- (1, 0.5) node [pos=0.5, above] {$s$};
-          \draw [->-=0.5] (0,0 0) -- (1, -0.5) node [pos=0.5, below] {$s$};
-
-          \draw [red] (1, 0.5) -- (2, 2);
-          \draw [blue] (1, -0.5) -- (2, -2);
-        \end{tikzpicture}
-      \end{center}
-      We replace it with
-      \begin{center}
-        \begin{tikzpicture}
-          \draw [->-=0.5] (0, 0) -- (1, 0) node [pos=0.5, above] {$s$};
-
-          \draw [red] (1, 0) -- (2, 2);
-          \draw [blue] (1, 0) -- (2, -2);
-        \end{tikzpicture}
-      \end{center}
-  \end{itemize}
-  Note that if we see something that looks like
-  \begin{center}
+  This defines a diagram for the word $\prod_{i = 1}^n g_i r_i^{\pm} g_i^{-1}$ which is equal in $F(S)$ to $w$, but is not exactly $w$. However, note that performing elementary reductions (or their inverses) correspond to operations on the van Kampen diagram that does not increase the area. We will be careful and not say that the area doesn't change, since we may have to collapse paths that look like
+    \begin{center}
     \begin{tikzpicture}
-      \fill [gray] (0, 0) edge [bend left] (2, 0) edge [bend left] (0, 0); % this is going to be wrong
-      \draw (0, 0) edge [bend left, ->-=0.5] (2, 0) node [pos=0.5, above] {$s$};
-      \draw (0, 0) edge [bend right, ->-=0.5] (2, 0) node [pos=0.5, above] {$s$};
+      \draw (0, 0) edge [bend left, fill=morange, fill opacity=0.5] (2, 0);
+      \draw (2, 0) edge [bend left, fill=morange, fill opacity=0.5] (0, 0);
+      \draw (0, 0) edge [bend left, ->-=0.6] (2, 0);
+      \draw (0, 0) edge [bend right, ->-=0.6] (2, 0);
     \end{tikzpicture}
   \end{center}
-  folding replaces it with simply
-  \begin{center}
-    \begin{tikzpicture}
-      \draw [->-=0.5] (0, 0) -- (2, 0) node [pos=0.5, above] {$s$};
-    \end{tikzpicture}
-  \end{center}
-  Note that in this step, we lose area.
-
-  We see that we can perform one of moves whenever the boundary of our diagram forms a non-reduced word, and each of these moves corresponds to reducing the words. Therefore the procedure terminates and in the end, we obtain a diagram $D$ with boundary cycle $w$ and
-  \[
-    \Area(D) \leq \Area(D').
-  \]
-  % in each step, either area decreases or length decreases
+%
+%  $w' \underset{F(S)}{=} w$. Note that $\Area(D') = d$. We next need to define moves on diagrams to transform $w'$ to $w$. These are
+%  \begin{itemize}
+%    \item Pruning: We replace
+%      \begin{center}
+%        \begin{tikzpicture}
+%          \fill [gray] circle [radius=0.5];
+%          \draw [->-=0.5] (0.5, 0) -- (1.5, 0) node [pos=0.5, above] {$s$};
+%        \end{tikzpicture}
+%      \end{center}
+%      with
+%      \begin{center}
+%        \begin{tikzpicture}
+%          \fill [gray] circle [radius=0.5];
+%        \end{tikzpicture}
+%      \end{center}
+%    \item Folding: If we see
+%      \begin{center}
+%        \begin{tikzpicture}
+%          \draw [->-=0.5] (0, 0) -- (1, 0.5) node [pos=0.5, above] {$s$};
+%          \draw [->-=0.5] (0,0 0) -- (1, -0.5) node [pos=0.5, below] {$s$};
+%
+%          \draw [red] (1, 0.5) -- (2, 2);
+%          \draw [blue] (1, -0.5) -- (2, -2);
+%        \end{tikzpicture}
+%      \end{center}
+%      We replace it with
+%      \begin{center}
+%        \begin{tikzpicture}
+%          \draw [->-=0.5] (0, 0) -- (1, 0) node [pos=0.5, above] {$s$};
+%
+%          \draw [red] (1, 0) -- (2, 2);
+%          \draw [blue] (1, 0) -- (2, -2);
+%        \end{tikzpicture}
+%      \end{center}
+%  \end{itemize}
+%  Note that if we see something that looks like
+%  \begin{center}
+%    \begin{tikzpicture}
+%      \fill [gray] (0, 0) edge [bend left] (2, 0) edge [bend left] (0, 0); % this is going to be wrong
+%      \draw (0, 0) edge [bend left, ->-=0.5] (2, 0) node [pos=0.5, above] {$s$};
+%      \draw (0, 0) edge [bend right, ->-=0.5] (2, 0) node [pos=0.5, above] {$s$};
+%    \end{tikzpicture}
+%  \end{center}
+%  folding replaces it with simply
+%  \begin{center}
+%    \begin{tikzpicture}
+%      \draw [->-=0.5] (0, 0) -- (2, 0) node [pos=0.5, above] {$s$};
+%    \end{tikzpicture}
+%  \end{center}
+%  Note that in this step, we lose area.
+%
+%  We see that we can perform one of moves whenever the boundary of our diagram forms a non-reduced word, and each of these moves corresponds to reducing the words. Therefore the procedure terminates and in the end, we obtain a diagram $D$ with boundary cycle $w$ and
+%  \[
+%    \Area(D) \leq \Area(D').
+%  \]
+%  % in each step, either area decreases or length decreases
 
   In the other direction, given a diagram $D$ for $w$, we need to produce an expression
   \[
@@ -1058,7 +1103,7 @@ Note that in this case, the map $S^1 X_{\mathcal{P}}$ that represents $w$ factor
   \]
   such that $d \leq \Area(D)$.
 
-  We let $e$ be the first $2$-cell that the boundary curve arrives at, reading anticlocwise around $\partial D$. let $g$ be the path from $p$ to $e$, and let $r$ be the relator read anti-clockwise around $e$. Let
+  We let $e$ be the first $2$-cell that the boundary curve arrives at, reading anticlocwise around $\partial D$. Let $g$ be the path from $p$ to $e$, and let $r$ be the relator read anti-clockwise around $e$. Let
   \[
     D' = D - e,
   \]
@@ -1073,8 +1118,9 @@ Note that in this case, the map $S^1 X_{\mathcal{P}}$ that represents $w$ factor
   with $d = \Area(D)$.
 \end{proof}
 
+We observe that in our algorithm about, the $g_i$'s produced have length $\leq \Diam(D)$. So we see that
 \begin{cor}
-  If $w$ is null-homotopic, then
+  If $w$ is null-homotopic, then we can write $w$ in the form
   \[
     w = \prod_{i = 1}^d g_i r_i^{\pm} g_i^{-1},
   \]
@@ -1105,7 +1151,8 @@ It is now easy to prove that
   \end{itemize}
 \end{proof}
 
-\begin{thm}[Novikov--Boone theorem]
+It is a hard theorem that
+\begin{thm}[Novikov--Boone theorem]\index{Novikov--Boone theorem}
   There exists a finitely-presented group with an unsolvable word problem.
 \end{thm}
 
@@ -1113,7 +1160,49 @@ It is now easy to prove that
   $\delta_{\mathcal{P}}$ is sometimes non-computable.
 \end{cor}
 
-\subsection{The Filling theorem}
+Let's look at some applications to geometry. In geometry, people wanted to classify manifolds. Classifying (orientable) $2$-dimensional manifolds is easy. They are completely labeled by the genus. This classification can in fact be performed by a computer. If we manage to triangulate our manifold, then we can feed the information of the triangulation into a computer, and then the computer can compute the Euler characteristic.
+
+Is it possible to do this in higher dimensions? It turns out the word problem gives a severe hindrance to doing so.
+\begin{thm}
+  Let $n \geq 4$ and $\Gamma = \bra S \mid R\ket$ be a finitely-presented group. Then we can construct a closed, smooth, orientable manifold $M^n$ such that $\pi_1 M \cong \Gamma$.
+\end{thm}
+This is a nice, little surgery argument.
+
+\begin{proof}
+  Let $S = \{a_1, \ldots, a_m\}$ and $R = \{r_1, \ldots, r_n\}$. We start with
+  \[
+    M_0 = \#_{i = 0}^m (S^1 \times S^{n - 1}).
+  \]
+  Note that when we perform this construction, as $n \geq 3$, we have
+  \[
+    \pi_1M_0 \cong F_m
+  \]
+  by Seifert van-Kampen theorem. We now construct $M_k$ from $M_{k - 1}$ such that
+  \[
+    \pi_1 M_k \cong \bra a_1, \ldots, a_m \mid r_1, \ldots, r_k\ket.
+  \]
+  We realize $r_k$ as a loop in $M_{k - 1}$. Because $n \geq 3$, we may assume (after a small homotopy) that this is represented by a smooth embedded map $r_k: S^1 \to M_{k - 1}$.
+
+  We take $N_k$ to be a smooth tubular neighbourhood of $r_k$. Then $N_k \cong S^1 \times D^{n - 1} \subseteq M_{k - 1}$. Note that $\partial N_k \cong S^1 \times S^{n - 2}$.
+
+  Let $U_k = D^2 \times S^{n - 2}$. Notice that $\partial U_k \cong \partial N_k$. Since $n \geq 4$, we know $U_k$ is simply connected. So we let
+  \[
+    M'_{k - 1} = M_k \setminus \mathring{N}_k,
+  \]
+  a manifold with boundary $S^1 \times S^{n - 2}$. Choose an orientation-reversing diffeomorphism $\varphi_k: \partial U_k \to \partial M_{k - 1}'$. Let
+  \[
+    M_k = M_{k - 1}' \cup_{\varphi_k} U_k.
+  \]
+  Then by applying Seifert van Kampen repeatedly, we see that
+  \[
+    \pi_1 M_k = \pi_1 M_{k - 1} / \bra \bra r_k \ket \ket,
+  \]
+  as desired.
+\end{proof}
+Thus, if we have an algorithm that can distinguish between the fundamental groups of manifolds, then that would solve (some variant of) the word problem for us, which is impossible.
+
+Finally, we provide some (even more) geometric interpretation of the Dehn function.
+
 \begin{defi}[Filling disc]\index{filling disc}
   Let $(M, g)$ be a closed Riemannian manifold. Let $\gamma: S^1 \to M$ be a smooth null-homotopic loop. A filling disk for $\gamma$ in $M$ is a smooth map $f: D^2 \to M$ such that the diagram
   \[
@@ -1138,56 +1227,57 @@ So we can define
 \end{defi}
 
 \begin{defi}[Isoperimetric function]\index{isoperimetric function}
-  The isoperimetric function of $(M g)$ is
+  The isoperimetric function of $(M, g)$ is
   \begin{multline*}
     FiU^M: [0, \infty) \to [0, \infty)\\
     \ell \mapsto \sup\{\FArea(\gamma): \gamma: S^1 \to M\text{ is a smooth null-homotopic loop, }\ell(\gamma) \leq \ell\}
   \end{multline*}
 \end{defi}
 
-\begin{thm}[Filling theorem (Gromov, Bridson, Burillo--Taback)] % insert name
+\begin{thm}[Filling theorem]
   let $M$ be a closed Riemannian manifold. Then $FiU^M \simeq \delta_{\pi_1 M}$.
 \end{thm}
 
-This theorem applies to every finitely-presented group, because
-\begin{thm}
-  If $n \geq 4$ and $\Gamma = \bra S \mid R\ket$ is a finitely-presented group, then there exists a closed, smooth, orientable manifold $M^n$ such that $\pi_1 M \cong \Gamma$.
-\end{thm}
-This is a nice, little surgery argument.
-
-\begin{proof}
-  Let $S = \{a_1, \ldots, a_m\}$ and $R = \{r_1, \ldots, r_n\}$. We start with
-  \[
-    M_0 = \#_{i = 0}^m (S^1 \times S^{n - 1}.
-  \]
-  Note that when we perform this construction, as $n \geq 3$, we have
-  \[
-    \pi_1M_0 \cong F_m
-  \]
-  by Seifert van-Kampen theorem. We now construct $M_k$ from $M_{k - 1}$ such that
-  \[
-    \pi_1 M_k \cong \bra a_1, \ldots, a_m \mid r_1, \ldots, r_k\ket.
-  \]
-  We realize $R_k$ as a loop in $M_{k - 1}$, which we may assume is null-homotopic. Because $n \geq 3$, we may assume (after a small homotopy) that this is represented by a smooth embedded map $r_k: S^1 \to M_{k - 1}$.
-
-  We take $N_k$ to be a smooth tubular neighbourhood of $r_k$. Then $N_k \cong S^1 \times D^{n - 1} \subseteq M_{k - 1}$. Note that $\partial N_k \cong S^1 \times S^{n - 2}$.
-
-  Let $U_k = D^2 \times S^{n - 2}$. Notice that $\partial U_k \cong \partial N_k$. Since $n \geq 4$, we know $U_k$ is simply connected. So we let
-  \[
-    M'_{k - 1} = M_k \setminus \mathring{N}_k,
-  \]
-  a manifold with boundary $S^1 \times S^{n - 2}$. Choose an orientation-reversing diffeomorphism $\varphi_k: \partial U_k \to \partial M_{k - 1}'$. Let
-  \[
-    M_k = M_{k - 1}' \cup_{\varphi_k} U_k.
-  \]
-  Then by applying Seifert van Kampen repeatedly, we see that
-  \[
-    \pi_1 M_k = \pi_1 M_{k - 1} / \bra \bra r_k \ket \ket,
-  \]
-  as desired.
-\end{proof}
-
-The point is that whenever we come up with a bad group, we can construct a bad manifold with similar bad behaviour. So manifolds are at least as difficult to understand as groups. In particular, there is no algorithm that can distinguish any two smooth manifolds, since that would allow us to figure out if two group presentations define the same group, which we know is impossible.
+By our previous construction, we know this applies to every finitely-presented group.
+%This theorem applies to every finitely-presented group, because
+%\begin{thm}
+%  If $n \geq 4$ and $\Gamma = \bra S \mid R\ket$ is a finitely-presented group, then there exists a closed, smooth, orientable manifold $M^n$ such that $\pi_1 M \cong \Gamma$.
+%\end{thm}
+%This is a nice, little surgery argument.
+%
+%\begin{proof}
+%  Let $S = \{a_1, \ldots, a_m\}$ and $R = \{r_1, \ldots, r_n\}$. We start with
+%  \[
+%    M_0 = \#_{i = 0}^m (S^1 \times S^{n - 1}.
+%  \]
+%  Note that when we perform this construction, as $n \geq 3$, we have
+%  \[
+%    \pi_1M_0 \cong F_m
+%  \]
+%  by Seifert van-Kampen theorem. We now construct $M_k$ from $M_{k - 1}$ such that
+%  \[
+%    \pi_1 M_k \cong \bra a_1, \ldots, a_m \mid r_1, \ldots, r_k\ket.
+%  \]
+%  We realize $R_k$ as a loop in $M_{k - 1}$, which we may assume is null-homotopic. Because $n \geq 3$, we may assume (after a small homotopy) that this is represented by a smooth embedded map $r_k: S^1 \to M_{k - 1}$.
+%
+%  We take $N_k$ to be a smooth tubular neighbourhood of $r_k$. Then $N_k \cong S^1 \times D^{n - 1} \subseteq M_{k - 1}$. Note that $\partial N_k \cong S^1 \times S^{n - 2}$.
+%
+%  Let $U_k = D^2 \times S^{n - 2}$. Notice that $\partial U_k \cong \partial N_k$. Since $n \geq 4$, we know $U_k$ is simply connected. So we let
+%  \[
+%    M'_{k - 1} = M_k \setminus \mathring{N}_k,
+%  \]
+%  a manifold with boundary $S^1 \times S^{n - 2}$. Choose an orientation-reversing diffeomorphism $\varphi_k: \partial U_k \to \partial M_{k - 1}'$. Let
+%  \[
+%    M_k = M_{k - 1}' \cup_{\varphi_k} U_k.
+%  \]
+%  Then by applying Seifert van Kampen repeatedly, we see that
+%  \[
+%    \pi_1 M_k = \pi_1 M_{k - 1} / \bra \bra r_k \ket \ket,
+%  \]
+%  as desired.
+%\end{proof}
+%
+%The point is that whenever we come up with a bad group, we can construct a bad manifold with similar bad behaviour. So manifolds are at least as difficult to understand as groups. In particular, there is no algorithm that can distinguish any two smooth manifolds, since that would allow us to figure out if two group presentations define the same group, which we know is impossible.
 
 \section{New groups from old: A crash course in Bass--Serre theory}
 The idea is that we want to be able to do things similar to how we built new manifolds by gluing together old manifolds.
@@ -1389,7 +1479,7 @@ Note that the underlying graph of $\hat{\mathcal{X}}$ is not necessarily a cover
   Now let's define the edge maps $\partial_{\hat{e}}^{\pm}$ for each $\hat{e} \in E(\hat{\Xi}) \mapsto e \in E(\Xi)$. To do so, we consider the diagram
   \[
     \begin{tikzcd}
-      \hat{X}_{\hat{e}} \ar[r, hook, "\sim"] \ar[rr, bend left] \ar[d] & \hat{X}_{\hat{e}} \times [-1, 1]  \ar[d] \ar[r, dashed] & \hat{X} \ar[d, "p"]\\
+      \hat{X}_{\hat{e}} \ar[r, hook, "\sim"] \ar[rr, bend left] \ar[d] & \hat{X}_{\hat{e}} \times [-1, 1] \ar[d] \ar[r, dashed] & \hat{X} \ar[d, "p"]\\
       X_e \ar[r, hook, "\sim"] & X_e \times [-1, 1] \ar[r] & X
     \end{tikzcd}
   \]
@@ -1572,7 +1662,7 @@ This should be alarming. The quasi-geodesics in the Euclidean plane can look unl
 
 \begin{thm}[Morse lemma]\index{Morse lemma}
   For all $\delta \geq 0, \lambda \geq 1$ there is $R(\delta, \lambda, \varepsilon)$ such that the following holds:
-  
+
   If $X$ is a $\delta$-hyperbolic metric space, and $c: [a, b] \to X$ is a $(\lambda, \varepsilon)$-quasigeodesic from $p$ to $q$, and $[p, q]$ is a choice of geodesic from $p$ to $q$, then
   \[
     d_{Haus}([p, q], \im(c)) \leq R(\delta, \lambda, \varepsilon),
@@ -1597,7 +1687,7 @@ This has nothing to do with the Morse lemma in differential topology.
 
 Thus, we can make the following definition:
 \begin{defi}[Hyperbolic group]\index{hyperbolic group}
-  A  group $\Gamma$ is \emph{hyperbolic} if it acts properly discontinuously and cocompactly by isometries on a proper, geodesic hyperbolic metric space. Equivalently, if it is finitely-generated and with a hyperbolic Cayley graph.
+  A group $\Gamma$ is \emph{hyperbolic} if it acts properly discontinuously and cocompactly by isometries on a proper, geodesic hyperbolic metric space. Equivalently, if it is finitely-generated and with a hyperbolic Cayley graph.
 \end{defi}
 
 Let's prove the Morse lemma. To do so, we need the following definition:
@@ -1685,7 +1775,7 @@ In general, this number is extremely hard to compute, and may even be finite.
   \[
     \frac{\ell(c|_{[0, \frac{1}{2}]})}{2^{N - 1}} < 1 \leq \frac{\ell(c|_{[0, \frac{1}2}])}{2^{N - 2}}.
   \]
-  So by the induction hypothesis, 
+  So by the induction hypothesis,
   \begin{align*}
     d(x_1, \im c) &\leq \delta |\log_2 \ell(c|_{[0, \frac{1}{2}]}| + 1\\
     &= \delta \abs{ \frac{1}{2}\log_2 \ell(c)} + 1\\
@@ -1749,7 +1839,7 @@ In general, this number is extremely hard to compute, and may even be finite.
   \]
   The left hand side is linear in $D$, and the right hand side is a logarithm in $D$. So it must be the case that $D$ is bounded. Hence $[p, q] \subseteq N_{D_0}(\im c)$, where $D_0$ is some constant.
 
-  It remains to find a bound $M$ such that $\im c \subseteq N_M([p, q])$. Let $[a', b']$ be a maximal subinterval of $[a, b]$ such that $c[a', b']$ lies entirely outside $\mathring{N}_{D_0}([p, q])$. Since $\bar{N}_D(c[a, a'])$  and $\bar{N}_D(c[b', b])$ are both closed, and they collectively cover the connected set $[p, q]$, there exists
+  It remains to find a bound $M$ such that $\im c \subseteq N_M([p, q])$. Let $[a', b']$ be a maximal subinterval of $[a, b]$ such that $c[a', b']$ lies entirely outside $\mathring{N}_{D_0}([p, q])$. Since $\bar{N}_D(c[a, a'])$ and $\bar{N}_D(c[b', b])$ are both closed, and they collectively cover the connected set $[p, q]$, there exists
   \[
     w \in [p, q] \cap \bar{N}_{D_0}(c[a, a']) \cap \bar{N}_{D_0}(c[b', b]).
   \]
@@ -1780,6 +1870,277 @@ With the Morse lemma proven, we can sensibly talk about hyperbolic groups. We ha
   Surface groups $\Sigma_g$ for $g \geq 2$ acts on the hyperbolic plane properly discontinuously and cocompactly by isometries (since the universal cover of the genus $g$ surface is the hyperbolic plane by tesselating the hyperbolic plane with $4g$-gons, c.f.\ IB Geometry).
 \end{eg}
 
- 
+\begin{defi}[virtually-P]\index{virtually-P}
+  Let P be a property of groups. Then we say $G$ is virtually-P if there is a finite index subgroup $G_0 \leq G$ such that $G_0$ is P.
+\end{defi}
+
+\begin{eg}
+  Finite groups are virtually trivial!
+\end{eg}
+
+Note that $G_0 \leq G$ is finite-index, then $G_0$ acts on $\Cay_S(G)$ in a way that satisfies the properties of the Schwarz--Milnor lemma (the only property we may worry about is cocompactness, which is what we need finite-index for) and hence $G_0 \qi G$. In particular,
+
+\begin{eg}
+  A virtually hperbolic group is hyperbolic. For example, virtually free groups such that $(\Z/2) * (\Z/3) = \PSL_2\Z$ are hyperbolic.
+\end{eg}
+
+These are some nice classes of examples, but they will be drawfed by our next class of examples.
+
+A ``random group'' is hyperbolic. More precisely, fix $m \geq 2$ and $n \geq 1$. We temporarily fix $\ell \geq 0$. Consider groups of the form
+\[
+  \Gamma = \bra a_1, \ldots, a_m \mid r_1, \ldots, r_n\ket.
+\]
+such that $r_i$ are all \emph{cyclicly reduced}\index{cyclicly reduced word} words of length $\ell$. Put the uniform probability distribution on the set of all such groups. This defines a group-valued random variable $\Gamma_\ell$. For a property $P$, we say that ``a random grouup is $P$''\index{random group} if % explain cyclicly reduced
+\[
+  \lim_{\ell \to \infty}\P(\text{$\Gamma_\ell$ is hyperbolic}) = 1
+\]
+for all $n, m$.
+\begin{thm}[Gromov]
+  A random group is infinite and hyperbolic.
+\end{thm}
+
+There are, of course, other ways to define a ``random group''. As long as we control the number of relations well so that we don't end up with finite groups all the time, the ``random group'' should still be hyperbolic.
+
+Recall that in differential geometry, geodesics are defined locally. However, we defined our geodesics to be embedded interval, which is necessarily a global notion. We want an analogous local version. However, if we want to work up to quasi-isomoprhism, then we cannot go completely local, because locally, you are allowed to be anything.
+
+\begin{defi}[$k$-local geodesic]\index{$k$-local geodesic}\index{local geodesic}
+  Let $X$ be a geodesic metric space, and $k > 0$. A path $c: [a, b] \to X$ is a \emph{$k$-local geodesic} if
+  \[
+    d(c(t), c(t')) = |t - t'|
+  \]
+  for all $t, t' \in [a, b]$ with $|t - t'| \leq k$.
+\end{defi}
+
+\begin{thm}
+  Let $X$ be $\delta$-hyperbolic and $c: [a, b] \to X$ be a $k$-local geodesic where $k > 8 \delta$. Then $c$ is a $(\lambda, \varepsilon)$-quasigeodesic for $\lambda = \lambda(\delta, k)$ and $\varepsilon = \varepsilon(\delta, k)$.
+\end{thm}
+
+First, we prove
+\begin{lemma}
+  Let $X$ be $\delta$-hyperbolic and $k > 8\delta$. If $c: [a, b] \to X$ is a $k$-local geodesic, then $\im c$ is contained in the $2\delta$-neighbourhood $[c(a), c(b)]$.
+\end{lemma}
+Observe that by iterating the definition of hyperbolicity, on a $\delta$-hyperbolic space, any point on an $n$-gon is at most $(n - 2)\delta$ away from a pointo n another side.
+
+\begin{proof}
+  Let $x = c(t)$ maximize $d(x, [c(a), c(b)])$. Let
+  \[
+    y = c\left(t - \frac{k}{2}\right),\quad z = c\left(t - \frac{k}{2}\right).
+  \]
+  If $t - \frac{k}{2} < a$, we set $y = c(a)$ instead, and similarly for $z$.
+
+  Let $y' \in [c(a), c(b)]$ minimize $d(y, y')$, and likewise let $z' \in [c(a), c(b)]$ minimize $d(z, z')$.
+
+  Fix geodesics $[y, y']$ and $[z, z']$. Then we have a geodesic rectangle with vertices $y, y', z, z'$. By $\delta$-hyperbolicity, there exists $w$ on the rectangle \emph{not} on $\im c$, such that $d(x, w) = 2 \delta$.
+
+  If $w \in [y', z']$, then we win. Otherwise, we may wlog assume $w \in [y, y']$. Note that in the case $y = c(a)$, we must have $y = y'$, and so this would imply $w = y \in [c(a), c(b)]$. So we are only worried about the case $y = c\left(t - \frac{k}{2}\right)$. So $d(y, x) > 4\delta$. But then by the triangle inequality, we must have $d(y, w) > 2\delta$.
+
+  However,
+  \[
+    d(x, y') \leq d(x, w) + d(w, y') < d(y, w) + d(w, y') = d(y, y').
+  \]
+  So it follows that
+  \[
+    d(x, [c(a), c(b)]) < d(y, y') = d(y, [c(a), c(b)]).
+  \]
+  This contradicts our choice of $c$.
+\end{proof}
+
+\begin{proof}[Proof of theorem]
+  Let $c: [a, b] \to X$ be a $k$-local geodesic, and $t \leq t' \in [a, b]$. Choose $t_0 = t < t_1 < \cdots < t_n < t'$ such that $t_i = t_{i - 1} + k$ for all $i$ and $t' - t_n < k$.
+
+  Then by definition, we have
+  \[
+    d(c(t_{i - 1}), c(t_i)) = k,\quad d(c(t_n), c(t')) = |t_n - t'|.
+  \]
+  for all $i$. So by the triangle inequality, we have
+  \[
+    d(c(t), c(t')) \leq \sum_{i = 1}^n d(c(t_{i - 1}), c(t_i)) + d(t_n, t') = |t - t'|.
+  \]
+  We now have to establish a coarse \emph{lower} bound on $d(c(t), c(t'))$.
+
+  We may wlog assume $t = a$ and $t' = b$. We need to show that
+  \[
+    d(c(a), c(b)) \geq \frac{1}{\lambda} |b - a| - \varepsilon.
+  \]
+  We divide $c$ up into regular subintervals $[x_i, x_{i + 1}]$, and choose $x_i'$ close to $x_i$. The goal is then to prove that the $x_i'$ appear in order along $[c(a), c(b)]$.
+
+  Let
+  \[
+    k' = \frac{k}{2} + 2 \delta > 6\delta.
+  \]
+  Let $b - a = M k' + \eta$ for $0 \leq \eta < k'$ and $M \in \N$. Put $x_i = c(i k')$ for $i = 1, \ldots, M$, and let $x_i'$ be a closest point on $[c(a), c(b)]$ to $x_i$. By the lemma, we know $d(x_i, x_i') \leq 2\delta$.
+
+  \begin{claim}
+    $x_1', \ldots, x_m'$ appear in the correct order along $[c(a), c(b)]$.
+  \end{claim}
+  Let's finish the proof assuming the claim. If this holds, then note that
+  \[
+    d(x_i', x_{i + 1}') \geq k' - 4\delta > 2\delta
+  \]
+  because we know $d(x_i, x_{i + 1}) = 6\delta$, and also $d(x_m, c(b)) \geq \eta - 2 \delta$. Therefore
+  \[
+    d(c(a), c(b)) = \sum_{i = 1}^M d(x_i, x_{i - 1}) + d(x_m, c(b)) \geq 2 \delta M + \eta - 2 \delta \geq 2\delta(M - 1).
+  \]
+  On the other hand, we haev
+  \[
+    M = \frac{|b - a| - \eta}{k'} \geq \frac{|b - a|}{k'} - 1.
+  \]
+  Thus, we find that
+  \[
+    d(c(a), c(b)) \geq \frac{2\delta}{k'} |b - a| - 4 \delta.
+  \]
+
+  To prove the claim, let $x_i = c(t_i)$ for all $i$. We let
+  \begin{align*}
+    y &= c(t_{i - 1} + 2 \delta)\\
+    z &= c(t_{i + 1} - 2 \delta).
+  \end{align*}
+  Define
+  \begin{align*}
+    \Delta_- &= \Delta(x_{i - 1}, x_{i - 1}', y)\\
+    \Delta_+ &= \Delta(x_{i + 1}, x_{i + 1}', z).
+  \end{align*}
+  Both $\Delta_-$ and $\Delta_+$ are disjoint from $B(x_i, 3 \delta)$. Indeed, if $w \in \Delta_-$ with $d(x_i, w) \leq 3\delta$, then by $\delta$-slimness of $\Delta_-$, we know $d(w, x_{i - 1}) \leq 3 \delta$, and so $d(x_i, x_{i - 1}) \leq 6 \delta$, which is not possible.
+
+  Therefore, since the rectangle $y, z, x_{i + 1}', x_{i - 1}'$ is $2\delta$-slim, and $x_i$ is more than $2\delta$ away from the sides $y x_{i - 1}'$ and $z x_{i + 1}'$. So there must be some $x_i'' \in [x_{i - 1}', x_{i + 1}']$ with $d(x_i, x_i'') \leq 2 \delta$.
+
+  Now consider $\Delta = \Delta(x_i, x_i', x_i'')$. We know $x_i x_i'$ and $x_i x_i''$ are both of length $\leq 2 \delta$. Note that every point in this triangle is within $3\delta$ of $x_i$ by $\delta$-slimness. So $\Delta \subseteq B(x_i, 3 \delta)$, and this implies $\Delta$ is disjoint from $B(x_{i - 1}, 3 \delta)$ and $B(x_{i + 1}, 3 \delta)$ as before.
+
+  But $x_{i - 1}' \in B(x_{i - 1}, 3 \delta)$ and $x_{i + 1}' \in B(x_{i + 1}, 3\delta)$. Moreover, $\Delta$ contains the segment of $[c(a), c(b)]$ joining $x_i'$ and $x_i''$. Therefore, it must be the case that $x_i' \in [x_{i - 1}', x_{i + 1}']$.
+\end{proof}
+
+\subsection{Dehn functions of hyperbolic groups}
+We now use our new understanding of quasi-geodesics in hyperbolic spaces to try to understand the word problem in hyperbolic groups. Note that by the Schwarz--Milnor lemma, hyperbolic groups are finitely-generated and their Cayley graphs are hyperbolic.
+
+\begin{cor}
+  Let $X$ be $\delta$-hyperbolic. Then there exists a constant $C = C(\delta)$ such that any non-constant loop in $X$ is \emph{not} $C$-locally geodesic.
+\end{cor}
+
+\begin{proof}
+  Take $k = 8 \delta + 1$, and let
+  \[
+    C = \max \{\lambda \varepsilon, k\}
+  \]
+  where $\lambda, \varepsilon$ are as in the theorem.
+
+  Let $\gamma: [a, b] \to X$ be a closed loop. If $\Gamma$ were $C$-locally geodesic, then it would be $(\lambda, \varepsilon)$-quasigeodesic. So
+  \[
+    0 = d(\gamma(a), \gamma(b)) \geq \frac{|b - a|}{\lambda} - \varepsilon.
+  \]
+  So
+  \[
+    |b - a| \leq \lambda \varepsilon < C.
+  \]
+  But $\gamma$ is a $C$-local geodesic. This implies $\gamma$ is a constant loop.
+\end{proof}
+
+\begin{defi}[Dehn presentation]\index{Dehn presentation}
+  A finite presentation $\bra S \mid R \ket$ for a group $\Gamma$ is called \emph{Dehn} if for every null-homotopic reduced word $w \in S^*$, there is (a cyclic conjugate of) a relator $r \in R$ such that $r = u^{-1}v$ with $\ell_S(u) < \ell_S(v)$, and $w = w_1 v w_2$ (without cancellation).
+\end{defi}
+The point about this is that if we have a null-homotopic word, then there is some part in the word that can be replaced with a shorter word using a single relator.
+
+If a presentation is Dehn, then the naive way of solving the word problem just works. In fact,
+
+\begin{lemma}
+  If $\Gamma$ has a Dehn presentation, then $\delta_\Gamma$ is linear.
+\end{lemma}
+
+\begin{proof}
+  Exercise.
+\end{proof}
+
+\begin{thm}
+  Every hyperbolic group $\Gamma$ is finitely-presented and admits a Dehn presentation.
+
+  In particular, the Dehn function is linear, and the word problem is solvable.
+\end{thm}
+So while an arbitrary group can be very difficult, the generic group is easy.
+
+\begin{proof}
+  Let $S$ be a finite generating set for $\Gamma$, and $\delta$ a constant of hyperbolicity for $\Cay_S(\Gamma)$. 
+
+  Let $C = C(\delta)$ be such that every non-trivial loop is \emph{not} $C$-locally geodesic.
+
+  Take $\{u_i\}$ to be the set of all words in $F(S)$ representing geodesics $[1, u_i]$ in $\Cay_S(\Gamma)$ with $|u_i| < C$. Let $\{v_j\} \subseteq F(S)$ be the set of all \emph{non}-geodesic words of length $\leq C$ in $\Cay_S(\Gamma)$.
+
+  Let $R = \{u_i^{-1} v_j \in F(S) : u_i =_\Gamma v_j\}$.
+
+  We now just observe that this gives the desired Dehn presentation! Indeed, any non-trivial loop must contain one of the $v_j$'s, since $\Cay_S(\Gamma)$ is not $C$-locally geodesic, and re can replace it with $u_i$!
+\end{proof}
+This argument was developed by Dehn to prove results about the fundamental group of surface groups in 1912. In 1980, Gromov noticed that Dehn's argument works for an arbitrary hyperbolic group!  % check years
+
+One can keep on proving new things about hyperbolic groups if we wished to, but there are better uses of our time. So for the remaining of the chapter, we shall just write down random facts about hyperbolic groups without proof.
+
+So hyperbolic groups have linear Dehn functions. In fact,
+\begin{thm}[Gromov, Bowditch, etc] % Papadopoulos (?)
+  If $\Gamma$ is a finitely-presented group and $\delta_\Gamma \precneq n^2$, then $\Gamma$ is hyperbolic.
+\end{thm}
+Thus, there is a ``gap'' in the isoperimetric spectrum. We can collect our results as
+\begin{thm}
+  If $\Gamma$ is finitely-generated, then the following are equivalent:
+  \begin{enumerate}
+    \item $\Gamma$ is hyperbolic.
+    \item $\Gamma$ has a Dehn presentation.
+    \item $\Gamma$ satisfies a linear isoperimetric inequality.
+    \item $\Gamma$ has a subquadratic isoperimetric inequality.
+  \end{enumerate}
+\end{thm}
+
+In general, we can ask the question --- for which $\alpha \in \R$ is $n^\alpha \simeq$ a Dehn function of a finitely-presented group? As we saw, $\alpha$ cannot lie in $(1, 2)$, and it is a theorem that the set of such $\alpha$ is dense in $[2, \infty)$. In fact, it includes all rationals in the interval.
+
+  \subsubsection*{Subgroup structure}
+When considering subgroups of a hyperbolic group $\Gamma$, it is natural to consider ``geometrically nice'' subgroups, i.e.\ finitely-generated subgroups $H \subseteq \Gamma$ such that the inclusion is a quasi-isometric embedding. Such subgroups are called \term{quasi-convex}, and they are always hyperbolic.
+
+What sort of such subgroups can we find? There are zillions of free quasi-convex subgroups!
+\begin{lemma}[Ping-pong lemma]
+  Let $\Gamma$ be hyperbolic and torsion-free (for convenience of statement). If $\gamma_1, \gamma_2 \in \Gamma$ do not commute, then for large enough $n$, the subgroup $\bra \gamma_1^n, \gamma_2^n\ket \cong F_2$ and is quasi-convex.
+\end{lemma}
+How about non-free subgroups? Can we find surface groups? Of course, we cannot always guarantee the existence of such surface groups, since all subgroups of free groups are free.
+
+\begin{question}
+  Let $\Gamma$ be hyperbolic and torsion-free, and not itself free.  Must $\Gamma$ contain a quasi-convex subgroup isomorphic to $\pi_1 \Sigma$ for some closed hyperbolic surface $\Sigma$?
+\end{question}
+We have no idea if it is true or false.
+
+Another open problem we can ask is the following:
+\begin{question}
+  If $\Gamma$ is hyperbolic and not the trivial group, must $\Gamma$ have a proper subgroup of finite index?
+\end{question}
+
+\begin{prop}
+  Let $\Gamma$ be hyperbolic, and $\gamma \in \Gamma$. Then $C(\gamma)$ is quasiconvex. In particular, it is hyperbolic.
+\end{prop}
+
+\begin{cor}
+  $\Gamma$ does not contain a copy of $\Z^2$.
+\end{cor}
+
+\subsubsection*{The boundary}
+Recall that if $\Sigma$ is a compact surface of genus $g \geq 2$, then $\pi_1 \Sigma \qi \H^2$. If we try to draw the hyperbolic plane in the disc model, then we would probably draw a circle and fill it in. One might think the drawing of the circle is just an artifact of the choice of the model, but it's not! It's genuinely there.
+
+\begin{defi}[Geodesic ray]\index{geodesic ray}
+  Let $X$ be a $\delta$-hyperbolic geodesic metric space. A \emph{geodesic ray} is an isometric embedding $r: [0, \infty) \to X$. 
+\end{defi}
+
+We say $r_1 \sim r_2$ if there exists $M$ such that $d(r_1(t), r_2(t)) \leq M$ for all $t$. In the disc model of $\H^2$, this is the scenario where two geodesic rays get very close together as $t \to \infty$ (in the upper half plane model, this contains vertical, parallel lines).
+
+We define $\partial_\infty X = \{\text{geodesic rays}\}/\sim$\index{$\partial_\infty X$}. This can be topologized in a sensible way, and in this case $X \cup \partial_\infty X$ is compact. By the Morse lemma, for hyperbolic spaces, this is quasi-isometry invariant.
+
+\begin{eg}
+  If $\Gamma = \pi_1 \Sigma$, with $\Sigma$ closed  hyperbolic surface, then $\partial_\infty \Gamma = S^1$ and the union $X \cup \partial_\infty X$ gives us the closed unit disc.
+\end{eg}
+
+\begin{thm}[Casson--Jungreis, Gabai]
+  If $\Gamma$ is hyperbolic and $\partial_\infty \Gamma \cong S^1$, then $\Gamma$ is virtually $\pi_1 \Sigma$ for some closed hyperbolic $\Sigma$.
+\end{thm}
+
+\begin{eg}
+  If $\Gamma$ is free, then $\partial_\infty \Gamma$ is the Cantor set.
+\end{eg}
+
+\begin{conjecture}[Cannon]
+  If $\Gamma$ is hyperbolic and $\partial_\infty \Gamma \cong S^2$, then $\Gamma$ is virtually $\pi_1 M$ for $M$ a closed hyperbolic $3$-manifold.
+\end{conjecture}
+
 \printindex
 \end{document}

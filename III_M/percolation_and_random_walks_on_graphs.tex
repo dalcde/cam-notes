@@ -721,7 +721,7 @@ To do so, suppose we again do coupling, and increase $p$ by a really tiny bit. T
   \]
   where $\omega'$ is defined by
   \[
-    \omega'(f) = 
+    \omega'(f) =
     \begin{cases}
       \omega(f) & f \not= e\\
       1 - \omega(f) & f = e
@@ -1203,7 +1203,7 @@ To prove the first part, the idea is that if we want the origin to be connected 
   By RSW, it suffices to prove that there exists $\alpha > 0$ such that $\P_{\frac{1}{2}} (LR \ell) \geq \alpha$ for all $\ell$.
 
   Let $A_n$ be the event that there is a left-right crossing of $[0, n + 1] \times [0, n]$. Using duality, we showed that $\P_{\frac{1}{2}}(A_n) = \frac{1}{2}$. So in particular, the probability that there is a left-right crossing of $[0, n] \times [0, n] \geq \frac{1}{2}$. So we are done.
-  
+
 %  If there exists a left-right crossing of $[0, n + 1] \times [0, n]$, then there also exists a left-right crossing of $[0, n + 1] \times [-1, n + 1]$. Then
 %  \[
 %    \P_{\frac{1}{2}}(\text{LR of }[0, n + 2] \times [-1, n + 1]) \P_p(\text{LR of }[0, n + 1] \times [-1, n + 1], \text{last edge open})
@@ -1251,7 +1251,7 @@ for all $n$. By the easy corollary of Russo's formula, and since $\{0 \leftright
 \]
 So
 \[
-  \theta(p) \leq (2p)^{12n^2} \P_{\frac{1}{2}}(0 \leftrightarrow \partial B_n)  \leq A_1 (2p)^{18n^2} n^{-\alpha_1}.
+  \theta(p) \leq (2p)^{12n^2} \P_{\frac{1}{2}}(0 \leftrightarrow \partial B_n) \leq A_1 (2p)^{18n^2} n^{-\alpha_1}.
 \]
 Now take $n = \lfloor (\log 2p)^{-1/2} \rfloor $. Then as $p \downarrow \frac{1}{2}$, we have
 \[
@@ -1330,7 +1330,11 @@ Then by RSW (for $\T$), we get that
 \]
 independent of $\delta$. We might ask what happens when $\delta \to 0$. In particular, does it converge, and what does it converge to?
 
-Cardy, a physicist studying conformal field theories, conjectured that $\lim_{\delta \to 0} \P_\delta(ac \leftrightarrow bx) = |BX|$. He didn't really write it this way, but expressed it in terms of hypergeometric functions. It was Carlesson who expressed it in this form.
+Cardy, a physicist studying conformal field theories, conjectured that
+\[
+  \lim_{\delta \to 0} \P_\delta(ac \leftrightarrow bx) = |BX|.
+\]
+He didn't really write it this way, but expressed it in terms of hypergeometric functions. It was Carlesson who expressed it in this form.
 
 In 2001, Smirnov proved this conjecture.
 
@@ -1359,6 +1363,383 @@ and $a(t) = g_t(\gamma_t)$, $g_0(z) = z$.
 This is known as \term{Loewner's equation}.
 
 If we take $a(t) = \sqrt{\kappa} B_t$, where $B_t$ is a standard Brownian motion, this gives us SLE($\kappa$).
+
+\section{Random walks and electrical networks}
+Let $G = (V, E)$ be a finite connected graph. We assign a conductances/weights to the edges $(c(e))_{e \in E}$. Note that we require $c(xy) = c(yx)$.
+
+Consider a weighted random walk on $G$, with the probability of going from $x$ to $y$ (assuming $x \sim y$)
+\[
+  \P(x, y) = \frac{c(x, y)}{ c(x)},\quad c(x) = \sum_{z \sim x} c(x, z).
+\]
+If we put $c(e) = 1$ for all $e$, then this is just a simple random walk, with
+\[
+  \P(x, Y) =
+  \begin{cases}
+    \frac{1}{\deg x} & y \sim x\\
+    0 & \text{otherwise}
+  \end{cases}.
+\]
+The weighted random walk is reversible with respect to $\pi(x) = \frac{c(x)}{c_G}$, where $c_G = \sum_x c(x)$, because
+\[
+  \pi(x) P(x, y) = \frac{c(x)}{c_G} \cdot \frac{c(x, y)}{c(x)} = \pi(y) \P(y, x).
+\]
+Conversely, every reversible Markov chain can be represented as a random walk on a weighted graph --- place an edge $\{x, y\}$ if $\P(x, y) > 0$. By reversibility, $\P(x, y) > 0$ iff $\P(y, x) = 0$. Define weights
+\[
+  c(x, y) = \pi(x) \P(x, y)
+\]
+for all $x \sim y$.
+
+\begin{defi}[Harmonic function]\index{harmonic function}
+  Let $P$ be a transition matrix on $\Omega$. We call $h$ \emph{harmonic} for $P$ at the vertex $x$ if
+  \[
+    h(x) = \sum_y \P(x, y) h(y).
+  \]
+\end{defi}
+If $B \subseteq \Omega$, and $X$ is a Markov chain with matrix $P$, then we write
+\[
+  \tau_B = \min\{t \geq 0: X_t \in B\},
+\]
+
+\begin{prop}
+  Let $P$ be an irreducible matrix on $\Omega$ and $B \subseteq \Omega$, $f: B \to \R$ a function. Then
+  \[
+    h(x) = \E_x [f(X_{\tau_B})]
+  \]
+  is the unique extension of $f$ which is harmonic on $\Omega \setminus B$.
+\end{prop}
+
+\begin{proof}
+  It is obvious that $h(x) = f(x)$ for $x \in B$. Let $x \not\in B$. Then
+  \begin{align*}
+    h(x) &= \E_x [f(X_{\tau_B})] \\
+    &= \sum_y \P(x, y) \E_x[f(X_{\tau_B} \mid X_1 = y]\\
+    &= \sum_y \P(x, y) \E_y[f(X_{\tau_B}]\\
+    &= \sum_Y \P(x, y) h(y)
+  \end{align*}
+  So $h$ is harmonic.
+
+  To show uniqueness, suppose $h'$ be another harmonic extension. Take $g = h - h'$. Then $g = 0$ on $B$. Set
+  \[
+    A = \left\{x: g(x) = \max_{y \in \Omega \setminus B} g(y) \right\},
+  \]
+  and let $x \in A \setminus B$. Now since $g(x)$ is the weighted average of its neighbours, and $g(y) \leq g(x)$ for all neighbours $y$ of $x$, it must be the case that $g(x) = g(y)$ for all neighbours of $y$.
+
+  Since we assumed $G$ is connected, we can construct a path from $x$ to the boundary, where $g$ vanishes. So $g(x) = 0$. In other words, $\max g = 0$. Similarly, $\min g = 0$. So $g = 0$.
+\end{proof}
+
+One way to understand this weighted graph is as an electrical network. Let $G = (V, E)$ be a finite connected graph with conductances $(c(e))$ and resistances on the edges given by
+\[
+  r(e) = \frac{1}{c(e)}.
+\]
+\begin{defi}[Flow]\index{flow}
+  A \emph{flow} $\theta$ on $G$ is a function defined on oriented edges which is anti-symmetric, i.e.\ $\theta(x, y) = - \theta(y, x)$.
+\end{defi}
+
+\begin{defi}[Divergence]\index{divergence}
+  The \emph{divergence} of a flow $\theta$ is
+  \[
+    \div \theta (x) = \sum_{y \sim x} \theta(x, y).
+  \]
+\end{defi}
+By the antisymmetry property, we have
+\[
+  \sum_x \div \theta(x) = \sum_x \sum_{y \sim x} \theta(x, y) = \sum_{x \sim y} \theta(x, y) = 0.
+\]
+We shall have $2$ distinguished vertices, $a$ and $z$, called the \term{source} and the \term{sink} respectively.
+
+\begin{defi}[Flow from $a$ to $z$]\index{flow}
+  A flow $\theta$ from $a$ to $z$ is a flow such that
+  \begin{enumerate}
+    \item $\div \theta(x) = 0$ for all $x \not \in \{a, z\}$. \hfill (\term{Kirchhoff's node law})
+    \item $\div \theta(a) \geq 0$.
+  \end{enumerate}
+  The \term{strength} of the flow from $a$ to $z$ is $\|\theta\| = \div \theta(a)$.\index{$\|\theta\|$}
+
+  We say this is a \term{unit flow} if $\|\theta\| = 1$.
+\end{defi}
+Since $\sum \div \theta(x) = 0$, a flow from $a$ to $z$ satisfies $\div \theta(z) = - \div \theta(a)$.
+
+\begin{defi}[Voltage]\index{voltage}
+  A \emph{voltage} $W$ is a harmonic function on $\Omega \setminus \{a, z\}$.
+\end{defi}
+Such a harmonic function is uniquely determined by the values on $a$ and $z$.
+\begin{defi}[Current flow]\index{current flow}
+  The \emph{current flow} associated to the voltage $W$ is
+  \[
+    I(x, y) = \frac{W(x) - W(y)}{r(x, y)} = c(x, y) (W(x) - W(y)).
+  \]
+\end{defi}
+One checks that $I$ is indeed a flow. By definition, $I$ satisfies \term{Ohm's law}:
+\[
+  W(x) - W(y) = r(x, y) I(x, y).
+\]
+Also, $I$ satisfies the \term{cycle law}, i.e.\ for any cycle $\vec{e}_1, \vec{e}_2, \ldots, \vec{e}_n$, we have
+\[
+  \sum_{i = 1}^n r(\vec{e}_i) I (\hat{e}_i) = 0.
+\]
+
+\begin{prop}
+  Let $\theta$ be a flow from $a$ to $z$ satisfying the cycle law for any cycle. Let $I$ the current flow associated to a voltage $W$. If $\|\theta\| = \|I\|$, then $\theta = I$.
+\end{prop}
+
+\begin{proof}
+  Take $f = \theta - I$. Then $f$ is a flow which satisfies Kirchhoff's node law at all vertices and the cycle law for any cycle. We want to show that $f - 0$. Suppose not. The we can find some $\vec{e}_1$ such that $f(e_i) > 0$. But
+  \[
+    \sum_{y\sim x} f(x, y) = 0
+  \]
+  for all $x$, so there must exist an edge $\vec{e}_i$ that $\hat{e}_1$ leads to such that $f(\vec{e}_2) > 0$. Continuing this way, we will get a cycle of ordered edges where $f > 0$, which violates the cycle law.
+\end{proof}
+Let $W_0$ be a voltage with $W_0(a) = 1$ and $W_0(z) = 0$, and let $I_0$ be the current associated to $W_0$. Then any other voltage $W$ can be written as
+\[
+  W(x) = (W(a) - W(z) W_0(x) + W(z).
+\]
+Let $I$ be the current associated to $W$. Then
+\[
+  \|I\| = \sum_{x \sim a} i(a, x) = \sum_{x \sim a} \frac{W(a) - W(x)}{r(a, z)} = (W(a) - W(z)) \|I_0\|.
+\]
+So we know that
+\[
+  \frac{W(a) - W(z)}{\|I\|} = \frac{1}{\|I_0\|},
+\]
+and in particular does not depend on $W$.
+
+\begin{defi}[Effective resistance]\index{Effective resistance}
+  The \emph{effective resistance} $R_{eff}(a, z)$ of an electric network is defined to be the ratio
+  \[
+    R_{eff}(a, z) = \frac{W(a) - W(z)}{\|I\|}
+  \]
+  for any voltage $W$ with associated current $I$. The \term{effective conductance} is $C_{eff}(a, z) = \frac{1}{R_{eff}(a, z)}$.
+\end{defi}
+
+\begin{prop}
+  Take a weighted random walk on $G$. Then
+  \[
+    \P_a(\tau_z < \tau_a^+) = \frac{1}{c(a) R_{eff}(a, z)},
+  \]
+  where $\tau_a^+ = \min \{t \geq 1: X_t = a\}$.
+\end{prop}
+
+\begin{proof}
+  Let
+  \[
+    f(x) = \P_x(\tau_z < \tau_a).
+  \]
+  Then $f(a) = 0$ and $f(z) = 1$. Moreover, $f$ is harmonic on $\Omega \setminus \{a, z\}$. Let $W$ be a voltage. By uniqueness, we know
+  \[
+    f(x) = \frac{W(a) - W(x)}{W(a) - W(z)}.
+  \]
+  So we know
+  \begin{align*}
+    \P_a(\tau_z < \tau_a^+) &= \sum_{x \sim a} \P(a, x) f(x) \\
+    &= \sum_{x \sim a} \frac{c(a, x)}{c(a)} \frac{W(a) - W(x)}{W(a) - W(z)}\\
+    &= \frac{1}{c(a) (W(a) - W(z))} \sum_{x \sim a}I(a, x)\\
+    &= \frac{\|I\|}{c(a) (W(a) - W(z))}\\
+    &= \frac{1}{c(a) R_{eff}(a, z)}.
+  \end{align*}
+\end{proof}
+
+\begin{defi}[Green kernel]\index{Green kernel}
+  Let $\tau$ be a stopping time. We define the \emph{Green kernel} to be
+  \[
+    G_\tau(a, x) = \E_a \left[ \sum_{t = 0}^\infty \mathbf{1}(X_t = x, \tau > t)\right].
+  \]
+\end{defi}
+
+\begin{cor}
+  For any reversible chain and all $a, z$, we have
+  \[
+    G_{\tau_z}(a, a) = c(a) R_{eff}(a, z).
+  \]
+\end{cor}
+
+\begin{proof}
+  By the Markov property, the number of visits to $a$ starting from $a$ until $\tau_z$ is the geometric distribution $Geo(\P_a(\tau_z < \tau_a^+))$. So
+  \[
+    G_{\tau_z}(a, a) = \frac{1}{\P_a(\tau_z < \tau_a^+)} = c(a) R_{eff}(a, z).
+  \]
+\end{proof}
+
+From high school physics, we know that conductances in parallel add:
+\begin{center}
+  \begin{tikzpicture}
+    \draw (0, 0) -- (1, 0) -- (1, 0.5) -- (2, 0.5);
+    \draw (1, 0) -- (1, -0.5) -- (2, -0.5);
+    \draw [decorate, decoration={zigzag}] (2, 0.5) -- (2.5, 0.5) node [pos=0.5, above] {$c_1$};
+    \draw [decorate, decoration={zigzag}] (2, -0.5) -- (2.5, -0.5) node [pos=0.5, below] {$c_2$};
+
+    \draw (2.5, 0.5) -- (3.5, 0.5) -- (3.5, -0.5) -- (2.5, - 0.5);
+    \draw (3.5, 0) -- (4.5, 0);
+
+    \node at (5.5, 0) {$=$};
+
+    \draw (6.5, 0) -- (7.5, 0);
+    \draw [decorate, decoration={zigzag}] (7.5, 0) -- (8, 0) node [pos=0.5, above] {$c_2$};
+    \draw (8, 0) -- (9, 0);
+  \end{tikzpicture}
+\end{center}
+
+In general, let $e_1$ and $e_2$ be $2$ edges with the same endvertices. Then we we can replace them by a single edge of conductance the sum of the conductances. The voltages and currents remain unchanged outside of $e_1, e_2$. We can check Kirchhoff's and Ohm's law with
+\[
+  I(\vec{e}) = I(\vec{e}_1) + I(\vec{e}_2).
+\]
+Similarly, resistances in series add. Let $v$ be a node of degree $2$ and let $v_1$ and $v_2$ be its $2$ neighbours. Then we can replace these $2$ edges by a single edge of resistacne $r_1 + r_2$. We can check Kirchoff's and Ohm's law with
+\[
+  I(\vec{v_1 v_2}) = I(\vec{v_1 v}) + I(\vec{vv_2}).
+\]
+\begin{center}
+  \begin{tikzpicture}
+    \draw (0, 0) -- (0.5, 0);
+    \draw [decorate, decoration={zigzag}] (0.5, 0) -- (1, 0) node [pos=0.5, above] {$r_1$};
+    \draw (1, 0) -- (2, 0);
+    \draw [decorate, decoration={zigzag}] (2, 0) -- (2.5, 0) node [pos=0.5, above] {$r_2$};
+    \draw (2.5, 0) -- (3, 0);
+
+    \node [below] at (0, 0) {$v_1$};
+    \node [below] at (1.5, 0) {$v$};
+    \node [below] at (3, 0) {$v_2$};
+
+    \node at (4, 0) {$=$};
+    \draw (5, 0) -- (6, 0);
+    \draw (6, 0) -- (6.5, 0) node [pos=0.5, above] {$r_1 + r_2$};
+    \draw (6.5, 0) -- (7.5, 0);
+  \end{tikzpicture}
+\end{center}
+
+We can also glue $2$ vertices of the same potential, keeping all other edges. Current and potential are unchanged since current doesn't flow if there is the same potential.
+
+\begin{ex}
+  Let $T$ be a finite connected tree, and $a, z$ two vertices. Then $R_{eff}(a, z)$ is the graph distance between $a$ and $z$.
+\end{ex}
+
+We now provide an alternative characterization of the effective resistance.
+
+\begin{defi}[Energy]\index{energy}
+  Let $\theta$ be a flow on $G$ with conductances $(c(e))$. Then the \emph{energy} is
+  \[
+    \mathcal{E}(\theta) = \sum_e (\theta(e))^2 r(e).
+  \]
+  Here we sum over unoriented edges.
+\end{defi}
+
+\begin{thm}[Thomson's principle]\index{Thomson's principle}
+  Let $G$ be a finite connected graph with conductances $(c(e))$. Then for any $a, z$, we have
+  \[
+    R_{eff}(a, z) = \inf \{\mathcal{E}(\theta): \text{$\theta$ is a unit flow from $a$ to $z$}\}.
+  \]
+  Moreover, there is a unique minimizer, which is the unit current flow from $a$ to $z$.
+\end{thm}
+
+\begin{proof}
+  Let $i$ be the unit current flow associated to potential $\varphi$. Let $j$ be another unit flow $a \to z$. We need to show that $\mathcal{E}(j) \geq \mathcal{E}(i)$ with equality iff $j = i$.
+
+  Let $k = j - i$. Then $k$ is a flow of $0$ strength. We have
+  \[
+    \mathcal{E}(j) = \mathcal{E}(i + k) = \sum_e (i(e) + k(e))^2 r(e) = \mathcal{E}(i) + \mathcal{E}(k) + 2 \sum_e i(e) k(e) r(e).
+  \]
+  It suffices to show that the last sum is zero. By definition, we have
+  \[
+    i(x, y) = \frac{\varphi(x) - \varphi(y)}{r(x, y)}.
+  \]
+  So we know
+  \begin{align*}
+    \sum_e i(e) k(e) r(e) &= \frac{1}{2} \sum_x \sum_{y \sim x} (\varphi(x) - \varphi(y)) k(x, y)\\
+    &= \frac{1}{2} \sum_x \sum_{y \sim x} \varphi(x)k(x, y) + \frac{1}{2} \sum_x \sum_{y \sin x} \varphi(x) k(x, y).
+  \end{align*}
+  Now note that $\sum_{y \sim x} k(x, y) = 0$ for any $x$ since $k$ has zero strength. So this vanishes.
+
+  Thus,
+  \[
+    \mathcal{E}(j) = \mathcal{E}(i) + \mathcal{E}(k),
+  \]
+  and so $\mathcal{E}(j) \geq \mathcal{E}(i)$ with equality iff $\mathcal{E}(k) = 0$, i.e.\ $k(e) = 0$ for all $e$.
+\end{proof}
+
+\begin{thm}[Rayleigh's monotonicity principle]\index{Rayleigh's monotonicity principle}\index{monotonicity principle}
+  Let $G$ be a finite connected graph and $(r(e))_e$ and $(r'(e))_e$ two sets of resistances on the edges such that $r(e) \leq r'(e)$ for all $e$. Then
+  \[
+    R_{eff}(a, z; r) \leq R_{eff}(a, z; r').
+  \]
+  for all $a, z \in G$.
+\end{thm}
+
+\begin{proof}
+  By definition of energy, for any current $i$, we have
+  \[
+    \mathcal{E}(i; r) \leq \mathcal{E}(i; r').
+  \]
+  Then take the infimum and conclude by Thompson.
+\end{proof}
+
+\begin{cor}
+  Suppose we add an edge to $G$ which is not adjacent to $a$. This increases the escape probability
+  \[
+    \P_a(\tau_z < \tau_a^+).
+  \]
+\end{cor}
+
+\begin{proof}
+  We have
+  \[
+    \P_a(\tau_z < \tau_z^+) = \frac{1}{c(a) R_{eff}(a, z)}.
+  \]
+  We can think of the new edge as an edge having infinite resistance in the old graph. By decreasing it to a finite number, we decrease $R_{eff}$.
+\end{proof}
+
+\begin{defi}[Edge cutset]\index{edge cutset}\index{cutset}
+  A set of edges $\Pi$ is an edge-cutset separating $a$ from $z$ if every path from $a$ to $z$ uses an edge of $\Pi$.
+\end{defi}
+
+\begin{thm}[Nash--Williams inequality]\index{Nash--Williams inequality}
+  Let $(\Pi_k)$ be disjoint edge-cutsets separating $a$ from $z$. Then
+  \[
+    R_{eff}(a, z) \geq \sum_k \left(\sum_{e \in \Pi_k}c(e)\right)^{-1}.
+  \]
+\end{thm}
+
+\begin{proof}
+  By Thompson, it suffices to prove that for any unit flow $\theta$ from $a$ to $z$, we have
+  \[
+    \sum_e (\theta(e))^2 r(e) \geq \sum_k \left(\sum_{e \in \Pi_k}c(e)\right)^{-1}.
+  \]
+  Certainly, we have
+  \[
+    \sum_e (\theta(e))^2 r(e) \geq \sum_k \sum_{e \in \Pi_k}(\theta(e))^2 r(e).
+  \]
+  We now use Cauchy--Schwarz to say
+  \begin{align*}
+    \left(\sum_{e \in \Pi_k} (\theta(e))^2 r(e)\right) \left(\sum_{e \in \Pi_k}c(e)\right) &\geq \left(\sum_{e \in \Pi_k} |\theta(e) \sqrt{r(e) c(e)} \right)^2\\
+    &= \left(\sum_{e \in \Pi_k} |\theta(e)|\right)^2.
+  \end{align*}
+  The result follows if we show that the final sum is $\geq \|\theta\|^2i = 1$.
+
+  Let $F$ be the component of $G \setminus \Pi_k$ containing $a$. Let $F'$ be the set of all edges that start in $F$ and land outside $F$. Then we have
+  \[
+    1 = \sum_{x \in F} \div \theta(x) \leq \sum_{e \in F'} |\theta(e)| \leq \sum_{e \in \Pi_k} |\theta(e)| \leq \sum_{e \in \Pi_k} |\theta(e)|.
+  \]
+\end{proof}
+
+\begin{cor}
+  Consider $B_n = [1, n]^2 \cap \Z^2$. Then
+  \[
+    R_{eff}(a, z) \geq \frac{1}{2} \log (n - 1).
+  \]
+\end{cor}
+There is also an upper bound of the form $R_{eff}(a, z) \leq c \log n$. So this is indeed the correct order. The proof involves constructing an explicit flow with this energy.
+
+\begin{proof}
+  Take
+  \[
+    \Pi_k = \{(v, u) \in B_n: \|v\|_\infty = k - 1, \|u\|_\infty = k\}.
+  \]
+  Then
+  \[
+    |\Pi_k| = 2(k - 1),
+  \]
+  and so
+  \[
+    R_{eff}(a, z) \geq \sum_{k = 1}^{ - 1} \frac{1}{|\Pi_k|} \geq \frac{1}{2} \log (n - 1)
+  \]
+\end{proof}.
 
 \printindex
 \end{document}
