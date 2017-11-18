@@ -9,6 +9,10 @@
 \input{header}
 
 \DeclareMathOperator*\argmin{argmin}
+\DeclareMathOperator\pa{pa}
+\DeclareMathOperator\child{ch}
+\DeclareMathOperator\de{de}
+
 \begin{document}
 \maketitle
 {\small
@@ -618,38 +622,43 @@ We know the reproducing kernel associated with an RKHS is a positive-definite ke
 
 In general, it is difficult to understand the RKHS, but if we can do so, this provides a lot of information on what we are regularizing in the kernel trick.
 
-\subsection{The representer theorem}
-Let's now try to understand what exactly we are doing when we do Ridge regression with a kernel $k$.
-
-Note that for the linear kernel, the $L^2$ norm $\|\beta\|_2^2$ corresponds exactly to the norm in the RKHS $\|f\|_{\mathcal{H}}^2$. Thus, an alternative way of expressing ridge regression is
+\subsection{Making predictions}
+Let's now try to understand what exactly we are doing when we do ridge regression with a kernel $k$. To do so, we first think carefully what we were doing in ordinary ridge regression, which corresponds to using the linear kernel. For the linear kernel, the $L^2$ norm $\|\beta\|_2^2$ corresponds exactly to the norm in the RKHS $\|f\|_{\mathcal{H}}^2$. Thus, an alternative way of expressing ridge regression is
 \[
-  \argmin_{f \in \mathcal{H}} \left\{\sum_{i = 1}^n (Y_i - f(x_i))^2 + \lambda \|f\|_{\mathcal{H}}^2 \right\},\tag{$*$}
+  \hat{f} = \argmin_{f \in \mathcal{H}} \left\{\sum_{i = 1}^n (Y_i - f(x_i))^2 + \lambda \|f\|_{\mathcal{H}}^2 \right\},\tag{$*$}
 \]
-where $\mathcal{H}$ is the RKHS of the linear kernel. We might guess that it is true in complete generality.
+where $\mathcal{H}$ is the RKHS of the linear kernel. Now this way of writing ridge regression makes sense for an arbitrary RKHS, so we might think this is what we should solve in general.
+
+But if $\mathcal{H}$ is infinite dimensional, then naively, it would be quite difficult to solve $(*)$. The solution is provided by the representer theorem.
 
 \begin{thm}[Representer theorem]\index{representer theorem}
-  Let $\mathcal{H}$ be an RKHS with reproducing kernel $k$. Let $c$ be an arbitrary loss function and $J: [0, \infty) \to \R$ any strictly increasing function. Then $\hat{f}$ minimizes
+  Let $\mathcal{H}$ be an RKHS with reproducing kernel $k$. Let $c$ be an arbitrary loss function and $J: [0, \infty) \to \R$ any strictly increasing function. Then the minimizer $\hat{f} \in \mathcal{H}$ of
   \[
     Q_1(f) = c(Y, x_1, \ldots, x_n, f(x_1), \ldots, f(x_n)) + J(\|f\|_{\mathcal{H}}^2)
   \]
-  over all functions $f \in \mathcal{H}$ iff
-  \[
-    \hat{f}(\ph) = \sum_{i = 1}^n \hat{\alpha}_i k(\ph, x_i)
-  \]
-  and $\hat{\alpha} \in \R^n$ minimizes
-  \[
-    Q_2(\alpha) = c(Y, x_1, \ldots, x_n, K\alpha) + J(\alpha^T K \alpha),
-  \]
-  over $\alpha \in \R^n$ (with $K_{ij}(x_i, \ldots, x_j)$).
+  lies in the linear span of $\{k(\ph, x_i)\}_{i = 1}^n$.
 \end{thm}
-For an arbitrary $c$, the second function can be quite hard to optimize. But in the case of Ridge regression, this tells us that $(*)$ is equivalent to minimizing
+
+Given this theorem, we know our optimal solution can be written in the form
+\[
+  \hat{f}(\ph) = \sum_{i = 1}^n \hat{\alpha}_i k(\ph, x_i),
+\]
+and thus we can rewrite our optimization problem as looking for the $\hat{\alpha} \in \R^n$ that minimizes
+\[
+  Q_2(\alpha) = c(Y, x_1, \ldots, x_n, K\alpha) + J(\alpha^T K \alpha),
+\]
+over $\alpha \in \R^n$ (with $K_{ij} = k(x_i, x_j)$).
+
+For an arbitrary $c$, this can still be quite difficult, but in the case of Ridge regression, this tells us that $(*)$ is equivalent to minimizing
 \[
   \|Y - K\alpha\|_2^2 + \lambda \alpha^T K \alpha,
 \]
-and we know that this is given by
+and by differentiating, we find that this is given by solving
 \[
   K \hat{\alpha} = K(K + \lambda I)^{-1} Y.
 \]
+Of course $K\hat{\alpha}$ is also our fitted values, so we see that if we try to minimize $(*)$, then the fitted values is indeed given by $K(K + \lambda I)^{-1}Y$, as in our original motivation.
+
 \begin{proof}
   Suppose $\hat{f}$ minimizes $Q_1$. We can then write
   \[
@@ -676,14 +685,13 @@ and we know that this is given by
   Thus, we know that the optimizer in fact lies in $V$, and then the formula of $Q_2$ just expresses $Q_1$ in terms of $\alpha$.
 \end{proof}
 
-\subsection{Kernel ridge regression}
-Consider a model
+How well does our kernel machine do? Let $\mathcal{H}$ be an RKHS with reproducing kernel $k$, and $f^0 \in \mathcal{H}$. Consider a model
 \[
   Y_i = f^0(x_i) + \varepsilon_i
 \]
-for $i = 1, \ldots, n$, and assume $\E \varepsilon = 0$ and $\var(\varepsilon) = \sigma^2 I$. This is analogous to the ridge regression setting, but now we have a more general function $f^0$.
+for $i = 1, \ldots, n$, and assume $\E \varepsilon = 0$, $\var(\varepsilon) = \sigma^2 I$.
 
-We assume $f^0 \in \mathcal{H}$, where $\mathcal{H}$ is an RKHS with reproducing kernel $k$. We assume $\|f^0\|^2_{\mathcal{H}} \leq 1$. There is no loss in generality by assuming this, since we can always achieve this by scaling the norm.
+For convenience, We assume $\|f^0\|^2_{\mathcal{H}} \leq 1$. There is no loss in generality by assuming this, since we can always achieve this by scaling the norm.
 
 Let $K$ be the kernel matrix $K_{ij} = k(x_i, x_j)$ with eigenvalues $d_1 \geq d_2 \geq \cdots \geq d_n \geq 0$. Define
 \[
@@ -703,24 +711,22 @@ Given a data set, we can compute the eigenvalues $d_i$, and thus we can compute 
   \[
     (\hat{f}_\lambda (x_i), \ldots, \hat{f}_\lambda (x_n))^T = K(K + \lambda I)^{-1} Y.
   \]
-  Also,
+  Also, there is some $\alpha \in \R^n$ such that
   \[
-    (f^0(x_1), \ldots, f^0(x_n))^T = K \alpha
+    (f^0(x_1), \ldots, f^0(x_n))^T = K \alpha.
   \]
-  for some $\alpha \in \R^n$ by an example sheet question. Moreover,
+  Moreover, on the example sheet, we show that
   \[
     1 \geq \|f^0\|_{\mathcal{H}}^2 \geq \alpha^T K \alpha.
   \]
-  So we are now in matrix world, and everything is much more familiar.
-
-  Consider the eigendecomposition of $K = UDU^T$, where $U$ is orthogonal, $D_{ii} = d_i$ and $D_{ij} = 0$ for $i \not= j$. Then we have
+  Consider the eigen-decomposition $K = UDU^T$, where $U$ is orthogonal, $D_{ii} = d_i$ and $D_{ij} = 0$ for $i \not= j$. Then we have
   \begin{align*}
-    \E \sum_{i = 1}^n (f^0(x_i) - \hat{f}_\lambda (x_i))^2 &= \E\|K\alpha - K(K + \lambda I)^{-1} (k\alpha + \varepsilon)\|_2^2\\
+    \E \sum_{i = 1}^n (f^0(x_i) - \hat{f}_\lambda (x_i))^2 &= \E\|K\alpha - K(K + \lambda I)^{-1} (K\alpha + \varepsilon)\|_2^2\\
     \intertext{Noting that $K\alpha= (K + \lambda I)(K + \lambda I)^{-1} K\alpha$, we obtain}
     &= \E \norm{\lambda (K + \lambda I)^{-1} K\alpha - K(K + \lambda I)^{-1} \varepsilon}_2^2\\
-    &= \underbrace{\lambda^2 \norm{(K + \lambda I)^{-1} K\alpha\|_2^2}}_{\mathrm{(I)}} + \underbrace{\E \norm{K(K + \lambda I)^{-1} \varepsilon}_2^2}_{\mathrm{(II)}}.
+    &= \underbrace{\lambda^2 \norm{(K + \lambda I)^{-1} K\alpha}_2^2}_{\mathrm{(I)}} + \underbrace{\E \norm{K(K + \lambda I)^{-1} \varepsilon}_2^2}_{\mathrm{(II)}}.
   \end{align*}
-  At this stage, we can throw in the eigendecomposition of $K$ to write (I) as
+  At this stage, we can throw in the eigen-decomposition of $K$ to write (I) as
   \begin{align*}
     \mathrm{(I)} &= \lambda^2 \norm{(UDU^T + \lambda I)^{-1} UDU^T \alpha }_2^2\\
     &= \lambda^2 \|U (D + \lambda I)^{-1} \underbrace{D U^T \alpha}_{\theta} \|_2^2\\
@@ -790,11 +796,11 @@ and
 \[
   \int_{\mathcal{X}} e_k(x) e_j(x) p(x)\;\d x = \mathbf{1}_{j = k}.
 \]
-One can show that
+One can then show that
 \[
-  \frac{1}{n} \E \sum_{i = 1}^n \min \left(\frac{\hat{\mu}_i}{4}, \lambda_n\right) \leq \frac{1}{n} \sum_{i = 1}^\infty \sum_{i = 1}^\infty \min\left(\frac{\mu_i}{4}, \lambda_n\right)
+  \frac{1}{n} \E \sum_{i = 1}^n \min \left(\frac{\hat{\mu}_i}{4}, \lambda_n\right) \leq \frac{1}{n} \sum_{i = 1}^\infty \min\left(\frac{\mu_i}{4}, \lambda_n\right)
 \]
-up to some absolute constant factors (like $\sqrt{2}$). For a particular density $p(x)$ of the input space, we can try to solve the integral equation to figure out what the $\mu_j$'s are, and we can find the expected bound.
+up to some absolute constant factors. For a particular density $p(x)$ of the input space, we can try to solve the integral equation to figure out what the $\mu_j$'s are, and we can find the expected bound.
 
 When $k$ is the Sobolev kernel and $p(x)$ is the uniform density, then it turns out we have
 \[
@@ -817,15 +823,15 @@ which gives an error rate of $\sim \left(\frac{\sigma^2}{n}\right)^{2/3}$.
 \subsection{Other kernel machines}
 Recall that the representer theorem was much more general than what we used it for. We could apply it to any loss function. In particular, we can apply it to classification problems. For example, we might want to predict whether an email is a spam. In this case, we have $Y \in \{-1, 1\}^n$.
 
-\subsubsection*{The support vector machine}
-Suppose $\{x_i\}_{y_i = 1}$ and $\{x_i\}_{i: Y_i = -1}$ are separable by a hyperplane through the origin. So there exists $\beta \in \R^p$ (the normal vector) with $y_i x_I^T \beta> 0$ for all $i$. Moreover, it would be nice if we can maximize the minimum distance between any of the points and the hyperplane defined by $\beta$. This is given by
+Suppose we are trying to find a hyperplane that separates the two sets $\{x_i\}_{y_i = 1}$ and $\{x_i\}_{i: Y_i = -1}$. Consider the really optimistic case where they can indeed be completely separated by a hyperplane through the origin. So there exists $\beta \in \R^p$ (the normal vector) with $y_i x_I^T \beta> 0$ for all $i$. Moreover, it would be nice if we can maximize the minimum distance between any of the points and the hyperplane defined by $\beta$. This is given by
 \[
   \max \frac{y_i x_i^T \beta}{\|\beta\|_2}.
 \]
 Thus, we can formulate our problem as
 \begin{center}
-  Maximize $M$ among $\beta \in \R^p, M \geq 0$ subject to $\frac{y_i x_i^T \beta}{\|\beta\|_2} \geq M$.
+  maximize $M$ among $\beta \in \R^p, M \geq 0$ subject to $\frac{y_i x_i^T \beta}{\|\beta\|_2} \geq M$.
 \end{center}
+
 This optimization problem gives the hyperplane that maximizes the \emph{margin} between the two classes.
 
 Let's think about the more realistic case where we cannot completely separate the two sets. We then want to impose a penalty for each point on the wrong side, and attempt to minimize the distance.
@@ -834,19 +840,19 @@ There are two options. We can use the penalty
 \[
   \lambda \sum_{i = 1}^n \left(M - \frac{Y_i x_i^T \beta}{\|\beta\|_2}\right)_+
 \]
-where $(t)_+ = t \mathbf{1}_{t \geq 0}$. Another option is to take
+where $t_+ = t \mathbf{1}_{t \geq 0}$. Another option is to take
 \[
-  \lambda \sum_{i = 1}^n \left(1 - \frac{Y_i x_i^T \beta}{M \|\beta\|_2}\right)+
+  \lambda \sum_{i = 1}^n \left(1 - \frac{Y_i x_i^T \beta}{M \|\beta\|_2}\right)_+
 \]
-which is perhaps more natural, since we are measuring things in unit of length $M$. It turns out it is this second option that leads to a tractable convex optimization problem. Using this, our problem becomes
+which is perhaps more natural, since now everything is ``dimensionless''. We will actually use neither, but will start with the second form and massage it to something that can be attacked with our existing machinery. Starting with the second option, we can write our optimization problem as
 \[
   \max_{M \geq 0, \beta \in \R^p} \left(M - \lambda \sum_{i = 1}^n \left(1 - \frac{Y_i x_i^T \beta}{M \|\beta\|_2}\right)_+\right).
 \]
 Since the objective function is invariant to any positive scaling of $\beta$, we may assume $\|\beta\|_2 = \frac{1}{M}$, and rewrite this problem as maximizing
 \[
-  \frac{1}{\|\beta\|_2} - \lambda \sum_{i = 1}^n (1 - Y_i x-i^T \beta)_+.
+  \frac{1}{\|\beta\|_2} - \lambda \sum_{i = 1}^n (1 - Y_i x_i^T \beta)_+.
 \]
-Replacing $\max \frac{1}{\|\beta\|_2}$ with minimizing $\|\beta\|_2^2$ and adding instead of subtracting the penalty part, we write this as
+Replacing $\max \frac{1}{\|\beta\|_2}$ with minimizing $\|\beta\|_2^2$ and adding instead of subtracting the penalty part, we modify this to say
 \[
   \min_{\beta \in \R^p} \left(\|\beta\|_2^2 + \lambda \sum_{i = 1}^n (1 - Y_i x_i^T \beta)_+\right).
 \]
@@ -866,11 +872,7 @@ Since $\delta^T \beta$ always appears together, we can simply replace it with a 
 \]
 This gives the \term{support vector classifier}.
 
-This is still just fitting a hyperplane. Now we would like to ``kernelize'' this, so that we can fit in a surface instead.
-
-Note that in our original model, given a new observation $x$, predictions are obtained via $\sgn(x_i^T \hat{\beta}_\lambda + \hat{\mu})$.
-
-We let $\mathcal{H}$ be the RKHS corresponding to the linear kernel. We can then write $(*)$ as
+This is still just fitting a hyperplane. Now we would like to ``kernelize'' this, so that we can fit in a surface instead. Let $\mathcal{H}$ be the RKHS corresponding to the linear kernel. We can then write $(*)$ as
 \[
   (\hat{\mu}_\lambda, \hat{f}_\lambda) = \argmin_{(\mu, f) \in \R \times \mathcal{H}} \sum_{i = 1}^n (1 - Y_i( f(x_i) + \mu))_+ + \lambda \|f\|_{\mathcal{H}}^2.
 \]
@@ -878,13 +880,12 @@ The representer theorem (or rather, a slight variant of it) tells us that the ab
 \[
   (\hat{\mu}_\lambda, \hat{\alpha}_\lambda) = \argmin_{(\mu, \alpha) \in \R \times \R^n}\sum_{i = 1}^n (1 - Y_i (K_i^T \alpha + \mu))_+ + \lambda \alpha^T K \alpha
 \]
-where $K_{ij} = k(x_i, x_j)$ and $k$ is the reproducing kernel of $\mathcal{H}$: this equivalence holds for all RKHS's. Predictions at a new $x$ are then given by
+where $K_{ij} = k(x_i, x_j)$ and $k$ is the reproducing kernel of $\mathcal{H}$. Predictions at a new $x$ are then given by
 \[
-  \mathrm{sign} (\hat{\mu}_\lambda + \sum_{i = 1}^n \hat{\alpha}_{\lambda, i} k(x, x_i)).
+  \mathrm{sign} \left(\hat{\mu}_\lambda + \sum_{i = 1}^n \hat{\alpha}_{\lambda, i} k(x, x_i)\right).
 \]
-This is hugely popular in machine learning, even though it performs similarly to logistic regression. It seems like people like exotic names.
-\subsubsection*{Logistic regression}
-Recall that logistic regression may be motivated by assuming that
+
+One possible alternative to this is to use \term{logistic regression}. Suppose that
 \[
   \log \left(\frac{\P(Y_i = 1)}{\P(Y_i = -1)}\right) = x_i^T \beta^0,
 \]
@@ -933,9 +934,13 @@ One motivation of this comes from a classical result known as \emph{Bochner's th
     k(x, x') = c\E \cos((x - x')^T W).
   \]
 \end{thm}
-Our strategy is then to find some $\hat{\phi}$ depending on $W$ such that $c\cos((x - x')^T W) = \hat{\phi}(x) \hat{\phi}(x')$. We are going to take $b = 1$, so we don't need a transpose on the right.
+Our strategy is then to find some $\hat{\phi}$ depending on $W$ such that
+\[
+  c\cos((x - x')^T W) = \hat{\phi}(x) \hat{\phi}(x').
+\]
+We are going to take $b = 1$, so we don't need a transpose on the right.
 
-The idea is then to play around with trigonometric identities to try to write $c \cos ((x - x')^T W)$\ldots and we find the following:
+The idea is then to play around with trigonometric identities to try to write $c \cos ((x - x')^T W)$. After some work, we find the following solution:
 
 Let $u \sim U[-\pi, \pi]$, and take $x, y \in \R$. Then
 \[
@@ -958,7 +963,7 @@ Then
   &= k(x, x').
 \end{align*}
 
-In order to get this to work, we must find the appropriate $W$.
+In order to get this to work, we must find the appropriate $W$. In certain cases, this $W$ is actually not too hard to find:
 \begin{eg}
   Take
   \[
@@ -1034,7 +1039,7 @@ If we are given a value of $\|\hat{\beta}_\lambda^L\|_1$, how can we go about so
 
     \node [circ] at (2.5, 2) {};
 
-    \draw [rotate=25] (2.5, 2) ellipse (0.5 and 0.1);
+    \draw (2.5, 2) ellipse (0.5 and 0.1); % maybe rotate this.
   \end{tikzpicture}
 \end{center}
 The contours of $\|Y - X \beta\|_2^2$ are ellipses centered at $\hat{\beta}^{OLS}$. Since the constraint set has corners, when we expand $\|\hat{\beta}\|_1$, the ellipse is likely to hit the corner. Hence it is likely that a lot of coefficients will vanish. If we have Ridge regression instead, then the constraint set is round, and hence in general, we expect all the coefficients to be non-zero.
@@ -1668,7 +1673,7 @@ We are going to make heavy use of the KKT conditions.
 \end{proof}
 
 \subsubsection*{Prediction and estimation}
-Now consider $Y = X \beta^0 + \varepsilon - \bar{\varepsilon} 1$, where the $\varepsilon_i$ are independent and have common sub-Gaussian parameter $\sigma$. Let $S, s, N$  be as before.
+Now consider $Y = X \beta^0 + \varepsilon - \bar{\varepsilon} 1$, where the $\varepsilon_i$ are independent and have common sub-Gaussian parameter $\sigma$. Let $S, s, N$ be as before.
 
 \begin{defi}[Compatibility factor]\index{compatibility factor}
   Define the \emph{compatibility factor} to be
@@ -1820,5 +1825,352 @@ If we want to analyze how $\phi^2_{\Sigma}(S)$ behaves for a ``random'' $\Sigma$
   \]
   So we are done.
 \end{proof}
+
+Define
+\[
+  \phi^2_{\Sigma, s} = \min_{S: |S| = s} \phi^2_\Sigma(S).
+\]
+Note that if
+\[
+  \max_{jk} |\Theta_{jk} - \Sigma_{jk}| \leq \frac{\phi^2_{\Theta, s}}{32 s},
+\]
+then
+\[
+  \phi^2_\Sigma(S) \geq \frac{1}{2} \phi^2_\Theta(S).
+\]
+for all $S$ with $|S| = s$. In particular,
+\[
+  \phi^2_{\Sigma, s} \geq \frac{1}{2} \phi^2_{\Theta, s}.
+\]
+\begin{thm}
+  Suppose the rows of $X$ are iid and each entry is sub-Gaussian with parameter $v$. Suppose $s \sqrt{\log p / n} \to 0$ as $n \to \infty$, and $\phi^2_{\Sigma^0, s}$ is bounded away from $0$. Then if $\Sigma^0 = \E \hat{\Sigma}$, then we have
+  \[
+    \P\left(\phi^2_{\hat{\Sigma}, s} \geq \frac{1}{2} \phi^2_{\Sigma^0, s}\right) \to 1 % \geq 1 - O(s \sqrt{\log p / n})
+  \]
+  as $n \to \infty$.
+\end{thm}
+
+\begin{proof}
+  It is enough to show that
+  \[
+    \P\left(\max_{jk} |\hat{\Sigma}_{jk} - \Sigma^0_{jk}| \leq \frac{\phi^2_{\Sigma^0, s}}{32 s}\right) \to 0
+  \]
+  as $n \to \infty$.
+
+  Let $t = \frac{\phi_{\Sigma^0, s}^2}{32 s}$. Then
+  \[
+    \P \left(\max_{j,k} |\hat{\Sigma}_{jk} - \Sigma^0_{jk}| \geq t\right) \leq \sum_{j, k} \P(|\hat{\Sigma}_{jk} - \Sigma^0_{jk}| \geq t).
+  \]
+  Recall that
+  \[
+    \hat{\Sigma}_{jk} = \frac{1}{n} \sum_{i = 1}^n X_{ij} X_{ik}.
+  \]
+  So we can apply Bernstein's inequality to bound
+  \[
+    \P(|\hat{\Sigma}_{jk} - \Sigma^0_{jk}) \leq 2 \exp \left(-\frac{nt^2}{2 (64 v^4 + 4 v^2 t)}\right),
+  \]
+  since $\sigma = 8v^2$ and $b = 4 v^2$. So we can bound 
+  \[
+    \P \left(\max_{j,k} |\hat{\Sigma}_{jk} - \Sigma^0_{jk}| \geq t\right) \leq 2 p^2 \exp \left( - \frac{c n}{s^2}\right) = 2 \exp \left(-\frac{c n}{s^2}\left(c - \frac{2s^2}{n \log p}\right)\right) \to 0
+  \]
+  for some constant $c$. 
+\end{proof}
+
+\begin{cor}
+  Suppose the rows of $X$ are iid mean-zero multivariate Gaussian with variance $\Sigma^0$. Suppose $\Sigma^n$ has minimum eigenvalue bounded from below by $c_{min} > 0$, and suppose the diagonal entries of $\Sigma^0$ are bounded from above. If $s \sqrt{\log p / n} \to 0$, then
+  \[
+    \P\left(\phi_{\hat{\Sigma}, s}^2 \geq \frac{1}{2} c_{min}\right) \to 1
+  \]
+  as $n \to \infty$.
+\end{cor}
+
+\subsection{Computation of Lasso solutions}
+We shall explore the method of \term{coordinate descent}. This is a general method to find the minimum of a function.
+
+Suppose we have a function $f: \R^d \to \R$. We start with an initial guess $x^{(0)}$ and repeat for $m = 1, 2, \ldots$
+\begin{align*}
+  x_1^{(m)} &= \argmin_{x_1} f(x_1, x_2^{(m - 1)}, \ldots, x_d^{(m - 1)})\\
+  x_2^{(m)} &= \argmin_{x_2} f(x_1^{(m)}, x_2, x_3^{(m - 1)}, \ldots, x_d^{(m - 1)})\\
+  &\rvdots\\
+  x_d^{(m)} &= \argmin_{x_d} f(x_1^{(m)}, x_2^{(m)}, \ldots, x_{d - 1}^{(m)}, x_d).
+\end{align*}
+This was proposed for solving the Lasso a long time ago, and a Stanford group tried this out. However, instead of using $x_1^{(m)}$ when computing $x_2^{(m)}$, they used $x^{(m - 1)}_1$ instead. This turned out to be pretty useless, and so the group abandoned the method. After trying some other methods, which weren't very good, they decided to revisit this method and fixed their mistake.
+
+For this to work well, of course the coordinatewise minimizations have to be easy (which is the case for the Lasso, where we even have explicit solutions). This converges to the global minimizer the minimizer is unique, $\{x : f(x) \leq f(x^{(0)}\}$, and if $f$ has the form
+\[
+  f(x) = g(x) + \sum_j h_j(x_j),
+\]
+where $g$ is convex and differentiable, and each $h_j$ is convex but not necessarily differentiable. In the case of the Lasso, the first is the least squared term, and the $h_j$ is the $\ell_1$ term.
+
+There are two things we can do to make this faster. We typically solve the Lasso on a grid of $\lambda$ values $\lambda_0 > \lambda_1 > \cdots > \lambda_L$, and then picking the appropriate $\lambda$ by $v$-fold cross-validation. IN this case, we can start solving at $\lambda_0$, and then start at the previous $\lambda$-value to ``warm start'' our iterative procedure. In fact, even if we already have a fixed $\lambda$ value we want to use, it is often advantageous to solve the Lasso with a larger $\lambda$-value, and then use that as a warm start to get to our desired $\lambda$ value. 
+
+Another strategy is an \term{active set} strategy. If $p$ is large, then this loop may take a very long time. Since we know the Lasso should set a lot of things to zero, for $\ell = 1, \ldots, L$, we set
+\[
+  A = \{ k : \hat{\beta}^L_{\lambda_{\ell - 1}, k} \not= 0 \}.
+\]
+We then perform coordinate descent only on coordinates in $A$ to obtain a Lasso solution $\hat{\beta}$ with $\hat{\beta}_{A^c} = 0$. This may not be the actual Lasso solution. To check this, we use the KKT conditions. We set
+\[
+  V = \left\{k \in A^c: \frac{1}{n} |X_k^T(Y - X \hat{\beta})| > \lambda_\ell \right\}.
+\]
+If $V = \emptyset$, and we are done. Otherwise, we add $V$ to our active set $A$, and then run coordinate descent again on this active set.
+
+\subsection{Extensions of the Lasso}
+The first thing we might want to change in the Lasso is to replace the least squares loss with other log-likelihoods. Another way to modify the Lasso is to replace the $\ell_1$ penalty with something else in order to encourage a different form of sparsity.
+
+\begin{eg}[Group Lasso]\index{group Lasso}
+  Given a partition
+  \[
+    G_1 \cup \cdots G_q = \{1, \ldots, p\},
+  \]
+  the \emph{group Lasso} penalty is
+  \[
+    \lambda \sum \sum_{j = 1}^q m_j \|\beta_{G_j}\|_2,
+  \]
+  where $\{m_j\}$ is some sort of weight to account for the fact that the groups have different sizes. Typically, we take $m_j = \sqrt{|G_j|}$.
+
+  If we take $G_i = \{i\}$, then we recover the original Lasso. If we take $q = 1$, then we recover Ridge regression. What this does is that it encourages the entire group to be all zero, or all non-zero.
+
+  This is useful, for example, when groups occur through coding for categorical predictors.
+\end{eg}
+
+\begin{eg}
+  Another variation is the \term{fused Lasso}. If $\beta^0_{j + 1}$ is expected to be close to $\beta_j^0$,  then a \emph{fused Lasso} penalty may be appropriate, with
+  \[
+    \lambda_1 \sum_{j = 1}^{p - 1} |\beta_{j + 1} - \beta_j| + \lambda_2 \|\beta\|_1.
+  \]
+  For example, if
+  \[
+    Y_i = \mu_i + \varepsilon_i,
+  \]
+  and we believe that $(\mu_i)_{i = 1}^n$ form a piecewise constant sequence, we can estimate $\mu^0$ by
+  \[
+    \argmin_\mu \left\{\|Y - \mu\|_2^2 + \lambda \sum_{i = 1}^{n - 1} |\mu_{i + 1} - \mu_i|\right\}.
+  \]
+\end{eg}
+
+\begin{eg}[Elastic net]\index{elastic net}
+  We can use
+  \[
+    \hat{\beta}_{\lambda, \alpha}^{EN} = \argmin_{\beta} \left\{\frac{1}{2n} \|Y - X \beta\|_2^2 + \lambda (\alpha \|\beta\|_1 + (1 - \alpha)\|\beta\|_2^2)\right\}.
+  \]
+  for $\alpha \in [0, 1]$. What the $\ell_2$ norm does is that it encourages highly positively correlated variables to have similar estimated coefficients.
+
+  For example, if we have duplicate columns, then the $\ell_1$ penalty encourages us to take one of the coefficients to be $0$, while the $\ell_2$ penalty encourages the coefficients to be the same. 
+\end{eg}
+
+Another class of variations try to reduce the bias of the Lasso. Although the bias of the Lasso is a necessary by-product of reducing the variance of the estimate, it is sometimes desirable to reduce this bias.
+
+The \term{LARS-OLS hybrid} re-estimate $\beta^0_{\hat{S}_\lambda}$ by OLS. There are similarly the \term{relaxed Lasso} and \term{adaptive Lasso}.
+
+In the adaptive Lasso, we obtain an initial estimate of $\beta^0$, e.g.\ with the Lasso, and then solve
+\[
+  \hat{\beta}^{\mathrm{adapt}}_\lambda = \argmin_{\beta : \beta_{\hat{S}} = 0} \left\{\frac{1}{2n} \|Y - X \beta\|_2^2 + \lambda \sum_{k \in \hat{S}} \frac{|\beta_k|}{|\hat{\beta}_k|}\right\}.
+\]
+We can also try to use a non-convex penalty. We can attempt to solve
+\[
+  \argmin_\beta \left\{\frac{1}{2n} \|Y - X \beta\|_2^2 + \sum_{k = 1}^n p_\lambda(|\beta_k|)\right\},
+\]
+where $p_\lambda: [0, \infty) \to p[0, \infty)$ is a non-convex function. One common example is the \term{MCP}, given by
+\[
+  p_\lambda'(u) = \left(\lambda - \frac{u}{\gamma}\right)_+,
+\]
+where $\Gamma$ is an extra tuning parameter.
+
+% insert picture
+
+This tends to give estimates even sparser than the Lasso.
+
+\section{Graphical modelling}
+So far, we have been looking at prediction problems. What we want to consider now is the situation where we have a large number of variables, and we want to see which of them are related to each other. However, this is not a good idea, since often there could be a lot of spurious correlations, and also there could be a lot of factors that are very closely related, but do not have causal relations. For example, one can find a positive correlation between the wine budget of a college and the percentage of students getting firsts. However, this does not mean increasing the wine budget will increase the number of students getting firsts! It's just that if we happen to know the wine budget of a college but forgot the percentage of students getting firsts, then we can use the data to predict it.
+
+\begin{defi}[Graph]\index{graph}
+  A \emph{graph} is a pair $\mathcal{G} = (V, E)$, where $V$ is a set and $E \subseteq (V, V)$ such that $(v, v) \not \in E$ for all $v \in V$. % check this
+\end{defi}
+Thus, our graphs are directed.
+
+\begin{defi}[Edge]\index{edge}
+  We say there is an \emph{edge} between $j$ and $k$ and that $j$ and $k$ are \term{adjacent} if $(j, k) \in E$ or $(k, j) \in E$.
+\end{defi}
+
+\begin{defi}[Undirected edge]\index{undirected edge}
+  An edge $(j, k)$ is \emph{undirected} if also $(k, j) \in E$. Otherwise, it is \emph{directed}\index{directed edge} and we write $j \to k$ to represent it.
+\end{defi}
+
+\begin{defi}[(Un)directed graph]\index{undirected graph}\index{directed graph}
+  A graph is \emph{(un)directed} if all its edges are (un)directed.
+\end{defi}
+
+\begin{defi}[Subgraph]\index{subgraph}
+  A graph $\mathcal{G}_1 = (V, E)$ is a \emph{subgraph} of $\mathcal{G} = (V, E)$ if $V_1 \subseteq V$ and $E_1 \subseteq E$. A \term{proper subgraph}\index{subgraph!proper} is one where either of the inclusions are proper inclusions.
+\end{defi}
+
+\begin{defi}[Parent and child]\index{parent}\index{$\mathrm{pa}$}\index{$\mathrm{ch}$}
+  We say $j$ is a \emph{parent} of $k$ and $k$ is a \term{child} of $j$ if $j \to k$. The sets of parents and children of $k$ will be denoted $\pa(k)$ and $\child(k)$ respectively. % index these
+\end{defi}
+
+\begin{defi}[$v$-structure]\index{$v$-structure}
+  A set of three nodes is called a \emph{$v$-structure} if one node is a child of the two other nodes, and these two nodes are not adjacent.
+\end{defi}
+
+% define skeleton
+
+\begin{defi}[Path]\index{path}
+  A \emph{path} from $j$ to $k$ is a sequence $j = j_1, j_2, \ldots, j_m = k$ of (at least two) distinct vertices such that $j_\ell$ and $j_{\ell + 1}$ are adjacent.
+
+  A path is \emph{directed}\index{directed path} if $j_\ell \to j_{\ell + 1}$ for all $\ell$.
+\end{defi}
+
+\begin{defi}[Descendent]\index{descendant}\index{$\mathrm{de}$}
+  We say $k$ is a \emph{descendant} of $j$ if there is a directed path from $j$ to $k$. The set of descendant of $j$ will be denoted $\de(j)$.
+\end{defi}
+
+\begin{defi}[Directed cycle]\index{directed cycle}
+  A \emph{directed cycle} is (almost) a directed path but with the start and end points the same.
+\end{defi}
+
+\begin{defi}[Partially directed acyclic graph (PDAG)]\index{partially directed acyclic graph}
+   % insert definition
+\end{defi}
+
+\begin{defi}[Directed acyclic graph (DAG)]\index{DAG}
+  % insert definition
+\end{defi}
+
+\begin{defi}[Separates]\index{separates}
+  Given a triple of (disjoint) subsets of nodes $A, B, S$, we say $S$ \emph{separates} $A$ from $B$ if every path from a node in $A$ to a node in $B$ contains a node in $S$.
+\end{defi}
+
+\begin{defi}[Moralised graph]\index{moralised graph}
+  The \emph{moralise graph} of a DAG $\mathcal{G}$ is the undirected graph obtained by adding edges between (marrying) the parents of each node and removing all edge directions.
+\end{defi}
+The idea if two parents have a child but are not married, then that is immoral and we should moralize it.
+
+\begin{defi}[Blocked]\index{blocked}
+  In a DAG, a path between $j_1$ and $j_m$ ($j_1, \ldots, j_m)$) is \emph{blocked} by a set of nodes $S$ with neither $j_1$ nor $j_m$ in $S$ whenever there is a node $j_\ell$ such that one of the possibilities hold:
+  \begin{itemize}
+    \item $j_\ell \in S$ and we \emph{don'} have $j_{\ell - 1} \to j_1 \leftarrow j_{\ell + 1}$.
+    \item $j_{\ell - 1} \to j_{\ell} \leftarrow j_{\ell + 1}$ and neither $j_\ell$ nor any of its descendants are in $S$.
+  \end{itemize}
+\end{defi}
+In some sense, this says we can ``modify'' the path so that the colliders are exactly the points in $S$.
+
+\begin{defi}[d-separate]\index{d-separate}
+  If $\mathcal{G}$ is a DAG, given a triple of (disjoint) subsets of nodes $A, B, S$, we say $S$ \emph{d-separates} $A$ from $B$ if $S$ blocks every path from $A$ to $B$.
+\end{defi}
+
+\begin{eg}
+  Two points are d-separated by $\emptyset$ iff there is no directed path between the two points.
+\end{eg}
+
+\begin{defi}[Topological ordering]\index{topological ordering}
+  Given a DAG $\mathcal{G}$ with $V = \{1, \ldots, p\}$ we say that a permutation $\pi: V \to V$ is a topological ordering if $\pi(j) < \pi(k)$ whenever $k \in de(j)$.
+\end{defi}
+
+\subsection{Conditional independence graphs}
+We shall now talk about undirected graphs for a bit. Henceforth all graphs are undirected.
+
+\begin{defi}[Conditional independence]\index{conditional independence}
+  Let $X, Y, Z$ be random vectors with joint density $f_{XYZ}$. We say that $X$ is \emph{conditionally independent} of $Y$ given $Z$, written $X amalg Y \mid Z$, if
+  \[
+    f_{XY\midZ}(x, y \mid z) = f_{X\midZ}(x \mid z) f_{Y \mid Z} (y \mid z).
+  \]
+  Equivalently,
+  \[
+    f_{X\mid YZ} (x \mid y, z) = f_{X \mid Z}(x \mid z)
+  \]
+  for all $y$.
+\end{defi}
+We shall ignore all the technical difficulties, and take as an assumption that all these conditional densities exist.
+
+
+\begin{defi}[Pairwise Markov property]\index{pairwise Markov property}
+  Let $P$ be the joint law of $Z = (Z_1, \ldots, Z_p)^T$. We say $P$ satisfies the \emph{pairwise Markov property} with respect to a graph $\mathcal{G}$ if for any $j \not= k$, $(j, k), (k, j) \not \in E$, we have $Z_j \amalg Z_k \mid Z_{-jk}$.
+\end{defi}
+In other words, things that are not connected are conditionally independent given the other things.
+
+Of course, if $\mathcal{G}$ is a complete graph, then $P$ satisfies the pairwise Markov property with respect to $\mathcal{G}$. Thus, we want to find a minimal such graph.
+\begin{defi}[Conditional independence graph (CIG)]\index{conditional independence graph}\index{CIG}
+  Given $P$ as above, the \emph{conditional independent graph} (CIG) contains an edge between $j$ and $k$ iff $Z_j \not \amalg Z_k \mid Z_{-jk}$.
+\end{defi}
+
+We might hope to know more from the graph than just the conditional independence relation.
+
+\begin{defi}[Global Markov property]\index{global Markov property}
+  We say $P$ satisfies the \emph{global Markov property} with respect to $\mathcal{G}$ if for any triple of disjoint subsets of $V$ $(A, B, S)$, if $S$ separates $A$ and $B$, then $Z_A \amalg Z_B \mid Z_S$.
+\end{defi}
+
+\begin{prop}
+  If $P$ has a positive density, then if it satisfies the pairwise Markov property with respect to $\mathcal{G}$, then it also satisfies the global Markov property.
+\end{prop}
+This is a really nice result, but we will not prove this. However, we will prove a special case in the example sheet.
+
+
+\subsection{Gaussian graphical models}
+Testing conditional dependency is very difficult in general, but in the case where we have Gaussian data, it is much easier, since independence is the same as vanishing covariance.
+
+\begin{notation}[$M_{A,B}$]
+  Let $M$ be a matrix. Then $M_{A,B}$ refers to the submatrix given by the rows in $A$ and columns in $B$.
+\end{notation}
+
+\begin{prop}
+  Suppose $Z \sim N_p(\mu, \Sigma)$ and $\Sigma$ is positive definite. Then
+  \[
+    Z_A \mid Z_B = z_B \sim N_{|A|}(\mu_A + \Sigma_{A, B} \Sigma_{B, B}^{-1}(z_B - \mu_B), \Sigma_{A, A} - \Sigma_{A, B} \Sigma_{B, B}^{-1} \Sigma_{B, A}).
+  \]
+\end{prop}
+
+\begin{proof}
+  Of course, we can just compute this directly, maybe using moment generating functions. But for pleasantness, we adopt a different approach. We seek an $M$ such that 
+  \[
+    Z_A = M Z_B + (Z_A - M Z_B),
+  \]
+  where $Z_A - M Z_B$ is independent of $Z_B$, i.e.\ such that
+  \[
+    0 = \cov(Z_B, Z_A - M Z_B) = \Sigma_{B,A} - \Sigma_{B, B} M^T.
+  \]
+  So we should take
+  \[
+    M = (\Sigma_{B, B}^{-1}\Sigma_{B,A})^T = \Sigma_{A,B} \Sigma_{B,B}^{-1}.
+  \]
+  We already know that $Z_A - M Z_B$ is Gaussian, so to understand it, we only need to know its mean and variance. We have
+  \begin{align*}
+    \E[Z_A - M Z_B ] &= \mu_A - M \mu_B = \mu_A - \Sigma_{AB} \Sigma_{BB}^{-1} \mu_B\\
+    \var(Z_A - M Z_B) &= \Sigma_{A, A} - 2 \Sigma_{A, B} \Sigma_{B, B}^{-1} \Sigma_{B, A} + \Sigma_{A, B} \Sigma_{B, B}^{-1} \Sigma_{B, B} \Sigma_{B, B}^{-1} \Sigma_{B, A}\\
+    &= \Sigma_{A, A} - \Sigma_{A, B} \Sigma_{B, B}^{-1} \Sigma_{B, A}.
+  \end{align*}
+  Then we are done.
+\end{proof}
+
+\subsubsection*{Neighbourhood selection}
+We are going to specialize to $A = \{k\}$ and $B = \{1, \ldots, n\} \setminus \{k\}$. Then we have
+\[
+  Z_k = M_k + Z_{-k}^T \Sigma_{-k, -k}^{-1} \Sigma_{-k, k} + \varepsilon_k,
+\]
+where
+\[
+  M_k = \mu_k - \mu_{-k}^T \Sigma_{k, -k}^{-1} \Sigma_{-k, k},
+\]
+and
+\[
+  \varepsilon_k \mid Z_{-k} \sim N(0, \Sigma_{k, k} - \Sigma_{k, -k} \Sigma_{-k, -k}^{-1} \Sigma_{-k, k}).
+\]
+The point of writing it this way is that it now looks like we're doing regression.
+
+If the $j$th component of $\Sigma_{-k, -k}^{-1} \Sigma_{-k, k}$ is $0$, then the distribution of $Z_k \mid Z_{-k}$ will not depend on $(Z_{-k})_j = Z_{j'}$ (here $j'$ is either $j$ or $j + 1$, depending on where $k$ is). So we know
+\[
+  Z_k \mid Z_{-k} \overset{d}{=} Z_k \mid Z_{-kj'}.
+\]
+This is the same as saying $Z_k \amalg Z_{j'} \mid Z_{-kj'}$.
+
+Neighbourhood selection exploits this fact. Given $x_1, \ldots, x_n$ which are iid $\sim Z$ and
+\[
+  X = (x_1^T, \cdots, x_n^T)^T,
+\]
+we can estimate $\Sigma_{-k, -k}^{-1} \Sigma_{-k, k}$ by regressing $X_k$ on $X_{-k}$ using the Lasso (with an intercept term). We then obtain selected sets $\hat{S}_k$. There are two ways of estimating the CIG based on these:
+\begin{itemize}
+  \item OR rule: We add the edge $(j, k)$ if $j \in \hat{S}_k$ or $k \in \hat{S}_j$.
+  \item AND rule: We add the edge $(j, k)$ if $j \in \hat{S}_k$ and $k \in \hat{S}_j$.
+\end{itemize}
+Note that since the Lasso favors zeroes, it is likely that the resulting graph is larger than the actual CIG, but it should at least contain the actual CIG.
 \printindex
 \end{document}

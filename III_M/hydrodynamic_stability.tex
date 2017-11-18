@@ -1494,10 +1494,19 @@ We can imagine the evolution of a convective instability as looking like this:
     \draw [->] (0, -1) -- (0, 4) node [above] {$t$};
 
     \draw [semithick, mblue] (-2, 0) -- (5, 0);
+
+    \draw [semithick, mblue] (-2, 1) -- (0.5, 1);
+    \draw [semithick, mblue] (-2, 2) -- (1, 2);
+    \draw [semithick, mblue] (-2, 3) -- (1.5, 3);
+
+    \draw [semithick, mblue] (1.8, 1) -- (5, 1);
+    \draw [semithick, mblue] (3, 2) -- (5, 2);
+    \draw [semithick, mblue] (4, 3) -- (5, 3);
+
     \node [circ, mblue] at (0, 0) {};
-    \draw [semithick, mblue, domain=-2:5,samples=400] plot(\x, {1 + 0.2 * cos(2500 * \x) * exp (- 25 * ((\x - 1)^2))});
-    \draw [semithick, mblue, domain=-2:5,samples=400] plot(\x, {2 + 0.3 * cos(2500 * \x) * exp (- 10 * ((\x - 2)^2))});
-    \draw [semithick, mblue, domain=-2:5,samples=400] plot(\x, {3 + 0.4 * cos(2500 * \x) * exp (- 6 * ((\x - 2.9)^2))});
+    \draw [semithick, mblue, domain=0.5:1.8,samples=80] plot (\x, {1 + 0.2 * cos(2500 * \x) * exp (- 25 * ((\x - 1)^2))});
+    \draw [semithick, mblue, domain=1:3,samples=100] plot (\x, {2 + 0.3 * cos(2500 * \x) * exp (- 10 * ((\x - 2)^2))});
+    \draw [semithick, mblue, domain=1.5:4,samples=200] plot (\x, {3 + 0.4 * cos(2500 * \x) * exp (- 6 * ((\x - 2.9)^2))});
 
     \draw [dashed] (0, 0) -- (2.6, 3.8);
     \draw [dashed] (0, 0) -- (4.8, 3.8);
@@ -1509,10 +1518,19 @@ whereas an absolute instability would look like this:
     \draw [->] (0, -1) -- (0, 4) node [above] {$t$};
 
     \draw [semithick, mblue] (-2, 0) -- (5, 0);
+
+    \draw [semithick, mblue] (-2, 1) -- (-1, 1);
+    \draw [semithick, mblue] (-2, 2) -- (-1.5, 2);
+    \draw [semithick, mblue] (-2, 3) -- (-2, 3);
+
+    \draw [semithick, mblue] (1.2, 1) -- (5, 1);
+    \draw [semithick, mblue] (2, 2) -- (5, 2);
+    \draw [semithick, mblue] (3, 3) -- (5, 3);
     \node [circ, mblue] at (0, 0) {};
-    \draw [semithick, mblue, domain=-2:5,samples=300] plot(\x, {1 + 0.2 * cos(2500 * \x) * exp (- 8 * ((\x - 0.2)^2))});
-    \draw [semithick, mblue, domain=-2:5,samples=300] plot(\x, {2 + 0.3 * cos(2500 * \x) * exp (- 2 * ((\x - 0.4)^2))});
-    \draw [semithick, mblue, domain=-2:5,samples=300] plot(\x, {3 + 0.4 * cos(2500 * \x) * exp (- ((\x - 0.6)^2))});
+
+    \draw [semithick, mblue, domain=-1:1.2,samples=100] plot (\x, {1 + 0.2 * cos(2500 * \x) * exp (- 8 * ((\x - 0.2)^2))});
+    \draw [semithick, mblue, domain=-1.5:2,samples=200] plot (\x, {2 + 0.3 * cos(2500 * \x) * exp (- 2 * ((\x - 0.4)^2))});
+    \draw [semithick, mblue, domain=-2:3,samples=300] plot (\x, {3 + 0.4 * cos(2500 * \x) * exp (- ((\x - 0.6)^2))});
 
     \draw [dashed] (0, 0) -- (-1.7, 3.8);
     \draw [dashed] (0, 0) -- (3.2, 3.8);
@@ -1693,7 +1711,7 @@ Along such a contour, we would expect the greatest contribution to the integral 
 %
 %Now there are many contours of $\rho_i$. Which of them should we pick? Along such contours, the greatest contribution comes from the point where $\rho_r(k)$ is the greatest. If we want to essentially approximate the whole integral by the value at the maximum, then we should pick a contour where $\rho_r(k)$ drops as quickly as possible when we move away from the maximum. After some work, we see that we should pick the contour that passes through the points $k_*$ with $\frac{\partial \rho}{\partial k}(k^*) = 0$.
 %
-%Note that since $\rho_r$ and $\rho_i$ satisfy Laplace's equation, 
+%Note that since $\rho_r$ and $\rho_i$ satisfy Laplace's equation,
 %
 %
 %To approximate the integral, we expand $\rho$ about the point $k_*$, to get
@@ -2021,60 +2039,91 @@ It can be established that $\omega_{G, i} \leq \omega_{0, i, max}$. This then gi
 Sometimes this is a good predict, i.e.\ $R_{G_c} \simeq R_t$. For example, with mixing layers, we have $R_t = 1.315$ while $R_{G_c} = 1.34$. On the other hand, it is sometimes poor. For example, for bluff-body wakes, we have $Re_t = 25$ while $Re_{Gc} = 48.5$.
 
 \section{Transient growth}
-We have always considered modal growth of wavelike disturbances. The central idea is that exponential growth (complex frequency or wavenumber) is instability. This works very will in some circumstances (e.g.\ mixing layer), but not others. In fact, they don't occur in \emph{the} two most important problems.
+\subsection{Motivation}
+So far, our model of stability is quite simple. We linearize our theory, look at the individual perturbation modes, and say the system is unstable if there is exponential growth. In certain circumstances, it works quite well. In others, they are just completely wrong.
 
-There are six billion kilometers of pipes in the United States alone, where the flow is turbulent. The major consumption of energy is that we have to pump the fluid through pipes, which takes energy.
+There are six billion kilometers of pipes in the United States alone, where the flow is turbulent. A lot of energy is spent pumping fluids through these pipes, and turbulence is not helping. So we might think we should try to understand flow in a pipe mathematically, and see if it gives ways to improve the situation.
 
-However, we can prove that flow in a pipe is linearly stable for all Reynolds numbers. In reality, we find that turbulence starts to occur for
-\[
-  Re = \frac{QD}{\nu A} \sim 2000.
-\]
-On the other hand, this can be avoided for a quiet flow for $Re \sim 10^5$. What is going on?
+Unfortunately, we can prove that flow in a pipe is linearly stable for all Reynolds numbers. The analysis is not \emph{wrong}. The flow is indeed linearly stable. The real problem is that linear stability is not the right thing to consider.
 
-We get similar issues with plane Poiseuille flow, i.e.\ a pressure driven flow between horizontal plates. The flow profile is a parabola. This can be shown to be linearly unstable for
+%In reality, we find that turbulence starts to occur for
+%\[
+%  Re = \frac{QD}{\nu A} \sim 2000.
+%\]
+%If we On the other hand, this can be avoided for a quiet flow for $Re \sim 10^5$. What is going on?
+
+We get similar issues with plane Poiseuille flow, i.e.\ a pressure driven flow between horizontal plates. As we know from IB Fluids, the flow profile is a parabola:
+\begin{center}
+  \begin{tikzpicture}[scale=1.5]
+    \fill [black] (0, 0) rectangle (6, -0.15);
+    \fill [black] (0, 1) rectangle (6, 1.15);
+    \fill [opacity=0.3, mblue] (0, 0) rectangle (6, 1);
+
+    \foreach \x in {0.14, 0.26, 0.38, 0.5, 0.62, 0.74, 0.86} {
+      \pgfmathsetmacro\len{\x * (1 - \x)}
+      \draw [-latex'] (2, \x) -- +(3 * \len, 0);
+    };
+    \draw [rotate=270, yscale=-1, shift={(-3,-3)}] (2.5, 0.25) parabola (2, 1);% magic
+    \draw [rotate=90, shift={(-2,-3)}] (2.5, 0.25) parabola (2, 1);
+    \draw [dashed] (2, 0) -- (2, 1);
+  \end{tikzpicture}
+\end{center}
+One can analyze this and prove that it is linearly unstable when
 \[
   Re = \frac{U_c d}{\nu} > 5772.
 \]
 However, it is observed to be unstable at much lower $Re$.
 
-We have an even more extreme issue for plane Couette flow.
-
-This is flow between two plates $2f$ apart driven at speeds of $\pm U_0$. The base state (scale with $d$ and $U_0$) is
+We have an even more extreme issue for plane Couette flow. This is flow between two plates at $z = \pm 1$ (after rescaling) driven at speeds of $\pm 1$ (after scaling). Thus, the base flow is given by
 \[
   \bar{U} = z,\quad |z| \leq 1.
 \]
-Assuming the fluid is inviscid, the Rayleigh equation then gives
+Assuming the fluid is inviscid, the Rayleigh equation then tells us perturbations obey
 \[
   \left[ (\bar{U} - c) \left(\frac{\d^2}{\d z^2} - k^2\right) - \frac{\d^2}{\d z^2} \bar{U} \right] \hat{w} = 0.
 \]
-Since $\bar{U} = z$, this becomes
+Since $\bar{U} = z$, the second derivative term drops out and this becomes
 \[
   (\bar{U} - c) \left(\frac{\d^2}{\d z^2} - k^2\right) \hat{w} = 0.
 \]
-If we want our solution to be smooth, then we need $\left(\frac{\d^2}{\d z^2} - k^2\right) \hat{w} = 0$. So the solution is of the form
+If we want our solution to be smooth, or even just continuously differentiable, then we need $\left(\frac{\d^2}{\d z^2} - k^2\right) \hat{w} = 0$. So the solution is of the form
 \[
   \hat{w} = A \sinh k(z + 1) + B \sinh k(z - 1).
 \]
 However, to satisfy the boundary conditions $\hat{w}(\pm 1) = 0$, then we must have $A = B = 0$, i.e.\ $\hat{w} = 0$.
 
+Of course, it is \emph{not} true that there can be no perturbations. Instead, we have to relax the requirement that the eigenfunction is smooth. We shall allow it to be non-differentiable at certain points, but still require that it is continuous (alternatively, we relax differentiability to weak differentiability).
+
 The fundamental assumption that the eigenfunction is smooth must be relaxed. Let's instead consider a solution of the form
 \begin{align*}
-  \hat{w}_+ &= A_+ \sinh k (z - 1) & z > z_c\\
-  \hat{w}_- &= A_- \sinh k(z + 1) & z < z_c.
+  \hat{w}_+ &= A_+ \sinh k (z - 1) & z &> z_c\\
+  \hat{w}_- &= A_- \sinh k(z + 1) & z &< z_c.
 \end{align*}
-If we require the vertical velocity to be continuous ta the critical layer, then we must have the matching condition
+If we require the vertical velocity to be continuous at the critical layer, then we must have the matching condition
 \[
   A_+ \sinh k (z - z_c) = A_- \sinh k(z + z_c).
 \]
-This still satisfies the Rayleigh equation if $\bar{U} = c$ at the critical layer. % insert picture
-
-So for all $|c\ = |\omega/k| < 1$, there is a (marginally stable) mode. The spectrum is \emph{continuous}. There is no discrete spectrum. This is quite weird, compared to what we have previously seen.
-
-This shows that inviscid plane Couette flow is stable! Note that $u$ is discontinuous at the critical layer, because incompressibility requires
+This still satisfies the Rayleigh equation if $\bar{U} = c$ at the critical layer. Note that $u$ is discontinuous at the critical layer, because incompressibility requires
 \[
   \frac{\partial w}{\partial z} = - \frac{\partial u}{\partial x} = -iku.
 \]
-Velocity regularizes the flow, but it turns out that does not linearly destabilize the flow at \emph{any} Reynolds number (Romanov, 1973).
+\begin{center}
+  \begin{tikzpicture}
+    \fill [black] (0, 0) rectangle (4, -0.2);
+    \fill [black] (0, 2) rectangle (4, 2.2);
+    \fill [opacity=0.3, mblue] (0, 0) rectangle (4, 2);
+
+    \draw [dashed] (1, 0) -- (1, 2);
+
+    \draw (2.5, 1.5) parabola (1, 0);
+    \draw (2.5, 1.5) parabola (1, 2);
+
+    \draw [dashed] (2.5, 1.5) -- (1, 1.5) node [left] {\small$c$};
+  \end{tikzpicture}
+\end{center} % improve this picture
+So for all $|c| = |\omega/k| < 1$, there is a (marginally stable) mode. The spectrum is \emph{continuous}. There is no discrete spectrum. This is quite weird, compared to what we have previously seen.
+
+But still, we have only found modes with a real $c$, since $\bar{U}$ is real! Thus, we conclude that inviscid plane Couette flow is stable! While viscosity regularizes the flow, but it turns out that does not linearly destabilize the flow at \emph{any} Reynolds number (Romanov, 1973).
 
 Experimentally, and numerically, plane Couette flow is known to exhibit a rich array of dynamics.
 \begin{itemize}
@@ -2083,29 +2132,51 @@ Experimentally, and numerically, plane Couette flow is known to exhibit a rich a
   \item Up to $Re \approx 415$, we have sustained spots and stripes.
   \item For $Re > 415$, we have fully-developed turbulence.
 \end{itemize}
-This is an open and active research area. The behaviour undoubtedly relates to transient dynamics in Navier--Stokes.
+In this chapter, we wish to understand transient growth. This is the case when small perturbations can grow up to some visible, significant size, and then die off.
 
-Continuous spectrum also can lead to transient dynamics, because normal modes are not complete. This is fundamentally related to the non-normality of operators.
+\subsection{A toy model}
+Let's try to understand transient dynamics in a finite-dimensional setting. Ultimately, the existence of transient growth is due to the \emph{non-normality} of the operator.
 
-Recall that a matrix $A$ is \emph{normal}\index{normal operator} iff $A^\dagger A = A A^\dagger$. Of course, self-adjoint matrices are examples of normal operators. The spectral theorem applies only to normal operators, which says there is a complete basis of orthonormal eigenvectors.
+Recall that a matrix $A$ is \emph{normal}\index{normal operator} iff $A^\dagger A = A A^\dagger$. Of course, self-adjoint matrices are examples of normal operators. The spectral theorem says a normal operator has a complete basis of orthonormal eigenvectors, which is the situation we understand well. However, if our operator is not normal, then we don't necessarily have a basis of eigenvectors, and even if we do, they need not be orthonormal.
 
-The key idea is that if eigenvectors are non-orthogonal, then transient growth can occur in stable systems. Suppose we have a vector $f$ that can be written as $\Phi_1 - \Phi_2$, where $\Phi_1$ and $\Phi_2$ are eigenvectors. Suppose $\Phi_2$ decays faster than $\Phi_1$. Then the magnitude of $f$ can increase transiently.
+So suppose we are in a $2$-dimensional world, and we have two eigenvectors that are very close to each other:
+\begin{center}
+  \begin{tikzpicture}[xscale=1.5]
+    \draw [-latex'] (0, 0) -- (0, 2) node [pos=0.5, right] {$\Phi_2$};
+    \draw [-latex'] (0, 0) -- (-0.3, 2) node [pos=0.5, left] {$\Phi_1$};
 
-% insert picture?
+    \draw [-latex', mred, semithick] (0, 0) -- (0.3, 0);
+  \end{tikzpicture}
+\end{center}
+Now suppose we have a small perturbation given by $\boldsymbol\varepsilon = (\varepsilon, 0)^T$. While this perturbation is very small in magnitude, if we want to expand this in the basis $\Phi_1$ and $\Phi_2$, we must use coefficients that are themselves quite large. In this case, we might have $\boldsymbol\varepsilon = \Phi_2 - \Phi_1$, as indicated in red in the diagram above.
 
-We can consider a toy model, described by the linear ODE
+Let's let this evolve in time. Suppose both $\Phi_1$ and $\Phi_2$ are stable modes, but $\Phi_1$ decays much more quickly than $\Phi_2$. Then after some time, the perturbation will grow like
+\begin{center}
+  \begin{tikzpicture}[xscale=1.5]
+    \draw [-latex'] (0, 0) -- (0, 1.8);
+    \draw [-latex'] (0, 0) -- (-0.15, 1);
+
+    \draw [-latex', mred, semithick] (0, 0) -- (0.15, 0.8);
+    \draw [-latex', mred, opacity=0.5] (0, 0) -- (0.22, 0.5);
+    \draw [-latex', mred, opacity=0.5] (0, 0) -- (0.28, 0.2);
+    \draw [-latex', mred, opacity=0.5] (0, 0) -- (0.3, 0);
+  \end{tikzpicture}
+\end{center}
+Note that the perturbation grows to reach a finite, large size, until it vanishes again as the $\Phi_1$ component goes away.
+
+Let's try to put this down more concretely in terms of equations. We shall consider a linear ODE of the form
 \[
-  \dot{\mathbf{x}} = A \mathbf{x},
+  \dot{\mathbf{x}} = A \mathbf{x}.
 \]
-with
+We first begin by considering the matrix
 \[
   A =
   \begin{pmatrix}
     0 & 1\\
     0 & 0
-  \end{pmatrix}.
+  \end{pmatrix},
 \]
-We can check that $A$ is not normal. Indeed,
+which does \emph{not} exhibit transient growth. We first check that $A$ is not normal. Indeed,
 \[
   AA^T
   \begin{pmatrix}
@@ -2117,7 +2188,9 @@ We can check that $A$ is not normal. Indeed,
     0 & 1
   \end{pmatrix} = A^T A.
 \]
-This has a repeated eigenvalue of $0$ with a \emph{single} eigenvector of $(1\; 0)$. We can write the equations more explicitly as
+Note that the matrix $A$ has a repeated eigenvalue of $0$ with a \emph{single} eigenvector of $(1\; 0)$.
+
+To solve this system, write the equations more explicitly as
 \begin{align*}
   \dot{x}_1 &= x_2\\
   \dot{x_2} &= 0.
@@ -2131,7 +2204,7 @@ then the solution is
   x_1(t) &= x_{20}t + x_{10}\\
   x_2(t) &= x_{20}.
 \end{align*}
-This exhibits linear algebraic growth instead of the familiar exponential growth.
+This exhibits linear, algebraic growth instead of the familiar exponential growth.
 
 Let's imagine we perturb this system slightly (perhaps associated with finite, yet large Reynolds number effect). For $\varepsilon > 0$, set
 \[
@@ -2256,7 +2329,7 @@ So we see that we can have very large transient growth for a small $\varepsilon$
 
 We can think of this $\varepsilon$ as describing the (tiny) viscosity of a fluid, which is $\sim \frac{1}{Re}$. Thus, for such a fluid, we expect the transient growth to be $\sim Re^2$, which can be huge!
 
-Notice that this understanding critically depends on the choice of norm. 5 insert more
+Notice that this understanding critically depends on the choice of norm. % insert more
 
 How about the case where there is an unstable mode? We can consider a perturation of the form
 \[
@@ -2268,7 +2341,7 @@ How about the case where there is an unstable mode? We can consider a perturatio
 \]
 with eigenvectors
 \[
-  \mathbf{e}_1 = 
+  \mathbf{e}_1 =
   \begin{pmatrix}
     1 \\0
   \end{pmatrix},\quad
@@ -2290,24 +2363,237 @@ for all $x, y$. For a real matrix with real eigenvalues, $A^\dagger$ and $A$ sha
     \varepsilon_1 + \varepsilon_2 \\ 1
   \end{pmatrix}
 \]
-Note that this is orthogonal to $\mathbf{e}_2$. 
+Note that this is orthogonal to $\mathbf{e}_2$.
 
 With these in mind, let's go and actually do some fluids.
 
 \subsection{Orr-Sommerfeld and Squire equations}
 For this chapter, we will use the ``engineering'' coordinate system, so that the $y$ direction is the vertical direction. The $x, y, z$ directions are known as the \term{streamwise direction}, \term{wall-normal direction} and \term{spanwise direction} respectively.
 
-Consider small perturbations to a base shear flow $U(y)$ with a small perturbation $(u, v, w)$.  We have equations
+Consider small perturbations to a base shear flow $U(y)$ with a small perturbation $(u, v, w)$. We have equations
 \begin{align*}
   \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} + \frac{\partial w}{\partial z} &= 0\\
   \frac{\partial u}{\partial t} + U \frac{\partial u}{\partial x} + v U' &= - \frac{\partial p}{\partial x} + \frac{1}{Re}\nabla^2 u\\
   \frac{\partial v}{\partial t} + U \frac{\partial v}{\partial x} &= - \frac{\partial p}{\partial y} + \frac{1}{Re} \nabla^2 v\\
-  \frac{\partial w}{\partial t} + U \frac{\partial w}{\partial x} &= - \frac{\partial p}{\partial z}\\
+  \frac{\partial w}{\partial t} + U \frac{\partial w}{\partial x} &= - \frac{\partial p}{\partial z}
 \end{align*}
 Differentiating the second, third and fourth equation with respect to $x, y$ and $z$ respectively and applying incompressibility, we obtain
 \[
   \nabla^2 p = -2U' \frac{\partial v}{\partial x}.
 \]
+By applying $\nabla^2$ to the third equation, we get an equation for the wall-normal velocity:
+\[
+  \left[ \left(\frac{\partial}{\partial t} + U \frac{\partial}{\partial x}\right)\nabla^2 - U'' \frac{\partial}{\partial x} - \frac{1}{Re}\nabla^4\right] v = 0.
+\]
+We also want to consider the wall-normal vorticity
+\[
+  \omega_y = \frac{\partial u}{\partial z} - \frac{\partial w}{\partial x} = \eta.
+\]
+By taking $\frac{\partial}{\partial z}$ of the second equation and then subtracting the $\frac{\partial}{\partial x}$ of the last, we then get the equation
+\[
+  \left[\frac{\partial}{\partial t} + U \frac{\partial}{\partial x} - \frac{1}{Re} \nabla^2\right] \eta = - U' \frac{\partial v}{\partial z}.
+\]
+We impose boundary conditions $v = v' = \eta = 0$ on the boundary. 
 
+This coupled system can be used to investigate flow stability:
+\begin{align*}
+  v(x, y, z, t) &= \hat{v}(y) e^{i(\alpha x + \beta z - \omega t)}\\
+  \eta(x, y, z, t) &= \hat{\eta}(y) e^{i(\alpha x + \beta z - \omega t)}.
+\end{align*}
+We can then derive the \term{Orr-Sommerfeld equation} and \term{Squire} equation with boundary conditions $\hat{v} = \mathcal{D} \hat{v} = \eta = 0$:
+\begin{align*}
+  \left[(-i\omega + i \alpha U)(\mathcal{D}^2 - k^2) - i \alpha U'' - \frac{1}{Re} (\mathcal{D}^2 - k^2)^2\right] \hat{v} &= 0\\
+  \left[(-i\omega + i \alpha U) - \frac{1}{Re} (\mathcal{D}^2 - k^2) \right] \hat{\eta} &= -i\beta U' \hat{v}\\
+  k^2 &= \alpha^2 + \beta^2.
+\end{align*}
+Note that if we set $Re = \infty$, then this reduces to the Rayleigh equation. Moreover, there is a factor of $i$ different between the operators that involve $\frac{1}{Re}$ and those that don't.
+
+There are typically two classes of modes in the Squire equation:
+\begin{enumerate}
+  \item The Orr-Sommerfeld modes, where the vertical vorticity particular integral slaved to velocity: $\{\hat{v}_n, \hat{\eta}_n^p, \omega_n\}$.
+  \item The Squire modes, associated with zero vertical velocity: $\{\hat{v} = 0, \hat{\eta}_m, \omega_m\}$.
+\end{enumerate}
+
+The Squire modes are always damped. Indeed, set $\hat{v} = 0$, write $\omega = \alpha c$, multiply by $\eta^*$ and integrate across the domain:
+\[
+  c \int_{-1}^1 \hat{\eta}^* \hat{\eta} \;\d y = \int_{-1}^1 U \hat{\eta}^* \eta \;\d y - \frac{i}{\alpha Re} \int_{-1}^1 \hat{\eta}^* (k^2 - \mathcal{D}^2) \hat{\eta}\;\d y.
+\]
+Taking the imaginary part and integrating by parts, we obtain
+\[
+  c_i \int_{-1}^1 |\hat{\eta}|^2 \;\d y = - \frac{1}{\alpha Re} \int_{-1}^1 |\mathcal{D} \hat{\eta}|^2 + k^2 |\hat{\eta}|^2 + k^2 |\hat{\eta}|^2 \;\d y < 0.
+\]
+So we see that the Squire modes are always stable, and instability in vorticity comes from the forcing due to the velocity.
+
+It is convenient to express the various operators in compact vector form. Define
+\[
+  \hat{\mathbf{q}} =
+  \begin{pmatrix}
+    \hat{\mathbf{v}}\\\hat{\eta}
+  \end{pmatrix},\quad
+  \hat{\mathbf{q}}_{OS} =
+  \begin{pmatrix}
+    \hat{\mathbf{v}}\\ \hat{\eta}^p
+  \end{pmatrix},\quad 
+  \hat{\mathbf{q}}_{SQ} =
+  \begin{pmatrix}
+    0 \\ \hat{\eta}
+  \end{pmatrix}.
+\]
+We can define the operators
+\[
+  \mathbf{M} = 
+  \begin{pmatrix}
+    k^2 - \mathcal{D}^2 & 0\\
+    0 & 1
+  \end{pmatrix},\quad
+  \mathbf{L} =
+  \begin{pmatrix}
+    \mathcal{L}_{0S} & 0\\
+    i \beta U' & \mathcal{L}_{SQ}
+  \end{pmatrix},
+\]
+where
+\begin{align*}
+  \mathcal{L}_{OS} &= i\alpha U(k^2 - \mathcal{D}^2) + i \alpha U' + \frac{1}{Re} (k^2 - \mathcal{D}^2)^2\\
+  \mathcal{L}_{SQ} &= i\alpha U + \frac{1}{Re}(k^2 - \mathcal{D})^2.
+\end{align*}
+We can then write our equations as
+\[
+  \mathbf{L}\hat{\mathbf{q}} = i \omega M \hat{\mathbf{q}}.
+\]
+Equivalently, defining $\mathbf{L}_1 = \mathbf{M}^{-1} \mathbf{L}$, this is
+\[
+  \mathbf{L}_1 \hat{\mathbf{q}} = i \omega \hat{\mathbf{q}}.
+\]
+This now looks like an eigenvalue problem.
+
+We now see that the Orr--Sommerfeld are both eigenmodes, and can just be separately classified. Note that the eigenmodes of the Orr-Sommerfeld operators are in general not orthogonal, and has both discrete and continuous spectrum. The fundamental questions which we want to ask are:
+\begin{itemize}
+  \item Is the Orr-Sommerfeld operator non-self-adjoint?
+  \item How do the eigenfunctions relate to adjoint eigenfunctions?
+  \item Does adjoint help us to understand optimal transient growth.
+\end{itemize}
+Recall that the notion of an adjoint has to be defined with respect to an inner product. We use the $L^2$ inner product, so that
+\[
+  \int_{-1}^1 \hat{\xi}^* \mathcal{L}_{OS} \hat{v} \;\d y = \int_{-1}^1 \hat{v} (\mathcal{L}_{OS}^\dagger \hat{\xi})^*\;\d y.
+\]
+Computing $\mathcal{L}_{OS}^\dagger$ is just an exercise in integration by parts. Using the boundary conditions, we have
+\begin{align*}
+  \int_{-1}^1 \hat{\xi}^* [U(\mathcal{D}^2 - \alpha^2)\hat{v} - U'' \hat{v}]\;\d y &= \int_{-1}^1 \hat{v}(\hat{\xi}^*)'' \;\d y - \int_{-1}^1 \hat{\xi}^* (\alpha^2 U + U'') \hat{v}\;\d y\\
+  &= \int_{-1}^1 \hat{v} [U(\mathcal{D}^2 - \alpha^2) \hat{\xi}^* + 2 U' \mathcal{D} \hat{\xi}^*]\;\d y.
+\end{align*}
+We can similarly integrate the $Re$ term by parts $4$ times to obtain
+\[
+  \frac{1}{Re} \int_{-1}^1 \hat{\xi}^* \mathcal{D}^4 \hat{v}\;\d y = \frac{1}{Re} \int_{-1}^1 \hat{v} \mathcal{D}^4 \hat{\xi}^* \;\d y.
+\]
+Here we need to impose the boundary condition that both $\hat{v}$ and $\mathcal{D}\hat{v}$ vanish at the boundary (and same for $\hat{\xi}$, of course). Therefore, remembering the complex conjugate, the adjoint Orr--Sommerfeld equation is
+\[
+  \left[(-i\omega + i \alpha U) (\mathcal{D}^2 - \alpha^2) + 2i\alpha U' \mathcal{D} + \frac{1}{Re} ( \mathcal{D}^2 - \alpha^2)^2\right] \hat{\xi} = 0.
+\]
+Note that we have a different advection term, a relative sign of diffusion, and time-dependence switched.
+
+From the definitions of the direct and adjoint Orr-Sommerfeld operators, adjoint eigenvalues are complex conjugates of the direct eigenvalues. Indeed, a direct eigenfunction is a $\hat{v}_p$ such that
+\[
+  \mathcal{L}_{OS} \hat{v} = i\omega_p (\alpha^2 - \mathcal{D}^2) \hat{v},
+\]
+while an adjoint eigenfunctino $\hat{\xi}_p$ is one such that
+\[
+  \mathcal{L}_{OS}^\dagger \hat{\xi}_q = i\omega_q (\mathcal{D}^2 - \alpha^2) \hat{\xi}_q.
+\]
+So we have
+\[
+  0 = \int_{-1}^1 \hat{\xi}_q^* \mathcal{L}_{OS} \hat{v}_p\;\d y  - \int_{-1}^1 \hat{v}_p (\mathcal{L}_{OS}^\dagger \hat{\xi}_q)^* \;\d y = (\omega_p - \omega_q)^* \int_{-1}^1 \hat{\xi}_q^* (\alpha^2 - \mathcal{D}^2) \hat{v}_p \;\d y.
+\]
+When defined this way, we now have identified a \emph{weighted} inner product such, provided the eigenvectors are normalized,
+\[
+  \int_{-1}^1 \hat{\xi}_q^*( \alpha^2 - \mathcal{D}62) \hat{v}_p \;\d y = \delta_{pq}.
+\]
+This is called the \term{bi-orthogonality condition}. Note that the Orr-Sommerfeld eigenfunctions are not orthogonal to each other (leading to transient growth). However, they are orthogonal to the eigenfunctions of the \emph{adjoint} Orr-Sommerfeld operator.
+
+What is the physical mechanism that gives rise to transient growth? The equation for $z$-direction vorticity
+\[
+  \omega_3 = \frac{\partial v}{\partial x} - \frac{\partial u}{\partial y}
+\]
+is given by
+\[
+  \frac{\partial \omega_3}{\partial t} + U \frac{\partial \omega_3}{\partial x} = U' \left(\frac{\partial u}{\partial x} + \frac{\partial v}{\partial y}\right) + v U'' + \frac{1}{Re} \nabla^2 \omega_3.
+\]
+Assuming constant shear and $\beta = 0$ at high Reynolds number, we have $\frac{\D \omega_3}{\D t} \simeq 0$. But remember that Stokes theorem tells us
+\[
+  \int_\mathcal{D} [\nabla \times \mathbf{u}] \;\d A = \int_{\partial D} \mathbf{u} \cdot \d \ell.
+\]
+Thus, if we have vortices that are initially tilted into the shear, then this gets advected by the mean shear. In this process, the perimeter of each vortex sheet gets smaller, then grows again. Since $\int_{\partial \mathcal{D}} \mathbf{u} \cdot \d \ell$ is constant, we know $\mathbf{u}$ grows transiently, and then vanishes again.
+
+Another mechanism is lift-up. 
+
+Recall the Squire equation in the large Re limit:
+\[
+  \left[\frac{\partial}{\partial t} + i \alpha U \right] \tilde{\eta}(y, t) =  -i \beta U' \tilde{v}(y, t),
+\]
+where we set
+\[
+  v = \tilde{v}(y, t) e^{i\alpha x + i \beta z},\quad \eta = \tilde{\eta}(y, t) e^{i\alpha x + i \beta z}.
+\]
+We can formally integrate
+\[
+  \tilde{\eta} = \tilde{\eta}_0 e^{-i\alpha Ut} - i \beta U' e^{-i\alpha Ut} \int_0^t \tilde{v}(y, \tau)e^{i \alpha U\tau} \;\d \tau.
+\]
+Let's suppose that $\alpha = 0$. Then the evolution is completely dominated by wall-normal velocity. We make similar assumptions for the Rayleigh equation, which was
+\[
+  \left[\left(\frac{\partial}{\partial t} + i \alpha U\right) (\mathcal{D}^2 - k^2) - i \alpha U''\right] \tilde{v}(y, t) = 0.
+\]
+If $\alpha = 0$, then $\tilde{v} = \tilde{v}_0$ is a constant, and so $\tilde{\eta} = \tilde{\eta}_0 - i \beta U' \tilde{v}_0 t$. This is an \emph{algebraic} instability. Such dynamics can be associated with streamwise rolls with purely $\omega_1$ \emph{lifting up} fluid. 
+
+We need to be more carefuly for localized disturbances. Consider the ``total'' vertical velocity $\bar{v} = \int_{-\infty}^\infty v\;\d x$. if the disturbance is local, then it is reasonable to assume this is convergent. To understand this, consider
+\[
+  \nabla^2 p = - 2U' \frac{\partial v}{\partial x}.
+\]
+Integrating over $x$, we have
+\[
+  \nabla^2 \bar{p} = 0.
+\]
+But since the perturbation is localized, this implies $\bar{p} = 0$. Looking at the equation
+\[
+  \frac{\partial u}{\partial t} + U \frac{\partial u}{\partial x} + v U' = - \frac{\partial p}{\partial x}.
+\]
+So we find that
+\[
+  \frac{\partial \bar{u}}{\partial t} = - \bar{v} U'.
+\]
+The equation
+\[
+  \frac{\partial v}{\partial t} + U \frac{\partial v}{\partial x} = - \frac{\partial p}{\partial y}
+\]
+gives us
+\[
+  \frac{\partial \bar{v}}{\partial t} = - \frac{\partial \bar{p}}{\partial y} = 0.
+\]
+So we know $\bar{v} = \bar{v}_0$ is constant. Then
+\[
+  \bar{u} = \bar{u}_0 - \bar{v}_0 U' t.
+\]
+So the velocity integral also increases linearly. But this does not mean the average value of $u$ is increasing. But we need to be careful as the domain may grow too. We assume that the length of the domain grows as $\dot{\ell} \propto U_{max} - U_{min}$. Then $\ell = \Delta U t$.
+
+Let's now consider the energy. We let
+\[
+  f(x, t) = u(x, t),
+\]
+Suppose $u$ is localled at $[-\delta, \delta]$ at $t = 0$. We can then set
+\[
+  g(x) =
+  \begin{cases}
+    1 & U_{min} t - \delta < x < U_{max} t + \delta\\
+    0 & \text{otherwise}
+  \end{cases}.
+\]
+Then applying Cauchy--Schwarz, we have
+\[
+  \bar{u}^2 \leq [\Delta U + t + 2\delta] \int_{-\infty}^\infty u^2 \;\d x.
+\]
+So we have
+\[
+  E \geq \frac{[\bar{u}]^2}{2 \Delta U}t = \frac{[\bar{v}_0 U']^2 t}{2 \Delta U}
+\]
+provided $t \gg \frac{2\delta}{\Delta U}$. Therefore energy grwos at least as fast as $t$, but not necessarily as fast as $t^2$.
 \printindex
 \end{document}

@@ -1582,7 +1582,7 @@ In general, let $e_1$ and $e_2$ be $2$ edges with the same endvertices. Then we 
 \[
   I(\vec{e}) = I(\vec{e}_1) + I(\vec{e}_2).
 \]
-Similarly, resistances in series add. Let $v$ be a node of degree $2$ and let $v_1$ and $v_2$ be its $2$ neighbours. Then we can replace these $2$ edges by a single edge of resistacne $r_1 + r_2$. We can check Kirchoff's and Ohm's law with
+Similarly, resistances in series add. Let $v$ be a node of degree $2$ and let $v_1$ and $v_2$ be its $2$ neighbours. Then we can replace these $2$ edges by a single edge of resistance $r_1 + r_2$. We can check Kirchoff's and Ohm's law with
 \[
   I(\vec{v_1 v_2}) = I(\vec{v_1 v}) + I(\vec{vv_2}).
 \]
@@ -1708,7 +1708,7 @@ We now provide an alternative characterization of the effective resistance.
   We now use Cauchy--Schwarz to say
   \begin{align*}
     \left(\sum_{e \in \Pi_k} (\theta(e))^2 r(e)\right) \left(\sum_{e \in \Pi_k}c(e)\right) &\geq \left(\sum_{e \in \Pi_k} |\theta(e) \sqrt{r(e) c(e)} \right)^2\\
-    &= \left(\sum_{e \in \Pi_k} |\theta(e)|\right)^2.
+    &= \left(\sum_{e \in \Pi_k} |\theta(e)|\right)^3.
   \end{align*}
   The result follows if we show that the final sum is $\geq \|\theta\|^2i = 1$.
 
@@ -1741,5 +1741,163 @@ There is also an upper bound of the form $R_{eff}(a, z) \leq c \log n$. So this 
   \]
 \end{proof}.
 
+\begin{prop}
+  Let $X$ be an irreducible Markov chain on a finite state space. Let $\tau$ be a stopping time such that $\P_a(X_\tau = a) = 1$ and $\E_a[\tau] < \infty$ for some $a$ in the state space. Then
+  \[
+    G_\tau(a, x) = \pi(x) \E_a[\tau]. % invariant distribution. % G(a, x) is the number of times we hit x before tau happens
+  \]
+\end{prop}
+A special case of this result was proven in IB Markov Chain, where $\tau$ was taken to be the first return time to $a$. The proof of this is very similar, and we shall not repeat it.
+
+We can now prove the commute-time identity.
+\begin{thm}[Commute time identity]\index{commute time identity}
+  Let $X$ be a reversible Markov chain on a finite state space. Then for all $a, b$, we have
+  \[
+    \E_a [\tau_b] + \E_b[ \tau_a] = c(G) R_{eff}(a, b),
+  \]
+  where
+  \[
+    c(G) = 2 \sum_e c(e).
+  \]
+\end{thm}
+
+\begin{proof}
+  Let $\tau_{a,b}$ be the first time we hit $a$ after we hit $b$. Then $\P_a(X_{\tau_{a, b}} = a) = 1$. By the proposition, we have
+  \[
+    G_{\tau_{a, b}}(a, a) = \pi_(a) \E_a[\tau_{a,b}].
+  \]
+  Since starting from $a$, the number of times we come back to $A$ by $\tau_{a, b}$ is the same as up to time $\tau_b$, we get
+  \[
+    G_{\tau_{a,b}}(a, a) = G_{\tau_b}(a, a) = c(a) R_{eff}(a, b).
+  \]
+  Combining the two, we get
+  \[
+    \pi(a) \E_a[\tau_{a, b}] = c(a) R_{eff}(a, b).
+  \]
+  Thus, the result follows.
+\end{proof}
+In particular, from the commute-time identity, we see that the effective resistance satisfies the triangle inequality, and hence defines a metric on any graph.
+
+\subsection{Infinite graphs}
+Let's now see how we can define effective resistance on infinite graphs.
+
+Let $G$ be an infinite connected weighted graph with conductances $(c(e))_e$. Let $0$ be a distinguished vertex. 
+
+Let $(G_k = (V_k, E_k))_k$ be an \term{exhaustion} of $G$ by finite graphs, i.e.
+\begin{itemize}
+  \item $V_k \subseteq V_{k + 1}$ for all $k$;
+  \item $0 \in V_k$ for all $k$;
+  \item $\bigcup_k V_k = V$;
+  \item $E_k$ is the set of edges of $E$ with both end points in $V_k$.
+\end{itemize}
+
+Let $G_n^*$ be the graph obtained by gluing all the vertices of $V \setminus V_n$ into a single point $z_n$ and setting
+\[
+  c(x, z_n) = \sum_{z \in V \setminus V_n} c(x, z)
+\]
+for all $x \in V_n$. Now observe that $R_{eff}(0, z_n; G_n^*)$ is a non-decreasing function of $n$ (Rayleigh). So the limit as $n \to \infty$ exists.
+
+We set \index{$R_{eff}(0, \infty)$}
+\[
+  R_{eff}(0, \infty) = \lim_{n \to \infty} R_{eff}(0, z_n; G_n*).
+\]
+This is independent of the choice of exhaustion by Rayleigh. % or by interlacing.
+
+Now we have
+\[
+  \P_0(\tau_0^+ = \infty) = \lim_{n \to \infty} \P_0(\tau_{z_n} < \tau_0^+) = \frac{1}{c(0) R_{eff}(0, z_n; G_n^*)} = \frac{1}{c(0) R_{eff}(0, \infty)}.
+\]
+\begin{defi}[Flow]\index{flow}
+  Let $G$ be an infinite graph. A \emph{flow} $\theta$ from $0$ to $\infty$ is an anti-symmetric function on the edges such that $\div \theta(x) = 0$ for all $x \not= 0$.
+\end{defi}
+
+\begin{thm}
+  Let $G$ be an infinite connected graph with conductances $(c(e))_e$. Then
+  \begin{enumerate}
+    \item Random walk on $G$ is recurrent iff $R_{eff}(0, \infty) = \infty$.
+    \item The random walk is transient iff there exists a unit flow $i$ from $0$ to $\infty$ of finite energy
+      \[
+        \mathcal{E}(i) = \sum_e (i(e))^2 r(e).
+      \]
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}
+  The first part is immediate since
+  \[
+    \P_0(\tau_0^+ = \infty) = \frac{1}{c(0) R_{eff}(0, \infty)}.
+  \]
+  To prove the second part, let $\theta$ be a unit flow from $0$ to $\infty$ of finite energy. We want to show that the effective resistance is finite, and it suffices to extend Thompson's principle to infinite graphs.
+
+  Let $i_n$ be the unit current flow from $0$ to $z_n$ in $G_n^*$. Let $v_n(x)$ be the associated potential. Then by Thompson,
+  \[
+    R_{eff}(0, z_n; G_n^*) = \mathcal{E}(i_n).
+  \]
+  Let $\theta_n$ be the restriction of $\theta$ to $G_n^*$. Then this is a unit flow on $G_n^*$ from $0$ to $z_n$. By Thompson, we have
+  \[
+    \mathcal{E}(i_n) \leq \mathcal{E}(\theta_n) \leq \mathcal{E}(\theta) < \infty.
+  \]
+  So
+  \[
+    R_{eff}(0, \infty) = \lim_{n \to \infty} \mathcal{E}(i_n).
+  \]
+  So by the first part, the flow is transient.
+
+  Conversely, if the random walk is transient, we want to construct a unit flow from $0$ to $\infty$ of finite energy. The idea is to define it to be the limit of $(i_n)(x, y)$.
+  
+  By the first part, we know $R_{eff}(0, \infty) = \lim \mathcal{E}(i_n) < \infty$. So there exists $M > 0$ such that $\mathcal{E}(i_n) \leq M$ for all $n$. Starting from $0$, let $Y_n(x)$ be the number of visits to $x$ up to time $\tau_{z_n}$. Let $Y(x)$ be the total number of visits to $x$. Then $Y_n(x) \nearrow Y(x)$ as $n \to \infty$ almost surely.
+
+  By monotone convergence, we get that
+  \[
+    \E_0[Y_n(x)] \nearrow \E_0[Y(x)] < \infty,
+  \]
+  since the walk is transient. On the other hand, we know
+  \[
+    E_0[Y_n(x)] = G_{\tau_{z_n}}(0, x).
+  \]
+  It is then easy to check that $\frac{G_{\tau_{z_n}}(0, x)}{c(x)}$ is a harmonic function outside of $0$ and $z_n$ with value $0$ at $z_n$. So it has to be equal to the voltage $v_n(x)$. So
+  \[
+    v_n(x) = \frac{G_{\tau_{z_n}}(0, x)}{c(x)}.
+  \]
+  Therefore there exists a function $v$ such that
+  \[
+    \lim_{n \to \infty} c(x) v_n(x) = c(x) v(x).
+  \]
+  We define
+  \[
+    i(x, y) = c(x, y) (v(x) - v(y)) = \lim_{n \to \infty} c(x, y) (v_n(x) - v_n(y)) = \lim_{n \to \infty} i_n(x, y).
+  \]
+  Then by dominated convergence, we know $\mathcal{E}(i) \leq M$, and also $i$ is a flow from $0$ to $\infty$.
+\end{proof}
+
+Note that this connection with electrical networks only works for reversible Markov chains.
+
+\begin{cor}
+  Let $G' \subseteq G$ be connected graphs.
+  \begin{enumerate}
+    \item If a random walk on $G$ is recurrent, then so is random walk on $G'$.
+    \item If random walk on $G'$ is transient, so is random walk on $G$.
+  \end{enumerate}
+\end{cor}
+
+\begin{thm}[Polya's theorem]\index{Polya's theorem}
+  Random walk on $\Z^2$ is recurrent and transient on $\Z^d$ for $d \geq 3$.
+\end{thm}
+
+\begin{proof}[Sketch]
+  For $d = 2$, if we glue all vertices at distance $n$ from $0$, then
+  \[
+    R_{eff}(0, \infty) \geq \sum_{i = 1}^{n - 1} \frac{1}{8i - 4} \geq c \cdot \log n
+  \]
+  using the parallel and series laws. So $R_{eff}(0, \infty) = \infty$. So we are recurrent.
+
+  For $d = 3$, we can construct a flow as follows --- let $S$ be the sphere of radius $\frac{1}{4}$ centered at the origin. Given any edge $\mathbf{e}$, take the unit square centered at the midpoint $\mathbf{m}_e$ of $\mathbf{e}$ and has normal $\mathbf{e}$. We define $|\theta(\mathbf{e})|$ to be the area of the radial projection on the sphere, with positive sign iff $\bra \mathbf{m}_e, \mathbf{e} \ket > 0$.
+
+  One checks that $\theta$ satisfies Kirchoff's node law outside of $0$. Then we find that
+  \[
+    \mathcal{E}(\theta) \leq C \sum_n n^2 \cdot \left(\frac{1}{n^2}\right)^2 < \infty,
+  \]
+  since there are $\sim n^2$ edges at distance $n$, and the flow has magnitude $\sim \frac{1}{n^2}$.
+\end{proof}
 \printindex
 \end{document}
