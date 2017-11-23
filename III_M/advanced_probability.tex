@@ -5,6 +5,7 @@
 \def\nyear {2017}
 \def\nlecturer {M. Lis}
 \def\ncourse {Advanced Probability}
+\def\nnotready {}
 
 \input{header}
 
@@ -1966,7 +1967,7 @@ Brownian motion was first observed by the botanist Robert Brown in 1827, when he
   \end{enumerate}
   If $B_0 = 0$, then we call it a \term{standard Brownian motion}.
 \end{defi}
-We always assume our Brownian motion is standard. 
+We always assume our Brownian motion is standard.
 
 \begin{thm}[Wiener's theorem]\index{Wiener's theorem}
   There exists a Brownian motion on some probability space.
@@ -2102,8 +2103,8 @@ The idea is to approximate $s$ from above and then use continuity.
     B_{t + s} - B_s = \lim_{n \to \infty} B_{t + s_n} - B_{s_n}
   \]
   almost surely. Now each of $B_{t + s_n} - B_{s_n}$ is independent of $\mathcal{F}_s^+$, and hence so is the limit.
-%  
-%  Let $F$ be a real-valued continuous bounded function on $(\R^d)^m$, and let $A \in \mathcal{F}_{s+}$.  Then by dominated convergence, we have
+%
+%  Let $F$ be a real-valued continuous bounded function on $(\R^d)^m$, and let $A \in \mathcal{F}_{s+}$. Then by dominated convergence, we have
 %  \[
 %    \E F (B_{t_1 + s} - B_s, \ldots, B_{t_m - s} - B_s) \mathbf{1}_A = \lim_{n \to \infty} \E F(B_{t_1 - s_n} - B_{s_n}, \ldots, B_{t_m - s_n} - B_{s_n}) \mathbf{1}_A.
 %  \]
@@ -2235,7 +2236,7 @@ Of course, the fact that we are reflecting is not important. We can apply any op
 \begin{proof}
   Consider the stopping time $T$ given by the first hitting time of $b$. Since $S_\infty = \infty$, we know $T$ is finite almost surely. Let $(\tilde{B}_t)_{t\geq 0}$ be the reflected process. Then
   \[
-    \{S_t \geq b, B_t \leq a\} = \{\tilde{B}_t  \geq 2b - a \}.\qedhere
+    \{S_t \geq b, B_t \leq a\} = \{\tilde{B}_t \geq 2b - a \}.\qedhere
   \]
 \end{proof}
 
@@ -2307,6 +2308,7 @@ There is also an alternative characterization of harmonic functions that involve
       \]
   \end{enumerate}
 \end{lemma}
+The latter two properties are known as the \term{mean value property}.
 
 \begin{proof}
   IA Vector Calculus.
@@ -2320,5 +2322,201 @@ There is also an alternative characterization of harmonic functions that involve
   for any $x \in \R^d$ and $t \geq 0$. Then the process $(u(B_t))_{t \geq 0}$ is a martingale with respect to $(\mathcal{F}_{t+})_{t \geq 0}$.
 \end{thm}
 
+To prove this, we need to prove a side lemma:
+\begin{lemma}
+  If $X$ and $Y$ are independent random variables in $\R^d$, and $X$ is $\mathcal{G}$-measurable. If $f: \R^d \times \R^d \to \R$ is such that $f(X, Y)$ is integrable, then
+  \[
+    \E(f(X, Y) \mid \mathcal{G}) = \E f(z, Y)|_{z = X}.
+  \]
+\end{lemma}
+
+\begin{proof}
+  Use Fubini and the fact that $\mu_{(X, Y)} = \mu_X \otimes \mu_Y$.
+\end{proof}
+
+Observe that if $\mu$ is a probability measure in $\R^d$ such that the density of $\mu$ with respect to the Lebesgue measure depends only on $|x|$. Then if $u$ is harmonic, the mean value property implies
+\[
+  u(x) = \int_{\R^d} u(x + y) \;\d \mu(y).
+\]
+\begin{proof}
+  Let $t \geq s$. Then
+  \begin{align*}
+    \E (u (B_t) \mid \mathcal{F}_{s+}) &= \E(u(B_s + (B_t - B_s)) \mid \mathcal{F}_{s+})\\
+    &= \E(z + B_t - B_s) \mid _{Z = B_s}\\
+    &= u(z)|_{z = B_s}\\
+    &= u(B_s).
+  \end{align*}
+\end{proof}
+
+In fact, the following more general result is true:
+\begin{thm}
+  Let $f: \R^d \to \R$ be twice continuously differentiable with bounded derivatives. Then, the processes $(X_t)_{t \geq 0}$ defined by
+  \[
+    X_t = f(B_t) - \frac{1}{2} \int_0^t \Delta f(B_s)\;\d s
+  \]
+  is a martingale with respect to $(\mathcal{F}_{t+})_{t \geq 0}$.
+\end{thm}
+We shall not prove this, but we can justify this as follows: suppose we have a sequence of independent random variables $\{X_1, X_2, \ldots\}$, with
+\[
+  \P(X_i = \pm 1) = \frac{1}{2}.
+\]
+Let $S_n = x_1 + \cdots + x_n$. Then
+\[
+  \E(f(S_{n + 1}) \mid S_1, \ldots, S_n) - f(S_n) = \frac{1}{2} (f(S_n - 1) + f(S_n + 1) - 2 f(s_n)) \equiv \frac{1}{2} \tilde{\Delta} f(S_n),
+\]
+and we see that this is the discretized second derivative. So
+\[
+  f(S_n) - \frac{1}{2} \sum_{i = 0}^{n - 1} \tilde{\Delta} f(S_i)
+\]
+is a martingale.
+
+\subsection{The Dirichlet problem}
+We first write down a technical definition.
+\begin{defi}[Poincar\'e cone condition]\index{Poincar\'e cone condition}
+  We say a domain $D$ satisfies the \emph{Poincar\'e cone condition} if for any $x \in \partial D$, there is an open coin $C$ based at $X$ such that
+  \[
+    C \cap D \cap B(x, \delta) = \emptyset
+  \]
+  for some $\delta \geq 0$.
+\end{defi}
+
+\begin{eg}
+  If $D = \R^2 \setminus \{0\} \times \R_{\geq 0}$, then $D$ does not satisfy the Poincar\'e cone condition.
+\end{eg}
+
+\begin{thm}
+  Let $D$ be a bounded domain satisfying the Poincar\'e cone condition, and let $\varphi: \partial D \to \R$ be continuous. Let
+  \[
+    T_{\partial D} = \inf\{ t \geq 0 : B_t \in \partial D \}.
+  \]
+  This is a \emph{bounded} stopping time. Then the function $u: \bar{D} \to \R$ defined by
+  \[
+    u(x) = \E_x (\varphi(B_{T_{\partial D}})),
+  \]
+  where $\E_x$ is the expectation if we start at $x$, is the unique continuous function such that $u(x) = \varphi(x)$ for $x \in \partial D$, and $\Delta u = 0$ for $x \in D$.
+\end{thm}
+
+To prove uniqueness, we need the maximum principle.
+\begin{defi}[Maximum rinciple]\index{maximum principle}
+  Let $u: \bar{D} \to \R$ be continuous and harmonic. Then
+  \begin{enumerate}
+    \item If $u$ attains its maximum inside $D$, then $u$ is constant.
+    \item If $D$ is bounded, then the maximum of $u$ in $\bar{D}$ is attained at $\partial D$.
+  \end{enumerate}
+\end{defi}
+Thus, harmonic functions do not have interior maxima unless it is constant.
+
+\begin{proof}
+  Follows from the mean value property of harmonic functions.
+\end{proof}
+
+\begin{cor}
+  If $u$ and $u'$ solve $\Delta u = \Delta u' = 0$, and $u$ and $u'$ agree on $\partial D$, then $u = u'$.
+\end{cor}
+
+\begin{proof}
+  $u - u'$ is also harmonic, and so attains the maximum at the boundary, where it is $0$. Similarly, the minimum is attained at the boundary.
+\end{proof}
+
+\begin{lemma}
+  Let $C$ be an open cone in $\R^d$ based at $0$. Then there exists $0 \leq a < 1$ such that if $|x| \leq \frac{1}{2^k}$, then
+  \[
+    \P_x(T_{\partial B(0, 1)} < T_C) \leq a^k.
+  \]
+\end{lemma}
+
+\begin{proof}
+  Note that
+  \[
+    a = \sup_{|x| \leq \frac{1}{2}} \P_x(T_{\partial B(0, 1)} < T_c) < 1.
+  \]
+  We then apply the strong Markov property, and the fact that Brownian motion is scale invariant. We reason as follows --- if we start with $|x| \leq \frac{1}{2^k}$, we may or may not hit $\partial B(2^{-k + 1})$ before hitting $T_c$. If we don't, then we are happy. If we are not, then we have reached $\partial B(2^{-k + 1})$. This happens with probability at most $a$. Now that we are at $\partial B(2^{-k + 1})$, the probability of hitting $\partial B(2^{-k + 2})$ before hitting the cone is at most $a$ again. If we hit $\partial B(2^{-k + 3})$, we again have a probability of $\leq a$ of hitting $\partial B(2^{-k + 4})$, and keep going on. Then by induction, we find that the probability of hitting $\partial B(0, 1)$ before hitting the cone is $\leq a^k$.
+\end{proof}
+
+We can now prove the theorem.
+\begin{proof}[Proof of theorem]
+  Let $\tau = T_{\partial B(x, \delta)}$ for $\delta$ small. Then by the strong Markov property and the tower law, we have
+  \[
+    u(x) = \E_x(u(x_\tau)).
+  \]
+  Now $x_\tau$ is uniformly distributed over $\partial B(x, \delta)$. Thus, it remains to show that $u$ is continuous.
+
+  Note that $\varphi$ is bounded since $\partial D$ is compact (since $D$ is bounded). In particular, $u$ is continuous in $D$, and it remains to check the boundary.
+
+  So let $x \in \partial D$. Since $\varphi$ is continuous, for every $\varepsilon > 0$, there is $\delta > 0$ such that if $y \in \partial D$ and $|y - x| < \delta$, then $|\varphi(y) - \varphi(x)| \leq \varepsilon$.
+
+  Take $c \in \bar{D}$ such that $|z - x| \leq \frac{\delta}{2}$. Suppose we start our Brownian motion at $z$. If we hit the boundary before we leave the ball, then we are in good shape. If not, then we are sad. But if the second case has small probability, then since $\varphi$ is bounded, we can still be fine.
+
+  Pick a cone $C$ as in the definition of the Poincar\'e cone condition, and assume we picked $\delta$ small enough that $C \cap B(x, \delta) \cap D = \emptyset$. Then we have
+  \begin{align*}
+    |u(z) - \varphi(x)| &= |\E_z(\varphi(B_{T_{\partial D}})) - \varphi(x)|\\
+    &\leq \E_z |(\varphi(B_{T_{\partial D}} - \varphi(x)))|\\
+    &\leq \varepsilon \P_z(T_{B(x, \delta)} > T_{\partial D}) + 2 \sup \|\varphi\| \P_z(T_{\partial D} > T_{\partial B(x, \delta)})\\
+    &\leq \varepsilon + 2 \|\varphi\|_{\infty} \P_z(T_{B(x, \delta)} \leq T_C),
+  \end{align*}
+  and we know the second term $\to 0$ as $z \to x$.
+\end{proof}
+Apparently, there exists an example of a $D$ not satisfying the Poincar\'e cone condition where $u$ is not continuous at the boundary.
+
+Recall that in our characterization of harmonic functions, we said $\varphi(x)$ has to be equal to the average over a sphere containing it. Can we replace it with an arbitrary surface? This theorem gives us the correct measure to impose on the surface for this to be true, namely the probability density for a random walk to hit that point on the boundary. This is known as the \term{harmonic measure}.
+
+\subsection{Transience and recurrence}
+\begin{thm}
+  Let $(B_t)_{t \geq 0}$ be a Brownian motion in $\R^d$.
+  \begin{itemize}
+    \item If $d = 1$, then $(B_t)_{t \geq 0}$ is \term{point recurrent}, i.e.\ for each $x, z \in \R$, the set $\{t \geq 0: B_t = z\}$ is unbounded $\P_x$-almost surely.
+    \item If $d = 2$, then $(B_t)_{t \geq 0}$ is \term{neighbourhood recurrent}, i.e.\ for each $x \in \R^2$ and $U \subseteq \R^2$ open, the set $\{t \geq 0: B_t \in U\}$ is unbounded $\P_x$-almost surely. However, the process does not visit points, i.e. for all $x, z \in \R^d$, we have
+      \[
+        \P_X(B_t = z\text{ for all }t > 0) = 0.
+      \]
+    \item If $d \geq 3$, then $(B_t)_{t \geq 0}$ is \term{transient}, i.e.\ $|B_t| \to \infty$ as $t\to \infty$ $\P_x$-almost surely.
+  \end{itemize}
+\end{thm}
+
+\begin{proof}\leavevmode
+  \begin{itemize}
+    \item This is trivial, since $\inf_{t \geq 0} B_t = -\infty$ and $\sup_{t \geq 0} B_t = \infty$ almost surely, and $(B_t)_{t \geq 0}$ is continuous.
+    \item It is enough to prove for $z = 0$. Let $0 < \varepsilon < R < \infty$ and $\varphi \in C_b^2(\R^2)$ such that $\varphi(x) = \log |x|$ for $\varepsilon \leq |x| \leq R$. It is an easy exercise to check that this is harmonic inside the annulus. By the theorem we didn't prove, we know
+      \[
+        M_t = \varphi(B_t) - \frac{1}{2} \int_0^t \Delta \varphi (B_s)\;\d s
+      \]
+      is a martingale. For $\lambda \geq 0$, let $S_\lambda = \inf \{t \geq 0: |B_t| = \lambda\}$. If $\varepsilon \leq |x| \leq R$, then $S_\varepsilon \wedge S_R$ is $\P_X$-almost surely finite. Then $M_{t \wedge H}$ is a bounded martingale. By optional stopping, we have
+      \[
+        \E_x (\log |B_H|) = \log |x|.
+      \]
+      But the LHS is
+      \[
+        \log \varepsilon \P(S_\varepsilon < S_R) + \log R \P(S_R < S_\varepsilon).
+      \]
+      So we find that
+      \[
+        \P_x(S_\varepsilon < S_R) = \frac{\log R - \log |x|}{\log R - \log \varepsilon}.\tag{$*$}
+      \]
+      Note that if we let $R \to \infty$, then $S_R \to \infty$ almost surely. Using $(*)$, this implies $\P_X(S_\varepsilon < \infty) = 1$, and this does not depend on $x$. So we are done.
+
+      To prove that $(B_t)_{t \geq 0}$ does not visit points, let $\varepsilon \to 0$ in $(*)$ and then $R \to \infty$ for $x \not= z = 0$.
+    \item It is enough to consider the case $d = 3$. As before, let $\varphi \in C_b^2(\R^3)$ be such that
+      \[
+        \varphi(x) = \frac{1}{|x|}
+      \]
+      for $\varepsilon \leq x \leq 2$. Then $\Delta \varphi(x) = 0$ for $\varepsilon \leq x \leq R$. As before, we get
+      \[
+        \P_x(S_\varepsilon < S_R) = \frac{|x|^{-1} - |R|^{-1}}{\varepsilon^{-1} R^{-1}}.
+      \]
+      As $R \to \infty$, we have
+      \[
+        \P_x(S_\varepsilon < \infty) = \frac{\varepsilon}{x}.
+      \]
+      Now let
+      \[
+        A_n = \{B_t \geq n\text{ for all }t \geq B_{T_{n^3}}\}.
+      \]
+      Then
+      \[
+        \P_0(A_n^c) = \frac{1}{n^2}.
+      \]
+      So by Borel--Cantelli, we know only finitely of $A_n^c$ occur almost surely. So infinitely many of the $A_n$ hold. This guarantees our process $\to \infty$, since each $B_{T_{n^3}}$ is finite almost surely for all $n$.
+  \end{itemize}
+\end{proof}
 \printindex
 \end{document}

@@ -6,13 +6,15 @@
 \def\nlecturer {R.\ D.\ Shah}
 \def\ncourse {Modern Statistical Methods}
 \def\nofficial {https://www.statslab.cam.ac.uk/~rds37/modern_statistical_methods}
+\def\nnotready {}
+
 \input{header}
 
 \DeclareMathOperator*\argmin{argmin}
 \DeclareMathOperator\pa{pa}
 \DeclareMathOperator\child{ch}
 \DeclareMathOperator\de{de}
-
+\newcommand\ddo{\mathsf{do}}
 \begin{document}
 \maketitle
 {\small
@@ -1869,11 +1871,11 @@ for all $S$ with $|S| = s$. In particular,
   \[
     \P(|\hat{\Sigma}_{jk} - \Sigma^0_{jk}) \leq 2 \exp \left(-\frac{nt^2}{2 (64 v^4 + 4 v^2 t)}\right),
   \]
-  since $\sigma = 8v^2$ and $b = 4 v^2$. So we can bound 
+  since $\sigma = 8v^2$ and $b = 4 v^2$. So we can bound
   \[
     \P \left(\max_{j,k} |\hat{\Sigma}_{jk} - \Sigma^0_{jk}| \geq t\right) \leq 2 p^2 \exp \left( - \frac{c n}{s^2}\right) = 2 \exp \left(-\frac{c n}{s^2}\left(c - \frac{2s^2}{n \log p}\right)\right) \to 0
   \]
-  for some constant $c$. 
+  for some constant $c$.
 \end{proof}
 
 \begin{cor}
@@ -1902,7 +1904,7 @@ For this to work well, of course the coordinatewise minimizations have to be eas
 \]
 where $g$ is convex and differentiable, and each $h_j$ is convex but not necessarily differentiable. In the case of the Lasso, the first is the least squared term, and the $h_j$ is the $\ell_1$ term.
 
-There are two things we can do to make this faster. We typically solve the Lasso on a grid of $\lambda$ values $\lambda_0 > \lambda_1 > \cdots > \lambda_L$, and then picking the appropriate $\lambda$ by $v$-fold cross-validation. IN this case, we can start solving at $\lambda_0$, and then start at the previous $\lambda$-value to ``warm start'' our iterative procedure. In fact, even if we already have a fixed $\lambda$ value we want to use, it is often advantageous to solve the Lasso with a larger $\lambda$-value, and then use that as a warm start to get to our desired $\lambda$ value. 
+There are two things we can do to make this faster. We typically solve the Lasso on a grid of $\lambda$ values $\lambda_0 > \lambda_1 > \cdots > \lambda_L$, and then picking the appropriate $\lambda$ by $v$-fold cross-validation. IN this case, we can start solving at $\lambda_0$, and then start at the previous $\lambda$-value to ``warm start'' our iterative procedure. In fact, even if we already have a fixed $\lambda$ value we want to use, it is often advantageous to solve the Lasso with a larger $\lambda$-value, and then use that as a warm start to get to our desired $\lambda$ value.
 
 Another strategy is an \term{active set} strategy. If $p$ is large, then this loop may take a very long time. Since we know the Lasso should set a lot of things to zero, for $\ell = 1, \ldots, L$, we set
 \[
@@ -1934,7 +1936,7 @@ The first thing we might want to change in the Lasso is to replace the least squ
 \end{eg}
 
 \begin{eg}
-  Another variation is the \term{fused Lasso}. If $\beta^0_{j + 1}$ is expected to be close to $\beta_j^0$,  then a \emph{fused Lasso} penalty may be appropriate, with
+  Another variation is the \term{fused Lasso}. If $\beta^0_{j + 1}$ is expected to be close to $\beta_j^0$, then a \emph{fused Lasso} penalty may be appropriate, with
   \[
     \lambda_1 \sum_{j = 1}^{p - 1} |\beta_{j + 1} - \beta_j| + \lambda_2 \|\beta\|_1.
   \]
@@ -1955,7 +1957,7 @@ The first thing we might want to change in the Lasso is to replace the least squ
   \]
   for $\alpha \in [0, 1]$. What the $\ell_2$ norm does is that it encourages highly positively correlated variables to have similar estimated coefficients.
 
-  For example, if we have duplicate columns, then the $\ell_1$ penalty encourages us to take one of the coefficients to be $0$, while the $\ell_2$ penalty encourages the coefficients to be the same. 
+  For example, if we have duplicate columns, then the $\ell_1$ penalty encourages us to take one of the coefficients to be $0$, while the $\ell_2$ penalty encourages the coefficients to be the same.
 \end{eg}
 
 Another class of variations try to reduce the bias of the Lasso. Although the bias of the Lasso is a necessary by-product of reducing the variance of the estimate, it is sometimes desirable to reduce this bias.
@@ -2012,7 +2014,9 @@ Thus, our graphs are directed.
   A set of three nodes is called a \emph{$v$-structure} if one node is a child of the two other nodes, and these two nodes are not adjacent.
 \end{defi}
 
-% define skeleton
+\begin{defi}[Skeleton]\index{skeleton}
+  The \emph{skeleton} of $\mathcal{G}$ is a copy of $\mathcal{G}$ with every edge replaced by an undirected edge.
+\end{defi}
 
 \begin{defi}[Path]\index{path}
   A \emph{path} from $j$ to $k$ is a sequence $j = j_1, j_2, \ldots, j_m = k$ of (at least two) distinct vertices such that $j_\ell$ and $j_{\ell + 1}$ are adjacent.
@@ -2029,11 +2033,11 @@ Thus, our graphs are directed.
 \end{defi}
 
 \begin{defi}[Partially directed acyclic graph (PDAG)]\index{partially directed acyclic graph}
-   % insert definition
+  A \emph{partially directed acyclic graph (PDAG)} is a graph containing no directed cycles.
 \end{defi}
 
 \begin{defi}[Directed acyclic graph (DAG)]\index{DAG}
-  % insert definition
+  A \emph{directed acyclic graph (DAG)} is a directed graph containing no directed cycles.
 \end{defi}
 
 \begin{defi}[Separates]\index{separates}
@@ -2048,7 +2052,7 @@ The idea if two parents have a child but are not married, then that is immoral a
 \begin{defi}[Blocked]\index{blocked}
   In a DAG, a path between $j_1$ and $j_m$ ($j_1, \ldots, j_m)$) is \emph{blocked} by a set of nodes $S$ with neither $j_1$ nor $j_m$ in $S$ whenever there is a node $j_\ell$ such that one of the possibilities hold:
   \begin{itemize}
-    \item $j_\ell \in S$ and we \emph{don'} have $j_{\ell - 1} \to j_1 \leftarrow j_{\ell + 1}$.
+    \item $j_\ell \in S$ and we \emph{don't} have $j_{\ell - 1} \to j_1 \leftarrow j_{\ell + 1}$.
     \item $j_{\ell - 1} \to j_{\ell} \leftarrow j_{\ell + 1}$ and neither $j_\ell$ nor any of its descendants are in $S$.
   \end{itemize}
 \end{defi}
@@ -2063,16 +2067,16 @@ In some sense, this says we can ``modify'' the path so that the colliders are ex
 \end{eg}
 
 \begin{defi}[Topological ordering]\index{topological ordering}
-  Given a DAG $\mathcal{G}$ with $V = \{1, \ldots, p\}$ we say that a permutation $\pi: V \to V$ is a topological ordering if $\pi(j) < \pi(k)$ whenever $k \in de(j)$.
+  Given a DAG $\mathcal{G}$ with $V = \{1, \ldots, p\}$ we say that a permutation $\pi: V \to V$ is a topological ordering if $\pi(j) < \pi(k)$ whenever $k \in \de(j)$.
 \end{defi}
 
 \subsection{Conditional independence graphs}
 We shall now talk about undirected graphs for a bit. Henceforth all graphs are undirected.
 
 \begin{defi}[Conditional independence]\index{conditional independence}
-  Let $X, Y, Z$ be random vectors with joint density $f_{XYZ}$. We say that $X$ is \emph{conditionally independent} of $Y$ given $Z$, written $X amalg Y \mid Z$, if
+  Let $X, Y, Z$ be random vectors with joint density $f_{XYZ}$. We say that $X$ is \emph{conditionally independent} of $Y$ given $Z$, written $X \amalg Y \mid Z$, if
   \[
-    f_{XY\midZ}(x, y \mid z) = f_{X\midZ}(x \mid z) f_{Y \mid Z} (y \mid z).
+    f_{XY\mid Z}(x, y \mid z) = f_{X\mid Z}(x \mid z) f_{Y \mid Z} (y \mid z).
   \]
   Equivalently,
   \[
@@ -2120,7 +2124,7 @@ Testing conditional dependency is very difficult in general, but in the case whe
 \end{prop}
 
 \begin{proof}
-  Of course, we can just compute this directly, maybe using moment generating functions. But for pleasantness, we adopt a different approach. We seek an $M$ such that 
+  Of course, we can just compute this directly, maybe using moment generating functions. But for pleasantness, we adopt a different approach. We seek an $M$ such that
   \[
     Z_A = M Z_B + (Z_A - M Z_B),
   \]
@@ -2160,7 +2164,7 @@ If the $j$th component of $\Sigma_{-k, -k}^{-1} \Sigma_{-k, k}$ is $0$, then the
 \[
   Z_k \mid Z_{-k} \overset{d}{=} Z_k \mid Z_{-kj'}.
 \]
-This is the same as saying $Z_k \amalg Z_{j'} \mid Z_{-kj'}$.
+this is the same as saying $Z_k \amalg Z_{j'} \mid Z_{-kj'}$.
 
 Neighbourhood selection exploits this fact. Given $x_1, \ldots, x_n$ which are iid $\sim Z$ and
 \[
@@ -2172,5 +2176,405 @@ we can estimate $\Sigma_{-k, -k}^{-1} \Sigma_{-k, k}$ by regressing $X_k$ on $X_
   \item AND rule: We add the edge $(j, k)$ if $j \in \hat{S}_k$ and $k \in \hat{S}_j$.
 \end{itemize}
 Note that since the Lasso favors zeroes, it is likely that the resulting graph is larger than the actual CIG, but it should at least contain the actual CIG.
+
+Let's now consider the relation between the precision matrix and conditional independence.
+\begin{prop}
+  Let $M \in \R^{p \times p}$ be positive definite, and write
+  \[
+    M =
+    \begin{pmatrix}
+      P & Q\\
+      Q^T & R
+    \end{pmatrix},
+  \]
+  where $P$ and $Q$ are square. The \term{Schur complement} of $R$ is
+  \[
+    S = P - QR^{-1} Q^T.
+  \]
+  Note that this has the same size as $P$. Then
+  \begin{enumerate}
+    \item $S$ is positive definite.
+    \item
+      \[
+        M^{-1} =
+        \begin{pmatrix}
+          S^{-1} & -S^{-1} QR^{-1}\\
+          -R^{-1} Q^T S^{-1} & R^{-1} + R^{-1} Q^T S^{-1} Q R^{-1}
+        \end{pmatrix}.
+      \]
+    \item $\det(M) = \det (S) \det (R)$
+  \end{enumerate}
+\end{prop}
+We have seen this Schur complement when we looked at $\var(Z_A \mid Z_{A^c})$ previously, where we got
+\[
+  \var(Z_a \mid Z_{A^c}) = \Sigma_{A, A} - \Sigma_{A, A^C} \Sigma_{A^c, A^c}^{-1} \Sigma_{A^c, A} = \Omega_{A, A}^{-1},
+\]
+where $\Omega = \Sigma^{-1}$ is the \term{precision matrix}.
+
+Specializing to the case where $A = \{j, k\}$, we have
+\[
+  \var(Z_{\{j, k\}} \mid Z_{-jk}) = \frac{1}{\det (\Omega_{A, A})}
+  \begin{pmatrix}
+    \Omega_{k, k} & -\Omega_{j, k}\\
+    -\Omega_{j, k} & \Omega_{j, j}.
+  \end{pmatrix}
+\]
+This tells us $Z_k \amalg Z_j \mid Z_{-kj}$ iff $\Omega_{j k} = 0$. Thus, we can approximate the conditional independence graph by computing the precision matrix $\Omega$.
+
+\subsection{The graphical Lasso}
+Our method to estimate the precision matrix is similar to the Lasso. Recall that the density of $N_p(\mu, \Sigma)$ is
+\[
+  P(z) = \frac{1}{(2\pi)^{p/2} (\det \Sigma)^{1/2}} \exp \left(-\frac{1}{2} (z - \mu)^T \Sigma^{-1} (z - \mu)\right).
+\]
+The log-likelihood of $(\mu, \Omega)$ based on an iid sample $(X_1, \ldots, X_n)$ is (after dropping a constant)
+\[
+  \ell(\mu, \Omega) = \frac{n}{2} \log \det \Omega - \frac{1}{2} \sum_{i = 1}^n (x_i - \mu)^T \Omega (x_i - \mu).
+\]
+To simplify this, we let
+\[
+  \bar{x} = \frac{1}{n} \sum_{i = 1}^n x_i,\quad S = \frac{1}{n} \sum_{i = 1}^n (x_i - \bar{x}) (x_i - \bar{x})^T.
+\]
+Then
+\begin{align*}
+  \sum (x_i - \mu)^T \Omega (x_i -\mu) &= \sum (x_i - \bar{x} + \bar{x} - \mu)^T \Omega (x_i - \bar{x} + \bar{x} - \mu) \\
+  &= \sum (x_i - \bar{x})^T \Omega (x_i - \bar{x}) + n (\bar{X} - \mu)^T \Omega (\bar{X} - \mu).
+\end{align*}
+We have
+\[
+  \sum (x_i - \bar{x})^t \Omega (x_i - \bar{x}) = \sum \tr \Big((x_i - \bar{x})^t \Omega (x_i - \bar{x})\Big) = n \tr (S\Omega).
+\]
+So we now have
+\[
+  \ell(\mu, \Omega) = -\frac{n}{2} \Big(\tr (S\Omega) - \log \det \Omega + (\bar{X} - \mu)^T \Omega (\bar{X} - \mu)\Big).
+\]
+We are really interested in estimating $\Omega$. So we should try to maximize this over $\mu$, but that is easy, since this is the same as minimizing $(\bar{X} - \mu)^T \Omega (\bar{X} - \mu)$, and we know $\Omega$ is positive-definite. So we should set $\mu = \bar{X}$. Thus, we have
+\[
+  \ell(\Omega) = \max_{\mu \in \R^p} \ell(\mu, \Omega) = -\frac{n}{2} \Big(\tr (S\Omega) - \log \det \omega\Big).
+\]
+So we can solve for the MLE of $\Omega$ by solving
+\[
+  \min_{\Omega: \Omega \succ 0} \Big(- \log \det \Omega + \tr (S \Omega)\Big).
+\]
+One can show that this is convex, and to find the MLE, we can just differentiate
+\[
+  \frac{\partial}{\partial \Omega_{jk}} \log \det \Omega = (\Omega^{-1})_{jk},\quad \frac{\partial}{\partial \Omega_{jk}} \tr (S\Omega) = S_{jk},
+\]
+using that $S$ and $\Omega$ are symmetric. So provided that $S$ is positive definite, the maximum likelihood estimate is just
+\[
+  \Omega = S^{-1}.
+\]
+But we are interested in the high dimensional situation, where we have loads of variables, and $S$ cannot be positive definite. To solve this, we use the \term{graphical Lasso}.
+
+The \emph{graphical Lasso} solves
+\[
+  \argmin_{\Omega: \Omega \succ 0} \Big(-\log \det \Omega + \tr (S \Omega) + \lambda \|\Omega\|_1\Big),
+\]
+where
+\[
+  \|\Omega\|_1 = \sum_{jk} \Omega_{jk}.
+\]
+Often, people don't sum over the diagonal elements, as we want to know if off-diagonal elements ought to be zero. Similar to the case of the Lasso, this gives a sparse estimate of $\Omega$ from which we may estimate the conditional independence graph.
+
+\subsection{Structural equation modelling}
+The conditional independence graph only tells us which variables are related to one another. However, it doesn't tell us any causal relation between the different variables. To talk about causal structures, we need to consider directed graphs. Hence in this section, the word ``graph'' refers to any type of graphs.
+
+\begin{defi}[Structural equation model (SEM)]\index{structural equation model}\index{SEM}
+  A \emph{structural equation model} $\mathcal{S}$ for a random vector $Z \in \R^p$ is a collection of equations
+  \[
+    Z_k = h_k(Z_{p_k}, \varepsilon_k),
+  \]
+  where $k = 1, \ldots, p$ and $\varepsilon_1, \ldots, \varepsilon_p$ are independent, and $p_k \subseteq \{1, \ldots, p\} \setminus \{k\}$ and such that the graph with $pa(k) = p_k$ is a directed acyclic graph.
+\end{defi}
+
+\begin{eg}
+  Consider three random variables:
+  \begin{itemize}
+    \item $Z_1 = 1$ if a student is taking a course, $0$ otherwise
+    \item $Z_2 = 1$ if a student is attending catch up lectures, $0$ otherwise
+    \item $Z_3 = 1$ if a student heard about machine learning before attending the course, $0$ otherwise.
+  \end{itemize}
+  Suppose
+  \begin{align*}
+    Z_3 &= \varepsilon_3 \sim \Bernoulli(0.25)\\
+    Z_2 &= \mathbf{1}_{\{\varepsilon_2(1 + Z_3) > \frac{1}{2}\}},\quad \mathcal{E}_2 \sim U[0, 1]\\
+    Z_1 &= \mathbf{1}_{\{\varepsilon_1(Z_2 + Z_3) > \frac{1}{2}\}},\quad \varepsilon_1 \sim U[0, 1].
+  \end{align*}
+  This is then an example of a structural equation modelling, and the corresponding DAG is
+  \begin{center}
+    \begin{tikzpicture}
+      \node [mstate] (2) at (0, 0) {$Z_2$};
+      \node [mstate] (3) at (2, 0) {$Z_3$};
+
+      \node [mstate] (1) at (1, -1.732) {$Z_1$};
+
+      \draw [->] (2) -- (1);
+      \draw [->] (3) -- (1);
+      \draw [->] (3) -- (2);
+    \end{tikzpicture}
+  \end{center}
+\end{eg}
+Note that the structural equation model for $Z$ determines its distribution, but it does much more than that, but it does more than that. Using a topological ordering $\pi$, we can write $Z_k$ as a function of $\varepsilon_{\pi^{-1}(1)}, \ldots, \varepsilon_{\pi^{-1}(\pi(k))}$.
+
+One way to understand structural equation models is via \emph{interventions}. We can modify a structural equation model by replacing the equation for $Z_k$ by setting, e.g. $Z_k = a$. This is called a \term{perfect intervention}\index{intervention!perfect}. The modified SEM gives a new joint distribution for $Z$. Expectations or probabilities with respect to the new distribution are written by adding ``$\ddo(Z_k = a)$''. For example, we write
+\[
+  \E(Z_j \mid \ddo(Z_k = a)).
+\]
+In general, this is different to $\E(Z_j \mid Z_k = a)$, since if we conditioned on $Z_2 = a$ in our example, then that would tell us something about $Z_3$.
+
+\begin{eg}
+  After the intervention $\ddo(Z_2 = 1)$, i.e.\ we force everyone to go to the catch-up lectures, we have a new SEM with
+  \begin{align*}
+    Z_3 &= \varepsilon_3 \sim \Bernoulli(0.25)\\
+    Z_2 &= 1\\
+    Z_1 &= \mathbf{1}_{\varepsilon_1 (1 + Z_3) > \frac{1}{2}}, \quad \varepsilon_1 \sim U[0, 1].
+  \end{align*}
+  Then, for example, we can compute
+  \[
+    \P(Z_1 = 1 \mid \ddo(Z_2 = 1)) = \frac{1}{2} \cdot \frac{3}{4} + \frac{3}{4} + \frac{1}{4} = \frac{9}{16},
+  \]
+  and by high school probability, we can also compute
+  \[
+    \P(Z_1 = 1 \mid Z_2 = 1) = \frac{7}{12}.
+  \]
+\end{eg}
+
+\subsection{Causal structure learning}
+To understand The DAGs associated to structural equation models, we would like to come up with Markov properties analogous to what we had for undirected graphs.
+
+Let $P$ be the distribution of $Z$ and let $f$ be the density.
+\begin{defi}[Markov properties]
+  Given a DAG $\mathcal{G}$, we say $P$ satisfies 
+  \begin{enumerate}
+    \item the \term{Markov factorization criterion} if 
+      \[
+        f(z_1, \ldots, z_p) = \prod_{k = 1}^p f(z_k \mid z_{\pa(k)}).
+      \]
+    \item the \term{global Markov property} if for all disjoint $A, B, S$ such that $A, B$ is d-separated by $S$, then $Z_A \amalg Z_B \mid Z_S$.
+  \end{enumerate}
+\end{defi}
+
+\begin{prop}
+  If $P$ has a density with respect to a product measure, then (i) and (ii) are equivalent.
+\end{prop}
+
+How does this fit into the structural equation model?
+
+\begin{prop}
+  Let $P$ be the structural equation model with DAG $\mathcal{G}$. Then $P$ obeys the Markov factorization property.
+\end{prop}
+
+\begin{proof}
+  We assume $\mathcal{G}$ is topologically ordered. % define this
+  Then we can always write
+  \[
+    f(z_1, \ldots, z_p) = f(z_1) f(z_2 \mid z_1) \cdots z(_p \mid z_1, z_2, \ldots, z_{p - 1}).
+  \]
+  By definition of a topological order, we know $\pa(k) \subseteq \{1, \ldots, k - 1\}$. Since $Z_k$ is a function of $Z_{\pa(k)}$ and independent noise $\varepsilon_k$. So we know
+  \[
+    Z_{k} \amalg Z_{\{1, \ldots, p\} \setminus \{k \cup \pa(k)\}} \mid Z_{\pa(k)}.
+  \]
+  Thus,
+  \[
+    f(z_{k} \mid z_1, \ldots, z_{k - 1}) = f(z_k \mid z_{\pa(k)}).\qedhere
+  \]
+\end{proof}
+
+Now given a distribution, can we try to learn the DAG with which the distribution satisfies the global Markov property? Perhaps we should start with a slightly simpler problem --- given an exact distribution $P$, how can we find the DAG of the SEM that gives rise to this distribution? There are three obstacles to do doing so.
+
+\subsubsection*{Causal minimality}
+If $P$ is generated by an SEM with DAG $\mathcal{G}$, then from the above, we know that $P$ is Markov with respect to $\mathcal{G}$. The converse is also true: if $P$ is Markov with respect to a DAG $\mathcal{G}$, then there exists a SEM with DAG $\mathcal{G}$ that generates $P$. This immediately implies that $P$ will be Markov with respect to many DAGs. For example, a DAG whose skeleton is complete will always work. This suggests the following definition:
+
+\begin{defi}[Causal minimality]\index{causal minimality}
+  A distribution $P$ satisfies \emph{causal minimality} with respect to $\mathcal{G}$ but not any proper subgraph of $\mathcal{G}$.
+\end{defi}
+
+\subsubsection*{Markov equivalent DAGs}
+
+It is natural to aim for finding a causally minimal DAG. However, this does not give a unique solution. For example, if we have two variables with $Z_1 = Z_2$, then there are two DAGS that give rise to this (one with $Z_1 \to Z_2$ and the other with $Z_2 \to Z_1$).
+
+In general, two different DAGs may satisfy the same set of d-separations, and then a distribution is Markov with respect to one iff its Markov with respect to the other, and we cannot distinguish between the two.
+
+\begin{defi}[Markov equivalence]\index{Markov equivalence}
+  For a DAG $\mathcal{G}$, we let
+  \[
+    \mathcal{M}(\mathcal{G}) = \{\text{distributions $P$ such that $P$ is Markov with respect to $\mathcal{G}$}\}.
+  \]
+  We say two DAGs $\mathcal{G}_1, \mathcal{G}_2$ are are \emph{Markov equivalent} if $\mathcal{M}(\mathcal{G}_1) = \mathcal{M}(\mathcal{G}_2)$.
+\end{defi}
+What is nice is that there is a rather easy way of determining when two DAGs are Markov equivalent.
+
+\begin{prop}
+  Two DAGs are Markov equivalent iff they have the same skeleton and same set of $v$-structure.
+\end{prop}
+The set of all DAGs that are Markov equivalent to a given DAG can be represented by a \term{CPDAG}, which contains an edge $(j, k)$ iff some member of the equivalence class does.
+
+\subsubsection*{Faithfulness}
+To describe the final issue, consider the SEM
+\[
+  Z_1 = \varepsilon_1,\quad Z_2 = \alpha Z_1 + \varepsilon_2,\quad Z_3 = \beta Z_1 + \gamma Z_2 + \varepsilon_3.
+\]
+We take $\varepsilon \sim N_3(0, I)$. Then we have $Z = (Z_1, Z_2, Z_3) \sim N(0, \Sigma)$, where
+\[
+  \Sigma =
+  \begin{pmatrix}
+    1 & \alpha & \beta + \alpha \gamma\\
+    \alpha & \alpha^2 + 1 & \alpha(\beta + \alpha \gamma) + \gamma\\
+    \beta + \alpha\gamma & \alpha(\beta + \alpha \gamma) + \gamma & \beta^2 + \gamma^2(\alpha^2 + 1) + 1 + 2\alpha \beta \gamma
+  \end{pmatrix}.
+\]
+\begin{center}
+  \begin{tikzpicture}
+    \node [mstate] (2) at (0, 0) {$Z_2$};
+    \node [mstate] (3) at (2, 0) {$Z_3$};
+
+    \node [mstate] (1) at (1, 1.732) {$Z_1$};
+
+    \draw [->] (1) -- (2);
+    \draw [->] (1) -- (3);
+    \draw [->] (2) -- (3);
+  \end{tikzpicture}
+\end{center}
+Now if we picked values of $\alpha, \beta, \gamma$ such that
+\[
+  \beta + \alpha \gamma = 0,
+\]
+then we obtained an extra independence relation $Z_1 \amalg Z_3$ in our system. For example, if we pick $\beta = -1$ and $\alpha, \gamma = 1$, then
+\[
+  \Sigma =
+  \begin{pmatrix}
+    1 & 1 & 0\\
+    1 & 2 & 1\\
+    0 & 1 & 2
+  \end{pmatrix}.
+\]
+While there is an extra independence relation, we cannot remove any edge while still satisfying the Markov property. Indeed:
+\begin{itemize}
+  \item If we remove $1 \to 2$, then this would require $Z_1 \amalg Z_2$, but this is not true.
+  \item If we remove $2 \to 3$, then this would require $Z_2 \amalg Z_3 \mid Z_1$, but we have
+    \[
+      \var((Z_2, Z_3) \mid Z_1) =
+      \begin{pmatrix}
+        2 & 1\\
+        1 & 2
+      \end{pmatrix} -
+      \begin{pmatrix}
+        1 \\0
+      \end{pmatrix}
+      \begin{pmatrix}
+        1 & 0
+      \end{pmatrix} =
+      \begin{pmatrix}
+        1 & 1\\
+        1 & 2
+      \end{pmatrix},
+    \]
+    and this is not diagonal.
+  \item If we remove $1 \to 3$, then this would require $Z_1 \amalg Z_3 \mid Z_2$, but
+    \[
+     \var((Z_1, Z_3) \mid Z_2) =
+     \begin{pmatrix}
+       1 & 0 \\
+       0 & 2
+     \end{pmatrix} - 
+     \frac{1}{2}
+     \begin{pmatrix}
+       1 \\ 1
+     \end{pmatrix}
+     \begin{pmatrix}
+       1 & 1
+     \end{pmatrix},
+   \]
+   which is again non-diagonal.
+\end{itemize}
+So this DAG satisfies causal minimality. However, $P$ can also be generated by the structural equation model
+\[
+  \tilde{Z}_1 = \tilde{\varepsilon}_1,\quad \tilde{Z}_2 = \tilde{Z}_1 + \frac{1}{2} \tilde{Z}_3 + \tilde{\varepsilon}_2,\quad \tilde{Z}_3 = \tilde{\varepsilon}_3,
+\]
+where the $\tilde{\varepsilon}_i$ are independent with
+\[
+  \tilde{\varepsilon}_1 \sim N(0, 1),\quad \tilde{\varepsilon}_3 \sim N(0, 2),\quad \tilde{\varepsilon}_3 \sim N(0, \tfrac{1}{2}).
+\]
+Then this has the DAG
+\begin{center}
+  \begin{tikzpicture}
+    \node [mstate] (2) at (0, 0) {$Z_2$};
+    \node [mstate] (3) at (2, 0) {$Z_3$};
+
+    \node [mstate] (1) at (1, 1.732) {$Z_1$};
+
+    \draw [->] (1) -- (2);
+    \draw [->] (3) -- (2);
+  \end{tikzpicture}
+\end{center}
+This is a strictly smaller DAG in terms of the number of edges involved. It is easy to see that this satisfies causal minimality.
+
+\begin{defi}[Faithfulness]\index{faithfulness}
+  We say $P$ is \emph{faithful} to a DAG $\mathcal{G}$ if it is Markov with respect to $\mathcal{G}$ and for all $A, B, S$ disjoint, $Z_A \amalg Z_B \mid Z_S$ implies $A, B$ are d-separated by $S$.
+\end{defi}
+
+We shall assume our distribution is faithful to some $\mathcal{G}_0$, and see if we can figure out $\mathcal{G}_0$ from $P$, or even better, from data.
+
+\subsection{The PC algorithm}
+To find $\mathcal{G}$, the following proposition helps us compute the skeleton:
+\begin{prop}
+  If nodes $j$ and $k$ are adjacent in a DAG $\mathcal{G}$, then no set can $d$-separate them.
+
+  If they are not adjacent, and $\pi$ is a topological order for $\mathcal{G}$ with $\pi(j) < \pi(k)$, then they are $d$-separated by $\pa(k)$.
+\end{prop}
+
+\begin{proof}
+  Only the last part requires proof. Consider a path $j = j_1, \ldots, j_m = k$.  We may assume that $j_{m - 1} \leftarrow k$, as otherwise $j_{m - 1}$ would be a parent of $k$, and blocks $k$.
+  
+  Consider a path between $j$ and $k$, say $j = v_1 , v_2, \ldots, v_n = k$. Observe that it must be the case that $v_n v_{n - 1} \in E$, as opposed to $v_{n - 1} v_n \in E$, or else the path is blocked by $v_{n - 1}$. Let $\ell$ be the largest $\ell'$ with $j_{\ell' - 1} \to j_{\ell'} \leftarrow j_{\ell' + 1}$. This must exist as $j \not\in \de(k)$ by topological ordering. In order for the path not to be blocked, we know $j\ell'$ must have a descendant in $\pa(k)$, but this would introduce a cycle.
+\end{proof}
+
+Finding the $v$-structures is harder, and at best we can do so up to Markov equivalence. To do that, observe the following:
+\begin{prop}
+  Suppose we have $j - \ell - k$ in the skeleton of a DAG.
+  \begin{enumerate}
+    \item If $j \to \ell \leftarrow k$, then no $S$ that d-separates $j$ can have $\ell \in S$.
+    \item If there exists $S$ that d-separates $j$ and $k$ and $\ell \not \in S$, then $j \to \ell \leftarrow k$.\qedsym
+  \end{enumerate}
+\end{prop}
+Denote the set of nodes adjacent to the vertex $k$ in the graph $\mathcal{G}$ by $\adj(\mathcal{G}, k)$.
+
+We can now describe the first part of the \term{PC algorithm}:
+\begin{enumerate}
+  \item Set $\hat{\mathcal{G}}$ to be the complete undirected graph. Set $\ell = -1$.
+  \item Repeat the following steps:
+    \begin{enumerate}
+      \item Set $\ell = \ell + 1$:
+      \item Repeat the following steps:
+        \begin{enumerate}
+          \item Select a new ordered pair of nodes $j, k$ that are adjacent in $\hat{\mathcal{G}}$ and such that $|\adj(\hat{\mathcal{G}}, j) \setminus \{k\}| \geq \ell$.
+          \item Repeat the following steps:
+            \begin{enumerate}
+              \item Choose a new $S \subseteq \adj(\hat{\mathcal{G}}, j) \setminus \{k\}$ with $|S| = \ell$.
+              \item If $Z_j \amalg Z_k \mid Z_S$, then delete the edge $jk$, and store $S(k, j) = S(j, k) = S$
+              \item Repeat until $j-k$ is deleted or all $S$ chosen.
+            \end{enumerate}
+          \item Repeat until all pairs of adjacent nodes are inspected.
+        \end{enumerate}
+      \item Repeat until $\ell \geq p - 2$.
+    \end{enumerate}
+\end{enumerate}
+Suppose $P$ is faithful to a DAG $\mathcal{G}^0$. At each stage of the algorithm, the skeleton of $\mathcal{G}^0$ will be a subgraph of $\hat{\mathcal{G}}$. On the other hand, edges $(j, k)$ remaining at termination will have
+\[
+  Z_j \amalg Z_k \mid Z_S\text{ for all }S \subseteq (\hat{\mathcal{G}}, k),\quad S \subseteq (\hat{\mathcal{G}}, j).
+\]
+So they must be adjacent in $\mathcal{G}^0$. Thus, $\hat{\mathcal{G}}$ and $\mathcal{G}_0$ have the same skeleton.
+
+To find the $v$-structures, we perform:
+\begin{enumerate}
+  \item For all $j-l-k$ in $\hat{\mathcal{G}}$, do:
+    \begin{enumerate}
+      \item If $\ell \not \in S(j, k)$, then orient $j \to \ell \leftarrow k$.
+    \end{enumerate}
+\end{enumerate}
+This gives us the Markov equivalence class, and we may orient the other edges using other properties like acyclicity.
+
+If we want to apply this to data sets, then we need to apply some conditional independence tests instead of querying our oracle to figure out if things are conditional dependence. However, errors in the algorithm propagate, and the whole process may be derailed by early errors. Moreover, the result of the algorithm may depend on how we iterate through the nodes. People have tried many ways to fix these problems, but in general, this method is rather unstable.
+
+
 \printindex
 \end{document}

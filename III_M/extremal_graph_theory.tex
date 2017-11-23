@@ -5,6 +5,7 @@
 \def\nyear {2017}
 \def\nlecturer {A.\ G.\ Thomason}
 \def\ncourse {Extremal Graph Theory}
+\def\nnotready {}
 
 \input{header}
 
@@ -618,7 +619,7 @@ Szmer\'edi's regularity lemma tells us given a very large graph, we can always e
 
 Note that it is necessary to impose some conditions on how small $U'$ and $W'$ can be. For example, if $|U'| = |W'| = 1$, then $d(U', W')$ is either $0$ or $1$. So we cannot have a sensible definition if we want to require the inequality to hold for arbitrary $U', W'$.
 
-But we might be worried that it is unnatural to use the same $\varepsilon$ for two different purposes. This is not something one should worry about. The Szemer\'edi regularity lemma is a fairly robust result, and everything goes through if we use different $\varepsilon$'s for the two different purposes. However, it is annoying to have to have many different $\varepsilon$'s floating around. 
+But we might be worried that it is unnatural to use the same $\varepsilon$ for two different purposes. This is not something one should worry about. The Szemer\'edi regularity lemma is a fairly robust result, and everything goes through if we use different $\varepsilon$'s for the two different purposes. However, it is annoying to have to have many different $\varepsilon$'s floating around.
 
 Before we state and prove Szemer\'edi's regularity lemma, let's first try to understand why uniformity is good. The following is an elementary observation.
 \begin{lemma}
@@ -715,7 +716,7 @@ We say that the partition is $\varepsilon$-uniform\index{$\varepsilon$-uniform!p
 \end{thm}
 This lemma was proved by Szemer\'edi in order to prove his theorem on arithmetic progressions in dense subsets of integers.
 
-When we want to apply this, we usually want at least $\ell$ many prats. For example, having $1$ part is usually not very helpful. The upper bound on $m$ is helpful for us to ensure the parts are large enough, by picking graphs with sufficiently many vertices.
+When we want to apply this, we usually want at least $\ell$ many parts. For example, having $1$ part is usually not very helpful. The upper bound on $m$ is helpful for us to ensure the parts are large enough, by picking graphs with sufficiently many vertices.
 
 We first need a couple of trivial lemmas.
 \begin{lemma}
@@ -976,15 +977,22 @@ The natural generalizations of Szemer\'edi's lemma to hypergraphs is easily show
 We need is a stronger version of the regularity that allows us to build graphs, but not too strong that we can't prove the Szemer\'edi regularity lemma. A workable hypergraph regularity lemma along these lines was proved by Nagle, R\"odl, Skokan, and by Gowers (those weren't quite the same lemma, though).
 
 \section{Subcontraction, subdivision and linking}
-We study three topics with unexpected connections (and also expected connections).
-
-If $e = xy$ is an edge of $G$, then the graph $G/e$\index{$G/e$} obtained by contracting the edge $e$ is the graph formed from $G \setminus \{x, y\}$ by adding a new vertex joined to all neighbours of $x$ and $y$.
+We begin with some definitions.
+\begin{defi}
+  Let $G$ be a graph, $e = xy$ an edge. Then the graph $G/e$\index{$G/e$} is the graph formed from $G \setminus \{x, y\}$ by adding a new vertex joined to all neighbours of $x$ and $y$. We say this is the graph formed by \emph{contracting} the edge $e$.
+\end{defi}
 
 % insert picture
 
-A \term{contraction} of $G$ is a graph obtained by a sequence of edge contractions. A \term{subcontraction} of $G$ is a contraction of a subgraph. Write $G \succ H$ if $H$ is a subcontraction of $G$. In this case, $G$ has disjoint vertex subsets $W_v$ for $v \in V(H)$ such that $G[W_v]$ is connected, and there's an edge of $G$, and there is an edge of $G$ between $W_u$ and $W_v$ if $w \in E(H)$.
+\begin{defi}[(Sub)contraction]
+  A \term{contraction} of $G$ is a graph obtained by a sequence of edge contractions. A \term{subcontraction} of $G$ is a contraction of a subgraph. We write $G \succ H$ if $H$ is a subcontraction of $G$.
+\end{defi}
+If $G \succ H$, then $G$ has disjoint vertex subsets $W_v$ for each $v \in V(H)$ such that $G[W_v]$ is connected, and there is an edge of $G$ between $W_u$ and $W_v$ if $w \in E(H)$.
 
-If $H$ is a graph, TH stands for any graph obtained from $H$ by replacing its edges by vertex disjoint paths (i.e.\ we subdivide edges). The $T$ stands for ``topological''.
+\begin{defi}[Subdivision]\index{subdivision}
+  If $H$ is a graph, \term{$TH$} stands for any graph obtained from $H$ by replacing its edges by vertex disjoint paths (i.e.\ we subdivide edges).
+\end{defi}
+The $T$ stands for ``topological'', since the resulting graph has the same topology.
 
 Clearly, if $G \supseteq TH$, then $G \succ H$.
 
@@ -992,12 +1000,18 @@ Clearly, if $G \supseteq TH$, then $G \succ H$.
   \begin{tikzpicture}
     \draw (0, 0) node [circ] {} -- (2, 0) node [circ] {} -- (1, 1.732) node [circ] {} -- cycle;
 
-    \draw (2.5, 0.866) -- +(1, 0);
+    \draw [->] (2.5, 0.866) -- +(1, 0);
 
-    \draw (4, 0) node [circ] {} -- (4, 0) node [circ] {} node [pos=0.5, circ] {} -- (4, 1.732) node [circ] {} node [pos=0.333, circ] {} node [pos=0.667, circ] {} -- cycle;
+    \draw (4, 0) node [circ] {} -- (6, 0) node [circ] {} node [pos=0.5, circ] {} -- (5, 1.732) node [circ] {} node [pos=0.333, circ] {} node [pos=0.667, circ] {} -- cycle;
   \end{tikzpicture}
 \end{center}
-Let $G$ be a graph and $s_1, \ldots, s_k, t_1, \ldots, t_k$ be distinct vertices. Menger's theorem says if $\kappa(G) \geq k$, then there exists $k$ vertex disjoint paths from $\{s_1, \ldots, s_k\}$ to $\{t_1, \ldots, t_k\}$.
+
+Recall the following theorem:
+\begin{thm}[Menger's theorem]\index{Menger's theorem}
+  Let $G$ be a graph and $s_1, \ldots, s_k, t_1, \ldots, t_k$ be distinct vertices. If $\kappa(G) \geq k$, then there exists $k$ vertex disjoint paths from $\{s_1, \ldots, s_k\}$ to $\{t_1, \ldots, t_k\}$.
+\end{thm}
+
+This is good, but not good enoguh. It would be nice if we can have paths that join $s_i$ to $t_i$, as opposed to joining $s_i$ to any element in $\{t_1, \ldots, t_k\}$.
 
 \begin{defi}[$k$-linked graph]\index{$k$-linked graph}
   We say $G$ is \emph{$k$-linked} if there exists vertex disjoint $s_i$-$t_i$ paths for $1 \leq i \leq k$ for any choice of these $2k$ vertices.
@@ -1011,7 +1025,7 @@ We want to understand how these three notions interact. There are some obvious w
 \begin{proof}
   Let $B$ be the set of ``branch vertices'' of $TK_{5k}$, i.e.\ the $5k$ vertices joined by paths. By Menger's theorem, there exists $2k$ vertex disjoint paths joining $\{s_1, \ldots, s_k, t_1, \ldots, t_k\}$ to $B$ (note that these sets might intersect). We say one of our $2k$ paths \emph{impinges} on a path in $TK_{5k}$ if it meets that path and subsequently leaves it. Choose a set of $2k$ paths impinging minimally (counting 1 per impingement).
 
-  Let these join $\{s_1, \ldots, t_k\}$ to $\{v_1, \ldots, v_{2k}\}$, where $B = \{v_1, \ldots, v_{5k}\}$. Then no path impinges on a path in $TK_{5k}$ from from $\{v_1, \ldots, v_2k\}$ to $\{v_{2k + 1}, \ldots, v_{5k}\}$. Otherwise, pick the path impinging closest to $v_{2k + j}$, and reroute it to $v_{2k + j}$ rather than to something in $\{v_1, \ldots, v_{2k}\}$, reducing the number of impingements.
+  Let these join $\{s_1, \ldots, t_k\}$ to $\{v_1, \ldots, v_{2k}\}$, where $B = \{v_1, \ldots, v_{5k}\}$. Then no path impinges on a path in $TK_{5k}$ from $\{v_1, \ldots, v_{2k}\}$ to $\{v_{2k + 1}, \ldots, v_{5k}\}$. Otherwise, pick the path impinging closest to $v_{2k + j}$, and reroute it to $v_{2k + j}$ rather than to something in $\{v_1, \ldots, v_{2k}\}$, reducing the number of impingements.
 
   Hence each path (of any $2k$) meet at most one path in $\{v_1, \ldots, v_{2k}\}$ to $\{v_{2k + 1}, \ldots, v_{5k}\}$ (once we hit it, we must stay there).
 
@@ -1019,19 +1033,26 @@ We want to understand how these three notions interact. There are some obvious w
 \end{proof}
 The argument can be improved to use $TK_{3k}$.
 
-Since we are doing extremal graph theory, we want to ask the following question --- how many edges do we need to guarantee $G \succ K_t$ or $G \supseteq TK_t$.
+Since we are doing extremal graph theory, we want to ask the following question --- how many edges do we need to guarantee $G \succ K_t$ or $G \supseteq TK_t$?
 
 For two graphs $G$ and $H$, we write $G + H$ for the graph formed by taking the disjoint union of $G$ and $H$ and then joining everything in $G$ to everything in $H$.
 \begin{lemma}
-  If $e(G) \geq k|G|$, then $G \succ K_1 + H$ for some $H$ with $|H| \leq 2k|$ and $\delta(H) \geq k$.
+  If $e(G) \geq k|G|$, then there exists some $H$ with $|H| \leq 2k$ and $\delta(H) \geq k$ such that $G \succ K_1 + H$.
 \end{lemma}
 
 \begin{proof}
-  Take a subcontraction $G_1'$ of $G$ minimal satisfying $e(G') \geq k |G'|$. Then $e(G') = k |G'|$. So $\delta(G') \leq 2k$. Pick $v$ of minimal degree in $G'$ and let $H = G'[\Gamma(v)]$. Then $G \succ K_1 + H$ and $|H| \leq 2k$.
+  Consider the minimal subcontraction $G'$ of $G$ among those that satisfy $e(G') \geq k |G'|$. Then we must in fact have $e(G') = k|G'|$ , or else we can just throw away an edge.
 
-  If $u \in V(H)$, i.e.\ $\Gamma(v)$, then $e(G'/uv) \leq k|G'| - k - 1$, by minimality of $G'$. So it must be the case that $uV$ lies in $\geq k$ triangles of $G'$. In other words, $\delta(H) \geq k$.
+  Since $e(G') = k|G'|$, it must be the case that $\delta(G') \leq 2k$. Let $v$ be of minimum degree in $G'$. and set $H = G'[\Gamma(v)]$. Then $G \succ K_1 + H$ and $|H| \leq 2v$.
+
+  To see that $\delta(H) \geq k$, suppose $u \in V(H) = \Gamma(v)$. Then by minimality of $G'$, we have
+  \[
+    e(G'/uv) \leq k|G'| - k - 1.
+  \]
+  But the number of edges we kill when performing this contraction is exactly $1$ plus the number of triangles containing $uv$. So $uv$ lies in at least $k$ triangles of $G'$. In other words, $\delta(H) \geq k$.
 \end{proof}
 
+By iterating this, we can find some subcontractions into $K_t$.
 \begin{thm}
   If $t \geq 3$ and $e(G) \geq 2^{t - 3}|G|$, then $G \succ K_t$.
 \end{thm}
@@ -1051,68 +1072,130 @@ If we contract $J$ to a single vertex, then we get an $H + K_1$.
 
   Now pick a subgraph $J$ maximal such that $J$ is connected and $e(G/J) \geq k(|G| - |J| + 1)$. Note that any vertex could be used for $J$. So such a $J$ exist.
 
-  Let $H$ be the subgraph spanned by the vertices having a neighbour in $J$. Note that if $v \in V(H)$, then $v$ has at least $k$ neighbours in $H$. Indeed, when we contract $J \cup \{v\}$, because
+  Let $H$ be the subgraph spanned by the vertices having a neighbour in $J$. Note that if $v \in V(H)$, then $v$ has at least $k$ neighbours in $H$. Indeed, when we contract $J \cup \{v\}$, maximality tells us
   \[
-    e(G/(J \cup \{v\})) \leq k(|G| - |J| + 1) - k - 1.
+    e(G/(J \cup \{v\})) \leq k(|G| - |J| + 1) - k - 1,
   \]
+  and the number of edges we lose in the contraction is $1$ plus the number of neighbours of $v$ (it is easier to think of this as a two-step process --- first contract $J$, so that we get an $H + K_1$, then contract $v$ with the vertex coming from $K_1$).
 \end{proof}
 
+Again, we iterate this result.
 \begin{thm}
-  Let $F$ be a graph with $n$ edges and no isolated vertices. If $\delta(G) \geq 2^m$, then $G \supseteq TF$.
+  Let $F$ be a graph with $n$ edges and no isolated vertices. If $\delta(G) \geq 2^n$, then $G \supseteq TF$.
 \end{thm}
-\begin{proof}
-  If $m = 1$, then this is immediate. If $F$ consists of $m$ isolated edges, then $F \subseteq G$ (in fact, $\delta(G) \geq 2m - 1$ is enough for this). Otherwise, pick an edge $e$ which is not isolated. Then $F - e$ has at most $1$ isolated vertex. Apply the previous lemma to $G$ to obtain $H$ with $\delta(H) \geq 2^{m - 1}$. Find $T(F - e)$ in $h$ (apart from isolated vertex, if exists).
 
-  If $e$ was just a leaf, then just add an edge (say to $J$). If not, just construct a path going through $J$, since $J$ is connected.
+\begin{proof}
+  If $n = 1$, then this is immediate. If $F$ consists of $n$ isolated edges, then $F \subseteq G$ (in fact, $\delta(G) \geq 2n - 1$ is enough for this). Otherwise, pick an edge $e$ which is not isolated. Then $F - e$ has at most $1$ isolated vertex. Apply the previous lemma to $G$ to obtain $H$ with $\delta(H) \geq 2^{n - 1}$. Find a copy of $T(F - e)$ in $H$ (apart from the isolated vertex, if exists).
+
+  If $e$ was just a leaf, then just add an edge (say to $J$). If not, just construct a path going through $J$ to act as $e$, since $J$ is connected.
 \end{proof}
 
-Note that if $e(G) \geq k|G|$, then $G$ contains a subgraph with $\delta \geq k$. Otherwise, we can keep removing vertices of degree $<k$ till we have nothing left, which is nonsense. Hence, we can define
+It is convenient to make the definition
 \begin{align*}
   c(t) &= \inf \{c: e(G) \geq c|G| \Rightarrow G \succ K_t\}\\
-  t(t) &= \inf \{c: e(g) \geq c|G| \Rightarrow G \supseteq T K_t\},
+  t(t) &= \inf \{c: e(G) \geq c|G| \Rightarrow G \supseteq T K_t\}.
 \end{align*}
-and we have shown that these numbers do exist. Indeed, we know that
-\[
-  c(t) \leq 2^{t - 3},\quad t(t) \leq 2^{\binom{t}{2}}.
-\]
+We can interpret the first result as saying $c(t) \leq 2^{t - 3}$. Moreover, note that if $e(G) \geq k|G|$, then $G$ must contain a subgraph with $\delta \geq k$. Otherwise, we can keep removing vertices of degree $<k$ till we have none left, but still have a positive number of edges, which is clearly nonsense. Hence, the second result says $t(t) \leq 2^{\binom{t}{2}}$.
+
 Likewise, we can define
 \[
   f(k) = \min \{c: \kappa(G) \geq c \Rightarrow G \text{ is $k$-linked}\}.
 \]
-Since $\kappa(G) \geq c$ implies $\delta(G) \geq c$, the existence of $t(t)$ and our previous lemma implies that $f(k)$ exists.
+Since $\kappa(G) \geq c$ implies $\delta(G) \geq c$, the existence of $t(t)$ and the beginning lemma implies that $f(k)$ exists.
+
+In 1967, Mader showed $c(t) = t - 2$ for $t \leq 7$. Indeed, for $t \leq 7$, we have the exact result
+\[
+  \ex(n; \succ K_t) = (t - 2) n - \binom{t - 1}{2}.
+\]
+So for some time, people though $c$ is linear. But in fact, $c(t)$ is superlinear.
 
 \begin{lemma}
-  Let $G$ be a graph with $e(G) \geq 11 k |G|$, where $k \in \N$. Then $G \succ H$ with
+  We have
   \[
-    |H| \leq 11k + 2,\quad 2\delta (H) \geq |H| + 4k - 1.
+    c(t) \geq (\alpha + o(1)) t \sqrt{\log t}.
+  \]
+  To determine $\alpha$, let $\lambda < 1$ be the root to $1 - \lambda + 2 \lambda \log \lambda = 0$. In fact $\lambda \approx 0.284$. Then
+  \[
+    \alpha = \frac{1 - \lambda}{2 \sqrt{\log 1/\lambda}} \approx 0.319.
   \]
 \end{lemma}
-This improves our previous lemma by $\delta(h) \geq \left(\frac{1}{2} + \text{constant}\right) |H|$.
 
 \begin{proof}
-  Let $\ell = 11k$. We know that
+  Consider a random graph $G(n, p)$, where $p$ is a constant to be chosen later. So $G(n, p)$ has $n$ vertices and edges are chosen independently at random, with probability $p$. Here we \emph{fix} a $t$, and then try to find the best combination of $n$ and $p$ to give the desired result.
+
+  A partition $V_1, \ldots, V_t$ of $V(G)$ is said to be \emph{complete} if there is an edge between $V_i$ and $V_j$ for all $i$ and $j$. Note that having a complete partition is a \emph{necessary}, but not sufficient condition for having a $K_t$ minor. So it suffices to show that with probability $> 0$, there is no complete partition.
+
+  Writing $q = 1 - p$, a given partition with $|V_i| = n_i$ is complete with probability
+  \begin{align*}
+    \prod_{i, j}(1 - q^{n_i n_j}) &\leq \exp\left(- \sum_{i < j} q^{n_i n_j}\right)\\
+    &\leq \exp \left(- \binom{t}{2}\prod q^{n_i n_j/\binom{t}{2}}\right) \tag{AM-GM}\\
+    &\leq \exp \left(- \binom{t}{2} q^{n^2/t^2}\right).
+  \end{align*}
+  The expected number of complete partitions is then
+  \[
+    \leq t^n \exp \left(- \binom{t}{2} q^{n^2/t^2}\right),
+  \]
+  As long as we restrict to the choices of $n$ and $q$ such that
+  \[
+    t > n \sqrt{\frac{\log(1/q)}{\log n}},
+  \]
+  we can bound this by
+  \[
+    \leq \exp \left(n \log t - \binom{t}{2} \frac{1}{n} \right) = o(1)
+  \]
+  in the limit $t \to \infty$. We set
+  \[
+    q = \lambda,\quad n = \frac{t \sqrt{\log t}}{\sqrt{\log 1/\lambda}}.
+  \]
+  Then with probability $>0$, we can find a graph with only $o(1)$ many complete partitions, and by removing $o(n)$ many edges, we have a graph with
+  \[
+    p \binom{n}{2} - o(n) = (\alpha + o(1)) t \sqrt{\log t} \cdot n
+  \]
+  many edges with no $K_t$ minor.
+\end{proof}
+
+At this point, the obvious question to ask is --- is $t \sqrt{\log t}$ the correct growth rate? The answer is yes, and perhaps surprisingly, the proof is also probabilistic. Before we prove that, we need the following lemma:
+
+\begin{lemma}
+  Let $k \in \N$ and $G$ be a graph with $e(G) \geq 11 k |G|$. Then there exists some $H$ with
+  \[
+    |H| \leq 11k + 2,\quad 2\delta (H) \geq |H| + 4k - 1
+  \]
+  such that $G \succ H$.
+\end{lemma}
+
+\begin{proof}
+  We use our previous lemma as a starting point. Letting $\ell = 11k$, we know that we can find $H_1$ such that
   \[
     G \succ K_1 + H_1,
   \]
-  with $|H_1| \leq 2\ell$ and $\delta(H_1) \geq \ell$.
+  with $|H_1| \leq 2\ell$ and $\delta(H_1) \geq \ell$. We shall improve the connectivity of this $H_1$ at the cost of throwing away some elements.
 
-  Let
+  By divine inspiration, consider the constant $\beta \approx 0.37$ defined by the equation
   \[
-    \mathcal{C} = \{F : |F| \geq \beta \ell, e(f) \geq \phi(F)\},
+    1 = \beta \left(1 + \frac{\log 2}{\beta}\right),
   \]
-  where
+  and the function $\phi$ defined by
   \[
-    \phi(F) = \beta \ell \frac{|F|}{2} \left( \log \frac{|F|}{\beta \ell} + 1\right)
+    \phi(F) = \beta \ell \frac{|F|}{2} \left( \log \frac{|F|}{\beta \ell} + 1\right).
   \]
-  and $\beta \approx 0.37$ is defined by
+  Now consider the set of graphs
   \[
-    1 = \beta \left(1 + \frac{\log 2}{\beta}\right).
+    \mathcal{C} = \{F : |F| \geq \beta \ell, e(F) \geq \phi(F)\}.
   \]
-  Then $H_1 \in \mathcal{C}$, since $\delta(H_1) \geq \ell$ and $|H_1| \leq 2\ell$.
+%  where
+%  \[
+%    \phi(F) = \beta \ell \frac{|F|}{2} \left( \log \frac{|F|}{\beta \ell} + 1\right)
+%  \]
+%  and $\beta \approx 0.37$ is defined by
+%  \[
+%    1 = \beta \left(1 + \frac{\log 2}{\beta}\right).
+%  \]
+  Observe that $H_1 \in \mathcal{C}$, since $\delta(H_1) \geq \ell$ and $|H_1| \leq 2\ell$.
 
   Let $H_2$ be a subcontraction of $H_1$, minimal with respect to $\mathcal{C}$.
 
-  Since the complete graph of order $\lceil \beta \ell\rceil$ is not in $\mathcal{C}$, as $\phi > \binom{\beta \ell}{2}$, the only reason we are minimal is that we have as few edges as possible. We have
+  Since the complete graph of order $\lceil \beta \ell\rceil$ is not in $\mathcal{C}$, as $\phi > \binom{\beta \ell}{2}$, the only reason we are minimal is that we have hit the bound on the number of edges. Thus, we must have
   \[
     |H_2| \geq \beta\ell + 1,\quad e(H_2) = \lceil \phi(H_2)\rceil,
   \]
@@ -1124,13 +1207,14 @@ This improves our previous lemma by $\delta(h) \geq \left(\frac{1}{2} + \text{co
 
   Choose a vertex $u \in H_2$ of minimum degree, and put $H_3 = H_2 [\Gamma(u)]$. Then we have
   \[
-    |H_3| = \delta (H_2) \leq \frac{2 \lceil \phi(H_2)\rceil}{|H_2|} \leq \left\lfloor\beta \ell \left(\log \left(\frac{H_2}{\beta \ell}\right) + 1\right)  + \frac{2}{|H_2|}\right\rfloor \leq \ell. % funny terms for rounding.
+    |H_3| = \delta (H_2) \leq \frac{2 \lceil \phi(H_2)\rceil}{|H_2|} \leq \left\lfloor\beta \ell \left(\log \left(\frac{|H_2|}{\beta \ell}\right) + 1\right) + \frac{2}{|H_2|}\right\rfloor \leq \ell,
   \]
-  and $\beta \ell \leq |H_2| \leq 2\ell$.
+  since $\beta \ell \leq |H_2| \leq 2\ell$.
 
   Let's write $b = \beta \ell$ and $h = |H_2|$. Then by the usual argument, we have
   \begin{align*}
-    2 \delta (H_3) - |H_3| &\geq 2 (\phi(H_2) - \phi(H_2/uv) - 1) - |H_3|\\
+    &\hphantom{ {}\geq{}}2 \delta (H_3) - |H_3| \\
+    &\geq 2 (\phi(H_2) - \phi(H_2/uv) - 1) - |H_3|\\
     &\geq bh \left(\log \frac{h}{\beta} + 1\right) - b (h - 1) \left(\log \frac{h - 1}{b} + 1\right) - b \left(\log \frac{h}{b} + 1\right) - 3\\% funny terms for rounding.
     &= b(h - 1) \log \frac{h}{h - 1} - 3\\
     &> b - 4,
@@ -1141,52 +1225,12 @@ This improves our previous lemma by $\delta(h) \geq \left(\frac{1}{2} + \text{co
   \]
   If we put $H = K_2 + H_3$, then $G \succ H$, $|H| \leq 11k + 2$ and
   \[
-    2\delta (H) - |H| \geq 2 \delta(H_3)  - |H_3| + 2 \geq 4k - 1.
+    2\delta (H) - |H| \geq 2 \delta(H_3) - |H_3| + 2 \geq 4k - 1.\qedhere
   \]
 \end{proof}
 % Where did that magical function $\phi$ come from? This was an argument by Mader, who had a proof using two straight lines. The exact function is found by solving a differential equation of the form $\phi(x) - \phi(x - 1) \approx \phi'(x)$.
-% use a graph of steeper slope. We know we have 2\ell vertices 
+% use a graph of steeper slope. We know we have 2\ell vertices
 
-In 1967, Mader showed $c(t) = t - 2$ for $t \leq 7$. Indeed, for $t \leq 7$, we have the exact result
-\[
-  \ex(n, \succ K_t) = (t - 2) n - \binom{t - 1}{2}.
-\]
-So for some time, people though $c$ is linear. But in fact, $c(t)$ is superlinear.
-
-\begin{lemma}
-  We have
-  \[
-    c(t) \geq (\alpha + o(1)) t \sqrt{\log t}.
-  \]
-  To determine $\alpha$, let $\lambda \leq 1$ be the root to $1 - \lambda + 2 \lambda \log \lambda = 0$. In fact $\lambda \approx 0.284$. Then
-  \[
-    \alpha = \frac{1 - \lambda}{2 \sqrt{\log 1/\lambda}} \approx 0.319.
-  \]
-\end{lemma}
-
-\begin{proof}
-  Consider a random graph $G(n, p)$, where $p$ is a constant to be chosen later. So $G(n, p)$ has $n$ vertices and edges are chosen independently at random, with probability $p$.
-
-  A partition $V_1, \ldots, V_t$ of $V(G)$ is said to be \emph{complete} if there is an edge between $V_i$ and $V_j$ for all $i$ and $j$. Writing $q = 1 - p$, a given partition with $|V_i| = n_i$ is complete with probability
-  \begin{align*}
-    \prod_{i, j}(1 - q^{n_i n_j}) &\leq \exp \exp\left(- \sum_{i < j} q^{n_i n_j}\right)\\
-    &\leq \exp \left(- \binom{t}{2}\prod q^{n_i n_j/\binom{t}{2}}\right) \tag{AM-GM}\\
-    &\leq \exp \left(- \binom{t}{2} q^{n^2/t^2}\right).\tag{Cauchy--Schwarz}
-  \end{align*}
-  The expected number of complete partitions is then
-  \[
-    n^2 \exp \left(- \binom{t}{2} q^{n^2/t^2}\right) = o(1)
-  \]
-  if
-  \[
-    t > n \sqrt{\frac{\log(1/q)}{\log n}}.
-  \]
-  Thus, there exists graphs with
-  \[
-    (p + o(1)) \binom{n}{2}
-  \]
-  edges and with no $K_t$ minor. Choosing $q = \lambda$ then gives the result.
-\end{proof}
 
 \begin{thm}
   We have
@@ -1196,20 +1240,24 @@ So for some time, people though $c$ is linear. But in fact, $c(t)$ is superlinea
   if $t$ is large.
 \end{thm}
 
+The idea of the proof is as follows: First, we pick some $H$ with $G \succ H$ such that $H$ has high minimum degree, as given by the previous lemma. We now randomly pick disjoint subsets $U_1, \ldots, U_{2t}$, and hope that they give us a subcontraction to $K_t$. There are more sets that we need, because some of them might be ``bad'', in the sense that, for example, there might be no edges from $U_1$ to $U_{57}$. However, since $H$ has high minimum degree, the probability of being bad is quite low, and with positive probability, we can find $t$ subsets that have an edge between any pair. While the $U_i$ are not necessarily connected, this is not a huge problem since $H$ has so many edges that we can easily find paths that connect the different vertices in $U_i$.
+
 \begin{proof}
   For large $t$, we can choose $k \in \N$ so that
   \[
     5.8t \sqrt{\log_2 t} \leq 11k \leq 7t \sqrt{\log t}.
   \]
-  Let $\ell = \lceil 1.01 \sqrt{\log_2 t}\rceil$. Then $k \geq t\ell/2$. We want to show that $G \succ K_t$ if $e(g) \geq 11k |G|$.
+  Let $\ell = \lceil 1.01 \sqrt{\log_2 t}\rceil$. Then $k \geq t\ell/2$. We want to show that $G \succ K_t$ if $e(G) \geq 11k |G|$.
 
-  We already know that $G \succ H$ where $h = |h| \leq 11k + 2$, and $2 \delta(H) \geq |H| + 4k - 1$. We show that $H \succ K_t$.
+  We already know that $G \succ H$ where $h = |H| \leq 11k + 2$, and $2 \delta(H) \geq |H| + 4k - 1$. We show that $H \succ K_t$.
 
-  From now on, we work entirely in $H$. Note that any two adjacent vertices have $\geq 4k + 1$  common neighbours. Randomly select $2t$ disjoint $\ell$ sets $U_1, \ldots, U_{2t}$ in $V(H)$. This is possible since we need $2t \ell$ vertices, and $2t\ell \leq 4k$.
+  From now on, we work entirely in $H$. Note that any two adjacent vertices have $\geq 4k + 1$ common neighbours. Randomly select $2t$ disjoint $\ell$ sets $U_1, \ldots, U_{2t}$ in $V(H)$. This is possible since we need $2t \ell$ vertices, and $2t\ell \leq 4k$.
 
-  Consider a random part $U$. The degree of some vertex $v$ is at least $h/2$. So the probability that $v$ has no neighbour in $U$ is at most $\binom{h/2}{\ell} / \binom{h}{\ell} \leq 2^{-\ell}$. Write $X(U)$ for the vertices having no neighbour in $U$, then $\E |X(U)| \leq 2^{-\ell} h$.
+  Of course, we only need $t$ many of those $\ell$ sets, and we want to select the ones that have some chance of being useful to us.
 
-  We say $U$ is \emph{bad} if $|X(U)| > 8 \cdot 2^{-\ell}h$. Hence the probability that $U$ is bad is $< \frac{1}{8}$ by Markov's inequality. Hence the expected number of bad sets amongst $U_1, \ldots, U_{25}$ is $\leq \frac{t}{4}$. Hence the probability that there are more than $\frac{t}{2}$ bad sets is $< \frac{1}{2}$.
+  Fix a part $U$. For any vertex $v$ (not necessarily in $U$), its degree is at least $h/2$. So the probability that $v$ has no neighbour in $U$ is at most $\binom{h/2}{\ell} / \binom{h}{\ell} \leq 2^{-\ell}$. Write $X(U)$ for the vertices having no neighbour in $U$, then $\E |X(U)| \leq 2^{-\ell} h$.
+
+  We say $U$ is \emph{bad} if $|X(U)| > 8 \cdot 2^{-\ell}h$. Then by Markov's inequality, the probability that $U$ is bad is $< \frac{1}{8}$. Hence the expected number of bad sets amongst $U_1, \ldots, U_{2t}$ is $\leq \frac{t}{4}$. By Markov again, the probability that there are more than $\frac{t}{2}$ bad sets is $< \frac{1}{2}$.
 
   We say a pair of sets $(U, U')$ is \emph{bad} if there is no $U-U'$ edge. Now the probability that $U, U'$ is bad is $\P(U' \subseteq X(U))$. If we condition on the event that $U$ is good (i.e.\ not bad), then this probability is bounded by
   \[
@@ -1227,15 +1275,126 @@ So for some time, people though $c$ is linear. But in fact, $c(t)$ is superlinea
 
   Fixing such a choice $U_1, \ldots, U_t$, we now work deterministically. We would be done if each $U_i$ were connected, but they are not in general. However, we can find $W_1, \ldots, W_t$ in $V(H) \setminus (U_1 \cup \cdots U_t)$ such that $U_i \cup W_i$ is connected for $1 \leq i \leq t$.
 
-  Indeed, if $U_i = \{u_1, \ldots, u_\ell\}$, we pick a common neighbour of $u_{j - 1}$ and $u_j$ if $u_{j - 1} u_j \not \in E(H)$, and put it in $W_i$. In total, this requires us to pick $\leq t\ell$ distinct vertices in $V(H) - U1 \cup \cdots \cup U_t)$, and we can do this because $u_{j - 1}$ and $u_j$ have at least $4k - t\ell \geq t\ell$ common neighbours in this set.
+  Indeed, if $U_i = \{u_1, \ldots, u_\ell\}$, we pick a common neighbour of $u_{j - 1}$ and $u_j$ if $u_{j - 1} u_j \not \in E(H)$, and put it in $W_i$. In total, this requires us to pick $\leq t\ell$ distinct vertices in $V(H) - (U_1 \cup \cdots \cup U_t)$, and we can do this because $u_{j - 1}$ and $u_j$ have at least $4k - t\ell \geq t\ell$ common neighbours in this set.
 \end{proof}
 
 It has been shown (2001) that equality holds in the previous lemma.
 
-So we now understand $c(t)$ quite well. How about subdivision and linking? We decide to work on $f(k)$ now, because Robertson and Seymour (1995) showed that our first lemma that holds if $G \succ TK_{3k}$ instead of $G \succ TK_{5k}$. We also know how many edges we need to get a minor. Combining with our previous theorem, we know
+So we now understand $c(t)$ quite well. How about subdivision and linking? We decide to work on $f(k)$ now, because Robertson and Seymour (1995) showed that our first lemma that holds if $G \succ TK_{3k}$ instead of $G \supseteq K_{3k}$. We also know how many edges we need to get a minor. Combining with our previous theorem, we know
 \[
   f(k) = O(k \sqrt{\log k}).
 \]
 We know we can't do better than $k$, but we can get it down to order $k$ by proving our first lemma under the weaker hypothesis that $G \succ H$ where $H$ is dense.
+
+So far, we have proven theorems that say, roughly, ``if $G$ is a graph with enough edges, then it subcontracts to some highly connected thing''. Now saying that $G$ subcontracts to some highly connected thing is equivalent to saying we can find disjoint non-empty connected subgraphs $D_1, \ldots, D_m$ such that each $D_i$ is connected, and there are many edges between the $D_i$. The lemma we are going to prove next says under certain conditions, we can choose the $D_i$ in a way that they contain certain prescribed points.
+
+\begin{defi}[$S$-cut]\index{$S$-cut}
+  Given $S \subseteq V(G)$, an $S$-cut is a pair $(A, B)$ of subsets of the vertices such that $A \cup B = V(G)$, $S \subseteq A$ and $e(A \setminus B, B \setminus A) = 0$. The \term{order} of the cut is $|A \cap B|$.
+
+  We say $(A, B)$ \emph{avoids} $C$ if $A \cap V(C) = \emptyset$.
+\end{defi}
+
+\begin{eg}
+  For any $S \subseteq A$, the pair $(A, V(G))$ is an $S$-cut.
+\end{eg}
+
+\begin{lemma}
+  Let $d \geq 0$, $k \geq 2$ and $h \geq d + \lfloor 3k/2 \rfloor$ be integers.
+
+  Let $G$ be a graph, $S= \{s_1, \ldots, s_k\} \subseteq V(G)$. Suppose there exists disjoint subgraphs $C_1, \ldots, C_h$ of $G$ such that
+  \begin{itemize}
+    \item[($*$)] Each $C_i$ is either connected, or each of its component meets $S$. Moreover, each $C_i$ is adjacent to all but at most $d$ of the $C_j$, $j \not= i$ not meeting $S$.
+    \item[($\dagger$)] Moreover, no $S$-cut of order $< k$ avoids $d + 1$ of $C_1, \ldots, C_h$.
+  \end{itemize}
+  Then $G$ contains disjoint non-empty connected subgraphs $D_1, \ldots, D_m$, where
+  \[
+    m = h - \lfloor k/2 \rfloor,
+  \]
+  such that for $1 \leq i \leq k$, $s_i \in D_i$, and $D_i$ is adjacent to all but at most $d$ of $D_{k + 1}, \ldots, D_m$.
+\end{lemma}
+
+\begin{proof}
+  Suppose the theorem is not true. Then there is a minimal counterexample $G$ (with minimality defined with respect to proper subgraphs). 
+
+  We first show that we may assume $G$ has no isolated vertices. If $v$ is an isolated vertex, and $v \not \in S$, then we can simply apply the result to $G - v$. If $v \in S$, then the $S$-cut $(S, V(G) \setminus \{v\})$ of order $k - 1$ avoids $h - k \geq d - 1$ of the $C_i$'s.
+
+  \begin{claim}
+    If $(A, B)$ is an $S$-cut of order $k$ avoiding $d + 1$ many of the $C_i$'s, then $B = V(G)$ and $A$ is discrete.
+  \end{claim}
+  Indeed, given such an $S$-cut, we define
+  \begin{align*}
+    S' &= A \cap B\\
+    G' &= G[B] - E(S')\\
+    C_i' &= C_i \cap G'.
+  \end{align*}
+  We now make a further claim:
+  \begin{claim}
+    $(G', S', \{C_i'\})$ satisfies the hypothesis of the lemma.
+  \end{claim}
+  We shall assume this claim, and then come back to establishing the claim.
+
+  Assuming these claims, we show that $G$ isn't a countrexample after all. Since $(G', S', \{C_i'\})$ satisfies the hypothesis of the lemma, by minimality, we can find subgraphs $D_1', \ldots, D_m'$ in $G'$ that satisfy the conclusion of the lemma for $G'$ and $S'$. Of course, these do not necessarily contain our $s_i$Assuming these claims, we can construct the desired $D_i$. However, we can just add paths from $S'$ to the $s_i$.
+
+  Indeed, $G[A]$ has no $S$-cut $(A'', B'')$ of order less than $k$ with $S' \subseteq B''$, else $(A'', B'' \cup B)$ is an $S$-cut of $G$ of the forbidden kind, since $A$, and hence $A''$ avoids too many of the $C_i$. Hence by Menger's theorem, there are vertex disjoint paths $P_1, \ldots, P_k$ in $G[A]$ joining $s_i$ to $s_i'$ (for some labelling of $S'$). Then simply take
+  \[
+    D_i = D_i' \cup P_i.
+  \]
+ 
+  \separator
+
+  To check that $(G', S', \{C_i'\})$ satisfy the hypothesis of the lemma, we first need to show that the $C_i'$ are non-empty.
+
+  If $(A, B)$ avoids $C_j$, then by definition $C_j \cap A = \emptyset$. So $C_j = C_j'$. By assumption, there are $d + 1$ many $C_j$'s for which this holds. Also, since these don't meet $S$, we know each $C_i$ is adjacent to at least one of these $C_j$'s. So in particular, $C_i'$ is non-empty since $C_i' \supseteq C_i \cap C_j' = C_i \cap C_j$.
+
+  Let's now check the conditions:
+  \begin{itemize}
+    \item[($*$)] For each $C_i'$, consider its components. If there is some component that does not meet $S'$, then this component is contained in $B \setminus A$. So this must also be a component of $C_i$. But $C_i$ is connected. So this component is $C_i$. So $C_i' = C_i$. Thus, either $C_i'$ is connected, or all components meet $S'$.
+      
+      Moreover, since any $C_j'$ not meeting $S'$ equals $C_j$, it follows that each $C_i$ and so each $C_i'$ is adjacent to all but at most $d$ of these $C_j'$s. Therefore $(*)$ holds.
+
+    \item[($\dagger$)] If $(A', B')$ is an $S'$-cut in $G'$ avoiding some $C_i'$, then $(A \cup A', B')$ is an $S$-cut of $G$ of the same order, and it avoids $C_i$ (since $C_i'$ doesn't meet $S'$, and we have argued this implies $C_i' = C_i$, and so $C_i \cap A = \emptyset$). In particular, no $S'$-cut $(A', B')$ of $G'$ has order less than $k$ and still avoids $d + 1$ of $C_1', \ldots, C_h'$.
+  \end{itemize}
+
+  \separator
+
+  We can now use our original claim. We know what $S$-cuts of order $k$ loop like, so we see that if there is an edge that does not join two $C_i$'s, then we can contract the eedge to get a smaller counterexample. Recalling that $G$ has no isolated vertices, we see that in fact $V(G) = \cup V(C_i)$, and $|C_i| = 1$ unless $C_i \subseteq S$.
+
+  Let
+  \[
+    C = \bigcup \{V(C_i): |C_i| \geq 2\}.
+  \]
+  We claim that there is a set $I$ of $|C|$ independent edges meeting $C$. If not, by Hall's theorem, we can find $X \subseteq C$ whose neighbourhood $Y$ (in $V(G) - S$) such that $|Y| < |X|$. Then $(S \cup Y, V(G) - X)$ is an $S$-cut of order $|S| - |X| + |Y| < |S| = k$ avoiding $\geq |G| - |S| - |Y|$ many $C_i$'s, and this is
+  \[
+    \geq |G| - |S| - |X| + 1 \geq |G| - |C| - k + 1.
+  \]
+  But $h \leq |G| - |C| + \frac{|C|}{2}$, since $|G| - |C|$ is the number of $C_i$'s of size $1$, so we can bound the above by
+  \[
+    \geq h - \frac{|C|}{2} - k + 1 \geq h - \frac{3k}{2} + 1 \geq d + 1.
+  \]
+  This contradiction shows that $I$ exists.
+
+  Now we can just write down the $D_i$'s. For $1 \leq i \leq k$, set $D_i$ to be $s_i$ if $s_i$ is a $C_\ell$ with $|C_\ell| = 1$, i.e.\ $s_i \not \in C$. If $s_i \in C$, let $D_i$ be the edge of $I$ meeting $S_i$.
+
+  Let $D_{k + 1}, \ldots, D_m$ each be single vertices of $G - S - (\text{ends of }I)$. Note those exist because $\geq |G| - k - |C| \geq h - \lfloor \frac{3k}{2}\rfloor = m - k$ vertices are avaiable. Note that each $D_i$ contains a $C_\ell$ with $|C_\ell| = 1$. So each $D_i$ is joined to all but $\leq d$ many $D_j$'s.
+\end{proof}
+
+The point of this result is to prove the following theorem:
+\begin{thm}
+  Let $G$ be a graph with $\kappa(G) \geq 2k$ and $e(G) \geq 11k |G|$. Then $G$ is $k$-linked.
+
+  In particular, $f(k) \leq 22k$.
+\end{thm}
+Note that if $\kappa(G) \geq 22k$ then $\delta(G) \geq 22k$, so $e(G) \geq 11k |G|$.
+
+\begin{proof}
+  We know that under these conditions, $G \succ H$ with $|H| \leq 11k + 2$ and $2\delta(H) \geq |H| + 4k - 1$. Let $h = |H|$, and $d = h - 1 - \delta (H)$. Note that
+  \[
+    h = 2d - 2 + 2 \delta(H) - h \geq 2d + 4k.
+  \]
+  Let $C_1, \ldots, C_k$ be connected subgraphs of $G$ which contract to form $H$. Then clearly each $C_i$ is joined to all but at most $h - 1 - \delta(H) = d$ other $C_j$'s. Now let $s_1, \ldots, s_k, t_1, \ldots, t_k$ be the vertices we want to link up. Let $S = \{s_1, \ldots, s_k, t_1, \ldots, t_k\}$. Observe that $G$ has no $S$-cut of order $< 2k$ at all since $\kappa(G) \geq 2k$. So the conditions are satisfied, but with $2k$ instead of $k$.
+
+  So there are subgraphs $D_1, \ldots, D_m$, where $m = h - k \geq 2d + 3k$ as described. We may assume $s_i \in D_i$ and $t_i \in D_{k + i}$. Note that for each pair $(D_i, D_j)$, we can find $\geq m - 2d \geq 3k$ other $D_\ell$ such that $D_\ell$ is joined to both $D_i$ and $D_j$. So for each $i = 1, \ldots, k$, we can find an unused $D_\ell$ not among $D_1, \ldots, D_{2k}$ that we can use to connect up $D_i$ and $D_{k + i}$, hence $s_i$ and $t_i$.
+\end{proof}
+
 \printindex
 \end{document}
