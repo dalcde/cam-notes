@@ -1916,6 +1916,7 @@ Note that this connection with electrical networks only works for reversible Mar
 Note that this method is rather robust. We only need to be able to embed our $T_\rho$ into $\Z^3$. Using a similar method, Grimmett, Kesten and Zhang (1993) showed that simple random walk on a supercritical bond percolation is transient for $d \geq 3$.
 
 \section{Uniform spanning trees}
+\subsection{Finite uniform spanning trees}
 The relation between uniform spanning trees and electrical networks was discovered by Kirchoff in 1850's. Of course, he was not interested in uniform spanning tress, but in electrical networks themselves. One of the theorems we will prove is
 \begin{thm}[Foster's theorem]\index{Foster's theorem}
   Let $G = (V, E)$ be a finite weighted graph on $n$ vertices. Then
@@ -2049,5 +2050,80 @@ We first prove a \emph{deterministic} lemma about cycle popping.
 
   Thus, by induction, if $C$ is a cycle that is popped, then after performing a finite number of pops, $C$ is still a cycle that can be popped. So either there is an infinite number of cycles that can be popped, so popping can never stop, or every cycle that can be popped will be popped, thus in this case giving the same spanning tree.
 \end{proof}
+
+Using this, we can prove that Wilson's method gives the correct distribution. In Wilson's algorithm, we pop cycles by erasing loops in the order of cycle creation. This procedure will stop will probability $1$. With this procedure, we will reveal a finite set of coloured cycles $O$ lying over a spanning tree. Let $X$ be the set of all $(O, T)$, where $O$ is the set of coloured cycles lying on top of $T$, which arise from running the random walks.
+
+Now if we can get to $(O, T)$, then we could also get to $(O, T')$ for any other spanning spanning tree $T'$, since there is no restriction on what could be under the stacks. So we can write
+\[
+  X = X_1 \times X_2,
+\]
+where $X_1$ is a certain set of finite sets of coloured cycles, and $X_2$ is the set of all spanning trees.
+
+Define a function $\Psi$ on the set of cycles by
+\[
+  \Psi(C) = \prod_{e \in C} p(e),\quad p(e) = \frac{c(e)}{c(e_-)},
+\]
+where $e = (e_-, e_+)$, and $c(e_-)$ is the sum of the conductances of all edges with vertex $e_-$.
+
+More generally, if $O$ is a set of cycles, then we write
+\[
+  \Psi(O) = \prod_{C \in O} \Psi(C).
+\]
+Then
+\[
+  \P(\text{get $(O, T)$ using Wilson's algorithm}) = \prod_{e \in \bigcup_{C \in O} C \cup T)} p(e) = \Psi(O) \cdot \Psi(T).
+\]
+Since this probability factorizes, it follows that the distribution of $O$ is independent of $T$, and the probability of getting $T$ is proportional to $\Psi(T)$. So $T$ has the distribution of a uniform spanning tree.
+
+\begin{cor}[Cayley's formula]\index{Cayley's formula}
+  The number of labeled unrooted trees on $n$-vertices is equal to $n^{n - 2}$.
+\end{cor}
+
+\begin{proof}
+  Exercise.
+\end{proof}
+
+How can we generalize Wilson's algorithm to infinite graphs? If the graph is recurrent, then we can still use the same algorithm, and with probability one, the algorithm terminates. If we have a transient graph, then we can still perform the same algorithm, but it is not clear what the resulting object will be.
+
+The \term{Aldous--Broder algorithm} is another way of generating a uniform spanning tree. Run a random walk that visits all vertices at least once. For every vertex other than the root, take the edge the walk crossed the first time it visited the vertex, and keep the edge in the spanning tree. It is an exercise to prove that this does give a uniform spanning tree. Again, this algorithm works only on a recurrent graph. A generalization to transient graphs was found by Hutchcroft.
+
+\subsection{Infinite uniform spanning trees and forests}
+Let $G$ be an infinite recurrent graph. Then we can generate a uniform spanning tree of $G$ by running Wilson's algorithm in the obvious way. If $G$ is an infinite transient graph, then we can define uniform spanning trees by exhaustions.
+
+Let $G_n$ be an exhaustion of $G$ by finite graphs. Define $G_n^W$ (where $W$ stands for ``wired'') to be the graph $G_n$, where all of the vertices of $G \setminus G_n$ are glued to a single vertex $z_n$. The ``free'' $G_n$ is just $G_n$ considered as a subgraph. It turns out the wired one is much easier to study.
+
+Let $\mu_n$ be the uniform spanning tree measure on $G_n^W$. Let $B$ be a finite set of edges $B = \{e_1, \ldots, e_n\}$. Then for $T$ a UST of $G_n^W$, we have
+\[
+  \mu_n(B \subseteq T) = \prod_{k = 1}^m \mu(e_k \in T \mid e_j \in T\text{for all }j < k) = \prod_{k = 1}^n R_{eff}(e_k; G_n^W/\{e_j: j < k\}),
+\]
+where $G_n^W/\{e_j: j < k\}$ is the graph obtained from $G_n^W$ by contracting the edges $\{e_j: j < k\}$.
+
+We want to show that $\mu_n$ as a sequence of measures converges. So we want to understand how $R_{eff}(e_k; G_n^W/\{e_j: j < k\})$ changes when we replace $n$ with $n + 1$. By Rayleigh's monotonicity principle, since $G_n^W$ can be obtained from $G_{n + 1}^W$ by contracting more edges, we know the effective resistance increases when we replace $n$ with $n + 1$. So we know that
+\[
+  \mu_n(B \subseteq T) \leq \mu_{n + 1}(B \subseteq T).
+\]
+So $(\mu_n(B \subseteq T))$ is an increasing sequence. So we can define
+\[
+  \mu(B \subseteq \mathcal{F}) = \lim_{n \to \infty} \mu_n(B \subseteq T),
+\]
+and $\mathcal{F}$ is our uniform forest. We can then extend the definition of $\mu$ to cylinder events
+\[
+  \{\mathcal{F}: B_1 \subseteq \mathcal{F}, B_2 \cap \mathcal{F} = \emptyset\}
+\]
+with $B_1, B_2$ finite sets of edges, using inclusion-exclusion:
+\[
+  \mu(B_1 \subseteq \mathcal{F}, B_2 \cap \mathcal{F} = \emptyset) = \sum_{S \subseteq B_2} \mu(B_1 \cup S \subseteq \mathcal{F}) (-1)^{|S|}.
+\]
+Then by commuting limits, we find that in fact
+\[
+  \mu(B_1 \subseteq \mathcal{F}, B_2 \cap \mathcal{F} = \emptyset) = \lim_{n \to \infty} \mu_n (B_1 \subseteq T, B_2 \cap T = \emptyset).
+\]
+If $\mathcal{A}$ is a finite union or intersection of cylinder sets of this form, then we have
+\[
+  \mu(\mathcal{A}) = \lim_{n \to \infty} \mu_n(\mathcal{A}).
+\]
+So this gives a consistent family of measures.
+
+By Kolmogorov's theorem, we get a unique probability measure $\mu$ supported on the forests of $G$. $\mu$ is called the \term{wired uniform spanning forest}.
 \printindex
 \end{document}

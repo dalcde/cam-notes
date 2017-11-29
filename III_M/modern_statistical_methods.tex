@@ -2315,7 +2315,7 @@ The conditional independence graph only tells us which variables are related to 
 \end{eg}
 Note that the structural equation model for $Z$ determines its distribution, but it does much more than that, but it does more than that. Using a topological ordering $\pi$, we can write $Z_k$ as a function of $\varepsilon_{\pi^{-1}(1)}, \ldots, \varepsilon_{\pi^{-1}(\pi(k))}$.
 
-One way to understand structural equation models is via \emph{interventions}. We can modify a structural equation model by replacing the equation for $Z_k$ by setting, e.g. $Z_k = a$. This is called a \term{perfect intervention}\index{intervention!perfect}. The modified SEM gives a new joint distribution for $Z$. Expectations or probabilities with respect to the new distribution are written by adding ``$\ddo(Z_k = a)$''. For example, we write
+One way to understand structural equation models is via \emph{interventions}. We can modify a structural equation model by replacing the equation for $Z_k$ by setting, e.g.\ $Z_k = a$. This is called a \term{perfect intervention}\index{intervention!perfect}. The modified SEM gives a new joint distribution for $Z$. Expectations or probabilities with respect to the new distribution are written by adding ``$\ddo(Z_k = a)$''. For example, we write
 \[
   \E(Z_j \mid \ddo(Z_k = a)).
 \]
@@ -2343,9 +2343,9 @@ To understand The DAGs associated to structural equation models, we would like t
 
 Let $P$ be the distribution of $Z$ and let $f$ be the density.
 \begin{defi}[Markov properties]
-  Given a DAG $\mathcal{G}$, we say $P$ satisfies 
+  Given a DAG $\mathcal{G}$, we say $P$ satisfies
   \begin{enumerate}
-    \item the \term{Markov factorization criterion} if 
+    \item the \term{Markov factorization criterion} if
       \[
         f(z_1, \ldots, z_p) = \prod_{k = 1}^p f(z_k \mid z_{\pa(k)}).
       \]
@@ -2475,7 +2475,7 @@ While there is an extra independence relation, we cannot remove any edge while s
      \begin{pmatrix}
        1 & 0 \\
        0 & 2
-     \end{pmatrix} - 
+     \end{pmatrix} -
      \frac{1}{2}
      \begin{pmatrix}
        1 \\ 1
@@ -2523,8 +2523,8 @@ To find $\mathcal{G}$, the following proposition helps us compute the skeleton:
 \end{prop}
 
 \begin{proof}
-  Only the last part requires proof. Consider a path $j = j_1, \ldots, j_m = k$.  We may assume that $j_{m - 1} \leftarrow k$, as otherwise $j_{m - 1}$ would be a parent of $k$, and blocks $k$.
-  
+  Only the last part requires proof. Consider a path $j = j_1, \ldots, j_m = k$. We may assume that $j_{m - 1} \leftarrow k$, as otherwise $j_{m - 1}$ would be a parent of $k$, and blocks $k$.
+
   Consider a path between $j$ and $k$, say $j = v_1 , v_2, \ldots, v_n = k$. Observe that it must be the case that $v_n v_{n - 1} \in E$, as opposed to $v_{n - 1} v_n \in E$, or else the path is blocked by $v_{n - 1}$. Let $\ell$ be the largest $\ell'$ with $j_{\ell' - 1} \to j_{\ell'} \leftarrow j_{\ell' + 1}$. This must exist as $j \not\in \de(k)$ by topological ordering. In order for the path not to be blocked, we know $j\ell'$ must have a descendant in $\pa(k)$, but this would introduce a cycle.
 \end{proof}
 
@@ -2573,7 +2573,288 @@ To find the $v$-structures, we perform:
 \end{enumerate}
 This gives us the Markov equivalence class, and we may orient the other edges using other properties like acyclicity.
 
-If we want to apply this to data sets, then we need to apply some conditional independence tests instead of querying our oracle to figure out if things are conditional dependence. However, errors in the algorithm propagate, and the whole process may be derailed by early errors. Moreover, the result of the algorithm may depend on how we iterate through the nodes. People have tried many ways to fix these problems, but in general, this method is rather unstable.
+If we want to apply this to data sets, then we need to apply some conditional independence tests instead of querying our oracle to figure out if things are conditional dependence. However, errors in the algorithm propagate, and the whole process may be derailed by early errors. Moreover, the result of the algorithm may depend on how we iterate through the nodes. People have tried many ways to fix these problems, but in general, this method is rather unstable. Yet, if we have large data sets, this can produce quite decent results.
+
+\section{High-dimensional inference}
+\subsection{Multiple testing}
+What we are going to talk about first is the problem of multiple testing. We have a lot of hypothesis we want to test, and we want to control the error we have. This is very common in, for example, biological sciences.
+
+Suppose we have some null hypothesis $H_1, \ldots, H_m$, and $i \in I_0$ are the set of true null hypothesis. Let $m_0 = |I_0|$, and let $p_1, \ldots, p_m$ be the $p$-values, so that
+\[
+  \P_{H_i}(p_i \leq \alpha) \leq \alpha
+\]
+for all $\alpha \in [0, 1]$. Given a procedure for rejecting hypothesis (multiple testing procedure), we let $N$ be the number of false rejections (false positives), and $R$ the total number of rejections. We can also think about the number of false negatives, but we shall not do that here.
+
+Traditionally, multiple-testing procedures sought to control the \term{family-wise error rate} (\term{FWER}), defined by $\P(N \geq 1)$. The simplest way to minimize this is to use the \term{Bonferroni correction}, which rejects $H_i$ if $p_i \leq \frac{\alpha}{m}$. Usually, we might have $\alpha \sim 0.05$, and so this might be very small if we have lots of hypothesis (e.g.\ a million). The reason is that $N \geq 1$ is a really strict condition to impose.
+
+Unsurprisingly, we have
+\begin{thm}
+  When using the Bonferroni correction, we have
+  \[
+    \mathrm{FWER} \leq \E(N) \leq \frac{m_0 \alpha}{m} \leq \alpha.
+  \]
+\end{thm}
+
+\begin{proof}
+  The first inequality is Markov's inequality, and the last is obvious. The second follows from
+  \[
+    \E(N) = \E \left(\sum_{i \in I_0} \mathbf{1}_{p_i \leq \alpha/m}\right) = \sum_{i \in I_0} \P(p_i \leq \frac{\alpha}{m}) \leq \frac{m_0 \alpha}{m}.
+  \]
+\end{proof}
+The Bonferroni is a rather conservative procedure, since all these inequalities can be quite loose.
+
+A more sophisticated approach is the \term{closed testing procedure}. For each non-empty subset $I \subseteq \{1, \ldots, m\}$, we let $H_I$ be the null hypothesis that $H_i$ is true for all $i \in I$. This is known as an \term{intersection hypothesis}. Suppose for each $I \subseteq \{1, \ldots, m\}$ non-empty, we have an $\alpha$-level test $\phi_I$ for $H_I$ (a \term{local test}), so that
+\[
+  \P_{H_I}(\phi_I = 1) \leq \alpha.
+\]
+Here $\Phi_I$ takes values in $\{0, 1\}$, and $\phi_I = 1$ means rejection. The closed testing procedure then rejects $H_I$ iff for all $J \supseteq I$, we have $\phi_J = 1$.
+
+\begin{eg}
+  Consider the tests, where the red ones are the rejected one:
+  \begin{center}
+    \begin{tikzpicture}
+      \node [mred] at (0, 4) {$H_{1234}$};
+
+      \node [mred] at (-1.5, 3) {$H_{134}$};
+      \node [mred] at (-0.5, 3) {$H_{124}$};
+      \node [mred] at (0.5, 3) {$H_{134}$};
+      \node [mred] at (1.5, 3) {$H_{234}$};
+
+      \node [mred] at (-2.5, 2) {$H_{12}$};
+      \node [mred] at (-1.5, 2) {$H_{13}$};
+      \node [mred] at (-0.5, 2) {$H_{14}$};
+      \node [mred] at (0.5, 2) {$H_{23}$};
+      \node at (1.5, 2) {$H_{24}$};
+      \node at (2.5, 2) {$H_{34}$};
+
+      \node [mred] at (-1.5, 3) {$H_{1}$};
+      \node [mred] at (-0.5, 3) {$H_{2}$};
+      \node at (0.5, 3) {$H_{3}$};
+      \node at (1.5, 3) {$H_{4}$};
+    \end{tikzpicture}
+  \end{center}
+  In this case, we reject $H_1$ but not $H_2$ by closed testing. While $H_{23}$ is rejected, we cannot tell if it is $H_2$ or $H_3$ that should be rejected.
+\end{eg}
+
+This might seem like a very difficult procedure to analyze, but it turns out it is extremely simple.
+\begin{thm}
+  Closed testing makes no false rejections with probability $\geq 1 - \alpha$. In particular, FWER $\leq \alpha$.
+\end{thm}
+
+\begin{proof}
+  In order for there to be a false rejection, we must have falsely rejected $H_{I_0}$ with the local test, which has probability at most $\alpha$.
+\end{proof}
+
+But of course this doesn't immediately give us an algorithm we can apply to data. Different choices for the local test give rise to different multiple testing procedures. One famous example is \term{Holm's procedure}. This takes $\phi_I$ to be the Bonferroni test, where $\phi_I = 1$ iff $\min_{i \in I} p_i \leq \frac{\alpha}{|I|}$.
+
+When $m$ is large, then we don't want to compute all $\phi_I$, since there are $2^I$ computations to do. So we might want to find a shortcut. One can show that Holm's procedure amounts to the following:
+\begin{itemize}
+  \item Let $(i)$ be the index of the $i$th smallest $p$-value, so $p_{(1)} \leq p_{(2)} \leq \cdots \leq p_{(m)}$.
+  \item Step $1$: If $p_{(1)} \leq \frac{\alpha}{m}$, then reject $H_{(1)}$ and go to step $2$. Otherwise, accept all hypothesis.
+  \item Step $i$: If $p_{(i)} \leq \frac{\alpha}{m - i + 1}$, then reject $H_{(i)}$ and go to step $i + 1$. Otherwise, accept $H_{(i)}, H_{(i + 1)}, \ldots, H_{(m)}$.
+  \item Step $m$: If $p_{(m)} \leq \alpha$, then reject $H_{(m)}$. Otherwise, accept $H_{(m)}$.
+\end{itemize}
+The interesting thing about this is that it has the same bound on FWER as the Bonferroni correction, but the conditions here are less lenient.
+
+But the FWER is still a rather strict requirement. Instead of controlling the probability that there is one false rejection, when $m$ is large, it might be more reasonable to control the proportion of false discoveries. Many modern multiple testing procedures aim to control the \term{false discovery rate}
+\[
+  \mathrm{FDR} = \E\left(\frac{N}{\max \{R, 1\}}\right).
+\]
+The funny maximum in the denominator is just to avoid division by zero. When $R = 0$, then we must have $N = 0$ as well, so what is put in the denominator doesn't really matter.
+
+The \term{Benjamini--Hochberg procedure} attempts to control the FDR at level $\alpha$ and works as follows:
+\begin{itemize}
+  \item Let $\hat{k} = \max \left\{\{i: p_{(i)} \leq \frac{\alpha_i}{m}\right\}$. Then reject $M_{(1)}, \ldots, H_{(\hat{k})}$, or accept all hypothesis if $\hat{k}$ is not defined.
+\end{itemize}
+
+Under certain conditions, this does control the false discovery rate.
+\begin{thm}
+  Suppose that for each $i \in I_0$, $p_i$ is independent of $\{p_j: j \not= i\}$. Then using the Benjamini--Hochberg procedure, the false discovery rate
+  \[
+    FDR = \E \frac{N}{\max (R, 1)} \leq \frac{\alpha M_0}{M} \leq \alpha.
+  \]
+\end{thm}
+While the proof requires $p_i$ to be independent of the others, in simulations, even when there is no hope that the $p_i$ are independent, it appears that the Benjamini--Hochberg still works very well, and people are still trying to understand what it is that makes Benjamini--Hochberg work so well in general.
+
+\begin{proof}
+  The false discovery rate is
+  \begin{align*}
+    \E \frac{N}{\max (R, 1)} &= \sum_{r = 1}^M \E \frac{N}{r} \mathbf{1}_{R = r}\
+    &= \sum_{r = 1}^m \frac{1}{r} \E \sum_{i \in I_0} \mathbf{1}_{p_i \leq \alpha r/M} \mathbf{1}_{R = r}\\
+    &= \sum_{i \in I_0} \sum_{r = 1}^M \frac{1}{r} \P\left(p_i \leq \frac{\alpha r}{m}, R = r\right).
+  \end{align*}
+  The brilliant idea is, for each $i \in I_0$, let $R_i$ be the number of rejections when applying a modified Benjamini--Hochberg procedure to $p^{\setminus i} = \{p_1, \ldots, p_M\} \setminus \{p_i\}$ with cutoff
+  \[
+    \hat{k}_i = \max \left\{j: p_{(j)}^{\setminus i} \leq \frac{\alpha (j + 1)}{m}\right\}
+  \]
+  We observe hat for $i \in I_0$ and $r \geq 1$, we have
+  \begin{align*}
+    \left\{ p_i \leq \frac{\alpha r}{m} , R = r\right\} &= \left\{ p_i \leq \frac{ar}{m}, p_{(r)}  \leq \frac{\alpha r}{m}, p_{(s)} > \frac{\alpha s}{m}\text{ for all }s \geq r\right\}\\
+    &= \left\{p_i \leq \frac{\alpha r}{m}, p_{(r - 1)}^{\setminus i} \leq \frac{\alpha r}{m}, p^{\setminus i}_{(s - 1)} > \frac{\alpha s}{m}\text{ for all }s > r\right\}\\
+    &= \left\{p_i \leq \frac{\alpha r}{m}, R_i = r - 1\right\}.
+  \end{align*}
+  The key point is that $R_i = r - 1$ depends only on the other $p$-values. So the FDR is equal to
+  \begin{align*}
+    \mathrm{FDR} &= \sum_{i \in I_0} \sum_{r = 1}^M \frac{1}{r} \P\left(p_i \leq \frac{\alpha r}{M}, R_i = r - 1\right)\\
+    &= \sum_{i \in I_0} \sum_{r = 1}^M \frac{1}{r} \P \left(p_i \leq \frac{\alpha r}{m}\right) \P(R_i = r - 1)\\
+    \intertext{Using that $\P(p_i \leq \frac{\alpha r}{m} \leq \frac{\alpha r}{m}$ by definition, this is}\\
+    &\leq \frac{\alpha }{M} \sum_{i \in I_0} \sum_{r = 1}^m \P(R_i = r - 1)\\
+    &= \frac{\alpha}{M} \sum_{i \in I_0} \P(R_i \in \{0, \ldots, m - 1\})\\
+    &= \frac{\alpha M_0}{M}.
+  \end{align*}
+\end{proof}
+This is one of the most used procedures in modern statistics, especially in the biological sciences.
+
+However, in general, what is a good way to obtain $p$-values? We might be trying to do regression, and are trying figure out which coefficients are non-zero. If we have more coefficients than there are data points, then our classical methods do not apply. So we need to look for something else.
+
+\subsection{Inference in high-dimensional regression}
+Consider the normal linear model $Y = X\beta^0 + \varepsilon$, where $\varepsilon \sim N_n(0, \sigma^2 I)$. In the low-dimensional setting, we have $\sqrt{n}(\hat{\beta}^{OLS} - \beta^0) \sim N_p(0, \sigma^2(\frac{1}{n} X^T X)^{-1})$. Since this does not depend on $\beta^0$, we can use this to form confidence intervals and hypothesis tests etc.
+
+In high dimensions, we might want to replace the OLS estimate with the Lasso estimate. However, $\sqrt{n}(\hat{\beta}_\lambda^L - \beta^0)$ has an intractable distribution. In particular, since $\hat{\beta}_\lambda^L$ has a bias, the distribution will depend on $\beta^0$ in a complicated way.
+
+The recently introduced \term{debiased Lasso} overcomes these issues. See (van de Geer et al, 2014) for more details. Let $\hat{\beta}$ be the Lasso solution at $\lambda > 0$. Recall the KKT conditions
+\[
+  \frac{1}{n} X^T (Y - X \hat{\beta}) = \lambda \hat{\nu},
+\]
+where $\|\hat{\nu}\|_\infty \leq 1$ and if $\hat{S} = \{k : \hat{\beta}_k \not= 0\}$, then
+\[
+  \hat{\nu}_{\hat{S}} = \sgn (\hat{\beta}_{\hat{S}}).
+\]
+We set $\hat{\Sigma} = \frac{1}{n} X^T X$. Then we have
+\[
+  \hat{\Sigma} (\hat{\beta} - \beta^0) + \lambda \hat{\nu} = \frac{1}{n} X^T \varepsilon.
+\]
+What we are trying to understand is $\hat{\beta} - \beta^0$. So it would be nice if we can find some sort of inverse to $\hat{\Sigma}$. If so, then $\hat{\beta} - \beta^0$ plus some correction term involving $\hat{v}$ would then be equal to a Gaussian.
+
+Of course, the problem is that in the high dimensional setting, that $\hat{\Sigma}$ has no hope of being invertible. So we want to find some approximate inverse $\hat{\Theta}$ so that the error we make is not too large. If we are equipped with such a $\hat{\Theta}$, then we have
+\[
+  \sqrt{n} (\hat{\beta} + \lambda \hat{\Theta} \hat{\nu} - \beta^0) = \frac{1}{\sqrt{n}} \hat{\Theta} X^T \varepsilon + \Delta,
+\]
+where
+\[
+  \Delta = \sqrt{n}(\hat{\Theta} \hat{\Sigma} - I)(\beta^0 - \hat{\beta}).
+\]
+We hope we can choose $\hat{\Theta}$ so that this is small. The quantity
+\[
+  b = \hat{\beta} + \lambda \hat{\Theta} \hat{\nu} = \hat{\beta} + \frac{1}{n} \hat{\Theta} X^T (Y - X \hat{\beta})
+\]
+is the \term{debiased Lasso}.
+
+We already know that (under compatibility and sparsity conditions), we can make the $\ell_1$ norm of $\|\beta^0 - \hat{\beta}\|$ small with high probability. So if the $\ell_\infty$ norm of each of the rows of $\hat{\Theta} \hat{\Sigma} - 1$ is small, then H\"older allows us to bound $\Delta$.
+
+Write $\hat{\theta}_j$ for the $j$th row of $\hat{\Theta}$. Then
+\[
+  \|(\hat{\Sigma} \hat{\Theta}^T)_j - I \|_\infty \leq \eta
+\]
+is equivalent to $|(\hat{\Sigma} \hat{\Theta}^T)_{kj}| \leq \eta$ for $k \not= j$ and $|(\hat{\Sigma} \hat{\Theta}^T)_{jj} - 1 | \leq \eta$. Using the definition of $\hat{\Sigma}$, these are equivalent to
+\[
+  \frac{1}{n}|X_k^T X \hat{\theta}_j| \leq \eta,\quad \left|\frac{1}{n} X^T_j X \hat{\theta}_j - 1 \right| \leq \eta.
+\]
+The first is the same as saying
+\[
+  \frac{1}{n} \|X_{-j}^T X \hat{\theta}_j\|_\infty \leq \eta.
+\]
+This is quite reminiscent of the KKT conditions for the Lasso. So let us define
+\begin{align*}
+  \hat{\gamma}^{(j)} &= \argmin_{\gamma \in \R^{p - 1}} \left\{\frac{1}{2n} \|X_j - X_{-j} \gamma\|_2^2 + \lambda_j \|\gamma\|_1\right\}\\
+  \hat{\tau}_j^2 &= \frac{1}{n} X_j^T (X_j - X_{-j} \hat{\gamma}^{(j)}) = \frac{1}{n} \|X_j - X_{-j} \hat{\gamma}^{(j)}\|_2^2 + \lambda_j \|\hat{\gamma}^{(j)}\|_1.
+\end{align*}
+We can then set
+\[
+  \hat{\theta}_j = -\frac{1}{\hat{\tau}_j^2} (\hat{\gamma}_1^{(j)}, \ldots, \hat{\gamma}_{j - 1}^{(j)}, -1, \hat{\gamma}_j^{(j)}, \ldots, \hat{\gamma}_{p - 1}^{(j)})^T.
+\]
+The factor is there so that the second inequality holds.
+
+Then by construction, we have
+\[
+  X \hat{\theta}_j = \frac{X_j - X_{-j} \hat{\gamma}^{(j)}}{X^T_j(X - X_{-j} \hat{\gamma}^{(j)})/n}.
+\]
+Thus, we have $X_j^T X \hat{\theta}_j n = 1$, and by the KKT conditions for the Lasso, we have
+\[
+  \hat{\tau}_j \|X_{-j}^T X \hat{\theta}_j\|_{\infty}/n \leq \lambda_j.
+\]
+Thus, with the choice of $\hat{\Theta}$ above, we have
+\[
+  \|\Delta\|_{\infty} \leq \sqrt{n} \|\hat{\beta} - \beta^0\|_1 \max_j \frac{\lambda_j}{\hat{\tau}_j^2}.
+\]
+Now this is good as long as we can ensure $\frac{\lambda_j}{\hat{\tau}_j^2}$ to be small. When is this true?
+
+We can consider a random design setting, where each row of $X$ is iid $N_p(0, \Sigma)$ for some positive-definite $\Sigma$. Write $\Omega = \Sigma^{-1}$.
+
+Then by our study of the neighbourhood selection procedure, we know that for each $j$, we can write
+\[
+  X_j = X_{-j} \gamma^{(j)} + \varepsilon^{(j)},
+\]
+where $\varepsilon_i^{(j)}| X_{-j} \sim N(0, \Omega_{jj}^{-1})$ are iid and $\gamma^{(j)} =  - \Omega_{jj}^{-1} \Omega_{-j, j}$. To apply our results, we need to ensure that $\gamma^{(j)}$ are sparse. Let use therefore define
+\[
+  s_j = \sum_{k \not= j} \mathbf{1}_{\Omega_{jk} \not =0},
+\]
+and set $s_{max} = \max (\max_j s_j, s)$.
+
+\begin{thm}
+  Suppose the maximum eigenvalue of $\Sigma$ is always at least $c_{min}  0$ and $\max_j \Sigma_{jj} \leq 1$. Suppose further that $s_{max} \sqrt{\log (p)/n} \to 0$. Then there exists constants $A_1, A_2$ such that setting $\lambda = \lambda_j = A_1 \sqrt{\log(p) /n}$, we have
+  \begin{align*}
+    \sqrt{n} (\hat{b} - \beta^0) &= W + \Delta\\
+    W\mid X \sim N_p(0, \sigma^2 \hat{\Theta} \hat{\Sigma} \hat{\Theta}^T),
+  \end{align*}
+  and as $n, p \to \infty$,
+  \[
+    \P(\|\Delta\|_\infty > A_2 s \log(p)/\sqrt{n}) \to 0.
+  \]
+\end{thm}
+Note that here $X$ is not centered and scaled.
+
+We see that in particular, $\sqrt{n}(\hat{b}_j - \beta_j^0) \sim N(0, \sigma^2(\hat{\Theta} \hat{\Sigma} \hat{\Theta}^T)_{jj})$. In fact, one can show that
+\[
+  d_j = \frac{1}{n} \frac{\|X_j - X_{-j} \hat{\gamma}^{(j)}\}_2^2}{\hat{\tau}_j^2}.
+\]
+This suggests an approximate $(1 - \alpha)$-level confidence interval for $\beta^0_j$,
+\[
+  \mathrm{CI} = (\hat{\beta}_j - Z_{\alpha/2} \sigma \sqrt{d_j/n}, \hat{b}_j + Z_{\alpha/2} \sigma \sqrt{d_j/n}),
+\]
+where $Z_\alpha$ is the upper $\alpha$ point of $N(0, 1)$. Note that here we are getting confidence intervals of width $\sim \sqrt{1/n}$. In particular, there is no $\log p$ dependence, if we are only trying to estimate $\beta^0_j$ only.
+
+\begin{proof}
+  Consider the sequence of events $\Lambda_n$ defined by the following properties:
+  \begin{itemize}
+    \item $\phi_{\hat{\Sigma}, s} \geq c_{min}/2$ and $\phi^2_{\hat{\Sigma}_{-j, -j}, s_j} \geq c_{min}/2$ for all $j$
+    \item $\frac{2}{n} \|X^T \Sigma\|_\infty \leq \lambda$ and $\frac{2}{n} \|X_{-j}^T  \varepsilon^{(j)} \|_\infty \leq \lambda$.
+    \item $\frac{1}{n} \Sigma^{(j)} \|_2^2 \geq (\Omega_{jj})^{-1} (1 - 4 \sqrt{(\log p) / n})$
+  \end{itemize}
+%  The idea of the last condition is that we hope $\|X_j - X_{-j} \hat{\gamma}^{(j)}\|_2^2$ would be close to $\varepsilon$, so we want $\hat{\gamma}^{(j)}$ to be not too far off from the what it ought to be, and 
+
+  Question 13 on example sheet 4 shows that $\P(\Lambda_n) \to 1$ for $A_1$ sufficiently large. So we will work on the event $\Lambda_n$.
+
+  By our results on the Lasso, we know
+  \[
+    \|\beta^0 - \hat{\beta}\|_1 \leq c_1 s \sqrt{\log p / n}.
+  \]
+  for some constant $c_1$. We now seek a lower bound for $\hat{\tau}_j^2$. Consider linear models
+  \[
+    X_j = X_{-j} \gamma^{(j)} + \varepsilon^{(j)},
+  \]
+  where the sparsity of $\gamma^{(j)}$ is $s_j$, and $\varepsilon_i^{(j)}| X_{-j} \sim N(0, \Omega_{jj}^{-1})$. Note that
+  \[
+    \Omega_{jj}^{-1} = \var (X_{ij} \mid X_{i, -j}) \leq \var(X_{ij}) = \Sigma_{ij} \leq A.
+  \]
+  Also, the maximum eigenvalue of $\Omega$ is at most $c_{min}^{-1}$. So $\Omega_{jj} \leq c_{min}^{-1}$. So $\Omega_{jj}^{-1} \geq c_{min}$. So by Lasso theory, we know
+  \[
+    \|\gamma^{(j)} - \hat{\gamma}^{(j)}\|_1 \leq c_2 s_j \sqrt{\frac{\log p}{n}}
+  \]
+  for some constant $c_2$. Then we have
+  \begin{align*}
+    \hat{\tau}_j^2 &= \frac{1}{n} \|X_j - X_{-j} \hat{\gamma}^{(j)} \|_2^2 + \lambda \|\hat{\gamma}^{(j)} \|_1\\
+    &\geq \frac{1}{n} \|\varepsilon^{(j)} + X_{-j} (\gamma^{(j)} - \hat{\gamma}^{(j)})\|_2^2\\
+    &\geq \frac{1}{n} \|\varepsilon^{(j)}\|_2^2 - \frac{2}{n} X_{-j}^T \varepsilon^{(j)}\|_\infty \|\gamma^{(j)} - \hat{\gamma}^{(j)}\|_1\\
+    &\geq \Omega_{jj}^{-1} \left(1 - 4\sqrt{{\log p} \over n}\right) - c_2 s_j \sqrt{\frac{\log p}{n}} + A_1 \sqrt{\frac{\log p}{n}}
+  \end{align*}
+  In the limit, this tends to $\Omega_{jj}^{-1}$. So for large $n$, this is $\geq \frac{1}{2} \Omega_{jj}^{-1} \geq \frac{1}{2} c_{min}$.
+
+  Thus, we have
+  \[
+    \|\Delta\|_\infty \leq 2\lambda \sqrt{n} c_1 s \sqrt{\frac{\log p}{n}} c_{min}^{-1} = A_2 s \frac{\log p}{\sqrt{n}}.\qedhere
+  \]
+\end{proof}
 
 
 \printindex

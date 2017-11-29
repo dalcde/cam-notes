@@ -645,71 +645,98 @@ Before we state and prove Szemer\'edi's regularity lemma, let's first try to und
   The other case is similar, or observe that the complementary bipartite graph between $U$ and $W$ has density $1 - d$ and is $\varepsilon$-uniform.
 \end{proof}
 
-We can use this idea repeatedly to build subgraphs.
+What is good about $\varepsilon$-uniform pairs is that if we have enough of them, then we can construct essentially any subgraph we like. Later, Szemer\'edi's regularity lemma says any graph large enough has $\varepsilon$-uniform equipartitions, and together, they can give us some pretty neat results.
 \begin{lemma}[Graph building lemma]\index{graph building lemma}\index{building lemma}
-  Let $H$ be a graph with maximum degree $\Delta(H) \leq \Delta$. Suppose $H$ has an $r$-colouring in which no colour is used more than $s$ times, i.e.\ $H \subseteq K_r(s)$. Let $G$ be a graph containing distinct vertex subsets $V_1, \ldots, V_r$ with $|V_i| = u$, such that $(V_i, V_j)$ is $\varepsilon$-uniform and $d(V_i, V_j) \geq \lambda$ for all $1 \leq i \leq j \leq r$.
+  Let $G$ be a graph containing distinct vertex subsets $V_1, \ldots, V_r$ with $|V_i| = u$, such that $(V_i, V_j)$ is $\varepsilon$-uniform and $d(V_i, V_j) \geq \lambda$ for all $1 \leq i \leq j \leq r$.
 
-  Suppose $(\Delta + 1) \varepsilon \leq \lambda^\Delta$ and $s \leq \lfloor \varepsilon u\rfloor$. Then $H \subseteq G$.
+  Let $H$ be a graph with maximum degree $\Delta(H) \leq \Delta$. Suppose $H$ has an $r$-colouring in which no colour is used more than $s$ times, i.e.\ $H \subseteq K_r(s)$, and suppose $(\Delta + 1) \varepsilon \leq \lambda^\Delta$ and $s \leq \lfloor \varepsilon u\rfloor$. Then $H \subseteq G$.
 \end{lemma}
 
 To prove this, we just do what we did in the previous lemma, and find lots of vertices connected to lots of other vertices, and then we are done.
 \begin{proof}
   We wlog assume $V(H) = \{1, \ldots, k\}$, and let $c: V(H) \to \{1, \ldots, r\}$ be a colouring of $V(H)$ using no colour more than $s$ times. We want to pick vertices $x_1, \ldots, x_k$ in $G$ so that $x_i x_j \in E(G)$ if $ij \in E(H)$.
 
-  We claim that, for $0 \leq \ell \leq k$, we can choose vertices $x_1, \ldots, x_\ell$ so that $x_j \in C_{c(j)}$, and for $\ell < j \leq k$, a set $X^{\ell}_j$ of \emph{candidates} for $x_j$ such that
-  \begin{itemize}
+  We claim that, for $0 \leq \ell \leq k$, we can choose distinct vertices $x_1, \ldots, x_\ell$ so that $x_j \in C_{c(j)}$, and for $\ell < j \leq k$, a set $X^{\ell}_j$ of \emph{candidates} for $x_j$ such that
+  \begin{enumerate}
     \item $X_j^{\ell} \subseteq V_{c(j)}$;
-    \item $x_i y_j \in E(G)$ for all $y_j \in X_j^{\ell}$ and $x_i \in N(j, \ell) = \{x_i: 1 \leq i \leq \ell \text{ and }ij \in E(H)\}$; and
-    \item $|X_j^{\ell}| \geq (\lambda - \varepsilon)^{|N(j, \ell)|} |V_{c(j)}|$.
-  \end{itemize}
+    \item $x_i y_j \in E(G)$ for all $y_j \in X_j^{\ell}$ and $i \leq \ell$ such that $ij \in E(H)$.
+      
+    \item $|X_j^{\ell}| \geq (\lambda - \varepsilon)^{|N(j, \ell)|} |V_{c(j)}|$, where
+      \[
+        N(j, \ell) = \{x_i: 1 \leq i \leq \ell \text{ and }ij \in E(H)\}.
+      \]
+  \end{enumerate}
+
   The claim holds for $\ell = 0$ by taking $X_j^0 = V_{c(j)}$.
 
-  In general, for each $t \in T = \{j > \ell + 1 : (\ell + 1)j \in E(H)\}$, we let
+  By induction, suppose it holds for $\ell$. To pick $x_{\ell + 1}$, of course we should pick it from our candidate set $X_{\ell + 1}^\ell$. Then the first condition is automatically satisfied. Define the set
   \[
-    Y_t = \{y \in X_{\ell + 1}^{\ell} : |\Gamma(y) \cap X_t^\ell| \leq (\lambda - \varepsilon) |X^{\ell}_t|\}.
+    T = \{j > \ell + 1 : (\ell + 1)j \in E(H)\}.
   \]
-  Let $m = |N(\ell + 1, \ell)|$. Note that $m + |T| \leq \Delta$.
+  Then each $t \in T$ presents an obstruction to (ii) and (iii) being satisfied. To satisfy (ii), for each $t \in T$, we should set
+  \[
+    X^{\ell + 1}_t = X_t^\ell \cap \Gamma(x_{\ell + 1}).
+  \]
+  Thus, to satisfy (iii), we want to exclude those $x_{\ell + 1}$ that make this set too small. We define
+  \[
+    Y_t = \Big\{y \in X_{\ell + 1}^{\ell} : |\Gamma(y) \cap X_t^\ell| \leq (\lambda - \varepsilon) |X^{\ell}_t|\Big\}.
+  \]
+  So we want to find something in $X_{\ell + 1}^\ell \setminus \bigcup_{t \in T} Y_t$. We also cannot choose one of the $x_i$ already used. So our goal is to show that
+  \[
+    \left|X_{\ell + 1}^{\ell} - \bigcup_{t \in T} Y_t \right| > s - 1.
+  \]
+  This will follow simply from counting the sizes of $|X_{\ell + 1}^\ell|$ and $|Y_t|$. We already have a bound on the size of $|X_{\ell + 1}^\ell|$, and we shall show that if $|Y_t|$ is too large, then it violates $\varepsilon$-uniformity.
 
-  Since
+  Indeed, by definition of $Y_t$, we have
   \[
-    d(Y_t, X_{\ell + 1}^\ell) \leq \lambda - \varepsilon \leq d(V_{c(t)}, V_{c(\ell + 1)}) - \varepsilon,
+    d(Y_t, X_{\ell + 1}^\ell) \leq \lambda - \varepsilon \leq d(V_{c(t)}, V_{c(\ell + 1)}) - \varepsilon.
   \]
-  and
-  \[
-    |X_{\ell + 1}| \geq (\lambda - \varepsilon)^{\Delta - 1} |V_{c(t)}| \geq (\lambda^{\Delta - 1} - (\Delta - 1)\varepsilon) |V_{c(t)}| > \varepsilon |V_{c(t)}|.,
-  \]
-  we have
-  \[
-    |Y_t \leq \varepsilon |V_{c(\ell + 1)}|.
-  \]
-  Therefore
-  \[
-    \left|X_{\ell + 1}^{\ell} - \bigcup_{t \in T} Y_t \right| \geq (\lambda - \varepsilon)^m |V_{c(\ell + 1)}| - (\Delta - m) \varepsilon|V_{c(\ell + 1)}| \geq (\lambda^m - m\varepsilon - (\Delta - m)\varepsilon) u \geq \varepsilon u > s - 1.
-  \]
-  At most $s - 1$ vertices of $X_{\ell + 1}^\ell - \bigcup Y_t$ have been chosen amongst $x_1, \ldots, x_\ell$, so we may select $x_{\ell + 1}$ in this set. Then take
-  \[
-    X^{\ell + 1}_t = X^\ell_t \cap \Gamma(x_{\ell + 1})
-  \]
-  for $t \in T$, and for $t \not \in T$, we just set $X_j^{\ell + 1} X_j^{\ell}$.
+  So either $|X_{\ell + 1}^\ell| < \varepsilon |V_{c(t)}|$ or $|Y_t| < \varepsilon |V_{c(\ell + 1)}|$. But the first cannot occur.
 
-  This establishes the claim for $1 \leq \ell \leq k$, completing the proof.
+  Indeed, write $m = |N(\ell + 1, \ell)|$. Then $m + |T| \leq \Delta$. In particular, since the $|T| = 0$ case is trivial, we may assume $m \leq \Delta - 1$. So we can easily bound
+  \[
+    |X_{\ell + 1}| \geq (\lambda - \varepsilon)^{\Delta - 1} |V_{c(t)}| \geq (\lambda^{\Delta - 1} - (\Delta - 1)\varepsilon) |V_{c(t)}| > \varepsilon |V_{c(t)}|.
+  \]
+  Thus, by $\varepsilon$-uniformity, it must be the case that
+  \[
+    |Y_t| \leq \varepsilon |V_{c(\ell + 1)}|.
+  \]
+  Therefore, we can bound
+  \begin{multline*}
+    \left|X_{\ell + 1}^{\ell} - \bigcup_{t \in T} Y_t \right| \geq (\lambda - \varepsilon)^m |V_{c(\ell + 1)}| - (\Delta - m) \varepsilon|V_{c(\ell + 1)}|\\
+    \geq (\lambda^m - m\varepsilon - (\Delta - m)\varepsilon) u \geq \varepsilon u > s - 1.
+  \end{multline*}
+  So we are done.
+
+%  At most $s - 1$ vertices of $X_{\ell + 1}^\ell - \bigcup Y_t$ have been chosen amongst $x_1, \ldots, x_\ell$, so we may select $x_{\ell + 1}$ in this set. Then take
+%  \[
+%    X^{\ell + 1}_t = X^\ell_t \cap \Gamma(x_{\ell + 1})
+%  \]
+%  for $t \in T$, and for $t \not \in T$, we just set $X_j^{\ell + 1} X_j^{\ell}$.
+%
+%  This establishes the claim for $1 \leq \ell \leq k$, completing the proof.
 \end{proof}
 
 \begin{cor}
-  Let $H$ be a graph with vertex set $\{v_1, \ldots, v_k\}$. Let $0 < \lambda, \eta < 1$ satisfy $k \eta \leq \lambda^{k - 1}$. Let $G$ be a graph with disjoint vertex subsets $V_1, \ldots, V_k$, each of size $u \geq 1$. Suppose each pair $(V_i, V_j)$ is $\eta$ uniform, and $d(V_i, V_j) \geq \lambda$ if $v_i v_j \in E(H)$, and $d(V_i, V_j) \leq 1 - \lambda$ if $v_i v_j \not \in E(H)$. Then there exists $x_i \in V_i$, so the map $v_i \to x_i$ is an isomorphism $H \to G[\{x_1, \ldots, x_k\}]$.
+  Let $H$ be a graph with vertex set $\{v_1, \ldots, v_r\}$. Let $0 < \lambda, \varepsilon < 1$ satisfy $r \varepsilon \leq \lambda^{r - 1}$.
+
+  Let $G$ be a graph with disjoint vertex subsets $V_1, \ldots, V_r$, each of size $u \geq 1$. Suppose each pair $(V_i, V_j)$ is $\varepsilon$ uniform, and $d(V_i, V_j) \geq \lambda$ if $v_i v_j \in E(H)$, and $d(V_i, V_j) \leq 1 - \lambda$ if $v_i v_j \not \in E(H)$. Then there exists $x_i \in V_i$ so that the map $v_i \to x_i$ is an isomorphism $H \to G[\{x_1, \ldots, x_r\}]$.
 \end{cor}
 
 \begin{proof}
   By replacing the $V_i$-$V_j$ edges by the complementary set whenever $v_i v_j \not \in E(H)$, we may assume $d(V_i, V_j) \geq \lambda$ for all $i, j$, and $H$ is a complete graph.
 
-  We then apply the previous lemma by taking $\varepsilon = \eta$, $r = k$, $\Delta = k- 1$ and $s = 1$.
+  We then apply the previous lemma with $\Delta = r - 1$ and $s = 1$.
 \end{proof}
 
-Remarkably, Szemer\'edi showed that every graph can be partitioned into finitely many classes, most pairs being $\varepsilon$-uniform.
+Szemer\'edi showed that every graph that is sufficiently large can be partitioned into finitely many classes, with most pairs being $\varepsilon$-uniform. The idea is simple --- whenever we see something that is not uniform, we partition it further into subsets that are more uniform. The ``hard part'' of the proof is to come up with a measure of how far we are from being uniform.
 
-An \term{equipartition} of $v(G)$ into $k$ parts is a partition into sets $V_1, \ldots, V_k$, where $\lfloor \frac{n}{k} \rfloor \leq V_i \leq \lceil n/k\rceil$, where $n = |G|$.
+\begin{defi}[Equipartition]\index{equipartition}
+  An \term{equipartition} of $V(G)$ into $k$ parts is a partition into sets $V_1, \ldots, V_k$, where $\lfloor \frac{n}{k} \rfloor \leq V_i \leq \lceil \frac{n}{k}\rceil$, where $n = |G|$.
 
-We say that the partition is $\varepsilon$-uniform\index{$\varepsilon$-uniform!partition} if $(V_i, V_j)$ is $\varepsilon$-uniform for all but $\varepsilon \binom{k}{2}$ pairs.
+  We say that the partition is $\varepsilon$-uniform\index{$\varepsilon$-uniform!partition} if $(V_i, V_j)$ is $\varepsilon$-uniform for all but $\varepsilon \binom{k}{2}$ pairs.
+\end{defi}
+
 
 \begin{thm}[Szemer\'edi's regularity lemma]\index{Szemer\'edi regularity lemma}
   Let $0 < \varepsilon < 1$ and let $\ell$ be some natural number. Then there exists some $L = L(\ell, \varepsilon)$ such that every graph has an $\varepsilon$-uniform equipartition into $m$ parts for some $\ell \leq m \leq L$, depending on the graph.
@@ -720,7 +747,7 @@ When we want to apply this, we usually want at least $\ell$ many parts. For exam
 
 We first need a couple of trivial lemmas.
 \begin{lemma}
-  Let $U' \subseteq U$ and $W" \subseteq W$, where $|U'| \geq (1 - \delta)|U|$ and $|W'| \geq (1 - \delta) |W|$. Then
+  Let $U' \subseteq U$ and $W' \subseteq W$, where $|U'| \geq (1 - \delta)|U|$ and $|W'| \geq (1 - \delta) |W|$. Then
   \[
     |d(U', W') - d(U, W)| \leq 2\delta.
   \]
@@ -1314,7 +1341,7 @@ So far, we have proven theorems that say, roughly, ``if $G$ is a graph with enou
 \end{lemma}
 
 \begin{proof}
-  Suppose the theorem is not true. Then there is a minimal counterexample $G$ (with minimality defined with respect to proper subgraphs). 
+  Suppose the theorem is not true. Then there is a minimal counterexample $G$ (with minimality defined with respect to proper subgraphs).
 
   We first show that we may assume $G$ has no isolated vertices. If $v$ is an isolated vertex, and $v \not \in S$, then we can simply apply the result to $G - v$. If $v \in S$, then the $S$-cut $(S, V(G) \setminus \{v\})$ of order $k - 1$ avoids $h - k \geq d - 1$ of the $C_i$'s.
 
@@ -1339,7 +1366,7 @@ So far, we have proven theorems that say, roughly, ``if $G$ is a graph with enou
   \[
     D_i = D_i' \cup P_i.
   \]
- 
+
   \separator
 
   To check that $(G', S', \{C_i'\})$ satisfy the hypothesis of the lemma, we first need to show that the $C_i'$ are non-empty.
@@ -1349,7 +1376,7 @@ So far, we have proven theorems that say, roughly, ``if $G$ is a graph with enou
   Let's now check the conditions:
   \begin{itemize}
     \item[($*$)] For each $C_i'$, consider its components. If there is some component that does not meet $S'$, then this component is contained in $B \setminus A$. So this must also be a component of $C_i$. But $C_i$ is connected. So this component is $C_i$. So $C_i' = C_i$. Thus, either $C_i'$ is connected, or all components meet $S'$.
-      
+
       Moreover, since any $C_j'$ not meeting $S'$ equals $C_j$, it follows that each $C_i$ and so each $C_i'$ is adjacent to all but at most $d$ of these $C_j'$s. Therefore $(*)$ holds.
 
     \item[($\dagger$)] If $(A', B')$ is an $S'$-cut in $G'$ avoiding some $C_i'$, then $(A \cup A', B')$ is an $S$-cut of $G$ of the same order, and it avoids $C_i$ (since $C_i'$ doesn't meet $S'$, and we have argued this implies $C_i' = C_i$, and so $C_i \cap A = \emptyset$). In particular, no $S'$-cut $(A', B')$ of $G'$ has order less than $k$ and still avoids $d + 1$ of $C_1', \ldots, C_h'$.
@@ -1380,9 +1407,7 @@ So far, we have proven theorems that say, roughly, ``if $G$ is a graph with enou
 
 The point of this result is to prove the following theorem:
 \begin{thm}
-  Let $G$ be a graph with $\kappa(G) \geq 2k$ and $e(G) \geq 11k |G|$. Then $G$ is $k$-linked.
-
-  In particular, $f(k) \leq 22k$.
+  Let $G$ be a graph with $\kappa(G) \geq 2k$ and $e(G) \geq 11k |G|$. Then $G$ is $k$-linked. In particular, $f(k) \leq 22k$.
 \end{thm}
 Note that if $\kappa(G) \geq 22k$ then $\delta(G) \geq 22k$, so $e(G) \geq 11k |G|$.
 
@@ -1395,6 +1420,111 @@ Note that if $\kappa(G) \geq 22k$ then $\delta(G) \geq 22k$, so $e(G) \geq 11k |
 
   So there are subgraphs $D_1, \ldots, D_m$, where $m = h - k \geq 2d + 3k$ as described. We may assume $s_i \in D_i$ and $t_i \in D_{k + i}$. Note that for each pair $(D_i, D_j)$, we can find $\geq m - 2d \geq 3k$ other $D_\ell$ such that $D_\ell$ is joined to both $D_i$ and $D_j$. So for each $i = 1, \ldots, k$, we can find an unused $D_\ell$ not among $D_1, \ldots, D_{2k}$ that we can use to connect up $D_i$ and $D_{k + i}$, hence $s_i$ and $t_i$.
 \end{proof}
+
+In 2004, the coefficient was reduced from $11$ to $5$. This shows $f(k) \leq 10 k$. It is known that $f(1) = 3, f(2) = 6$ and $f(k) \geq 3k - 2$ for $k \geq 3$.
+
+Finally, we consider the function $t(t)$. We begin by the following trivial lemma:
+\begin{lemma}
+  If $\delta(a) \geq t^2$ and $G$ is $\binom{t + 2}{3}$-linked, then $G \supseteq TK_t$.
+\end{lemma}
+
+\begin{proof}
+  Since $\delta(G) \geq t^2$, we may pick vertices $v_1, \ldots, v_t$ and sets $U_1, \ldots U_t$ all disjoint so that $|U_i| = t - 1$ and $v_i$ is joined to $U_i$. Then $G - \{v_1, \ldots, v_k\}$ is still $\binom{t + 2}{2} - t = \binom{t}{2}$-linked. So $U_1, \ldots, U_{t - 1}$ may be joined with paths to form a $TK_t$ in $G$.
+\end{proof}
+
+To apply our previous theorem together with this lemma, we need the following lemma:
+\begin{lemma}
+  Let $k, d \in \N$ with $k \leq \frac{d + 1}{2}$, and suppose $e(G) \geq d|G|$. Then $G$ contains a subgraph $H$ with
+  \[
+    e(H) = d|H| - kd + 1,\quad \delta(H) \geq d + 1,\quad \kappa(H) \geq k.
+  \]
+\end{lemma}
+
+\begin{proof}
+  Define
+  \[
+    \mathcal{E}_{d, k} = \{F \subseteq G: |F| \geq d, e(F) > d|F| - kd\}.
+  \]
+  We observe that $D \in \mathcal{E}_{d, k}$, but $K_d \not \in \mathcal{E}_{d, k}$. Hence $|F| > d$ for all $F \in \mathcal{E}_{d, k}$. let $H$ be a subgraph of $G$ minimal with respect to $H \in \mathcal{E}_{d, k}$. Then $e(H) = d|H| - kd + 1$, and $\delta(H) \geq d + 1$, else $H - v \in \mathcal{E}_{d,k}$ for some $v \in H$.
+
+  We only have to worry about the connectivity condition. Suppose $S$ is a cutset of $H$. Let $C$ be a component of $G - S$. Since $\delta(h) \geq d + 1$, we have $|C \cup S| \geq d + 2$ and $|H - C| \geq d + 2$.
+
+  Since neither $C \sup S$ nor $H - C$ lies in that class, we have
+  \[
+    e(C \cup S) \leq d|C \cup S| - kd \leq d|C| + d |S| - kd
+  \]
+  and
+  \[
+    e(H - C) \leq d|H| - d|C| - kd.
+  \]
+  So we find that
+  \[
+    e(H) \leq d|H| + d|S| - 2 kd.
+  \]
+  But we know this is equal to $d|H| - kd + 1$. So we must have $|S| \geq k$.
+\end{proof}
+
+\begin{thm}
+  \[
+    \frac{t^2}{16} \leq t(t) \leq 13 \binom{t + 1}{2}.
+  \]
+\end{thm}
+Recall our previous upper bound was something like $2^{t^2}$. So this is an improvement.
+\begin{proof}
+  The lower bound comes from (disjoint copies of) $K_{t^2/8, t^2/8}$. For the uppper bound, write
+  \[
+    d = 13 \binom{t + 1}{2},\quad k = t\cdot (t + 1).
+  \]
+  Then we can find a subgraph $H$ with $\delta(H) \geq d + 1$ and $\kappa(H) \geq k + 1$.
+
+  Certainly $|H| \geq d + 2$, and we know
+  \[
+    e(H) \geq d |H| - kd > (d - k)|H| \geq 11 \binom{t + 1}{2} |H|.
+  \]
+  So we know $H$ is $\binom{t + 1}{2}$-linked, and so $H \supseteq TK_t$.
+\end{proof}
+So $t(t)$ is, more or less, $t^2$!
+
+\section{Extremal hypergraphs}
+Define $K_\ell^\ell(t)$ be the complete $\ell$-partite $\ell$-uniform hypergraph with $\ell$ classes of size $t$, containing all $t^{\ell}$ edges with one vertex in each class.
+
+\begin{thm}[Erd\"os]
+  Let $G$ be $\ell$-uniform of order $n$ with $p \binom{n}{\ell}$ edges, where $p \geq 2n^{-1/t^{\ell - 1}}$. Then $G$ contains $K_{\ell}^{\ell}(t)$ (provided $n$ is large).
+\end{thm}
+If we take $\ell = 2$, then this agrees with what we know about the exact value of the extremal function.
+
+\begin{proof}
+  Assume that $t \geq 2$. We proceed by induction on $\ell \geq 2$. For each $(\ell - 1)$-set $\sigma \subseteq V(G)$, let
+  \[
+    N(\sigma) = \{v: \sigma \cup \{v\} \in E(G)\}.
+  \]
+  Then the average degree is
+  \[
+    \binom{n}{\ell - 1}^{-1} \sum |N(\sigma)| = \binom{n}{\ell - 1}^{-1} \ell |E(G)| = p (n - \ell + 1).
+  \]
+  For each of the $\binom{n}{t}$ many $t$-sets $T \subseteq V(G)$, let
+  \[
+    D(T) = \{\sigma : T \subseteq N(\sigma)\}.
+  \]
+  Then
+  \[
+    \sum_T |D(T)| = \sum_\sigma \binom{|N(\sigma)|}{t} \geq \binom{n}{\ell - 1} \binom{p(n - \ell + 1)}{t},
+  \]
+  where the inequality follows from convexity, since we can assume that $p(n - \ell + 1) \geq t - 1$ if $n$ is large.
+
+  In particular, there exists a $T$ with
+  \[
+    |D(T)| \geq \binom{n}{t}^{-1} \binom{n}{\ell - 1} \binom{p(n - \ell + 1)}{t} \geq \frac{1}{2} p^t \binom{n}{\ell - 1}.
+  \]
+  when $n$ is large. By our choice of $t$, we can write this as
+  \[
+    |D(T)| \geq 2^{t - 1} n^{-1/t^{\ell - 2}} \binom{n}{\ell - 1}.
+  \]
+  If $\ell = 2$, then this is $\geq 2^{t - 1} \geq t$. So $T$ is joined to a $T$-set giving $K_{t, t}$.
+
+  If $\ell \geq 3$, then $|D(T)| \geq 2 n^{-1/t^{\ell - 2}} \binom{n}{\ell - 1}$. So, by induction, the $(\ell - 1)$-uniform hypergraph induced by the $\sigma$ with $T \subseteq N(\sigma)$ contains $K_{\ell - 1}^{\ell - 1}(t)$, giving $K_{\ell}^\ell(t)$ with $T$.
+\end{proof}
+We can do a simple random argument to show that this is a right-order of magnitude.
 
 \printindex
 \end{document}
