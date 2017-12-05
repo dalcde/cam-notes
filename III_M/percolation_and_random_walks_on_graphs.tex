@@ -2124,6 +2124,83 @@ If $\mathcal{A}$ is a finite union or intersection of cylinder sets of this form
 \]
 So this gives a consistent family of measures.
 
-By Kolmogorov's theorem, we get a unique probability measure $\mu$ supported on the forests of $G$. $\mu$ is called the \term{wired uniform spanning forest}.
+By Kolmogorov's theorem, we get a unique probability measure $\mu$ supported on the forests of $G$. $\mu$ is called the \term{wired uniform spanning forest}. One can also consider the \term{free uniform spanning forest}, where we do the same thing but without gluing, however, this is more complicated and we will not study it.
+
+We can adapt Wilson's algorithm to generate uniform spanning forests. This is called \term{Wilson's method rooted at infinity} (BKPS, 2001).
+
+Let $G$ be a transient graph, and start with $\mathcal{F}_0 = \emptyset$. Pick an ordering of the vertices of $V = \{x_1, x_2, \ldots\}$. Inductively, from $x_n$, we start a simple random walk until the first time it hits $\mathcal{F}_{n - 1}$ if it does. If it doesn't, then run indefinitely. Call this (possibly infinite) path $\mathcal{P}_n$. Since $G$ is transient, $\mathcal{P}_n$ will visit every vertex finitely many times with probability $1$. So it makes sense to define the loop erasure of $\mathcal{P}_n$. Call it $LE(\mathcal{P}_n)$. We set
+\[
+  \mathcal{F}_n = \mathcal{F}_{n - 1} \cup LE(\mathcal{P}_n),
+\]
+and take
+\[
+  \mathcal{F} = \bigcup_n \mathcal{F}_n.
+\]
+As before, the order of $V$ that we take does not affect the final distribution.
+\begin{prop}
+  Let $G$ be a transient graph. The wired uniform spanning forest is the same as the spanning forest generated using Wilson's method rooted at infinity.
+\end{prop}
+
+\begin{proof}
+  Let $e_1, \ldots, e_M$ be a finite set of edges. Let $T(n)$ be the uniform spanning tree on $G_n^W$. Let $\mathcal{F}$ be the limiting law of $T(n)$. Look at $G_n^W$ and generate $T(n)$ using Wilson's method rooted at $z_n$. Start the random walks from $u_1, u_2, \ldots, u_L$ in this order, where $(u_i)$ are all the end points of the $e_1, \ldots, e_M$ ($L$ could be less than $2M$ if the edges share end points).
+
+  Start the first walk from $u_1$ and wait until it hits $z_n$; Then start from the next vertex and wait until it hits the previous path. We use the same infinite path to generate all the walks, i.e.\ for all $i$, let $(X_k(u_i))_{k \geq 0}$ be a simple random walk on $G$ started from $u_i$. When considering $G_n^W$, we stop these walks when they exit $G_n$, .e.\ if they hit $z_n$. In this way, we couple all walks together and all the spanning trees.
+
+  Let $\tau_i^n$ be the first time the $i$th walk hits the tree the previous $i - 1$ walks have generated in $G_n^W$. Now
+  \[
+    \P(e_1, \ldots, e_M \in T(n)) = \P\left(e_1, \ldots, e_M \in \bigcup_{j = 1}^L LE(X_k(u_j)) : k \leq \tau_{j^n} \right).
+  \]
+  Let $\tau_j$ be the stopping times corresponding to Wilson's method rooted at infinity. By induction on $j$, we have $\tau_j^n \to \tau_j$ as $n \to \infty$, and by transience, we have $LE(X_k(u_j): k \leq \tau_j^k) \to LE(X_k(u_j): k \leq \tau_j)$. So we are done.
+\end{proof}
+
+\begin{thm}[Pemantle, 1991]
+  The uniform spanning forest on $\Z^d$ is a single tree almost surely if and only if $d \leq 4$.
+\end{thm}
+
+Note that the above proposition tells us.
+\begin{prop}[Pemantle]
+  The uniform spanning forest is a single tree iff starting from every vertex, a simple random walk intersects an independent loop erased random walk infinitely many times with probability $1$. Moreover, the probability that $x$ and $y$ are in the same tree of the uniform spanning forest is equal to the probability that simple random walk started from $x$ intersects an independent loop-erased random walk started from $y$.
+\end{prop}
+
+To further simplify the theorem, we use the following theorem of Lyons, Peres and Schramm:
+\begin{thm}[Lyons, Peres, Schramm]
+  Two independent simple random walks intersect infinitely often with probability $1$ if one walks intersects the loop erasure of the other one infinitely often with probability $1$.
+\end{thm}
+
+Using these, we can now prove the theorem we wanted. Note that proving things about intersection, rather than collisions, tends to be higher, because any attempts to, say, define the first intersection time would inherently introduce an asymmetry.
+
+We prove half of Pemantle's theorem.
+\begin{thm}
+  The uniform spanning forest is not a tree for $d \geq 5$ with probability $1$.
+\end{thm}
+
+\begin{proof}[Proof of Pemantle's theorem]
+  Let $X, Y$ be two independent simple random walks in $\Z^d$. Write
+  \[
+    I = \sum_{t = 0}^\infty \sum_{s = 0}^\infty \mathbf{1}(X_t = Y_s).
+  \]
+  Then we have
+  \[
+    \E_{x, y}[I] = \sum_t \sum_s \P_{x - y} (X_{t + s} = 0) \approx \sum_{t = \|x - y\|} t \P_{x - y}(X_t = 0).
+  \]
+  It is an elementary exercise to show that
+  \[
+    \P_x(X_t = 0) \leq \frac{c}{t^{d/2}},
+  \]
+  so
+  \[
+    \P_x(X_t = 0) \leq \sum_{t = \|x - y\|} \frac{1}{t^{d/2 - 1}}.
+  \]
+  For $d \geq 5$, for all $\varepsilon > 0$, we take $x, y$ such that
+  \[
+    \E_{x, y} [I] < \varepsilon.
+  \]
+  Then
+  \[
+    \P(\text{USF is connected}) \leq \P_{x, y}(I > 0) \leq \E_{x, y}[I] < \varepsilon.
+  \]
+  Since this is true for every $\varepsilon$, it follows that $\P(\text{USF is connected}) = 0$.
+\end{proof}
+
 \printindex
 \end{document}

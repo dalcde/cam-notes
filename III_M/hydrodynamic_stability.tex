@@ -5,7 +5,6 @@
 \def\nyear {2017}
 \def\nlecturer {C.\ P.\ Caulfield}
 \def\ncourse {Hydrodynamic Stability}
-\def\nnotready {}
 
 \input{header}
 
@@ -1920,7 +1919,7 @@ We can then invert for $x$ to obtain
 \]
 The second term is associated with the switch-on transients, and is very similar to what we get in the previous steepest descent.
 
-If the flow is absolutely unstable, then the transients dominate and invade the entire domain. But if the flow is convectively unstable, then this term is swept away, and all that is left is $\chi_F(x, t)$. This gives us a way to distinguish between 
+If the flow is absolutely unstable, then the transients dominate and invade the entire domain. But if the flow is convectively unstable, then this term is swept away, and all that is left is $\chi_F(x, t)$. This gives us a way to distinguish between
 
 Note that in the forcing term, we get contributions at the singularities $k^{\pm}(\omega_f)$. Which one contributes depends on causality. One then checks that the correct result is
 \[
@@ -2398,8 +2397,92 @@ In our toy example, our condition for the existence of transient growth is that 
 %
 %With these in mind, let's go and actually do some fluids.
 
+Now assuming we have transient growth, the natural question to ask is how large this growth is. We can write the solution to the initial value problem as
+\[
+  \mathbf{x}(t) = e^{At} \mathbf{x}_0.
+\]
+The maximum gain at time $t$ is given by
+\[
+  G(t) = \max_{\mathbf{x}_0 \not= 0} \frac{\|\mathbf{q}(t)\|^2}{\|\mathbf{q}(0)\|} = \max_{\mathbf{x}_0 \not= 0} \frac{\|e^{At} \mathbf{x}_0\|^2}{\|\mathbf{x}_0\|^2}.
+\]
+This is, by definition, the matrix norm of $B$.
+
+\begin{defi}[Matrix norm]\index{matrix norm}
+  Let $B$ be an $n \times n$ matrix. Then the \emph{matrix norm} is
+  \[
+    \|B\| = \max_{\mathbf{v} \not= 0} \frac{\|B\mathbf{v}\|}{\|\mathbf{v}\|}.
+  \]
+\end{defi}
+
+To understand the matrix norm, we may consider the eigenvalues of the matrix. Order the eigenvalues of $A$ by their real parts, so that $\Re(\lambda_1) \geq \cdots \geq \Re(\lambda_n)$. Then the gain is clearly bounded below by
+\[
+  G(t) \geq e^{2 \Re(\lambda_1)t},
+\]
+achieved by the associated eigenvector.
+
+If $L$ is normal, then this is the complete answer. We know the eigenvectors form an orthonormal basis, so we can write $L = V \Lambda V^{-1}$ for $\Lambda = \diag(\lambda_1,\ldots, \lambda_n)$ and $V$ is unitary. Then we have
+\[
+  G(t) = \|e^{Lt}\|^2 = \|V e^{\Lambda t} V^{-1}\|^2 = \|e^{\Lambda t}\|^2 = e^{2 \Re (\lambda_1) t}.
+\]
+But life gets enormously more complicated when matrices are non-normal. As a simple example, the matrix $\begin{pmatrix} 1 & 1\\ 0 & 1 \end{pmatrix}$ has $1$ as the unique eigenvalue, but applying it to $(0, 1)$ results in a vector of length $\sqrt{2}$.
+
+In the non-normal case, it would still be convenient to be able to diagonalize $e^{At}$ in some sense, so that we can read off its norm. To do so, we must relax what we mean by diagonalizing. Instead of finding a $U$ such that $U^\dagger e^{At} U$ is diagonal, we find unitary matrices $U, V$ such that
+\[
+  U^\dagger e^{At} V = \Sigma = \diag(\sigma_1, \ldots, \sigma_n),
+\]
+where $\sigma_i \in \R$ and $\sigma_1 > \cdots > \sigma_n \geq 0$. We can always do this. This is known as the \term{singular value decomposition}, and the diagonal entries $\sigma_i$ are called the \term{singular values}. We then have
+%
+%Recall the \term{condition number}
+%\[
+%  \kappa(A) = \|A\| \|A^{-1}\|.
+%\]
+%Singular values and singular vectors air pairs of vectors $(\mathbf{v}, \mathbf{u})$ such that
+%\[
+%  A\mathbf{v} = \sigma \mathbf{u},\quad A^\dagger \mathbf{u} = \sigma \mathbf{v}.
+%\]
+%Then we have
+%\[
+%  A^\dagger A \mathbf{v} = \sigma^2 \mathbf{v},\quad AA^\dagger \mathbf{u} = \sigma^2 \mathbf{u}.
+%\]
+%Note $AA^\dagger$ and $A^\dagger A$. We may wlog assume singular values are normalized, so that $\|A\|= \sigma_{max}$, but consider the square invertible case:
+%\[
+%  A^{-1}A \mathbf{v} = \sigma A^{-1} \mathbf{u},\quad (A^{-1})^\dagger A^\dagger \mathbf{u} = \sigma [A^{-1}]^{\dagger} \mathbf{v}.
+%\]
+%So in fact we have
+%\[
+%  \frac{1}{\sigma} \mathbf{v} = A^{-1} \mathbf{u},\quad \frac{1}{\sigma} \mathbf{u} = [A^\dagger]^{-1} \mathbf{v}.
+%\]
+%Therefore we know
+%\[
+%  \|A^{-1}\| = \frac{1}{\sigma_{min}}.
+%\]
+%So we have
+%\[
+%  \kappa(A) = \frac{\sigma_{max}}{\sigma_{min}}.
+%\]
+%Therefore, returning to gain, where now eigenvectors do not form orthonormal basis, we have (with $V$ not necessarily unitary)
+%\[
+%  G(t) = \|e^{Lt}\|^2 = \|V e^{\Lambda t} V^{-1}\|^2 \leq \|V\|^2 \|e^{\Lambda t}\|^2 \|V^{-1}\|^2 = \kappa^2(V) e^{2 \Re(\lambda_1) t},
+%\]
+%which may be much larger. So we have the possibility for transient growth.
+%
+%Actually to calculate transient growth, it is very tempting to use the idea of SVD. We can write $e^{Lt} = B$, with
+%\[
+%  BV = U\Sigma, U^\dagger = U^{-1}, V^\dagger = V^{-1}, \Sigma = \diag(\sigma_1, \ldots, \sigma_n),
+%\]
+%with $\sigma_i \in \R$ and $\sigma_1 > \cdots > \sigma_n \geq 0$.
+%
+%Therefore, $B\mathbf{v}_1 = \sigma_1 \mathbf{u}_1$, and remembering the definition of matrix norms, we have
+\begin{multline*}
+  G(t) =\|e^{At}\|^2 = \max_{\mathbf{x} \not= 0} \frac{(e^{At}\mathbf{x}, e^{At}\mathbf{x})}{(\mathbf{x}, \mathbf{x})} = \max_{\mathbf{x} \not= 0} \frac{(U\Sigma V^\dagger \mathbf{x}, U\Sigma V^\dagger \mathbf{x})}{(\mathbf{x}, \mathbf{x})}\\
+  = \max_{\mathbf{x} \not= 0} \frac{(\Sigma V^\dagger \mathbf{x}, \Sigma V^\dagger \mathbf{x})}{(\mathbf{x}, \mathbf{x})} = \max_{\mathbf{y} \not= 0} \frac{(\Sigma \mathbf{y}, \Sigma \mathbf{y})}{(\mathbf{y}, \mathbf{y})} = \sigma_1^2(t).
+\end{multline*}
+If we have an explicit singular value decomposition, then this tells us the optimal initial condition if we want to maximize $G(t)$, namely the first column of $\mathbf{v}$.
+
+%The optimal initial condition is $\mathbf{v}_1$, power and appealing techniques, as SVD can be calculated. This can of course be applied to the Orr-Sommerfeld equation, but there are subtleties arising from discretization.
+
 \subsection{Orr-Sommerfeld and Squire equations}
-For this chapter, we will use the ``engineering'' coordinate system, so that the $y$ direction is the vertical direction. The $x, y, z$ directions are known as the \term{streamwise direction}, \term{wall-normal direction} and \term{spanwise direction} respectively.
+Let's now see how this is relevant to our fluid dynamics problems. For this chapter, we will use the ``engineering'' coordinate system, so that the $y$ direction is the vertical direction. The $x, y, z$ directions are known as the \term{streamwise direction}, \term{wall-normal direction} and \term{spanwise direction} respectively.
 \begin{center}
   \begin{tikzpicture}[scale=0.8]
     \draw [->] (0, 0) -- (0, 2) node [above] {$y$};
@@ -2414,7 +2497,7 @@ Again suppose we have a base shear flow $U(y)$ subject to some small perturbatio
   \frac{\partial v}{\partial t} + U \frac{\partial v}{\partial x} &= - \frac{\partial p}{\partial y} + \frac{1}{Re} \nabla^2 v\\
   \frac{\partial w}{\partial t} + U \frac{\partial w}{\partial x} &= - \frac{\partial p}{\partial z} + \frac{1}{Re} \nabla^2 w.
 \end{align*}
-Again our strategy is to reduce these to a single, higher order equation in $v$. To get rid of the pressure term, we differentiating the second, third and fourth equation with respect to $x, y$ and $z$ respectively and applying incompressibility, we obtain
+Again our strategy is to reduce these to a single, higher order equation in $v$. To get rid of the pressure term, we differentiate the second, third and fourth equation with respect to $x, y$ and $z$ respectively and apply incompressibility to obtain
 \[
   \nabla^2 p = -2U' \frac{\partial v}{\partial x}.
 \]
@@ -2465,23 +2548,12 @@ It is convenient to express the various operators in compact vector form. Define
   \begin{pmatrix}
     \hat{\mathbf{v}}\\\hat{\eta}
   \end{pmatrix},\quad
-  \hat{\mathbf{q}}_{OS} =
-  \begin{pmatrix}
-    \hat{\mathbf{v}}\\ \hat{\eta}^p
-  \end{pmatrix},\quad
-  \hat{\mathbf{q}}_{SQ} =
-  \begin{pmatrix}
-    0 \\ \hat{\eta}
-  \end{pmatrix}.
-\]
-We can define the operators
-\[
-  \mathbf{M} =
+  M =
   \begin{pmatrix}
     k^2 - \mathcal{D}^2 & 0\\
     0 & 1
   \end{pmatrix},\quad
-  \mathbf{L} =
+  L =
   \begin{pmatrix}
     \mathcal{L}_{0S} & 0\\
     i \beta U' & \mathcal{L}_{SQ}
@@ -2494,43 +2566,101 @@ where
 \end{align*}
 We can then write our equations as
 \[
-  \mathbf{L}\hat{\mathbf{q}} = i \omega M \hat{\mathbf{q}}.
+  L\hat{\mathbf{q}} = i \omega M \hat{\mathbf{q}}.
 \]
-Equivalently, defining $\mathbf{L}_1 = \mathbf{M}^{-1} \mathbf{L}$, this is
+This form of equation reminds us of what we saw in Sturm--Liouville theory, where we had an eigenvalue equation of the form $Lu = \lambda w u$ for some weight function $w$. Here $M$ is not just a weight function, but a differential operator. However, the principle is the say. First of all, this tells us the correct inner product to use on our space of functions is
 \[
-  \mathbf{L}_1 \hat{\mathbf{q}} = i \omega \hat{\mathbf{q}}.
+  \bra \mathbf{p}, \mathbf{q}\ket = \int \mathbf{p}^\dagger M \mathbf{q} \;\d y.\tag{$*$},
 \]
-This now looks like an eigenvalue problem.
+We can make the above equation look like an actual eigenvalue problem by writing it as
+\[
+  M^{-1}L \hat{\mathbf{q}} = i \omega \hat{\mathbf{q}}.
+\]
+We want to figure out if the operator $M^{-1}L$ is self-adjoint under $(*)$, because this tells us something about its eigenvalues and eigenfunctions. So in particular, we should be able to figure out what the adjoint should be. By definition, we have
+\begin{align*}
+  \bra \mathbf{p}, M^{-1}L\mathbf{q}\ket &= \int \mathbf{p}^\dagger MM^{-1} L \mathbf{q}\;\d y\\
+  &= \int \mathbf{p}^\dagger L\mathbf{q}\;\d y\\
+  &= \int (\mathbf{q}^\dagger (L^\dagger \mathbf{p}))^*\;\d y\\
+  &= \int (\mathbf{q}^\dagger M (M^{-1} L^\dagger \mathbf{p}))^*\;\d y,
+\end{align*}
+where $L^\dagger$ is the adjoint of $L$ under the $L^2$ norm. So the adjoint eigenvalue equation is
+\[
+  L^\dagger \mathbf{q} = -i\omega M \mathbf{q}.
+\]
+Here we introduced a negative sign in the right hand side, which morally comes from the fact we ``took the conjugate'' of $i$. Practically, adopting this sign convention makes, for example, the statement of biorthogonality cleaner.
 
-We now see that the Orr--Sommerfeld modes and Squire modes are both eigenmodes, and can just be separately classified. Note that the eigenmodes of the Orr-Sommerfeld operators are in general not orthogonal, and has both discrete and continuous spectrum. The fundamental questions which we want to ask are:
-\begin{itemize}
-  \item Is the Orr-Sommerfeld operator non-self-adjoint?
-  \item How do the eigenfunctions relate to adjoint eigenfunctions?
-  \item Does the adjoint help us to understand optimal transient growth.
-\end{itemize}
-Recall that the notion of an adjoint has to be defined with respect to an inner product. We use the $L^2$ inner product, so that
+So \emph{mathematically}, we know we should take the inner product as $\int \mathbf{p}^\dagger M \mathbf{q}$. Physically, what does this mean? From incompressibility
 \[
-  \int_{-1}^1 \hat{\xi}^* \mathcal{L}_{OS} \hat{v} \;\d y = \int_{-1}^1 \hat{v} (\mathcal{L}_{OS}^\dagger \hat{\xi})^*\;\d y.
+  \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} + \frac{\partial w}{\partial z} = 0,
 \]
-Computing $\mathcal{L}_{OS}^\dagger$ is just an exercise in integration by parts, with annoyances arising when we do integration by parts with, say, $\hat{\xi}^* U \mathcal{D}v$. Ultimately, we end up with
+plugging in our series expansions of $v, \eta$ etc. gives us
 \[
-  \mathcal{L}_{OS}^\dagger = i\alpha U (\mathcal{D}^2 - k^2) - 2i \alpha U'\mathcal{D} + \frac{1}{Re} (k^2 - \mathcal{D}^2)^2.
+  i\alpha \hat{u} + i \beta \hat{w} = - \mathcal{D} \hat{v},\quad i\beta \hat{u} - i\alpha \hat{w} = \hat{\eta}.
 \]
-Compared to the original operator, we picked up some sign changes due to conjugation, but more significantly, we have a different advection term $2i\alpha U' \mathcal{D}$.
+So we find that
+\[
+  \hat{u} = \frac{i}{k^2}(\alpha \mathcal{D} \hat{v} - \beta \eta),\quad \hat{w} = \frac{i}{k^2}(\beta \mathcal{D} \hat{v} + \alpha \eta).
+\]
+Thus, we have
+\[
+  \frac{1}{2}(|u|^2 + |w|^2) = \frac{1}{2k^2} \Big(|\mathcal{D} \hat{v}|^2 + |\eta|^2\Big),
+\]
+and the total energy is
+\begin{multline*}
+  E = \int \frac{1}{2k^2} \Big(|\mathcal{D} \hat{v}|^2 + k^2 |\hat{v}|^2 + |\eta|^2\Big)\\
+  = \frac{1}{2k^2} \int_{-1}^1 (\hat{v}^*\; \hat{\eta}^*)
+  \begin{pmatrix}
+    k^2 - \mathcal{D}^2 & 0\\
+    0 & 1
+  \end{pmatrix}
+  \begin{pmatrix}
+    \hat{v}\\
+    \hat{\eta}
+  \end{pmatrix}\;\d y = \frac{1}{2k^2}\bra \mathbf{q}, \mathbf{q}\ket.
+\end{multline*}
+So the inner product the mathematics told us to use is in fact, up to a constant scaling, the energy!
 
-A perhaps slightly subtle point is that the eigenvalue problem for the adjoint should be
-\[
-  \mathcal{L}_{OS}^\dagger \hat{\xi}_q = i \omega_q(\mathcal{D}^2 - \alpha^2) \hat{\xi}_q.
-\]
-The change in sign is largely because we have decided to put an $i$ in from of our eigenvalues. To see this gives the correct definition, suppose $\hat{v}_p$ is an eigenvector of the original equation, so that
-\[
-  \mathcal{L}_{OS}\hat{v}_p = i\omega_p (\alpha^2 - \mathcal{D}^2) \hat{v}_p.
-\]
-Then we have
-\[
-  0 = \int_{-1}^1 \hat{\xi}_q^* \mathcal{L}_{OS} \hat{v}_p\;\d y - \int_{-1}^1 \hat{v}_p (\mathcal{L}_{OS}^\dagger \hat{\xi}_q)^* \;\d y = (\omega_p - \omega_q)^* \int_{-1}^1 \hat{\xi}_q^* (\alpha^2 - \mathcal{D}^2) \hat{v}_p \;\d y.
-\]
-Thus, we recover the usual result that eigenvectors of the adjoint and the direct operator are orthogonal unless their eigenvalues are conjugate, provided we use the \emph{weighted} inner product. After normalizing, we obtain eigenvectors such that
+%We now see that the Orr--Sommerfeld modes and Squire modes are both eigenmodes, and can just be separately classified. Note that the eigenmodes of the Orr-Sommerfeld operators are in general not orthogonal, and has both discrete and continuous spectrum. The fundamental questions which we want to ask are:
+%\begin{itemize}
+%  \item Is the Orr-Sommerfeld operator non-self-adjoint?
+%  \item How do the eigenfunctions relate to adjoint eigenfunctions?
+%  \item Does the adjoint help us to understand optimal transient growth?
+%\end{itemize}
+%Recall that the notion of an adjoint has to be defined with respect to an inner product. This is slightly subtle. Recall that the Orr--Sommerfeld equation was
+%\[
+%  \mathcal{L}_{OS} \hat{\mathbf{q}} = i\omega (k^2 - \mathcal{D}^2) \hat{\mathbf{q}}
+%\]
+%This tells us the correct inner product is the \emph{energy} norm
+%\[
+%  \bra \xi, v\ket = \int \xi^* (k^2 - \mathcal{D}^2) v \;\d y = \int \Big(k^2 \xi^* \cdot v + (\D \xi) \cdot (\D v)\Big)\;\d y.
+%\]
+%On the other hand, the actual eigenvalue problem is that associated to $(k^2 - \mathcal{D}^2)^{-1} \mathcal{L}_{OS}$. Then the adjoint is defined to be $(k^2 - \mathcal{D}^2)^{-1} \mathcal{L}_{OS}^\dagger$, where $\mathcal{L}_{OS}^\dagger$ satisfies
+%\[
+%  \int_{-1}^1 \hat{\xi}^* \mathcal{L}_{OS} \hat{v} \;\d y = \int_{-1}^1 \hat{v} (\mathcal{L}_{OS}^\dagger \hat{\xi})^*\;\d y,
+%\]
+%since the $(k^2 - \mathcal{D}^2)^{-1}$ in the operator cancels with the $(k^2 - \mathcal{D}^2)$ in the inner product. Thus, we are equivalently asking if $\mathcal{L}_{OS}$ is self-adjoint in the $L^2$ norm.
+%
+%This might seem like a long-winded way of getting back to the $L^2$-norm, but we will see that the energy norm is indeed the correct norm to think about, such as when we think about orthogonality.
+%
+%Given this, computing $\mathcal{L}_{OS}^\dagger$ is just an exercise in integration by parts, with slight annoyances due to the fact that $U$ has non-zero derivative. Ultimately, we end up with
+%\[
+%  \mathcal{L}_{OS}^\dagger = ik U (\mathcal{D}^2 - k^2) - 2i k U'\mathcal{D} + \frac{1}{Re} (k^2 - \mathcal{D}^2)^2.
+%\]
+%Compared to the original operator, we picked up some sign changes due to conjugation, but more significantly, we have a different advection term $2ik U' \mathcal{D}$.
+%
+%A perhaps slightly subtle point is that the eigenvalue problem for the adjoint should be
+%\[
+%  \mathcal{L}_{OS}^\dagger \hat{\xi}_q = i \omega_q(\mathcal{D}^2 - k^2) \hat{\xi}_q.
+%\]
+%The change in sign is largely because we have decided to put an $i$ in from of our eigenvalues. To see this gives the correct definition, suppose $\hat{v}_p$ is an eigenvector of the original equation, so that
+%\[
+%  \mathcal{L}_{OS}\hat{v}_p = i\omega_p (k^2 - \mathcal{D}^2) \hat{v}_p.
+%\]
+%Then we have
+%\[
+%  0 = \int_{-1}^1 \hat{\xi}_q^* \mathcal{L}_{OS} \hat{v}_p\;\d y - \int_{-1}^1 \hat{v}_p (\mathcal{L}_{OS}^\dagger \hat{\xi}_q)^* \;\d y = (\omega_p - \omega_q^*) \int_{-1}^1 \hat{\xi}_q^* (k^2 - \mathcal{D}^2) \hat{v}_p \;\d y.
+%\]
+%Thus, we recover the usual result that eigenvectors of the adjoint and the direct operator are orthogonal unless their eigenvalues are conjugate, provided we use the energy inner product. After normalizing, we obtain eigenvectors such that
 %
 %Using the boundary conditions, we have
 %\begin{align*}
@@ -2560,13 +2690,15 @@ Thus, we recover the usual result that eigenvectors of the adjoint and the direc
 %  0 = \int_{-1}^1 \hat{\xi}_q^* \mathcal{L}_{OS} \hat{v}_p\;\d y - \int_{-1}^1 \hat{v}_p (\mathcal{L}_{OS}^\dagger \hat{\xi}_q)^* \;\d y = (\omega_p - \omega_q)^* \int_{-1}^1 \hat{\xi}_q^* (\alpha^2 - \mathcal{D}^2) \hat{v}_p \;\d y.
 %\]
 %When defined this way, we now have identified a \emph{weighted} inner product such, provided the eigenvectors are normalized,
-\[
-  \int_{-1}^1 \hat{\xi}_q^*( \alpha^2 - \mathcal{D}^2) \hat{v}_p \;\d y = \delta_{pq}.
-\]
-This is called the \term{bi-orthogonality condition}. Note that the Orr-Sommerfeld eigenfunctions are not orthogonal to each other. However, they are orthogonal to the eigenfunctions of the \emph{adjoint} Orr-Sommerfeld operator.
+%\[
+%  \int_{-1}^1 \hat{\xi}_q^*( k^2 - \mathcal{D}^2) \hat{v}_p \;\d y = \delta_{pq}.
+%\]
+%This is called the \term{bi-orthogonality condition}.
 
-\subsubsection*{Physical mechanisms}
-Before we dive into the mathematics, let us first consider why we would physically expect transient growth. Suppose we have a simple flow profile that looks like this:
+We can now try to discretize this, do SVD (numerically), and find out what the growth rates are like. However, in the next chapter, we shall see that there is a better way of doing so. Thus, in the remainder of this chapter, we shall look at ways in which transient growth can physically manifest themselves.
+
+\subsubsection*{Orr's mechanisms}
+Suppose we have a simple flow profile that looks like this:
 \begin{center}
   \begin{tikzpicture}[scale=0.7, yscale=1.3]
     \draw (-1.2, -1.2) -- (1.2, 1.2);
@@ -2618,7 +2750,7 @@ Now by incompressibility, the area of this new region is the same as the area of
 \[
   \int_{\mathcal{D}} \nabla \times \mathbf{u} \cdot \d A = \int_{\partial \mathcal{D}} \mathbf{u} \cdot \;\d \ell.
 \]
-Since the left-hand-side didn't change, the same must be true for the right hand side. But since the boundary $\partial \mathcal{D}$ decreased in length, this implies $\mathbf{u}$ must have increased in magnitude! This growth is only transient, since after some further time, the vorticity patch gets sheared into 
+Since the left-hand-side didn't change, the same must be true for the right hand side. But since the boundary $\partial \mathcal{D}$ decreased in length, this implies $\mathbf{u}$ must have increased in magnitude! This growth is only transient, since after some further time, the vorticity patch gets sheared into
 \begin{center}
   \begin{tikzpicture}
     \draw[rotate=10] ellipse (2 and 0.15);
@@ -2637,6 +2769,7 @@ But remember that Stokes theorem tells us
 \]
 Thus, if we have vortices that are initially tilted into the shear, then this gets advected by the mean shear. In this process, the perimeter of each vortex sheet gets smaller, then grows again. Since $\int_{\partial \mathcal{D}} \mathbf{u} \cdot \d \ell$ is constant, we know $\mathbf{u}$ grows transiently, and then vanishes again.
 
+\subsubsection*{Lift up}
 Another mechanism is lift-up. This involves doing some mathematics. Suppose we instead expand our solutions as
 \[
   v = \tilde{v}(y, t) e^{i\alpha x + i \beta z},\quad \eta = \tilde{\eta}(y, t) e^{i\alpha x + i \beta z}.
@@ -2704,212 +2837,190 @@ So we can bound
 \]
 provided $t \gg \frac{2\delta}{\Delta U}$. Therefore energy grows at least as fast as $t$, but not necessarily as fast as $t^2$.
 
-To discuss transient growth, we need to have some appropriate measure which we consider. So we remember our definitions and incompressibility:
-\[
-  \frac{\partial u}{\partial x} + \frac{\partial v}{\partial y} + \frac{\partial w}{\partial z} = 0,\quad \eta = \omega_2 = \frac{\partial u}{\partial z} - \frac{\partial w}{\partial x}.
-\]
-Putting in
-\[
-  v(x, y, z, t) = \hat{v}(y) e^{i(\alpha x + \beta z - \omega t},\quad \eta(x, y, z, t) = \hat{\eta}(y) e^{i(\alpha x + \beta z - \omega t}.
-\]
-This implies
-\begin{align*}
-  i\alpha \hat{u} + i \beta \hat{w} &= - \mathcal{D} \hat{v}\\
-  i\beta \hat{u} - i\alpha \hat{w} &= \hat{\eta}..
-\end{align*}
-So we find that
-\begin{align*}
-  \hat{u} &= \frac{i}{k^2}(\alpha \mathcal{D} \hat{v} - \beta \eta)\\
-  \hat{w} &= \frac{i}{k^2}(\beta \mathcal{D} \hat{v} + \alpha \eta)
-\end{align*}
-Thus, we have
-\[
-  \frac{1}{2}(|u|^2 + |w|^2) = \frac{1}{2k^2} \Big(|\mathcal{D} \hat{v}|^2 + |\eta|^2\Big).
-\]
-Thus, the energy is
-\begin{align*}
-  E &= \int \frac{1}{2k^2} \frac{1}{2k^2} \Big(|\mathcal{D} \hat{v}|^2 + k^2 |\hat{v}|^2 + |\eta|^2\Big)\\
-  &= \frac{1}{2k^2} \int_{-1}^1 (\hat{v}^* \hat{\eta}^*)
-  \begin{pmatrix}
-    k^2 - \mathcal{D}^2 & 0\\
-    0 & 1
-  \end{pmatrix}
-  \begin{pmatrix}
-    \hat{v}\\
-    \hat{\eta}
-  \end{pmatrix}\;\d y.
-\end{align*}
-Compare this with the binormality condition!
 
-Let's try to recall some linear algebra. We shall consider bounded domains, so that we don't have to worry about continuous spectra. Let us also assume that finite Fourier representations of a perturbation are adequate. Further, let us assume that the base state is independent of time, to make life easier.
+%Let's try to recall some linear algebra. We shall consider bounded domains, so that we don't have to worry about continuous spectra. Let us also assume that finite Fourier representations of a perturbation are adequate. Further, let us assume that the base state is independent of time, to make life easier.
+%
+%For a weight matrix $W$, we can define a weighted inner product by
+%\[
+%  (\mathbf{a}, \mathbf{b}) = \mathbf{a}^\dagger W\mathbf{b},
+%\]
+%where $\mathbf{a}, \mathbf{b} \in \C^n$. Since the weight matrix is positive definite, we have a \term{Cholesky factorization} $W = FF^\dagger$, where $F$ is lower triangular. We now have a natural definition of an (energy) norm:
+%\[
+%  \|\mathbf{q}(t)\|^2 = (\mathbf{q}, \mathbf{q}) = \mathbf{q}^\dagger W\mathbf{q} = \|F^\dagger \mathbf{q}(t)\|_2^2.
+%\]
+%Of course, if $W$ is just the identity matrix, then we are doing nothing. What this tells us is that we can always change our coordinate system so that we get the Euclidean norm, so let us assume that is the case. In particular, this removes problems to do with $\mathcal{D} = \frac{\partial}{\partial y}$.
+%
+%In this case, we can reduce the stability problem to solving a system of coupled linear ODEs. But unlike classic undergraduate problems, our operators are not normal.
+%
+%We are interested in a system
+%\[
+%  \frac{\d \mathbf{q}}{\d t} = L \mathbf{q}
+%\]
+%for $\mathbf{q} \in \C^n$ and $\mathbf{q}(0) = \mathbf{q}_0$. We can solve this in terms of matrix exponentials:
+%\[
+%  \mathbf{q}(t) = e^{Lt} \mathbf{q}_0,
+%\]
+%where the matrix exponential is defined by
+%\[
+%  e^{Lt} = 1 + Lt + \frac{t^2}{2} L^2 + \cdots.
+%\]
+%The key question is what is the maximum gain
+%\[
+%  G(t) = \max_{\mathbf{q}(0) \not= 0}\frac{\|\mathbf{q}(t)\|^2}{ \|\mathbf{q}(0)\|^2} = \max_{\mathbf{q}(0) \not= 0} \frac{\|e^{Lt} \mathbf{q}(0)\|^2}{\|\mathbf{q}(0)\|^2}.
+%\]
+%By definition, this is the natrix norm:
+%\begin{defi}[Matrix norm]\index{matrix norm}
+%  Let $B$ be an $n \times n$ matrix. Then the \emph{matrix norm} is
+%  \[
+%    \|B\| = \max_{\mathbf{v} \not= 0} \frac{\|B\mathbf{v}\|}{\|\mathbf{v}\|}.
+%  \]
+%\end{defi}
+%The fundamental issue is then to describe $q$ in terms of normalized eigenvectors of $L$. We order the associated eigenvalues by their real partrs, so that $\Re(\lambda_1) \geq \cdots \geq \Re(\lambda_n)$. Then the gain is clearly bounded below by
+%\[
+%  G(t) \geq e^{2 \Re(\lambda_1)t}.
+%\]
+%If $L$ is normal, then the eigenvectors form an orthonormal basis. So we can write $L = V \Lambda V^{-1}$ for $\Lambda = \diag(\lambda_1,\ldots, \lambda_n)$ and $V$ is unitary. Then % condition number \kappa(V) = 1, but in general \kappa(V) = |V| |V^{-1}|
+%\[
+%  G(t) = \|e^{Lt}\|^2 = \|V e^{\Lambda t} V^{-1}\|^2 = \|e^{\Lambda t}\|^2 = e^{2 \Re (\lambda_1) t}.
+%\]
+%By life gets enormously more complicated when matrices are non-normal. Recall the \term{condition number}
+%\[
+%  \kappa(A) = \|A\| \|A^{-1}\|.
+%\]
+%Singluar values and singular vectors air pairs of vectors $(\mathbf{v}, \mathbf{u})$ such that
+%\[
+%  A\mathbf{v} = \sigma \mathbf{u},\quad A^\dagger \mathbf{u} = \sigma \mathbf{v}.
+%\]
+%Then we have
+%\[
+%  A^\dagger A \mathbf{v} = \sigma^2 \mathbf{v},\quad AA^\dagger \mathbf{u} = \sigma^2 \mathbf{u}.
+%\]
+%Note $AA^\dagger$ and $A^\dagger A$. We may wlog assume singular values are normalized, so that $\|A\|= \sigma_{max}$, but consider the square invertible case:
+%\[
+%  A^{-1}A \mathbf{v} = \sigma A^{-1} \mathbf{u},\quad (A^{-1})^\dagger A^\dagger \mathbf{u} = \sigma [A^{-1}]^{\dagger} \mathbf{v}.
+%\]
+%Sio in fact we have
+%\[
+%  \frac{1}{\sigma} \mathbf{v} = A^{-1} \mathbf{u},\quad \frac{1}{\sigma} \mathbf{u} = [A^\dagger]^{-1} \mathbf{v}.
+%\]
+%Therefore we know
+%\[
+%  \|A^{-1}\| = \frac{1}{\sigma_{min}}.
+%\]
+%So we have
+%\[
+%  \kappa(A) = \frac{\sigma_{max}}{\sigma_{min}}.
+%\]
+%Therefore, returning to gain, where now eigenvectors do not form orthonormal basis, we have (with $V$ not necessarily unitary)
+%\[
+%  G(t) = \|e^{Lt}\|^2 = \|V e^{\Lambda t} V^{-1}\|^2 \leq \|V\|^2 \|e^{\Lambda t}\|^2 \|V^{-1}\|^2 = \kappa^2(V) e^{2 \Re(\lambda_1) t},
+%\]
+%which may be much larger. So we have the possibility for transient growth.
+%
+%Actually to calculate transient growth, it is very tempting to use the idea of SVD. We can write $e^{Lt} = B$, with
+%\[
+%  BV = U\Sigma, U^\dagger = U^{-1}, V^\dagger = V^{-1}, \Sigma = \diag(\sigma_1, \ldots, \sigma_n),
+%\]
+%with $\sigma_i \in \R$ and $\sigma_1 > \cdots > \sigma_n \geq 0$.
+%
+%Therefore, $B\mathbf{v}_1 = \sigma_1 \mathbf{u}_1$, and remembering the definition of matrix norms, we have
+%\begin{multline*}
+%  G(t) =\|e^{Lt}\|^2 = \max_{\mathbf{x} \not= 0} \frac{(B\mathbf{x}, B\mathbf{x})}{(\mathbf{x}, \mathbf{x}}) = \max_{\mathbf{x} \not= 0} \frac{(U\Sigma V^\dagger \mathbf{x}, U\Sigma V^\dagger \mathbf{x})}{(\mathbf{x}, \mathbf{x})}\\
+%  = \max_{\mathbf{x} \not= 0} \frac{(\Sigma V^\dagger \mathbf{x}, \Sigma V^\dagger \mathbf{x})}{(\mathbf{x}, \mathbf{x})} = \max_{\mathbf{y} \not= 0} \frac{(\Sigma \mathbf{y}, \Sigma \mathbf{y})}{(\mathbf{y}, \mathbf{y})} = \sigma_1^2(t).
+%\end{multline*}
+%The optimal initial condition is $\mathbf{v}_1$, power and appealing techniques, as SVD can be calculated. This can of course be applied to the Orr-Sommerfeld equation, but there are subtleties arising from discretization.
+%
+%% say a bit more
+%But there are some further problems. Crucially, this assumes the system is linear.
 
-For a weight matrix $W$, we can define a weighted inner product by
-\[
-  (\mathbf{a}, \mathbf{b}) = \mathbf{a}^\dagger W\mathbf{b},
-\]
-where $\mathbf{a}, \mathbf{b} \in \C^n$. Since the weight matrix is positive definite, we have a \term{Cholesky factorization} $W = FF^\dagger$, where $F$ is lower triangular. We now have a natural definition of an (energy) norm:
-\[
-  \|\mathbf{q}(t)\|^2 = (\mathbf{q}, \mathbf{q}) = \mathbf{q}^\dagger W\mathbf{q} = \|F^\dagger \mathbf{q}(t)\|_2^2.
-\]
-Of course, if $W$ is just the identity matrix, then we are doing nothing. What this tells us is that we can always change our coordinate system so that we get the Euclidean norm, so let us assume that is the case. In particular, this removes problems to do with $\mathcal{D} = \frac{\partial}{\partial y}$.
+\section{A variational point of view}
+In this chapter, we are going to learn about a more robust and powerful way to approach and understand transient growth. Instead of trying to think about $G(t)$ as a function of $t$, let us fix some target time $T$, and just look at $G(T)$.
 
-In this case, we can reduce the stability problem to solving a system of coupled linear ODEs. But unlike classic undergraduate problems, our operators are not normal.
-
-We are interested in a system
+For any two times $t_i < t_f$, we can define a \term{propagator function} such that
 \[
-  \frac{\d \mathbf{q}}{\d t} = L \mathbf{q}
+  \mathbf{u}(t_f) = \Phi(t_f, t_i) \mathbf{u}(t_i)
 \]
-for $\mathbf{q} \in \C^n$ and $\mathbf{q}(0) = \mathbf{q}_0$. We can solve this in terms of matrix exponentials:
-\[
-  \mathbf{q}(t) = e^{Lt} \mathbf{q}_0,
-\]
-where the matrix exponential is defined by
-\[
-  e^{Lt} = 1 + Lt + \frac{t^2}{2} L^2 + \cdots.
-\]
-The key question is what is the maximum gain
-\[
-  G(t) = \max_{\mathbf{q}(0) \not= 0}\frac{\|\mathbf{q}(t)\|^2}{ \|\mathbf{q}(0)\|^2} = \max_{\mathbf{q}(0) \not= 0} \frac{\|e^{Lt} \mathbf{q}(0)\|^2}{\|\mathbf{q}(0)\|^2}.
-\]
-By definition, this is the natrix norm:
-\begin{defi}[Matrix norm]\index{matrix norm}
-  Let $B$ be an $n \times n$ matrix. Then the \emph{matrix norm} is
-  \[
-    \|B\| = \max_{\mathbf{v} \not= 0} \frac{\|B\mathbf{v}\|}{\|\mathbf{v}\|}.
-  \]
-\end{defi}
-The fundamental issue is then to describe $q$ in terms of normalized eigenvectors of $L$. We order the associated eigenvalues by their real partrs, so that $\Re(\lambda_1) \geq \cdots \geq \Re(\lambda_n)$. Then the gain is clearly bounded below by
-\[
-  G(t) \geq e^{2 \Re(\lambda_1)t}.
-\]
-If $L$ is normal, then the eigenvectors form an orthonormal basis. So we can write $L = V \Lambda V^{-1}$ for $\Lambda = \diag(\lambda_1,\ldots, \lambda_n)$ and $V$ is unitary. Then % condition number \kappa(V) = 1, but in general \kappa(V) = |V| |V^{-1}|
-\[
-  G(t) = \|e^{Lt}\|^2 = \|V e^{\Lambda t} V^{-1}\|^2 = \|e^{\Lambda t}\|^2 = e^{2 \Re (\lambda_1) t}.
-\]
-By life gets enormously more complicated when matrices are non-normal. Recall the \term{condition number}
-\[
-  \kappa(A) = \|A\| \|A^{-1}\|.
-\]
-Singluar values and singular vectors air pairs of vectors $(\mathbf{v}, \mathbf{u})$ such that
-\[
-  A\mathbf{v} = \sigma \mathbf{u},\quad A^\dagger \mathbf{u} = \sigma \mathbf{v}.
-\]
-Then we have
-\[
-  A^\dagger A \mathbf{v} = \sigma^2 \mathbf{v},\quad AA^\dagger \mathbf{u} = \sigma^2 \mathbf{u}.
-\]
-Note $AA^\dagger$ and $A^\dagger A$. We may wlog assume singular values are normalized, so that $\|A\|= \sigma_{max}$, but consider the square invertible case:
-\[
-  A^{-1}A \mathbf{v} = \sigma A^{-1} \mathbf{u},\quad (A^{-1})^\dagger A^\dagger \mathbf{u} = \sigma [A^{-1}]^{\dagger} \mathbf{v}.
-\]
-Sio in fact we have
-\[
-  \frac{1}{\sigma} \mathbf{v} = A^{-1} \mathbf{u},\quad \frac{1}{\sigma} \mathbf{u} = [A^\dagger]^{-1} \mathbf{v}.
-\]
-Therefore we know
-\[
-  \|A^{-1}\| = \frac{1}{\sigma_{min}}.
-\]
-So we have
-\[
-  \kappa(A) = \frac{\sigma_{max}}{\sigma_{min}}.
-\]
-Therefore, returning to gain, where now eigenvectors do not form orthonormal basis, we have (with $V$ not necessarily unitary)
-\[
-  G(t) = \|e^{Lt}\|^2 = \|V e^{\Lambda t} V^{-1}\|^2 \leq \|V\|^2 \|e^{\Lambda t}\|^2 \|V^{-1}\|^2 = \kappa^2(V) e^{2 \Re(\lambda_1) t},
-\]
-which may be much larger. So we have the possibility for transient growth.
-
-Actually to calculate transient growth, it is very tempting to use the idea of SVD. We can write $e^{Lt} = B$, with
-\[
-  BV = U\Sigma, U^\dagger = U^{-1}, V^\dagger = V^{-1}, \Sigma = \diag(\sigma_1, \ldots, \sigma_n),
-\]
-with $\sigma_i \in \R$ and $\sigma_1 > \cdots > \sigma_n \geq 0$.
-
-Therefore, $B\mathbf{v}_1 = \sigma_1 \mathbf{u}_1$, and remembering the definition of matrix norms, we have
+for any solution $\mathbf{u}$ of our equations. In the linear approximation, this propagator is a linear function between appropriate function spaces. Writing $\Phi = \Phi(T, T_0)$, the gain problem is then equivalent to maximizing
 \begin{multline*}
-  G(t) =\|e^{Lt}\|^2 = \max_{\mathbf{x} \not= 0} \frac{(B\mathbf{x}, B\mathbf{x})}{(\mathbf{x}, \mathbf{x}}) = \max_{\mathbf{x} \not= 0} \frac{(U\Sigma V^\dagger \mathbf{x}, U\Sigma V^\dagger \mathbf{x})}{(\mathbf{x}, \mathbf{x})}\\
-  = \max_{\mathbf{x} \not= 0} \frac{(\Sigma V^\dagger \mathbf{x}, \Sigma V^\dagger \mathbf{x})}{(\mathbf{x}, \mathbf{x})} = \max_{\mathbf{y} \not= 0} \frac{(\Sigma \mathbf{y}, \Sigma \mathbf{y})}{(\mathbf{y}, \mathbf{y})} = \sigma_1^2(t).
+  G(T, T_0) = \frac{E(T)}{E(T_0)} = \frac{\bra \mathbf{u}_p(T), \mathbf{u}_p(T)\ket}{ \bra \mathbf{u}_p(T_0), \mathbf{u}_p(T_0)\ket}\\
+  = \frac{\bra \Phi \mathbf{u}_p(T_0), \Phi \mathbf{u}_p(T_0)\ket}{\bra \mathbf{u}_p(T_0), \mathbf{u}_p(T_0)\ket} = \frac{\bra \mathbf{u}_p(T_0), \Phi^\dagger \Phi \mathbf{u}_p(T_0)\ket}{\bra \mathbf{u}_p(T_0), \mathbf{u}_p(T_0)\ket}.
 \end{multline*}
-The optimal initial condition is $\mathbf{v}_1$, power and appealing techniques, as SVD can be calculated. This can of course be applied to the Orr-Sommerfeld equation, but there are subtleties arising from discretization.
+Here the angled brackets denote natural inner product leading to the energy norm. Note that the operator $\Phi^\dagger \Phi$ is necessarily self-adjoint, and so this $G$ is maximized when $\mathbf{u}_p(T_0)$ is chosen to be the eigenvector of $\Phi$ of maximum eigenvalue.
 
-% say a bit more
-But there are some further problems. Crucially, this assumes the system is linear.
+There is a general method to find the maximum eigenvector of a (self-adjoint) operator $\Phi$. We start with a random vector $\mathbf{x}$. Then we have $\Phi^n \mathbf{x} \sim \lambda_1^n \mathbf{v}_1$ as $n \to \infty$, where $\lambda_1$ is the maximum eigenvalue with associated eigenvector $\mathbf{v}_1$. Indeed, if we write $x$ as the linear combination of eigenvectors, then as we apply $\Phi$ many times, the sum is dominated by the term with largest eigenvalue.
 
-\section{Adjoints for linear gain}
-Let us consider first the simplest case where we are interested in $G(T)$ at some target $T$. So we are not interested in the matrix exponential at every intermediate time, just the end. So we can think of the Navier--Stokes equation as a propagator function $\mathbf{u}_p(t_f) = \Phi_\lambda(t_f, t_i) \mathbf{u}_p(t_i)$. The gain problem is then equivalent to determining
-\begin{multline*}
-  \mathcal{G}(\lambda, T, T_0) = \frac{E(\lambda, T)}{ E(\lambda, T_0)} = \frac{\bra \mathbf{u}_p(T), \mathbf{u}_p(T)\ket}{ \bra \mathbf{u}_p(T_0), \mathbf{u}_p(T_0), \mathbf{u}_p(T_0)\ket}\\
-  = \frac{\bra \Phi_\lambda (T, T_0) \mathbf{u}_p(T_0), \Phi_\lambda(T, T_0) \mathbf{u}_p(T_0)\ket}{\bra \mathbf{u}_p(T_0), \mathbf{u}_p(T_0)\ket} = \frac{\bra \mathbf{u}_p(T_0), \Phi_\lambda (T, T_0)^\dagger \Phi_\lambda(T, T_0) \mathbf{u}_p(T_0)\ket}{\bra \mathbf{u}_p(T_0), \mathbf{u}_p(T_0)\ket}
-\end{multline*}
-The angled brackets denote natural inner product leading to the energy norm. Formally, this defines a self-adjoint operator $\Phi_\lambda^\dagger (T, T_0) \Phi_\lambda(T, T_0)$. The optimal initial condition is the eigenfunction/state vector associated with the largest eigenvalue. There is a natural iterative method to determine if we know the propagators --- for a general operator $\Phi$, we have $\Phi^n x \sim \lambda_1^n \mathbf{v}_1$.
+So if we want to find the mode with maximal transient growth, we only need to be able to compute $\Phi^\dagger \Phi$. The forward propagator $\Phi(T, T_0)$ is something we know how to compute (at least numerically). We simply numerically integrate the Navier--Stokes equation. So we need to understand $\Phi(T, T_0)^\dagger$.
 
-The forward propagator is something we can compute by the Navier--Stokes equation, and so we need to figure out how to compute the adjoint propagator.
-
-This is essentially divorced from a modal/stability description. In a linearized world, the direct or forward propagator is clearly
+Let $\mathbf{u}(t)$ be a solution to the linear equation
 \[
-  \frac{\partial \mathbf{u}_p}{\partial t} + (\mathbf{U}(t) \cdot \nabla) \mathbf{u}_p = -\nabla p_p - (\mathbf{u}_p \cdot \nabla) \mathbf{u}(t) + Re^{-1} \nabla^2 \mathbf{u}_p,
+  \frac{\d \mathbf{u}}{\d t}(t) = L(t) \mathbf{u}(t).
 \]
-where
+Here we may allow $L$ to depend on time. Let $L^\dagger$ be the adjoint, and suppose $\mathbf{v}(t)$ satisfies
 \[
-  \nabla \cdot \mathbf{u}_p = 0,\quad \mathbf{U} = (U(x, y, t), V(x, y, t), 0)^T.
+  \frac{\d \mathbf{v}}{\d t}(t) = - L(t)^\dagger \mathbf{v}(t).
 \]
-Crucially, we don't have to assume the system is autonomous, as we do not intend to write our solution as a matrix exponential. There is also no need for timescale separation. For example, we can consider a rapidly changing base flow. This equation \emph{defines} the \term{propagator}
+Then the chain rule tells us
 \[
-  \mathbf{u}_p(T) = \Phi_\lambda (T, T_0) \mathbf{u}_p(T_0).
+  \frac{\d}{\d t} \bra\mathbf{v}(t), \mathbf{u}(t)\ket = \bra -L(t)^\dagger \mathbf{v}(t), \mathbf{u}(t)\ket + \bra \mathbf{v}(t), L(t)^\dagger \mathbf{u}(t)\ket = 0.
 \]
-The adjoint of the propagator is defined by
+So we know that
 \[
-  \bra \mathbf{u}_a, \Phi_\lambda \mathbf{u}_p) = \bra \Phi_\lambda^\dagger \mathbf{u}_a, \mathbf{u}_p\ket.
+  \bra \mathbf{v}(T_0), \mathbf{u}(T_0)\ket = \bra \mathbf{v}(T), \mathbf{u}(T)\ket = \bra \mathbf{v}(T), \Phi(T, T_0) \mathbf{u}(T_0)\ket.
 \]
-We introduce the notation
+Thus, given a $\mathbf{v}_0$, to compute $\Phi(T, T_0)^\dagger \mathbf{v}_0$, we have to integrate the adjoint $\frac{\d \mathbf{v}}{\d t} = - L(t)^\dagger v$ \emph{backwards in time}, using the ``initial'' condition $\mathbf{v}(T) = \mathbf{v}_0$, and then we have
 \[
-  \bra \mathbf{a} \cdot \mathbf{b}\ket = \frac{1}{V} \mathbf{a} \cdot \mathbf{b} \;\d V,\quad [\mathbf{a}, \mathbf{b}] = \int_0^T \bra a, b \ket \;\d t.
+  \Phi(T, T_0)^\dagger \mathbf{v}_0 = \mathbf{v}(T_0).
 \]
-The adjoint (linearized) Navier--Stokes equation is
+What does the adjoint equation look like? For a time-dependent background shear flow, the linearized forward/direct equation for a perturbation $\mathbf{u}_p$ is given by
 \[
-  -\frac{\partial \mathbf{u}_a}{\partial t} = \boldsymbol\Omega \times \mathbf{u}_a - \nabla \times (\mathbf{U} \times \mathbf{u}_\sigma) - \nabla p_a + Re^{-} \nabla^2 \mathbf{u}_a,
+  \frac{\partial \mathbf{u}_p}{\partial t} + (\mathbf{U}(t) \cdot \nabla) \mathbf{u}_p = -\nabla p_p - (\mathbf{u}_p \cdot \nabla) \mathbf{u}(t) + Re^{-1} \nabla^2 \mathbf{u}_p.
 \]
-where 
+The adjoint (linearized) Navier--Stokes equation is then
+\[
+  -\frac{\partial \mathbf{u}_a}{\partial t} = \boldsymbol\Omega \times \mathbf{u}_a - \nabla \times (\mathbf{U} \times \mathbf{u}_\sigma) - \nabla p_a + Re^{-1} \nabla^2 \mathbf{u}_a,
+\]
+where we again have
 \[
   \nabla \cdot \mathbf{u}_a = 0,\quad \boldsymbol\Omega = \nabla \times \mathbf{U}.
 \]
-Note that the time-derivative term flips sign, since it is a single derivative, while the diffusion term does not. This is ill-posed, unless we integrate back in time!
+This PDE is ill-posed if we wanted to integrate it forwards in time, but that does not concern us, because to compute $\Phi^\dagger$, we have to integrate it \emph{backwards} in time.
+
+Thus, to find the maximal transient mode, we have to run the \term{direct-adjoint loop}.
 \[
   \begin{tikzcd}
-    \mathbf{u}_p(T_0) \ar[r, "\phi_\lambda"] & \mathbf{u}_p(T) \ar[d]\\
-    \phi^\dagger \phi (\mathbf{u}_p(T_0)) & \mathbf{u}_p(T) \ar[l, "\phi_{\lambda}^\dagger"]
-  \end{tikzcd}
+    \mathbf{u}_p(T_0) \ar[r, "\Phi"] & \mathbf{u}_p(T) \ar[d]\\
+    \Phi^\dagger \Phi (\mathbf{u}_p(T_0)) \ar[u, dashed] & \mathbf{u}_p(T) \ar[l, "\Phi^\dagger"]
+  \end{tikzcd},
 \]
-This is the simplest example of a direct-adjoint loop. When converged, the adjoint integrates back precisely, and this is easy to compute numerically.
+and keep running this until it converges.
 
-Using these analysis, we can find some interesting results. For example, in a shear layer flow, 3-dimensional modes with both streamwise and spanwise perturbations are the most unstable. However, in the long run, the Kelvin-Helmholtz modes dominates.
+Using these analysis, we can find some interesting results. For example, in a shear layer flow, 3-dimensional modes with both streamwise and spanwise perturbations are the most unstable. However, in the long run, the Kelvin-Helmholtz modes dominate.
 
-Why does this work? And how does this relate to the toy problems we were looking at before? Let's think about a simple linear version first with energy norms:
-\[
-  \frac{\partial \mathbf{q}}{\partial t} = \mathcal{L} \mathbf{q}.
-\]
-Then it is again straightforward to define the adjoint operator $\mathcal{L}^\dagger$, and the eigenvalues of $\mathcal{L}^\dagger$ are thus complex conjugates of the eigenvalues of $\mathcal{L}$. We denoted the associated eigenvectors of $\mathcal{L}$ as $\mathbf{v}_k^{(d)}$ and of $\mathcal{L}^\dagger$ as $\mathbf{v}_k^{(a)}$. We have biorthogonality property
-\[
-  (\mathbf{v}_i^{(a)}, \mathbf{v}_j^{(d)} = 0 \text{ if }i \not= j.
-\]
-The normalized initial condition approximation is then
-\[
-  \mathbf{q}(0) = \sum_{k = 1}^n \alpha_k \mathbf{v}_k^{(d)},\quad \alpha_k = \frac{(\mathbf{v}_k^{(a)}, \mathbf{q})}{(\mathbf{v}_k^{(a)}, \mathbf{v}_k^{(d)}}.
-\]
-If there is a dominant mode within the system $\mathbf{v}_1^{(d)}$, and the system is strongly non-normal so that $(\mathbf{v}_1^{(a)}, \mathbf{v}_1^{(d)}) \ll 1$ (as in the toy problem), then $\alpha_k$ would be very large, and so there can be very strong amplification. In fact, the optimal initial condition should be the equivalent eigenvector of the adjoint, $\mathbf{v}_k^{(a)}$.
+%Why does this work? And how does this relate to the toy problems we were looking at before? Let's think about a simple linear version first with energy norms:
+%\[
+%  \frac{\partial \mathbf{q}}{\partial t} = \mathcal{L} \mathbf{q}.
+%\]
+%Then it is again straightforward to define the adjoint operator $\mathcal{L}^\dagger$, and the eigenvalues of $\mathcal{L}^\dagger$ are thus complex conjugates of the eigenvalues of $\mathcal{L}$. We denoted the associated eigenvectors of $\mathcal{L}$ as $\mathbf{v}_k^{(d)}$ and of $\mathcal{L}^\dagger$ as $\mathbf{v}_k^{(a)}$. We have biorthogonality property
+%\[
+%  (\mathbf{v}_i^{(a)}, \mathbf{v}_j^{(d)} = 0 \text{ if }i \not= j.
+%\]
+%The normalized initial condition approximation is then
+%\[
+%  \mathbf{q}(0) = \sum_{k = 1}^n \alpha_k \mathbf{v}_k^{(d)},\quad \alpha_k = \frac{(\mathbf{v}_k^{(a)}, \mathbf{q})}{(\mathbf{v}_k^{(a)}, \mathbf{v}_k^{(d)}}.
+%\]
+%If there is a dominant mode within the system $\mathbf{v}_1^{(d)}$, and the system is strongly non-normal so that $(\mathbf{v}_1^{(a)}, \mathbf{v}_1^{(d)}) \ll 1$ (as in the toy problem), then $\alpha_k$ would be very large, and so there can be very strong amplification. In fact, the optimal initial condition should be the equivalent eigenvector of the adjoint, $\mathbf{v}_k^{(a)}$.
+%
+%But the adjoint is even more attractive if we pose it a variational way\ldots
 
-But the adjoint is even more attractive if we pose it a variational way\ldots
-\subsection{Variational formulation}
-Consider a variational formulation to extremize an objective functional, e.g.\ $\|q(T)\|_E^2$. We can think about the calculation as a \emph{constrained optimization} problem with three requirements:
+\subsubsection*{Variational formulation}
+We can also use variational calculus to find the maximally unstable mode. We think of the calculation as a \emph{constrained optimization} problem with the following requirements:
 \begin{enumerate}
   \item For all $T_0 \leq t \leq T$, we have $\frac{\partial \mathbf{q}}{\partial t} = \mathcal{D}_t \mathbf{q} = \mathcal{L} \mathbf{q}$.
-  \item $\|\mathbf{q}(0)\|_E^2 = \mathbf{e}_0$
-  \item The initial state is given by $\mathbf{q}(0) = \mathbf{q}_0)$
+  \item The initial state is given by $\mathbf{q}(0) = \mathbf{q}_0$.
 \end{enumerate}
-So we need a Lagrangian multiplier to impose the first condition at all points in space and time. So formulation of the augmetned Lagrangian is
+We will need Lagrangian multipliers to impose these constraints, and so the augmented Lagrangian is
 \[
-  \mathcal{G} = \frac{\bra \mathbf{q}_T, \mathbf{q}_T\ket}{\bra \mathbf{q}_0, \mathbf{q}_0\ket} - \int_0^T \bra \tilde{\mathbf{q}} (\mathcal{D}_t - \mathcal{L} \mathbf{q}\ket \;\d t + \bra \tilde{\mathbf{q}}_0, (\mathbf{q}(0) - \mathbf{q}_0)\ket.
+  \mathcal{G} = \frac{\bra \mathbf{q}_T, \mathbf{q}_T\ket}{\bra \mathbf{q}_0, \mathbf{q}_0\ket} - \int_0^T \bra \tilde{\mathbf{q}},  (\mathcal{D}_t - \mathcal{L}) \mathbf{q}\ket \;\d t + \bra \tilde{\mathbf{q}}_0, \mathbf{q}(0) - \mathbf{q}_0\ket.
 \]
 Taking variations with respect to $\tilde{\mathbf{q}}$ and $\tilde{\mathbf{q}}_0$ recover the evolution equation and the initial condition. The integral can then be written as
 \[
@@ -2921,9 +3032,9 @@ Now if we take a variation with respect to $\mathbf{q}$, we see that $\tilde{\ma
 \]
 So the Lagrange multiplier within such a variational problem evolves according to the adjoint equation!
 
-Writing
+Taking appropriate adjoints, we can write
 \[
-  \mathcal{G} = \frac{\bra \mathbf{q}_T, \mathbf{q}_T\ket}{\bra \mathbf{q}_0, \mathbf{q}_0\ket} + \int_0^T \bra \mathbf{q}, (\mathcal{D}_t + \mathcal{L}^\dagger) \tilde{\mathbf{q}}\ket \;\d t + \bra \tilde{\mathbf{q}}_0, \mathbf{q}_0\ket - \bra \tilde{\mathbf{q}}_T, \mathbf{q}_T\ket + bt
+  \mathcal{G} = \frac{\bra \mathbf{q}_T, \mathbf{q}_T\ket}{\bra \mathbf{q}_0, \mathbf{q}_0\ket} + \int_0^T \bra \mathbf{q}, (\mathcal{D}_t + \mathcal{L}^\dagger) \tilde{\mathbf{q}}\ket \;\d t + \bra \tilde{\mathbf{q}}_0, \mathbf{q}_0\ket - \bra \tilde{\mathbf{q}}_T, \mathbf{q}_T\ket + \text{boundary terms}.
 \]
 But if we take variations with respect to our initial conditions, then $\frac{\delta \mathcal{G}}{\delta \mathbf{q}_0} = 0$ gives
 \[
@@ -2937,58 +3048,65 @@ Applying $\bra \ph, \mathbf{q}_0\ket$ to the first equation and $\bra \ph, \math
 \[
   \bra \tilde{\mathbf{q}}_0, \mathbf{q}_0\ket = \bra \tilde{\mathbf{q}}_T, \mathbf{q}_T\ket.
 \]
-This is a consistency condition to see if we have found the optimal solution. This is useful. Previously our algorithm used power iteration, which requires us to integrate many times. However, we now have \emph{gradient information} for gain:
+This is the equation we previously saw for the adjoint equation, and this provides a consistency condition to see if we have found the optimal solution.
+
+Previously our algorithm used power iteration, which requires us to integrate forwards and backwards many times. However, we now have \emph{gradient information} for gain:
 \[
   \frac{\delta \mathcal{G}}{\partial \mathbf{q}_0} = \tilde{\mathbf{q}}_0 - \frac{2 \bra \mathbf{q}_T, \mathbf{q}_T\ket}{\bra \mathbf{q}_0, \mathbf{q}_0\ket^2}\mathbf{q}_0.
 \]
-This allows us to exploit optimization algorithms (steepest descent, conjugate gradient etc.). This has an opportunity for faster convergence. Notice that the adjoint field determines sensitivity of flows to perturbations.
+This allows us to exploit optimization algorithms (steepest descent, conjugate gradient etc.). This has an opportunity for faster convergence.
 
-Note that in general, there can be 3 different inner products in such a formulation:
+There are many ways we can modify this. One way is to modify the inner product. Note that we actually had to use the inner product in three occasions:
 \begin{enumerate}
-  \item Inner products in the objective functional $\mathcal{J}$
+  \item Inner product in the objective functional $\mathcal{J}$
   \item Inner product in initial normalization/constraint of the state vector.
   \item Inner product in the definition of adjoint operator.
 \end{enumerate}
-There is no reason we have to use the same norm for all of these. However, there are strong arguments that an energy norm is natural for norm 2. It is an open research question whether it is best to impose using Lagrange multiplier or directly. It is a wide open research question as to whether there is an appropriate choice for inner product 3. On the other hand, investigation of variation of inner product 1 is widely explored.
+We used the same energy norm for all of these, but there is no reason we have to use the same norm for all of these. However, there are strong arguments that an energy norm is natural for norm 2. It is a wide open research question as to whether there is an appropriate choice for inner product 3. On the other hand, investigation of variation of inner product 1 has been widely explored.
 
 As an example, consider $p$-norms
 \[
-  \mathcal{J} = \left( \frac{1}{V_\omega} \int_\Omega  e(x, T)^p \;\d \Omega\right)^{1/p},\quad e(x T) = \frac{1}{2} |u(x, T)|^2. % tilde is dagger everywhere
+  \mathcal{J} = \left( \frac{1}{V_\Omega} \int_\Omega e(x, T)^p \;\d \Omega\right)^{1/p},\quad e(x, T) = \frac{1}{2} |u(x, T)|^2. % tilde is dagger everywhere
 \]
-This has the attraction that for large values of $p$, this would be dominated by peak values of $e$, not average. Then we have
-\[
-  \mathcal{M} = \mathcal{J} - \int_0^T \left\bra \mathbf{u}^\dagger, \left(\frac{\partial \mathbf{u}}{\partial t} + \mathbf{u} \cdot \nabla \mathbf{u} + \mathbf{u} \cdot \nabla \mathbf{U} + \nabla p - \frac{1}{Re} \nabla^2 \mathbf{u}\right)\right\ket - \bra \mathbf{p}^\dagger, \nabla \cdot \mathbf{u}\ket \;\d t - \bra \mathbf{u}^\dagger_0, \mathbf{u}_0 - \mathbf{u}(0)\ket.
-\]
-Note that the pressure is a Lagrange multiplier. 
+This has the attraction that for large values of $p$, this would be dominated by peak values of $e$, not average.
 
-Here integration by parts with respect to time will lead to a term $\bra \tilde{\mathbf{u}} (0), \mathbf{u}(0)\ket - \bra \tilde{\mathbf{u}} (T), \mathbf{u}(T)\ket$. Variations with respect to $\mathbf{u}(0)$ , $\mathbf{u}(T)$ lead to interesting alternate conditions. We have
-\[
-  \frac{\delta \mathcal{M}}{\delta \mathbf{u}_0} = \tilde{\mathbf{u}}_0.
-\]
-If we fix the norm of $\mathbf{u}_0$, then given $\frac{\delta \mathcal{M}}{\delta \mathbf{u}_0}$, we should ``improve'' our solution by letting $\mathbf{u}_0$ move in the direction of the projection of $\frac{\delta \mathcal{M}}{\delta \mathbf{u}_0}$ to the sphere of fixed norm. So the optimal solution occurs when $\tilde{\mathbf{u}}_0, \mathbf{u}_0$ are perfectly parallel.
+When we set $p = 1$, i.e.\ we use the usual energy norm, then we get a beautiful example of the Orr mechanism, in perfect agreement with what SVD tells us. For, say, $p = 50$, we get more exotic center/wall modes. % insert pictures ?
 
-If we set $\frac{\delta \mathcal{M}}{\delta \mathbf{u}_T} = 0$, then we have
-\[
-  \tilde{\mathbf{u}} (x, T) = \left(\frac{1}{V_\Omega} \int_\Omega e(x, T)^p \;\d \Omega\right)^{1/p - 1} e(x, T)^{p - 1} \mathbf{u}(x, T).
-\]
-So although there is a term $\bra \mathbf{u}^\dagger(0), \mathbf{u}(0)\ket - \bra \tilde{\mathbf{u}}(T), \mathbf{u}(T)\ket$, it doesn't affect the value of $\mathcal{M}$. Iterative process leads to optimal solutions for different objective functional.
-
-Therefore convergence occurs when $\tilde{\mathbf{u}}_0$, $\mathbf{u}_0$ are perfectly parallel if $\mathbf{u}_0$ is normalized. 
+%Replacing the energy term in $\mathcal{G}$ with $\mathcal{J}$, we obtain 
+%Then we have
+%\[
+%  \mathcal{M} = \mathcal{J} - \int_0^T \left\bra \mathbf{u}^\dagger, \left(\frac{\partial \mathbf{u}}{\partial t} + \mathbf{u} \cdot \nabla \mathbf{u} + \mathbf{u} \cdot \nabla \mathbf{U} + \nabla p - \frac{1}{Re} \nabla^2 \mathbf{u}\right)\right\ket - \bra \mathbf{p}^\dagger, \nabla \cdot \mathbf{u}\ket \;\d t - \bra \mathbf{u}^\dagger_0, \mathbf{u}_0 - \mathbf{u}(0)\ket.
+%\]
+%Note that the pressure is a Lagrange multiplier.
+%
+%Here integration by parts with respect to time will lead to a term $\bra \tilde{\mathbf{u}} (0), \mathbf{u}(0)\ket - \bra \tilde{\mathbf{u}} (T), \mathbf{u}(T)\ket$. Variations with respect to $\mathbf{u}(0)$ , $\mathbf{u}(T)$ lead to interesting alternate conditions. We have
+%\[
+%  \frac{\delta \mathcal{M}}{\delta \mathbf{u}_0} = \tilde{\mathbf{u}}_0.
+%\]
+%If we fix the norm of $\mathbf{u}_0$, then given $\frac{\delta \mathcal{M}}{\delta \mathbf{u}_0}$, we should ``improve'' our solution by letting $\mathbf{u}_0$ move in the direction of the projection of $\frac{\delta \mathcal{M}}{\delta \mathbf{u}_0}$ to the sphere of fixed norm. So the optimal solution occurs when $\tilde{\mathbf{u}}_0, \mathbf{u}_0$ are perfectly parallel.
+%
+%If we set $\frac{\delta \mathcal{M}}{\delta \mathbf{u}_T} = 0$, then we have
+%\[
+%  \tilde{\mathbf{u}} (x, T) = \left(\frac{1}{V_\Omega} \int_\Omega e(x, T)^p \;\d \Omega\right)^{1/p - 1} e(x, T)^{p - 1} \mathbf{u}(x, T).
+%\]
+%So although there is a term $\bra \mathbf{u}^\dagger(0), \mathbf{u}(0)\ket - \bra \tilde{\mathbf{u}}(T), \mathbf{u}(T)\ket$, it doesn't affect the value of $\mathcal{M}$. Iterative process leads to optimal solutions for different objective functional.
+%
+%Therefore convergence occurs when $\tilde{\mathbf{u}}_0$, $\mathbf{u}_0$ are perfectly parallel if $\mathbf{u}_0$ is normalized.
 
 \subsubsection*{Non-linear adjoints}
-Our algorithm doesn't actually require things to be linear!
+In the variational formulation, there is nothing in the world that stops us from using a non-linear evolution equation! We shall see that this results in slightly less pleasant formulas, but it can still be done.
 
 Consider plane Couette flow with $Re = 1000$, and allow arbitrary amplitude in perturbation
 \[
-  \mathbf{u}_{tot} = \mathbf{u} + \mathbf{u},\quad \partial_t \mathbf{u} + (\mathbf{u} + \mathbf{u}) \cdot \nabla (\mathbf{u} + \mathbf{U}) = - \nabla p + Re^{-1} \nabla^2 \mathbf{u},
+  \mathbf{u}_{tot} = \mathbf{U} + \mathbf{u},\quad \partial_t \mathbf{u} + (\mathbf{u} + \mathbf{U}) \cdot \nabla (\mathbf{u} + \mathbf{U}) = - \nabla p + Re^{-1} \nabla^2 \mathbf{u},
 \]
-where $\mathbf{u} = y\hat{x}$. We can define a variational problem
+where $\mathbf{U} = y\hat{x}$. We can define a variational problem with Lagrangian
 \[
   \mathcal{L} = \frac{E(T)}{E_0} - [\partial_t \mathbf{u} + \mathcal{N}(u) + \nabla p, v] - [\nabla \cdot \mathbf{u}, q] - \left(\frac{1}{2} \bra \mathbf{u}_0, \mathbf{u}_0\ket - E_0\right) c - \bra \mathbf{u}(0) - \mathbf{u}_0, \mathbf{v}_0\ket,
 \]
 where
 \[
-  N(u_i) = U_j \partial_j u_i + u _i \partial_i U_j + u_j \partial_j u_i - \frac{1}{Re} \partial_j \partial_j \mathbf{u}_i,\quad [\mathbf{v}, \mathbf{u}] = \frac{1}{T} \bra \mathbf{v}, \mathbf{u}\ket\;\d t.
+  N(u_i) = U_j \partial_j u_i + u_i \partial_i U_j + u_j \partial_j u_i - \frac{1}{Re} \partial_j \partial_j \mathbf{u}_i,\quad [\mathbf{v}, \mathbf{u}] = \frac{1}{T} \int_0^T \bra \mathbf{v}, \mathbf{u}\ket\;\d t.
 \]
 Variations with respect to the direct variable $u$ can once again define a non-linear adjoint equation
 \[
@@ -2996,21 +3114,19 @@ Variations with respect to the direct variable $u$ can once again define a non-l
 \]
 where
 \[
-  N^\dagger (v_i, \mathbf{u}) = \partial_j (u_j, v_i) - v_j \partial_i i_j + \partial_j (U_j v_i) - v_j \partial_i U_j - v_j \partial_i U_j + \frac{1}{Re} \partial_j \partial_j v_i.
+  N^\dagger (v_i, \mathbf{u}) = \partial_j (u_j, v_i) - v_j \partial_i u_j + \partial_j (U_j v_i) - v_j \partial_i U_j - v_j \partial_i U_j + \frac{1}{Re} \partial_j \partial_j v_i.
 \]
 We also have
 \[
   \frac{\delta \mathcal{L}}{\delta p} = \nabla \cdot \mathbf{v} = 0,\quad \frac{\delta \mathcal{L}}{\delta \mathbf{u}_0} = \mathbf{v}_0 - c \mathbf{u}_0 = 0.
 \]
-Note that the equation for the adjoint variable $v$ depends on the direct variable $u$, but is linear in $v$. Computationally, this means that we need to remember our solution to $\mathbf{u}$ when we do our adjoint loop, but formally it is entirely tractable. This is often done using a method called checkpointing. The idea is as follows:
+Note that the equation for the adjoint variable $v$ depends on the direct variable $u$, but is linear in $v$. Computationally, this means that we need to remember our solution to $\mathbf{u}$ when we do our adjoint loop. If $T$ is large, then it may not be feasible to store all information about $\mathbf{u}$ across the whole period, as that is too much data. Instead, the method of \term{checkpointing} is used:
 \begin{enumerate}
   \item Pick ``checkpoints'' $0 = T_0 < \cdots < T_K = T$.
   \item When integrating $\mathbf{u}$, we remember high resolution data for $u(x, T_K)$.
-  \item When integrating $v$ backwards in the interval $(T_{K - 1}, T_K)$, we use the data remembered at $T_{K - 1}$ to re-integrate to obtain $\mathbf{u}$ in the interval $(T_{k - 1}, T_K)$.
+  \item When integrating $v$ backwards in the interval $(T_{K - 1}, T_K)$, we use the data remembered at $T_{K - 1}$ to re-integrate to obtain detailed information about $\mathbf{u}$ in the interval $(T_{k - 1}, T_K)$.
 \end{enumerate}
-This powerful algorithmic approach allows us to identify \emph{minimal} seed of turbulence.
-
-% insert explanation
+This powerful algorithmic approach allows us to identify \emph{minimal} seed of turbulence, i.e.\ the minimal, finite perturbation required to enter a turbulence mode. Note that this is something that cannot be understood by linear approximations! This is rather useful, because in real life, it allows us to figure out how to modify our system to reduce the chance of turbulence arising.
 
 \printindex
 \end{document}
