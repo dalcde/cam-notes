@@ -58,9 +58,16 @@ Currently, the notes for the following subjects are available.
 
 ## Part III
 ### Michaelmas Term
+ - Advanced Probability (2017, M. Lis)
  - Algebraic Topology (2016, O. Randal-Williams)
+ - Analysis of Partial Differential Equations (2017, C. Warnick)
+ - Combinatorics (2017, B. Bollobas)
  - Differential Geometry (2016, J. A. Ross)
+ - Extremal Graph Theory (2017, A. G. Thomason)
+ - Hydrodynamic Stability (2017, C. P. Caulfield)
  - Local Fields (2016, H. C. Johansson)
+ - Modern Statistical Methods (2017, R. D. Shah)
+ - Percolation and Random Walks on Graphs (2017, P. Sousi)
  - Quantum Computation (2016, R. Jozsa)
  - Quantum Field Theory (2016, B. Allanach)
  - Symmetries, Fields and Particles (2016, N. Dorey)
@@ -78,5 +85,8 @@ Currently, the notes for the following subjects are available.
  - Classical and Quantum Solitons (2017, N. S. Manton and D. Stuart)
 
 ## Part IV
+### Michaelmas Term
+ - Topics in Geometric Group Theory (2017, H. Wilton)
+
 ### Easter Term
  - Bounded Cohomology (2017, M. Burger)
