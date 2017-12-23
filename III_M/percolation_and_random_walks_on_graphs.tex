@@ -6,30 +6,10 @@
 \def\nlecturer {P. Sousi}
 \def\ncourse {Percolation and Random Walks on Graphs}
 \def\nofficial {http://www.statslab.cam.ac.uk/~ps422/percolation.html}
-\def\nnotready {}
-
 \input{header}
 
-\pgfdeclaredecoration{penciline}{initial}{
-    \state{initial}[width=+\pgfdecoratedinputsegmentremainingdistance,auto corner on length=1mm,]{
-        \pgfpathcurveto%
-        {% From
-            \pgfqpoint{\pgfdecoratedinputsegmentremainingdistance}
-                            {\pgfdecorationsegmentamplitude}
-        }
-        {%  Control 1
-        \pgfmathrand
-        \pgfpointadd{\pgfqpoint{\pgfdecoratedinputsegmentremainingdistance}{0pt}}
-                        {\pgfqpoint{-\pgfdecorationsegmentaspect\pgfdecoratedinputsegmentremainingdistance}%
-                                        {\pgfmathresult\pgfdecorationsegmentamplitude}
-                        }
-        }
-        {%TO
-        \pgfpointadd{\pgfpointdecoratedinputsegmentlast}{\pgfpoint{3pt}{3pt}}
-        }
-    }
-    \state{final}{}
-}
+\let\div\relax
+\DeclareMathOperator\div{div}
 
 \renewcommand\L{\mathbb{L}}
 \newcommand\Pci[1]{\P_{#1}(|\mathcal{C}(0)| = \infty)}
@@ -50,39 +30,80 @@ There are no essential pre-requisites beyond probability and analysis at undergr
 
 \setcounter{section}{-1}
 \section{Introduction}
-The course is naturally divided into two parts --- percolation, and random walks on graphs. Percolation is one of the simplest models that experience phase transition --- an abrupt change in quantitative feature due to a continuous change of a parameter. Examples include the boiling of water, and the loss of long-range correlation in magnets when temperature increases.
+This course is naturally divided into two parts --- percolation, and random walks on graphs. Percolation is one of the simplest models that experience phase transition --- an abrupt change in quantitative feature due to a continuous change of a parameter. More sophisticated examples of percolation the boiling of water and the loss of long-range correlation in magnets when temperature increases.
 
-For example, consider an $n \times n$ lattice connected by edges:
+But we are not physicists. So let's talk about percolation. For reasons that become clear later, consider an $n \times (n + 1)$ lattice connected by edges:
 \begin{center}
-  \begin{tikzpicture}
-    \draw (0, 0) rectangle (6, 6);
-    \foreach \x in {1,2,3}{
+  \begin{tikzpicture}[scale=0.5]
+    \draw (0, 0) rectangle (7, 6);
+    \foreach \x in {1,2,3,4,5,6}{
       \draw (\x, 0) -- (\x, 6);
-      \draw (0, \x) -- (6, \x); % draw nodes as well
+      \draw (0, \x) -- (7, \x);
+    }
+    \draw (7, 0) -- (7, 6);
+    \foreach \x in {0,...,7}{
+      \foreach \y in {0,...,6}{
+        \node [circ] at (\x, \y) {};
+      }
     }
   \end{tikzpicture}
 \end{center}
-We now fix some $p \in [0, 1]$, and for each edge in the graph, we either keep it or remove it with probability $p$. We can define, for example, the quantity $f_n(p)$, the probability that there is an left-to-right crossing of open edges: % example
-
+We now fix some $p \in [0, 1]$, and for each edge in the graph, we either keep it or remove it with probability $p$. There are many questions we may ask. For example, we may ask for the probability that there is a left-to-right crossing of open edges.
+\begin{center}
+  \begin{tikzpicture}[scale=0.5]
+    \draw [gray] (0, 0) rectangle (7, 6);
+    \foreach \x in {1,2,3,4,5,6}{
+      \draw [gray] (\x, 0) -- (\x, 6);
+      \draw [gray] (0, \x) -- (7, \x);
+    }
+    \draw [gray] (7, 0) -- (7, 6);
+    \foreach \x in {0,...,7}{
+      \foreach \y in {0,...,6}{
+        \node [gray, circ] at (\x, \y) {};
+      }
+    }
+    \draw [thick, mred] (0, 3) node [circ] {} -- (1, 3) node [circ] {} -- (1, 4) node [circ] {} -- (2, 4) node [circ] {} -- (3, 4) node [circ] {} -- (3, 3) node [circ] {} -- (3, 2) node [circ] {} -- (4, 2) node [circ] {} -- (4, 3) node [circ] {} -- (5, 3) node [circ] {} -- (6, 3) node [circ] {} -- (7, 3) node [circ] {};
+  \end{tikzpicture}
+\end{center}
 For example, we have $f_n(0) = 0$ and $f_n(1) = 1$.
 
-How about $p = \frac{1}{2}$? ``By symmetry'', this must be $\frac{1}{2}$. To see this, we consider the \term{dual lattice}, where we put a vertex in the middle of each square, and put an edge between squares that share a common edge. This is again isomorphic to $\Z^2$. We can do the same procedure with the dual lattice. We see that if there is a left-right crossing of open edges, then there cannot be a top-bottom crossing in the dual graph. But since the two graphs are isomorphic, we are done. % Explain this much better
+An interesting choice of $p$ to consider is $p = \frac{1}{2}$. We can argue that $f_n(\frac{1}{2})$ must be $\frac{1}{2}$, by symmetry. More precisely, consider the dual lattice:
+\begin{center}
+  \begin{tikzpicture}[scale=0.5]
+    \draw [mblue] (0.5, -0.5) rectangle (6.5, 6.5);
+    \foreach \x in {1,2,3,4,5,6}{
+      \draw [mblue] (\x-0.5, -0.5) -- (\x - 0.5, 6.5);
+      \draw [mblue] (0.5, \x - 0.5) -- (6.5, \x - 0.5);
+    }
 
-This is a very important property that is only true in $2$ dimensions. We shall see later that a lot of things we can figure out in $2$ dimensions cannot be extended to higher dimensions.
+    \draw [gray, opacity=0.5] (0, 0) rectangle (7, 6);
+    \foreach \x in {1,2,3,4,5,6}{
+      \draw [gray, opacity=0.5] (\x, 0) -- (\x, 6);
+      \draw [gray, opacity=0.5] (0, \x) -- (7, \x);
+    }
+    \draw [gray, opacity=0.5] (7, 0) -- (7, 6);
+    \foreach \x in {0,...,7}{
+      \foreach \y in {0,...,6}{
+        \node [gray, circ, opacity=0.5] at (\x, \y) {};
+      }
+    }
 
-What about other values of $p$? We might think it should be linear, but that is not the case. If $n$ is large, then the graph looks approximately like
+    \foreach \x in {0,...,7}{
+      \foreach \y in {0,...,6}{
+        \node [mblue, opacity=0.6, circ] at (\y + 0.5, \x - 0.5) {};
+      }
+    }
 
-% show example
+    \draw [thick, mred] (0, 3) node [circ] {} -- (1, 3) node [circ] {} -- (1, 4) node [circ] {} -- (2, 4) node [circ] {} -- (3, 4) node [circ] {} -- (3, 3) node [circ] {} -- (3, 2) node [circ] {} -- (4, 2) node [circ] {} -- (4, 3) node [circ] {} -- (5, 3) node [circ] {} -- (6, 3) node [circ] {} -- (7, 3) node [circ] {};
+  \end{tikzpicture}
+\end{center}
+Note that this lattice is isomorphic to the original lattice we were thinking about, by applying a rotation. Now each edge in the dual lattice crosses exactly one edge in the original lattice, and we can set the edge to be open iff the corresponding edge in the original lattice is open. This gives rise to a percolation on the dual lattice with $p = \frac{1}{2}$ as well.
 
-As $n \to \infty$, this converges to the step function:
+Now notice that that there is a left-right crossing of open edges in the original lattice iff there is no top-bottom crossing in the dual graph. But since the dual and original lattices are isomorphic, it follows that the probability that there is a left-right crossing in the original lattice is equal to the probability that there is \emph{no} left-right crossing in the original lattice. So both of these must be $\frac{1}{2}$.
 
-% insert example
+The ability to talk about the dual graph is a very important property that is only true in $2$ dimensions. In general, there are many things known for $2$ dimensions via the dual, which do not generalize to higher dimensions.
 
-Now suppose we do a percolation, and we obtain a graph. Suppose this graph is such that $0$ is in an infinite component, i.e.\ $0$ is connected to $\infty$. But we want to know more about the properties of this resulting graph. One way to do so is to perform a random walk on this graph, and see what we can say about this graph. Questions we can ask involve hitting times or transience or recurrence.
-
-In IB Markov Chains, we proved the null recurrence of a random walk on $\Z^2$ by rather direct means. Here we are going to use a rather different approach, where we think of our graph as an electric network. We can then interpret the original question in terms of properties of the electric circuits, which provides powerful tools to understand random walks.
-
-We will also look at the theory of uniform spanning trees, and how they connect to electric networks.
+The other topic we are going to discuss is random walks in graphs. In IB Markov chains, and maybe IA Probability, we considered random walks on the integer lattice $\Z^d$. Here we shall consider random walks on \emph{any graph}. We shall mostly think about finite graphs, but we will also talk about how certain results can be extended to infinite graphs. It turns out a rather useful way of thinking about this is to think of the graph as representing an electrical network. Then many concepts familiar from high school physics translate to interesting properties about the graph, and importing well-known (and elementary) results from electrical networks helps us understand graphs better.
 
 \section{Percolation}
 \subsection{The critical probability}
@@ -96,7 +117,7 @@ More precisely, we define the probability space to be $\Omega= \{0, 1\}^E$, wher
 \]
 where $A$ is a finite set and $x_e \in \{0, 1\}$ for all $e$. In other words, this is the product $\sigma$-algebra. As probability measure, we take the product measure $\P_p$, i.e.\ every edge is $1$ with probability $p$ and $0$ with probability $1 - p$. We will write \index{$\eta_p$}$\eta_p \in \{0, 1\}^E$ for the state of the system.
 
-Now what can we say about the graph resulting from this process? One question we may ask is if we can connect two points in the graphs via the edges that remain. To further the discussion, we introduce some notation.
+Now what can we say about the graph resulting from this process? One question we may ask is whether we can connect two points in the graphs via the edges that remain. To further the discussion, we introduce some notation.
 
 \begin{notation}
   We write \term{$x \leftrightarrow y$} if there is an open path of edges from $x$ to $y$.
@@ -245,12 +266,12 @@ This allows us to define
 \begin{defi}[$\lambda$ and $\kappa$]\index{$\lambda$}\index{$\kappa$}
   We define
   \[
-    \lambda = \lim_{n \to \infty} \frac{\log \sigma_n}{n},\quad \kappa = e^\lambda
+    \lambda = \lim_{n \to \infty} \frac{\log \sigma_n}{n},\quad \kappa = e^\lambda.
   \]
   $\kappa$ is known as the \term{connective constant}.
 \end{defi}
 
-Thus, we have
+Then by definition, we have
 \[
   \sigma_n= e^{n \lambda (1 + o(1))} = \kappa^{n + o(n)}.
 \]
@@ -367,7 +388,7 @@ The dual lattice will help us prove a lot of properties for percolation in $\Z^2
   Thus, if $p$ is sufficiently near $1$, then $\P_p(|\mathcal{C}(0)| < \infty)$ is bounded away from $1$.
 \end{proof}
 
-By definition, if $p < p_c(d)$, then $0$ is almost surely not contained in an infinite cluster. If $p > p_c(d)$, then there is a positive probability that $0$ is contained in an infinite cluster. However, it is of course not necessarily the case that $0$ is connected to $\infty$ with probability $1$. In fact, there is at least $(1 - p)^{2d}$ probability that $0$ is not connected to $\infty$, since $0$ cannot be connected to $\infty$ if all its neighbouring edges are closed. However, it is still possible that there is some infinite cluster somewhere. It's just that it does not contain $0$.
+By definition, if $p < p_c(d)$, then $0$ is almost surely not contained in an infinite cluster. If $p > p_c(d)$, then there is a positive probability that $0$ is contained in an infinite cluster. However, it is of course not necessarily the case that $0$ is connected to $\infty$ with probability $1$. In fact, there is at least probability $(1 - p)^{2d}$ that $0$ is not connected to $\infty$, since $0$ cannot be connected to $\infty$ if all its neighbouring edges are closed. However, it is still possible that there is some infinite cluster somewhere. It's just that it does not contain $0$.
 
 \begin{prop}
   Let $A_\infty$ be the event that there is an infinite cluster.
@@ -389,7 +410,7 @@ By definition, if $p < p_c(d)$, then $0$ is almost surely not contained in an in
       \[
         w(e_1), w(e_2), \ldots.
       \]
-      These are iid random variables. We certainly have $\P_p(A_\infty) \geq \theta(p) > 0$. So if we can show that $A_\infty \in \mathcal{F}_\infty$, then we are done. But this is clear, since changing the states of a finite number of edges does not affect the occurrence of $A_\infty$.
+      These are iid random variables. We certainly have $\P_p(A_\infty) \geq \theta(p) > 0$. So if we can show that $A_\infty \in \mathcal{F}_\infty$, then we are done. But this is clear, since changing the states of a finite number of edges does not affect the occurrence of $A_\infty$.\qedhere
   \end{enumerate}
 \end{proof}
 
@@ -429,7 +450,7 @@ This proof is considerably harder than the ones we have previously done. We migh
   \]
   So we are done.
 
-  We now have to show that $k \not= \infty$. This involves the notion of a trifurcation. The idea is that we will show that if $k = \infty$, then the probability that a vertex is a trifurcation is positive. This implies the expected number of trifurcations is $\sim n^d$. We will then show deterministically that the number of trifurcations inside $B(n)$ must be $\leq |\partial B(n)|$, and so there are $O(n^{d - 1})$ trifurcations, which is a contradiction.
+  We now have to show that $k \not= \infty$. This involves the notion of a \emph{trifurcation}. The idea is that we will show that if $k = \infty$, then the probability that a vertex is a trifurcation is positive. This implies the expected number of trifurcations is $\sim n^d$. We will then show deterministically that the number of trifurcations inside $B(n)$ must be $\leq |\partial B(n)|$, and so there are $O(n^{d - 1})$ trifurcations, which is a contradiction.
 
   We say a vertex $x$ is a \term{trifurcation} if the following three conditions hold:
   \begin{enumerate}
@@ -598,7 +619,7 @@ What we want to prove is the following result, which will be extremely useful.
   \]
   By the $\mathcal{L}^2$-martingale convergence theorem, $X_n \to X$, $Y_n \to Y$ in $L^2$ and almost surely. So taking the limit $n \to \infty$, we get
   \[
-    \E_p[XY] \geq \E_p[X] \E_p[Y].
+    \E_p[XY] \geq \E_p[X] \E_p[Y].\qedhere
   \]
 \end{proof}
 
@@ -701,13 +722,13 @@ The idea of the proof is that if we want a path from, say, $0$ to $B(2n)$, then 
   Now we have
   \begin{align*}
     \P_p( 0 \leftrightarrow \partial B(m + k)) &= \P_p(\exists x \in \partial B(m) : 0 \leftrightarrow x \text{ and } x \leftrightarrow \partial B(m + k)\text{ disjointly})\\
-    &\leq \sum_{x \in \partial B(m)} \P_p(0 \leftrightarrow x) \P_p(x \leftrightarrow \partial B(m + k)) \tag{union bound + BK}\\
+    &\leq \sum_{x \in \partial B(m)} \P_p(0 \leftrightarrow x) \P_p(x \leftrightarrow \partial B(m + k)) \tag{BK}\\
     &\leq \sum_{x \in \partial B(m)} \P_p(0 \leftrightarrow x) \P_p(0 \leftrightarrow \partial B(k)) \tag{trans. inv.}\\
     &\leq \P_p(0 \leftrightarrow B(k)) \E_p[X_m].
   \end{align*}
   So for any $n > m$, write $n = qm + r$, where $r \in [0, m - 1]$. Then iterating the above result, we have
   \[
-    \P_p(0 \leftrightarrow \partial B(n)) \leq \P_p(0 \leftrightarrow B(mq)) \leq \delta^q \leq \delta^{-1 + \frac{n}{m}} \leq e^{-cn}.
+    \P_p(0 \leftrightarrow \partial B(n)) \leq \P_p(0 \leftrightarrow B(mq)) \leq \delta^q \leq \delta^{-1 + \frac{n}{m}} \leq e^{-cn}.\qedhere
   \]
 \end{proof}
 
@@ -784,7 +805,7 @@ Note that whether or not $e$ is pivotal for $(A, \omega)$ is independent of $\om
   \begin{align*}
     \frac{\d}{\d p} \P_p(A) &= \left.\sum_{i = 1}^m \frac{\partial}{\partial p(e_i)} \P_{\bar{p}}(A)\right|_{\bar{p} = (p, \ldots, p)} \\
     &= \sum_{i = 1}^m \P_p(\text{$e_i$ is pivotal for $A$})\\
-    &= \E_p[N(A)].
+    &= \E_p[N(A)].\qedhere
   \end{align*}
 \end{proof}
 If $A$ depends on an infinite number of edges, then the best we can say is that
@@ -846,9 +867,7 @@ With Russo's formula, we can now prove the desired theorem.
       \]
   \end{enumerate}
 \end{thm}
-This was first proved by Aizenman and Barsky who looked at the more general framework of long-range percolation. Menshikov gave an alternative proof by analyzing the geometry of pivotal edges.
-
-The proof we will see is by Duminil-Copin and Tassion. Recall that we defined
+This was first proved by Aizenman and Barsky who looked at the more general framework of long-range percolation. Menshikov gave an alternative proof by analyzing the geometry of pivotal edges. The proof we will see is by Duminil-Copin and Tassion. Recall that we defined
 \[
   \chi(p) = \E_p[|\mathcal{C}(0)|].
 \]
@@ -857,7 +876,11 @@ We saw that if $\chi(p) < \infty$, then $\P_p(0 \leftrightarrow \partial B_n) \l
 The strategy of the proof is to define a new percolation probability $\tilde{p}_c$, whose definition makes it easier to prove the theorem. Once we have established the two claims, we see that (i) forces $\tilde{p}_c \leq p_c$, and (ii) forces $\tilde{p}_c \geq p_c$. So they must be equal.
 
 \begin{proof}[Proof (Duminil-Copin and Tassion)]
-  If $S \subseteq V$ is finite, we write $\partial S = \{(x, y) \in E: x \in S, y \not \in S\}$. We write $x \overset{S}{\leftrightarrow} y$ if there exists an open path of edges from $x$ to $y$ all of whose end points lie in $S$.
+  If $S \subseteq V$ is finite, we write
+  \[
+    \partial S = \{(x, y) \in E: x \in S, y \not \in S\}.
+  \]
+  We write $x \overset{S}{\leftrightarrow} y$ if there exists an open path of edges from $x$ to $y$ all of whose end points lie in $S$.
 
   Now suppose that $0 \in S$. We define
   \[
@@ -882,11 +905,11 @@ The strategy of the proof is to define a new percolation probability $\tilde{p}_
 
       Now if we have an open path from $0$ to $\partial B_{kL}$, we let $x$ be the last element on the path that lies in $\mathcal{C}$. We can then replace the path up to $x$ by a path that lies entirely in $S$, by assumption. This is then a path that lies in $\mathcal{C}$ up to $x$, then takes an edge on $\partial S$, and then lies entirely outside of $\mathcal{C}^c$. Thus,
       \[
-        \P_p(0 \leftrightarrow \partial B_{kL}) \leq \sum_{A \subseteq S, 0\in A} \sum_{(x, y) \in \partial A} \P_p(0 \overset{A}{\leftrightarrow} x, (x, t)\text{ is open}, \mathcal{C} = A, y \overset{A^C}{\leftrightarrow} \partial B_{kL}).
+        \P_p(0 \leftrightarrow \partial B_{kL}) \leq \sum_{\substack{A \subseteq S\\0\in A}} \sum_{(x, y) \in \partial A} \P_p(0 \overset{A}{\leftrightarrow} x,\ (x, y)\text{ open},\ \mathcal{C} = A,\ y \overset{A^C}{\leftrightarrow} \partial B_{kL}).
       \]
-      Now observe that the events $\{\mathcal{C} = A, 0 \overset{S}{\leftrightarrow}\}$, $\{(x, y)\text{ is open}\}$ and $\{y \overset{A^c}{\leftrightarrow} \partial B_{kL}\}$ are independent. So we obtain
+      Now observe that the events $\{\mathcal{C} = A, 0 \overset{S}{\leftrightarrow} x\}$, $\{(x, y)\text{ is open}\}$ and $\{y \overset{A^c}{\leftrightarrow} \partial B_{kL}\}$ are independent. So we obtain
       \[
-        \P_p(0 \leftrightarrow \partial B_{kL}) \leq \sum_{A \subseteq S, 0 \in A} \sum_{(x, y) \in \partial S} \P_p(0\overset{S}{\leftrightarrow} x, \mathcal{C} = A) \cdot p \cdot \P_p(y \overset{A^c}{\leftrightarrow} \partial B_{kL}).
+        \P_p(0 \leftrightarrow \partial B_{kL}) \leq \sum_{A \subseteq S, 0 \in A} \sum_{(x, y) \in \partial S} p\ \P_p(0\overset{S}{\leftrightarrow} x, \mathcal{C} = A) \ \P_p(y \overset{A^c}{\leftrightarrow} \partial B_{kL}).
       \]
       Since we know that $y \in B_L$, we can bound
       \[
@@ -894,8 +917,8 @@ The strategy of the proof is to define a new percolation probability $\tilde{p}_
       \]
       So we have
       \begin{align*}
-        \P_p(0 \leftrightarrow \partial B_{kL}) &\leq \P_p(0 \leftrightarrow \partial B_{(k-1)L}) p \sum_{A \subseteq S, 0 \in A} \sum_{(x, y) \in \partial S} \P_p(0 \overset{S}{x} x, \mathcal{C} = A)\\
-        &= \P_p(0 \leftrightarrow \partial B_{(k - 1)L}) \cdot p \cdot \sum_{(x, y) \in \partial S} \P_p(0 \overset{S}{\leftrightarrow} x)\\
+        \P_p(0 \leftrightarrow \partial B_{kL}) &\leq p\ \P_p(0 \leftrightarrow \partial B_{(k-1)L}) \sum_{A \subseteq S, 0 \in A} \sum_{(x, y) \in \partial S} \P_p(0 \overset{S}{\leftrightarrow} x, \mathcal{C} = A)\\
+        &= \P_p(0 \leftrightarrow \partial B_{(k - 1)L})\ p\sum_{(x, y) \in \partial S} \P_p(0 \overset{S}{\leftrightarrow} x)\\
         &= \P_p(0 \leftrightarrow \partial B_{(k - 1)L}) \varphi_p(S).
       \end{align*}
       Iterating, we obtain the deseired result.
@@ -909,41 +932,38 @@ The strategy of the proof is to define a new percolation probability $\tilde{p}_
       \begin{align*}
         \frac{\d}{\d p} \P_p(0 \leftrightarrow \partial B_n) &= \sum_{e \in B_n} \P_p(e\text{ is pivotal for }\{0 \leftrightarrow \partial B_n\})\\
         \intertext{Since being pivotal and being open/closed are independent, we can write this as}
-        &= \sum_{e \in B_n} \frac{1}{1 - p} \P_p(e\text{ is pivotal for }-\{0 \leftrightarrow \partial B_n\}, e\text{ is closed})\\
-        &= \sum_{e \in B_n} \frac{1}{1 - p} \P_p(e\text{ is pivotal for }-\{0 \leftrightarrow \partial B_n\}, 0 \not\leftrightarrow \partial B_n)
+        &= \sum_{e \in B_n} \frac{1}{1 - p} \P_p(e\text{ is pivotal for }\{0 \leftrightarrow \partial B_n\},\ e\text{ is closed})\\
+        &= \sum_{e \in B_n} \frac{1}{1 - p} \P_p(e\text{ is pivotal for }\{0 \leftrightarrow \partial B_n\},\ 0 \not\leftrightarrow \partial B_n)
       \end{align*}
       Define $\mathcal{S} = \{x \in B_n: x \not\leftrightarrow \partial B_n\}$. Then $\{0 \not\leftrightarrow \partial B_n\}$ implies $0 \in S$. So
       \[
-        \frac{\d}{\d p} \P_p(0 \leftrightarrow \partial B_n) = \frac{1}{1 - p} \sum_{e \in B_n} \sum_{A \subseteq B_n, 0 \in A} \P_p(e\text{ is pivotal}, \mathcal{S} = A)
+        \frac{\d}{\d p} \P_p(0 \leftrightarrow \partial B_n) = \frac{1}{1 - p} \sum_{e \in B_n} \sum_{A \subseteq B_n, 0 \in A} \P_p(e\text{ is pivotal},\ \mathcal{S} = A)
       \]
       Given that $\mathcal{S} = A$, an edge $e = (x, y)$ is pivotal iff $e \in \partial A$ and $0 \overset{A}{\leftrightarrow} x$. So we know
       \[
-        \frac{\d}{\d p} \P_p(0 \leftrightarrow \partial B_n) = \frac{1}{1 - p} \sum_{A \subseteq B_n, 0 \in A} \sum_{(x, y) \in \partial A} \P_p(0 \overset{A}{\leftrightarrow} x, \mathcal{S} = A).
+        \frac{\d}{\d p} \P_p(0 \leftrightarrow \partial B_n) = \frac{1}{1 - p} \sum_{A \subseteq B_n, 0 \in A} \sum_{(x, y) \in \partial A} \P_p(0 \overset{A}{\leftrightarrow} x,\ \mathcal{S} = A).
       \]
-      Observe that $\{0 \overset{A}{\leftrightarrow} x\}$ and $\{\mathcal{S} = A\}$ are independent, since to determine if $\mathcal{S} = A$, we only look at the edges on the boundary of $A$. So the above is equal to % check
+      Observe that $\{0 \overset{A}{\leftrightarrow} x\}$ and $\{\mathcal{S} = A\}$ are independent, since to determine if $\mathcal{S} = A$, we only look at the edges on the boundary of $A$. So the above is equal to
       \begin{align*}
         &\hphantom{{}={}}\frac{1}{1 - p} \sum_{A \subseteq B_n, 0 \in A} \sum_{(x, y) \in \partial A} \P_p(0 \overset{A}{\leftrightarrow} x)\P_p(\mathcal{S} = A)\\
         &= \frac{1}{p(1 - p)} \sum_{A \subseteq B_n, 0 \in A} \varphi_p(A) \P_p(\mathcal{S} = A)\\
         &\geq \frac{1}{p(1 - p)} \inf_{S \subseteq B_n, 0 \in S} \varphi_P(S) \P_p(0 \not\leftrightarrow \partial B_n),
       \end{align*}
-      as desired.
+      as desired.\qedhere
   \end{enumerate}
 \end{proof}
-Note that in (i), the proof uses that $p < p_c$, and not $\theta(p) = 0$. Later, we see that in $\Z^2$, for $p = p_c = \frac{1}{2}$, $\theta(p)$ does not have exponential decay.
-
-We might ask if $\P_p(0 \leftrightarrow \partial B_n) \leq e^{-cn}$ is the best convergence rate when $p < p_c$, but we cannot, since $\P_p(0 \leftrightarrow \partial B_n) \geq p^n$.
+We might ask if $\P_p(0 \leftrightarrow \partial B_n) \leq e^{-cn}$ is the best convergence rate when $p < p_c$, but we cannot do better, since $\P_p(0 \leftrightarrow \partial B_n) \geq p^n$.
 
 Also, if $p < p_c$, then we can easily bound
 \[
   \P_p(|\mathcal{C}(0)| \geq n) \leq \P_p(0 \leftrightarrow \partial B_{n^{1/d}}) \leq \exp(-c n^{1/d}).
 \]
-However, this is not a good bound. In fact, $n^{1/d}$ can be bounded by $n$, but we will not prove it here.
-
-What is this saying? This tells us the largest cluster in $B_n$ will have size of order $\log n$ with high probability.
+However, this is not a good bound. In fact, $n^{1/d}$ can be replaced by $n$, but we will not prove it here. This tells us the largest cluster in $B_n$ will have size of order $\log n$ with high probability.
 
 \subsection{Two dimensions}
-We now focus on $2$ dimensions, where a lot of things are known due to the duality property.
+We now focus on $2$ dimensions. As discussed previously, we can exploit duality to prove a lot of things specific to two dimensions. In particular, we will show that, at $p = p_c = \frac{1}{2}$, certain probabilities such as $\P_{\frac{1}{2}} (0 \leftrightarrow \partial B(n))$ exhibit a power law decay. This is in contrast to the exponential decay for subcritical percolation (and being bounded away from zero for supercritical percolation).
 
+First we establish that $p_c$ is actually $\frac{1}{2}$.
 \begin{thm}
   In $\Z^2$, we have $\theta \left(\frac{1}{2}\right) = 0$ and $p_c = \frac{1}{2}$.
 \end{thm}
@@ -953,188 +973,274 @@ This was proved first by Harris, Kesten, Russo, Seymour, Welsh in several iterat
 \begin{proof}
   First we prove that $\theta\left(\frac{1}{2}\right) = 0$. This will imply that $p_c \geq \frac{1}{2}$.
 
-  Suppose not, and $\theta\left(\frac{1}{2}\right) > 0$. Consider the box $S_n = [0, n]^2$. Then we know that there exists a unique infinite cluster almost surely. So
+  Suppose not, and $\theta\left(\frac{1}{2}\right) > 0$. Recall that $B(n) = [-n, n]^2$, and we define
   \[
-    \P_{\frac{1}{2}}(\partial S_n \leftrightarrow \infty) \to 1.
+    C(n) = [-(n - 1), (n - 1)]^2 + \left(\tfrac{1}{2}, \tfrac{1}{2}\right)
   \]
-  Take $n$ large enough such that $\P_{\frac{1}{2}} (\partial S_n \leftrightarrow \infty) \geq 1 - \frac{1}{8^4}$. Let $A_\ell$/$A_r$/$A_t$/$A_b$/ be the event that the left/right/top/bottom side of $S_n$ is connected to $\infty$ via an open path of edges.
+  in the dual lattice. The appearance of the $-1$ is just a minor technical inconvenience. For the same $n$, our $B(n)$ and $C(n)$ look like
+  \begin{center}
+    \begin{tikzpicture}
+      \draw [mblue] (0, 0) rectangle (3, 3);
+      \draw [mred] (0.25, 0.25) rectangle (2.75, 2.75);
+      \node [right, mblue] at (3, 1.5) {$B(n)$};
+      \node [right, mred] at (0.25, 1.5) {$C(n)$};
+      \node [left, white] at (0, 1.5) {$B(n)$};
+    \end{tikzpicture}
+  \end{center}
 
-  Consider the dual box $T(n) = [0, n]^2 + \left(\frac{1}{2}, \frac{1}{2}\right)$. We let $D_\ell$ be the event that the left of $T(n)$ is connected to $\infty$ via a closed path, and similarly define $D_r, D_r, D_b$.
+  We claim that for large $n$, there is a positive probability that there are open paths from the left and right edges of $B(n)$ to $\infty$, and also there are \emph{closed} paths from the top and bottom edges of $C(n)$ to $\infty$. But we know that with probability $1$, there is a \emph{unique} infinite cluster in both the primal lattice and the dual lattice. To connect up the two infinite open paths starting from the left and right edges of $B(n)$, there must be an open left-right crossing of $B(n)$. To connect up the two infinite closed paths starting from the top and bottom of $C(n)$, there must be a closed top-bottom crossing. But these cannot both happen, since this would require an open primal edge crossing a closed dual edge, which is impossible.
 
-  By symmetry, we see that
-  \[
-    \P_{\frac{1}{2}}(A_i) = \P_{\frac{1}{2}} (D_j)
-  \]
-  for $i, j \in \{\ell, r, t, b\}$. We now have
-  \begin{align*}
-    \P_{\frac{1}{2}}(\partial S_n \not\leftrightarrow \infty) &= \P_{\frac{1}{2}} (A_\ell^c \cap A_r^c \cap A_t^c \cap A_b^c)\\
-    &\geq (\P_{\frac{1}{2}}(A_\ell^c))^4 \tag{FKG}\\
-    &= \left(1 - \P_{\frac{1}{2}}(A_\ell)\right)^4.
-  \end{align*}
-  By assumption on $n$, we know that
-  \[
-    \left(1 - \P_{\frac{1}{2}}(A_\ell)\right)^{4} \leq \frac{1}{8^4}.
-  \]
-  So we know that
-  \[
-    \P_{\frac{1}{2}} (A_\ell) \geq \frac{7}{8}.
-  \]
-  Now let $G = A_\ell \cap A_r \cap D_t \cap D_b$. Then
-  \[
-    \P_{\frac{1}{2}} (G^c) \leq \P_{\frac{1}{2}}(A_\ell^c) + \P_{\frac{1}{2}}(A_r^c) + \P_{\frac{1}{2}}(D_t^c) + \P_{\frac{1}{2}}(D_b^c) \leq \frac{1}{2}.
-  \]
-  So we know that
-  \[
-    \P_{\frac{1}{2}}(G) \geq \frac{1}{2}.
-  \]
-  On $G$, there are two infinite open clusters of primal lattice, uniqueness, of $\infty$ clusters, these two must connect inside the box. But if this happens, this creates a barrier for the two infinite closed clusters of the dual to join. This means that there are $2$ infinite disjoint closed clusters of the dual, but again this is impossible by uniqueness. So we have reached a contradiction.
+  To make this an actual proof, we need to show that these events do happen with positive probability. We shall always take $p = \frac{1}{2}$, and will not keep repeating it.
 
-  So we have $p_c \geq \frac{1}{2}$. It remains to prove that $p_c \leq \frac{1}{2}$. Suppose for contradiction that $p_c > \frac{1}{2}$. Let
+  First note that since there is, in particular, an infinite cluster with probability $1$, we have
   \[
-    B_n = [-n, n]^d \cap \Z^d.
+    \P(\partial B(n) \leftrightarrow \infty) \to 1.
   \]
-  By exponential decay in subcritical regime, there exists a $c > 0$ such that for all $n \geq 1$,
+  So we can pick $n$ large enough such that
   \[
-    \P_{\frac{1}{2}}(0 \leftrightarrow \partial B_n) \leq e^{-cn}.
+    \P (\partial B(n) \leftrightarrow \infty),\ \P (\partial C(n) \leftrightarrow \infty) \geq 1 - \frac{1}{8^4}.
+  \]
+  Let $A_\ell$/$A_r$/$A_t$/$A_b$ be the events that the left/right/top/bottom side of $B(n)$ is connected to $\infty$ via an open path of edges. Similarly, let $D_\ell$ be the event that the left of $C(n)$ is connected to $\infty$ via a closed path, and same for $D_r, D_r, D_b$.
+
+  Of course, by symmetry, for $i, j \in \{\ell, r, t, b\}$, we have $\P(A_i) = \P(A_j)$. Using FKG, we can bound
+  \[
+    \P(\partial S_n \not\leftrightarrow \infty) = \P (A_\ell^c \cap A_r^c \cap A_t^c \cap A_b^c) \geq (\P(A_\ell^c))^4 = \left(1 - \P(A_\ell)\right)^4.
+  \]
+  Thus, by assumption on $n$, we have
+  \[
+    \left(1 - \P(A_\ell)\right)^{4} \leq \frac{1}{8^4},
+  \]
+  hence
+  \[
+    \P (A_\ell) \geq \frac{7}{8}.
+  \]
+  Of course, the same is true for other $A_i$ and $D_j$.
+
+  Then if $G = A_\ell \cap A_r \cap D_t \cap D_b$, which is the desired event, then we have
+  \[
+    \P (G^c) \leq \P(A_\ell^c) + \P(A_r^c) + \P(D_t^c) + \P(D_b^c) \leq \frac{1}{2}.
+  \]
+  So it follows that
+  \[
+    \P(G) \geq \frac{1}{2},
+  \]
+  which, as argued, leads to a contradiction.
+
+%
+%  By symmetry, we see that
+%  \[
+%    \P(A_i) = \P (D_j)
+%  \]
+%  for $i, j \in \{\ell, r, t, b\}$. We now have
+%  \begin{align*}
+%    \P(\partial S_n \not\leftrightarrow \infty) &= \P (A_\ell^c \cap A_r^c \cap A_t^c \cap A_b^c)\\
+%    &\geq (\P(A_\ell^c))^4 \tag{FKG}\\
+%    &= \left(1 - \P(A_\ell)\right)^4.
+%  \end{align*}
+%  By assumption on $n$, we know that
+%  \[
+%    \left(1 - \P(A_\ell)\right)^{4} \leq \frac{1}{8^4}.
+%  \]
+%  So we know that
+%  \[
+%    \P (A_\ell) \geq \frac{7}{8}.
+%  \]
+%  Now let $G = A_\ell \cap A_r \cap D_t \cap D_b$. Then
+%  \[
+%    \P (G^c) \leq \P(A_\ell^c) + \P(A_r^c) + \P(D_t^c) + \P(D_b^c) \leq \frac{1}{2}.
+%  \]
+%  So we know that
+%  \[
+%    \P(G) \geq \frac{1}{2}.
+%  \]
+%  On $G$, there are two infinite open clusters of primal lattice, by uniqueness of $\infty$ clusters, these two must connect inside the box. But if this happens, this creates a barrier for the two infinite closed clusters of the dual to join. This means that there are $2$ infinite disjoint closed clusters of the dual, but again this is impossible by uniqueness. So we have reached a contradiction.
+
+  So we have $p_c \geq \frac{1}{2}$. It remains to prove that $p_c \leq \frac{1}{2}$. Suppose for contradiction that $p_c > \frac{1}{2}$. Then $p = \frac{1}{2}$ is in the subcritical regime, and we expect exponential decay. Thus, (again with $p = \frac{1}{2}$ fixed) there exists a $c > 0$ such that for all $n \geq 1$,
+  \[
+    \P(0 \leftrightarrow \partial B(n)) \leq e^{-cn}.
   \]
   Consider $C_n = [0, n + 1] \times [0, n]$, and define $A_n$ to be the event that there exists a left-right crossing of $C_n$ by open edges.
 
   Again consider the dual box $D_n = [0, n] \times [-1, n] + \left(\frac{1}{2}, \frac{1}{2}\right)$.
   \begin{center}
-    \begin{tikzpicture}
+    \begin{tikzpicture}[scale=0.7]
       \draw [thick, mblue] (0, 0) rectangle (6, 5);
       \draw [dashed, mred, thick] (0.5, -0.5) rectangle (5.5, 5.5);
       \node [right, mblue] at (6, 2.5) {$C_n$};
       \node [above, mred] at (3, 5.5) {$D_n$};
-      \draw [mblue, decorate, decoration=penciline] (0, 2.5) -- (6, 2.4);
-      \draw [mred, decorate, decoration=penciline] (3, -0.5) -- (2.9, 5.5);
+      \draw [mblue] (0, 2.5) -- (6, 2.5);
+      \draw [mred] (3, -0.5) -- (3, 5.5);
     \end{tikzpicture}
   \end{center}
   Define $B_n$ to be the event that there is a top-bottom crossing of $D_n$ by closed edges of the dual.
 
-  Observe that it cannot be the case that $A_n$ and $B_n$ both occur, or else there must be an open edge of the primal lattice crossed by a closed edge of the dual, which is impossible. In fact, $A_n$ and $B_n$ partition the whole space, since if $A_n$ does not hold, then every path from left to right of $C_n$ is blocked by a closed path of the dual.
-
-  Thus, we know
+  As before, it cannot be the case that $A_n$ and $B_n$ both occur. In fact, $A_n$ and $B_n$ partition the whole space, since if $A_n$ does not hold, then every path from left to right of $C_n$ is blocked by a closed path of the dual. Thus, we know
   \[
-    \P_p(A_n) + \P_p(B_n) = 1
+    \P(A_n) + \P(B_n) = 1.
   \]
-  for any $p$. But by duality, we have $\P_p(A_n) = \P_{1 - p}(B_n)$. So
+  But also by symmetry, we have $\P(A_n) = \P(B_n)$. So
   \[
-    \P_{\frac{1}{2}} (A_n) = \frac{1}{2}.
+    \P (A_n) = \frac{1}{2}.
   \]
   On the other hand, for any point on the left edge, the probability of it reaching the right edge decays exponentially with $n$. Thus,
   \[
-    \P_{\frac{1}{2}}(A_n) \leq n (n + 1) \P_{\frac{1}{2}}(0 \leftrightarrow \partial B_n) \leq (n + 1) e^{-cn}
+    \P(A_n) \leq n (n + 1) \P(0 \leftrightarrow \partial B_n) \leq (n + 1) e^{-cn}
   \]
   which is a contradiction. So we are done.
 \end{proof}
 
-\subsection{Russo--Symour--Welsh}
-In the previous proof, we proved that $\P_{\frac{1}{2}}(A_n) = \frac{1}{2}$. We might ask what happens if we ask the same question with boxes of different sizes. Define
+So we now know that $p_c = \frac{1}{2}$. We now want to prove that
+\[
+  \P_{\frac{1}{2}}(0 \leftrightarrow \partial B(n)) \leq A n^{-\alpha}
+\]
+for some $A, \alpha$. To prove this, we again consider the dual lattice. Observe that if we have a closed dual circuit around the origin, then this prevents the existence of an open path from the origin to a point far far away. What we are going to do is to construct ``zones'' in the dual lattice like this:
+\begin{center}
+  \begin{tikzpicture}[scale=0.1]
+    \draw [fill=mred!30!white] (-13.5, -13.5) rectangle (13.5, 13.5);
+    \draw [fill=mgreen!30!white] (-4.5, -4.5) rectangle (4.5, 4.5);
+    \draw [fill=mblue!30!white] (-1.5, -1.5) rectangle (1.5, 1.5);
+    \draw [fill=mred!30!white] (-0.5, -0.5) rectangle (0.5, 0.5);
+    \node [fill, circle, inner sep = 0, minimum size = 1] at (0, 0) {};
+  \end{tikzpicture}
+\end{center}
+The idea is to choose these zones in a way such that the probability that each zone contains a closed circuit around the origin is $\geq \zeta$ for some fixed $\zeta$. Thus, if $B(n)$ contains $m$ many of these zones, then the probability that $0$ is connected to $\partial B(n)$ is bounded above by $(1 - \zeta)^m$. We would then be done if we can show that $m \sim \log n$.
+
+The main strategy to bounding these probabilities is to use FKG. For example, if we want to bound the probability that there is a closed circuit in a region
+\begin{center}
+  \begin{tikzpicture}
+    \draw [fill=gray!50!white] (0, 0) rectangle (1.5, 1.5);
+    \draw [fill=white] (0.5, 0.5) rectangle (1, 1);
+  \end{tikzpicture}
+\end{center}
+then we cut it up into the pieces
+\begin{center}
+  \begin{tikzpicture}
+    \draw [fill=gray!50!white] (0, 0) rectangle (1.5, 0.5);
+    \draw [fill=gray!50!white] (0, 1) rectangle (1.5, 1.5);
+
+    \draw [fill=gray!50!white] (-1, 0) rectangle (-0.5, 1.5);
+    \draw [fill=gray!50!white] (2, 0) rectangle (2.5, 1.5);
+  \end{tikzpicture}
+\end{center}
+If we can bound the probability of there being a left-to-right crossing of a horizontal piece, and hence by symmetry the probability of there being a top-to-bottom crossing of a vertical piece, then FKG gives us a bound on the probability of there being a closed circuit.
+
+For convenience of notation, we prove these bounds for open paths in the primal lattice. We make the following definitions:
 \begin{align*}
   B(k\ell, \ell) &= [-\ell, (2k - 1)\ell] \times [-\ell, \ell]\\
-  B(\ell, \ell) &= B(\ell) = [-\ell, \ell]^2\\
+  B(\ell) &= B(\ell, \ell) = [-\ell, \ell]^2\\
   A(\ell) &= B(3\ell) \setminus B(\ell)\\
-  LR(k\ell ,\ell) &= \{\text{there exists left-right crossing of $B(\ell, \ell)$ of open edges}\}\\
-  LR(\ell, \ell) &= LR(\ell)\\
+  LR(k\ell ,\ell) &= \{\text{there exists left-right crossing of $B(k\ell, \ell)$ of open edges}\}\\
+  LR(\ell) &= LR(\ell, \ell)\\
   O(\ell) &= \{\text{there exists open circuit in $A(\ell)$ that contains $0$ in its interior}\}.
 \end{align*}
+We first note that we have already proven the following:
+\begin{prop}
+  $\P_{\frac{1}{2}}(LR(\ell)) \geq \frac{1}{2}$ for all $\ell$.
+\end{prop}
 
+\begin{proof}
+  We have already seen that the probability of there being a left-right crossing of $[0, n + 1] \times [0, n]$ is at least $\frac{1}{2}$. But if there is a left-right crossing of $[0, n + 1] \times [0, n]$, then there is also a left-right crossing of $[0, n] \times [0, n]$!
+\end{proof}
+
+For a general $p$, Russo--Symour--Welsh (RSW) lets us bound $\P_p(O(\ell))$ by $\P_p(LR(\ell))$:
 \begin{thm}[Russo--Symour--Welsh (RSW) theorem]\index{Russo--Symour--Welsh}\index{RSW}
   If $\P_p(LR(\ell)) = \alpha$, then
   \[
     \P_p(O(\ell)) \geq \left(\alpha \left(1 - \sqrt{1 - \alpha}\right)^4\right)^{12}.
   \]
 \end{thm}
-Usually, it is not so important what the number on the right is. The important part is that it is positive.
 
-\begin{lemma}
-  \begin{align*}
-    \P_p(LR(2\ell ,\ell)) \geq \P_p(LR(\ell)) \left(\P_p\left(LR\left(\frac{3}{2}\ell, \ell\right)\right)\right)^2\\
-    \P_p(LR(3\ell ,\ell)) \geq \P_p(LR(\ell)) \left(\P_p\left(LR\left(2\ell, \ell\right)\right)\right)^2\\
-    \P_p(O(\ell)) \geq \P_p(LR(3\ell, \ell))^4
-  \end{align*}
-\end{lemma}
-
-\begin{proof}\leavevmode
-  To prove the first inequality, consider the box $[0, 4\ell] \times [-\ell, \ell]$.
-  \begin{center}
-    \begin{tikzpicture}[scale=0.6]
-      \draw (0, 0) rectangle (2, 4);
-      \draw (2, 0) rectangle (4, 4);
-      \draw (4, 0) rectangle (6, 4);
-      \draw (6, 0) rectangle (8, 4);
-      \node [below] at (6, 0) {$3\ell$};
-      \node [below] at (2, 0) {$\ell$};
-
-      \draw [mblue, decorate, decoration=penciline] (0, 3) -- (6, 2.9);
-      \draw [mblue, decorate, decoration=penciline] (2, 1) -- (8, 1.1);
-      \draw [mblue, decorate, decoration=penciline] (3, 0) -- (3.1, 4);
-    \end{tikzpicture}
-  \end{center} % insert paths
-  We let
-  \begin{align*}
-    LR_1 &= \{LR\text{ of }[0, 3\ell] \times [-\ell, \ell]\}\\
-    LR_2 &= \{LR\text{ of }[\ell, 4\ell] \times [-\ell, \ell]\}\\
-    TB_1 &= \{LR\text{ of }[\ell, 3\ell] \times [-\ell, \ell]\}.
-  \end{align*}
-  Then by FKG, we find that
-  \[
-    \P_p(LR(2\ell, \ell)) \geq \P_p(LR_1 \cap LR_2 \cap TB_1) \geq \P_p(LR_1) \P_p(LR_2) \P_p(TB_1).
-  \]
-  The others are similar.
-\end{proof}
-
-The other ingredient in the proof of RSW is the following:
+A large part of the proof is done by the cut-and-paste argument we sketched above. However, to successfully do cut-and-paste, it turns out we need bounds on the probability of a left-right crossing on something that is \emph{not} a square. The key, non-trivial estimate is the following:
 \begin{lemma}
   If $\P_p(LR(\ell)) = \alpha$, then
   \[
-    \P_p\left(LR\left(\frac{3}{2}\ell, \ell\right)\right) \geq (1 - \sqrt{1 - \alpha})^3.
+    \P_p\left(LR\left(\tfrac{3}{2}\ell, \ell\right)\right) \geq (1 - \sqrt{1 - \alpha})^3.
+  \]
+\end{lemma}
+
+To prove this, we need a result from the first example sheet:
+\begin{lemma}[$n$th root trick]\index{$n$th root trick}
+  If $A_1, \ldots, A_n$ are increasing events all having the same probability, then
+  \[
+    \P_p(A_1) \geq 1 - \left(1 - \P_p\left(\bigcup_{i = 1}^n A_i\right)\right)^{1/n}.
   \]
 \end{lemma}
 
 \begin{proof}[Proof sketch]
+  Observe that the proof of FKG works for \emph{decreasing} events as well, and then apply FKG to $A_i^c$.
+\end{proof}
+
+We can now prove our initial lemma.
+\begin{proof}[Proof sketch]
   Let $\mathcal{A}$ be the set of left-right crossings of $B(\ell) = [-\ell, \ell]^2$. Define a partial order on $\mathcal{A}$ by $\pi_1 \leq \pi_2$ if $\pi_1$ is contained in the closed bounded region of $B(\ell)$ below $\pi_2$.
 
-  If a set of left-right crossings is non-empty, then there exists a lowest one. Since $\mathcal{A}$ must be finite, it suffices to show that meets exist in this partial order, which is left as an exercise for the reader.
+  Note that given any configuration, if the set of open left-right crossings is non-empty, then there exists a lowest one. Indeed, since $\mathcal{A}$ must be finite, it suffices to show that meets exist in this partial order, which is clear.
 
-  For a left-right crossing $\pi$, let $(0, y_\pi)$ be the last vertex on the vertical axis where $\pi$ intersects.
+  For a left-right crossing $\pi$, let $(0, y_\pi)$ be the last vertex on the vertical axis where $\pi$ intersects, and let $\pi_r$ be the path of the path that connects $(0, y_\pi)$ to the right.
   \begin{center}
-    \begin{tikzpicture}
+    \begin{tikzpicture}[scale=0.7]
+
        \draw (-2, -2) rectangle (2, 2);
        \draw [dashed] (0, -2) -- (0, 2);
        \draw [dashed] (-2, 0) -- (2, 0);
        \node [circ] at (0, 0) {};
-       \node [anchor = north east] {$O$};
+       \node [anchor = north west] {\small $O$};
 
-       \draw plot [smooth] coordinates {(-2, 1) (-0.5, 1.2) (0, 0.8) (-0.4, -1) (0, -1.3) (2, -1.1)};
+       \draw [thick, mred] plot [smooth] coordinates {(-2, 1) (-0.5, 1.2) (0, 0.8) (-0.4, -1) (0, -1.3) (2, -1.1)};
+       \begin{scope}
+         \clip (-2, -2) -- (0, -2) -- (0, 0) -- (2, 0) -- (2, 2) -- (-2, 2) -- (-2, -2);
+         \draw [thick, black] plot [smooth] coordinates {(-2, 1) (-0.5, 1.2) (0, 0.8) (-0.4, -1) (0, -1.3) (2, -1.1)};
+       \end{scope}
        \node [circ] at (0, -1.3) {};
-       \node [anchor = north east] {$(0, y_\pi)$};
+       \node [anchor = north east] at (0, -1.3) {\small$(0, y_\pi)$};
+       \node [below, mred] at (1, -1.2) {\small$\pi_r$};
     \end{tikzpicture}
   \end{center}
-  Let % insert picture
+  Let
   \begin{align*}
-    \mathcal{A}_- &= \{\pi \in \mathcal{A}: y_\pi < 0\}\\
-    \mathcal{A}_+ = \{\pi \in \mathcal{A}: y_\pi \geq 0\}
+    \mathcal{A}_- &= \{\pi \in \mathcal{A}: y_\pi \leq 0\}\\
+    \mathcal{A}_+ &= \{\pi \in \mathcal{A}: y_\pi \geq 0\}
   \end{align*}
-  Let $\pi_r$ be the path of the path that connects $(0, y_\pi)$ to the right. Let $\pi_r'$ be the reflection of $\pi_r$ on $\{(\ell, k): k \in \Z\}$.
+   Letting $B(\ell)' = [0, 2\ell] \times [-\ell, \ell]$, our goal is to find a left-right crossing of the form
+  \begin{center}
+    \begin{tikzpicture}[scale=0.7]
+       \draw (-2, -2) rectangle (2, 2);
+       \draw [dashed] (0, -2) -- (0, 2);
+       \draw [dashed] (-2, 0) -- (2, 0);
+       \node [circ] at (0, 0) {};
+       \node [anchor = north west] {$O$};
 
-  We define $B(\ell)' = [0, 2\ell] \times [-\ell, \ell]$.
-\{
-  In general, for $\pi \in \mathcal{A}$, we define the events
+       \draw [thick, mred] plot [smooth] coordinates {(-2, 1) (-0.5, 1.2) (-0.2, 0.8) (-0.4, -1) (0, -1.3) (2, -1.1)};
+
+       \draw [morange!50!black, opacity=0.8] (0, -2) rectangle (4, 2);
+
+       \draw [mblue, thick] (0, 1.5) edge [out=0, in=185] (4, 1);
+
+       \draw [mgreen, thick] (1.1, 2) edge [out=250, in=85] (1.3, -2);
+    \end{tikzpicture}
+  \end{center}
+  More precisely, we want the following paths:
+  \begin{enumerate}
+    \item Some $\pi \in \mathcal{A}_-$
+    \item Some top-bottom crossing of $B(\ell')$ that crosses $\pi_r$.
+    \item Some left-right crossing of $B(\ell')$ that starts at the positive (i.e.\ non-negative) $y$ axis.
+  \end{enumerate}
+  To understand the probabilities of these events happening, we consider the ``mirror'' events and then apply the square root trick.
+
+  Let $\pi_r'$ be the reflection of $\pi_r$ on $\{(\ell, k): k \in \Z\}$. For any $\pi \in \mathcal{A}$, we define
   \begin{align*}
     V_\pi &= \{\text{all edges of $\pi$ are open}\}\\
     M_\pi &= \{\text{exists open crossing from top of $B(\ell)'$ to $\pi_r \cup \pi_r'$}\}\\
     M_\pi^- &= \{\text{exists open crossing from top of $B(\ell)'$ to $\pi_r$}\}\\
     M_\pi^+ &= \{\text{exists open crossing from top of $B(\ell)'$ to $\pi_r'$}\}\\\
-    L^+ &= \{\text{exists open crossing in $\mathcal{A}_+$}\}\\
-    L^- &= \{\text{exists open crossing in $\mathcal{A}_-$}\}\\
+    L^+ &= \{\text{exists open path in $\mathcal{A}_+$}\}\\
+    L^- &= \{\text{exists open path in $\mathcal{A}_-$}\}\\
     L_\pi &= \{\text{$\pi$ is the lowest open LR crossing of $B(\ell)$}\}\\
     N &= \{\text{exists open LR crossing of $B(\ell)'$}\}\\
     N^+ &= \{\text{exists open LR crossing in $B(\ell)'$ starting from positive vertical axis}\}\\
     N^- &= \{\text{exists open LR crossing in $B(\ell)'$ starting from negative vertical axis}\}
   \end{align*}
-  Now note that
+  In this notation, our previous observation was that
   \[
     \underbrace{\bigcup_{\pi \in \mathcal{A}_-}(V_\pi \cap M_{\pi}^-)}_{G} \cap N^+ \subseteq LR\left(\frac{3}{2} \ell, \ell\right)
   \]
@@ -1154,7 +1260,7 @@ The other ingredient in the proof of RSW is the following:
   \]
   We now have to understand $G$. To bound its probability, we try to bound it by the union of some disjoint events. We have
   \begin{align*}
-    \P_p(G) &= \P_p\left(\bigcup_{\pi \in \mathcal{A}} (V_\pi \cap M_\pi^-)\right)\\
+    \P_p(G) &= \P_p\left(\bigcup_{\pi \in \mathcal{A}_-} (V_\pi \cap M_\pi^-)\right)\\
     &\geq \P_p\left(\bigcup_{\pi \in A_-} (M_\pi^- \cap L_\pi)\right)\\
     &= \sum_{\pi \in \mathcal{A}_-} \P_p(M_\pi^- \mid L_\pi) \P_p(L_\pi).
   \end{align*}
@@ -1184,100 +1290,128 @@ The other ingredient in the proof of RSW is the following:
   and we are done.
 \end{proof}
 
-\subsection{Applications of RSW to critical exponents}
-\begin{thm}
-  There exists positive constants $A_1, \alpha_1, A_2, \alpha_2, \alpha_3, A_4, \alpha^4$ such that
-  \begin{align*}
-    \frac{1}{2\sqrt{n}} \leq \P_{\frac{1}{2}} (0 \leftrightarrow \partial B(n)) &\leq A_1 \cdot n^{-\alpha_n}\\
-    \frac{1}{2\sqrt{n}} \leq \P_{\frac{1}{2}} (|\mathcal{C}(0)| \geq n) &\leq A_2 n^{-\alpha_2}\\
-    \E(|\mathcal{C}(0)|^{\alpha_3}) \leq \infty\\
-    \theta(p) &\leq A_4 \left(p - \frac{1}{2}\right)^{\alpha_4}
-  \end{align*}
-\end{thm}
-To prove the first part, the idea is that if we want the origin to be connected to $\partial B(n)$, then we need to forbid the existence of closed circuits around the origin in the dual lattice.
-
+We now do the easy bit to finish off the theorem:
 \begin{lemma}
-  There exists $\zeta > 0$ such that $\P_{\frac{1}{2}}(O(\ell)) \geq \zeta$ for all $\ell > 1$.
+  \begin{align*}
+    \P_p(LR(2\ell ,\ell)) &\geq \P_p(LR(\ell)) \left(\P_p\left(LR\left(\frac{3}{2}\ell, \ell\right)\right)\right)^2\\
+    \P_p(LR(3\ell ,\ell)) &\geq \P_p(LR(\ell)) \left(\P_p\left(LR\left(2\ell, \ell\right)\right)\right)^2\\
+    \P_p(O(\ell)) &\geq \P_p(LR(3\ell, \ell))^4
+  \end{align*}
 \end{lemma}
 
-\begin{proof}
-  By RSW, it suffices to prove that there exists $\alpha > 0$ such that $\P_{\frac{1}{2}} (LR \ell) \geq \alpha$ for all $\ell$.
+\begin{proof}\leavevmode
+  To prove the first inequality, consider the box $[0, 4\ell] \times [-\ell, \ell]$.
+  \begin{center}
+    \begin{tikzpicture}[scale=0.6]
+      \draw (0, 0) rectangle (2, 4);
+      \draw (2, 0) rectangle (4, 4);
+      \draw (4, 0) rectangle (6, 4);
+      \draw (6, 0) rectangle (8, 4);
+      \node [below] at (6, 0) {$3\ell$};
+      \node [below] at (2, 0) {$\ell$};
 
-  Let $A_n$ be the event that there is a left-right crossing of $[0, n + 1] \times [0, n]$. Using duality, we showed that $\P_{\frac{1}{2}}(A_n) = \frac{1}{2}$. So in particular, the probability that there is a left-right crossing of $[0, n] \times [0, n] \geq \frac{1}{2}$. So we are done.
-
-%  If there exists a left-right crossing of $[0, n + 1] \times [0, n]$, then there also exists a left-right crossing of $[0, n + 1] \times [-1, n + 1]$. Then
-%  \[
-%    \P_{\frac{1}{2}}(\text{LR of }[0, n + 2] \times [-1, n + 1]) \P_p(\text{LR of }[0, n + 1] \times [-1, n + 1], \text{last edge open})
-%  \]
+      \draw [mblue, thick] (0, 3) edge [out=-10, in=170] (6, 3);
+      \draw [mblue, thick] (2, 1) edge [out=15, in=191] (8, 1);
+      \draw [mblue, thick] (3, 4) edge [out=270, in=90] (5, 0);
+    \end{tikzpicture}
+  \end{center}
+  We let
+  \begin{align*}
+    LR_1 &= \{\text{exists left-right crossing of }[0, 3\ell] \times [-\ell, \ell]\}\\
+    LR_2 &= \{\text{exists left-right crossing of }[\ell, 4\ell] \times [-\ell, \ell]\}\\
+    TB_1 &= \{\text{exists top-bottom crossing of }[\ell, 3\ell] \times [-\ell, \ell]\}.
+  \end{align*}
+  Then by FKG, we find that
+  \[
+    \P_p(LR(2\ell, \ell)) \geq \P_p(LR_1 \cap LR_2 \cap TB_1) \geq \P_p(LR_1) \P_p(LR_2) \P_p(TB_1).
+  \]
+  The others are similar.
 \end{proof}
 
-\begin{proof}[Proof of upper bound]
-  Define dual boxes
+\begin{thm}
+  There exists positive constants $\alpha_1, \alpha_2, \alpha_3, \alpha_4, A_1, A_2, A_4$ such that
+  \begin{align*}
+    \P_{\frac{1}{2}} (0 \leftrightarrow \partial B(n)) &\leq A_1 n^{-\alpha_1}\\
+    \P_{\frac{1}{2}} (|\mathcal{C}(0)| \geq n) &\leq A_2 n^{-\alpha_2}\\
+    \E(|\mathcal{C}(0)|^{\alpha_3}) &\leq \infty
+  \end{align*}
+  Moreover, for $p > p_c = \frac{1}{2}$, we have
   \[
-    B(k)_d = B(k) + \left(\frac{1}{2}, \frac{1}{2}\right).
+    \theta(p) \leq A_4 \left(p - \frac{1}{2}\right)^{\alpha_4}.
   \]
-  The dual annuli $A(\ell)_d$ are defined by
-  \[
-    A(\ell)_d = B(3\ell)_d \setminus B(\ell)_d.
-  \]
-  We let $O(\ell)_d$ be the event that there is a closed dual circuit in $A(\ell)_d$ containing $\left(\frac{1}{2}, \frac{1}{2}\right)$.
+\end{thm}
+It is an exercise on the example sheet to prove that $\P_{\frac{1}{2}}(0 \leftrightarrow B(n)) \geq \frac{1}{2\sqrt{n}}$ using the BK inequality. So the true decay of $\P_{\frac{1}{2}}(0 \leftrightarrow \partial B(n))$ is indeed a power law.
 
-  Then
-  \[
-    \P_{\frac{1}{2}} (0 \leftrightarrow \partial B(3^k + 1)) \leq \P_p(O(3^r)_d\text{ does not occur for all }r < k).
-  \]
-  The annuli $(A(3^r)_d)$ are disjoint, so the events above are independent. By RSW (since the dual is isomorphic to $\Z^2$), we get
-  \[
-    \P_{\frac{1}{2}}(O(\ell)_d) \geq \zeta
-  \]
-  for some $\zeta > 0$, independent of $\ell$. So it follows that
-  \[
-    \P_{\frac{1}{2}}(0 \leftrightarrow \partial B(3^k + 1)) \leq (1 - \zeta)^k.\qedhere
-  \]
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item We first prove the first inequality. Define dual boxes
+      \[
+        B(k)_d = B(k) + \left(\frac{1}{2}, \frac{1}{2}\right).
+      \]
+      The dual annuli $A(\ell)_d$ are defined by
+      \[
+        A(\ell)_d = B(3\ell)_d \setminus B(\ell)_d.
+      \]
+      We let $O(\ell)_d$ be the event that there is a closed dual circuit in $A(\ell)_d$ containing $\left(\frac{1}{2}, \frac{1}{2}\right)$. Then RSW tells us there is some $\zeta \in (0, 1)$ such that
+      \[
+        \P_{\frac{1}{2}}(O(\ell)_d) \geq \zeta,
+      \]
+      independent of $\ell$. Then observe that
+      \[
+        \P_{\frac{1}{2}} (0 \leftrightarrow \partial B(3^k + 1)) \leq \P_p(O(3^r)_d\text{ does not occur for all }r < k).
+      \]
+      Since the annuli $(A(3^r)_d)$ are disjoint, the events above are independent. So
+      \[
+        \P_{\frac{1}{2}}(0 \leftrightarrow \partial B(3^k + 1)) \leq (1 - \zeta)^k,
+      \]
+      and this proves the first inequality.
+
+    \item The second inequality follows from the first inequality plus the fact that $|\mathcal{C}(0)| \geq n$ implies $0 \leftrightarrow \partial B(g(n))$, for some function $g(n) \sim \sqrt{n}$.
+
+    \item To show that $\E_{\frac{1}{2}}[|\mathcal{C}(0)|^{\alpha_3}] < \infty$ for some $\alpha_3$, we observe that this expectation is just
+      \[
+        \sum_n \P_{\frac{1}{2}}(|\mathcal{C}(0)|^{\alpha_3} \geq n).
+      \]
+    \item To prove the last part, note that
+      \[
+        \theta(p) = \P_p(|\mathcal{C}(0)| = \infty) \leq \P_p(0 \leftrightarrow \partial B_n)
+      \]
+      for all $n$. By the corollary of Russo's formula, and since $\{0 \leftrightarrow \partial B_n\}$ only depends on the edges in $B_n$, which are $\leq 18 n^2$, we get that
+      \[
+        \P_{\frac{1}{2}}(0 \leftrightarrow \partial B_n) \geq \left(\frac{1}{2p}\right)^{18n^2}\P_p(0 \leftrightarrow \partial B_n).
+      \]
+      So
+      \[
+        \theta(p) \leq (2p)^{18n^2} \P_{\frac{1}{2}}(0 \leftrightarrow \partial B_n) \leq A_1 (2p)^{18n^2} n^{-\alpha_1}.
+      \]
+      Now take $n = \lfloor (\log 2p)^{-1/2} \rfloor $. Then as $p \searrow \frac{1}{2}$, we have
+      \[
+        n \sim \frac{1}{(2p - 1)^{\frac{1}{2}}}.
+      \]
+      Substituting this in, we get
+      \[
+        \theta(p) \leq C \left(p - \frac{1}{2}\right)^{\alpha_1/2}.\qedhere
+      \]%\qedhere
+  \end{enumerate}
 \end{proof}
-
-The second inequality follows from this.
-
-To show that $\E_{\frac{1}{2}}[|\mathcal{C}(0)|^\gamma] < \infty$ for some $\gamma$, we observe that this expectation is just
-\[
-  \sum_n \P_{\frac{1}{2}}(|\mathcal{C}(0)|^\gamma \geq n).
-\]
-To prove the last part, note that
-\[
-  \theta(p) = \P_p(|\mathcal{C}(0)| = \infty) \leq \P_p(0 \leftrightarrow \partial B_n)
-\]
-for all $n$. By the easy corollary of Russo's formula, and since $\{0 \leftrightarrow \partial B_n\}$ only depends on the edges in $B_n$, which are $\leq 18 n^2$, we get that
-\[
-  \P_{\frac{1}{2}}(0 \leftrightarrow \partial B_n) \geq \left(\frac{1}{2p}\right)^{18n^2}\P_p(0 \leftrightarrow \partial B_n).
-\]
-So
-\[
-  \theta(p) \leq (2p)^{12n^2} \P_{\frac{1}{2}}(0 \leftrightarrow \partial B_n) \leq A_1 (2p)^{18n^2} n^{-\alpha_1}.
-\]
-Now take $n = \lfloor (\log 2p)^{-1/2} \rfloor $. Then as $p \downarrow \frac{1}{2}$, we have
-\[
-  n \sim \frac{1}{(2p - 1)^{\frac{1}{2}}}.
-\]
-Substituting this, we get
-\[
-  \theta(p) \leq C \left(p - \frac{1}{2}\right)^{1/2}.
-\]
-% format this properly
 
 By similar methods, we can prove that
 \begin{thm}
   When $d = 2$ and $p > p_c$, there exists a positive constant $c$ such that
   \[
-    \P_p(0 \leftrightarrow, |\mathcal{C}(0)| < \infty) \leq e^{-cn}.
+    \P_p(0 \leftrightarrow \partial B(n), |\mathcal{C}(0)| < \infty) \leq e^{-cn}.
   \]
 \end{thm}
 
 It is natural to ask if we have a similar result in higher dimensions. In higher dimensions, all the techniques in $\Z^2$ don't work.
 
-\subsubsection*{Grimmett--Marstrand theorem}
-% slab percolation
+\subsubsection*{Higher dimensions}
 
-\index{slab percolation}In $d \geq 3$, define $S_k = \Z^2 \times \{0, 1, \ldots, k\}^{d - 2}$. Then $S_k \subseteq S_{k + 1} \subseteq \Z^d$.
+\index{slab percolation}In $d \geq 3$, define the \emph{slab}
+\[
+  S_k = \Z^2 \times \{0, 1, \ldots, k\}^{d - 2}.
+\]
+Then $S_k \subseteq S_{k + 1} \subseteq \Z^d$.
 
 In general, for a graph $G$, we let $p_c(G)$ be the critical probability of bond percolation in $G$. Then we have
 \[
@@ -1310,7 +1444,7 @@ A consequence of Grimmett-Marstrand is that
 \begin{thm}
   If $d \geq 3$ and $p > p_c$, then there exists $c > 0$ such that
   \[
-    \P_p(0 \leftrightarrow \partial B_n, |\mathcal{C}(0)| < \infty) \leq e^{-cn}.
+    \P_p(0 \leftrightarrow \partial B(n), |\mathcal{C}(0)| < \infty) \leq e^{-cn}.
   \]
 \end{thm}
 
@@ -1347,34 +1481,33 @@ In 2001, Smirnov proved this conjecture.
 \end{thm}
 This says percolation at criticality on the triangular lattice is conformally invariant.
 
-If we take the dual of the triangular lattice, which is the hexagonal lattice. % insert picture
+We may also take the dual of the triangular lattice, which is the hexagonal lattice. Colour a hexagon black if the center is black, and similarly for whites. Suppose we impose the boundary condition on the upper half plane that the hexagons are black when $x > 0, y = 0$, and white when $x < 0, y = 0$.
 
-Colour a hexagon black if the center is black, and similarly for whites. Suppose we impose the boundary condition on the upper half plane that the hexagons are black when $x > 0, y = 0$, and white when $x < 0, y = 0$.
+Starting at $(x, y) = (0, 0)$, we explore the interface between the black and white by always keeping a black to our right and white on our right. We can again take the limit $\delta \to 0$. What is this exploration path going to look like in the limit $\delta \to 0$? It turns out this is an SLE(6) curve.
 
-Starting at $(x, y) = (0, 0)$, we explore the interface between the black and white by always keeping a black to your right and white on your right. We can again take the limit $\delta \to 0$. What is this exploration path going to look like in the limit $\delta \to 0$? It turns out this is an SLE(6) curve.
+To prove this, we use the fact that the exploration curve satisfies the \emph{locality property}, namely that if we want to know where we will be in the next step, we only need to know where we currently are.
 
-This exploration curve satisfies the \emph{locality property}, namely that if we want to know where we will be in the next step, we only need to know where we currently are.
+%Let $\gamma_t$ be a continuous curve in $\H$, and let $K_t$ be the unbounded component of $\H \setminus \gamma [0, t]$. Then there is a conformal map $g_t: \H \setminus K_t \to \H$ such that
+%\[
+%  \frac{\d}{\d t} g_t(x) = \frac{2}{g_t(z) - a(t)},
+%\]
+%and $a(t) = g_t(\gamma_t)$, $g_0(z) = z$.
+%
+%This is known as \term{Loewner's equation}.
+%
+%If we take $a(t) = \sqrt{\kappa} B_t$, where $B_t$ is a standard Brownian motion, this gives us SLE($\kappa$).
 
-Let $\gamma_t$ be a continuous curve in $\H$, and let $K_t$ be the unbounded component of $\H \setminus \gamma [0, t]$. Then there is a conformal map $g_t: \H \setminus K_t \to \H$ such that
-\[
-  \frac{\d}{\d t} g_t(x) = \frac{2}{g_t(z) - a(t)},
-\]
-and $a(t) = g_t(\gamma_t)$, $g_0(z) = z$.
+\section{Random walks}
+\subsection{Random walks in finite graphs}
+We shall consider weighted random walks on finite graphs. Let $G = (V, E)$ be a finite connected graph. We assign a conductances/weights to the edges $(c(e))_{e \in E}$. Here $c$ is a function of the edges, so we require $c(xy) = c(yx)$.
 
-This is known as \term{Loewner's equation}.
-
-If we take $a(t) = \sqrt{\kappa} B_t$, where $B_t$ is a standard Brownian motion, this gives us SLE($\kappa$).
-
-\section{Random walks and electrical networks}
-Let $G = (V, E)$ be a finite connected graph. We assign a conductances/weights to the edges $(c(e))_{e \in E}$. Note that we require $c(xy) = c(yx)$.
-
-Consider a weighted random walk on $G$, with the probability of going from $x$ to $y$ (assuming $x \sim y$)
+In the weighted random walk on $G$, the probability of going from $x$ to $y$ (assuming $x \sim y$) is
 \[
   \P(x, y) = \frac{c(x, y)}{ c(x)},\quad c(x) = \sum_{z \sim x} c(x, z).
 \]
 If we put $c(e) = 1$ for all $e$, then this is just a simple random walk, with
 \[
-  \P(x, Y) =
+  \P(x, y) =
   \begin{cases}
     \frac{1}{\deg x} & y \sim x\\
     0 & \text{otherwise}
@@ -1390,13 +1523,63 @@ Conversely, every reversible Markov chain can be represented as a random walk on
 \]
 for all $x \sim y$.
 
+One way to understand random walks on weighted graphs is to think of them as currents in electrical networks. We set the resistance on the edges by
+\[
+  r(e) = \frac{1}{c(e)}.
+\]
+Naturally, we would like to talk about currents flowing through the circuit.
+\begin{defi}[Flow]\index{flow}
+  A \emph{flow} $\theta$ on $G$ is a function defined on oriented edges which is anti-symmetric, i.e.\ $\theta(x, y) = - \theta(y, x)$.
+\end{defi}
+Not every flow can be thought of as a current. We fix two distinguished vertices $a$ and $z$, called the \term{source} and the \term{sink} respectively. We think of current as entering the network through $a$ and exiting through $z$. Through any other vertex, the amount of current going in should equal the amount of current going out.
+
+\begin{defi}[Divergence]\index{divergence}
+  The \emph{divergence} of a flow $\theta$ is
+  \[
+    \div \theta (x) = \sum_{y \sim x} \theta(x, y).
+  \]
+\end{defi}
+By the antisymmetry property, we have
+\[
+  \sum_x \div \theta(x) = \sum_x \sum_{y \sim x} \theta(x, y) = \sum_{x \sim y} \theta(x, y) = 0.
+\]
+\begin{defi}[Flow from $a$ to $z$]\index{flow}
+  A flow $\theta$ from $a$ to $z$ is a flow such that
+  \begin{enumerate}
+    \item $\div \theta(x) = 0$ for all $x \not \in \{a, z\}$. \hfill (\term{Kirchhoff's node law})
+    \item $\div \theta(a) \geq 0$.
+  \end{enumerate}
+  The \term{strength} of the flow from $a$ to $z$ is $\|\theta\| = \div \theta(a)$.\index{$\|\theta\|$}We say this is a \term{unit flow} if $\|\theta\| = 1$.
+\end{defi}
+Since $\sum \div \theta(x) = 0$, a flow from $a$ to $z$ satisfies $\div \theta(z) = - \div \theta(a)$.
+
+Now if we believe in Ohm's law, then the voltage difference across each edge is $I(x, y) r(x, y)$. So we have
+\[
+  W(x) = W(y) + r(x, y) I(x, y)
+\]
+for all $y$. We know that if we sum $I(x, y)$ over all $y$, then the result vanishes. So we rewrite this as
+\[
+  c(x, y) W(x) = c(x, y) W(y) + I(x, y).
+\]
+Summing over all $y$, we find that the voltage satisfies
+\[
+  W(x) = \sum_{x \sim y} \frac{c(x, y)}{c(x)} W(y) = \sum_{x \sim y} \P(x, y) W(y).
+\]
 \begin{defi}[Harmonic function]\index{harmonic function}
   Let $P$ be a transition matrix on $\Omega$. We call $h$ \emph{harmonic} for $P$ at the vertex $x$ if
   \[
     h(x) = \sum_y \P(x, y) h(y).
   \]
 \end{defi}
-If $B \subseteq \Omega$, and $X$ is a Markov chain with matrix $P$, then we write
+
+We now take this as a \emph{definition} of what a voltage is.
+\begin{defi}[Voltage]\index{voltage}
+  A \emph{voltage} $W$ is a function on $\Omega$ that is harmonic on $\Omega \setminus \{a, z\}$.
+\end{defi}
+
+The first theorem to prove is that given any two values $W(a)$ and $W(z)$, we can find a unique voltage with the prescribed values at $a$ and $z$.
+
+More generally, if $B \subseteq \Omega$, and $X$ is a Markov chain with matrix $P$, then we write
 \[
   \tau_B = \min\{t \geq 0: X_t \in B\},
 \]
@@ -1413,8 +1596,8 @@ If $B \subseteq \Omega$, and $X$ is a Markov chain with matrix $P$, then we writ
   It is obvious that $h(x) = f(x)$ for $x \in B$. Let $x \not\in B$. Then
   \begin{align*}
     h(x) &= \E_x [f(X_{\tau_B})] \\
-    &= \sum_y \P(x, y) \E_x[f(X_{\tau_B} \mid X_1 = y]\\
-    &= \sum_y \P(x, y) \E_y[f(X_{\tau_B}]\\
+    &= \sum_y \P(x, y) \E_x[f(X_{\tau_B}) \mid X_1 = y]\\
+    &= \sum_y \P(x, y) \E_y[f(X_{\tau_B})]\\
     &= \sum_Y \P(x, y) h(y)
   \end{align*}
   So $h$ is harmonic.
@@ -1428,55 +1611,16 @@ If $B \subseteq \Omega$, and $X$ is a Markov chain with matrix $P$, then we writ
   Since we assumed $G$ is connected, we can construct a path from $x$ to the boundary, where $g$ vanishes. So $g(x) = 0$. In other words, $\max g = 0$. Similarly, $\min g = 0$. So $g = 0$.
 \end{proof}
 
-One way to understand this weighted graph is as an electrical network. Let $G = (V, E)$ be a finite connected graph with conductances $(c(e))$ and resistances on the edges given by
-\[
-  r(e) = \frac{1}{c(e)}.
-\]
-\begin{defi}[Flow]\index{flow}
-  A \emph{flow} $\theta$ on $G$ is a function defined on oriented edges which is anti-symmetric, i.e.\ $\theta(x, y) = - \theta(y, x)$.
-\end{defi}
-
-\begin{defi}[Divergence]\index{divergence}
-  The \emph{divergence} of a flow $\theta$ is
-  \[
-    \div \theta (x) = \sum_{y \sim x} \theta(x, y).
-  \]
-\end{defi}
-By the antisymmetry property, we have
-\[
-  \sum_x \div \theta(x) = \sum_x \sum_{y \sim x} \theta(x, y) = \sum_{x \sim y} \theta(x, y) = 0.
-\]
-We shall have $2$ distinguished vertices, $a$ and $z$, called the \term{source} and the \term{sink} respectively.
-
-\begin{defi}[Flow from $a$ to $z$]\index{flow}
-  A flow $\theta$ from $a$ to $z$ is a flow such that
-  \begin{enumerate}
-    \item $\div \theta(x) = 0$ for all $x \not \in \{a, z\}$. \hfill (\term{Kirchhoff's node law})
-    \item $\div \theta(a) \geq 0$.
-  \end{enumerate}
-  The \term{strength} of the flow from $a$ to $z$ is $\|\theta\| = \div \theta(a)$.\index{$\|\theta\|$}
-
-  We say this is a \term{unit flow} if $\|\theta\| = 1$.
-\end{defi}
-Since $\sum \div \theta(x) = 0$, a flow from $a$ to $z$ satisfies $\div \theta(z) = - \div \theta(a)$.
-
-\begin{defi}[Voltage]\index{voltage}
-  A \emph{voltage} $W$ is a harmonic function on $\Omega \setminus \{a, z\}$.
-\end{defi}
-Such a harmonic function is uniquely determined by the values on $a$ and $z$.
+Given a voltage, Ohm's law\index{Ohm's law} defines a natural flow, called the \emph{current flow}.
 \begin{defi}[Current flow]\index{current flow}
   The \emph{current flow} associated to the voltage $W$ is
   \[
     I(x, y) = \frac{W(x) - W(y)}{r(x, y)} = c(x, y) (W(x) - W(y)).
   \]
 \end{defi}
-One checks that $I$ is indeed a flow. By definition, $I$ satisfies \term{Ohm's law}:
+The current flow has an extra property, namely that it satisfies the \term{cycle law}. For any cycle $e_1, e_2, \ldots, e_n$, we have
 \[
-  W(x) - W(y) = r(x, y) I(x, y).
-\]
-Also, $I$ satisfies the \term{cycle law}, i.e.\ for any cycle $\vec{e}_1, \vec{e}_2, \ldots, \vec{e}_n$, we have
-\[
-  \sum_{i = 1}^n r(\vec{e}_i) I (\hat{e}_i) = 0.
+  \sum_{i = 1}^n r(e_i) I (e_i) = 0.
 \]
 
 \begin{prop}
@@ -1484,19 +1628,23 @@ Also, $I$ satisfies the \term{cycle law}, i.e.\ for any cycle $\vec{e}_1, \vec{e
 \end{prop}
 
 \begin{proof}
-  Take $f = \theta - I$. Then $f$ is a flow which satisfies Kirchhoff's node law at all vertices and the cycle law for any cycle. We want to show that $f - 0$. Suppose not. The we can find some $\vec{e}_1$ such that $f(e_i) > 0$. But
+  Take $f = \theta - I$. Then $f$ is a flow which satisfies Kirchhoff's node law at all vertices and the cycle law for any cycle. We want to show that $f = 0$. Suppose not. The we can find some $e_1$ such that $f(e_i) > 0$. But
   \[
     \sum_{y\sim x} f(x, y) = 0
   \]
-  for all $x$, so there must exist an edge $\vec{e}_i$ that $\hat{e}_1$ leads to such that $f(\vec{e}_2) > 0$. Continuing this way, we will get a cycle of ordered edges where $f > 0$, which violates the cycle law.
+  for all $x$, so there must exist an edge $e_2$ that $e_1$ leads to such that $f(e_2) > 0$. Continuing this way, we will get a cycle of ordered edges where $f > 0$, which violates the cycle law.
 \end{proof}
 Let $W_0$ be a voltage with $W_0(a) = 1$ and $W_0(z) = 0$, and let $I_0$ be the current associated to $W_0$. Then any other voltage $W$ can be written as
 \[
-  W(x) = (W(a) - W(z) W_0(x) + W(z).
+  W(x) = (W(a) - W(z)) W_0(x) + W(z).
 \]
-Let $I$ be the current associated to $W$. Then
+So, noting that $W_0(a) = 1$, we have
 \[
-  \|I\| = \sum_{x \sim a} i(a, x) = \sum_{x \sim a} \frac{W(a) - W(x)}{r(a, z)} = (W(a) - W(z)) \|I_0\|.
+  W(a) = W(x) = (W(a) - W(z))(W_0(a) - W_0(x)).
+\]
+Thus, if $I$ is the current associated to $W$, then
+\[
+  \|I\| = \sum_{x \sim a} I(a, x) = \sum_{x \sim a} \frac{W(a) - W(x)}{r(a, x)} = (W(a) - W(z)) \|I_0\|.
 \]
 So we know that
 \[
@@ -1505,17 +1653,17 @@ So we know that
 and in particular does not depend on $W$.
 
 \begin{defi}[Effective resistance]\index{Effective resistance}
-  The \emph{effective resistance} $R_{eff}(a, z)$ of an electric network is defined to be the ratio
+  The \emph{effective resistance} $R_{\mathrm{eff}}(a, z)$ of an electric network is defined to be the ratio
   \[
-    R_{eff}(a, z) = \frac{W(a) - W(z)}{\|I\|}
+    R_{\mathrm{eff}}(a, z) = \frac{W(a) - W(z)}{\|I\|}
   \]
-  for any voltage $W$ with associated current $I$. The \term{effective conductance} is $C_{eff}(a, z) = \frac{1}{R_{eff}(a, z)}$.
+  for any voltage $W$ with associated current $I$. The \term{effective conductance} is $C_{\mathrm{eff}}(a, z) = R_{\mathrm{eff}}(a, z)^{-1}$.
 \end{defi}
 
 \begin{prop}
   Take a weighted random walk on $G$. Then
   \[
-    \P_a(\tau_z < \tau_a^+) = \frac{1}{c(a) R_{eff}(a, z)},
+    \P_a(\tau_z < \tau_a^+) = \frac{1}{c(a) R_{\mathrm{eff}}(a, z)},
   \]
   where $\tau_a^+ = \min \{t \geq 1: X_t = a\}$.
 \end{prop}
@@ -1535,32 +1683,32 @@ and in particular does not depend on $W$.
     &= \sum_{x \sim a} \frac{c(a, x)}{c(a)} \frac{W(a) - W(x)}{W(a) - W(z)}\\
     &= \frac{1}{c(a) (W(a) - W(z))} \sum_{x \sim a}I(a, x)\\
     &= \frac{\|I\|}{c(a) (W(a) - W(z))}\\
-    &= \frac{1}{c(a) R_{eff}(a, z)}.
+    &= \frac{1}{c(a) R_{\mathrm{eff}}(a, z)}.\qedhere
   \end{align*}
 \end{proof}
 
 \begin{defi}[Green kernel]\index{Green kernel}
   Let $\tau$ be a stopping time. We define the \emph{Green kernel} to be
   \[
-    G_\tau(a, x) = \E_a \left[ \sum_{t = 0}^\infty \mathbf{1}(X_t = x, \tau > t)\right].
+    G_\tau(a, x) = \E_a \left[ \sum_{t = 0}^\infty \mathbf{1}(X_t = x, t < \tau)\right].
   \]
 \end{defi}
-
+This is the expected number of times we hit $x$ before $\tau$ occurs.
 \begin{cor}
   For any reversible chain and all $a, z$, we have
   \[
-    G_{\tau_z}(a, a) = c(a) R_{eff}(a, z).
+    G_{\tau_z}(a, a) = c(a) R_{\mathrm{eff}}(a, z).
   \]
 \end{cor}
 
 \begin{proof}
   By the Markov property, the number of visits to $a$ starting from $a$ until $\tau_z$ is the geometric distribution $Geo(\P_a(\tau_z < \tau_a^+))$. So
   \[
-    G_{\tau_z}(a, a) = \frac{1}{\P_a(\tau_z < \tau_a^+)} = c(a) R_{eff}(a, z).
+    G_{\tau_z}(a, a) = \frac{1}{\P_a(\tau_z < \tau_a^+)} = c(a) R_{\mathrm{eff}}(a, z).\qedhere
   \]
 \end{proof}
 
-From high school physics, we know that conductances in parallel add:
+Practically, to compute the effective resistance, it is useful to know some high school physics. For example, we know that conductances in parallel add:
 \begin{center}
   \begin{tikzpicture}
     \draw (0, 0) -- (1, 0) -- (1, 0.5) -- (2, 0.5);
@@ -1574,18 +1722,18 @@ From high school physics, we know that conductances in parallel add:
     \node at (5.5, 0) {$=$};
 
     \draw (6.5, 0) -- (7.5, 0);
-    \draw [decorate, decoration={zigzag}] (7.5, 0) -- (8, 0) node [pos=0.5, above] {$c_2$};
+    \draw [decorate, decoration={zigzag}] (7.5, 0) -- (8, 0) node [pos=0.5, above] {$c_1 + c_2$};
     \draw (8, 0) -- (9, 0);
   \end{tikzpicture}
 \end{center}
 
-In general, let $e_1$ and $e_2$ be $2$ edges with the same endvertices. Then we we can replace them by a single edge of conductance the sum of the conductances. The voltages and currents remain unchanged outside of $e_1, e_2$. We can check Kirchhoff's and Ohm's law with
+Thus, if $e_1$ and $e_2$ are two edges with the same endvertices, then we we can replace them by a single edge of conductance the sum of the conductances. We can prove that this actually works by observing that the voltages and currents remain unchanged outside of $e_1, e_2$, and we check that Kirchhoff's and Ohm's law are satisfied with
 \[
-  I(\vec{e}) = I(\vec{e}_1) + I(\vec{e}_2).
+  I(e) = I(e_1) + I(e_2).
 \]
-Similarly, resistances in series add. Let $v$ be a node of degree $2$ and let $v_1$ and $v_2$ be its $2$ neighbours. Then we can replace these $2$ edges by a single edge of resistance $r_1 + r_2$. We can check Kirchoff's and Ohm's law with
+Similarly, resistances in series add. Let $v$ be a node of degree $2$ and let $v_1$ and $v_2$ be its $2$ neighbours. Then we can replace these $2$ edges by a single edge of resistance $r_1 + r_2$. Again, to justify this, we check Kirchoff's and Ohm's law with
 \[
-  I(\vec{v_1 v_2}) = I(\vec{v_1 v}) + I(\vec{vv_2}).
+  I(v_1 v_2) = I(v_1 v) + I(vv_2).
 \]
 \begin{center}
   \begin{tikzpicture}
@@ -1599,20 +1747,26 @@ Similarly, resistances in series add. Let $v$ be a node of degree $2$ and let $v
     \node [below] at (1.5, 0) {$v$};
     \node [below] at (3, 0) {$v_2$};
 
+    \node [circ] at (0, 0) {};
+    \node [circ] at (1.5, 0) {};
+    \node [circ] at (3, 0) {};
+
     \node at (4, 0) {$=$};
     \draw (5, 0) -- (6, 0);
-    \draw (6, 0) -- (6.5, 0) node [pos=0.5, above] {$r_1 + r_2$};
+    \draw [decorate, decoration={zigzag}] (6, 0) -- (6.5, 0) node [pos=0.5, above] {$r_1 + r_2$};
     \draw (6.5, 0) -- (7.5, 0);
+    \node [circ] at (5, 0) {};
+    \node [circ] at (7.5, 0) {};
   \end{tikzpicture}
 \end{center}
 
 We can also glue $2$ vertices of the same potential, keeping all other edges. Current and potential are unchanged since current doesn't flow if there is the same potential.
 
 \begin{ex}
-  Let $T$ be a finite connected tree, and $a, z$ two vertices. Then $R_{eff}(a, z)$ is the graph distance between $a$ and $z$.
+  Let $T$ be a finite connected tree, and $a, z$ two vertices. Then $R_{\mathrm{eff}}(a, z)$ is the graph distance between $a$ and $z$.
 \end{ex}
 
-We now provide an alternative characterization of the effective resistance.
+It turns out it is not convenient to work with our definition of effective resistance. Instead, we can use the well known result from high school physics $P = IV = I^2 R$. For any flow, we define
 
 \begin{defi}[Energy]\index{energy}
   Let $\theta$ be a flow on $G$ with conductances $(c(e))$. Then the \emph{energy} is
@@ -1621,13 +1775,14 @@ We now provide an alternative characterization of the effective resistance.
   \]
   Here we sum over unoriented edges.
 \end{defi}
+Note that given any flow, we can always increase the energy by pumping more and more current along a cycle. Thus, we might expect the lowest energy configuration to be given by the flows satisfying the cycle law, and if we focus on unit flows, the following should not be surprising:
 
 \begin{thm}[Thomson's principle]\index{Thomson's principle}
   Let $G$ be a finite connected graph with conductances $(c(e))$. Then for any $a, z$, we have
   \[
-    R_{eff}(a, z) = \inf \{\mathcal{E}(\theta): \text{$\theta$ is a unit flow from $a$ to $z$}\}.
+    R_{\mathrm{eff}}(a, z) = \inf \{\mathcal{E}(\theta): \text{$\theta$ is a unit flow from $a$ to $z$}\}.
   \]
-  Moreover, there is a unique minimizer, which is the unit current flow from $a$ to $z$.
+  Moreover, the unit current flow from $a$ to $z$ is the unique minimizer.
 \end{thm}
 
 \begin{proof}
@@ -1644,21 +1799,21 @@ We now provide an alternative characterization of the effective resistance.
   So we know
   \begin{align*}
     \sum_e i(e) k(e) r(e) &= \frac{1}{2} \sum_x \sum_{y \sim x} (\varphi(x) - \varphi(y)) k(x, y)\\
-    &= \frac{1}{2} \sum_x \sum_{y \sim x} \varphi(x)k(x, y) + \frac{1}{2} \sum_x \sum_{y \sin x} \varphi(x) k(x, y).
+    &= \frac{1}{2} \sum_x \sum_{y \sim x} \varphi(x)k(x, y) + \frac{1}{2} \sum_x \sum_{y \sim x} \varphi(x) k(x, y).
   \end{align*}
   Now note that $\sum_{y \sim x} k(x, y) = 0$ for any $x$ since $k$ has zero strength. So this vanishes.
 
-  Thus,
+  Thus, we get
   \[
     \mathcal{E}(j) = \mathcal{E}(i) + \mathcal{E}(k),
   \]
   and so $\mathcal{E}(j) \geq \mathcal{E}(i)$ with equality iff $\mathcal{E}(k) = 0$, i.e.\ $k(e) = 0$ for all $e$.
 \end{proof}
-
+Using this characterization, it is then immediate that
 \begin{thm}[Rayleigh's monotonicity principle]\index{Rayleigh's monotonicity principle}\index{monotonicity principle}
   Let $G$ be a finite connected graph and $(r(e))_e$ and $(r'(e))_e$ two sets of resistances on the edges such that $r(e) \leq r'(e)$ for all $e$. Then
   \[
-    R_{eff}(a, z; r) \leq R_{eff}(a, z; r').
+    R_{\mathrm{eff}}(a, z; r) \leq R_{\mathrm{eff}}(a, z; r').
   \]
   for all $a, z \in G$.
 \end{thm}
@@ -1681,9 +1836,9 @@ We now provide an alternative characterization of the effective resistance.
 \begin{proof}
   We have
   \[
-    \P_a(\tau_z < \tau_z^+) = \frac{1}{c(a) R_{eff}(a, z)}.
+    \P_a(\tau_z < \tau_z^+) = \frac{1}{c(a) R_{\mathrm{eff}}(a, z)}.
   \]
-  We can think of the new edge as an edge having infinite resistance in the old graph. By decreasing it to a finite number, we decrease $R_{eff}$.
+  We can think of the new edge as an edge having infinite resistance in the old graph. By decreasing it to a finite number, we decrease $R_{\mathrm{eff}}$.
 \end{proof}
 
 \begin{defi}[Edge cutset]\index{edge cutset}\index{cutset}
@@ -1693,9 +1848,10 @@ We now provide an alternative characterization of the effective resistance.
 \begin{thm}[Nash--Williams inequality]\index{Nash--Williams inequality}
   Let $(\Pi_k)$ be disjoint edge-cutsets separating $a$ from $z$. Then
   \[
-    R_{eff}(a, z) \geq \sum_k \left(\sum_{e \in \Pi_k}c(e)\right)^{-1}.
+    R_{\mathrm{eff}}(a, z) \geq \sum_k \left(\sum_{e \in \Pi_k}c(e)\right)^{-1}.
   \]
 \end{thm}
+The idea is that if we combine all paths in each $\Pi_k$ to a single path with conductance $\sum_{e \in \Pi_k} c(e)$, then every path has to use all of these edges, so we can bound the effective resistance.
 
 \begin{proof}
   By Thompson, it suffices to prove that for any unit flow $\theta$ from $a$ to $z$, we have
@@ -1708,24 +1864,24 @@ We now provide an alternative characterization of the effective resistance.
   \]
   We now use Cauchy--Schwarz to say
   \begin{align*}
-    \left(\sum_{e \in \Pi_k} (\theta(e))^2 r(e)\right) \left(\sum_{e \in \Pi_k}c(e)\right) &\geq \left(\sum_{e \in \Pi_k} |\theta(e) \sqrt{r(e) c(e)} \right)^2\\
-    &= \left(\sum_{e \in \Pi_k} |\theta(e)|\right)^3.
+    \left(\sum_{e \in \Pi_k} (\theta(e))^2 r(e)\right) \left(\sum_{e \in \Pi_k}c(e)\right) &\geq \left(\sum_{e \in \Pi_k} |\theta(e)| \sqrt{r(e) c(e)} \right)^2\\
+    &= \left(\sum_{e \in \Pi_k} |\theta(e)|\right)^2.
   \end{align*}
-  The result follows if we show that the final sum is $\geq \|\theta\|^2i = 1$.
+  The result follows if we show that the final sum is $\geq 1$.
 
   Let $F$ be the component of $G \setminus \Pi_k$ containing $a$. Let $F'$ be the set of all edges that start in $F$ and land outside $F$. Then we have
   \[
-    1 = \sum_{x \in F} \div \theta(x) \leq \sum_{e \in F'} |\theta(e)| \leq \sum_{e \in \Pi_k} |\theta(e)| \leq \sum_{e \in \Pi_k} |\theta(e)|.
+    1 = \sum_{x \in F} \div \theta(x) \leq \sum_{e \in F'} |\theta(e)| \leq \sum_{e \in \Pi_k} |\theta(e)|.\qedhere
   \]
 \end{proof}
 
 \begin{cor}
   Consider $B_n = [1, n]^2 \cap \Z^2$. Then
   \[
-    R_{eff}(a, z) \geq \frac{1}{2} \log (n - 1).
+    R_{\mathrm{eff}}(a, z) \geq \frac{1}{2} \log (n - 1).
   \]
 \end{cor}
-There is also an upper bound of the form $R_{eff}(a, z) \leq c \log n$. So this is indeed the correct order. The proof involves constructing an explicit flow with this energy.
+There is also an upper bound of the form $R_{\mathrm{eff}}(a, z) \leq c \log n$. So this is indeed the correct order. The proof involves constructing an explicit flow with this energy.
 
 \begin{proof}
   Take
@@ -1738,23 +1894,24 @@ There is also an upper bound of the form $R_{eff}(a, z) \leq c \log n$. So this 
   \]
   and so
   \[
-    R_{eff}(a, z) \geq \sum_{k = 1}^{ - 1} \frac{1}{|\Pi_k|} \geq \frac{1}{2} \log (n - 1)
+    R_{eff}(a, z) \geq \sum_{k = 1}^{ - 1} \frac{1}{|\Pi_k|} \geq \frac{1}{2} \log (n - 1).\qedhere
   \]
-\end{proof}.
+\end{proof}
 
+We shall need the following result:
 \begin{prop}
   Let $X$ be an irreducible Markov chain on a finite state space. Let $\tau$ be a stopping time such that $\P_a(X_\tau = a) = 1$ and $\E_a[\tau] < \infty$ for some $a$ in the state space. Then
   \[
-    G_\tau(a, x) = \pi(x) \E_a[\tau]. % invariant distribution. % G(a, x) is the number of times we hit x before tau happens
+    G_\tau(a, x) = \pi(x) \E_a[\tau].
   \]
 \end{prop}
 A special case of this result was proven in IB Markov Chain, where $\tau$ was taken to be the first return time to $a$. The proof of this is very similar, and we shall not repeat it.
 
-We can now prove the commute-time identity.
+Using this, we can prove the commute-time identity.
 \begin{thm}[Commute time identity]\index{commute time identity}
   Let $X$ be a reversible Markov chain on a finite state space. Then for all $a, b$, we have
   \[
-    \E_a [\tau_b] + \E_b[ \tau_a] = c(G) R_{eff}(a, b),
+    \E_a [\tau_b] + \E_b[ \tau_a] = c(G) R_{\mathrm{eff}}(a, b),
   \]
   where
   \[
@@ -1765,26 +1922,24 @@ We can now prove the commute-time identity.
 \begin{proof}
   Let $\tau_{a,b}$ be the first time we hit $a$ after we hit $b$. Then $\P_a(X_{\tau_{a, b}} = a) = 1$. By the proposition, we have
   \[
-    G_{\tau_{a, b}}(a, a) = \pi_(a) \E_a[\tau_{a,b}].
+    G_{\tau_{a, b}}(a, a) = \pi(a) \E_a[\tau_{a,b}].
   \]
   Since starting from $a$, the number of times we come back to $A$ by $\tau_{a, b}$ is the same as up to time $\tau_b$, we get
   \[
-    G_{\tau_{a,b}}(a, a) = G_{\tau_b}(a, a) = c(a) R_{eff}(a, b).
+    G_{\tau_{a,b}}(a, a) = G_{\tau_b}(a, a) = c(a) R_{\mathrm{eff}}(a, b).
   \]
   Combining the two, we get
   \[
-    \pi(a) \E_a[\tau_{a, b}] = c(a) R_{eff}(a, b).
+    \pi(a) \E_a[\tau_{a, b}] = c(a) R_{\mathrm{eff}}(a, b).
   \]
   Thus, the result follows.
 \end{proof}
 In particular, from the commute-time identity, we see that the effective resistance satisfies the triangle inequality, and hence defines a metric on any graph.
 
 \subsection{Infinite graphs}
-Let's now see how we can define effective resistance on infinite graphs.
+Finally, let's think a bit about how we can develop the same theory for infinite graphs.
 
-Let $G$ be an infinite connected weighted graph with conductances $(c(e))_e$. Let $0$ be a distinguished vertex.
-
-Let $(G_k = (V_k, E_k))_k$ be an \term{exhaustion} of $G$ by finite graphs, i.e.
+Let $G$ be an infinite connected weighted graph with conductances $(c(e))_e$. Let $0$ be a distinguished vertex. Let $(G_k = (V_k, E_k))_k$ be an \term{exhaustion} of $G$ by finite graphs, i.e.
 \begin{itemize}
   \item $V_k \subseteq V_{k + 1}$ for all $k$;
   \item $0 \in V_k$ for all $k$;
@@ -1796,17 +1951,15 @@ Let $G_n^*$ be the graph obtained by gluing all the vertices of $V \setminus V_n
 \[
   c(x, z_n) = \sum_{z \in V \setminus V_n} c(x, z)
 \]
-for all $x \in V_n$. Now observe that $R_{eff}(0, z_n; G_n^*)$ is a non-decreasing function of $n$ (Rayleigh). So the limit as $n \to \infty$ exists.
-
-We set \index{$R_{eff}(0, \infty)$}
+for all $x \in V_n$. Now observe that $R_{\mathrm{eff}}(0, z_n; G_n^*)$ is a non-decreasing function of $n$ (Rayleigh). So the limit as $n \to \infty$ exists. We set \index{$R_{\mathrm{eff}}(0, \infty)$}
 \[
-  R_{eff}(0, \infty) = \lim_{n \to \infty} R_{eff}(0, z_n; G_n*).
+  R_{\mathrm{eff}}(0, \infty) = \lim_{n \to \infty} R_{\mathrm{eff}}(0, z_n; G_n*).
 \]
 This is independent of the choice of exhaustion by Rayleigh. % or by interlacing.
 
 Now we have
 \[
-  \P_0(\tau_0^+ = \infty) = \lim_{n \to \infty} \P_0(\tau_{z_n} < \tau_0^+) = \frac{1}{c(0) R_{eff}(0, z_n; G_n^*)} = \frac{1}{c(0) R_{eff}(0, \infty)}.
+  \P_0(\tau_0^+ = \infty) = \lim_{n \to \infty} \P_0(\tau_{z_n} < \tau_0^+) = \frac{1}{c(0) R_{\mathrm{eff}}(0, z_n; G_n^*)} = \frac{1}{c(0) R_{\mathrm{eff}}(0, \infty)}.
 \]
 \begin{defi}[Flow]\index{flow}
   Let $G$ be an infinite graph. A \emph{flow} $\theta$ from $0$ to $\infty$ is an anti-symmetric function on the edges such that $\div \theta(x) = 0$ for all $x \not= 0$.
@@ -1815,7 +1968,7 @@ Now we have
 \begin{thm}
   Let $G$ be an infinite connected graph with conductances $(c(e))_e$. Then
   \begin{enumerate}
-    \item Random walk on $G$ is recurrent iff $R_{eff}(0, \infty) = \infty$.
+    \item Random walk on $G$ is recurrent iff $R_{\mathrm{eff}}(0, \infty) = \infty$.
     \item The random walk is transient iff there exists a unit flow $i$ from $0$ to $\infty$ of finite energy
       \[
         \mathcal{E}(i) = \sum_e (i(e))^2 r(e).
@@ -1826,13 +1979,13 @@ Now we have
 \begin{proof}
   The first part is immediate since
   \[
-    \P_0(\tau_0^+ = \infty) = \frac{1}{c(0) R_{eff}(0, \infty)}.
+    \P_0(\tau_0^+ = \infty) = \frac{1}{c(0) R_{\mathrm{eff}}(0, \infty)}.
   \]
   To prove the second part, let $\theta$ be a unit flow from $0$ to $\infty$ of finite energy. We want to show that the effective resistance is finite, and it suffices to extend Thompson's principle to infinite graphs.
 
   Let $i_n$ be the unit current flow from $0$ to $z_n$ in $G_n^*$. Let $v_n(x)$ be the associated potential. Then by Thompson,
   \[
-    R_{eff}(0, z_n; G_n^*) = \mathcal{E}(i_n).
+    R_{\mathrm{eff}}(0, z_n; G_n^*) = \mathcal{E}(i_n).
   \]
   Let $\theta_n$ be the restriction of $\theta$ to $G_n^*$. Then this is a unit flow on $G_n^*$ from $0$ to $z_n$. By Thompson, we have
   \[
@@ -1840,13 +1993,13 @@ Now we have
   \]
   So
   \[
-    R_{eff}(0, \infty) = \lim_{n \to \infty} \mathcal{E}(i_n).
+    R_{\mathrm{eff}}(0, \infty) = \lim_{n \to \infty} \mathcal{E}(i_n).
   \]
   So by the first part, the flow is transient.
 
   Conversely, if the random walk is transient, we want to construct a unit flow from $0$ to $\infty$ of finite energy. The idea is to define it to be the limit of $(i_n)(x, y)$.
 
-  By the first part, we know $R_{eff}(0, \infty) = \lim \mathcal{E}(i_n) < \infty$. So there exists $M > 0$ such that $\mathcal{E}(i_n) \leq M$ for all $n$. Starting from $0$, let $Y_n(x)$ be the number of visits to $x$ up to time $\tau_{z_n}$. Let $Y(x)$ be the total number of visits to $x$. Then $Y_n(x) \nearrow Y(x)$ as $n \to \infty$ almost surely.
+  By the first part, we know $R_{\mathrm{eff}}(0, \infty) = \lim \mathcal{E}(i_n) < \infty$. So there exists $M > 0$ such that $\mathcal{E}(i_n) \leq M$ for all $n$. Starting from $0$, let $Y_n(x)$ be the number of visits to $x$ up to time $\tau_{z_n}$. Let $Y(x)$ be the total number of visits to $x$. Then $Y_n(x) \nearrow Y(x)$ as $n \to \infty$ almost surely.
 
   By monotone convergence, we get that
   \[
@@ -1888,9 +2041,9 @@ Note that this connection with electrical networks only works for reversible Mar
 \begin{proof}[Proof sketch]
   For $d = 2$, if we glue all vertices at distance $n$ from $0$, then
   \[
-    R_{eff}(0, \infty) \geq \sum_{i = 1}^{n - 1} \frac{1}{8i - 4} \geq c \cdot \log n
+    R_{\mathrm{eff}}(0, \infty) \geq \sum_{i = 1}^{n - 1} \frac{1}{8i - 4} \geq c \cdot \log n
   \]
-  using the parallel and series laws. So $R_{eff}(0, \infty) = \infty$. So we are recurrent.
+  using the parallel and series laws. So $R_{\mathrm{eff}}(0, \infty) = \infty$. So we are recurrent.
 
   For $d = 3$, we can construct a flow as follows --- let $S$ be the sphere of radius $\frac{1}{4}$ centered at the origin. Given any edge $\mathbf{e}$, take the unit square centered at the midpoint $\mathbf{m}_e$ of $\mathbf{e}$ and has normal $\mathbf{e}$. We define $|\theta(\mathbf{e})|$ to be the area of the radial projection on the sphere, with positive sign iff $\bra \mathbf{m}_e, \mathbf{e} \ket > 0$.
 
@@ -1904,13 +2057,13 @@ Note that this connection with electrical networks only works for reversible Mar
 \begin{proof}[Another proof sketch]
   We consider a binary tree $T_\rho$ with edges joining generation to $n + 1$ having resistance $\rho^n$ for $\rho$ to be determined. Then
   \[
-    R_{eff}(T_\rho) = \sum_{n = 1}^\infty \left(\frac{\rho}{2}\right)^n,
+    R_{\mathrm{eff}}(T_\rho) = \sum_{n = 1}^\infty \left(\frac{\rho}{2}\right)^n,
   \]
   and this is finite when $\rho < 2$.
 
   Now we want to embed this in $\Z^3$ in such a way that neighbours in $T_\rho$ of generation $n$ and $n + 1$ are separated by a path of length of order $\rho^n$. In generation $n$ of $T_\rho$, there are $2^n$ vertices. On the other hand, the number of vertices at distance $n$ in $\Z^3$ will be of order $(\rho^n)^2$. So we need $(\rho^n)^2 \geq 2^n$. So we need $\rho > \sqrt{2}$. We can then check that
   \[
-    R_{eff}(0, \infty; \Z^3) \leq c \cdot R_{eff}(T_\rho) < \infty.
+    R_{\mathrm{eff}}(0, \infty; \Z^3) \leq c \cdot R_{\mathrm{eff}}(T_\rho) < \infty.\qedhere
   \]
 \end{proof}
 Note that this method is rather robust. We only need to be able to embed our $T_\rho$ into $\Z^3$. Using a similar method, Grimmett, Kesten and Zhang (1993) showed that simple random walk on a supercritical bond percolation is transient for $d \geq 3$.
@@ -1921,7 +2074,7 @@ The relation between uniform spanning trees and electrical networks was discover
 \begin{thm}[Foster's theorem]\index{Foster's theorem}
   Let $G = (V, E)$ be a finite weighted graph on $n$ vertices. Then
   \[
-    \sum_{e \in E}e \in _{eff}(e) = n - 1.
+    \sum_{e \in E}R_{\mathrm{eff}}(e) = n - 1.
   \]
 \end{thm}
 We can prove this using the commute-time formula, but there is a one-line proof using this connection between electrical networks and uniform spanning trees.
@@ -1929,20 +2082,20 @@ We can prove this using the commute-time formula, but there is a one-line proof 
   Let $G = (V, E)$ be a finite connected graph. A \emph{spanning tree} $T$ of $G$ is a connected subgraph of $G$ which is a tree\index{tree} (i.e.\ there are no cycles) and contains all the vertices in $G$.
 \end{defi}
 
-Let $\mathcal{T}$ be the set of all spanning trees of $G$. Pick $T \in \mathcal{T}$ uniformly at random. We call it the \term{uniform spanning tree}.
+Let $\mathcal{T}$ be the set of all spanning trees of $G$. Pick $T \in \mathcal{T}$ uniformly at random. We call it the \term{uniform spanning tree}. We shall prove the following theorem:
 \begin{thm}
   Let $e \not= f \in E$. Then
   \[
     \P(e \in T \mid f \in T) \leq \P(e \in T).
   \]
 \end{thm}
-We can ask a very similar question --- if we instead considered all spanning \emph{forests} instead, do we get the same result? Intuitively, we should, but it turns out this is an open question.
+It is tempting to ask a very similar question --- if we instead considered all spanning \emph{forests}, do we get the same result? Intuitively, we should, but it turns out this is an open question. So let's think about trees instead.
 
 In order to prove this, we need the following result:
 \begin{thm}[Kirchoff]
   Let $T$ be a uniform spanning tree, $e$ an edge. Then
   \[
-    \P(e \in T) = R_{eff}(e)
+    \P(e \in T) = R_{\mathrm{eff}}(e)
   \]
 \end{thm}
 Of course, this immediately implies Foster's theorem, since every tree has $n - 1$ edges.
@@ -2012,9 +2165,9 @@ We can now prove the theorem we wanted to prove.
   \[
     \P(e \in T \mid f \in T) = \frac{\text{number of spanning trees of $G.f$ containing $e$}}{\text{number of spanning trees of $G.f$}}.
   \]
-  But this is just $\P(e \in \text{UST of $G.f$})$, and this is just $R_{eff}(e; G .f)$. So it suffices to show that
+  But this is just $\P(e \in \text{UST of $G.f$})$, and this is just $R_{\mathrm{eff}}(e; G .f)$. So it suffices to show that
   \[
-    R_{eff}(e; G.f) \leq R_{eff}(e; G).
+    R_{\mathrm{eff}}(e; G.f) \leq R_{\mathrm{eff}}(e; G).
   \]
   But this is clear by Rayleigh's monotone principle, since contracting $f$ is the same as setting the resistance of the edge to $0$.
 \end{proof}
@@ -2025,14 +2178,14 @@ In practice, how can we generate a uniform spanning tree? One way to do so is \t
   Let $x = \bra x_1, \ldots x_n\ket$ be a finite path in the graph $G$. We define the \emph{loop erasure} as follows: for any pair $i < j$ such that $x_i = x_j$, remove $x_{i + 1}, x_{i+2}, \ldots, x_j$, and keep repeating until no such pairs exist.
 \end{defi}
 
-To implement Wilson's algorithm, distinguish a root vertex of $G$, called $r$, and take an ordering of $V$. Define inductively as follows: take the first vertex in the ordering is not in $T_i$. We start a simple random walk from this vertex, and run until it hits $T_i$, and erase the loops. Then set $T_{i + 1}$ to be the union of $T_i$ with this (loop-erased) path. Repeat until all vertices are used.
+To implement Wilson's algorithm, distinguish a root vertex of $G$, called $r$, and take an ordering of $V$. Set $T_0 = \{r\}$. Define $T_i$ inductively as follows: take the first vertex in the ordering is not in $T_i$. We start a simple random walk from this vertex, and run until it hits $T_i$, and erase the loops. Then set $T_{i + 1}$ to be the union of $T_i$ with this (loop-erased) path. Repeat until all vertices are used.
 
 \begin{thm}[Wilson]
   The resulting tree is a uniform spanning tree.
 \end{thm}
 Note that in particular, the choice of ordering is irrelevant to the resulting distribution.
 
-We first describe a way of generating a simple random walk on a graph $G$. Under any vertex $G$, place an infinite number of cards that contain iid instructions, i.e.\ each card tells us to which neighbour we jump. Different vertices have independent stacks. Whenever we are at a vertex $x$, look at the top card underneath it and go to the neighbour it instructs. Then throw away the top card and continue.
+To prove this theorem, it is convenient to have a good model of how the simple random walk on $G$ is generated. Under any vertex $G$, place an infinite number of cards that contain iid instructions, i.e.\ each card tells us to which neighbour we jump. Different vertices have independent stacks. Whenever we are at a vertex $x$, look at the top card underneath it and go to the neighbour it instructs. Then throw away the top card and continue.
 
 Given stacks of cards under the vertices of the graph, by revealing the top card of each vertex, we get a directed graph, where directed edges are of the form $(x, y)$, where $y$ is the instruction on the top card under $x$.
 
@@ -2088,17 +2241,18 @@ How can we generalize Wilson's algorithm to infinite graphs? If the graph is rec
 The \term{Aldous--Broder algorithm} is another way of generating a uniform spanning tree. Run a random walk that visits all vertices at least once. For every vertex other than the root, take the edge the walk crossed the first time it visited the vertex, and keep the edge in the spanning tree. It is an exercise to prove that this does give a uniform spanning tree. Again, this algorithm works only on a recurrent graph. A generalization to transient graphs was found by Hutchcroft.
 
 \subsection{Infinite uniform spanning trees and forests}
-Let $G$ be an infinite recurrent graph. Then we can generate a uniform spanning tree of $G$ by running Wilson's algorithm in the obvious way. If $G$ is an infinite transient graph, then we can define uniform spanning trees by exhaustions.
+Since recurrent graphs are boring, let $G$ be an infinite transient graph. Then a ``naive'' way to define a uniform spanning tree is by exhaustions.
 
 Let $G_n$ be an exhaustion of $G$ by finite graphs. Define $G_n^W$ (where $W$ stands for ``wired'') to be the graph $G_n$, where all of the vertices of $G \setminus G_n$ are glued to a single vertex $z_n$. The ``free'' $G_n$ is just $G_n$ considered as a subgraph. It turns out the wired one is much easier to study.
 
 Let $\mu_n$ be the uniform spanning tree measure on $G_n^W$. Let $B$ be a finite set of edges $B = \{e_1, \ldots, e_n\}$. Then for $T$ a UST of $G_n^W$, we have
-\[
-  \mu_n(B \subseteq T) = \prod_{k = 1}^m \mu(e_k \in T \mid e_j \in T\text{for all }j < k) = \prod_{k = 1}^n R_{eff}(e_k; G_n^W/\{e_j: j < k\}),
-\]
+\begin{align*}
+  \mu_n(B \subseteq T) &= \prod_{k = 1}^m \mu(e_k \in T \mid e_j \in T\text{for all }j < k) \\
+  &= \prod_{k = 1}^n R_{\mathrm{eff}}(e_k; G_n^W/\{e_j: j < k\}),
+\end{align*}
 where $G_n^W/\{e_j: j < k\}$ is the graph obtained from $G_n^W$ by contracting the edges $\{e_j: j < k\}$.
 
-We want to show that $\mu_n$ as a sequence of measures converges. So we want to understand how $R_{eff}(e_k; G_n^W/\{e_j: j < k\})$ changes when we replace $n$ with $n + 1$. By Rayleigh's monotonicity principle, since $G_n^W$ can be obtained from $G_{n + 1}^W$ by contracting more edges, we know the effective resistance increases when we replace $n$ with $n + 1$. So we know that
+We want to show that $\mu_n$ as a sequence of measures converges. So we want to understand how $R_{\mathrm{eff}}(e_k; G_n^W/\{e_j: j < k\})$ changes when we replace $n$ with $n + 1$. By Rayleigh's monotonicity principle, since $G_n^W$ can be obtained from $G_{n + 1}^W$ by contracting more edges, we know the effective resistance increases when we replace $n$ with $n + 1$. So we know that
 \[
   \mu_n(B \subseteq T) \leq \mu_{n + 1}(B \subseteq T).
 \]
@@ -2157,7 +2311,7 @@ As before, the order of $V$ that we take does not affect the final distribution.
   The uniform spanning forest on $\Z^d$ is a single tree almost surely if and only if $d \leq 4$.
 \end{thm}
 
-Note that the above proposition tells us.
+Note that the above proposition tells us
 \begin{prop}[Pemantle]
   The uniform spanning forest is a single tree iff starting from every vertex, a simple random walk intersects an independent loop erased random walk infinitely many times with probability $1$. Moreover, the probability that $x$ and $y$ are in the same tree of the uniform spanning forest is equal to the probability that simple random walk started from $x$ intersects an independent loop-erased random walk started from $y$.
 \end{prop}

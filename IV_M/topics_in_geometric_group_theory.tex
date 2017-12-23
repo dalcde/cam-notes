@@ -6,11 +6,22 @@
 \def\nlecturer {H.\ Wilton}
 \def\ncourse {Topics in Geometric Group Theory}
 \def\ncoursehead {Geometric Group Theory}
-\def\nnotready {}
 
 \input{header}
 
-\usepackage{mathabx}
+\DeclareFontFamily{U}{mathb}{\hyphenchar\font45}
+\DeclareFontShape{U}{mathb}{m}{n}{
+      <5> <6> <7> <8> <9> <10> gen * mathb
+      <10.95> mathb10 <12> <14.4> <17.28> <20.74> <24.88> mathb12
+      }{}
+\DeclareSymbolFont{mathb}{U}{mathb}{m}{n}
+
+% Define a subset character from that font (from mathabx.dcl)
+% to completely replace the \subset character, you can replace
+% \varsubset with \subset
+
+\DeclareMathSymbol{\precneq}{3}{mathb}{"AC}
+
 \newcommand\Cay{\mathrm{Cay}}
 \newcommand{\qi}{\underset{qi}{\simeq}}
 \DeclareMathOperator\Area{Area}
@@ -42,7 +53,7 @@ Part IB Geometry and Part II Algebraic topology are required.
 
 \section{Cayley graphs and the word metric}
 \subsection{The word metric}
-There is this unfortunate tendency for people to think of groups as being part of algebra. Which is, perhaps, reasonable. There are elements and there are operations on them. These operations satisfy some algebraic laws. But there is also geometry involved. For example, one of the simplest non-abelian groups we know is $D_6$, the group of symmetries of a triangle. This is fundamentally a geometric idea, and often this geometric interpretation can let us prove a lot of things about $D_6$.
+There is an unfortunate tendency for people to think of groups as being part of algebra. Which is, perhaps, reasonable. There are elements and there are operations on them. These operations satisfy some algebraic laws. But there is also geometry involved. For example, one of the simplest non-abelian groups we know is $D_6$, the group of symmetries of a triangle. This is fundamentally a geometric idea, and often this geometric interpretation can let us prove a lot of things about $D_6$.
 
 In general, the way we find groups in nature is that we have some object, and we look at its symmetry. In geometric group theory, what we do is that we want to remember the object the group acts on, and often these objects have some geometric structure. In fact, we shall see that all groups are symmetries of some geometric object.
 
@@ -70,7 +81,7 @@ If we stare at the definition, we see that the word metric is left-invariant, i.
   \]
 However, it is usually not the case that the metric is right invariant, i.e.\ $d_S(\gamma_1 g, \gamma_2 g)$ is not equal to $d_S(\gamma_1, \gamma_2)$. This is one of the prices we have to pay for wanting to do geometry.
 
-If we tried to draw our metric space out, it looks pretty unhelpful --- it's just a bunch of dots. It is not path connected. We can't really think about it well. The solution is provided by Cayley graphs.
+If we tried to draw our metric space out, it looks pretty unhelpful --- it's just a bunch of dots. It is not path connected. We can't really think about it well. To fix this, we talk about Cayley graphs.
 
 \begin{defi}[Cayley graph]\index{Cayley graph}
   The \emph{Cayley graph} $\Cay_S(\Gamma)$ is defined as follows:
@@ -78,14 +89,12 @@ If we tried to draw our metric space out, it looks pretty unhelpful --- it's jus
     \item $V(\Cay_S(\Gamma)) = \Gamma$
     \item For each $\gamma \in \Gamma$ and $s \in S$, we draw an edge from $\gamma$ to $\gamma s$.
   \end{itemize}
+  If we want it to be a directed and labelled graph, we can label each edge by the generator $s$.
 \end{defi}
-If we want it to be a directed and labelled graph, we can label the edge by the generator $s$.
 
-How does this relate to the word metric? There is an obvious left action of $\Gamma$ on $\Cay_S(\Gamma)$ which extends the left action of $\Gamma$ on itself. This is since the edge is defined by multiplication of the generator on the \emph{right}.
+There is, of course, an embedding of $\Gamma$ into $\Cay_S(\Gamma)$. Moreover, if we metrize $\Cay_S(\Gamma)$ such that each edge has length $[0, 1]$, then this is an isometric embedding.
 
-Moreover the word metric on $\Gamma$ extends to a metric on $\Cay_S(\Gamma)$ in which every edge is isometric to $[0, 1]$.
-
-Finally, note that $\Cay_S(\Gamma)$ is always regular, where the degree of each vertex is $2|S|$.
+It will be useful for future purposes to note that there is a left action of $\Gamma$ on $\Cay_S(\Gamma)$ which extends the left action of $\Gamma$ on itself. This works precisely because the edges are defined by multiplication on the \emph{right}, and left and right multiplication commute.
 
 \begin{eg}
   Take $\Gamma = C_2 = \Z/2\Z$, and take $S = \{1\}$. Then the Cayley graph looks like
@@ -96,9 +105,8 @@ Finally, note that $\Cay_S(\Gamma)$ is always regular, where the degree of each 
       \node [below] at (0, 0) {$0$};
       \node [below] at (2, 0) {$1$};
 
-      \draw (0, 0) edge [bend left, ->-=0.57] (2, 0); %insert node saying $1$
+      \draw (0, 0) edge [bend left, ->-=0.57] (2, 0);
       \draw (2, 0) edge [bend left, ->-=0.57] (0, 0);
-
     \end{tikzpicture}
   \end{center}
 \end{eg}
@@ -112,7 +120,7 @@ Finally, note that $\Cay_S(\Gamma)$ is always regular, where the degree of each 
       \node [circ] (T) at (1, 1.732) {};
       \node [circ] (LL) at (-0.866, -0.5) {};
       \node [circ] (RR) at (2.866, -0.5) {};
-      \node [circ] (TT) at (1, 2.732) {}; % this is wrong
+      \node [circ] (TT) at (1, 2.732) {};
 
 %      \node [below] at (L) {$1$};
 %      \node at (R) {$(3\; 2\; 1)$};
@@ -223,9 +231,9 @@ Now this seems quite complicated. It's still the same group $\Gamma = \Z$, but w
 \end{eg}
 If one has done algebraic topology, then one might recognize this as the universal cover of a space. This is not a coincidence, and we will talk about this later.
 
-We now return to the problem we noticed previously. The Cayley graph depends a lot on the generating set chosen, but we want to study the graph without picking a generating set.
+Let's now thing a bit more about the choice of generating set. As one would expect, the Cayley graph depends a lot on the generating set chosen, but often we only care about the group itself, and not a group-with-a-choice-of-generating-set.
 
-What we observe is that while the two Cayley graphs of $\Z$ we drew seem quite different, if we looked at them from $100$ meters away, they look quite similar --- they both look like a long, thin line. This is the idea we are trying to formalize.
+The key observation is that while the two Cayley graphs of $\Z$ we drew seem quite different, if we looked at them from $100$ meters away, they look quite similar --- they both look like a long, thin line.
 
 \begin{defi}[Quasi-isometry]\index{quasi-isometry}\index{quasi-isometric embedding}
   Let $\lambda \geq 1$ and $c \geq 0$. A function between metric spaces $f: X \to Y$ is a \emph{$(\lambda, c)$-quasi-isometric embedding} if for all $x_1, x_2 \in X$
@@ -239,7 +247,7 @@ We can think of the first condition as saying we are \term{quasi-injective}, and
 The right way to think about the definition is that the $c$ says we don't care about what happens at scales less than $c$, and the $\lambda$ is saying we allow ourselves to stretch distances. Note that if we take $c = 0$, then this is just the notion of a bi-Lipschitz map. But in general, we don't even require $f$ to be continuous, since continuity is a rather fine-grained property.
 
 \begin{ex}
-  Check that $ X\qi Y$ is an equivalence relation.
+  Check that $X\qi Y$ is an equivalence relation.
 \end{ex}
 This is not immediately obvious, because there is no inverse to $f$. In fact, we need the axiom of choice to prove this result.
 
@@ -249,7 +257,7 @@ This is not immediately obvious, because there is no inverse to $f$. In fact, we
 For this reason, this is not a great point of view for studying finite groups. On the other hand, for infinite groups, this is really useful.
 
 \begin{eg}
-  For any $\Gamma$ and $S$, the inclusion $(\Gamma, \Gamma_S)\hookrightarrow (\Cay_S(\Gamma), d_S)$ is a quasi-isometry (take $\lambda = 1, c = 0, C = \frac{1}{2}$).
+  For any $\Gamma$ and $S$, the inclusion $(\Gamma, d_S)\hookrightarrow (\Cay_S(\Gamma), d_S)$ is a quasi-isometry (take $\lambda = 1, c = 0, C = \frac{1}{2}$).
 \end{eg}
 
 Of course, the important result is that any two word metrics on the same group are quasi-isomorphic.
@@ -260,7 +268,7 @@ Of course, the important result is that any two word metrics on the same group a
 \begin{proof}
   Pick
   \[
-    \lambda = \max_{s \in S} \ell_{S'}(s),\quad \lambda' \max_{s \in S'} \ell_{S}(s),
+    \lambda = \max_{s \in S} \ell_{S'}(s),\quad \lambda' = \max_{s \in S'} \ell_{S}(s),
   \]
   We then see
   \[
@@ -277,16 +285,17 @@ In order to do that, we must write down a bunch of definitions.
 \begin{defi}[Geodesic]\index{geodesic}
   Let $X$ be a metric space. A \emph{geodesic} in $X$ is an isometric embedding of a closed interval $\gamma: [a, b] \to X$.
 \end{defi}
-This is not exactly the same as the notion in differential geometry. For example, if we have a sphere and two non-antipodal points on the sphere, then there are many geodesics connecting them in the differential geometry sense, but only the shortest one is a geodesic in our sense. To recover the differential geometry notion, we need to insert the words ``locally'' somewhere, but we shall not care about that.
+This is not exactly the same as the notion in differential geometry. For example, if we have a sphere and two non-antipodal points on the sphere, then there are many geodesics connecting them in the differential geometry sense, but only the shortest one is a geodesic in our sense. To recover the differential geometry notion, we need to insert the words ``locally'' somewhere, but we shall not need that.
 
 \begin{defi}[Geodesic metric space]\index{geodesic metric space}\index{metric space!geodesic}
   A metric space $X$ is called \emph{geodesic} if every pair of points $x, y \in X$ is joined by a geodesic denoted by $[x, y]$.
 \end{defi}
-Note that the notation $[x, y]$ is not entirely honest, since there may be many geodesics joining two points.
+Note that the notation $[x, y]$ is not entirely honest, since there may be many geodesics joining two points. However, this notation turns out to work surprisingly well.
 
 \begin{defi}[Proper metric space]\index{proper metric space}
   A metric space is \emph{proper} if closed balls in $X$ are compact.
 \end{defi}
+For example, infinite-dimensional Hilbert spaces are not proper, but finite-dimensional ones are.
 
 \begin{eg}
   If $\Gamma = \langle S\rangle$, then $\Cay_S(\Gamma)$ is geodesic. If $S$ is finite, then $\Cay_S(\Gamma)$ is proper.
@@ -304,7 +313,7 @@ Note that the notation $[x, y]$ is not entirely honest, since there may be many 
 
 We need two more definitions, before we can state the Schwarz--Milnor lemma.
 \begin{defi}[Proper discontinuous action]\index{proper discontinuous action}
-  An action $\Gamma$ on a topological space $X$ is \emph{proper discontinuous} if for every compact set $K$,
+  An action $\Gamma$ on a topological space $X$ is \emph{proper discontinuous} if for every compact set $K$, the set
   \[
     \{g \in \Gamma: gK \cap K \not= \emptyset\}
   \]
@@ -370,7 +379,6 @@ An easy application is that $\Gamma$ acting on its Caylay graph satisfies these 
 \end{eg}
 This gives us some concrete hold on what the group $\pi_1 \Sigma_2$ is like, since people have been thinking about the hyperbolic plane for centuries.
 
-After all those applications, we can start to write down a proof.
 \begin{proof}[Proof of Schwarz--Milnor lemma]
   Let $\bar{B} = \bar{B}(x, R)$ be such that $\Gamma \bar{B} = X$. This is possible since the quotient is compact.
 
@@ -388,9 +396,7 @@ After all those applications, we can start to write down a proof.
   \]
   We will show that $S$ generates $\Gamma$, and use the word metric given by $S$ to show that $\Gamma$ is quasi-isometric to $X$.
 
-  We first show that $\Gamma = \langle S\rangle$. We let $\gamma \in \Gamma$ be arbitrary.
-
-  Let $[x_0, \gamma x_0]$ be a geodesic from $x_0$ to $\gamma x_0$. Let $\ell$ be such that
+  We first show that $\Gamma = \langle S\rangle$. We let $\gamma \in \Gamma$ be arbitrary. Let $[x_0, \gamma x_0]$ be a geodesic from $x_0$ to $\gamma x_0$. Let $\ell$ be such that
   \[
     (\ell - 1)r \leq d(x_0, \gamma x_0) < \ell r.
   \]
@@ -421,16 +427,17 @@ After all those applications, we can start to write down a proof.
   So the orbit map is an orbit-embedding, and quasi-surjectivity follows from cocompactness.
 \end{proof}
 
-If we want to understand a group, then a reasonable strategy now would be to come up with a well-understood (proper geodesic) space for $\Gamma$ to act (proper discontinuously, cocompactly) on, and see what we can tell from this quasi-isometry. There is no general algorithm for doing so, but we shall see that for certain groups, there are some ``obvious'' good choices to make.
 
 \subsection{Free groups}
+If we want to understand a group, then a reasonable strategy now would be to come up with a well-understood (proper geodesic) space for $\Gamma$ to act (proper discontinuously, cocompactly) on, and see what we can tell from this quasi-isometry. There is no general algorithm for doing so, but it turns out for certain groups, there are some ``obvious'' good choices to make.
+
 Let's begin by understanding the free group. In some sense, they are the ``simplest'' groups, but they also contain some rich structure. Roughly speaking, a free group on a set $S$ is a group that is ``freely'' generated by $S$. This freeness is made precise by the following universal property.
 
 \begin{defi}[Free group]\index{free group}\index{$F(S)$}
   Let $S$ be a (usually finite) set. A group $F(S)$ with a map $S \to F(S)$ is called the \emph{free group on $S$} if it satisfies the following universal property: for any set map $S \to G$, there is a unique group homomorphism $F(S) \to G$ such that the following diagram commutes:
   \[
     \begin{tikzcd}
-      S \ar[r] \ar[rd, dashed] & F(S) \ar[d]\\
+      S \ar[r] \ar[rd] & F(S) \ar[d, dashed]\\
       & G
     \end{tikzcd}.
   \]
@@ -441,7 +448,7 @@ In fancy category-theoretic language, this says the functor $F: \mathbf{Sets} \t
 
 This definition is good for some things, but not good for others. One thing it does well is it makes it clear that $F(S)$ is unique up to isomorphism if it exists. However, it is not immediately clear that $F(S)$ exists! (unless one applies the adjoint functor theorem)
 
-Thus, we must concretely construct a group satisfying this property, and this construction is often useful if we actually want to work with the set.
+Thus, we must concretely construct a group satisfying this property. Apart from telling us that $F(S)$ actually exists, a concrete construction lets us actually do things with the group.
 
 For concreteness, suppose $S = \{a_1, \ldots, a_r\}$ is a finite set. We consider a graph
 \[
@@ -549,11 +556,13 @@ We can use this to understand the fundamental group $\pi_1(X_r)$. The elements o
     \draw [mred, ->-=0.1, ->-=0.45, ->-=0.7, ->-=0.9] (0, 0.1) -- (2.9, 0.1) -- (2.9, 1.5) -- (3.1, 1.5) -- (3.1, -1.5) -- (2.9, -1.5) -- (2.9, -0.1) -- (0.1, -0.1) -- (0.1, -3);
   \end{tikzpicture}
 \end{center}
-Since this is a loop, we know it ends at another vertex. Because $\tilde{X}_r$ is a tree, we may homotope $\tilde{\gamma}$ rel endpoints to the unique embedded path from $*$ to the endpoint of $\tilde{\gamma}$. We can push this homotopy down to $X_r$ to get a homotopy of $\gamma$. We can see that $\gamma$ is of the following form:
+In general, there are many paths that represent the same element. However, there is a ``canonical'' such path. Indeed, we can eliminate all backtracks in the path to obtain an embedded path from $*$ to the end point of $\tilde{\gamma}$. We may reparametrize so that it spends equal time on each edge, but that is not important.
+
+Algebraically, how do we understand this? Each loop in $X_r$ represents an element $a_i$ in $\pi_1(X_r)$. If we look at the ``canonical'' form of the path above, then we see that we are writing $\gamma$ in the form
 \[
   \gamma = a_{i_1}^{\pm 1} a_{i_2}^{\pm 1} a_{i_3}^{\pm 1}\cdots a_{i_n}^{\pm 1}.
 \]
-Moreover, since $\tilde{\gamma}$ is now embedded, we know $\gamma$ is reduced, i.e.\ we never see anything looking like $a_i^{\pm 1} a_i^{\mp 1}$. Importantly, this form is unique. There is only one way to write $\gamma$ in this form. This gives us a \term{normal form theorem} for elements in $\pi_1(X_r)$ --- every element in $\pi_1(X_r)$ is represented by a unique reduced word in the generators. So if we have two elements in $\pi_1(X_r)$ expressed as products of generators and their inverses, then to determine if they are equal, we can individually reduce the two words in any way we like, and check if the result is the same.
+The fact that we have eliminated all backtracks says this expression is \emph{reduced}\index{reduced word}, i.e.\ we don't see anything looking like $a_i a_i^{-1}$, or $a_i^{-1} a_i$. Importantly, there is a unique way to write $\gamma$ as a reduced word, corresponding to the unique embedded path from $*$ to the end point of $\tilde{\gamma}$ in the universal cover. Thus, if we somehow expressed $\gamma$ as a \emph{non-reduced} word in the $a_1, \ldots, a_r$, then we can reduce it by removing instances of $a_i a_i^{-1}$ or $a_i^{-1} a_i$, and keep doing so until we don't see any. This terminates since the length of the word is finite, and the result does not depend on the order we performed the reduction in, by uniqueness.
 
 \begin{eg}
   Take the case $\pi_1 X_2 = \langle a, b\rangle$. We might be given a word
@@ -567,7 +576,9 @@ Moreover, since $\tilde{\gamma}$ is now embedded, we know $\gamma$ is reduced, i
   In particular, since this is not the identity, we know the original path was not null-homotopic.
 \end{eg}
 
-As a consequence of this, we see that
+This gives us a very concrete understanding of $\pi_1(X_r)$ --- it is generated by $a_1, \ldots, a_r$, and each element is represented uniquely by a reduced word. To multiply words together, write them one after another, and then reduce the result.
+
+From this description, it is clear that
 \begin{cor}
   $\pi_1(X_r)$ has the universal property of $F(S)$, with $S = \{a_1, \ldots, a_r\}$. So $\pi_1(X_r) \cong F_r$.
 \end{cor}
@@ -581,7 +592,7 @@ As a consequence of this, we see that
 \end{proof}
 
 \subsection{Finitely-presented groups}
-Now if a group $\Gamma$ is generated by $S$, then we have a surjective homomorphism $F(S) \to \Gamma$. Let $K = \ker \eta$. Then
+Let's try to consider groups that are slightly more complex than free groups. If a group $\Gamma$ is generated by $S$, then we have a surjective homomorphism $F(S) \to \Gamma$. Let $K = \ker \eta$. Then the first isomorphism theorem tells us
 \[
   \Gamma \cong \frac{F(S)}{K}.
 \]
@@ -618,7 +629,7 @@ This is not canonical, since we have to pick a maximal tree, but let's not worry
 \end{ex}
 
 \subsection{The word problem}
-Before we try to understand the word problem, let's give some historical perspectives. Long time ago, Poincar\'e was interested in characterizing the $3$-sphere. His first conjecture was that if a closed $3$-manifold $M$ had $H_*(M) \cong H_*(S^3)$, then $M \cong S^3$. Poincar\'e thought very hard about the problem, and came up with a counterexample. The counterexample is known as the \term{Poincar\'e homology sphere}\index{homology sphere}. This is a manifold $P^3$ with
+Long time ago, Poincar\'e was interested in characterizing the $3$-sphere. His first conjecture was that if a closed $3$-manifold $M$ had $H_*(M) \cong H_*(S^3)$, then $M \cong S^3$. Poincar\'e thought very hard about the problem, and came up with a counterexample. The counterexample is known as the \term{Poincar\'e homology sphere}\index{homology sphere}. This is a manifold $P^3$ with
 \[
   H_*(P) \cong H_*(S^3),
 \]
@@ -634,17 +645,17 @@ For our purposes, perhaps we should be slightly less ambitious. Suppose we are g
 \[
   S^{\pm} = S \amalg S^{-1} = \{ s, s^{-1}: s \in S\},
 \]
-and let $S^*$ be the set of all finite words in $S^{\pm}$. Then the fundamental question is, given a word $w \in S^*$, when does it represent the identity element $1 \in \Gamma$. Ideally, we would want an \emph{algorithm} that determines whether this is the case.
+and let $S^*$ be the set of all finite words in $S^{\pm}$. Then the fundamental question is, given a word $w \in S^*$, when does it represent the identity element $1 \in \Gamma$? Ideally, we would want an \emph{algorithm} that determines whether this is the case.
 
 \begin{eg}
-  Recall that in the free group $F(S) = \bra S \mid \emptyset\ket$, we had a normal form theorem, namely that every element in $\Gamma$ can be written \emph{uniquely} as a product of generator (and inverses) such that there aren't any occurrences of $ss^{-1}$ or $s^{-1}s$. This gives a way of determining whether a given word $w \in S^*$ represents the identity. We perform \term{elementary reductions}, removing every occurrence of $ss^{-1}$ or $s^{-1}s$. Since each such procedure reduces the length of the word, this eventually stops, and we would end up with a \term{reduced word}. If this reduced word is empty, then $w$ reduces the identity. If it is non-empty, $w$ does not.
+  Recall that in the free group $F(S) = \bra S \mid \emptyset\ket$, we had a normal form theorem, namely that every element in $\Gamma$ can be written \emph{uniquely} as a product of generator (and inverses) such that there aren't any occurrences of $ss^{-1}$ or $s^{-1}s$. This gives a way of determining whether a given word $w \in S^*$ represents the identity. We perform \term{elementary reductions}, removing every occurrence of $ss^{-1}$ or $s^{-1}s$. Since each such procedure reduces the length of the word, this eventually stops, and we would end up with a \term{reduced word}. If this reduced word is empty, then $w$ represents the identity. If it is non-empty, $w$ does not.
 \end{eg}
 Thus, we have a complete solution to the word problem for free groups, and moreover the algorithm is something we can practically implement.
 
-For a general finitely-presented group, this is more difficult. We can first reformulate our problem. The presentation $\Gamma = \bra S \mid R \ker$ gives us a map $F(S) \to \Gamma$, sending $s$ to $s$. Each word gives us an element in $F(S)$, and thus we can reformulate our problem as identifying the elements in the kernel of this map.
+For a general finitely-presented group, this is more difficult. We can first reformulate our problem. The presentation $\Gamma = \bra S \mid R \ket$ gives us a map $F(S) \to \Gamma$, sending $s$ to $s$. Each word gives us an element in $F(S)$, and thus we can reformulate our problem as identifying the elements in the kernel of this map.
 
 \begin{lemma}
-  Let $\Gamma = \bra S \mid R\ket$. Then the elements of $\ker \{F(S) \to \Gamma\}$ are precisely those of the form
+  Let $\Gamma = \bra S \mid R\ket$. Then the elements of $\ker (F(S) \to \Gamma)$ are precisely those of the form
   \[
     \prod_{i = 1}^d g_i r_i^{\pm 1} g_i^{-1},
   \]
@@ -652,12 +663,11 @@ For a general finitely-presented group, this is more difficult. We can first ref
 \end{lemma}
 
 \begin{proof}
-  We know that $\ker \{F(S) \to \Gamma\} = \bra \bra R\ket \ket$, and the set described above is exactly $\bra \bra R\ket \ket$, noting that $gxyg^{-1} = (gxg^{-1})(gyg^{-1})$.
+  We know that $\ker (F(S) \to \Gamma) = \bra \bra R\ket \ket$, and the set described above is exactly $\bra \bra R\ket \ket$, noting that $gxyg^{-1} = (gxg^{-1})(gyg^{-1})$.
 \end{proof}
 
 This tells us the set of elements in $S^*$ that represent the identity is \term{recursively enumerable}, i.e.\ there is an algorithm that lists out all words that represent the identity. However, this is not very helpful when we want to identify whether a word represents the identity. If it does, then our algorithm will eventually tell us it is (maybe after 3 trillion years), but if it doesn't, the program will just run forever, and we will never know that it doesn't represent the identity.
 
-It turns out the answer to this question has some geometric interpretations. Let's first look at the example.
 \begin{eg}
   Let $\Gamma = \Z^2 \cong \bra a, b \mid [a, b]\ket$. Consider the word
   \[
@@ -725,7 +735,7 @@ It turns out the answer to this question has some geometric interpretations. Let
   \end{center}
 \end{eg}
 
-Of course, this is fine if we know very well what the Cayley graph of the group looks like, but in general it is quite hard. Indeed, solving the word problem is part of what you do if you want to draw the Cayley graph, since you need to know when two words give the same element.
+Of course, this is fine if we know very well what the Cayley graph of the group looks like, but in general it is quite hard. Indeed, solving the word problem is part of what you do if you want to draw the Cayley graph, since you need to know when two words give the same element!
 
 So how do we solve the word problem? Our previous partial algorithm would make a good, full solution if we knew how far we had to search. If we know that we will only need at most $d = 10^{10^{100}}$, then if we searched for all expressions of the form $\prod_{i = 1}^d g_i r_i^{\pm} g_i^{-1}$ for $d < 10^{10^{100}}$, and didn't find $w$, then we know $w$ does not represent the identity element (we will later argue that we don't have to worry about there being infinitely many $g_i$'s to look through).
 
@@ -794,14 +804,14 @@ We start with two special cases, and then show that we can reduce everything els
   \]
   It is then easy to see that
   \[
-    \Area_{\mathcal{P}}(w) \leq m \Area_{\mathcal{Q}}(w).
+    \Area_{\mathcal{P}}(w) \leq m \Area_{\mathcal{Q}}(w).\qedhere
   \]
 \end{proof}
 
 \begin{lemma}
   Let $\mathcal{P} = \bra S \mid R\ket$, and let
   \[
-    \mathcal{Q} = \bra S \coprod T \mid R \coprod R'\ket,
+    \mathcal{Q} = \bra S \amalg T \mid R \amalg R'\ket,
   \]
   where
   \[
@@ -813,7 +823,7 @@ We start with two special cases, and then show that we can reduce everything els
 \begin{proof}
   We first show $\delta_{\mathcal{P}} \preccurlyeq \delta_{\mathcal{Q}}$. Define
   \begin{align*}
-    \rho: F(S \coprod T) & \to F(s)\\
+    \rho: F(S \amalg T) & \to F(s)\\
     s &\mapsto s\\
     t &\mapsto w_t.
   \end{align*}
@@ -1149,7 +1159,7 @@ It is now easy to prove that
       \[
         w = \prod_{i = 1}^d g_i r_i^{\pm 1} g_i^{-1}.
       \]
-      A naive search would find the smallest area expression, and this gives us the Dehn function.
+      A naive search would find the smallest area expression, and this gives us the Dehn function.\qedhere
   \end{itemize}
 \end{proof}
 
@@ -1179,7 +1189,7 @@ This is a nice, little surgery argument.
   \[
     \pi_1M_0 \cong F_m
   \]
-  by Seifert van-Kampen theorem. We now construct $M_k$ from $M_{k - 1}$ such that
+  by Seifert--van Kampen theorem. We now construct $M_k$ from $M_{k - 1}$ such that
   \[
     \pi_1 M_k \cong \bra a_1, \ldots, a_m \mid r_1, \ldots, r_k\ket.
   \]
@@ -1230,10 +1240,10 @@ So we can define
 
 \begin{defi}[Isoperimetric function]\index{isoperimetric function}
   The isoperimetric function of $(M, g)$ is
-  \begin{multline*}
-    FiU^M: [0, \infty) \to [0, \infty)\\
-    \ell \mapsto \sup\{\FArea(\gamma): \gamma: S^1 \to M\text{ is a smooth null-homotopic loop, }\ell(\gamma) \leq \ell\}
-  \end{multline*}
+  \begin{align*}
+    &FiU^M: [0, \infty) \to [0, \infty)\\
+    &\ell \mapsto \sup\{\FArea(\gamma): \gamma: S^1 \to M\text{ is a smooth null-homotopic loop, }\ell(\gamma) \leq \ell\}
+  \end{align*}
 \end{defi}
 
 \begin{thm}[Filling theorem]
@@ -1256,7 +1266,7 @@ By our previous construction, we know this applies to every finitely-presented g
 %  \[
 %    \pi_1M_0 \cong F_m
 %  \]
-%  by Seifert van-Kampen theorem. We now construct $M_k$ from $M_{k - 1}$ such that
+%  by Seifert--van Kampen theorem. We now construct $M_k$ from $M_{k - 1}$ such that
 %  \[
 %    \pi_1 M_k \cong \bra a_1, \ldots, a_m \mid r_1, \ldots, r_k\ket.
 %  \]
@@ -1281,59 +1291,60 @@ By our previous construction, we know this applies to every finitely-presented g
 %
 %The point is that whenever we come up with a bad group, we can construct a bad manifold with similar bad behaviour. So manifolds are at least as difficult to understand as groups. In particular, there is no algorithm that can distinguish any two smooth manifolds, since that would allow us to figure out if two group presentations define the same group, which we know is impossible.
 
-\section{New groups from old: A crash course in Bass--Serre theory}
-The idea is that we want to be able to do things similar to how we built new manifolds by gluing together old manifolds.
-
+\section{Bass--Serre theory}
 \subsection{Graphs of spaces}
-Disclaimer: All spaces are cell complexes.
+Bass--Serre theory is a way of building spaces by gluing old spaces together, in a way that allows us to understand the fundamental group of the resulting space. In this section, we will give a brief (and sketchy) introduction to Bass-Serre theory, which generalizes some of the ideas we have previously seen, but they will not be used in the rest of the course.
 
-We want to build new spaces by gluing well-understood spaces together via homotopy pushouts.
+Suppose we have two spaces $X, Y$, and we want to glue them along some subspace. For concreteness, suppose we have another space $Z$, and maps $\partial^-: Z \to X$ and $\partial^+: Z \to Y$. We want to glue $X$ and $Y$ by identifying $\partial^-(z) \sim \partial^+(z)$ for all $z \in Z$.
 
-\begin{defi}[Homotopy pushout]\index{homotopy pushout}
-  Let $X, Y, Z$ be spaces, and $\partial^-: Z \to X$ and $\partial^+: Z \to Y$ be maps. We define\index{$X \underset{Z}{\coprod} Z$}
-  \[
-    X \underset{Z}{\coprod} Y = (X \coprod Y \coprod Z \times [-1, 1])/\sim,
-  \]
-  where we identify $\partial^{\pm}(z)\sim (z, \pm 1)$ for all $z \in Z$.
-\end{defi}
-% insert picture
+If we simply take the disjoint union of $X$ and $Y$ and then take the quotient, then this is a pretty poorly-behaved construction. Crucially, if we want to understand the fundamental group of the resulting space via Seifert--van Kampen, then the maps $\partial^{\pm}$ must be very well-behaved for the theorem to be applicable. The \emph{homotopy pushout} corrects this problem by gluing like this:
 \begin{center}
   \begin{tikzpicture}
     \draw (0, 0) rectangle (2, 2);
     \draw (6, 0) rectangle (8, 2);
 
-    \draw (3, 1) ellipse (0.25 and 0.5);
+    \draw (5, 0.5);
 
-    \draw [thick, mblue] (4, 0.5) arc(-90:90:0.25 and 0.5);
+    \fill [mblue, opacity=0.1] (3, 0.5) -- (5, 0.5) arc(-90:-270:0.25 and 0.5) -- (3, 1.5) arc(90:270:0.25 and 0.5);
+    \draw [dashed] (5, 0.5) arc(270:90:0.25 and 0.5);
+    \draw (3, 0.5) arc(270:90:0.25 and 0.5);
+
+    \draw [fill=mblue, fill opacity=0.3] (3, 0.5) -- (5, 0.5) arc(-90:90:0.25 and 0.5) -- (3, 1.5) arc(90:-90:0.25 and 0.5);
+
     \draw [dashed, thick, mblue] (4, 0.5) arc(270:90:0.25 and 0.5);
 
-    \draw (5, 0.5) arc(-90:90:0.25 and 0.5);
-    \draw [dashed] (5, 0.5) arc(270:90:0.25 and 0.5);
+    \draw [->] (3, 1) -- (1, 1) node [pos=0.3, above] {$\partial^-$};
+    \draw [->] (5, 1) -- (7, 1) node [pos=0.35, above] {$\partial^+$};
 
-    \draw (3, 0.5) -- (5, 0.5);
-    \draw (3, 1.5) -- (5, 1.5);
-
-    \draw [->] (3, 1) -- (1, 1) node [pos=0.5, above] {$\partial^-$};
-    \draw [->] (5, 1) -- (7, 1) node [pos=0.5, above] {$\partial^+$};
+    \draw [thick, mblue] (4, 0.5) arc(-90:90:0.25 and 0.5);
 
     \node [above] at (1, 2) {$X$};
     \node [above] at (7, 2) {$Y$};
     \node [above] at (4, 1.5) {$Z$};
   \end{tikzpicture}
 \end{center}
-By Seifert van-Kampen, we know $\pi_1(X\underset{Z}{\coprod} Y)$ is the pushout
+
+\begin{defi}[Homotopy pushout]\index{homotopy pushout}
+  Let $X, Y, Z$ be spaces, and $\partial^-: Z \to X$ and $\partial^+: Z \to Y$ be maps. We define\index{$X \underset{Z}{\coprod} Z$}
+  \[
+    X \underset{Z}{\amalg} Y = (X \amalg Y \amalg Z \times [-1, 1])/\sim,
+  \]
+  where we identify $\partial^{\pm}(z)\sim (z, \pm 1)$ for all $z \in Z$.
+\end{defi}
+By Seifert--van Kampen, we know $\pi_1(X\underset{Z}{\amalg} Y)$ is the pushout
 \[
   \begin{tikzcd}
-    \pi_1Z \ar[r, "\partial^+_*"] \ar[d, "\partial^-_*"] & X \ar[d]]\\
-    \pi_1 Y \ar[r] & \pi_1(X \underset{Z}{\coprod} Y)
+    \pi_1Z \ar[r, "\partial^+_*"] \ar[d, "\partial^-_*"] & \pi_1(X) \ar[d]\\
+    \pi_1 Y \ar[r] & \pi_1(X \underset{Z}{\amalg} Y)
   \end{tikzcd}
 \]
-If $\pi_*^{\pm}$ are injective, then we have
+In other words, we have
 \[
-  \pi_1(X \underset{Z}{\coprod} Y) \cong \pi_1 X \underset{\pi_1 Z}{*} \pi_1Y.
+  \pi_1(X \underset{Z}{\amalg} Y) \cong \pi_1 X \underset{\pi_1 Z}{*} \pi_1 Y.
 \]
-We want to generalize this.
+In general, this is more well-behaved if the maps $\partial_*^{\pm}$ are in fact injective, and we shall focus on this case.
 
+With this construction in mind, we can try to glue together something more complicated:
 \begin{defi}[Graph of spaces]\index{graph!of spaces}
   A \emph{graph of spaces} $\mathcal{X}$ consists of the following data
   \begin{itemize}
@@ -1344,66 +1355,92 @@ We want to generalize this.
   \end{itemize}
   The \term{realization} of $\mathcal{X}$ is
   \[
-    |\mathcal{X}| = X = \coprod_{v \in V(\Xi)} X_v \amalg \coprod_{e \in E(\Xi)} (X_e \times [-1, ]1)/(\forall e \in E(\Xi), \forall x \in X_e, (x, \pm 1) \sim \partial_e^{\pm}(x)).
+    |\mathcal{X}| = X = \frac{\coprod_{v \in V(\Xi)} X_v \amalg \coprod_{e \in E(\Xi)} (X_e \times [-1, 1])}{(\forall e \in E(\Xi), \forall x \in X_e, (x, \pm 1) \sim \partial_e^{\pm}(x))}.
   \]
 \end{defi}
 These conditions are not too restrictive. If our vertex or edge space were not path-connected, then we can just treat each path component as a separate vertex/edge. If our maps are not $\pi_1$ injective, as long as we are careful enough, we can attach $2$-cells to kill the relevant loops.
 
+%\begin{eg}
+%  Let $X$ be an orientable surface and $Y$ be a multi-curve, i.e.\ a disjoint union of essentially simple closed curves on $X$. Take a tubular neighbourhood of each curve in $Y$, and let $N(Y)$ be the union of all these tubular neighbourhoods, which is a union of closed annuli. Let
+%  \[
+%    \coprod X_i = X - \mathring{N(Y)}
+%  \]
+%  be the decomposition of $X - \mathring{N(Y)}$ into connected components.
+%
+%  % insert picture
+%
+%  We can then take $\coprod X_e = Y$. Then $X$ is just the realization of this graph, when we pick the appropriate attaching maps.
+%\end{eg}
 
 \begin{eg}
-  Let $X$ be an orientable surface and $Y$ be a multi-curve, i.e. a disjoint union of essentially simple closed curves on $X$. Take a tubular neighbourhood of each curve in $Y$, and let $N(Y)$ be the union of all these tubular neighbourhoods, which is a union of closed annuli. Let
-  \[
-    \coprod X_i = X - \mathring{N(Y)}
-  \]
-  be the decomposition of $X - \mathring{N(Y)}$ into connected components.
-
-  % insert picture
-
-  We can then take $\coprod X_e = Y$. Then $X$ is just the realization of this graph, when we pick the appropriate attaching maps.
+  A homotopy pushout is a special case of a realization of a graph of spaces.
+%  In the case of
+%  \begin{center}
+%    \begin{tikzpicture}
+%      \draw (0, 0) rectangle (2, 2);
+%      \draw (6, 0) rectangle (8, 2);
+%
+%      \draw (3, 1) ellipse (0.25 and 0.5);
+%
+%      \draw [thick, mblue] (4, 0.5) arc(-90:90:0.25 and 0.5);
+%      \draw [dashed, thick, mblue] (4, 0.5) arc(270:90:0.25 and 0.5);
+%
+%      \draw (5, 0.5) arc(-90:90:0.25 and 0.5);
+%      \draw [dashed] (5, 0.5) arc(270:90:0.25 and 0.5);
+%
+%      \draw (3, 0.5) -- (5, 0.5);
+%      \draw (3, 1.5) -- (5, 1.5);
+%
+%      \draw [->] (3, 1) -- (1, 1) node [pos=0.5, above] {$\partial^-$};
+%      \draw [->] (5, 1) -- (7, 1) node [pos=0.5, above] {$\partial^+$};
+%
+%      \node [above] at (1, 2) {$X_{v_1}$};
+%      \node [above] at (7, 2) {$X_{v_2}$};
+%      \node [above] at (4, 1.5) {$X_e$};
+%    \end{tikzpicture}
+%  \end{center}
+%  Recall that Seifert--van Kampen tells us
+%  \[
+%    \pi_1 X \cong \pi_1 X_{v_1} \underset{\pi_1 X_e}{*} \pi_1 X_{v_2}.
+%  \]
 \end{eg}
 
 \begin{eg}
-  In the case of
+  Suppose that the underlying graph looks like this:
   \begin{center}
-    \begin{tikzpicture}
-      \draw (0, 0) rectangle (2, 2);
-      \draw (6, 0) rectangle (8, 2);
-
-      \draw (3, 1) ellipse (0.25 and 0.5);
-
-      \draw [thick, mblue] (4, 0.5) arc(-90:90:0.25 and 0.5);
-      \draw [dashed, thick, mblue] (4, 0.5) arc(270:90:0.25 and 0.5);
-
-      \draw (5, 0.5) arc(-90:90:0.25 and 0.5);
-      \draw [dashed] (5, 0.5) arc(270:90:0.25 and 0.5);
-
-      \draw (3, 0.5) -- (5, 0.5);
-      \draw (3, 1.5) -- (5, 1.5);
-
-      \draw [->] (3, 1) -- (1, 1) node [pos=0.5, above] {$\partial^-$};
-      \draw [->] (5, 1) -- (7, 1) node [pos=0.5, above] {$\partial^+$};
-
-      \node [above] at (1, 2) {$X_{v_1}$};
-      \node [above] at (7, 2) {$X_{v_2}$};
-      \node [above] at (4, 1.5) {$X_e$};
+    \begin{tikzpicture}[scale=4]
+      \node [circ] at (0, 0) {};
+      \node [below] {$v$};
+      \draw (0, 0) edge [out=45, in =135, loop] (0, 0);
+      \node [above] at (0, 0.26) {$e$};
     \end{tikzpicture}
   \end{center}
-  Recall that Seifert--van Kampen tells us
-  \[
-    \pi_1 X \cong \pi_1 X_{v_1} \underset{\pi_1 X_e}{*} \pi_1 X_{v_2}.
-  \]
-\end{eg}
+  The corresponding gluing diagram looks like
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{scope}[cm={1,0, 0.5, 1, (0, 0)}]
+        \draw (0, 0) rectangle (4, 1.5);
+        \draw [fill=mblue, fill opacity=0.3] (2.6, 0.75) arc (180:360:0.4 and 0.2);
+        \draw [dashed] (2.6, 0.75) arc (180:0:0.4 and 0.2);
 
-\begin{eg}
-  If we instead have
+        \draw [fill=mblue, fill opacity=0.3] (0.6, 0.75) arc (180:360:0.4 and 0.2);
+        \draw [dashed] (0.6, 0.75) arc (180:0:0.4 and 0.2);
+      \end{scope}
+      \begin{scope}[shift={(0.375, 0)}]
+        \draw (1.4, 0.75) -- (1.4, 1.1) arc (180:0:0.6 and 0.6) -- (2.6, 0.75);
+        \draw (0.6, 0.75) -- (0.6, 1.1) arc (180:0:1.4 and 1.4) -- (3.4, 0.75);
+        \fill [mblue, opacity=0.3] (1.4, 0.75) -- (1.4, 1.1) arc (180:0:0.6 and 0.6) -- (2.6, 0.75) -- (3.4, 0.75) -- (3.4, 1.1) arc(0:180:1.4 and 1.4) -- (0.6, 0.75);
+      \end{scope}
+    \end{tikzpicture}
+  \end{center}
+  Fix a basepoint $* \in X_e$. Pick a path from $\partial_e^-(*)$ to $\partial_e^+(*)$. This then gives a loop $t$ that ``goes around'' $X_e \times [-1, 1]$ by first starting at $\partial_e^-(*)$, move along $* \times [-1, 1]$, then returning using the path we chose.
 
-  % insert picture with single self-loop
+  Since every loop inside $X_e$ can be pushed down along the ``tube'' to a loop in $X_v$, it should not be surprising that the group $\pi_1(X)$ is in fact generated by $\pi_1(X_v)$ and $t$.
 
-  then if we think carefully, we find that we have
+  In fact, we can explicitly write
   \[
     \pi_1 X = \frac{\pi_1 X_v * \bra t\ket}{\bra \bra(\partial_e^+)_*(g) = t (\partial_e^-)_*(g) t^{-1} \forall g \in \pi_1 X_e\ket \ket}.
   \]
-  Here $t$ represents a loop that starts at $X_v$, goes around $X_e$, and returns to the original point in $X_v$.
 
   This is known as an \term{HNN extension}. The way to think about this is as follows --- we have a group $\pi_1 X_v$, and we have two subgroups that are isomorphic to each other. Then the HNN extension is the ``free-est'' way to modify the group so that these two subgroups are conjugate.
 \end{eg}
@@ -1416,7 +1453,7 @@ How about for a general graph of spaces? If $\Xi$ is a graph of spaces, then its
     \item A graph $\Gamma$
     \item Groups $G_v$ for all $v \in V(\Gamma)$
     \item Groups $G_e$ for all $e \in E(\Gamma)$
-    \item For each $e \mapsto v^{\pm}(e)$, injective group homomorphisms
+    \item For each edge $e$ with vertices $v^{\pm}(e)$, injective group homomorphisms
       \[
         \partial_e^{\pm}: G_e \to G_{v^{\pm}(e)}.
       \]
@@ -1434,12 +1471,9 @@ This can be done by taking Eilenberg--Maclane spaces.
 
   Moreover, we can choose $K(G, 1)$ functorially, namely there are choices of $K(G, 1)$ for each $G$ and choices of $\bar{f}$ such that $\overline{f_1 \circ f_2} = \overline{f}_1 \circ \bar{f}_2$ and $\overline{\id_{G}} = \id_{K(G, 1)}$ for all $f, G, H$.
 \end{prop}
-When we talked about presentations, we saw that this is true if we don't have the word ``aspherical''. But the aspherical requirement makes the space unique.
+These $K(G, 1)$ are known as \term{Eilenberg--MacLane spaces}.
 
-These $K(G, 1)$ are known as \term{Eilenberg--MacLane spaces}
-\begin{proof}
-  See Hatcher (or Segal (or May)).
-\end{proof}
+When we talked about presentations, we saw that this is true if we don't have the word ``aspherical''. But the aspherical requirement makes the space unique (up to homotopy).
 
 Using Eilenberg--MacLane spaces, given any graph of groups $\mathcal{G}$, we can construct a graph of spaces $\Xi$ such that when we apply $\pi_1$ to all the spaces in $\mathcal{X}$, we recover $\mathcal{G}$.
 
@@ -1447,9 +1481,9 @@ We can now set
 \[
   \pi_1 \mathcal{G} = \pi_1|\mathcal{X}|.
 \]
-For more details, read \emph{Trees} by Serre, or \emph{Topological methods in group theory} by Scott and Wall.
-
 Note that if $\Gamma$ is finite, and all the $G_v$'s are finitely-generated, then $\pi_1\mathcal{G}$ is also finitely-generated, which one can see by looking into the construction of $K(G, 1)$. If $\Gamma$ is finite, all $G_v$'s are finitely-presented and all $G_e$'s are finitely-generated, then $\pi_1 \mathcal{G}$ is finitely-presented.
+
+For more details, read \emph{Trees} by Serre, or \emph{Topological methods in group theory} by Scott and Wall.
 
 \subsection{The Bass--Serre tree}
 Given a graph of groups $\mathcal{G}$, we want to analyze $\pi_ 1\mathcal{G} = \pi_1 X$, and we do this by the natural action of $G$ on $\tilde{X}$ by deck transformations.
@@ -1464,7 +1498,7 @@ Note that the underlying graph of $\hat{\mathcal{X}}$ is not necessarily a cover
 \begin{proof}[Proof sketch]
   Consider
   \[
-    \bigcup_{v \in V(\Xi)} X_V \subseteq X.
+    \bigcup_{v \in V(\Xi)} X_v \subseteq X.
   \]
   Let
   \[
@@ -1532,16 +1566,32 @@ Just like the case of the free group, careful analysis of the Bass--Serre tree l
         \node [circ] at (0, \y) {};
         \draw [morange, thick] (0, \y) -- (2, \y);
 
-%        \draw [mblue, thick] (2, \y-0.3) -- (2, \y + 0.3); % infinitely many yellow things pointing to the left.
+        \draw [mblue, thick] (2, \y-0.3) -- (2, \y + 0.3);
+        \foreach \z in {-0.3, -0.2, -0.1, 0.1, 0.2, 0.3} {
+          \draw [morange] (2, \y + \z) -- +(-0.2, 0);
+          \draw [mred] (1.8, \y + \z + 0.04) -- (1.8, \y + \z - 0.04);
+        }
       }
     \end{tikzpicture}
   \end{center}
-  This is \emph{not} the Bass--Serre tree. The Bass--Serre tree looks like % insert picture
+  This is \emph{not} the Bass--Serre tree. The Bass--Serre tree is an infinite-valent bipartite tree, which looks roughly like
+  \begin{center}
+    \begin{tikzpicture}
 
-  Thus, this is an infinite-valent bipartite tree.
+      \foreach \t in {0,20,...,340}{
+        \begin{scope}[rotate=\t]
+          \begin{scope}[shift={(1.5, 0)}]
+            \foreach \s in {-18,-12,-6,0,6,12,18}{
+              \draw [rotate=\s, morange] (0, 0) -- (0.5, 0) node [scirc, mred] {};
+            }
+          \end{scope}
+          \draw [morange](0, 0) -- (1.5, 0) node [circ, mblue] {};
+        \end{scope}
+      }
+      \node [circ, mred] {};
+    \end{tikzpicture}
+  \end{center}
 \end{eg}
-
-The simply-connected of the Bass--Serre tree translates into a normal form for the elements of $G$.
 
 This point of view gives two important results that relate elements of $G$ to the vertex groups $G_{v_i}$ and the edge maps $\partial_{e_j}^{\pm}: G_{e_j} \to G_{v_j^{\pm}}$.
 
@@ -1554,10 +1604,12 @@ Unsurprisingly, this really requires that the edge maps are injective. It is an 
   Observe that the universal cover $\tilde{X}$ can be produce by first building universal covers of the vertex space, which are then glued together in a way that doesn't kill the fundamental groups.
 \end{proof}
 
-The next theorem is a normal form theorem. Pick a base vertex $v \in V(\Xi)$. We can then represent elements of $G$ via loops in $\Xi = \Gamma$, the underlying graph based at $v$ and labelled by elements of vertex groups. These loops can be written formally as
+More importantly, Bass-Serre trees give us normal form theorems! Pick a base vertex $v \in V(\Xi)$. We can then represent elements of $G$ in the form
 \[
   \gamma = g_0 e_1^{\pm 1} g_1 e_2^{\pm 1} \cdots e_n^{\pm 1}g_n
 \]
+where each $e_i$ is an edge such that $e_1^{\pm1} e_2^{\pm 1} \cdots e_n^{\pm1}$ forms a closed loop in the underlying graph of $\Xi$, and each $g_i$ is an element of the graph at the vertex connecting $e_i^{\pm 1}$ and $e_{i + 1}^{\pm 1}$.
+
 We say a \emph{pinch} is a sub-word of the form
 \[
   e^{\pm 1} \partial_e^{\pm 1} (g) e^{\mp 1},
@@ -1569,7 +1621,7 @@ We say a loop is \emph{reduced} if it contains no pinches.
 \begin{thm}[Normal form theorem]\index{normal form theorem}
   Every element can be represented by a reduced loop, and the only reduced loop representing the identity is the trivial loop.
 \end{thm}
-This is good enough, since if we can recognize is something is the identity, then we see if the product of one with the inverse of the other is the identity. An exact normal form for all words would be tricky.
+This is good enough, since if we can recognize is something is the identity, then we see if the product of one with the inverse of the other is the identity. An exact normal form for all words would be a bit too ambitious.
 
 \begin{proof}[Proof idea]
   It all boils down to the fact that the Bass--Serre tree is a tree. Connectedness gives the existence, and the simply-connectedness gives the ``uniqueness''.
@@ -1628,13 +1680,11 @@ Note that in general, the geodesics may intersect.
 Unfortunately, none of these examples really justify why we call these things hyperbolic. Let's look at the actual motivating example.
 
 \begin{eg}
-  Let $X = \H^2$, the \term{hyperbolic plane}. Let $\Delta \subseteq \H^2$ be a triangle. Then $\Delta$ is $\delta$-slim, where the maximum radius of an inscribed semi-circle $D$ in $\Delta$ with the center on one of the edges.
+  Let $X = \H^2$, the \term{hyperbolic plane}. Let $\Delta \subseteq \H^2$ be a triangle. Then $\Delta$ is $\delta$-slim, where $\delta$ is the maximum radius of an inscribed semi-circle $D$ in $\Delta$ with the center on one of the edges.
 
-  But we know that the radius of $D$ is bounded by some increasing function of the area of $D$, and the area of $D$ is bounded above by the area of $\Delta$. On the other hand, by hyperbolic geometry, we know the area of \emph{any} triangle is bounded by $\pi$.
-
-  So $\H^2$ is $\delta$-hyperbolic for some $\delta$.
+  But we know that the radius of $D$ is bounded by some increasing function of the area of $D$, and the area of $D$ is bounded above by the area of $\Delta$. On the other hand, by hyperbolic geometry, we know the area of \emph{any} triangle is bounded by $\pi$. So $\H^2$ is $\delta$-hyperbolic for some $\delta$.
 \end{eg}
-For the arguments we are going to do, we don't really care about what $\delta$ is.
+If we worked a bit harder, then we can figure out the best value of $\delta$. However, for the arguments we are going to do, we don't really care about what $\delta$ is.
 
 \begin{eg}
   Let $X$ be any bounded metric space, e.g.\ $S^2$. Then $X$ is Gromov hyperbolic, since we can just take $\delta$ to be the diameter of the metric space.
@@ -1648,7 +1698,7 @@ However, this is not very helpful, since we have to check it for all finite gene
 This is slightly difficult, because we lose control of how the geodesic behaves if we only look at things up to isometry. To do so, we have to talk about quasi-geodesics.
 
 \subsection{Quasi-geodesics and hyperbolicity}
-\begin{defi}[quasi-geodesic]\index{quasi-geodesic}
+\begin{defi}[Quasi-geodesic]\index{quasi-geodesic}
   A $(\lambda, \varepsilon)$-quasi-geodesic for $\lambda \geq 1, \varepsilon \geq 0$ is a $(\lambda, \varepsilon)$-quasi-isometric embedding $I \to X$, where $I \subseteq \R$ is a closed interval.
 \end{defi}
 Note that our definition allows for $I$ to be unbounded, i.e.\ $I$ may be of the forms $[a, b]$, $[0, \infty)$ or $\R$ respectively. We call these \emph{quasi-geodesic intervals}\index{quasi-geodesic interval}, \emph{quasi-geodesic rays}\index{quasi-geodesic ray} and \emph{quasi-geodesic lines}\index{quasi-geodesic line} respectively.
@@ -1660,20 +1710,20 @@ Note that our definition allows for $I$ to be unbounded, i.e.\ $I$ may be of the
   \]
   is a quasigeodesic ray.
 \end{eg}
-This should be alarming. The quasi-geodesics in the Euclidean plane can look unlike any genuine geodesic.
+This should be alarming. The quasi-geodesics in the Euclidean plane can look unlike any genuine geodesic. However, it turns out things are well-behaved in hyperbolic spaces.
 
 \begin{thm}[Morse lemma]\index{Morse lemma}
   For all $\delta \geq 0, \lambda \geq 1$ there is $R(\delta, \lambda, \varepsilon)$ such that the following holds:
 
   If $X$ is a $\delta$-hyperbolic metric space, and $c: [a, b] \to X$ is a $(\lambda, \varepsilon)$-quasigeodesic from $p$ to $q$, and $[p, q]$ is a choice of geodesic from $p$ to $q$, then
   \[
-    d_{Haus}([p, q], \im(c)) \leq R(\delta, \lambda, \varepsilon),
+    d_{\mathrm{Haus}}([p, q], \im(c)) \leq R(\delta, \lambda, \varepsilon),
   \]
   where
   \[
-    d_{Haus}(A, B) = \inf\{\varepsilon > 0 \mid A \subseteq N_\varepsilon(B) \text{ and }B \subseteq N_\varepsilon(A)\}
+    d_{\mathrm{Haus}}(A, B) = \inf\{\varepsilon > 0 \mid A \subseteq N_\varepsilon(B) \text{ and }B \subseteq N_\varepsilon(A)\}
   \]
-  is the \term{Hausdorff distance}\index{$d_{Haus}$}.
+  is the \term{Hausdorff distance}\index{$d_{\mathrm{Haus}}$}.
 \end{thm}
 This has nothing to do with the Morse lemma in differential topology.
 
@@ -1699,7 +1749,7 @@ Let's prove the Morse lemma. To do so, we need the following definition:
     \ell (c) = \sup_{\mathcal{D}} \sum_{i = 1}^n d(c(t_{i - 1}), c(t_i)).
   \]
 \end{defi}
-In general, this number is extremely hard to compute, and may even be finite.
+In general, this number is extremely hard to compute, and may even be infinite.
 
 \begin{defi}[Rectifiable path]\index{rectifiable path}
   We say a path $c$ is \emph{rectifiable} if $\ell(c) < \infty$.
@@ -1710,7 +1760,7 @@ In general, this number is extremely hard to compute, and may even be finite.
 \end{eg}
 
 \begin{lemma}
-  Let $X$ be a geodesic space. For any $(\lambda, \varepsilon)$-quasigeodesic $c: [a, b] \to X$, there exists a continuous, rectifiable $(\lambda, \varepsilon')$-quasigeodesic $c'[a, b] \to X$ with $\varepsilon' = 2(\lambda + \varepsilon)$ such that
+  Let $X$ be a geodesic space. For any $(\lambda, \varepsilon)$-quasigeodesic $c: [a, b] \to X$, there exists a continuous, rectifiable $(\lambda, \varepsilon')$-quasigeodesic $c': [a, b] \to X$ with $\varepsilon' = 2(\lambda + \varepsilon)$ such that
   \begin{enumerate}
     \item $c'(a) = c(a)$, $c'(b) = c(b)$.
     \item For all $a \leq t < t' \leq b$, we have
@@ -1718,7 +1768,7 @@ In general, this number is extremely hard to compute, and may even be finite.
         \ell(c'|_{[t, t']}) \leq k_1 d(c'(t), c'(t')) + k_2
       \]
       where $k_1 = \lambda (\lambda + \varepsilon)$ and $k_2 = (\lambda \varepsilon' + 3)(\lambda + 3)$.
-    \item $d_{Haus}(\im c, \im c') \leq \lambda + \varepsilon$.
+    \item $d_{\mathrm{Haus}}(\im c, \im c') \leq \lambda + \varepsilon$.
   \end{enumerate}
 \end{lemma}
 
@@ -1769,7 +1819,6 @@ In general, this number is extremely hard to compute, and may even be finite.
       \draw (a) edge [bend right, -latex'] (b);
       \draw (b) edge [bend left, -latex'] (c);
       \draw (c) edge [bend right, -latex'] (d);
-      % insert points
     \end{tikzpicture}
   \end{center}
 
@@ -1787,18 +1836,12 @@ In general, this number is extremely hard to compute, and may even be finite.
 
   Then we are done since
   \[
-    d(x, \im c) \leq d(x, x_1) + d(x_1, \im c).
+    d(x, \im c) \leq d(x, x_1) + d(x_1, \im c).\qedhere
   \]
 \end{proof}
 
 \begin{proof}[Proof of Morse lemma]
   By the first lemma, we may assume that $c$ is continuous and rectifiable, and satisfies the properties as in the lemma.
-
-  First, we show that $[p, q]$ is contained in a bounded neighbourhood of $\im c$. Let
-  \[
-    D = \sup\{d(x, \im c) \mid x \in [p, q]\}.
-  \]
-  Since $[p, q]$ and $\im c$ are compact, we can let $x_0$ be a point where the supremum is obtained.
 
   Let $p, q$ be the end points of $c$, and $[p, q]$ a geodesic. First we show that $[p, q]$ is contained in a bounded neighbourhood of $\im c$. Let
   \[
@@ -1809,21 +1852,37 @@ In general, this number is extremely hard to compute, and may even be finite.
   Let $y' = c(s) \in \im c$ be such that $d(y', y) \leq D$, and similarly let $z' = c(t) \in \im c$ be such that $d(z, z') \leq D$.
   \begin{center}
     \begin{tikzpicture}
-      \draw (-4, 0) arc(180:0:4 and 2);
+      \draw [mblue, thick] (-4, 0) arc(180:0:4 and 2);
       \draw (-4, 0) -- (4, 0);
       \draw (-2, 0) arc (180:0:2);
 
-      \draw [<->] (0, 0) -- (0, 2) node [pos=0.5, left] {$D$};
+      \node [circ] at (-4, 0) {};
+      \node [left] at (-4, 0) {$p$};
+      \node [circ] at (4, 0) {};
+      \node [right] at (4, 0) {$q$};
 
-      \node [circ] at (-3, 0) {};
-      \node [below] at (-3, 0) {$y$};
-      \node [circ] at (3, 0) {};
-      \node [below] at (3, 0) {$z$};
+      \node [mblue, above] at (2, 1.75) {$c$};
 
-    % draw paths to y', z', and label distance between y,z and circle
+      \draw [<->] (0, 0)node [circ] {} node [below] {$x_0$} -- (0, 2) node [pos=0.5, left] {$D$};
+
+      \node [circ] (y) at (-3, 0) {};
+      \node [below] at (y) {$y$};
+      \node [circ] (z) at (3, 0) {};
+      \node [below] at (z) {$z$};
+
+      \draw [decorate, decoration={brace, amplitude=5pt}](0, -0.5) -- (-3, -0.5) node [pos=0.5, below=0.2cm] {$2D$};
+      \draw [decorate, decoration={brace, amplitude=5pt}](3, -0.5) -- (0, -0.5) node [pos=0.5, below=0.2cm] {$2D$};
+
+      \node [circ] (y') at (-3.35, 1.1) {};
+      \node [anchor = south east] at (y') {$y'$};
+      \node [circ] (z') at (3.35, 1.1) {};
+      \node [anchor = south west] at (z') {$z'$};
+
+      \draw [dashed] (y) -- (y') node [pos=0.5, right] {$\leq D$};
+      \draw [dashed] (z) -- (z') node [pos=0.5, left] {$\leq D$};
     \end{tikzpicture}
   \end{center}
-  Let $\gamma = [\gamma, \gamma'] \cdot c|_{[s, t]} \cdot [z', z]$. Then
+  Let $\gamma = [y, y'] \cdot c|_{[s, t]} \cdot [z', z]$. Then
   \[
     \ell(\gamma) = d(y, y') + d(z, z') + \ell(c|_{[s, t]}) \leq D + D + k_1 d(y', z') + k_2,
   \]
@@ -1837,7 +1896,7 @@ In general, this number is extremely hard to compute, and may even be finite.
   \]
   So the second lemma tells us
   \[
-    D \leq \delta |\log_2 (6 k_1 D + 2K + k_2)| + 1.
+    D \leq \delta |\log_2 (6 k_1 D + 2D + k_2)| + 1.
   \]
   The left hand side is linear in $D$, and the right hand side is a logarithm in $D$. So it must be the case that $D$ is bounded. Hence $[p, q] \subseteq N_{D_0}(\im c)$, where $D_0$ is some constant.
 
@@ -1852,10 +1911,12 @@ In general, this number is extremely hard to compute, and may even be finite.
     \ell(c|_{[t, t']}) \leq 2k_1 D_0 + k_2.
   \]
   So we know that for $s \in [a', b']$, we have
-  \[
-    d(c(s), [p, q]) \leq d(c(s), w) \leq d(c(s), c(t)) + d(c(t), w) \leq \ell(c|_{[t, t']}) + D_0 \leq D_0 + 2k_1 D_0 + k_2.
-  \]
-  So we are done.
+  \begin{align*}
+    d(c(s), [p, q]) &\leq d(c(s), w) \\
+    &\leq d(c(s), c(t)) + d(c(t), w) \\
+    &\leq \ell(c|_{[t, t']}) + D_0 \\
+    &\leq D_0 + 2k_1 D_0 + k_2.\qedhere
+  \end{align*}
 \end{proof}
 
 With the Morse lemma proven, we can sensibly talk about hyperbolic groups. We have already seen many examples of hyperbolic spaces, such as trees and the hyperbolic plane.
@@ -1869,9 +1930,10 @@ With the Morse lemma proven, we can sensibly talk about hyperbolic groups. We ha
 \end{eg}
 
 \begin{eg}
-  Surface groups $\Sigma_g$ for $g \geq 2$ acts on the hyperbolic plane properly discontinuously and cocompactly by isometries (since the universal cover of the genus $g$ surface is the hyperbolic plane by tessellating the hyperbolic plane with $4g$-gons, c.f.\ IB Geometry).
+  Surface groups $\Sigma_g$ for $g \geq 2$ acts on the hyperbolic plane properly discontinuously and cocompactly by isometries (since the universal cover of the genus $g$ surface is the hyperbolic plane by tessellating the hyperbolic plane with $4g$-gons, cf.\ IB Geometry).
 \end{eg}
 
+The following notion of ``virtually'' would be helpful
 \begin{defi}[virtually-P]\index{virtually-P}
   Let P be a property of groups. Then we say $G$ is virtually-P if there is a finite index subgroup $G_0 \leq G$ such that $G_0$ is P.
 \end{defi}
@@ -1892,7 +1954,7 @@ A ``random group'' is hyperbolic. More precisely, fix $m \geq 2$ and $n \geq 1$.
 \[
   \Gamma = \bra a_1, \ldots, a_m \mid r_1, \ldots, r_n\ket.
 \]
-such that $r_i$ are all \emph{cyclicly reduced}\index{cyclicly reduced word} words of length $\ell$. Put the uniform probability distribution on the set of all such groups. This defines a group-valued random variable $\Gamma_\ell$. For a property $P$, we say that ``a random group is $P$''\index{random group} if % explain cyclicly reduced
+such that $r_i$ are all \emph{cyclicly reduced}\index{cyclicly reduced word} words of length $\ell$ (i.e.\ reduced words such that the first letter is not the inverse of the last). Put the uniform probability distribution on the set of all such groups. This defines a group-valued random variable $\Gamma_\ell$. For a property $P$, we say that ``a random group is $P$''\index{random group} if % explain cyclicly reduced
 \[
   \lim_{\ell \to \infty}\P(\text{$\Gamma_\ell$ is hyperbolic}) = 1
 \]
@@ -1913,13 +1975,14 @@ Recall that in differential geometry, geodesics are defined locally. However, we
   for all $t, t' \in [a, b]$ with $|t - t'| \leq k$.
 \end{defi}
 
+We know very well that on a general Riemannian manifold, local geodesics need not be actual geodesics. In fact, they can be far from being an actual geodesic, since, for example, we can wrap around the sphere many times. Again, things are much better in the hyperbolic world.
 \begin{thm}
-  Let $X$ be $\delta$-hyperbolic and $c: [a, b] \to X$ be a $k$-local geodesic where $k > 8 \delta$. Then $c$ is a $(\lambda, \varepsilon)$-quasigeodesic for $\lambda = \lambda(\delta, k)$ and $\varepsilon = \varepsilon(\delta, k)$.
+  Let $X$ be $\delta$-hyperbolic and $c: [a, b] \to X$ be a $k$-local geodesic where $k > 8 \delta$. Then $c$ is a $(\lambda, \varepsilon)$-quasigeodesic for some $\lambda = \lambda(\delta, k)$ and $\varepsilon = \varepsilon(\delta, k)$.
 \end{thm}
 
 First, we prove
 \begin{lemma}
-  Let $X$ be $\delta$-hyperbolic and $k > 8\delta$. If $c: [a, b] \to X$ is a $k$-local geodesic, then $\im c$ is contained in the $2\delta$-neighbourhood $[c(a), c(b)]$.
+  Let $X$ be $\delta$-hyperbolic and $k > 8\delta$. If $c: [a, b] \to X$ is a $k$-local geodesic, then $\im c$ is contained in the $2\delta$-neighbourhood of $[c(a), c(b)]$.
 \end{lemma}
 Observe that by iterating the definition of hyperbolicity, on a $\delta$-hyperbolic space, any point on an $n$-gon is at most $(n - 2)\delta$ away from a point on another side.
 
@@ -1931,10 +1994,36 @@ Observe that by iterating the definition of hyperbolicity, on a $\delta$-hyperbo
   If $t - \frac{k}{2} < a$, we set $y = c(a)$ instead, and similarly for $z$.
 
   Let $y' \in [c(a), c(b)]$ minimize $d(y, y')$, and likewise let $z' \in [c(a), c(b)]$ minimize $d(z, z')$.
+  \begin{center}
+    \begin{tikzpicture}
+      \clip (-3, -1) rectangle (3, 3);
+      \draw [mblue, thick] (-4, 0) arc(180:0:4 and 2);
+      \draw (-4, 0) -- (4, 0);
+
+      \node [circ] at (0, 2) {};
+      \node [above] at (0, 2) {$x$};
+
+      \node [circ] (y) at (-2, 0) {};
+      \node [below] at (y) {$y'$};
+      \node [circ] (z) at (2, 0) {};
+      \node [below] at (z) {$z'$};
+
+      \node [circ] (y') at (-2.3, 1.64) {};
+      \node [anchor = south east] at (y') {$y$};
+      \node [circ] (z') at (2.3, 1.64) {};
+      \node [anchor = south west] at (z') {$z$};
+
+      \draw (y) edge [bend right] (y');
+      \draw (z) edge [bend left] (z');
+
+      \node [circ] (w) at (-1.9, 0.9) {};
+      \node [right] at (w) {$w$};
+    \end{tikzpicture}
+  \end{center}
 
   Fix geodesics $[y, y']$ and $[z, z']$. Then we have a geodesic rectangle with vertices $y, y', z, z'$. By $\delta$-hyperbolicity, there exists $w$ on the rectangle \emph{not} on $\im c$, such that $d(x, w) = 2 \delta$.
 
-  If $w \in [y', z']$, then we win. Otherwise, we may wlog assume $w \in [y, y']$. Note that in the case $y = c(a)$, we must have $y = y'$, and so this would imply $w = y \in [c(a), c(b)]$. So we are only worried about the case $y = c\left(t - \frac{k}{2}\right)$. So $d(y, x) > 4\delta$. But then by the triangle inequality, we must have $d(y, w) > 2\delta$.
+  If $w \in [y', z']$, then we win. Otherwise, we may wlog assume $w \in [y, y']$. Note that in the case $y = c(a)$, we must have $y = y'$, and so this would imply $w = y \in [c(a), c(b)]$. So we are only worried about the case $y = c\left(t - \frac{k}{2}\right)$. So $d(y, x) = \frac{k}{2} > 4\delta$. But then by the triangle inequality, we must have $d(y, w) > 2\delta = d(x, w)$.
 
   However,
   \[
@@ -1944,7 +2033,7 @@ Observe that by iterating the definition of hyperbolicity, on a $\delta$-hyperbo
   \[
     d(x, [c(a), c(b)]) < d(y, y') = d(y, [c(a), c(b)]).
   \]
-  This contradicts our choice of $c$.
+  This contradicts our choice of $x$.
 \end{proof}
 
 \begin{proof}[Proof of theorem]
@@ -2025,7 +2114,7 @@ We now use our new understanding of quasi-geodesics in hyperbolic spaces to try 
   \]
   where $\lambda, \varepsilon$ are as in the theorem.
 
-  Let $\gamma: [a, b] \to X$ be a closed loop. If $\Gamma$ were $C$-locally geodesic, then it would be $(\lambda, \varepsilon)$-quasigeodesic. So
+  Let $\gamma: [a, b] \to X$ be a closed loop. If $\gamma$ were $C$-locally geodesic, then it would be $(\lambda, \varepsilon)$-quasigeodesic. So
   \[
     0 = d(\gamma(a), \gamma(b)) \geq \frac{|b - a|}{\lambda} - \varepsilon.
   \]
@@ -2039,7 +2128,7 @@ We now use our new understanding of quasi-geodesics in hyperbolic spaces to try 
 \begin{defi}[Dehn presentation]\index{Dehn presentation}
   A finite presentation $\bra S \mid R \ket$ for a group $\Gamma$ is called \emph{Dehn} if for every null-homotopic reduced word $w \in S^*$, there is (a cyclic conjugate of) a relator $r \in R$ such that $r = u^{-1}v$ with $\ell_S(u) < \ell_S(v)$, and $w = w_1 v w_2$ (without cancellation).
 \end{defi}
-The point about this is that if we have a null-homotopic word, then there is some part in the word that can be replaced with a shorter word using a single relator.
+The point about this is that if we have a null-homotopic word, then there is some part in the word that can be replaced with a \emph{shorter} word using a single relator.
 
 If a presentation is Dehn, then the naive way of solving the word problem just works. In fact,
 
@@ -2063,13 +2152,11 @@ So while an arbitrary group can be very difficult, the generic group is easy.
 
   Let $C = C(\delta)$ be such that every non-trivial loop is \emph{not} $C$-locally geodesic.
 
-  Take $\{u_i\}$ to be the set of all words in $F(S)$ representing geodesics $[1, u_i]$ in $\Cay_S(\Gamma)$ with $|u_i| < C$. Let $\{v_j\} \subseteq F(S)$ be the set of all \emph{non}-geodesic words of length $\leq C$ in $\Cay_S(\Gamma)$.
-
-  Let $R = \{u_i^{-1} v_j \in F(S) : u_i =_\Gamma v_j\}$.
+  Take $\{u_i\}$ to be the set of all words in $F(S)$ representing geodesics $[1, u_i]$ in $\Cay_S(\Gamma)$ with $|u_i| < C$. Let $\{v_j\} \subseteq F(S)$ be the set of all \emph{non}-geodesic words of length $\leq C$ in $\Cay_S(\Gamma)$. Let $R = \{u_i^{-1} v_j \in F(S) : u_i =_\Gamma v_j\}$.
 
   We now just observe that this gives the desired Dehn presentation! Indeed, any non-trivial loop must contain one of the $v_j$'s, since $\Cay_S(\Gamma)$ is not $C$-locally geodesic, and re can replace it with $u_i$!
 \end{proof}
-This argument was developed by Dehn to prove results about the fundamental group of surface groups in 1912. In 1980, Gromov noticed that Dehn's argument works for an arbitrary hyperbolic group! % check years
+This argument was developed by Dehn to prove results about the fundamental group of surface groups in 1912. In the 1980's, Gromov noticed that Dehn's argument works for an arbitrary hyperbolic group!
 
 One can keep on proving new things about hyperbolic groups if we wished to, but there are better uses of our time. So for the remaining of the chapter, we shall just write down random facts about hyperbolic groups without proof.
 
@@ -2124,7 +2211,7 @@ Recall that if $\Sigma$ is a compact surface of genus $g \geq 2$, then $\pi_1 \S
   Let $X$ be a $\delta$-hyperbolic geodesic metric space. A \emph{geodesic ray} is an isometric embedding $r: [0, \infty) \to X$.
 \end{defi}
 
-We say $r_1 \sim r_2$ if there exists $M$ such that $d(r_1(t), r_2(t)) \leq M$ for all $t$. In the disc model of $\H^2$, this is the scenario where two geodesic rays get very close together as $t \to \infty$ (in the upper half plane model, this contains vertical, parallel lines).
+We say $r_1 \sim r_2$ if there exists $M$ such that $d(r_1(t), r_2(t)) \leq M$ for all $t$. In the disc model of $\H^2$, this is the scenario where two geodesic rays get very close together as $t \to \infty$. For example, in the upper half plane model of $\H^2$, all vertical lines are equivalent in this sense.
 
 We define $\partial_\infty X = \{\text{geodesic rays}\}/\sim$\index{$\partial_\infty X$}. This can be topologized in a sensible way, and in this case $X \cup \partial_\infty X$ is compact. By the Morse lemma, for hyperbolic spaces, this is quasi-isometry invariant.
 
@@ -2169,11 +2256,11 @@ We know that these problems are not solvable in general:
   There exists a finitely-presented group with an unsolvable word problem.
 \end{thm}
 
-\begin{thm}[Gordan] % check
+\begin{thm}[Gordon] % check
   There exists a sequence of finitely generated groups $\Gamma_n$ such that $H_2(\Gamma_n)$ is not computable.
 \end{thm}
 
-As before, we might expect that we can solve these problems if our groups come with some nice geometry.
+As before, we might expect that we can solve these problems if our groups come with some nice geometry. In the previous chapter, we talked about hyperbolic groups, which are \emph{negatively} curved. In this section, we shall work with slightly more general spaces, namely those that are \emph{non-positively} curved.
 
 Let $M$ be a compact manifold of non-positive sectional curvature. It is a classical fact that such a manifold satisfies a quadratic isoperimetric inequality. This is not too surprising, since the ``worst case'' we can get is a space with constant zero curvature, which implies $\tilde{M} \cong \R^n$.
 
@@ -2198,7 +2285,7 @@ This is a very big constraint, and comes very close to characterizing manifolds.
 Thus, we cannot hope to realize lots of groups as the $\pi_1$ of a non-positively curved manifold. The idea of CAT(0) spaces is to mimic the properties of non-positively curved manifolds in a much more general setting.
 
 \subsection{CAT(\tph{$\kappa$}{kappa}{&kappa;}) spaces}
-Let $\kappa = -1, 0$ or $1$, and let $M_\kappa$ be the unique, connected, complete $2$-dimensional Riemannian manifold of curvature $\kappa$. Thus,
+Let $\kappa = -1, 0$ or $1$, and let $M_\kappa$ be the unique, simply connected, complete $2$-dimensional Riemannian manifold of curvature $\kappa$. Thus,
 \[
   M_1 = S^2,\quad M_0 = \R^2,\quad M_{-1} = \H^2.
 \]
@@ -2220,7 +2307,7 @@ Suppose $\Delta = \Delta(x_1, x_2, x_3)$ is a triangle of perimeter $\leq 2 D_\k
 \]
 This is just the fact we know from high school that a triangle is determined by the lengths of its side. The natural map $\bar{\Delta} \to \Delta$ is called the \term{comparison triangle}.
 
-Similarly, given a point $p \in [x_i, x_j]$, there is a \term{comparison point} $\bar{p} \in [\bar{x}_i, \bar{y}_j]$. Note that $p$ might be only multiple edges, so it could have multiple comparison points. However, the comparison point is well-defined as long as we specify the edge as well.
+Similarly, given a point $p \in [x_i, x_j]$, there is a \term{comparison point} $\bar{p} \in [\bar{x}_i, \bar{y}_j]$. Note that $p$ might be on multiple edges, so it could have multiple comparison points. However, the comparison point is well-defined as long as we specify the edge as well.
 
 \begin{defi}[CAT($\kappa$) space]\index{CAT($\kappa$) space} % named after three people
   We say a space $(X, d)$ is CAT($\kappa$) if for any geodesic triangle $\Delta \subseteq X$ of diameter $\leq 2 D_\kappa$, any $p, q \in \Delta$ and any comparison points $\bar{p}, \bar{q} \in \bar{\Delta}$,
@@ -2229,7 +2316,7 @@ Similarly, given a point $p \in [x_i, x_j]$, there is a \term{comparison point} 
   \]
   If $X$ is locally CAT($\kappa$), then $K$ is said to be of \term{curvature} at most $\kappa$.
 
-  In particular, a locally CAT($\kappa$) space is called a \term{non-positively curved space}.
+  In particular, a locally CAT(0) space is called a \term{non-positively curved space}.
 \end{defi}
 
 We are mostly interested in CAT(0) spaces. At some point, we will talk about CAT(1) spaces.
@@ -2264,8 +2351,8 @@ Note that we have strict equality if this is in Euclidean space. So it makes sen
       \node [above] at (0, 2) {$\delta(0)$};
       \node [above] at (3, 2) {$\delta(1)$};
 
-      \node [below] at (1.5, 0) {$\delta$};
-      \node [above] at (1.5, 2) {$\gamma$};
+      \node [below] at (1.5, 0) {$\gamma$};
+      \node [above] at (1.5, 2) {$\delta$};
     \end{tikzpicture}
   \end{center}
   Let $\alpha: [0, 1] \to X$ be a geodesic from $\gamma(0)$ to $\delta(1)$. Applying the CAT(0) estimate to $\Delta(\gamma(0), \gamma(1), \delta(1))$, we get
@@ -2274,27 +2361,27 @@ Note that we have strict equality if this is in Euclidean space. So it makes sen
   \]
   using what we know in plane Euclidean geometry. The same argument shows that
   \[
-    d(\delta(t), \alpha(t) \leq (1 - t) d(\delta(0), \gamma(0)).
+    d(\delta(t), \alpha(t)) \leq (1 - t) d(\delta(0), \gamma(0)).
   \]
   So we know that
   \[
-    d(\gamma(t), \delta(t)) \leq d(\gamma(t), \alpha(t)) + d(\alpha(t), \delta(t)) \leq (1 - t) d(\gamma(0), \delta(0)) + t d(\gamma(1), \delta(1)).
+    d(\gamma(t), \delta(t)) \leq d(\gamma(t), \alpha(t)) + d(\alpha(t), \delta(t)) \leq (1 - t) d(\gamma(0), \delta(0)) + t d(\gamma(1), \delta(1)).\qedhere
   \]
 \end{proof}
 
 \begin{lemma}
-  If $X$ is CAT(0), then $X$ is \emph{uniquely geodesic}, i.e. each pair of points is joined by a unique geodesic.
+  If $X$ is CAT(0), then $X$ is \emph{uniquely geodesic}, i.e.\ each pair of points is joined by a unique geodesic.
 \end{lemma}
 
 \begin{proof}
-  Suppose $x_0, x_1 \in X$ and $\gamma(0) = \delta(0) = x_0$ and $\gamma(1) = \delta(1) = x_1$. Then by the convexity of the metric, we have $d(\gamma(t), \delta(t)) \leq 0$. So $\gamma(t) = \delta(t)$ for all $t$. % Fix this proof. Do it directly.
+  Suppose $x_0, x_1 \in X$ and $\gamma(0) = \delta(0) = x_0$ and $\gamma(1) = \delta(1) = x_1$. Then by the convexity of the metric, we have $d(\gamma(t), \delta(t)) \leq 0$. So $\gamma(t) = \delta(t)$ for all $t$.
 \end{proof}
-This is not surprising, because this is true in the Euclidean plane and the hyperbolic plane, but not in the sphere.
+This is not surprising, because this is true in the Euclidean plane and the hyperbolic plane, but not in the sphere. Of course, one can also prove this result directly.
 
 \begin{lemma}
   Let $X$ be a proper, uniquely geodesic metric space. Then geodesics in $X$ vary continuously with their end points in the compact-open topology (which is the same as the uniform convergence topology).
 \end{lemma}
-This is actually true without the word ``proper'', but the proof is harder
+This is actually true without the word ``proper'', but the proof is harder.
 
 \begin{proof}
   This is an easy application of the Arzel\'a--Ascoli theorem.
@@ -2313,6 +2400,8 @@ This is actually true without the word ``proper'', but the proof is harder
 \end{defi}
 Usually, for us, the action will also be free. This is the case, for example, when a fundamental group acts on the covering space.
 
+Note that a space being CAT(0) is a very fine-grained property, so this is not the same as saying the Cayley graph of the group is CAT(0).
+
 \begin{eg}
   $\Z^n$ for any $n$ is CAT(0), since it acts on $\R^n$.
 \end{eg}
@@ -2328,11 +2417,10 @@ Usually, for us, the action will also be free. This is the case, for example, wh
   Any free group, or direct product of free groups is CAT(0).
 \end{eg}
 
-We remark
+We remark, but will not prove
 \begin{prop}
   Any CAT(0) group $\Gamma$ satisfies a quadratic isoperimetric inequality, that is $\delta_\Gamma \simeq n$ or $\sim n^2$.
 \end{prop}
-We will not prove it.
 
 Note that if $\Gamma$ is in fact CAT(-1), then $\Gamma$ is hyperbolic, which is not terribly difficult to see, since $\H^2$ is hyperbolic. But if a group is hyperbolic, is it necessarily CAT(-1)? Or even just CAT(0)? This is an open question. The difficulty in answering this question is that hyperbolicity is a ``coarse condition'', but being CAT(0) is a fine condition. For example, Cayley graphs are not CAT(0) spaces unless they are trees.
 
@@ -2388,7 +2476,7 @@ Alexandrov's lemma is a lemma that enables us to glue CAT(0) space together to o
 This is the basic result we need if we want to prove ``gluing theorems'' for CAT(0) spaces.
 
 \begin{proof}
-  Consider $\bar{\Delta}_1$ and $\bar{\Delta}_2$, which together form a Euclidean quadrilateral $\bar{Q}$ with with vertices $\bra{x}, \bar{z}_1, \bar{z}_2, \bar{y}$. We claim that then the interior angle at $\bar{y}$ is $\geq 180^\circ$. Suppose not, and it looked like this:
+  Consider $\bar{\Delta}_1$ and $\bar{\Delta}_2$, which together form a Euclidean quadrilateral $\bar{Q}$ with with vertices $\bar{x}, \bar{z}_1, \bar{z}_2, \bar{y}$. We claim that then the interior angle at $\bar{y}$ is $\geq 180^\circ$. Suppose not, and it looked like this:
   \begin{center}
     \begin{tikzpicture}
       \draw (0, 0) node [left] {$\bar{x}$} -- (3, 0) node [right] {$\bar{y}$};
@@ -2465,7 +2553,7 @@ Now to prove the Cartan--Hadamard theorem, we only have to show that the univers
 Gromov's link condition is a criterion that makes it very easy to write down interesting examples of non-positively-curved metric spaces.
 
 \begin{defi}[Euclidean cell complex]\index{Euclidean cell complex}
-  A locally finite cell complex $X$ is \emph{Euclidean} if every cell is isometric to a convex polyhedron in Euclidean space and the attaching maps to identify faces isometrically with lower-dimensional cells.
+  A locally finite cell complex $X$ is \emph{Euclidean} if every cell is isometric to a convex polyhedron in Euclidean space and the attaching maps are isometries from the lower-dimensional cell to a face of the new cell.
 \end{defi}
 Such a complex $X$ has a natural length metric which is proper and geodesic by Hopf--Rinow. What we'd like to do is to come up with a condition that ensures $X$ is CAT(0).
 
@@ -2507,8 +2595,8 @@ Note that $Lk(V)$ is a cell complex: the intersection of $Lk(v)$ with a cell of 
 
       \draw (0, 0.3) arc(90:0:0.3);
       \draw (3, 0.3) arc(90:180:0.3);
-      \draw (0, -0.3) arc(-90:0:0.3);
-      \draw (3, -0.3) arc(-90:-180:0.3);
+      \draw (0, 2.7) arc(-90:0:0.3);
+      \draw (3, 2.7) arc(-90:-180:0.3);
     \end{tikzpicture}
   \end{center}
   So the link is $S^1$.
@@ -2516,16 +2604,31 @@ Note that $Lk(V)$ is a cell complex: the intersection of $Lk(v)$ with a cell of 
 
 \begin{eg}
   If we take the corner of a cube, then $Lk(v)$ is homeomorphic to $S^1$, but it is a weird one, because it is made up of three right angles, not two.
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{scope}[cm={1,0, 0.2, 0.6, (0, 0)}]
+        \draw (0, 0) rectangle (2, 2);
+        \draw [mred] (0.5, 0) arc (0:90:0.5);
+      \end{scope}
+      \begin{scope}[cm={0.2,0.6, 0, 1, (0, 0)}]
+        \draw (0, 0) rectangle (2, 2);
+        \draw [mred] (0.5, 0) arc (0:90:0.5);
+      \end{scope}
+      \draw [fill=white, fill opacity=0.7](0, 0) rectangle (2, 2);
+      \draw [mred] (0.5, 0) arc (0:90:0.5);
+    \end{tikzpicture}
+  \end{center}
 \end{eg}
 
 How can we distinguish between these two $S^1$'s? \emph{Angle} puts a metric on $Lk(v)$. We can do this for general metric spaces, but we only need it for Euclidean complexes, in which case there is not much to do.
 
-Restricted to each cell, the link is just a part of a sphere, and it has a natural spherical metric, which is a length metric. These then glue together to a length metric on $Lk(v)$. Note that this is not the same as the induced metric.
+Restricted to each cell, the link is just a part of a sphere, and it has a natural spherical metric, which is a length metric. These then glue together to a length metric on $Lk(v)$. Note that this is \emph{not} the same as the induced metric.
 
 \begin{eg}
   In the torus, the total length of the link is $2\pi$, while that of the cube is $\frac{3\pi}{2}$.
 \end{eg}
 
+The important theorem, which we are not going to prove, is this:
 \begin{thm}[Gromov's link criterion]\index{Gromov's link criterion}
   A Euclidean complex $X$ is non-positively-curved iff for every vertex $v$ of $X$, $Lk(v)$ is CAT(1).
 \end{thm}
@@ -2588,7 +2691,7 @@ In general, Gromov's link condition might not be too useful, because we still do
   \]
   Then the triangles each has angles $2\alpha, \beta, \beta$.
 
-  We show that $W$ is non-positively curved, and then use this to show that there is a homomorphism $W \to W$ that is surjective but not injective. We say $W$ is \term{non-Hopfian}. In particular, this will show that $WW$ is not linear, i.e.\ it is not a matrix group.
+  We show that $W$ is non-positively curved, and then use this to show that there is a homomorphism $W \to W$ that is surjective but not injective. We say $W$ is \term{non-Hopfian}. In particular, this will show that $W$ is not linear, i.e.\ it is not a matrix group.
 
   To show that $X$ is non-positively curved, we check the link condition:
   \begin{center}
@@ -2646,7 +2749,7 @@ In general, Gromov's link condition might not be too useful, because we still do
   \[
     a = s a^2 b^2 s^{-1},\quad b = ta^2 b^2 t^{-1},
   \]
-  and so $a, b, s, t \in \im t$. The non-trivial claim is that $\ker f \not 0$. Let
+  and so $a, b, s, t \in \im t$. The non-trivial claim is that $\ker f \not= 0$. Let
   \[
     g = [scs^{-1}, tct^{-1}].
   \]
@@ -2773,43 +2876,45 @@ How are we supposed to think about residually finite groups?
 
   Let $p: \tilde{X} \to X$ be the universal cover. For all compact subcomplexes $K \subseteq \tilde{X}$, there is a finite-sheeted cover $X' \to X$ such that the natural covering map $p': \tilde{X} \to X'$ is injective on $K$.
 \end{lemma}
-A good (though not technically correct) way to think about this is follows: if we have a map $f: K \to X$ that may be complicated, and in particular is not injective, then we might hope that there is some ``finite resolution'' $X' \to X$ such that $f$ lifts to $X'$, and the lift is injective. Of course, this is not always possible, and a necessary condition for this to work is that the lift to the universal cover is injective. If this is not true, then obviously no such resolution can exist. And residual finiteness says if there is not obvious reason to fail, then it in fact does not fail.
+A good (though not technically correct) way to think about this is follows: if we have a map $f: K \to X$ that may be complicated, and in particular is not injective, then we might hope that there is some ``finite resolution'' $X' \to X$ such that $f$ lifts to $X'$, and the lift is injective. Of course, this is not always possible, and a necessary condition for this to work is that the lift to the universal cover is injective. If this is not true, then obviously no such resolution can exist. And residual finiteness says if there is no obvious reason to fail, then it in fact does not fail.
 
 \subsection{Cube complexes}
 \begin{defi}[Cube complex]\index{cube complex}
   A Euclidean complex is a \emph{cube complex} if every cell is isometric to a cube (of any dimension).
 \end{defi}
-This is less general than Euclidean complexes, but we can still make high dimension things out of this. Of course, general Euclidean complexes also work in high dimensions, but except in two dimensions, the link condition is rather tricky to check in higher dimensional situations. It turns out the link condition is easy to check for cube complexes.
+This is less general than Euclidean complexes, but we can still make high dimension things out of this. Of course, general Euclidean complexes also work in high dimensions, but except in two dimensions, the link condition is rather tricky to check. It turns out the link condition is easy to check for cube complexes.
 
 Purely topologically, the link of each vertex is made out of simplices, and, subdividing if necessary, they are simplicial complexes. The metric is such that every edge has length $\frac{\pi}{2}$, and this is called the ``all-right simplicial complex''.
 
 Recall that
 \begin{center}
   \begin{tikzpicture}
-    \draw [fill=mblue, fill opacity=0.3] (-2, -2) rectangle (2, 2);
+    \draw (-2, -2) rectangle (2, 2);
     \draw (0, -2) -- (0, 2);
     \draw (-2, 0) -- (2, 0);
-    \draw [morange] (0.5, 0) -- (0, 0.5) -- (-0.5, 0) -- (0, -0.5) -- cycle;
+    \draw [mred] (0.5, 0) -- (0, 0.5) -- (-0.5, 0) -- (0, -0.5) -- cycle;
   \end{tikzpicture}
 \end{center}
 is non-positively curved, while
 \begin{center}
   \begin{tikzpicture}
-    \draw [fill=mblue, fill opacity=0.3] (0, 0) -- (0, 2) --(2, 1) -- (2, -1) -- cycle;
-    \draw [fill=mblue, fill opacity=0.3] (0, 0) -- (0, 2) --(-2, 1) -- (-2, -1) -- cycle;
-
-    \draw [fill=mblue, fill opacity=0.3] (2, -1) -- (0, 0) -- (-2, -1) -- (0, -2) -- cycle; % draw triangle
+    \begin{scope}[cm={1,0, 0.2, 0.6, (0, 0)}]
+      \draw (0, 0) rectangle (2, 2);
+      \draw [mred] (0.5, 0) -- (0, 0.5);
+    \end{scope}
+    \begin{scope}[cm={0.2,0.6, 0, 1, (0, 0)}]
+      \draw (0, 0) rectangle (2, 2);
+      \draw [mred] (0.5, 0) -- (0, 0.5);
+    \end{scope}
+    \draw [fill=white, fill opacity=0.7](0, 0) rectangle (2, 2);
+    \draw [mred] (0.5, 0) -- (0, 0.5);
   \end{tikzpicture}
 \end{center}
 is not.
 
 \begin{defi}[Flag simplicial complex]\index{flag simplicial complex}
-  A simplicial complex is not \emph{flag} if for some $n \geq 2$, it contains a $1$-dimensional subcomplex isomorphic to the $1$-skeleton of an $n$-simplex, which is not contained in the boundary of an $n$-simplex.
-
-  A flag simplicial complex is one that is not not flag.
+  A simplicial complex $X$ is \emph{flag} if for all $n \geq 2$, each copy of $\partial \Delta^n$ in $X$ is in fact the boundary of a copy of $\Delta^n$ in $X$.
 \end{defi}
-So we cannot contain an empty triangle, or hollow tetrahedra.
-
 Note that topologically, flag complexes are not special in any sense. For any simplicial complex $K$, the first barycentric subdivision is flag.
 
 \begin{thm}[Gromov]
@@ -2823,7 +2928,7 @@ Now the property of being flag is purely combinatorial, and easy to check. So th
   \[
     A_N = \bra V(N) \mid [u, v] = 1 \text{ for all } (u, v) \in E(N)\ket
   \]
-  is the \emph{right-angled Artin group}, or \term{graph group}.
+  is the \emph{right-angled Artin group}, or \term{graph group} of $N$.
 \end{defi}
 
 \begin{eg}
@@ -2843,7 +2948,7 @@ Now the property of being flag is purely combinatorial, and easy to check. So th
 \end{eg}
 
 \begin{defi}[Salvetti complex]\index{Salvetti complex}
-  $\mathcal{S}_N$ is a cube complex defined as follows:
+  Given a simplicial group $N$, the \emph{Salvetti complex} $\mathcal{S}_N$ is the cube complex defined as follows:
   \begin{itemize}
     \item Set $\mathcal{S}_N^{(2)}$ is the presentation complex for $A_N$.
     \item For any immersion of the $2$-skeleton of a $d$-dimensional cube, we glue in an $d$-dimensional cube to $\mathcal{S}_N^{(2)}$.
@@ -2863,10 +2968,6 @@ Now the property of being flag is purely combinatorial, and easy to check. So th
   \end{center}
   then $A_n = \Z * \Z^2$, and $\mathcal{S}_N$ is a circle glued to a torus.
 \end{eg}
-
-\begin{defi}[Flag complex]\index{flag complex}
-  The \emph{flag complex} of $N$, written $\bar{N}$, is the only flag simplicial complex with $1$-skeleton $N$.
-\end{defi}
 
 \begin{eg}
   If $N$ is
@@ -2891,7 +2992,7 @@ Now the property of being flag is purely combinatorial, and easy to check. So th
 In fact, there is a recipe for getting the link out of $N$.
 
 \begin{defi}[Double]\index{double}\index{$D(K)$}
-  the \emph{double} $D(K)$ of a simplicial complex $K$ is defined as follows:
+  The \emph{double} $D(K)$ of a simplicial complex $K$ is defined as follows:
   \begin{itemize}
     \item The vertices are $\{v_1^+, \ldots, v_n^+, v_1^-, \ldots, v_n^-\}$, where $\{v_1, \ldots, v_n\}$ are the vertices of $k$.
     \item The simplices are those of the form $\bra v_{i_0}^{\pm}, \ldots, v_{i_k}^{\pm}\ket$, where $\bra v_{i_0}, \ldots, v_{i_k}\ket \in K$.
@@ -2899,10 +3000,13 @@ In fact, there is a recipe for getting the link out of $N$.
 \end{defi}
 
 \begin{eg}
-  The double of $N$ is just $Lk(v)$!
+  In the example above, the double of $N$ is just $Lk(v)$!
 \end{eg}
 
-Note that $D(K)$ contains many copies of $K$, especially $K^+$, which is spanned by the $v_i^+$, and $K^-$, which is spanned by the $v_i^-$. In fact, $K^+$ (and also $K^-$) is a retract of $D(K)$, using the map that sends $v^{\pm}_i$ to $v_i$. Note also that $D(K)$ is flag iff $K$ is flag.
+%Note that $D(K)$ contains many copies of $K$, especially $K^+$, which is spanned by the $v_i^+$, and $K^-$, which is spanned by the $v_i^-$. In fact, $K^+$ (and also $K^-$) is a retract of $D(K)$, using the map that sends $v^{\pm}_i$ to $v_i$. Note also that $D(K)$ is flag iff $K$ is flag.
+\begin{defi}[Flag complex]\index{flag complex}
+  The \emph{flag complex} of $N$, written $\bar{N}$, is the only flag simplicial complex with $1$-skeleton $N$.
+\end{defi}
 
 \begin{lemma}
   For any (simplicial) graph $N$, the link of the unique vertex of $\mathcal{S}_N$ is $D(\bar{N})$. In particular, $\mathcal{S}_N$ is non-positively curved.
@@ -2920,29 +3024,143 @@ Let $X$ be a non-positively curved cube complex. We will write down explicit geo
 \subsubsection*{Hyperplanes and their pathologies}
 If $C \cong [-1, 1]^n$, then a \term{midcube} $M \subseteq C$ is the intersection of $C$ with $\{x_i = 0\}$ for some $i$.
 
-% insert picture
+\begin{center}
+  \begin{tikzpicture}
+    \draw (0, 0) -- (1, 0) -- (1.4, 0.2) -- (1.4, 1.2) -- (0.4, 1.2) -- (0, 1) -- cycle;
+    \draw (0, 1) -- (1, 1) -- (1, 0);
+    \draw (1, 1) -- (1.4, 1.2);
+    \draw [dashed] (0, 0) -- (0.4, 0.2) -- (1.4, 0.2);
+    \draw [dashed] (0.4, 0.2) -- (0.4, 1.2);
+
+    \draw [mblue, thick, fill, fill opacity=0.3] (0.5, 0) -- (0.9, 0.2) -- (0.9, 1.2) -- (0.5, 1) -- cycle;
+
+  \end{tikzpicture}
+\end{center}
 
 Now if $X$ is a non-positively curved cube complex, and $M_1, M_2$ are midcubes of cubes in $X$, we say $M_1 \sim M_2$ if they have a common face, and extend this to an equivalence relation. The equivalence classes are \emph{immersed hyperplanes}. We usually visualize these as the union of all the midcubes in the equivalence class.
+\begin{center}
+  \begin{tikzpicture}
+    \draw (0, 0) -- (1, 0) -- (1.4, 0.2) -- (1.4, 1.2) -- (0.4, 1.2) -- (0, 1) -- cycle;
+    \draw (0, 1) -- (1, 1) -- (1, 0);
+    \draw (1, 1) -- (1.4, 1.2);
+    \draw [dashed] (0, 0) -- (0.4, 0.2) -- (1.4, 0.2);
+    \draw [dashed] (0.4, 0.2) -- (0.4, 1.2);
 
-An immersed hyperplane can be thought of as a locally isometric map $H \looparrowright X$, where $H$ is a cube complex. Let $N_H$ be the pullback interval bundle over $H$. That is, $N_H$ Is obtained by gluing together $\{M \times (-1, 1) \mid M\text{ is a cube in }H\}$. The point of this is to resolve the self-intersections.
+    \draw [mblue, thick, fill, fill opacity=0.3] (0.5, 0) -- (0.9, 0.2) -- (0.9, 1.2) -- (0.5, 1) -- cycle;
 
-% insert picture
+    \draw (0, 0) -- (-0.4, -0.2) -- (0.6, -0.2) -- (1, 0);
+    \draw [mblue, thick] (0.5, 0) -- (0.1, -0.2);
+    \begin{scope}[shift={(-0.4, -0.2)}]
+      \draw (0, 0) -- (-0.4, -0.2);
+      \draw (0.6, -0.2) -- (1, 0);
+      \draw [dashed] (-0.4, -0.2) -- (0.6, -0.2);
+      \draw [mblue, thick] (0.5, 0) -- (0.1, -0.2);
+    \end{scope}
 
-% insert M\"obius band example.
+    \begin{scope}[shift={(-1.2, -0.6)}]
+      \fill [white, opacity=0.5] (0.4, 0.2) rectangle +(1, 1);
+      \draw (0, 0) -- (1, 0) -- (1.4, 0.2) -- (1.4, 1.2) -- (0.4, 1.2) -- (0, 1) -- cycle;
+      \draw (0, 1) -- (1, 1) -- (1, 0);
+      \draw (1, 1) -- (1.4, 1.2);
+      \draw [dashed] (0, 0) -- (0.4, 0.2) -- (0.4, 1.2);
 
-$N_H$ is always a $(-1, 1)$-bundle over $H$, and this corresponds to a homomorphism $\pi_1 H \to \Isom(-1, 1) \cong \Z/2$. If this homomorphism is trivial, then we say $H$ is \term{two-sided}. Otherwise, $H$ is \term{one-sided}.
+      \draw [mblue, thick, fill, fill opacity=0.3] (0.5, 0) -- (0.9, 0.2) -- (0.9, 1.2) -- (0.5, 1) -- cycle;
+    \end{scope}
+  \end{tikzpicture}
+\end{center}
+Note that in general, these immersed hyperplanes can have self-intersections, hence the word ``immersed''. Thus, an immersed hyperplane can be thought of as a locally isometric map $H \looparrowright X$, where $H$ is a cube complex.
 
-We have now met two pathologies of hyperplanes: they may be one-sided (e.g.\ a M\"obius band), or have self-intersections. There are two more. The first is \term{self osculations}:
+In general, these immersed hyperplanes can have several ``pathologies''. The first is self-intersections, as we have already met. The next problem is that of \emph{orientation}, or \emph{sidedness}. For example, we can have the following cube complex with an immersed hyperplane:
 
-% insert pictures
+\pgfplotsset{width=7cm,compat=1.8}
+\begin{center}
+  \begin{tikzpicture}
+    \begin{axis}[hide axis, view = {40}{40}]
+      \addplot3 [
+        patch,
+        faceted color=black,
+        color=white,
+        point meta = x,
+        samples = 15,
+        samples y = 2,
+        domain = 0:360,
+        y domain =-0.5:0.5
+      ] ({(1+0.3*y*cos(x/2)))*cos(x)}, {(1+0.3*y*cos(x/2)))*sin(x)}, {0.5*y*sin(x/2)});
+
+      \addplot3 [samples=50, domain=-135:185, samples y=0, thick, mblue] ({cos(x)}, {sin(x)}, {0});
+    \end{axis}
+  \end{tikzpicture}
+\end{center}
+
+This is bad, for the reason that if we think of this as a $(-1, 1)$-bundle over $H$, then it is non-orientable, and in particular, non-trivial.
+
+In general, there could be self intersections. So we let $N_H$ be the pullback interval bundle over $H$. That is, $N_H$ is obtained by gluing together $\{M \times (-1, 1) \mid M\text{ is a cube in }H\}$. Then we say $H$ is \term{two-sided} if this bundle is trivial, and \term{one-sided} otherwise.
+
+Sometimes, we might not have self-intersections, but something like this:
+\begin{center}
+  \begin{tikzpicture}[scale=0.7]
+    \draw (0, 0) rectangle (1, 1);
+    \draw (0, 0) rectangle (1, -1);
+    \draw (0, 0) -- (-1, 0.2) -- (-1, 1.2) -- (0, 1);
+    \draw (0, 0) -- (-1, -0.2) -- (-1, -1.2) -- (0, -1);
+    \draw (1, 0) -- (2, 0.2) -- (2, 1.2) -- (1, 1);
+    \draw (1, 0) -- (2, -0.2) -- (2, -1.2) -- (1, -1);
+
+    \draw (-1, -0.2) arc(270:90:0.2);
+    \draw (-1, -1.2) arc(270:90:1.2);
+    \draw (-2.2, 0) -- (-1.2, 0);
+
+    \draw [mblue, thick] (2, 0.7) -- (1, 0.5) -- (0, 0.5) -- (-1, 0.7) arc (90:270:0.7) -- (0, -0.5) -- (1, -0.5) -- (2, -0.7);
+  \end{tikzpicture}
+\end{center}
+This is a \term{direct self-osculation}. We can also have \term{indirect osculations} that look like this:
+\begin{center}
+  \begin{tikzpicture}[scale=0.7]
+    \draw (0, 0) rectangle (1, 1);
+    \draw (0, 0) rectangle (1, -1);
+    \draw (0, 0) -- (-1, 0.2) -- (-1, 1.2) -- (0, 1);
+    \draw (1, 0) -- (2, 0.2) -- (2, 1.2) -- (1, 1);
+
+    \draw (0, 0) -- (-1, -0.2) -- (-1, -1.2) -- (0, -1);
+    \draw (1, -1) arc(90:-90:0.2);
+    \draw (1, 0) arc(90:-90:1.2);
+
+    \draw (1, -1.4) rectangle (-1, -2.4);
+    \draw (0, -1.4) -- (0, -2.4);
+
+    \draw (-1, 0.2) arc(90:270:0.8);
+    \draw (-1, 1.2) arc(90:270:1.8);
+    \begin{scope}[shift={(-1, -0.6)}]
+      \draw (-0.8, 0) -- (-1.8, 0);
+      \draw [rotate=45] (-0.8, 0) -- (-1.8, 0);
+      \draw [rotate=-45] (-0.8, 0) -- (-1.8, 0);
+    \end{scope}
+
+    \draw (1.2, -1.2) -- +(1, 0);
+    \draw [mblue, thick] (2, 0.7) -- (1, 0.5) -- (0, 0.5) -- (-1, 0.7) arc (90:270:1.3) -- (1, -1.9) arc(-90:90:0.7) -- (0, -0.5) -- (-1, -0.7);
+  \end{tikzpicture}
+\end{center}
 
 Note that it makes sense to distinguish between direct and indirect osculations only if our hyperplane is two-sided.
 
-Finally, we have \term{inter-osculations}:
+Finally, we have \term{inter-osculations}, which look roughly like this:
+\begin{center}
+  \begin{tikzpicture}[scale=0.7]
+    \draw (0, 0) rectangle (1, 1);
+    \draw (0, 0) rectangle (1, -1);
+    \draw (0, 0) -- (-1, 0.2) -- (-1, 1.2) -- (0, 1);
+    \draw (0, 0) -- (-1, -0.2) -- (-1, -1.2) -- (0, -1);
+    \draw (1, 0) -- (2, 0.2) -- (2, 1.2) -- (1, 1);
+    \draw (1, 0) -- (2, -0.2) -- (2, -1.2) -- (1, -1);
 
-% another picture
 
-\begin{defi}[Special cube complex (Haglund--Wise)]\index{special cube complex}\index{cube complex!special}
+    \draw [mblue, thick] (-1, 0.7) -- (0, 0.5) -- (1, 0.5) -- (2, 0.7) edge [bend left] (4, -1);
+    \draw [mblue, thick] (-1, -0.5) -- (0, -0.5) -- (1, -0.5) -- (2, -0.7) edge [bend right] (4, 1);
+  \end{tikzpicture}
+\end{center}
+
+Haglund and Wise defined \emph{special cube complexes} to be cube complexes that are free of pathologies.
+\begin{defi}[Special cube complex]\index{special cube complex}\index{cube complex!special}
   A cube complex is \emph{special} if its hyperplanes do not exhibit any of the following four pathologies:
   \begin{itemize}
     \item One-sidedness
@@ -2969,6 +3187,7 @@ This is one example, but it is quite nice to have infinitely many. It is true th
   If $X = \mathcal{S}_N$ is a Salvetti complex, then it is a special cube complex, and it is not terribly difficult to check.
 \end{eg}
 
+The key theorem is the following:
 \begin{thm}[Haglund--Wise]
   If $X$ is a compact special cube complex, then there exists a graph $N$ and a local isometry of cube complexes
   \[
@@ -2980,7 +3199,7 @@ This is one example, but it is quite nice to have infinitely many. It is true th
   $\pi_1 X \hookrightarrow A_N$.
 \end{cor}
 
-\begin{proof}
+\begin{proof}[Proof of corollary]
   If $g \in \pi_1 X$, then $g$ is uniquely represented by a local geodesic $\gamma: I \to X$. Then $\varphi \circ \gamma$ is a local geodesic in $\mathcal{S}_N$. Since homotopy classes of loops are represented by unique local geodesics, this implies $\varphi_X \circ \gamma$ is not null-homotopic. So the map $(\varphi_X)_*$ is injective.
 \end{proof}
 
@@ -3000,19 +3219,19 @@ We shall try to give an indication of how we can prove the Haglund--Wise theorem
   \begin{itemize}
     \item Vertices: There is only one vertex in $\mathcal{S}_N$.
     \item Edges: Let $e$ be an edge of $X$. Then $e$ crosses a unique hyperplane $H$. Then $H$ is a vertex of $N$. This corresponds to a generator in $A_N$, hence a corresponding edge $e(H)$ of $\mathcal{S}_N$. Send $e$ to $e(H)$. The choice of transverse orientation tells us which way round to do it
-    \item Squares: given a hyperplane
+    \item Squares: given hyperplanes
       \begin{center}
         \begin{tikzpicture}
           \draw (0, 0) -- (2, 0) node [below, pos=0.5] {$f_2$} -- (2, 2) node [right, pos=0.5] {$e_2$} -- (0, 2) node [pos=0.5, above] {$f_1$} -- (0, 0) node [pos=0.5, left] {$e_1$};
 
-          \draw [mred] (1, 0) -- (1, 2) node [pos=0.7, right] {$H'$};
-          \draw [mblue] (0, 1) -- (2, 1) node [pos=0.7, below] {$H$};
+          \draw [mred, thick] (1, 0) -- (1, 2) node [pos=0.7, right] {$H'$};
+          \draw [mblue, thick] (0, 1) -- (2, 1) node [pos=0.7, below] {$H$};
         \end{tikzpicture}
       \end{center}
       Note that we already mapped $e_1, e_2$ to $e(H)$, and $f_1, f_2$ to $e(H')$. Since $H$ and $H'$ cross in $X$, we know $e(H)$ and $e(H')$ bound a square in $\mathcal{S}_N$. Send this square in $X$ to that square in $\mathcal{S}_N$.
     \item There is nothing to do for the higher-dimensional cubes, since by definition of $\mathcal{S}_N$, they have all the higher-dimensional cubes we can hope for.
   \end{itemize}
-  We haven't used a lot of the nice properties of special cube complexes. They are needed to show that the map is a local isometric embedding. What we do is to use the hypothesis to show that the induced map on links is an isometric embedding, which implies $\varphi_X$ Is a local isometry.
+  We haven't used a lot of the nice properties of special cube complexes. They are needed to show that the map is a local isometric embedding. What we do is to use the hypothesis to show that the induced map on links is an isometric embedding, which implies $\varphi_X$ is a local isometry.
 \end{proof}
 
 This really applies to a really wide selection of objects.
