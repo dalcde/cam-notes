@@ -8,6 +8,12 @@
 
 \input{header}
 
+\newcommand\A{\mathbb{A}}
+\newcommand\val{\mathrm{val}}
+\renewcommand\div{\mathrm{div}}
+\newcommand\Cl{\mathrm{Cl}}
+\newcommand\WDiv{\mathrm{WDiv}}
+
 \begin{document}
 \maketitle
 {\small
@@ -29,6 +35,361 @@ Familiarity with the basic concepts of the geometry of algebraic varieties of di
 Students should have also some familiarity with concepts covered in the Algebraic Topology Part 3 course such as cohomology, duality and characteristic classes.
 }
 \tableofcontents
+
+\section{Introduction}
+Fix a field $K$. The first problem we want to look at is the following:
+\begin{problem}
+  Classify all finitely-generated field extension $L/K$.
+\end{problem}
+A closely related problem is
+\begin{problem}
+  Classify all towers of field extensions $L/M/K$.
+\end{problem}
+In general, we don't want to consider finite extensions --- this falls within the scope of Galois theory instead.
+
+In general, given a finite extension $L/K$, we can factorize it into a tower $L/M/K$, where $M/K$ is purely transcendental, i.e.\ $M \cong K(x_1, \ldots, x_n)$ is a field of rational functions over $K$.
+
+A large class of examples comes from \term{function fields} of algebraic varieties, $K(X)$.
+\begin{eg}
+  Recall that if $X$ is affine, then $K(X)$ is the field of fractions of the ring of functions of $X$, i.e.\ $Q(K[X])$.
+\end{eg}
+
+\begin{question}
+  Are these all the examples of finitely-generated field extensions $L/K$?
+\end{question}
+
+
+\begin{lemma}
+  Let $\Char K = 0$. If $L/K$ is finitely-generated and not finite, then there exists an algebraic variety $X/K$ such that $K(X) \cong L$.
+\end{lemma}
+Note that the condition is satisfied in particular if $K$ is algebraically closed.
+
+\begin{proof}
+  We factor $L/M/K$, where $M/K$ is purely transcendental, say $M = K(x_1, \ldots, x_n) = K(\A^n)$. Since $\Char(K) = 0$, we can use the primitive element theorem to get that $L = M(\alpha)$ for some $\alpha \in L$. Then if $f$ is the minimal polynomial for $\alpha$, then
+  \[
+    L \cong Q(K[x_1, \ldots, x_n, x]/(f(x))).\qedhere
+  \]
+\end{proof}
+
+
+Now suppose $\varphi: X \to Y$ is a dominant birational map, % make birational
+i.e.\ $\overline{\varphi(X)} = Y$. Then this induces a map $\varphi^* : K(Y) \to K(X)$.
+
+Indeed, an element of $K(Y)$ is just a rational function $Y \to \A^1_K$, and pre-composing with $\varphi$ gives the desired function. The dominance ensures the composition is well-defined.
+
+Now if every embedding of field extensions arise this way, then we have reduced our problem to studying algebraic varieties over $K$ and their rational dominant maps. This is indeed the case.
+\begin{thm}
+  Let $K$ be a field with $\Char K = 0$. Then there is an equivalence of categories between
+  \[
+    \left\{ \parbox{4.8cm}{\centering algebraic varieties over $K$\\ rational dominant morphisms}\right\} \longleftrightarrow \left\{\parbox{5.3cm}{\centering infinite f.g.\ field extensions over $K$\\field embeddings}\right\}
+  \]
+\end{thm}
+
+\begin{proof}
+  We define a functor from the left category to the right by sending a variety $X$ to the field of rational functions on $X$, $K(X)$, and morphisms are as above. We have already seen that this is essentially surjective. To show it is fully faithful, suppose $X, Y$ are algebraic varieties over $K$, and $\psi: K(Y) \hookrightarrow K(X)$. We want to show that $\psi = \varphi^*$ for some rational dominant map $X \to Y$.
+
+  We can assume that $X$ and $Y$ are affine, since every variety is birationally equivalent to any Zariski open subset. Then $K(X) = Q(K[X])$ and $K(Y) = Q(K[Y])$. So in particular, we have an embedding $K[Y] \hookrightarrow K(X)$. Since $K[Y]$ is finitely-generated, we can produce a factorization
+  \[
+    \begin{tikzcd}
+      K[Y] \ar[r, hook] \ar[dr, hook] & K(X) \\
+      & K[X]_{s_1, \ldots, s_n} \ar[u, hook]
+    \end{tikzcd}
+  \]
+  for some $s_1, \ldots, s_n$. But then $K[X]_{s_1, \ldots, s_n} = K[U]$ for some open $U \subseteq X$. Then the map $K[Y] \to K[U]$ determines a map $U \to Y$, hence a rational map $X \to Y$. The injectivity of the map $K[Y] \to K[U]$ corresponds to the fact that the induced map $U \to Y$ is dominant. So we are done.
+\end{proof}
+
+So we have translated our initial problem into a problem about algebraic varieties and rational maps. So we now want to understand how we can construct rational maps.
+
+\begin{defi}[Generating section]\index{generating section}
+  Let $X$ be an algebraic variety over $K$, and $\mathcal{F}$ a sheaf of $\mathcal{O}_X$-modules. Let $s_0, \ldots, s_n \in H^0(X, \mathcal{F})$ be sections. We say the sections \emph{generate} $\mathcal{F}$ if the natural map
+  \[
+    \bigoplus_{i = 0}^{n + 1} \mathcal{O}_X \to \mathcal{F}
+  \]
+  induced by the $s_i$ is a surjective map of $\mathcal{O}_X$-modules.
+\end{defi}
+
+This is a very useful concept, because it lets us construct maps into projective spaces.
+\begin{thm}
+  Let $X$ be an algebraic variety over $K$.
+  \begin{enumerate}
+    \item If $\varphi: X \to \P^n$ is a morphism over $K$, then $\varphi^* \mathcal{O}_{\P^n}(1)$ is an invertible sheaf on $X$, generated by the sections $\varphi^* x_0, \ldots, \varphi^* x_n \in H^0(X, \varphi^* \mathcal{O}_{\P^n}(1))$.
+    \item If $\mathcal{L}$ is an invertible sheaf on $X$, and if $s_0, \ldots, s_n \in H^0(X, \mathcal{L})$ which generate $\mathcal{L}$, then there exists a unique morphism $\varphi: X \to \P^n$ such that $\varphi^* \mathcal{O}(1) \cong \mathcal{L}$ and $\varphi^* x_i = s_i$.
+  \end{enumerate}
+\end{thm}
+The moral of the story is that to study morphisms of algebraic varieties, we need to understand invertible sheaves and $n$-tuples of generating sections. This is the focus of the course -- to understand invertible sheaves and their sections.
+
+\begin{proof}\leavevmode
+  \begin{enumerate}
+    \item The pullback of an invertible sheaf is an invertible, and the same for sections. Since $x_0, \ldots, x_n$ generate $H^0(\mathcal{O}_{\P^n}(1))$, they generate, and this is again preserved under pullback.
+    \item The idea is that in homogeneous coordinates, we map $x \in X$ to $[s_0(x): \cdots : s_n(x)] \in \P^n$.
+
+      In more detail, define $X_{s_i} = \{p \in X: s_i \in \mathfrak{m}_p \mathcal{L}_p\}$. This is a Zariski open set, and $s_i$ is invertible on $X_{s_i}$. Thus there is a dual section $s_i^\vee \in \mathcal{L}^{\vee}$ such that $s_i \otimes s_i^\vee \in \mathcal{L} \otimes \mathcal{L}^\vee \cong \mathcal{O}_X$ is equal to $1$. Define the map $K_{s_i} \to \A^n$ by the map
+      \begin{align*}
+        K[\A^n] &\to H^0(X_{s_i}, \mathcal{O}_{s_i})\\
+        y_i &\mapsto s_j \otimes s_i^\vee.
+      \end{align*}
+      Identifying $\A^n$ as the $x_i \not= 0$ chart of $\P^n$, one checks that $X = \bigcup X_{s_i}$, and this map gives the desired map $X \to \P^n$.\qedhere
+  \end{enumerate}
+\end{proof}
+
+Amongst all maps, some are more equal than others. In particular, embeddings are nice.
+
+\begin{defi}[Very ample sheaf]\index{very ample sheaf}\index{sheaf!very ample}
+  Let $X$ be an algebraic variety over $K$, and $\mathcal{L}$ be an invertible sheaf. We say that $\mathcal{L}$ is very ample if there is a closed immersion $\varphi: X \to \P^n$ such that $\varphi^* \mathcal{O}_{\P^n}(1) \cong \mathcal{L}$.
+\end{defi}
+The natural question is --- is there a criteria to identify when $\mathcal{L}$ is very ample. The answer is yes! If $X \hookrightarrow \P^n$, is injective, then given any two points in $X$, there is a hyperplane in $\P^n$ that passes through one but not the other. We want something slightly more, since we want the differential of the map to be injective as well.
+
+\begin{prop}
+  Assume $K = \bar{K}$, and $X$ is a projective variety over $K$. Fix an invertible sheaf $\mathcal{L}$ on $X$, and sections $s_0, \ldots, s_n \in H^0(X, \mathcal{L})$ generating $\mathcal{L}$. Then the associated map $\varphi: X \to \P^n$ is a closed embedding iff
+  \begin{enumerate}
+    \item For every distinct closed points $p \not= q \in X$, there exists $s_{p, q} \in V = \bra s_0, \ldots, s_n\ket \subseteq H^0(X, \mathcal{L})$ such that $s_{p, q} \in \mathfrak{m}_p \mathcal{L}_p$ but $s_{p, q} \not \in \mathfrak{m}_q \mathcal{L}_q$.
+    \item For every $p \in X$, the set $\{s \in V \mid s \in \mathfrak{m}_p \mathcal{L}_p\}$ spans the vector space $\mathfrak{m}_p \mathcal{L}_p /\mathfrak{m}^2_p \mathcal{L}_p$.
+  \end{enumerate}
+\end{prop}
+
+\begin{defi}[Separate points and tangent vectors]
+  With the hypothesis of the proposition, we say that
+  \begin{itemize}
+    \item Elements of $V$ \term{separate points} if $V$ satisfies (i).
+    \item Elements of $V$ \term{separate tangent vectors} if $V$ satisfies (ii).
+  \end{itemize}
+\end{defi}
+
+\begin{proof}\leavevmode
+  \begin{itemize}
+    \item[$(\Rightarrow)$] Suppose $\phi$ is a closed immersion. Then it is injective on points. So suppose $p \not= q$ are (closed) points. Then there is some hyperplane $H_{p, q}$ in $\P^n$ passing through $p$ but not $q$, and $H_{p, q}$ is represented by a global section of $\mathcal{O}(1)$. Then $s_{p, q} = \varphi^* H_{p, q} \in V \subseteq H^0(X, \mathcal{L})$ is such that $s_{p, q} \in \mathfrak{m}_p \mathcal{L}_p$ and $s_{p, q} \not \in \mathfrak{m}_q \mathcal{L}_q$. So (i) is satisfied.
+
+      To see (ii), observe that by definition, the map of sheaves $\mathcal{O}_{\P^n} \to \varphi_* \mathcal{O}_X$ is surjective. So if $p \in X$ is a closed point, then in particular $\mathfrak{m}_{p, \P^n} \to \mathfrak{m}_{p, X}$ is surjective. This implies that the quotient
+       \[
+        \frac{\mathfrak{m}_{p, \P^n}}{\mathfrak{m}_{p, \P^n}^2} \twoheadrightarrow \frac{\mathfrak{m}_{p, X}}{\mathfrak{m}_{p, X}^2}.
+      \]
+      is also surjective. But on $\P^n$, $x_0, \ldots, x_n$ certainly spans $\mathfrak{m}_{p, \P^n}$. So their image $s_0, \ldots, s_n$ in $\mathfrak{m}_{p, X}$ also span $\mathfrak{m}_{p, X}/\mathfrak{m}_{p, X}^2$.
+
+    \item[$(\Leftarrow)$] We first show that $\varphi$ is injective on closed points. For any $p \not= q \in X$, write the given $s_{p, q}$ as
+      \[
+        s_{p, q} = \sum \lambda_i s_i = \sum \lambda_i \varphi^* x_i = \varphi^* \sum \lambda_i x_i
+      \]
+      for some $\lambda_i \in K$. So we can take $H_{p, q}$ to be given by the vanishing set of $\sum \lambda_i x_i$, and so it is injective on closed point. It follows that it is also injective on schematic points.
+
+      To show that $\varphi$ is in fact a closed immersion, we need to show that $\mathcal{O}_{\P^n} \to \varphi_* \mathcal{O}_X$ is surjective. As before, it is enough to prove that it holds at the level of stalks over closed points. To show this, we apply the following lemma:
+      \begin{lemma}
+        Let $f: A \to B$ be a local morphism of local rings such that
+        \begin{itemize}
+          \item $A/\mathfrak{m}_A \to B/\mathfrak{m}_B$ is an isomorphism;
+          \item $\mathfrak{m}_A \to \mathfrak{m}_B/\mathfrak{m}_B^2$ is surjective; and
+          \item $B$ is a finitely-generated $A$-module.
+        \end{itemize}
+        Then $f$ is surjective.\fakeqed
+      \end{lemma}
+      To check the first condition, note that we have
+      \[
+        \frac{\mathcal{O}_{p, \P^n}}{\mathfrak{m}_{p, \P^n}} \cong \frac{\mathcal{O}_{p, X}}{\mathfrak{m}_{p, X}} \cong K.
+      \]
+      Now since $\mathfrak{m}_{p, \P^n}$ is generated by $x_0, \ldots, x_n$, the second condition is the same as saying
+      \[
+        \mathfrak{m}_{p, \P^n} \to \frac{\mathfrak{m}_{p, X}}{\mathfrak{m}_{p, X}^2}
+      \]
+      is surjective. The last part is immediate.\qedhere
+  \end{itemize}
+\end{proof}
+However, this is still not a very pleasant hypothesis to check, since it requires us to really understand the structure of $V$. In general, given an invertible sheaf $\mathcal{L}$, it is unlikely that we can concretely understand the space of sections. Thus, what we want to do in this course is to simplify this criterion.
+
+\begin{problem}
+  Find easier ways to decide whether $\mathcal{L}$ is very ample/ample/has some kind of ``positivity''.
+\end{problem}
+
+We have the following theorem of Serre:
+\begin{thm}[Serre]
+  Let $X$ be a projective scheme over a Noetherian ring $A$, and let $\mathcal{L}$ be a very ample invertible sheaf, and $\mathcal{F}$ a coherent $\mathcal{O}_X$-module. Then there exists a positive integer $n_0 = n_0(\mathcal{F}, \mathcal{L})$ such that for all $n \geq n_0$, the twist $\mathcal{F} \otimes \mathcal{L}^n$ is generated by global sections.\fakeqed
+\end{thm}
+
+So we can try to weaken the condition of very ampleness to only require the condition of this theorem to hold.
+\begin{defi}[Ample sheaf]\index{ample sheaf}
+  Let $X$ be a Noetherian scheme over $A$, and $\mathcal{L}$ an invertible sheaf over $X$. We say $\mathcal{L}$ is ample iff for any coherent $\mathcal{O}_X$-module $\mathcal{F}$, there is an $n_0$ such that for all $n \geq n_0$, the sheaf $\mathcal{F} \otimes \mathcal{L}^n$ is generated by global sections.
+\end{defi}
+
+While this seems like a rather weak condition, by taking $\mathcal{F}$ to be $\mathcal{O}_X$, we can find some $\mathcal{L}^n$ that is generated by global sections. So at least it gives some map to $\P^n$. Can we make this an embedding? The answer is yes, and this is again a theorem of Serre.
+
+\begin{thm}[Serre]
+  Let $X$ be a scheme of finite type over a Noetherian ring $A$, and $\mathcal{L}$ an invertible sheaf on $X$. Then $\mathcal{L}$ is ample iff there exists $m > 0$ such that $\mathcal{L}^m$ is very ample.
+\end{thm}
+
+We only prove this when $A = K$ is a field.
+\begin{proof}\leavevmode
+  \begin{itemize}
+    \item[($\Leftarrow$)] Let $\mathcal{L}^n$ be very ample, and $\mathcal{F}$ a coherent sheaf. By Serre's theorem, there exists $n_0$ such that for all $j \geq j_0$, the sheafs
+      \[
+        \mathcal{F} \otimes \mathcal{L}^{mj}, (\mathcal{F} \otimes \mathcal{L}) \otimes \mathcal{L}^{mj}, \ldots, (\mathcal{F} \otimes \mathcal{L}^{m - 1}) \otimes \mathcal{L}^{mj}
+      \]
+      are all globally generated. So $\mathcal{F} \otimes \mathcal{L}^n$ is globally generated for $n \geq mj_0$.
+    \item[($\Rightarrow$)] Suppose $\mathcal{L}$ is ample. Then $\mathcal{L}^m$ is globally generated for $m$ sufficiently large. We claim that there exists $t_1, \ldots, t_n \in H^0(X, \mathcal{L}^N)$ such that $\mathcal{L}|_{X_{t_i}}$ are all trivial (i.e.\ isomorphic to $\mathcal{O}_{X_{t_i}}$), and $X = \bigcup X_{t_i}$.
+
+      By compactness, it suffices to show that for each $p \in X$, there is some $t \in H^0(X, \mathcal{L}^n)$ (for some $n$) such that $p \in X_{t_i}$ and $\mathcal{L}$ is trivial on $X_{t_i}$. First of all, since $\mathcal{L}$ is locally free by definition, we can find an open affine $U$ containing $p$ such that $\mathcal{L}|_U$ is trivial.
+
+      Thus, it suffices to produce a section $t$ that vanishes on $Y = X - U$ but not at $p$. Then $p \in X_t \subseteq U$ and hence $\mathcal{L}$ is trivial on $X_t$. Vanishing on $Y$ is the same as belonging to the ideal sheaf $\mathcal{I}_Y$. Since $\mathcal{I}_Y$ is coherent, ampleness implies there is some large $n$ such that $\mathcal{I}_Y \otimes \mathcal{L}^n$ is generated by global sections. In particular, since $\mathcal{I}_Y \otimes \mathcal{L}^n$ doesn't vanish at $p$, we can find some $t \in \Gamma(X, \mathcal{I}_Y \otimes \mathcal{L}^N)$ such that $t \not \in \mathfrak{m}_p (\mathcal{I}_Y \otimes \mathcal{L}^n)_p$. Since $\mathcal{I}_Y$ is a subsheaf of $\mathcal{O}_X$, we can view $t$ as a section of $\mathcal{L}^n$, and this $t$ works.
+
+      Fix a point $x \in X$, and take an affine open $U$ containing $x$ such that $\mathcal{L}|_U$ is trivial, i.e.\ $\mathcal{L}|_U \cong \mathcal{O}_U$. Define $Z = X \setminus U$.
+
+      We know there exists $\ell$ such that $I_Z \otimes \mathcal{L}^{\ell}$ is globally generated. So in particular, there exists $s \in H^0(X, I_Z \otimes \mathcal{L}^\ell)$ such that $s_x \not \in \mathfrak{m}_X \mathcal{L}_{x, X}$. So we can define $X_S$ to be the affine Zariski open such that $X_s = \{p \in X : s_p \not \in \mathfrak{m}_p \mathcal{L}_p\}$.
+
+      Now given the $X_{t_i}$, for each fixed $i$, we let $\{b_{ij}\}$ generate $\mathcal{O}_{X_{t_i}}$ as an $A$-algebra. Then for large $n$, $c_{ij} = t_i^n b_{ij}$ extends to a global section $c_{ij} \in \Gamma(X, \mathcal{L}^n)$ (by clearing denominators). We can pick an $n$ large enough to work for all $b_{ij}$. Then we use $\{t_i^n, c_{ij}\}$ as our generating sections to construct a morphism to $\P^N$, and let $\{x_i, x_{ij}\}$ be the corresponding coordinates. Observe that $\bigcup X_{t_i} = X$ implies the $t_i^n$ already generate $\mathcal{L}^n$. Now each $x_{t_i}$ gets mapped to $U_i \subseteq \P^N$, the vanishing set of $x_i$. The map $\mathcal{O}_{U_i} \to \varphi_* \mathcal{O}_{X_{t_i}}$ corresponds to the map
+      \[
+        A[y_i, y_{ij}] \to B_i,
+      \]
+      where $y_{ij}$ is mapped to $c_{ij}/t_i^n = b_{ij}$. So by assumption, this is surjective, and so we have a closed embedding.\qedhere
+  \end{itemize}
+\end{proof}
+\begin{ex}
+  Let $\mathcal{L}$ be a sheaf over $X$ (which is itself a projective variety over $K$). Then the following are equivalent:
+  \begin{enumerate}
+    \item $\mathcal{L}$ is ample.
+    \item $\mathcal{L}^m$ is ample for all $m > 0$.
+    \item $\mathcal{L}^m$ is ample for some $m > 0$.
+  \end{enumerate}
+\end{ex}
+
+\begin{thm}[Serre]
+  Let $X$ be a projective scheme over a Noetherian ring $A$, and $\mathcal{L}$ is very ample on $X$. Let $\mathcal{F}$ be a coherent sheaf. Then
+  \begin{enumerate}
+    \item For all $i \geq 0$ and $n \in \N$, $H^i(\mathcal{F} \otimes \mathcal{L}^n)$ is a finitely-generated $A$-module.
+    \item There exists $n_0 \in \N$ such that for all $n \geq n_0$, $H^i(\mathcal{F} \otimes \mathcal{L}^n) = 0$ for all $i > 0$.\fakeqed
+  \end{enumerate}
+\end{thm}
+The proof is exactly the same as the case of $\mathcal{O}(1)$ on $\P^n$.
+
+It turns out this result characterizes ample sheaves:
+\begin{thm}
+  Let $X$ be a proper scheme over a Noetherian ring $A$, and $\mathcal{L}$ an invertible sheaf. Then the following are equivalent:
+  \begin{enumerate}
+    \item $\mathcal{L}$ is ample.
+    \item For all coherent $\mathcal{F}$ on $X$, there exists $n_0 \in \N$ such that for all $n \geq n_0$, we have $H^i(\mathcal{F} \otimes \mathcal{L}^n) = 0$.
+  \end{enumerate}
+\end{thm}
+
+\begin{proof}
+  Proving (i) $\Rightarrow$ (ii) is the same as the first part of the theorem last time.
+
+  To prove (ii) $\Rightarrow$ (i), fix a point $x \in X$, and consider the sequence
+  \[
+    0 \to \mathfrak{m}_x \mathcal{F} \to \mathcal{F} \to \mathcal{F}_x \to 0.
+  \]
+  We twist by $\mathcal{L}^n$, where $n$ is sufficiently big, and take cohomology. Then we have a long exact sequence
+  \[
+    0 \to H^0(\mathfrak{m}_x \mathcal{F}(n)) \to H^0(\mathcal{F}(n)) \to H^0(\mathcal{F}_x(n) \to H^1(\mathfrak{m}_x \mathcal{F}(n)) = 0.
+  \]
+  In particular, the map $H^0(\mathcal{F}(n)) \to H^0(\mathcal{F}_x(n)$ is surjective. This mean at $x$, $\mathcal{F}(n)$ is globally generated. Then by compactness, there is a single $n$ large enough such taht $\mathcal{F}(n)$ is globally generated everywhere.
+\end{proof}
+
+\section{Divisors}
+\subsection{Weil divisors}
+Let $X$ be a Noetherian scheme. If $X$ is regular in codimension $1$ (e.g.\ if $X$ is normal), which one should think of as saying the singular locus of $X$ having codimension $ \geq 2$. Then if $Y \subseteq X$ is a codimension $1$ integral subscheme, then the local ring $\mathcal{O}_{X, Y}$ is a DVR. So there is a valuation
+\[
+  \val_Y: \mathcal{O}_{X, Y} \to \Z,
+\]
+which is the order of vanishing/poles along $Y$.
+
+\begin{defi}[Weil divisor]\index{Weil divisor}
+  A \emph{Weil divisor} is a formal sum
+  \[
+    \sum a_i Y_i,
+  \]
+  where the $a_i \in \Z$ and $Y_i$ are codimension $1$ integral subschemes. We write $\WDiv(X)$ for the group of Weil divisors of $X$.
+
+  For $K$ a field, a \term{Weil $K$-divisor} is the same where we allow $a_i \in K$.
+\end{defi}
+
+\begin{defi}[Effective divisor]\index{effective divisor}
+  We say a Weil divisor is \emph{effective} if $a_i \geq 0$ for all $i$. We write $D \geq 0$.
+\end{defi}
+
+\begin{defi}[Support]\index{support}
+  The \emph{support} of $D = \sum a_i Y_i$ is
+  \[
+    \supp(D) = \bigcup Y_i.
+  \]
+\end{defi}
+Another important kind of divisors is principal divisors.
+
+\begin{defi}[Principal divisor]\index{principal divisor}\index{$\div(f)$}
+  If $f \in K(X)$, then we define the \emph{principal divisor}
+  \[
+    \div(f) = \sum_{Y} \val_Y(f) \cdot Y.
+  \]
+\end{defi}
+One can show that $\val_Y(f)$ is non-zero for only finitely many $Y$'s, so this is a genuine divisor. To see this, there is always a Zariski open $U$ such that $f|_U$ is invertible, So $\val_Y(f) \not= 0$ implies $Y \subseteq X \setminus U$. Since $X$ is Noetherian, $X \setminus U$ can only contain finitely many codimension $1$ subscheme.
+Observe that $\div(fg) = \div(f) + \div(g)$. So the principal divisors form a subgroup of the Weil divisors.
+
+\begin{defi}[Class group]\index{class group}
+  The \emph{class group} of $X$, $\Cl(X)$, is the group of Weil divisors quotiented out by the principal divisors.
+\end{defi}
+
+\begin{eg}
+  Take $X = \A^1_K$, and $f = \frac{x^3}{x + 1} \in K(X)$. Then
+  \[
+    \div(f) = 3[0] - [-1].
+  \]
+\end{eg}
+
+A useful result for the future is the following:
+\begin{thm}[Hartog's lemma]\index{Hartog's lemma}
+  Let $X$ be normal, and $f \in \mathcal{O}(X \setminus V)$ for some $V \geq 2$. Then $f \in \mathcal{O}_X$.
+\end{thm}
+
+\subsection{Cartier divisors}
+Weil divisors do not behave too well on weirder schemes. A better alternative is Cartier divisors. Let $\mathcal{L}$ be a line bundle, and $ss$ a rational section of $\mathcal{L}$, i.e.\ $s$ is a section of $\mathcal{L}|_U$ for some open $U \subseteq X$. Given such an $s$, we can define
+\[
+  \div(s) = \sum_Y \val_Y(s) \cdot Y.
+\]
+To make sense of $\val_Y(s)$, for a fixed codimension $1$ subscheme $Y$, pick $W$ such that $W \cap W \not= \emptyset$, and $\mathcal{L}|_W$ is trivial. Then we can make sense of $\val_Y(s)$ using the trivialization. It is clear from Hartog's lemma that
+\begin{prop}
+  If $X$ is normal, then
+  \[
+    \div: \{\text{rational sections of }\mathcal{L}\} \to \WDiv(X).
+  \]
+  is well-defined, and two sections have the same image iff they differ by an element of $\mathcal{O}_X^*$.
+\end{prop}
+
+\begin{cor}
+  If $X$ is normal and proper, then
+  \[
+    \div \{\text{rational sections of }\mathcal{L}\}/K^* \to \WDiv(X).
+  \]
+\end{cor}
+
+\begin{proof}
+  Properness implies $\mathcal{O}_X^* = K^*$.
+\end{proof}
+
+\begin{eg}
+  Take $X = \P^1_K$, and $s = \frac{X^2}{X + Y} \in H^0(\mathcal{O}(1))$, where $X, Y$ are our homogeneous coordinates. Then
+  \[
+    \div(s) = 2[0:1] - [1:-1].
+  \]
+\end{eg}
+
+Let $X$ be a normal Noetherian scheme. Fix a Weil divisor $X$. We define the sheaf $\mathcal{O}_X(D)$\index{$\mathcal{O}_X(D)$} by setting, for all $U \subseteq X$ open,
+\[
+  \mathcal{O}_U(D) = \{f \in K(X) : \div(f) + D |_U \geq 0\}.
+\]
+\begin{prop}
+  $\mathcal{O}_X(D)$ is a rank $1$ quasicoherent $\mathcal{O}_X$-module. \fakeqed.
+\end{prop}
+
+\begin{defi}[Locally principal]\index{locally principal}
+  Let $D$ be a Weil divisor on $X$. Fix $x \in X$. Then $D$ is locally principal at $x$ if there exists an open set $U \subseteq X$ containing $x$ such that $D|_U = \div(f)|_U$ for some $f \in K(X)$.
+\end{defi}
+
+\begin{prop}
+  If $D$ is locally principal at every point $x$, then $\mathcal{O}_X(D)$ is an invertible sheaf.
+\end{prop}
+
+\begin{proof}
+  If $U \subseteq X$ is such that $D|_U = \div(f)|_U$, then there is an isomorphism
+  \begin{align*}
+    \mathcal{O}_X|_U &\to \mathcal{O}_X(D) |_U\\
+    g &\mapsto g/f.\qedhere
+  \end{align*}
+\end{proof}
 
 \printindex
 \end{document}

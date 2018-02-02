@@ -25,5 +25,782 @@ Knowledge of measure theoretic probability as taught in Part III Advanced Probab
 }
 \tableofcontents
 
+\section{Introduction}
+\subsection{Motivation}
+Ordinary differential equations are central for analysis. The simplest class may have the form
+\[
+  \dot{x}(t) = F(x(t)).
+\]
+\emph{Stochastic} differential equations are differential equations where we make the function $F$ ``random''. There are many ways of doing so, and the simplest way is to write it as
+\[
+  \dot{x}(t) = F(x(t)) + \eta(t),
+\]
+where $\eta$ is a random function, which we would like to think of as being random noise. What should we expect $\eta$ to be like? We would expect that for $|t - s| \gg 0$, the variables $\eta(t)$ and $\eta(s)$ are ``essentially'' independent. If we are interested in physical systems, then this is a rather reasonable assumption, since random noise is random!
+
+It might be easier to work with the idealization, where we in fact require that $\eta(t)$ and $\eta(s)$ are independent for $t \not= s$. Such an $\eta$ exists, and is known as \emph{white noise}, but is not a function, just a Schwartz distribution.
+
+To simplify matters a bit, we set $F = 0$. To make sense of
+\[
+  \dot{x} = \eta,
+\]
+or equivalently,
+\[
+  x(t) = x(0) + \int_0^t \eta(s)\;\d s,
+\]
+the function $\eta$ should at least be a signed measure. Unfortunately, white noise isn't. This is in some sense bad news.
+
+We ignore this issue for a little bit, and proceed as if it made sense. If the equation held, then for any $0 = t_0 < t_1 < \cdots$, the increments
+\[
+  x(t_i) - x(t_{i - 1}) = \int_{t_{i - 1}}^{t_i} \eta(s) \;\d s
+\]
+should be independent, and moreover their variance should scale linearly with $|t_i - t_{i - 1}|$. So maybe this $x$ should be a Brownian motion!
+
+Why should we be interested in this continuous problem, as opposed to what we obtain when we discretize time and get a random walk instead? It turns out in some sense the continuous problem is easier. Unfortunately, this will probably not be apparent from what we see in the course. Compare this with when we learn measure theory, there is a lot of work put into constructing the Lebesgue measure. However, what we end up is much easier --- it's easier to integrate $\frac{1}{x^3}$ than to sum $\sum_{n = 1}^\infty \frac{1}{n^3}$. What stochastic calculus gives us is a powerful tool to do explicit computations, which is usually harder in the discrete case.
+
+In ordinary analysis, a lot of the familiar functions such as trigonometric functions and Bessel functions are characterized as solutions to certain differential equations. Similarly, a lot of stochastic processes are characterized as solutions to stochastic differential equations.
+
+\subsection{The Wiener integral}
+To give a flavour of the construction of the It\^o integral, we consider a simpler scenario of the Wiener integral.
+
+\begin{defi}[Gaussian space]\index{Gaussian space}
+  Let $(\Omega, \mathcal{F}, \P)$ be a probability space. Then a subspace $S \subseteq L^2(\Omega, \mathcal{F}, \P)$ is called a \emph{Gaussian space} if it is a closed linear subspace and every $X \in S$ is a centered Gaussian random variable.
+\end{defi}
+
+An important construction is
+\begin{prop}
+  Let $H$ be any separable Hilbert space. Then there is a probability space $(\Omega, \mathcal{F}, \P)$ with a Gaussian subspace $S \subseteq L^2(\Omega, \mathcal{F}, \P)$ and an isometry $I: H \to S$. In other words, for any $f \in H$, there is a corresponding random variable $I(f) \sim N(0, (f, f)_H)$. Moreover, $I(\alpha f + \beta g) = \alpha I(f) + \beta I(g)$ and $(f, g)_H = \E[I(f) I(g)]$.
+\end{prop}
+
+\begin{proof}
+  By separability, we can pick a Hilbert space basis $(e_i)_{i = 1}^\infty$ of $H$. Let $(\Omega, \mathcal{F}, \P)$ be any probability space that carries an infinite independent sequence of standard Gaussian random variables $X_i \sim N(0, 1)$. Then send $e_i$ to $X_i$, and take $S$ to be the image, and extend by linearity and continuity.
+\end{proof}
+
+In particular, we can take $H = L^2(\R_+)$.
+
+\begin{defi}[Gaussian white noise]\index{Gaussian white noise}
+  A \emph{Gaussian white noise} on $\R_+$ is an isometry $WN$ from $L^2(\R_+)$ into some Gaussian space. For $A \subseteq \R_+$, we write $WN(A) = WN(\mathbf{1}_A)$.
+\end{defi}
+
+\begin{prop}\leavevmode
+  \begin{itemize}
+    \item For $A \subseteq \R_+$ with $|A| < \infty$, $WN(A) \sim N(0, |A|)$.
+    \item For disjoint $A, B \subseteq \R_+$, the variables $WN(A)$ and $WN(B)$ are independent.
+    \item If $A = \bigcup_{i = 1}^\infty A_i$ for disjoint sets $A_i \subseteq \R_+$, with $|A| < \infty, |A_i| < \infty$, then
+      \[
+        WN(A) = \sum_{i = 1}^\infty WN(A_i)
+      \]
+      in $L^2$ and a.s.
+  \end{itemize}
+\end{prop}
+
+\begin{proof}
+  Only the last point requires proof. Observe that the partial sum
+  \[
+    M_n = \sum_{i = 1}^n WN(A)
+  \]
+  is a martingale, and is bounded in $L^2$ as well, since
+  \[
+    \E M_n^2 = \sum_{i = 1}^n \E WN(A_i)^2 = \sum_{i = 1}^n |A_i| \leq |A|.
+  \]
+  So we are done by the martingale convergence theorem. The limit is indeed $WN(A)$ because $\mathbf{1}_A = \sum_{n = 1}^\infty \mathbf{1}_{A_i}$.
+\end{proof}
+The point of the proposition is that $WN$ really looks like a random measure on $\R_+$, except it is \emph{not}. We only have convergence almost surely above, which means we have convergence on a set of measure $1$. However, the set depends on which $A$ and $A_i$ we pick. For things to actually work out well, we must have a fixed set of measure $1$ for which convergence holds for all $A$ and $A_i$.
+
+But perhaps we can ignore this problem, and try to proceed. We define
+\[
+  B_t = WN([0, t])
+\]
+for $t \geq 0$.
+\begin{ex}
+  This $B_t$ is a standard Brownian motion, except for the continuity requirement. In other words, for any $t_1, t_2, \ldots, t_n$, the vector $(B_{t_i})_{i = 1}^n$ is jointly Gaussian with
+  \[
+    \E[B_s B_t] = s \wedge t\text{ for }s, t \geq 0.
+  \]
+  Moreover, $B_0 = 0$ a.s.\ and $B_t - B_s$ is independent of $\sigma(B_r: r \leq s)$. Moreover, $B_t - B_s \sim N(0, t - s)$ for $t \geq s$.
+\end{ex}
+In fact, by picking a good basis of $L^2(\R_+)$, we can make $B_t$ continuous.
+
+If $f \in L^2(\R_+)$ is a step function,
+\[
+  f = \sum_{i = 1}^n f_i \mathbf{1}_{[s_i, t_i]}
+\]
+with $s_i < t_i$, then
+\[
+  WN(f) = \sum_{i = 1}^n f_i (B_{t_i} - B_{s_i})
+\]
+This motivates the notation
+\[
+  WN(f) = \int f(s)\; \d B_S.
+\]
+If $(B)$ were a function of finite variation almost surely, then the last equality would make sense in the Lebesgue--Stieltjes sense.
+
+\subsection{Lebesgue--Stieltjes integral}
+In calculus, we are able to perform integrals more exciting than simply $\int_0^1 h(x) \;\d x$. In particular, if $h, a: [0, 1] \to \R$ are functions, we can perform integrals of the form
+\[
+  \int_0^1 h(x) \;\d a(x).
+\]
+For them, it is easy to make sense of what this means --- it's simply
+\[
+  \int_0^1 h(x) \;\d a = \int_0^1 h(x) a'(x) \;\d x.
+\]
+In our world, we wouldn't expect our functions to be differentiable, so this is not a great definition. One reasonable strategy to make sense of this is to come up with a measure that should equal ``$\d a$''.
+
+An immediate difficulty we encounter is that $a'(x)$ need not be positive all the time. So for example, $\int_0^1 1 \;\d a$ could be a negative number, which one wouldn't expect for a usual measure! Thus, we are naturally lead to think about \emph{signed measures}.
+
+From now on, we always use the Borel $\sigma$-algebra on $[0, T]$ unless otherwise specified.
+\begin{defi}[Signed measure]\index{signed measure}
+  A \emph{signed measure} on $[0, T]$ is a difference $\mu = \mu_+ - \mu_-$ of two positive measures on $[0, T]$ of disjoint support. The decomposition $\mu = \mu_+ - \mu_-$ is called the \term{Hahn decomposition}.
+\end{defi}
+
+In general, given two measures $\mu_1$ and $\mu_2$ with not necessarily disjoint supports, we may still want to talk about $\mu_1 - \mu_2$.
+\begin{thm}
+  For any two finite measures $\mu_1, \mu_2$, there is a signed measure $\mu$ with $\mu(A) = \mu_1(A) - \mu_2(A)$.
+\end{thm}
+
+If $\mu_1$ and $\mu_2$ are given by densities $f_1, f_2$, then we can simply decompose $\mu$ as $(f_1 - f_2)^+\;\d t + (f_1 - f_2)^- \;\d t$, where $^+$ and $^-$ denote the positive and negative parts respectively. In general, they need not be given by densities with respect to $\d x$, but they are always given by densities with respect to some other measure.
+\begin{proof}
+  Let $\nu = \mu_1 + \mu_2$. By Radon--Nikodym, there are positive functions $f_1, f_2$ such that $\mu_i(\d t) = f_i(t) \nu(\d t)$. Then
+  \[
+    (\mu_1 - \mu_2)(\d t) = (f_1 - f_2)^+(t) \cdot \nu(\d t) + (f_1 - f_2)^- (t) \cdot \nu(\d t).\qedhere
+  \]
+\end{proof}
+
+\begin{defi}[Total variation]\index{total variation}
+  The total variation of a signed measure $\mu = \mu_+ - \mu_-$ is $|\mu| = \mu_+ + \mu_-$.
+\end{defi}
+
+We now want to figure out how we can go from a function to a signed measure. Let's think about how one would attempt to define $\int_0^1 f(x)\;\d g$ as a Riemann sum. A natural option would be to write something like
+\[
+  \int_0^t h(s) \;\d a(s) = \lim_{m \to \infty} \sum_{i = 1}^{n_m} h(t_{i - 1}^{(m)}) (a (t_i^{(m)}) - a(t_{i - 1}^{(m)}))
+\]
+for any sequence of subdivisions $0 = t_0^{(m)} < \cdots < t_{n_m}^{(m)} = t$ of $[0, t]$ with $\max_i |t_i^{(m)} - t_{i - 1}^{(m)}| \to 0$.
+
+In particular, since we want the integral of $h = 1$ to be well-behaved, the sum $\sum (a(t_i^{(m)}) - a(t_{i - 1}^{(m)}))$ must be well-behaved. This leads to the notion of
+\begin{defi}[Total variation]\index{total variation}
+  The \emph{total variation} of a function $a: [0, T] \to \R$ is
+  \[
+    V_a(t) = |a(0)| + \sup \left\{\sum_{i = 1}^n |a(t_i) - a(t_{i - 1})|: 0 = t_0 < t_1 < \cdots < t_n = T\right\}.
+  \]
+  We say $a$ has \term{bounded variation} if $V_a(T) < \infty$. In this case, we write $a \in BV$.\index{BV}
+\end{defi}
+We include the $|a(0)|$ term because we want to pretend $a$ is defined on all of $\R$ with $a(t) = 0$ for $t < 0$.
+
+We also define
+\begin{defi}[c\`adl\`ag]\index{c\`adl\`ag}
+  A function $a: [0, T] \to \R$ is \emph{c\`adl\`ag} if it is right-continuous and has left-limits.
+\end{defi}
+
+The following theorem is then clear:
+\begin{thm}
+  There is a bijection
+  \[
+    \left\{\vphantom{\parbox{4.5cm}{a\\b}}\parbox{4.5cm}{\centering signed measures on $[0, T]$} \right\} \longleftrightarrow \left\{\parbox{4.5cm}{\centering c\`adl\`ag functions of bounded variation $a: [0, T] \to \R$}\right\}\\
+  \]
+  that sends a signed measure $\mu$ to $a(t) = \mu([0, t])$. To construct the inverse, given $a$, we define
+  \[
+    a_{\pm} = \frac{1}{2}(V_a \pm a).
+  \]
+  Then $a_{\pm}$ are both positive, and $a = a_+ - a_-$. We can then define $\mu_{\pm}$ by
+  \begin{align*}
+    \mu_{\pm}[0, t] &= a_{\pm}(t) - a_{\pm}(0)\\
+    \mu &= \mu_+ - \mu_-
+  \end{align*}
+  Moreover, $V_{\mu[0, t]} = |\mu|[0, t]$.
+\end{thm}
+
+\begin{eg}
+  Let $a: [0, 1] \to \R$ be given by
+  \[
+    a(t) =
+    \begin{cases}
+      1 & t < \frac{1}{2}\\
+      0 & t \geq \frac{1}{2}
+    \end{cases}.
+  \]
+  This is c\`adl\`ag, and it's total variation is $v_0(1) = 2$. The associated signed measure is
+  \[
+    \mu = \delta_0 - \delta_{1/2},
+  \]
+  and the total variation measure is
+  \[
+    |\mu| = \delta_0 + \delta_{1/2}.
+  \]
+\end{eg}
+
+We are now ready to define the Lebesgue--Stieltjes integral.
+
+\begin{defi}[Lebesgue--Stieltjes integral]\index{Lebesgue--Stieltjes integral}
+  Let $a: [0, T] \to \R$ be c\`adl\`ag of bounded variation and let $\mu$ be the associated signed measure. Then for $h \in L^1([0, T], |\mu|)$, the \emph{Lebesgue--Stieltjes integral} is defined by
+  \[
+    \int_s^t h(r) \d a(r) = \int_{(s, t]} h(r) \mu (\d r),
+  \]
+  where $0 \leq s \leq t \leq T$, and
+  \[
+    \int_s^t h(r) |\d a(r)| = \int_{(s, t]} h(r) |\mu| (\d r).
+  \]
+  We also write
+  \[
+    h \cdot a(t) = \int_0^t h(r) \;\d a(r).
+  \]
+\end{defi}
+
+To let $T = \infty$, we need the following notation:
+\begin{defi}[Finite variation]\index{finite variation}
+  A c\`adl\`ag function $a: [0, \infty) \to \R$ is of finite variation if $a|_{[0, T]} \in BV[0, 1]$ for all $T > 0$.
+\end{defi}
+
+\begin{fact}
+  Let $a: [0, T] \to \R$ be c\`adl\`ag and BV, and $h \in L^1([0, T], |\d a|)$, then
+  \[
+    \left|\int_0^T h(s) \;\d a (s) \right| \leq \int_a^b |h(s)|\;|\d a(s)|,
+  \]
+  and the function $h \cdot a: [0, T] \to \R$ is c\`adl\`ag and BV with associated signed measure $h(s) \;\d a(s)$. Moreover, $|h(s) \;\d a(s)| = |h(s)|\;|\d a(s)|$.
+\end{fact}
+
+\begin{prop}
+  Let $a$ be c\`adl\`ag and BV on $[0, t]$, and $h$ bounded and left-continuous. Then
+  \begin{align*}
+    \int_0^t h(s) \;\d a(s) &= \lim_{m \to \infty} \sum_{i = 1}^{n_m} h(t_{i - 1}^{(m)}) (a (t_i^{(m)}) - a(t_{i - 1}^{(m)}))\\
+    \int_0^t h(s) \;|\d a(s)| &= \lim_{m \to \infty} \sum_{i = 1}^{n_m} h(t_{i - 1}^{(m)}) |a (t_i^{(m)}) - a(t_{i - 1}^{(m)})|
+  \end{align*}
+  for any sequence of subdivisions $0 = t_0^{(m)} < \cdots < t_{n_m}^{(m)} = t$ of $[0, t]$ with $\max_i |t_i^{(m)} - t_{i - 1}^{(m)}| \to 0$.
+\end{prop}
+
+\begin{proof}
+  We approximate $h$ by $h_m$ defined by
+  \[
+    h_m(0) = 0,\quad h_m(s) = h(t_{i - 1}^{(m)})\text{ for }s \in (t_{i - 1}^{(m)}, t_i^{(m)}].
+  \]
+  Then by left continuity, we have
+  \[
+    h(s) = \lim_{n \to \infty}h_m(s)
+  \]
+  by left continuity, and moreover
+  \[
+    \lim_{m \to \infty} \sum_{i = 1}^{n_m} h(t_{i - 1}^{(m)}) (a(t_i^{(m)}) - a(t_{i - 1}^{(m)})) = \lim_{m \to \infty} \int_{(0, t]} h_m(s) \mu (\;\d s) = \int_{(0, t]} h(s) \mu(\d s)
+  \]
+  by dominated convergence theorem. The statement about $|\d a(s)|$ is left as an exercise.
+\end{proof}
+
+\section{Semi-martingales}
+The idea of a semi-martingale is what we get when we put together the ideas of a finite variation function and semi-martingales.
+
+From now on, $(\Omega, \mathcal{F}, (\mathcal{F}_t)_{t \geq 0}, \P)$ is a filtered probability space.
+
+\begin{defi}[c\`adl\`ag adapted process]\index{c\`adl\`ag adapted process}
+  A \emph{c\`adl\`ag adapted process} is a map $X: \Omega \times [0, \infty) \to \R$ such that
+  \begin{enumerate}
+    \item $X$ is c\`adl\`ag, i.e.\ $X(\omega, \ph): [0, \infty) \to \R$ is c\`adl\`ag for all $\omega \in \Omega$.
+    \item $X$ is adapted, i.e.\ $X_t = X(\ph, t) $ is $\mathcal{F}_t$-measurable for every $t \geq 0$.
+  \end{enumerate}
+\end{defi}
+
+\begin{notation}
+  We will write $X \in \mathcal{G}$ to denote that a random variable $X$ is measurable with respect to a $\sigma$-algebra $\mathcal{G}$.
+\end{notation}
+
+\subsection{Finite variation processes}
+\begin{defi}[Finite variation process]\index{Finite variation process}
+  A c\`adl\`ag adapted process $A$ is a \emph{finite variation process} if $A(\omega, \ph): [0, \infty) \to \R$ has finite variation for all $\omega \in \Omega$. The \term{total variation process} $V$ of a finite variation process $A$ is
+  \[
+    V_t = \int_0^T |\d A_s|.
+  \]
+\end{defi}
+
+\begin{prop}
+  The total variation process $V$ of a c\`adl\`ag adapted process $A$ is also c\`adl\`ag, finite variation and adapted, and it is also increasing.
+\end{prop}
+
+\begin{proof}
+  We only have to check that it is adapted. But that follows directly from our previous expression of the integral as the limit of a sum. Indeed, let $0 = t_0^{(m)} < t_1^{(m)} < \cdots < t_{n_m} = t$ be a (nested) sequence of subdivisions of $[0, t]$ with $\max_i |t_i^{(m)} - t_{i - 1}^{(m)}| \to 0$. We have seen
+  \[
+    V_t = \lim_{m \to \infty} \sum_{i = 1}^{n_m} |A_{t_i^{(m)}} - A_{t_{i - 1}^{(m)}}| + |A(0)| \in \mathcal{F}_t.\qedhere
+  \]
+\end{proof}
+
+\begin{defi}[$(H\cdot A)_t$]\index{$(H\cdot A)_t$}
+  Let $A$ be a finite variation process and $H$ a process such that for all $\omega \in \Omega$ and $t \geq 0$,
+  \[
+    \int_0^t H_s(\omega)|\;|\d A_s(\omega)| < \infty.
+  \]
+  Then define a process $((H \cdot A)_t)_{t \geq 0}$ by
+  \[
+    (H \cdot A)_t = \int_0^t H_s\;\d A_s.
+  \]
+\end{defi}
+For the process $H \cdot A$ to be adapted, we need a condition.
+\begin{defi}[Previsible process]\index{previsible process}
+  A process $H: \Omega \times [0, \infty) \to \R$ is \emph{previsible} if it is measurable with respect to the \term{previsible $\sigma$-algebra} $\mathcal{P}$ generated by the sets $E \times (s, t]$, where $E \in \mathcal{F}_s$ and $s < t$. We call the generating set $\Pi$.
+\end{defi}
+The idea is that a previsible process is one where whenever it happens, you know it a finite (though possibly arbitrarily small) before.
+
+\begin{defi}[Simple process]\index{simple process}\index{$\mathcal{E}$}
+  A process $H: \Omega \times [0, \infty) \to \R$ is \emph{simple}, written $H \in \mathcal{E}$, if
+  \[
+    H(\omega, t) = \sum_{i = 1}^n H_{i - 1}(\omega) \mathbf{1}_{(t_{i - 1}, t_i]}(t)
+  \]
+  for random variables $H_{i - 1} \in \mathcal{F}$ and $0 = t_0 < \cdots < t_n$.
+\end{defi}
+
+\begin{fact}
+  Simple processes and their limits are previsible.
+\end{fact}
+
+\begin{fact}
+  Let $X$ be a c\`adl\`ag adapted process. Then $H_t = X_{t^-}$ defines a left-continuous process and is previsible.
+\end{fact}
+
+\begin{proof}
+  Since $X$ is c\`adl\`ag adapted, it is clear that $H$ is left-continuous and adapted. Since $H$ is left-continuous, it is approximated by simple processes. Let
+  \[
+    H_t^n = \sum_{i = 1}^{2^nn} H_{(i - 1)2^{-n}} \mathbf{1}_{((i - 1)2^{-n}, i 2^{-n}]} (t) \wedge n \in \mathcal{E}.
+  \]
+  Then $H_t^n \to H$ for all $t$ by left continuity, and previsibility follows.
+\end{proof}
+
+\begin{ex}
+  Let $H$ be previsible. Then
+  \[
+    H_t \in \mathcal{F}_{t^-} = \sigma(\mathcal{F}_s : s < t).
+  \]
+\end{ex}
+
+\begin{eg}
+  Brownian motion is previsible (since it is continuous).
+\end{eg}
+
+\begin{eg}
+  A Poisson process $(N_t)$ is not previsible since $N_t \not \in \mathcal{F}_{t^-}$.
+\end{eg}
+
+\begin{prop}
+  Let $A$ be a finite variation process, and $H$ previsible such that
+  \[
+    \int_0^t |H(\omega, s)|\;|\d A(\omega, s)| < \infty\text{ for all }(\omega, t) \in \Omega \times [0, \infty).
+  \]
+  Then $H \cdot A$ is a finite variation process.
+\end{prop}
+
+\begin{proof}
+  The finite variation and c\`adl\`ag parts follow directly from the deterministic versions. We only have to check that $H \cdot A$ is adapted, i.e.\ $(H \cdot A)(\ph, t) \in \mathcal{F}_t$ for all $t \geq 0$.
+
+  First, $H \cdot A$ is adapted if $H(\omega, s) = 1_{(u, v]}(s) 1_E(\omega)$ for some $u < v$ and $E \in \mathcal{F}_u$, since
+  \[
+    (H \cdot A)(\omega, t) = 1_E(\omega) (A(\omega, t \wedge u) - A(\omega, t \wedge u)) \in \mathcal{F}_t.
+  \]
+  Thus, $H \cdot A$ is adapted for $H = \mathbf{1}_F$ when $F \in \Pi$. Clearly, $\Pi$ is a $\pi$ system, i.e.\ it is closed under intersections and non-empty, and by definition it generates the previsible $\sigma$-algebra $\mathcal{P}$. So to extend the adaptedness of $H \cdot A$ to all previsible $H$, we use the monotone class theorem.
+
+  We let
+  \[
+    \mathcal{V} = \{H: \Omega \times [0, \infty) \to \R: H \cdot A\text{ is adpated}\}.
+  \]
+  Then
+  \begin{enumerate}
+    \item $1 \in \mathcal{V}$
+    \item $1_F \in \mathcal{V}$ for all $F \in \Pi$.
+    \item $\mathcal{V}$ is closed under monotone limits.
+  \end{enumerate}
+  So $\mathcal{V}$ contains all bounded $\mathcal{P}$-measurable functions.
+\end{proof}
+
+\subsection{Local martingale}
+So far, we have talking about processes of finite variation, but in our original motivating example, we have Brownian motion, which is \emph{not} of finite variation. So maybe we should talk about something else. So let us think about something closer to Brownian motion.
+
+From now on, we assume that $(\Omega, \mathcal{F}, (\mathcal{F}_t)_t, \P)$ satisfies the \term{usual conditions}, namely that
+\begin{enumerate}
+  \item $\mathcal{F}_0$ contains all $\P$-null sets
+  \item $(\mathcal{F}_t)_t$ is right-continuous, i.e.\ $\mathcal{F}_t = (\mathcal{F}_{t+} = \bigcap_{s > t} \mathcal{F}_s$ for all $t \geq 0$.
+\end{enumerate}
+
+We recall some of the properties of continuous martingales.
+\begin{thm}[Optional stopping theorem]
+  Let $X$ be a c\`adl\`ag adapted integrable process. Then the following are equivalent:
+  \begin{enumerate}
+    \item $X$ is a martingale, i.e.\ $X_t \in L^1$ for every $t$, and
+      \[
+        \E(X_t \mid \mathcal{F}_s) = X_s \text{ for all }t > s.
+      \]
+    \item The \term{stopped process}\index{$X^T$} $X^T = (X^T_t) = (X_{T \wedge t})$ is a martingale for all stopping times $T$.
+    \item For all stopping times $T, S$ with $T$ bounded, $X_T \in L^1$ and $\E(X_T \mid \mathcal{F}_S) = X_{T \wedge S}$ almost surely.
+    \item For all bounded stopping times $T$, $X_T \in L^1$ and $\E(X_T) = \E(X_0)$.
+  \end{enumerate}
+  For $X$ uniformly integrable, (iii) and (iv) hold for all stopping times.
+\end{thm}
+
+This motivates the following definition:
+\begin{defi}[Local martingale]\index{local martingale}
+  A c\`adl\`ag adapted process $X$ is a \emph{local martingale} if there exists a sequence of stopping times $T_n$ such that $T_n \to \infty$ almost surely, and $X^{T_n}$ is a martingale for every $n$. The sequence $T_n$ \term{reduces} $X$.
+\end{defi}
+
+Firstly, any martingale is a martingale, since by (ii) of the optional stopping theorem, we can take $T_n = n$. So a local martingale is at least as general than a martingale. Is it really more general? We shall shortly see an example that it indeed is. So it is a strictly weaker condition.
+
+A useful thing about these is that by adding a cutoff, we can often choose $X^{T_n}$ to all be bounded, or perhaps square-integrable. The space of square-integrable martingales is a Hilbert space, and so we can do nice Hilbert space things about them. In general, local martingales are more stable under the various operations we are interested in.
+
+\begin{eg}\leavevmode
+  \begin{enumerate}
+    \item Every martingale is a local martingale.
+    \item Let $(B_t)$ to be a standard 3d Brownian motion on $\R^3$. Then
+      \[
+        (X_t)_{t \geq 1} = \left(\frac{1}{|B_t|}\right)_{t \geq 1}
+      \]
+      is a local martingale but not a martingale.
+
+      To see this, first note that
+      \[
+        \sup_{t \geq 1} \E X_t^2 < \infty,\quad \E X_t \to 0.
+      \]
+      Since $\E X_t \to 0$ and $X_t \geq 0$, we know $X$ cannot be a martingale. However, we can check that it is a local martingale. Recall that for any $f \in C^2_b$,
+      \[
+        M^f = f(B_t) - f(B_1) - \frac{1}{2} \int_0^t \Delta f(B_s)\;\d s
+      \]
+      is a martingale. Moreover, $\Delta \frac{1}{|x|} = 0$ for all $x \not= 0$. Thus, if $\frac{1}{|x|}$ didn't have a singularity at $0$, this would have told us $X_t$ is a martingale. But we are safe if we try to bound $|B_s|$ away from zero.
+
+      Let $T_n = \inf \{t \geq 1: |B_t| < \frac{1}{n}\}$ and pick $f_n = C_b^2$ with $f_n(x) = \frac{1}{|x|}$ for $|x| \geq \frac{1}{n}$. Then $X_t^T - X_1^{T_n} = M^{f_n}_{t \wedge T_n}$. So $X^{T_n}$ is a martingale.
+
+      It remains to show that $T_n \to \infty$, and this follows from the fact that $\E X_t \to 0$.
+  \end{enumerate}
+\end{eg}
+
+\begin{prop}
+  Let $X$ be a local martingale and $X_t \geq 0$ for all $t$. Then $X$ is a supermartingale.
+\end{prop}
+
+\begin{proof}
+  Let $(T_n)$ be a reducing sequence for $X$. Then
+  \begin{align*}
+    \E(X_t \mid \mathcal{F}_s) &= \E \left(\liminf_{n \to \infty} X_{t \wedge T_n} \mid \mathcal{F}_s\right) \\
+    &\leq \lim_{n \to \infty} \E(X_{t \wedge T_n} \mid \mathcal{F}_s) \\
+    &= \liminf_{T_n \to \infty} X_{s \wedge T_n} \\
+    &= X_s.\qedhere
+  \end{align*}
+\end{proof}
+
+Recall the following result from Advanced Probability:
+\begin{prop}
+  Let $X \in L^1 (\Omega, \mathcal{F}, \P)$. Then the set
+  \[
+    \chi = \{\E(X \mid \mathcal{G}): G \subseteq \mathcal{F}\text{ a sub-$\sigma$-algebra}\}
+  \]
+  is uniformly integrable, i.e.
+  \[
+    \sup_{Y \in \chi} \E (|Y| \mathbf{1}_{|Y| > \lambda}) \to 0\text{ as } \lambda \to \infty.
+  \]
+\end{prop}
+
+Recall also the following important result about uniformly integrable random variables:
+\begin{thm}[Vitali theorem]\index{Vitali theorem}
+  $X_n \to X$ in $L^1$ iff $(X_nn)$ is uniformly integrable and $X_n \to X$ in probability.
+\end{thm}
+
+With these, we can state the following characterization of martingales in terms of local martingales:
+\begin{prop}
+  The following are equivalent:
+  \begin{enumerate}
+    \item $X$ is a martingale.
+    \item $X$ is a local martingale, and for all $t \geq 0$, the set
+      \[
+        \chi_t = \{X_T: T\text{ is a stopping time with }T \geq t\}
+      \]
+      is uniformly integrable.
+  \end{enumerate}
+\end{prop}
+
+\begin{proof}\leavevmode
+  \begin{itemize}
+    \item (a) $\Rightarrow$ (b): Let $X$ be a martingale. Then by the optional stopping theorem, $X_T = \E(X_t \mid \mathcal{F}_T)$ for any bounded stopping time $T \leq t$. So $\chi_t$ is uniformly integrable.
+    \item (b) $\Rightarrow$ (a): Let $X$ be a local martingale with reducing sequence $(T_n)$, and assume that the sets $\chi_t$ are uniformly integrable for all $t \geq 0$. By the optional stopping theorem, it suffices to show that $\E(X_T) = \E(X_0)$ for any bounded stopping time $T$.
+
+      So let $T$ be a bounded stopping time, say $T \leq t$. Then
+      \[
+        \E(X_0) = \E(X_0^{T_n}) = \E(X_T^{T_n}) = \E(X_{T \wedge T_n})
+      \]
+      for all $n$. Now $T \wedge T_n$ is a stopping time $\leq t$, so $\{X_{T \wedge T_n}\}$ is uniformly integrable by assumption. Moreover, $T_n \wedge T \to T$ almost surely as $n \to \infty$, hence $X_{T \wedge T_n} \to X_T$ in probability. Hence by Vitali, this converges in $L^1$. So
+      \[
+        \E(X_T) = \E(X_0).\qedhere
+      \]%\qedhere
+  \end{itemize}
+\end{proof}
+
+\begin{cor}
+  If $Z \in L^1$ is such that $|X_t| \leq Z$ for all $t$, then $X$ is a martingale. In particular, every bounded local martingale $X$ is a martingale.
+\end{cor}
+
+\begin{prop}
+  Let $X$ be a \emph{continuous} local martingale with $X_0 \to 0$. Define
+  \[
+    S_n = \inf \{t \geq 0 : |X_t| = n \}.
+  \]
+  Then $S_n$ is the a stopping time, $S_n \to \infty$ and $X^{S_n}$ is a bounded martingale. In particular, $(S_n)$ reduces $X$.
+\end{prop}
+
+\begin{proof}
+  It is clear that $S_n$ is a stopping time, since
+  \[
+    \{S_n \leq t\} = \bigcap_{k \in \N} \left\{\sup_{s \leq t} |X_s| > n - \frac{1}{k}\right\} = \bigcap_{k \in \N} \bigcup_{s < t, s \in \Q} \left\{|X_s| > n - \frac{1}{k}\right\} \in \mathcal{F}_t.
+  \]
+  It is also clear that $S_n \to \infty$, since
+  \[
+    \sup_{s \leq t} |X_s| \leq n \leftrightarrow S_n \geq t,
+  \]
+  and by continuity, $\sup_{s \leq t} |X_s|$ is finite for every $(\omega, t)$ by continuity.
+
+  Finally, we show that $X^{S_n}$ is a martingale. By the optional stopping theorem, $X^{T_n \wedge S_n}$ is a martingale, so $X^{S_n}$ is a local martingale. But it is also bounded by $n$. So it is a martingle.
+\end{proof}
+
+\begin{thm}
+  Let $X$ be a continuous local martingale with $X_0 = 0$. If $X$ is also a finite variation process, then $X_t = 0$ for all $t$.
+\end{thm}
+This rules out the existence of Gaussian white noise.
+
+\begin{proof}
+  Let $X$ be a finite-variation continnuous local martingale with $X_0 = 0$. Since $X$ is finite variation, we can define the total variation process $(V_t)$ corresponding to $X$, and let
+  \[
+    S_n = \inf \{t \geq 0: V_t \geq n\} = \inf \left\{t \geq 0: \int_0^1 |\d X_s| \geq n\right\}.
+  \]
+  Then $S_n$ is a sstopping time, and $S_n \to \infty$ since $X$ is assumed to be finite variation. Moreover, by optional stopping, $X^{S_n}$ is a local martingale, and is also bounded, since
+  \[
+    X_t^{S_n} \leq \int_0^{t \wedge S_n} |\d X_s| \leq n.
+  \]
+  So $X^{S_n}$ is in fact a martingale.
+
+  We claim it's $L^2$-norm vanishes. Let $0 = t_0 < t_1 < \cdots < t_n = t$ be a subdivision of $[0, t]$. Then
+  \begin{align*}
+    \E((X_t^{S_n})^2) &= \sum_{i = 1}^k \E((X_{t_i}^{S_n} - X_{t_{i - 1}}^{S_n})^2)\\
+    \intertext{since $X^{S_n}$ is a martingale, and martingales have orthogonal increments. We can bound this crudely by}
+    &\leq \E\left(\max_{1 \leq i \leq k} |X_{t_i}^{S_n} - X_{t_{i - 1}}^{S_n}| \sum_{i =1 }^k |X_{t_i}^{S_n} - X_{t_{i - 1}}^{S_n}|\right)\\
+    &\leq \E\left(\max_{1 \leq i \leq k} |X_{t_i}^{S_n} - X_{t_{i - 1}}^{S_n}| V_{t \wedge S_n}\right)\\
+    &\leq \E\left(\max_{1 \leq i \leq k} |X_{t_i}^{S_n} - X_{t_{i - 1}}^{S_n}| n\right).
+  \end{align*}
+  Of course, the first term is also bounded by the total variation. Moreover, we can make further subdivisions so that the mesh size tends to zero, and then the first term vanishes in the limit by continuity. So by dominated continuity, we must have $\E((X_t^{S_n})^2) = 0$. So $X_t^{S_n} = 0$ almost surely for all $n$. So $X_t = 0$ for all $t$ almost surely.
+\end{proof}
+
+\subsection{Square integrable martingales}
+We are done with local martingales, but not martingales, since we need to develop a bit more theory before we can get to the punchline. Instead of weakening the definition of a martingale to a local martingale, we strengthen it to require square integrability. An important property is that the space of such martingales is a Hilbert space.
+
+\begin{defi}[$\mathcal{M}^2$]\index{$\mathcal{M}^2$}
+  Let
+  \begin{align*}
+    \mathcal{M}^2 &= \left\{X : \Omega \times [0, \infty) \to \R : X\text{ is cadlag martingale with } \sup_{t \geq 0} \E(X_t^2) < \infty\right\}.\\
+    \mathcal{M}^2_c &= \left\{X \in \mathcal{M}^2: X(\omega, \ph)\text{ is continuous for every }\omega \in \Omega\right\}
+  \end{align*}
+  We set
+  \[
+    \|X\|_{\mathcal{M}^2} = \left(\E(X_\infty^2)\right)^{1/2}.
+  \]
+  Here recall that for $X \in \mathcal{M}^2$, the martingale convergence theorem implies $X_t \to X_\infty$ almost surely and in $L^2$.
+\end{defi}
+Usually, we would like to talk about things like Brownian motion, but they are certainly not square integrable, so they won't live in these spaces. If we want to apply these methods, we would try to impose some sort of cut-off, and then take the limit to recover the Brownian motion. But if we do so, we might as well work with local martingales, who are defiend so that these cut-offs are martingales.
+
+Observe that if $X \in \mathcal{M}^2$, then $(X_t^2)_{t \geq 0}$ is a submartingale by Jensen, so $t \mapsto \E X_t^2$ is increasing, and
+\[
+  \E X_\infty^2 = \sup_{t \geq 0} \E X_t^2.
+\]
+Finally, Doob's inequality remarkably implies
+\[
+  \E \left(\sup_{t \geq 0} X_t^2\right) \leq 4 \E(X_\infty^2).
+\]
+So once we control the limit $X_\infty$, we control the whole path.
+
+In particular, $\|X\|_{\mathcal{M}^2} = 0$ implies that $X = 0$. So this makes $\|\ph\|_{\mathcal{M}^2}$ a norm. This norm comes from the inner product
+\[
+  (X, Y)_{\mathcal{M}^2} = \E(X_\infty Y_\infty).
+\]
+The punchline is the following:
+\begin{thm}
+  $\mathcal{M}^2$ is a Hilbert space and $\mathcal{M}_c^2$ is a closed subspace.
+\end{thm}
+
+\begin{proof}
+  We need to check that $\mathcal{M}^2$ is complete. Thus let $(X^n) \subseteq \mathcal{M}^2$ be a Cauchy sequence, i.e.
+  \[
+    \E((X_\infty^n - X_\infty^m)^2) \to 0\text{ as }n, m \to \infty.
+  \]
+  By passing to a subsequence, we may assume that
+  \[
+    \E((X_\infty^n - X_{\infty}^{n - 1})^2) \leq 2^{-n}.
+  \]
+  First note that
+  \begin{align*}
+    \E\left(\sum_n \sup_{t \geq 0} |X_t^n - X_t^{n - 1}|\right) &\leq \sum_n \E \left(\sup_{t \geq 0} |X_t^n - X_t^{n - 1}|^2 \right)^{1/2}\tag{Cauchy--Schwarz}\\
+    &\leq \sum_n 2 \E \left(|X_\infty^n - X_\infty^{n - 1}|^2\right)^{1/2}\tag{Doob's}\\
+    &\leq 2 \sum_n 2^{-n/2} < \infty.
+  \end{align*}
+  So
+  \[
+    \sum_{n = 1}^\infty \sup_{t \geq 0} |X_t^n - X_t^{n - 1}|< \infty\text{ a.s.}\tag{$*$}
+  \]
+  So on this event, $(X^n)$ is a Cauchy sequence in the space $(D[0, \infty), \|\ph\|_\infty)$ of cadlag sequences. So there is some $X(\omega, \ph) \in D[0, \infty)$ such that
+  \[
+    \|X^n (\omega, \ph) - X(\omega, \ph)\|_\infty \to 0\text{ for almost all }\omega.
+  \]
+  and we set $X = 0$ outside this almost sure event $(*)$. We now claim that
+  \[
+    \E \left(\sup_{t \geq 0} |X^n - X|^2\right) \to 0\text{ as }n \to \infty.
+  \]
+  We can just compute
+  \begin{align*}
+    \E \left(\sup_t |X^n - X|^2\right) &= \E \left(\lim_{m \to \infty} \sup_t |X^n - X^m|^2\right)\\
+    &\leq \liminf_{m \to \infty} \E\left(\sup_t |X^n - X^m|^2\right) \tag{Fatou}\\
+    &\leq \liminf_{m \to \infty} 4 \E (X^n_\infty - X_m^\infty)^2 \tag{Doob's}
+  \end{align*}
+  and this goes to $0$ in the limit $n \to \infty$ as well.
+
+  We finally have to check that $X$ is indeed a martingale. We use the triangle inequality to write
+  \begin{align*}
+    \|E(X_t \mid \mathcal{F}_s) - X_s \|_{L^2} &\leq \|\E (X_t - X_t^n \mid \mathcal{F}_s)\|_{L^2} + \|X_s^n - X_s\|_{L^2}\\
+    &\leq \E (\E ((X_t - X_t^n)^2 \mid \mathcal{F}_s))^{1/2} + \|X_s^n - X_s\|_{L^2}\\
+    &= \|X_t - X_t^n\|_{L^2} + \|X_s^n - X_s\|_{L^2}\\
+    &\leq 2 \E\left(\sup_t |X_t - X_t^n|^2\right)^{1/2} \to 0
+  \end{align*}
+  for all $n$. But taking the limit $n \to \infty$. So $X \in \mathcal{M}^2$.
+
+  We could have done exactly the same with continuous martingales, so the second part follows.
+\end{proof}
+\subsection{Quadratic variation}
+\begin{defi}[u.c.p.\ (uniformly on compact sets in probability)]\index{u.c.p.}\index{uniformly on compact sets in probability}
+  For a sequence of processes $(X^n)$ and a process $X$, we say that $X^n \to X$ u.c.p. iff
+  \[
+    \P\left(\sup_{s \in [0, t]} |X_s^n - X_s| > \varepsilon\right) \to 0\text{ as }n \to \infty\text{ for all }t > 0, \varepsilon > 0.
+  \]
+\end{defi}
+
+\begin{thm}
+  Let $M$ be a continuous local martingale with $M_0 = 0$. Then there exists a unique (up to indistinguishability) continuous adapted increasing process $(\bra M\ket_t)_{t \geq 0}$ such that $\bra M\ket_0 = 0$ and $M_t^2 - \bra M\ket_t$ is a continuous local martingale. Moreover,
+  \[
+    \bra M \ket_t = \lim_{n \to \infty} \bra M\ket_t^{(n)},\quad \bra M\ket_t^{(n)} = \sum_{i = 1}^{\lceil 2^n t\rceil} (M_{t 2^{-n}} - M_{(i - 1)2^{-n}})^2,
+  \]
+  where the limit u.c.p.
+\end{thm}
+The expression for $\bar M\ket_t$ looks like the definition of the total variation, but it has a square. So we define
+\begin{defi}[Quadratic variation]\index{quadratic variation}
+  $\bra M\ket$ is called the \term{quadratic variation} of $M$.
+\end{defi}
+If $B_t$ is Brownian motion, then $\bra t \ket = t$. So this $\bra M\ket_t$ in general tells us how the process grows.
+
+The proof is long and mechanical, but not hard. All the magic happened when we used the magical Doob's inequality to show that $\mathcal{M}_c^2$ and $\mathcal{M}^2$ are Hilbert spaces.
+
+\begin{proof}
+  To show uniqueness, we use that finite variation and local martingale are incompatible. Suppose $(A_t)$ and $(\tilde{A}_t)$ obey the conditions for $\bra M\ket$. Then $A_t - \tilde{A}_t = (M_t^2 - \tilde{A}_t) - (M_t^2 - A_t)$ is a continuous adapted local martingale starting at $0$. Moreover, both $A_t$ and $\tilde{A}_t$ are increasing, hence have finite variation. So $A - \tilde{A} = 0$ almost surely.
+
+  To show existence, we need to show that the limit exists and has the right property. We do this in steps.
+  \begin{claim}
+    The result holds if $M$ is in fact bounded.
+  \end{claim}
+  Suppose $|M(\omega, t)| \leq C$ for all $(\omega, t)$. Then $M \in \mathcal{M}_c^2$. Fix $T > 0$ deterministic. Let
+  \[
+    X_t^n = \sum_{i = 1}^{\lceil 2^n T \rceil} M_{(i - 1)2^{-n}} (M_{i 2^{-n} \wedge t} - M_{(i - 1) 2^{-n} \wedge t}).
+  \]
+  This is defined so that
+  \[
+    \bra M \ket_{k2^{-n}}^{(n)} = M_{k2^{-n}}^2 - 2 X_{k 2^{-n}}^n.
+  \]
+  This reduces the study of $\bra M\ket^{(n)}$ to that of $X_{k2^{-n}}^n$.
+
+  We check that $(X_t^n)$ is a Cauchy sequence in $\mathcal{M}_c^2$. The fact that it is a martingale is an immediate computation. To show it is Cauchy, for $n \geq m$, we calculate
+  \[
+    X_\infty^n - X_\infty^m = \sum_{i = 1}^{\lceil 2^n T\rceil} (M_{(i - 1)2^{-n}} - M_{\lfloor (i - 1) 2^{m - n}\rfloor 2^{-m}})(M_{i2^{-n}} - M_{(i - 1)2^{-n}}).
+  \]
+  We now take the expectation of the square to get
+  \begin{align*}
+    \E (X_\infty^n - X_\infty^m)^2 &= \E\left(\sum_{i = 1}^{\lceil 2^n T\rceil} (M_{(i - 1)2^{-n}} - M_{\lfloor (i - 1) 2^{m - n}\rfloor 2^{-m}})^2(M_{i 2^{-n}} - M_{(i - 1)2^{-n}})^2\right)\\
+    &\leq \E \left(\sup_{|s - t| \leq 2^{-m}} |M_t - M_s|^2 \sum_{i = 1}^{\lceil 2^n T\rceil} (M_{i2^{-n}} - M_{(i - 1)2^{-n}})^2\right)\\
+    &= \E \left(\sup_{|s - t| \leq 2^{-m}} |M_t - M_s|^2 \bra M\ket_T^{(n)}\right)\\
+    &\leq \E \left(\sup_{|s - t| \leq 2^{-m}}|M_t - M_s|^4\right)^{1/2}\E \left((\bra M\ket_T^n)^2\right)^{1/2}\tag{Cauchy--Schwarz}
+  \end{align*}
+  We shall show that the second factor is bounded, while the first factor tends to zero as $m \to \infty$. These are both not surprising --- the first term vanishing in the limit corresponds to $M$ being continuous, and the second term is bounded since $M$ itself is bounded.
+
+  To show that the first term tends to zero, we note that we have
+  \[
+    M_t - M_s|^4 \leq 16 C^4,
+  \]
+  and moreover
+  \[
+    \sup_{|s - t| \leq 2^{-m}} |M_t - M_s| \to 0\text{ as }m \to \infty\text{ by uniform continuity}.
+  \]
+  So we are done by the dominated convergence theorem.
+
+  To show the second term is bounded, we do (writing $N = \lceil 2^n T\rceil$)
+  \begin{align*}
+    \E\left((\bra M\ket_T^{(n)})^2\right) &= \E \left(\left(\sum_{i = 1}^{N} (M_{i 2^{-n}} - M_{(i - 1)2^{-n}})^2 \right)^2\right)\\
+    &= \sum_{i = 1}^N \E \left( (M_{i 2^{-n}}- M_{(i - 1)2^{-n}})^4\right) + 2 \sum_{i = 1}^N\E \left((M_{i 2^{-n}} - M_{(i - 1)2^{-n}})^2 \sum_{k = i + 1}^N (M_{k2^{-n}} - M_{(k - 1)2^{-n}})^2\right)
+  \end{align*}
+  We use the martingale property and orthogonal increments the rearrange the off-diagonal term as
+  \[
+    \E\left((M_{i2^{-n}} - M_{(i - 1)2^{-n}})(M_{N2^{-n}} - M_{i 2^{-n}})^2\right).
+  \]
+  Taking some sups, we get
+  \begin{align*}
+    \E\left((\bra M\ket_T^{(n)})^2\right) &\leq 12 C^2 \E \left(\sum_{i = 1}^N (M_{i 2^{-n}} - M_{(i - 1)2^{-n}})^2\right)\\
+    &= 12C^2 \E \left((M_{N 2^{-n}} - M_0)^2\right)\\
+    &\leq 12 C^2 \cdot 4 C^2.
+  \end{align*}
+  So done.
+
+  So we now have $X^n \to X$ in $M^2_c$ for some $X \in M_c^2$. In particular, we have
+  \[
+    \left\|\sup_t |X_t^n - X_t|\right\|_{L^2} \to 0
+  \]
+  So we know that
+  \[
+    \sup_t |X_t^n - X_t| \to 0
+  \]
+  almost surely along a subsequence $\Lambda$.
+
+  Let $N \subseteq \Omega$ be the events on which this convergence fails. We define
+  \[
+    A_t^{(T)} =
+    \begin{cases}
+      M_t^2 - 2X_t& \omega \in \Omega \setminus N\\
+      0 & \omega \in N
+    \end{cases}.
+  \]
+  Then $A^{(T)}$ is continuous, adapted since $M$ and $X$ are, and $(M_{t \wedge T}^2 - A^{(T)}_{t \wedge T})_t$ is a martingale since $X$ is. Finally, $A^{(T)}$ is increasing since $M_t^2 - X_t^n$ is increasing on $2^{-n} \Z \cap [0, T]$ and the limit is uniform. So this $A^{(T)}$ basically satisfies all the properties we want $\bra M\ket_t$ to satisfy, except we have the stopping time $T$.
+
+  We now claim that for any $T \geq 1$, $A_{t \wedge T}^{(T)} = A_{t \wedge T}^{(T + 1)}$ for all $t$ almost surely. This essentially follows from the same uniqueness argument as we had at the beginning of the proof. Thus, there is a process $(\bra M\ket_t)_{t \geq 0}$ such that
+  \[
+    \bra M\ket_t = A_t^{(T)}
+  \]
+  for all $t \in [0, T]$ and $T \in \N$, almost surely. Then this is the desired process. So we have constructed $\bra M\ket$ in the case where $M$ is bounded.
+
+  \begin{claim}
+    $\bra M\ket^{(n)} \to \bra M\ket$ u.c.p.
+  \end{claim}
+  Recall that
+  \[
+    \bra M\ket_t^{(n)} = M^2_{2^{-n}\lfloor 2^n t\rfloor} - 2 X^n_{2^{-n} \lfloor 2^n t\rfloor}.
+  \]
+  We also know that
+  \[
+    \sup_{t \leq T} |X_t^n - X_t| \to 0
+  \]
+  in $L^2$, hence also in probability. So we have
+  \[
+    |\bra M\ket_t - \bra M\ket^{(n)}_t| \leq \sup_{t \leq T} |M^2_{2^{-n}\lfloor 2^n t\rfloor} - M_t^2| + \sup_{t \leq T} |X^n_{2^{-n}\lfloor 2^n t\rfloor} - X_{2^{-n} \lfloor 2^n t\rfloor}| + \sup_{t \leq T} |X_{2^{-n}\lfloor 2^n t\rfloor} - X_t|.
+  \]
+  The first and last terms $\to 0$ in probability since $M$ and $X$ are uniformly continuous on $[0, T]$. The second term converges to zero by our previous assertion. So we are done.
+
+  \begin{claim}
+    The theorem holds for $M$ any continuous local martingale.
+  \end{claim}
+  We let $T_n = \inf\{t \geq 0 : |M_t| \geq n\}$. Then $(T_n)$ reduces $M$ and $M^{T_n}$ is a bounded martingale. So in particular $M^{T_n}$ is a bounded continuous martingale. We set
+  \[
+    A^n = \bra M^{T_n}\ket.
+  \]
+  Then $(A_t^n)$ and $(A_{t \wedge T_n}^{n + 1})$ are indistinguishable for $t < T_n$ by the uniqueness argument. Thus there is a process $\bra M\ket$ such that $\bra M \ket_{t \wedge T_n} = A_t^n$ are indistinguishable for all $n$. Clearly, $\bra M\ket$ is increasing since the $A^n$ are, and $M^2_{t \wedge T_n} - \bra M\ket_{t \wedge T_n}$ is a martingale for every $n$, so $M^2_t - \bra M\ket_t$ is a continuous local martingale.
+
+  \begin{claim}
+    $\bra M\ket^{(n)} \to \bra M\ket$ u.c.p.
+  \end{claim}
+  We have seen
+  \[
+    \bra M^{T_k}\ket^{(n)} \to \bra M^{T_k}\ket\text{ u.c.p.}
+  \]
+  for every $k$. So
+  \[
+    \P\left(\sup_{t \leq T} |\bra M\ket_t^{(n)} - \bra M_t\ket| > \varepsilon\right) \leq \P(T_k < T) + \P\left(\sup_{t \leq T} |\bra M^{T_k}\ket_t^{(n)} - \bra M^{T_k}\ket_t > \varepsilon\right).
+  \]
+  So we can fisrt pick $k$ large enough such that the first term is small, then pick $n$ large enough so that the second is small.
+\end{proof}
+
 \printindex
 \end{document}

@@ -8,16 +8,610 @@
 
 \input{header}
 
+\DeclareMathOperator{\grph}{graph}
+\DeclareMathOperator{\Symp}{Symp}
+
 \begin{document}
 \maketitle
 {\small
 \setlength{\parindent}{0em}
 \setlength{\parskip}{1em}
-The fist part of the course will be an overview of the basic structures of symplectic geometry, including symplectic linear algebra, symplectic manifolds, symplectomorphisms, Darboux theorem, cotangent bundles, Lagrangian submanifolds, and Hamiltonian systems. The course will then go further into two topics. The first one is moment maps and toric symplectic manifolds, and the second one is capacities and symplectic embedding problems.
+The first part of the course will be an overview of the basic structures of symplectic geometry, including symplectic linear algebra, symplectic manifolds, symplectomorphisms, Darboux theorem, cotangent bundles, Lagrangian submanifolds, and Hamiltonian systems. The course will then go further into two topics. The first one is moment maps and toric symplectic manifolds, and the second one is capacities and symplectic embedding problems.
+
 \subsubsection*{Pre-requisites}
 Some familiarity with basic notions from Differential Geometry and Algebraic Topology will be assumed. The material covered in the respective Michaelmas Term courses would be more than enough background.
 }
 \tableofcontents
+\section{Symplectic linear algebra}
+The objects studied in symplectic geometry are symplectic manifolds $(M, \omega)$.
+\begin{defi}[Symplectic manifold]\index{symplectic manifold}
+  A \emph{symplectic manifold} is a manifold $M$ of dimension $2n$ equipped with a $2$-form $\omega$ that is closed (i.e.\ $\d \omega = 0$) and non-degenerate (i.e.\ $\omega^{\wedge n} \not= 0$). We call $\omega$ the \term{symplectic form}.
+\end{defi}
+
+The closedness is an analytic condition, and the non-degeneracy is an algebraic condition. We first try to understand the algebraic side of the story.
+
+\begin{thm}
+  Let $V$ be a real vector space, and $\Omega: V \times V \to \R$ a skew-symmetric bilinear map. Then there exists a basis $\{u_1, \ldots, u_k, e_1, \ldots, e_n, f_1, \ldots, f_n\}$ of $V$ such that
+  \begin{enumerate}
+    \item $\Omega(u_i, v) = 0$ for all $v \in V$
+    \item $\Omega(e_i, e_j) = \Omega(f_i, f_j) = 0$.
+    \item $\Omega(e_i, f_j) = \delta_{ij}$.
+  \end{enumerate}
+\end{thm}
+
+The proof is a skew-symmetric version of Gram--Schmidt.
+\begin{proof}
+  Let
+  \[
+    \mathcal{U} = \{u \in V : \Omega(u, v) = 0\text{ for all }v \in V\},
+  \]
+  and pick a basis $u_1, \ldots, u_k$ of this. Choose any $W$ complementary to $U$.
+
+  First pick $e_1 \in W \setminus \{0\}$ arbitrarily. Since $e_1 \not \in U$, we can pick $f_1$ such that $\Omega(e_1, f_1) = 1$. Then define $W_1 = \spn\{e_i, f_i\}$, and
+  \[
+    W_1^\Omega = \{w \in W: \Omega(u, v) = 0\text{ for all }v \in W_1\}.
+  \]
+  It is clear that $W_1 \cap W_1^\Omega = \{0\}$. Moreover, $W = W_1 \oplus W_1^\Omega$. Indeed, if $v \in W$, then
+  \[
+    v = ((v, f_1) e_1 - (v, e_1) f_1) + (v - ((v, f_1) e_1 - (v, e_1) f_1)),
+  \]
+  Then we are done by induction on the dimension.
+\end{proof}
+Here $k = \dim U$ and $2n = \dim V - k$ are invariants of $(V, \Omega)$. The number $2n$ is called the rank of $\Omega$.
+
+Given a bilinear form $\Omega$, we can define $\tilde{\Omega}: V \to V^*$ by $\tilde{\Omega}(v)(w) = \Omega(v, u)$. Then $U = \ker \tilde{\Omega}$.
+
+\begin{defi}[Non-degenerate/symplectic bilinear map]\index{non-degenerate bilinear map}\index{symplectic bilinear map}
+  We say the bilinear map $\Omega$ is non-degenerate if $\tilde{\Omega}: V \to V^*$ is bijective, i.e.\ $U = \{0\}$.
+
+  In this case, $(V, \Omega)$ is called a \term{symplectic vector space}.
+\end{defi}
+
+\begin{ex}
+  $\Omega$ is non-degenerate iff $\Omega^{\wedge n} = \Omega \wedge \cdots \wedge \Omega \not= 0$.
+\end{ex}
+
+There are several consequences of being a symplectic vector space. First of all, $\tilde{\Omega}$ gives an canonical isomorphism $V \cong V^*$, and $\dim V$ is even. In particular, we can find a \term{symplectic basis} $\{e_1, \ldots, e_n, f_1, \ldots, f_n\}$ of $V$ such that
+\[
+  \Omega(e_i, e_j) = \Omega(f_i, f_j) = 0,\quad \Omega(e_i, f_i) = \delta_{ij}.
+\]
+Under this basis, the matrix representing $\Omega$ is
+\[
+  \Omega_0 = \begin{pmatrix}
+    0 & I\\
+    -I & 0
+  \end{pmatrix}.
+\]
+\begin{defi}[Symplectic subspace]\index{symplectic subspace}
+  If $(v, \Omega)$ is a symplectic vector space, a \emph{symplectic subspace} is a subspace $W \subseteq V$ such that $\Omega|_{W \times W}$ is non-degenerate.
+\end{defi}
+
+\begin{defi}[Isotropic subspace]\index{isotropic subspace}
+  If $(v, \Omega)$ is a symplectic vector space, an \emph{isotropic subspace} is a subspace $W \subseteq V$ such that $\Omega|_{W \times W} = 0$.
+\end{defi}
+
+\begin{defi}[Lagrangian subspace]\index{Lagrangian subspace}
+  If $(v, \Omega)$ is a symplectic vector space, an \emph{Lagrangian subspace} is an isotropic subspace $W$ with $\dim W = \frac{1}{2} \dim V$.
+\end{defi}
+
+\begin{defi}[Symplectomorphism]\index{symplectomorphism}
+  A \emph{symplectomorphism} between symplectic vector spaces $(V, \Omega), (V', \Omega')$ is an isomorphism $\varphi: V \to V'$ such that $\varphi^* \Omega' = \Omega$.
+\end{defi}
+
+The standard form theorem says any two $2n$-dimensional symplectic vector space $(V, \Omega)$ are symplectomorphic to each other.
+
+\section{Symplectic manifold}
+Take our symplectic manifold $(M, \omega)$ again. Since $\omega^{\wedge n}$ is non-zero by assumption.
+
+\begin{eg}
+  Take $M = S^2$. Take the standard embedding in $\R^3$, and for $p \in S^2$, the tangent space consists of the vectors perpendicular to $p$. We can take the symplectic form to be
+  \[
+    \omega_p(u, v) = p \cdot (u \times v).
+  \]
+  Anti-symmetry and non-degeneracy is IA Vectors and Matrices.
+\end{eg}
+
+\begin{eg}
+  Take $M = S^4$. We claim that this does not admit a symplectic structure, because it is compact with $H^2(S^2)$. So any potential symplectic form $\omega$ has $\omega \wedge \omega = 0 \in H^4(S^4)$. Hence it cannot be a volume form.
+\end{eg}
+
+We now want to consider when two symplectic structures can be considered ``the same''.
+\begin{defi}[Symplectomorphism]\index{symplectomorphic}
+  Let $(X_1, \omega_1)$ and $(X_2, \omega_2)$ be symplectic manifolds. A symplectomorphism is a diffeomorphism $f: X_1 \to X_2$ such that $f^* \omega_2 = \omega_1$.
+\end{defi}
+
+We can also consider the following notions:
+\begin{defi}[Strongly isotopic]\index{strongly isotopic}
+  Two symplectic structures on $M$ are \emph{strongly isotopic} if there is an isotopy taking one to the other.
+\end{defi}
+
+\begin{defi}[Deformation equivalent]\index{deformation equivalent}
+  Two symplectic structures $\omega_0, \omega_1$ on $M$ are \emph{deformation equivalent} if there is a family of symplectic forms $\omega_t$ that start and end at $\omega_0$ and $\omega_1$ respectively.
+\end{defi}
+
+\begin{defi}[Isotopic]\index{isotopic}
+  Two symplectic structures $\omega_0, \omega_1$ on $M$ are \emph{isotopic} if there is a family of symplectic forms $\omega_t$ that start and end at $\omega_0$ and $\omega_1$ respectively, and further the cohomology class $[\omega_t]$ is independent of $t$.
+\end{defi}
+
+A priori, it is clear that we have the following implications:
+\[
+  \text{symplectomorphic} \Leftarrow \text{strongly isotopic} \Rightarrow \text{isotopic} \Rightarrow \text{deformation equivalent}.
+\]
+It turns out when $M$ is compact, isotopic implies strongly isotopic:
+\begin{thm}[Moser]\index{Moser's trick}
+  If $M$ is compact with a family $\omega_t$ of symplectic forms with $[\omega_t]$ constant, then there is an isotopy $\rho_t: M \to M$ with $\rho_t^* \omega_t = \omega_0$.
+\end{thm}
+The key idea is to express the condition $\rho_t^* \omega_t = \omega_0$ as a differential equation for $v_t = \frac{\d}{\d t} \rho_t$, and ODE theory guarantees the existence of a $v_t$ satisfying the equation. Then compactness allows us to integrate it up to get a genuine $\rho_t$.
+
+\begin{proof}
+  We set $\rho_0$ to be the identity. Then the equation $\rho_t^* \omega_t = \omega_0$ is equivalent to $\rho_t^* \omega_t$ being constant. If $v_t$ is the associated vector field to $\rho_t$, then we need
+  \[
+    0 = \frac{\d}{\d t}(\rho_t^* \omega_t) = \rho_t^* \left(\mathcal{L}_{v_t} \omega_t + \frac{\d \omega_t}{\d t}\right).
+  \]
+  So we want to solve
+  \[
+    \mathcal{L}_{v_t} \omega_t + \frac{\d \omega_t}{\d t} = 0.
+  \]
+  To solve for this, since $[\frac{\d \omega_t}{\d t}] = 0$, it follows that there is a family $\mu_t$ of $1$-forms such that $\frac{\d \omega_t}{\d t} = \d \mu_t$. Then our equation becomes
+  \[
+    \mathcal{L}_{v_t} \omega_t + \d \mu_t = 0.
+  \]
+  By assumption, $\d \omega_t = 0$. So by Cartan's magic formula, we get
+  \[
+    \d \iota_{v_t} \omega_t + \d \mu_t = 0.
+  \]
+  To solve this equation, it suffices to solve \term{Moser's equation},
+  \[
+    \iota_{v_t} \omega_t + \mu_t = 0,
+  \]
+  which can be solved since $\omega_t$ is non-degenerate.
+\end{proof}
+
+There is also a relative version of this.
+\begin{thm}[Relative Moser]\index{relative Moser's trick}\index{Moser's trick!relative}
+  Let $X \subseteq M$ be a compact manifold of a manifold $M$, and $\omega_0, \omega_1$ symplectic forms on $M$ agreeing on $X$. Then there are neighbourhoods $U_0, U_1$ of $X$ and a diffeomorphism $\varphi: U_0 \to U_1$ fixing $X$ such that $\varphi^* \omega_1 = \omega_0$.
+\end{thm}
+
+\begin{proof}
+  We set
+  \[
+    \omega_t = (1 - t) \omega_0 + t \omega_1.
+  \]
+  Then this is certainly closed, and since this is constantly $\omega_0$ on $X$, it is non-degenerate on $X$, hence, by compactness, non-degenerate on a small tubular neighbourhood $U_0$ of $X$ (by compactness). Now
+  \[
+    \frac{\d}{\d t} \omega_t = \omega_1 - \omega_0,
+  \]
+  and we know this vanishes on $X$. Since the inclusion of $X$ into a tubular neighbourhood is a homotopy equivalence, we know $[\omega_1 - \omega_0] = 0 \in H^1_{\dR}(U_0)$. Thus, we can find some $\mu$ such that $\omega_1 - \omega_0 = \d \mu$, and by translation by a constant, we may suppose $\mu$ vanishes on $X$. We then solve Moser's equation, and the resulting $\rho$ will be constant on $X$ since $\mu$ vanishes.
+\end{proof}
+\begin{thm}[Darboux theorem]\index{Darboux theorem}
+  If $(M, \omega)$ is a symplectic manifold, and $p \in M$, then there is a chart $(x_1, \ldots, x_n, y_1, \ldots, y_n)$ about $p$ on which
+  \[
+    \omega = \sum \d x_i \wedge \d y_i.
+  \]
+\end{thm}
+
+\begin{proof}
+  $\omega$ can certainly be written in this form \emph{at} $p$. Then relative Moser with $X = \{p\}$ promotes this to hold in a neighbourhood of $p$.
+\end{proof}
+
+A canonical example of a symplectic manifold is the \term{cotangent bundle} of a manifold $X$. In physics, $X$ is called the \term{configuration space}, and $M = T^*X$ is called the \term{phase space}.
+
+Given a coordinate chart $(U, x_1, \ldots, x_n)$ for $X$, we have a coordinate chart of $T^*X$ given by $(T^* U, x_1, \ldots, x_n, \xi_1, \ldots, \xi_n)$, where $\xi_i$ is defined so that for $\xi \in T^*_xX$, we have
+\[
+  \xi = \sum_{i = 1}^n \xi_i(\xi) \;(\d x_i)_x.
+\]
+On $T^* U$, we define
+\[
+  \alpha = \sum_{i = 1}^n \xi_i \;\d x_i,
+\]
+the \term{tautological $1$-form}. Then we set
+\[
+  \omega = - \d \alpha = \sum_{i = 1}^n \;\d x_i \wedge \;\d \xi_i,
+\]
+the \term{canonical symplectic form} on $T^* X$.
+
+\begin{prop}
+  $\alpha$ (and hence $\omega$) do not depend on the chart chosen.
+\end{prop}
+Hence, $\alpha$ is a globally well-defined $1$-form, and $\omega = -\d \alpha$ is a globally well-defined $2$-form.
+
+One can check this by inspecting how $\alpha$ changes under a change in chart. Alternatively, one can provide a coordinate-free definition for $\alpha$, which is what we shall do.
+
+\begin{proof}
+  Let $\pi: M = T^*X \to X$ be the projection map. Then we have a pullback map $\pi^*: T^*X \to T^* M$. We claim that for $\xi \in M$, we have $\alpha_\xi = \pi^* \xi$. Indeed, on a chart,
+  \[
+    \pi^* \xi\left( \frac{\partial}{\partial x_j}\right) = \xi\left(\frac{\partial}{\partial x_j}\right) = \xi_j = \alpha_\xi \left(\frac{\partial}{\partial x_j}\right),
+  \]
+  and similarly both vanish on $\frac{\partial}{\partial \xi_j}$.
+\end{proof}
+
+From this coordinate-free description, we see that $\alpha$ and $\omega$ are natural in the sense that if $X_1, X_2$ are manifolds, $M_i = T^* X_i$, $\alpha_i$ is the tautological $1$-form on $i$, and $f: X_1 \to X_2$ is a diffeomorphism, then the induced map $f^\#: T^*X_2 \to T^* X_1$ is a symplectomorphism. This is immediate from the abstract characterization of the tautological $1$-form, but it may be instructive to see it in action in an explicit example.
+\begin{eg}
+  Take $X = S^1$, parametrized by $\theta$, and $T^* X = S^1 \times \R$ with coordinates $(\theta, \xi_\theta)$. Then
+  \[
+    \omega = \d \theta \wedge \d \xi_\theta.
+  \]
+  Suppose we reparametrize by $\tau = 2 \theta$. Then $\d \tau = 2 \d \theta$. However, since we defined $\xi_\theta$ by
+  \[
+    \xi = \xi_\theta(\xi) \;\d \theta
+  \]
+  for all $\xi \in T^* S^1$, we know that $\xi_\tau = \frac{1}{2} \xi_\theta$, and hence
+  \[
+    \d \theta \wedge \d \xi_\theta = \d \tau \wedge \d \xi_\tau.
+  \]
+\end{eg}
+
+Of course, while diffeomorphisms give rise to symplectomorphisms between the cotangent spaces, not all symplectomorphisms arise this way.
+\begin{eg}
+  If $X = S^1$ and $T^* X = S^1 \times \R$ is given the canonical symplectic structure, then the vertical translation $g(\theta, \xi) = (\theta, \xi + c)$ is a symplectomorphism that is not a lift of a diffeomorphism $S^1 \to S^1$.
+\end{eg}
+
+So when does a symplectomorphism come from a diffeomorphism?
+
+\begin{ex}
+  A symplectomorphism $y: T^* X \to T^* X$ is a lift of a diffeomorphism $X \to X$ iff $g^* \alpha = \alpha$.
+\end{ex}
+
+Why is $\alpha$ called the tautological $1$-form?
+\begin{prop}
+  Let $\mu$ be a one-form of $X$, i.e.\ a section $s_\mu: X \to T^* X$. Then $s_\mu^* \alpha = \mu$.
+\end{prop}
+
+\begin{proof}
+  By definition,
+  \[
+    \alpha_\xi = \xi \circ \d \pi.
+  \]
+  So we have
+  \[
+    s_\mu^*\alpha_{\mu(x)} = \mu(x) \circ \d \pi \circ \d s_\mu = \mu(x) \circ \d (\pi \circ s_\mu) = \mu(x) \circ \d(\mathrm{id}_X) = \mu(x).\qedhere
+  \]
+\end{proof}
+
+\begin{defi}[Lagrangian submanifold]
+  Let $(M, \omega)$ be a symplectic manifold, and $L \subseteq M$ a submanifold. Then $L$ is a \term{Lagrangian submanifold} if for all $p \in L$, $T_p L$ is a Lagrangian subspace of $T_p M$. Equivalently, the restriction of $\omega$ to $L$ vanishes and $\dim L = \frac{1}{2} \dim M$.
+\end{defi}
+
+\begin{eg}
+  If $(M, \omega)$ is a surface with area form $\omega$, and $L$ is any $1$-dimensional submanifold, then $L$ is Lagrangian, since any $1$-dimensional subspace of $T_p M$.
+\end{eg}
+
+What do Lagrangian submanifolds of $T^* X$ look like? Let $\mu$ be a $1$-form on $X$, i.e.\ a section of $T^* X$, and let
+\[
+  xX_\mu = \{(x, \mu_x): x \in X\} \subseteq T^* X.
+\]
+The map $s_\mu: X \to T^*X$ is an embedding, and $\dim X_\mu = \dim X = \frac{1}{2} \dim T^* X$. So this is a good candidate for a Lagrangian submanifold. By definition, $X_\mu$ is Lagrangian iff $s_\mu^* \omega = 0$. But
+\[
+  s_\mu^* \omega = s_\mu^* (\d \alpha) = \d (s_\mu^* \alpha) = \d \mu.
+\]
+So $X_\mu$ is Lagrangian iff $\mu$ is closed. In particular, if $h \in C^\infty(X)$, then $X_{\d h}$ is a Lagrangian submanifold of $T^* X$. We call $h$ the \term{generating function} of the Lagrangian submanifold.
+
+There are other examples of Lagrangian submanifolds of the cotangent bundle. Let $S$ be a submanifold of $X$, and $x \in X$. We define the \term{conormal space} of $S$ at $x$ to be
+\[
+  N_x^* S = \{\xi \in T_x^* X : \xi|_{T_x S} = 0\}.
+\]
+The \term{conormal bundle} of $S$ is the union of all $N^*_x S$.
+
+\begin{eg}
+  If $S = \{x\}$, then $N^*S = T^*_x X$.
+\end{eg}
+
+\begin{eg}
+  If $S = X$, then $N^*S = S$ is the zero section.
+\end{eg}
+
+Note that both of these are $n$-dimensional submanifolds of $T^*X$, and this is of course true in general.
+
+So if we are looking for Lagrangian submanifolds, this is already a good start. In the case of $S = X$, this is certainly a Lagrangian submanifold, and so is $S = \{x\}$. Indeed,
+\begin{prop}
+  Let $L = N^* S$ and $M = T^* X$. Then $L \hookrightarrow M$ is a Lagrangian submanifold.
+\end{prop}
+
+\begin{proof}
+  If $L$ is $k$-dimensional, then $S \hookrightarrow X$ locally looks like $\R^k \hookrightarrow \R^n$, and it is clear in this case.
+\end{proof}
+
+\subsection{Symplectomorphisms and Lagrangians}
+Let $(M_1, \omega_1)$ and $(M_2, \omega_2)$ be $2n$-dimensional symplectic manifolds. If $f: M_1 \to M_2$ is a diffeomorphism, then when is $f$ a symplectomorphism?
+
+We look at the $4n$-dimensional manifold $M_1 \times M_2$, and we define the \term{product form} $\omega = \pr_1^* \omega_1 + \pr_2^* \omega_2$. We have
+\[
+  \d \omega = \pr_1^* \d \omega_1 + \pr_2^* \d \omega_2 = 0,
+\]
+and $\omega$ is non-degenerate since
+\[
+  \omega^{2n} = \binom{2n}{n} \pr_1^* \omega_1^{\wedge n} \wedge \pr_2^* \omega_2^{\wedge n} \not= 0.
+\]
+So $\omega$ is a symplectic form on $M_1 \times M_2$. In fact, for $\lambda_1, \lambda_2 \in \R \setminus \{0\}$, the combination
+\[
+  \lambda_1 \pr_1^* \omega_1 + \lambda_2 \pr_2^* \omega_2
+\]
+is also symplectic. The case we are particularly interested in is $\lambda_1 = 1$ and $\lambda_2 = -1$, where we get
+\[
+  \tilde{\omega} = \pr_1^* \omega_1 - \pr_2^* \omega_2,
+\]
+which is called the \term{twisted product form}\index{$\tilde{\omega}$}.
+
+Let $T_f$ be the graph of $f$, namely
+\[
+  T_f = \{(p_1, f(p_1)) : p_1 \in M_1\} \subseteq M_1 \times M_2.
+\]
+and let $\gamma_f: M_1 \to M_1 \times M_2$ be the natural embedding with image $T_f$.
+
+\begin{prop}
+  $f$ is a symplectomorphism iff $T_f$ is a Lagrangian submanifold of $(M_1 \times M_2, \tilde{\omega})$.
+\end{prop}
+\begin{proof}
+  The first condition is $f^* \omega_2 = \omega_1$, and the second condition $\gamma_f^* \tilde{\omega}$, and
+  \[
+    \gamma_f^* \tilde{\omega} = \gamma_f^* \pr_1^* \omega_1 = \gamma_f^* \pr_2^* \omega_2 = \omega_1 - f^* \omega_2.\qedhere
+  \]
+\end{proof}
+
+\begin{quote}
+  EVERYTHING IS A LAGRANGIAN SUBMANIFOLD.\\
+  \emph{Symplectic Geometry}, Weinstein (1981) % fix this
+\end{quote}
+
+\begin{eg}
+  Let $X_1, X_2$ be $n$-dimensional, $M_i = T^*X_i$, and $\omega_i$ the canonical symplectic forms. We are looking for symplectomorphisms $\varphi: M_1 \to M_2$. We are looking for a symplectomorphism $\varphi: M_1 \to M_2$. The strategy is to look for Lagrangian submanifolds of $(M_1 \times M_2, \tilde{\omega})$. We have
+  \[
+    M_1 \times M_2 = T^* X_1 \times T^* X_2 = T^*(X_1 \times X_2),
+  \]
+  and $\omega$ is the canonical symplectic form on $M_1 \times M_2$. Sadly, we are interested in the twisted product instead. So we define an involution $\sigma: M_1 \times M_1 \times M_2$ That fixes $M_1$ and sends $(x_i, \xi_i)$ to $(x_i, -\xi_i)$ on $M_2$. Then $\sigma$ is a symplectomorphism, and $\sigma^*$ swaps $\omega$ with $\tilde{\omega}$.
+
+  So our recipe for finding symplectomorphisms $M_1 \to M_2$ is as follows:
+  \begin{enumerate}
+    \item Start with $L$ a Lagrangian submanifold of $(M_1 \times M_2, \omega)$.
+    \item Twist it to get $L^\sigma = \sigma(L)$.
+    \item Check if $L^\sigma$ is the graph of a diffeomorphism.
+  \end{enumerate}
+  More explicitly, pick a generating function $f \in C^\infty(X_1 \times X_2)$. Then $\d f$ is a closed form on $X_1 \times X_2$. Then
+  \[
+    L = X_{\d f} = \{(x, y, \d f_{(x, y)}): (x, y) \in X_1 \times X_2\}
+  \]
+  is a Lagrangian submanifold of $(M_1 \times M_2, \omega)$.
+
+  Next we twist it to obtain $L^\sigma = \sigma(X_{\d f})$, which is a Lagrangian submanifold of $(M_1 \times M_2, \tilde{\omega})$. We write
+  \[
+    T^*_{(x, y)} (X_1 \times X_2) T_x^* X_1 \times T_y^* X_2,
+  \]
+  and we write $(\d f)_{x, y} = (\partial_x f, \partial_y f)$. Then $L^\sigma = \{(x, \partial_x f, y, -\partial_y f)\}$.
+
+  Finally, we check if $L^\sigma$ is the graph of a diffeomorphism $\varphi: M_1 \to M_2$. If so, we win, and we call this the symplectomorphism generated by $f$.\index{symplectomorphism generated by $f$}, and $f$ is called the \term{generating function} for $\varphi$.
+
+  $L^\sigma$ is the graph of $\varphi: M_1 \to M_2$ iff $\varphi(x, \xi) = (y, \eta)$, where
+  \[
+    \xi = \partial_x f,\quad \eta = \partial_y f.
+  \]
+  Given $(x, \xi) \in M$, how do we find $(y, \eta) = \varphi(x, \xi)$?
+
+  Locally, let $(U_1, x_1, \ldots, x_n)$ be a coordinate chart for $X_1$ and $(U_2, y_1, \ldots, y_n)$ be some chart for $X_2$. These give rise to charts $(T^* U_1, x_1, \ldots, x_n, \xi_1, \ldots, \xi_n)$ and $(T^* U_2, y_1, \ldots, y_n, \eta_1, \ldots, \eta_n)$. We have to solve the system of equations for $(y, \eta)$
+  \begin{align*}
+    \xi_1 &= \frac{\partial f}{\partial x_i} (x, y)\\
+    \eta_i &= - \frac{\partial f}{\partial y_i} (x, y)
+  \end{align*}
+  To do so, we first solve the first one for $y$. When is this possible? The implicit function theorem says locally, there is a unique smooth solution if
+  \[
+    \det \left[\frac{\partial}{\partial y_i}\left(\frac{\partial f}{\partial x_j}\right)\right]_{i, j} \not= 0.
+  \]
+  Thus, this is a necessary condition for $f$ to generate a symplectomorphism $\varphi$. Locally, this is also sufficient, but globally, we need to worry about $\varphi$ not being well-defined.
+
+  If we succeed in doing that, then we can simply set $\eta = - \frac{\partial f}{\partial y_i} (x, y)$, and we are done.
+\end{eg}
+
+\begin{eg}
+  Let $X_1 = X_2 = \R^n$, and $f: \R^n \times \R^n \to \R$ given by
+  \[
+    (x, y) \mapsto - \frac{|x - y|^2}{2} = -\frac{1}{2} \sum_{i = 1}^n (x_i - y_i)^2.
+  \]
+  What, if any, symplectomorphism is generated by $f$? We have to solve
+  \begin{align*}
+    \xi_i &= \frac{\partial f}{\partial x_i} = y_i - x_i\\
+    \eta_i = -\frac{\partial f}{\partial y_i} = y_i - x_i
+  \end{align*}
+  So we find that
+  \begin{align*}
+    y_i &= x_i + \xi_i,\\
+    \eta_i &= \xi_i.
+  \end{align*}
+  So we have
+  \[
+    \varphi(x, \xi) = (x + \xi, \xi).
+  \]
+  If we use the Euclidean inner product to identify $T^* \R^n \cong \R^n$, and view $\xi$ as a vector, then $\varphi$ is a free translation in $\R^n$.
+\end{eg}
+
+\begin{eg}
+  Let $X_1 = X_2 = X$ be a connected manifold, and $g$ a Riemannian metric on $X$. We then have the Riemannian distance $d: X \times X \to \R$, and we can define
+  \begin{align*}
+    f: X \times X &\to \R\\
+    (x, y) &\mapsto - \frac{1}{2} d(x, y)^2.
+  \end{align*}
+  What is the symplectomorphism generated by $f$? We use the Riemannian metric to identify $T^*X \cong TX$. Then we can check that $\varphi: TX \to TX$ is given by
+  \[
+    \varphi(x, v) = (\gamma(1), \dot{\gamma}(1)),
+  \]
+  where $\gamma$ is the geodesic with $\gamma(0) = x$ and $\dot{\gamma}(0) = v$. Thus, $\varphi$ is the geodesic flow.
+\end{eg}
+
+Suppose $X$ is an $n$-dimensional manifold, $M = T^*X$ and $\omega$ the canonical symplectic form on $M$, $f: X \to X \to \R$. Suppose that $f$ generates a symplectomorphism $\varphi: M \to M$. A \term{periodic point} of $\varphi$ is a fixed point of $\varphi^n$ for some $n$.
+
+\begin{prop}
+  Let $\psi: X \to \R$ be defined by $x \mapsto f(x, x)$. Then the fixed points of $\varphi$ are in one-to-one correspondence with the critical points of $\psi$.
+\end{prop}
+
+\begin{proof}
+  For $x_0 \in X$, we have
+  \[
+    \d \psi_{x_0} = (\partial_x f + \partial_y f)|_{(x, y) = (x_0, x_0)}.
+  \]
+  We write $\xi = \partial_{x_0} f|_{(x, y) = (x_0, x_0)}$. Then $x_0$ is a critical point of $\psi$ iff $\d \psi_{x_0} = 0$ iff $\partial_y f|_{(x, y) = (x_0, x_0)} = - \xi$. Thus, the point in the graph $L^\sigma$ corresponding to $(x, y) = (x_0, x_0)$ with $x_0$ critical is $(x_0, \xi, x_0, \xi)$, i.e.\ $\varphi(x_0, \xi) = (x_0, \xi)$. The reverse direction follows similarly. % fix this.
+\end{proof}
+
+Thus, if $\varphi^N$ is generated by some $f_N: X \times X \to \R$, then the fixed points of $\varphi^N$ are in one-to-one correspondence with critical points of $\psi_N$.
+
+Then natural question is then if $f_N$ exists. The answer is sort-of. We fix $x, y \in X$. We define the map
+\begin{align*}
+  X &\to \R\\
+  z &\mapsto f(x, z) + f(z, y).
+\end{align*}
+Suppose that this map always has a unique critical point $z_0$ and that $z_0$ is non-degenerate. We let
+\[
+  f_2(x, y) = f(x, z_0) + f(z_0, y).
+\]
+Then we get
+\begin{align*}
+  \partial_x f_2(x, y) &= \partial_x f(x, z_0)\\
+  \partial_y f_2(x, y) &= \partial_y f(z_0, y),
+\end{align*}
+We then see that $f_2$ is a smooth function, and is a generating function for $\varphi^2$. Indeed,
+\begin{align*}
+  \varphi^2(x, \partial_x f_2(x, y)) &= \varphi(\varphi(x, \partial_x f(x, z_0)))\\
+  &= \varphi(z_0, -\partial_y f(x, z_0))\\
+  &= \varphi(z_0, \partial_x f(z_0, y))\\
+  &= (y, -\partial_y f(z_0, y))\\
+  &= (y, -\partial_y f_2(x, y)),
+\end{align*}
+using that $\partial_y f(x, z_0) + \partial_x f(z_0, y) = 0$ as $z_0$ is a critical point.
+
+Can we do the same thing for $\varphi^3$? Similarly, consider the map
+\begin{align*}
+  X \times X &\to \R\\
+  (z, w) &\mapsto f(x, z) + f(z, w) + f(w, y).
+\end{align*}
+Suppose there is a unique critical point $(z_0, w_0)$ and is non-degenerate. Let
+\[
+  f_3(x, y) = f(x, z_0) + f(z_0, w_0) + f(w_0, y).
+\]
+Similarly, one can show that $f_3$ is smooth and is a generating function for $\varphi^3$. In general, it follows that, under certain hypothesis, the fixed points of $\varphi^N$ are in one-to-one correspondence with the critical points of
+\[
+  (x_1, x_2, \ldots, x_n) \mapsto f(x_1, x_2) + f(x_2, x_3) + \cdots + f(x_{n - 1}, x_n) + f(x_n, x_1).
+\]
+\begin{eg}
+  Let $Y \subseteq \R^2$ be a bounded, convex region, thougth of as a billard table, and let $X = \partial Y \cong S^1$. Let $\chi: S^1 \cong \R/\Z \to \R^2$ be a parametrization of $X$.
+
+  The laws of physics determine a map $\varphi: X \times (-1, 1) \to X \times (-1, 1)$ as follows --- given $(x, \cos \theta)$, consider a billard ball that leaves $X$ at an angle $\theta$ from the tangent. Then $\varphi(x, v) = (y, \cos \tau)$ is so that $y$ is the point where the ball first hits the boundary, and $\cos \tau$ is the angle at which the ball leaves after bouncing off.
+
+  We can think of $X \times (-1, 1)$ as the unit ball in the cotangent, and $\omega = \d x \wedge \d v$ is the canonical symplectic form. We claim that $\varphi$ is area preserving. To show this, we find a generating function $f$ for $\varphi$. We define $f: X \times X \to \R$ by
+  \[
+    f(x, y) = - \|\chi(x) - \chi(y)\|.
+  \]
+  This is smooth off the diagonal, and we have
+  \begin{align*}
+    \frac{\partial f}{\partial x}(x, y) &= \frac{\chi(y) - \chi(x)}{\|\chi(y) - \chi(x)\|} \cdot \left. \frac{\d \chi}{\d s} \right|_{s = x} = \cos \theta = v\\
+    \frac{\partial f}{\partial y}(x, y) &= \frac{\chi(x) - \chi(y)}{\|\chi(y) - \chi(x)\|} \cdot \left. \frac{\d \chi}{\d s} \right|_{s = y} = - \cos \nu = -w.
+  \end{align*}
+  So $f$ is in deed a generating function for $\varphi$.
+
+  Thus, the $N$-periodic points are given by the critical points of
+  \[
+    (x_1, \ldots, x_N) \mapsto - |\chi(x_1) - \chi(x_2)| - |\chi(x_2) - \chi(x_3)| - \cdots - |\chi(x_N) - \chi(x_1)|.
+  \]
+  Thus, up to a sign, this is the sum of lengths of the ``generalized polygon'' with vertices $(x_1, \ldots, x_N)$.
+\end{eg}
+
+Let us think a bit more about the closed annulus $A = S^1 \times [-1, 1]$. If $\varphi: A \to A$ is an area preserving function generated by $f: S^1 \times S^1 \to \R$, then the number of fixed points of $\varphi$ is the number of critical points of $\psi(x) = f(x, x)$. Since every function has at least a maximum and a minimum, ther eare at least two critical points of $\psi$. But there is a more general statement.
+\begin{thm}[Poincar\'e's last geometric theorem (Birkhoff, 1925)]\index{Poincar\'e's last geometric theorem}
+  Let $\varphi: A \to A$ be an area-preserving diffeomorphism such that $\varphi$ preserves the boundary components, and twists them in opposite directions. Then $\varphi$ has at least two fixed points.
+\end{thm}
+
+\subsection{Fixed points via Lagrangian submanifolds}
+Let $(M, \omega)$ be a symplectic manifold, $\varphi: M \to M$. Then the graph of $\varphi$ is a subset of $M \times M$. Again let $\tilde{\omega}$ be the twisted product form on $M \times M$. Then we saw that a morphism $\varphi: M \to M$ is a symplectomorphism iff the graph of $\varphi$ is Lagrangian in $(M \times M, \tilde{\omega})$. Moreover, it is easy to see that $p$ is a fixed point iff $(p, p) \in \grph \varphi$. Thus, the fixed points corresponds to the intersection of $\grph \varphi$ with the diagonal $\Delta = \grph \id_M$.
+
+Thus, how close $\varphi$ is to $\id_M$ is the same as how close $\grph \varphi$ is to $\Delta$. This motives the study of neighbourhoods of Lagrangian submanifolds.
+
+\begin{thm}[Lagrangian neighbourhood theorem (Weinstein)]\index{Lagrangian neighbourhood theorem}
+  Let $(M, \omega)$ be a symplectic manifold, $X$ a compact Lagrangian submanifold, and $\omega_0$ the canonical symplectic form on $T^* X$. We let $i_0: X \hookrightarrow T^* X$ to be the zero section, and $i: X \hookrightarrow M$ the canonical inclusion. Then there exists a neighbourhood $U_0$ of $X$ in $T^* X$ and $U$ of $X$ in $M$ and a symplectomorphism $\varphi: \mathcal{U}_0 \to \mathcal{U}$ sending $X$ to $X$.
+\end{thm}
+
+An equivalent theorem is the following
+\begin{thm}[Weinstein]
+  Let $M$ be a $2n$-dimensional manifold, $X$ an $n$-dimensional compact submanifold, and $i: X \hookrightarrow M$ the inclusion, and symplectic forms $\omega_0, \omega_1$ on $M$ such that $i^* \omega_0 = i^* \omega_1 = 0$, i.e.\ $X$ is Lagrangian with respect to both symplectic structures. Then there exists neighbourhoods $\mathcal{U}_0, \mathcal{U}_1$ of $X$ in $M$ such that $\rho|_X = \id_X $ and $\rho^* \omega_1 = \omega_0$.
+\end{thm}
+
+\begin{proof}[Proof of equivalence]
+  We first do some linear algebra. Let $(V, \Omega)$ be a symplectic vector space, $L$ a Lagrangian subspace. Define the bilinear form
+  \begin{align*}
+    \Omega: V/L \times L &\to \R\\
+    ([v], u) &\to \Omega(v, u).
+  \end{align*}
+  This is a non-degenerate, and gives a natural isomorphism $V/L \cong L^*$.
+
+  Now let $V = T_p M$ and $L = T_p X$. Then doing the above fiberwise, we obtain an isomorphism between the normal bundle and the cotangent space
+  \[
+    NX = TM|_X /TX \cong T^* X.
+  \]
+  Thus, by the standard tubular neighbourhood theorem, there is a neighbourhood $\mathcal{N}_0$ of $X$ in $NX$ and a neighbourhood $\mathcal{N}$ of $X$ in $M$, and a diffeomorphism $\psi: \mathcal{N}_0 \to \mathcal{N}$. We now have two symplectic forms on $\mathcal{N}_0$ --- the one from the cotangent bundle and the pullback of that from $M$. Then applying the second theorem gives the first.
+
+  Conversely, if we know the first theorem, then applying this twice gives us symplectomorphisms between neighbourhoods of $X$ in $M$ under each symplectic structure with a neighbourhood in the cotangent bundle.
+\end{proof}
+
+\begin{proof}[Proof of second theorem]
+  The strategy is to get ourselves into a position that lets us apply relative Moser, which is where the magic is at.
+
+  For $p \in X$, we define $V = T_p M$ and $U = T_p X$, and $W = U^\perp$ the orthogonal complement of $U$ in $V$ with respect to some Riemannian metric in $M$. Since $i^* \omega_0 = i^* \omega_1 = 0$, we know that $U$ is a Lagrangian subspace of $(V, \omega_0|_p = \Omega_0)$ and $(V, \omega_1|_p = \Omega_1)$.
+
+  \begin{lemma}
+    Let $V$ be a $2n$-dimensional vector space, $\Omega_0, \Omega_1$ symplectic structures on $V$. Suppose $U$ is a subspace of $V$ Lagrangian with respect to both $\Omega_0$ and $\Omega_1$, and $W$ is any complement of $V$. Then we can construct canonically a linear isomorphism $H: V \to V$ such that $H|_U = \id_U$ and $H^* \Omega_1 = \Omega_2$.
+  \end{lemma}
+  By this lemma, we get canonically an isomorphism $H_p: T_p M \to T_p M$ such that $H_p|_{T_p X} = \id_{T_p X}$ and $H_p^* \omega_1|_p = \omega_0|_p$. The canonicity implies $H_p$ varies smoothly with $p$. We now apply the Whitney extension theorem
+  \begin{thm}[Whitney extension theorem]\index{Whitney extension theorem}
+    Let $X$ be a submanifold of $M$, $H_p: T_p M \to T_p M$ smooth family of isomorphisms such that $H_p|_{T_p X} = \id_{T_p X}$. Then there exists an neighbourhood $\mathcal{N}$ of $X$ in $M$ and an embedding $h: \mathcal{N} \to M$ such that $h|_X = \id_X$ and for all $p \in X$, $\d h_p = H_p$.
+  \end{thm}
+  So at $p \in X$, we have $h^* \omega_1|_p = (\d h_p)^*\omega_1|_P = H_p^* \omega_1|_p = \omega_0|_p$. So we are done by relative Moser.
+\end{proof}
+
+\begin{proof}[Proof sketch of lemma]
+  We first claim that for $V$ s vector space, $\Omega$ a symplectic form, $U$ a Lagrangian subspace and $W$ any complement of $U$, there is a canonical way to convert $W$ into a Lagrangian complement of $V$, by taking the linear map $A: W \to U$ such that $\Omega(A\omega, \ph) = - \frac{1}{2} \Omega(w, \ph)$, and then taking
+  \[
+    W' = (I - A) W.
+  \]
+  Thus in the situation of the lemma, we get two complements $W_0, W_1$ of $V$ that are Lagrangian with respect to $\Omega_0$ and $\Omega_1$ respectively. We set
+  \[
+    H = \id_U \oplus B: V \oplus W_0 \to U \oplus W_1,
+  \]
+  where $B$ satisfies $\Omega_0(w, u) = \Omega_1(Bw, u)$. Then $H^* \Omega_1 = \Omega_0$.
+\end{proof}
+
+\begin{eg}
+  We can use this result to understand the neighbourhood of the identity in the group $\Symp(M, \omega)$ of symplectomorphisms of a symplectic manifold $(M, \omega)$.
+
+  Suppose $\varphi, \id \in \Symp(M, \omega)$. Then the graphs $\Gamma_\varphi$ and $\Delta = \Gamma_{\id}$ are Lagrangian submanifolds of $(M \times M, \tilde{\omega})$. Then by our theorem, there is a neighbourhood $\mathcal{U}$ of $\Delta$ in $(M \times M, \tilde{\omega})$ that is symplectomorphic to a neighbourhood $\mathcal{U}_0$ of the zero section of $(T^*M, \omega_0)$.
+
+  Suppose $\varphi$ is sufficiently $C^0$-close to $\id$. Then $\Gamma_\varphi \subseteq \mathcal{U}$. If $\varphi$ is sufficiently $C^1$-close to the identity, then the image of $\Gamma_\varphi$ in $\mathcal{U}_0$ is a smooth section $X_\mu$ for some $1$-form $\mu$.
+  Now $\varphi$ is a symplectomorphism iff $\Gamma_\varphi$ is Lagrangian iff $X_\mu$ is Lagrangian iff $\mu$ is closed. So a small $C^1$-neighbourhood of $\id$ in $\Sym(M, \omega)$ is ``the same as'' a small $C^1$-neighbourhood of the zero-section in the space of closed $1$-forms on $X$.
+\end{eg}
+
+We can also use this to understand fixed points of symplectomorphisms (again!).
+\begin{thm}
+  Let $(M, \omega)$ be a compact symplectic manifold such that $H^1_{\dR}(M) = 0$. Then any symplectomorphism $\varphi: M \to M$ sufficiently close to the identity has at least two fixed points.
+\end{thm}
+
+\begin{proof}
+  The graph of $\varphi$ corresponds to a closed $1$-form on $M$. Since $\mu$ is closed and $H^1_{\dR}(M) = 0$, we know $\mu = \d h$ for some $h \in C^\infty$. Since $M$ is compact, $h$ has at least two critical points (the global maximum and minimum). Since the fixed points corresponding to the points where $\mu$ vanish (so that $\Gamma_\varphi$ intersects $\Delta$), we are done.
+\end{proof}
+Counting fixed points of symplectomorphisms is a rather popular topic in symplectic geometry, and Arnold made some conjectures about these. A version of this is
+\begin{thm}[Arnold conjecture] % check
+  Let $(M, \omega)$ be a compact symplectic manifold of dimension $2n$, and $\varphi: M \to M$ a symplectomorphism. Suppose $\varphi$ is \emph{exactly homotopic} to the identity and \emph{non-degenerate}. Then the number of fixed points of $\varphi$ is at least $\sum_{i = 0}^{2n} \dim H^i(M, \R)$.
+\end{thm}
+We should think of the sum $\sum_{i = 0}^{2n} \dim H^i(M, \R)$ as the minimal number of critical points of a function, as Morse theory tells us.
+
+\begin{defi}[Exactly homotopic]\index{exactly homotopic}
+  We say $\varphi$ is \emph{exactly homotopic} to the identity if $\varphi = \rho_1$ for some isotopy $\rho_t: M \to M$ with $\rho_0 = \id$ generated by some time dependent vector field $v_t$ satisfying $i_{v_t}^* \omega = \d h_t$ for some smooth $1$-periodic family of functions $h_t: M \to \R$.
+\end{defi}
+The condition $i_{v_t}^* \omega \d h_t$ says $v_t$ is a Hamiltonian vector field, which we will discuss soon after this.
+
+Note that the fixed points of $\varphi$ correspond to period-1 orbits of $\rho_t$, because $\varphi(p) = p$ iff $\{\rho_t(p) : t \in [0, 1]\}$ is a closed orbit.
+
+\begin{defi}[Non-degenerate function]\index{non-degenerate function}
+  A endomorphism $\varphi: M \to M$ is non-degenerate iff all its fixed points are non-degenerate, i.e.\ if $p$ is a fixed point, then $\det (\id - \d \varphi_p) \not= 0$.
+\end{defi}
+\begin{eg}
+  In the original statement of the Arnold conjecture, which is the case $(T^2, \d \theta_1 \wedge \d \theta_2)$, then any symplectomorphism has at least $4$ fixed points.
+\end{eg}
+
+In the case where $h_t$ is actually not time dependent, Arnold's conjecture is easy to prove.
 
 \printindex
 \end{document}
