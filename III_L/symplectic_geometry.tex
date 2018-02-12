@@ -10,6 +10,7 @@
 
 \DeclareMathOperator{\grph}{graph}
 \DeclareMathOperator{\Symp}{Symp}
+\newcommand\Dolb{\mathrm{Dolbeault}}
 
 \begin{document}
 \maketitle
@@ -22,16 +23,22 @@ The first part of the course will be an overview of the basic structures of symp
 Some familiarity with basic notions from Differential Geometry and Algebraic Topology will be assumed. The material covered in the respective Michaelmas Term courses would be more than enough background.
 }
 \tableofcontents
-\section{Symplectic linear algebra}
-The objects studied in symplectic geometry are symplectic manifolds $(M, \omega)$.
-\begin{defi}[Symplectic manifold]\index{symplectic manifold}
-  A \emph{symplectic manifold} is a manifold $M$ of dimension $2n$ equipped with a $2$-form $\omega$ that is closed (i.e.\ $\d \omega = 0$) and non-degenerate (i.e.\ $\omega^{\wedge n} \not= 0$). We call $\omega$ the \term{symplectic form}.
+\section{Symplectic manifolds}
+\subsection{Symplectic linear algebra}
+In symplectic geometry, we study symplectic manifolds. These are manifolds equipped with a certain structure on the tangent bundle. In this section, we first analyze the condition fiberwise.
+
+\begin{defi}[Symplectic vector space]\index{symplectic vector space}
+  A \emph{symplectic vector space} is a real vector space $V$ together with a non-degenerate skew-symmetric bilinear map $\Omega: V \times V \to \R$.
 \end{defi}
 
-The closedness is an analytic condition, and the non-degeneracy is an algebraic condition. We first try to understand the algebraic side of the story.
+Recall that
+\begin{defi}[Non-degenerate bilinear map]\index{non-degenerate bilinear map}
+  We say a bilinear map $\Omega$ is non-degenerate if the induced map $\tilde{\Omega}: V \to V^*$ given by $v \mapsto \Omega(v, \ph)$ is bijective.
+\end{defi}
 
+Even if we drop the non-degeneracy condition, there aren't that many symplectic vector spaces around up to isomorphism.
 \begin{thm}
-  Let $V$ be a real vector space, and $\Omega: V \times V \to \R$ a skew-symmetric bilinear map. Then there exists a basis $\{u_1, \ldots, u_k, e_1, \ldots, e_n, f_1, \ldots, f_n\}$ of $V$ such that
+  Let $V$ be a real vector space and $\Omega$ a skew-symmetric bilinear form. Then there exists a basis $\{u_1, \ldots, u_k, e_1, \ldots, e_n, f_1, \ldots, f_n\}$ of $V$ such that
   \begin{enumerate}
     \item $\Omega(u_i, v) = 0$ for all $v \in V$
     \item $\Omega(e_i, e_j) = \Omega(f_i, f_j) = 0$.
@@ -43,55 +50,48 @@ The proof is a skew-symmetric version of Gram--Schmidt.
 \begin{proof}
   Let
   \[
-    \mathcal{U} = \{u \in V : \Omega(u, v) = 0\text{ for all }v \in V\},
+    U = \{u \in V : \Omega(u, v) = 0\text{ for all }v \in V\},
   \]
   and pick a basis $u_1, \ldots, u_k$ of this. Choose any $W$ complementary to $U$.
 
   First pick $e_1 \in W \setminus \{0\}$ arbitrarily. Since $e_1 \not \in U$, we can pick $f_1$ such that $\Omega(e_1, f_1) = 1$. Then define $W_1 = \spn\{e_i, f_i\}$, and
   \[
-    W_1^\Omega = \{w \in W: \Omega(u, v) = 0\text{ for all }v \in W_1\}.
+    W_1^\Omega = \{w \in W: \Omega(w, v) = 0\text{ for all }v \in W_1\}.
   \]
   It is clear that $W_1 \cap W_1^\Omega = \{0\}$. Moreover, $W = W_1 \oplus W_1^\Omega$. Indeed, if $v \in W$, then
   \[
-    v = ((v, f_1) e_1 - (v, e_1) f_1) + (v - ((v, f_1) e_1 - (v, e_1) f_1)),
+    v = (\Omega(v, f_1) e_1 - \Omega(v, e_1) f_1) + (v - (\Omega(v, f_1) e_1 - \Omega(v, e_1) f_1)),
   \]
   Then we are done by induction on the dimension.
 \end{proof}
-Here $k = \dim U$ and $2n = \dim V - k$ are invariants of $(V, \Omega)$. The number $2n$ is called the rank of $\Omega$.
-
-Given a bilinear form $\Omega$, we can define $\tilde{\Omega}: V \to V^*$ by $\tilde{\Omega}(v)(w) = \Omega(v, u)$. Then $U = \ker \tilde{\Omega}$.
-
-\begin{defi}[Non-degenerate/symplectic bilinear map]\index{non-degenerate bilinear map}\index{symplectic bilinear map}
-  We say the bilinear map $\Omega$ is non-degenerate if $\tilde{\Omega}: V \to V^*$ is bijective, i.e.\ $U = \{0\}$.
-
-  In this case, $(V, \Omega)$ is called a \term{symplectic vector space}.
-\end{defi}
+Here $k = \dim U$ and $2n = \dim V - k$ are invariants of $(V, \Omega)$. The number $2n$ is called the \term{rank} of $\Omega$. Non-degeneracy is equivalent to $k = 0$.
 
 \begin{ex}
   $\Omega$ is non-degenerate iff $\Omega^{\wedge n} = \Omega \wedge \cdots \wedge \Omega \not= 0$.
 \end{ex}
 
-There are several consequences of being a symplectic vector space. First of all, $\tilde{\Omega}$ gives an canonical isomorphism $V \cong V^*$, and $\dim V$ is even. In particular, we can find a \term{symplectic basis} $\{e_1, \ldots, e_n, f_1, \ldots, f_n\}$ of $V$ such that
+By definition, every symplectic vector space is canonically isomorphism to its dual, given by the map $\tilde{\Omega}$. As in the above theorem, a \term{symplectic basis} $\{e_1, \ldots, e_n, f_1, \ldots, f_n\}$ of $V$ is a basis such that
 \[
   \Omega(e_i, e_j) = \Omega(f_i, f_j) = 0,\quad \Omega(e_i, f_i) = \delta_{ij}.
 \]
-Under this basis, the matrix representing $\Omega$ is
+Every symplectic vector space has a symplectic basis, and in particular has even dimension. In such a basis, the matrix representing $\Omega$ is
 \[
   \Omega_0 = \begin{pmatrix}
     0 & I\\
     -I & 0
   \end{pmatrix}.
 \]
+We will need the following definitions:
 \begin{defi}[Symplectic subspace]\index{symplectic subspace}
-  If $(v, \Omega)$ is a symplectic vector space, a \emph{symplectic subspace} is a subspace $W \subseteq V$ such that $\Omega|_{W \times W}$ is non-degenerate.
+  If $(V, \Omega)$ is a symplectic vector space, a \emph{symplectic subspace} is a subspace $W \subseteq V$ such that $\Omega|_{W \times W}$ is non-degenerate.
 \end{defi}
 
 \begin{defi}[Isotropic subspace]\index{isotropic subspace}
-  If $(v, \Omega)$ is a symplectic vector space, an \emph{isotropic subspace} is a subspace $W \subseteq V$ such that $\Omega|_{W \times W} = 0$.
+  If $(V, \Omega)$ is a symplectic vector space, an \emph{isotropic subspace} is a subspace $W \subseteq V$ such that $\Omega|_{W \times W} = 0$.
 \end{defi}
 
 \begin{defi}[Lagrangian subspace]\index{Lagrangian subspace}
-  If $(v, \Omega)$ is a symplectic vector space, an \emph{Lagrangian subspace} is an isotropic subspace $W$ with $\dim W = \frac{1}{2} \dim V$.
+  If $(V, \Omega)$ is a symplectic vector space, an \emph{Lagrangian subspace} is an isotropic subspace $W$ with $\dim W = \frac{1}{2} \dim V$.
 \end{defi}
 
 \begin{defi}[Symplectomorphism]\index{symplectomorphism}
@@ -100,9 +100,29 @@ Under this basis, the matrix representing $\Omega$ is
 
 The standard form theorem says any two $2n$-dimensional symplectic vector space $(V, \Omega)$ are symplectomorphic to each other.
 
-\section{Symplectic manifold}
-Take our symplectic manifold $(M, \omega)$ again. Since $\omega^{\wedge n}$ is non-zero by assumption.
+\subsection{Symplectic manifolds}
+We are now ready to define symplectic manifolds.
+\begin{defi}[Symplectic manifold]\index{symplectic manifold}
+  A \emph{symplectic manifold} is a manifold $M$ of dimension $2n$ equipped with a $2$-form $\omega$ that is closed (i.e.\ $\d \omega = 0$) and non-degenerate (i.e.\ $\omega^{\wedge n} \not= 0$). We call $\omega$ the \term{symplectic form}.
+\end{defi}
 
+The closedness condition is somewhat mysterious. There are some motivations from classical mechanics, for examples, but they are not very compelling, and the best explanation for the condition is ``these manifolds happen to be quite interesting''.
+
+Observe that by assumption, the form $\omega^{\wedge n}$ is nowhere-vanishing, and so it is a volume form. If our manifold is compact, then pairing the volume form with the fundamental class (i.e.\ integrating it over the manifold) gives the volume, and in particular is non-zero. Thus, $\omega^{\wedge n}\not= 0 \in H^{2n}_{\dR}(M)$. Since the wedge is well-defined on cohomology, an immediate consequence of this is that
+\begin{prop}
+  If a compact manifold $M^{2n}$ is such that $H_{\dR}^{2k}(M) = 0$ for some $k < n$, then $M$ does not admit a symplectic structure.
+\end{prop}
+A more down-to-earth proof of this result would be that if $\omega^{2k} = \d \alpha$ for some $\alpha$, then
+\[
+  \int \omega^n = \int \omega^{2k} \wedge \omega^{2(n - k)} = \int \d (\alpha \wedge \omega^{2(n - k)}) = 0
+\]
+by Stokes' theorem.
+
+\begin{eg}
+  $S^n$ does not admit a symplectic structure unless $n = 2$ (or $n = 0$, if one insists).
+\end{eg}
+
+On the other hand, $S^2$ is a symplectic manifold.
 \begin{eg}
   Take $M = S^2$. Take the standard embedding in $\R^3$, and for $p \in S^2$, the tangent space consists of the vectors perpendicular to $p$. We can take the symplectic form to be
   \[
@@ -111,16 +131,11 @@ Take our symplectic manifold $(M, \omega)$ again. Since $\omega^{\wedge n}$ is n
   Anti-symmetry and non-degeneracy is IA Vectors and Matrices.
 \end{eg}
 
-\begin{eg}
-  Take $M = S^4$. We claim that this does not admit a symplectic structure, because it is compact with $H^2(S^2)$. So any potential symplectic form $\omega$ has $\omega \wedge \omega = 0 \in H^4(S^4)$. Hence it cannot be a volume form.
-\end{eg}
-
-We now want to consider when two symplectic structures can be considered ``the same''.
 \begin{defi}[Symplectomorphism]\index{symplectomorphic}
-  Let $(X_1, \omega_1)$ and $(X_2, \omega_2)$ be symplectic manifolds. A symplectomorphism is a diffeomorphism $f: X_1 \to X_2$ such that $f^* \omega_2 = \omega_1$.
+  Let $(X_1, \omega_1)$ and $(X_2, \omega_2)$ be symplectic manifolds. A \emph{symplectomorphism} is a diffeomorphism $f: X_1 \to X_2$ such that $f^* \omega_2 = \omega_1$.
 \end{defi}
 
-We can also consider the following notions:
+If we have a single fixed manifold, and two symplectic structures on it, there are other notions of ``sameness'' we might consider:
 \begin{defi}[Strongly isotopic]\index{strongly isotopic}
   Two symplectic structures on $M$ are \emph{strongly isotopic} if there is an isotopy taking one to the other.
 \end{defi}
@@ -196,42 +211,55 @@ There is also a relative version of this.
 
 A canonical example of a symplectic manifold is the \term{cotangent bundle} of a manifold $X$. In physics, $X$ is called the \term{configuration space}, and $M = T^*X$ is called the \term{phase space}.
 
-Given a coordinate chart $(U, x_1, \ldots, x_n)$ for $X$, we have a coordinate chart of $T^*X$ given by $(T^* U, x_1, \ldots, x_n, \xi_1, \ldots, \xi_n)$, where $\xi_i$ is defined so that for $\xi \in T^*_xX$, we have
+On a coordinate chart $(U, x_1, \ldots, x_n)$ for $X$, a generic $1$-form can be written as
 \[
-  \xi = \sum_{i = 1}^n \xi_i(\xi) \;(\d x_i)_x.
+  \xi = \sum_{i = 1}^n \xi_i \;\d x_i.
 \]
-On $T^* U$, we define
+Thus, we have a coordinate chart on $T^*X$ given by $(T^* U, x_1, \ldots, x_n, \xi_1, \ldots, \xi_n)$. On $T^* U$, there is the \term{tautological $1$-form}
 \[
-  \alpha = \sum_{i = 1}^n \xi_i \;\d x_i,
+  \alpha = \sum_{i = 1}^n \xi_i \;\d x_i.
 \]
-the \term{tautological $1$-form}. Then we set
+Observe that this is independent of the chart chosen, since it can be characterized in the following coordinate-independent way:
+
+\begin{prop}
+  Let $\pi: M = T^*X \to X$ be the projection map, and $\pi^*: T^*X \to T^* M$ the pullback map. Then for $\xi \in M$, we have $\alpha_\xi = \pi^* \xi$.
+\end{prop}
+
+\begin{proof}
+ On a chart, we have
+ \[
+   \pi^* \xi\left( \frac{\partial}{\partial x_j}\right) = \xi\left(\frac{\partial}{\partial x_j}\right) = \xi_j = \alpha_\xi \left(\frac{\partial}{\partial x_j}\right),
+ \]
+ and similarly both vanish on $\frac{\partial}{\partial \xi_j}$.
+\end{proof}
+This tautological $1$-form is constructed so that the following hold:
+\begin{prop}
+  Let $\mu$ be a one-form of $X$, i.e.\ a section $s_\mu: X \to T^* X$. Then $s_\mu^* \alpha = \mu$.
+\end{prop}
+
+\begin{proof}
+  By definition,
+  \[
+    \alpha_\xi = \xi \circ \d \pi.
+  \]
+  So for $x \in X$, we have
+  \[
+    s_\mu^*\alpha_{\mu(x)} = \mu(x) \circ \d \pi \circ \d s_\mu = \mu(x) \circ \d (\pi \circ s_\mu) = \mu(x) \circ \d(\mathrm{id}_X) = \mu(x).\qedhere
+  \]
+\end{proof}
+
+Given this, we can set
 \[
   \omega = - \d \alpha = \sum_{i = 1}^n \;\d x_i \wedge \;\d \xi_i,
 \]
-the \term{canonical symplectic form} on $T^* X$.
+the \term{canonical symplectic form} on $T^* X$. It is clear that it is anti-symmetric, closed, and non-degenerate, because it looks just like the canonical symplectic form on $\R^{2n}$.
 
-\begin{prop}
-  $\alpha$ (and hence $\omega$) do not depend on the chart chosen.
-\end{prop}
-Hence, $\alpha$ is a globally well-defined $1$-form, and $\omega = -\d \alpha$ is a globally well-defined $2$-form.
-
-One can check this by inspecting how $\alpha$ changes under a change in chart. Alternatively, one can provide a coordinate-free definition for $\alpha$, which is what we shall do.
-
-\begin{proof}
-  Let $\pi: M = T^*X \to X$ be the projection map. Then we have a pullback map $\pi^*: T^*X \to T^* M$. We claim that for $\xi \in M$, we have $\alpha_\xi = \pi^* \xi$. Indeed, on a chart,
-  \[
-    \pi^* \xi\left( \frac{\partial}{\partial x_j}\right) = \xi\left(\frac{\partial}{\partial x_j}\right) = \xi_j = \alpha_\xi \left(\frac{\partial}{\partial x_j}\right),
-  \]
-  and similarly both vanish on $\frac{\partial}{\partial \xi_j}$.
-\end{proof}
-
-From this coordinate-free description, we see that $\alpha$ and $\omega$ are natural in the sense that if $X_1, X_2$ are manifolds, $M_i = T^* X_i$, $\alpha_i$ is the tautological $1$-form on $i$, and $f: X_1 \to X_2$ is a diffeomorphism, then the induced map $f^\#: T^*X_2 \to T^* X_1$ is a symplectomorphism. This is immediate from the abstract characterization of the tautological $1$-form, but it may be instructive to see it in action in an explicit example.
 \begin{eg}
   Take $X = S^1$, parametrized by $\theta$, and $T^* X = S^1 \times \R$ with coordinates $(\theta, \xi_\theta)$. Then
   \[
     \omega = \d \theta \wedge \d \xi_\theta.
   \]
-  Suppose we reparametrize by $\tau = 2 \theta$. Then $\d \tau = 2 \d \theta$. However, since we defined $\xi_\theta$ by
+  We can see explicitly how this is independent of coordinate. Suppose we parametrized the circle by $\tau = 2 \theta$. Then $\d \tau = 2 \d \theta$. However, since we defined $\xi_\theta$ by
   \[
     \xi = \xi_\theta(\xi) \;\d \theta
   \]
@@ -241,7 +269,7 @@ From this coordinate-free description, we see that $\alpha$ and $\omega$ are nat
   \]
 \end{eg}
 
-Of course, while diffeomorphisms give rise to symplectomorphisms between the cotangent spaces, not all symplectomorphisms arise this way.
+Of course, if we have a diffeomorphism $f: X \to Y$, then the pullback map induces a symplectomorphism $f^*: T*Y \to T*X$. However, not all symplectomorphisms arise this way.
 \begin{eg}
   If $X = S^1$ and $T^* X = S^1 \times \R$ is given the canonical symplectic structure, then the vertical translation $g(\theta, \xi) = (\theta, \xi + c)$ is a symplectomorphism that is not a lift of a diffeomorphism $S^1 \to S^1$.
 \end{eg}
@@ -252,33 +280,19 @@ So when does a symplectomorphism come from a diffeomorphism?
   A symplectomorphism $y: T^* X \to T^* X$ is a lift of a diffeomorphism $X \to X$ iff $g^* \alpha = \alpha$.
 \end{ex}
 
-Why is $\alpha$ called the tautological $1$-form?
-\begin{prop}
-  Let $\mu$ be a one-form of $X$, i.e.\ a section $s_\mu: X \to T^* X$. Then $s_\mu^* \alpha = \mu$.
-\end{prop}
-
-\begin{proof}
-  By definition,
-  \[
-    \alpha_\xi = \xi \circ \d \pi.
-  \]
-  So we have
-  \[
-    s_\mu^*\alpha_{\mu(x)} = \mu(x) \circ \d \pi \circ \d s_\mu = \mu(x) \circ \d (\pi \circ s_\mu) = \mu(x) \circ \d(\mathrm{id}_X) = \mu(x).\qedhere
-  \]
-\end{proof}
-
+\subsection{Symplectomorphisms and Lagrangians}
+We now consider Lagrangian submanifolds. These are interesting for many reasons, but in this section, we are going to use them to understand symplectomorphisms.
 \begin{defi}[Lagrangian submanifold]
   Let $(M, \omega)$ be a symplectic manifold, and $L \subseteq M$ a submanifold. Then $L$ is a \term{Lagrangian submanifold} if for all $p \in L$, $T_p L$ is a Lagrangian subspace of $T_p M$. Equivalently, the restriction of $\omega$ to $L$ vanishes and $\dim L = \frac{1}{2} \dim M$.
 \end{defi}
 
 \begin{eg}
-  If $(M, \omega)$ is a surface with area form $\omega$, and $L$ is any $1$-dimensional submanifold, then $L$ is Lagrangian, since any $1$-dimensional subspace of $T_p M$.
+  If $(M, \omega)$ is a surface with area form $\omega$, and $L$ is any $1$-dimensional submanifold, then $L$ is Lagrangian, since any $1$-dimensional subspace of $T_p M$ is Lagrangian.
 \end{eg}
 
 What do Lagrangian submanifolds of $T^* X$ look like? Let $\mu$ be a $1$-form on $X$, i.e.\ a section of $T^* X$, and let
 \[
-  xX_\mu = \{(x, \mu_x): x \in X\} \subseteq T^* X.
+  X_\mu = \{(x, \mu_x): x \in X\} \subseteq T^* X.
 \]
 The map $s_\mu: X \to T^*X$ is an embedding, and $\dim X_\mu = \dim X = \frac{1}{2} \dim T^* X$. So this is a good candidate for a Lagrangian submanifold. By definition, $X_\mu$ is Lagrangian iff $s_\mu^* \omega = 0$. But
 \[
@@ -311,10 +325,12 @@ So if we are looking for Lagrangian submanifolds, this is already a good start. 
   If $L$ is $k$-dimensional, then $S \hookrightarrow X$ locally looks like $\R^k \hookrightarrow \R^n$, and it is clear in this case.
 \end{proof}
 
-\subsection{Symplectomorphisms and Lagrangians}
-Let $(M_1, \omega_1)$ and $(M_2, \omega_2)$ be $2n$-dimensional symplectic manifolds. If $f: M_1 \to M_2$ is a diffeomorphism, then when is $f$ a symplectomorphism?
+Our objective is to use Lagrangian submanifolds to understand the following problem:
+\begin{problem}
+  Let $(M_1, \omega_1)$ and $(M_2, \omega_2)$ be $2n$-dimensional symplectic manifolds. If $f: M_1 \to M_2$ is a diffeomorphism, then when is $f$ a symplectomorphism?
+\end{problem}
 
-We look at the $4n$-dimensional manifold $M_1 \times M_2$, and we define the \term{product form} $\omega = \pr_1^* \omega_1 + \pr_2^* \omega_2$. We have
+Consider the $4n$-dimensional manifold $M_1 \times M_2$, with the \term{product form} $\omega = \pr_1^* \omega_1 + \pr_2^* \omega_2$. We have
 \[
   \d \omega = \pr_1^* \d \omega_1 + \pr_2^* \d \omega_2 = 0,
 \]
@@ -326,11 +342,10 @@ So $\omega$ is a symplectic form on $M_1 \times M_2$. In fact, for $\lambda_1, \
 \[
   \lambda_1 \pr_1^* \omega_1 + \lambda_2 \pr_2^* \omega_2
 \]
-is also symplectic. The case we are particularly interested in is $\lambda_1 = 1$ and $\lambda_2 = -1$, where we get
+is also symplectic. The case we are particularly interested in is $\lambda_1 = 1$ and $\lambda_2 = -1$, where we get the \term{twisted product form}\index{$\tilde{\omega}$}.
 \[
-  \tilde{\omega} = \pr_1^* \omega_1 - \pr_2^* \omega_2,
+  \tilde{\omega} = \pr_1^* \omega_1 - \pr_2^* \omega_2.
 \]
-which is called the \term{twisted product form}\index{$\tilde{\omega}$}.
 
 Let $T_f$ be the graph of $f$, namely
 \[
@@ -342,63 +357,61 @@ and let $\gamma_f: M_1 \to M_1 \times M_2$ be the natural embedding with image $
   $f$ is a symplectomorphism iff $T_f$ is a Lagrangian submanifold of $(M_1 \times M_2, \tilde{\omega})$.
 \end{prop}
 \begin{proof}
-  The first condition is $f^* \omega_2 = \omega_1$, and the second condition $\gamma_f^* \tilde{\omega}$, and
+  The first condition is $f^* \omega_2 = \omega_1$, and the second condition is $\gamma_f^* \tilde{\omega} = 0$, and
   \[
     \gamma_f^* \tilde{\omega} = \gamma_f^* \pr_1^* \omega_1 = \gamma_f^* \pr_2^* \omega_2 = \omega_1 - f^* \omega_2.\qedhere
   \]
 \end{proof}
 
-\begin{quote}
-  EVERYTHING IS A LAGRANGIAN SUBMANIFOLD.\\
-  \emph{Symplectic Geometry}, Weinstein (1981) % fix this
-\end{quote}
+%\begin{quote}
+%  EVERYTHING IS A LAGRANGIAN SUBMANIFOLD.\\
+%  \emph{Symplectic Geometry}, Weinstein (1981) % fix this
+%\end{quote}
 
-\begin{eg}
-  Let $X_1, X_2$ be $n$-dimensional, $M_i = T^*X_i$, and $\omega_i$ the canonical symplectic forms. We are looking for symplectomorphisms $\varphi: M_1 \to M_2$. We are looking for a symplectomorphism $\varphi: M_1 \to M_2$. The strategy is to look for Lagrangian submanifolds of $(M_1 \times M_2, \tilde{\omega})$. We have
-  \[
-    M_1 \times M_2 = T^* X_1 \times T^* X_2 = T^*(X_1 \times X_2),
-  \]
-  and $\omega$ is the canonical symplectic form on $M_1 \times M_2$. Sadly, we are interested in the twisted product instead. So we define an involution $\sigma: M_1 \times M_1 \times M_2$ That fixes $M_1$ and sends $(x_i, \xi_i)$ to $(x_i, -\xi_i)$ on $M_2$. Then $\sigma$ is a symplectomorphism, and $\sigma^*$ swaps $\omega$ with $\tilde{\omega}$.
+We are particularly interested in the case where $M_i$ are cotangent bundles. Let $X_1, X_2$ be $n$-dimensional, $M_i = T^*X_i$, and $\omega_i$ the canonical symplectic forms. We are looking for symplectomorphisms $\varphi: M_1 \to M_2$. We are looking for a symplectomorphism $\varphi: M_1 \to M_2$. The strategy is to look for Lagrangian submanifolds of $(M_1 \times M_2, \tilde{\omega})$. We have
+\[
+  M_1 \times M_2 = T^* X_1 \times T^* X_2 = T^*(X_1 \times X_2),
+\]
+and $\omega$ is the canonical symplectic form on $M_1 \times M_2$. Sadly, we are interested in the twisted product instead. So we define an involution $\sigma: M_1 \times M_1 \times M_2$ That fixes $M_1$ and sends $(x_i, \xi_i)$ to $(x_i, -\xi_i)$ on $M_2$. Then $\sigma$ is a symplectomorphism, and $\sigma^*$ swaps $\omega$ with $\tilde{\omega}$.
 
-  So our recipe for finding symplectomorphisms $M_1 \to M_2$ is as follows:
-  \begin{enumerate}
-    \item Start with $L$ a Lagrangian submanifold of $(M_1 \times M_2, \omega)$.
-    \item Twist it to get $L^\sigma = \sigma(L)$.
-    \item Check if $L^\sigma$ is the graph of a diffeomorphism.
-  \end{enumerate}
-  More explicitly, pick a generating function $f \in C^\infty(X_1 \times X_2)$. Then $\d f$ is a closed form on $X_1 \times X_2$. Then
-  \[
-    L = X_{\d f} = \{(x, y, \d f_{(x, y)}): (x, y) \in X_1 \times X_2\}
-  \]
-  is a Lagrangian submanifold of $(M_1 \times M_2, \omega)$.
+So our recipe for finding symplectomorphisms $M_1 \to M_2$ is as follows:
+\begin{enumerate}
+  \item Start with $L$ a Lagrangian submanifold of $(M_1 \times M_2, \omega)$.
+  \item Twist it to get $L^\sigma = \sigma(L)$.
+  \item Check if $L^\sigma$ is the graph of a diffeomorphism.
+\end{enumerate}
+More explicitly, pick a generating function $f \in C^\infty(X_1 \times X_2)$. Then $\d f$ is a closed form on $X_1 \times X_2$. Then
+\[
+  L = X_{\d f} = \{(x, y, \d f_{(x, y)}): (x, y) \in X_1 \times X_2\}
+\]
+is a Lagrangian submanifold of $(M_1 \times M_2, \omega)$.
 
-  Next we twist it to obtain $L^\sigma = \sigma(X_{\d f})$, which is a Lagrangian submanifold of $(M_1 \times M_2, \tilde{\omega})$. We write
-  \[
-    T^*_{(x, y)} (X_1 \times X_2) T_x^* X_1 \times T_y^* X_2,
-  \]
-  and we write $(\d f)_{x, y} = (\partial_x f, \partial_y f)$. Then $L^\sigma = \{(x, \partial_x f, y, -\partial_y f)\}$.
+Next we twist it to obtain $L^\sigma = \sigma(X_{\d f})$, which is a Lagrangian submanifold of $(M_1 \times M_2, \tilde{\omega})$. We write
+\[
+  T^*_{(x, y)} (X_1 \times X_2) T_x^* X_1 \times T_y^* X_2,
+\]
+and we write $(\d f)_{x, y} = (\partial_x f, \partial_y f)$. Then $L^\sigma = \{(x, \partial_x f, y, -\partial_y f)\}$.
 
-  Finally, we check if $L^\sigma$ is the graph of a diffeomorphism $\varphi: M_1 \to M_2$. If so, we win, and we call this the symplectomorphism generated by $f$.\index{symplectomorphism generated by $f$}, and $f$ is called the \term{generating function} for $\varphi$.
+Finally, we check if $L^\sigma$ is the graph of a diffeomorphism $\varphi: M_1 \to M_2$. If so, we win, and we call this the symplectomorphism generated by $f$.\index{symplectomorphism generated by $f$}, and $f$ is called the \term{generating function} for $\varphi$.
 
-  $L^\sigma$ is the graph of $\varphi: M_1 \to M_2$ iff $\varphi(x, \xi) = (y, \eta)$, where
-  \[
-    \xi = \partial_x f,\quad \eta = \partial_y f.
-  \]
-  Given $(x, \xi) \in M$, how do we find $(y, \eta) = \varphi(x, \xi)$?
+$L^\sigma$ is the graph of $\varphi: M_1 \to M_2$ iff $\varphi(x, \xi) = (y, \eta)$, where
+\[
+  \xi = \partial_x f,\quad \eta = \partial_y f.
+\]
+Given $(x, \xi) \in M$, how do we find $(y, \eta) = \varphi(x, \xi)$?
 
-  Locally, let $(U_1, x_1, \ldots, x_n)$ be a coordinate chart for $X_1$ and $(U_2, y_1, \ldots, y_n)$ be some chart for $X_2$. These give rise to charts $(T^* U_1, x_1, \ldots, x_n, \xi_1, \ldots, \xi_n)$ and $(T^* U_2, y_1, \ldots, y_n, \eta_1, \ldots, \eta_n)$. We have to solve the system of equations for $(y, \eta)$
-  \begin{align*}
-    \xi_1 &= \frac{\partial f}{\partial x_i} (x, y)\\
-    \eta_i &= - \frac{\partial f}{\partial y_i} (x, y)
-  \end{align*}
-  To do so, we first solve the first one for $y$. When is this possible? The implicit function theorem says locally, there is a unique smooth solution if
-  \[
-    \det \left[\frac{\partial}{\partial y_i}\left(\frac{\partial f}{\partial x_j}\right)\right]_{i, j} \not= 0.
-  \]
-  Thus, this is a necessary condition for $f$ to generate a symplectomorphism $\varphi$. Locally, this is also sufficient, but globally, we need to worry about $\varphi$ not being well-defined.
+Locally, let $(U_1, x_1, \ldots, x_n)$ be a coordinate chart for $X_1$ and $(U_2, y_1, \ldots, y_n)$ be some chart for $X_2$. These give rise to charts $(T^* U_1, x_1, \ldots, x_n, \xi_1, \ldots, \xi_n)$ and $(T^* U_2, y_1, \ldots, y_n, \eta_1, \ldots, \eta_n)$. We have to solve the system of equations for $(y, \eta)$
+\begin{align*}
+  \xi_1 &= \frac{\partial f}{\partial x_i} (x, y)\\
+  \eta_i &= - \frac{\partial f}{\partial y_i} (x, y)
+\end{align*}
+To do so, we first solve the first one for $y$. When is this possible? The implicit function theorem says locally, there is a unique smooth solution if
+\[
+  \det \left[\frac{\partial}{\partial y_i}\left(\frac{\partial f}{\partial x_j}\right)\right]_{i, j} \not= 0.
+\]
+Thus, this is a necessary condition for $f$ to generate a symplectomorphism $\varphi$. Locally, this is also sufficient, but globally, we need to worry about $\varphi$ not being well-defined.
 
-  If we succeed in doing that, then we can simply set $\eta = - \frac{\partial f}{\partial y_i} (x, y)$, and we are done.
-\end{eg}
+If we succeed in doing that, then we can simply set $\eta = - \frac{\partial f}{\partial y_i} (x, y)$, and we are done.
 
 \begin{eg}
   Let $X_1 = X_2 = \R^n$, and $f: \R^n \times \R^n \to \R$ given by
@@ -489,9 +502,9 @@ Similarly, one can show that $f_3$ is smooth and is a generating function for $\
   (x_1, x_2, \ldots, x_n) \mapsto f(x_1, x_2) + f(x_2, x_3) + \cdots + f(x_{n - 1}, x_n) + f(x_n, x_1).
 \]
 \begin{eg}
-  Let $Y \subseteq \R^2$ be a bounded, convex region, thougth of as a billard table, and let $X = \partial Y \cong S^1$. Let $\chi: S^1 \cong \R/\Z \to \R^2$ be a parametrization of $X$.
+  Let $Y \subseteq \R^2$ be a bounded, convex region, thought of as a billiard table, and let $X = \partial Y \cong S^1$. Let $\chi: S^1 \cong \R/\Z \to \R^2$ be a parametrization of $X$.
 
-  The laws of physics determine a map $\varphi: X \times (-1, 1) \to X \times (-1, 1)$ as follows --- given $(x, \cos \theta)$, consider a billard ball that leaves $X$ at an angle $\theta$ from the tangent. Then $\varphi(x, v) = (y, \cos \tau)$ is so that $y$ is the point where the ball first hits the boundary, and $\cos \tau$ is the angle at which the ball leaves after bouncing off.
+  The laws of physics determine a map $\varphi: X \times (-1, 1) \to X \times (-1, 1)$ as follows --- given $(x, \cos \theta)$, consider a billiard ball that leaves $X$ at an angle $\theta$ from the tangent. Then $\varphi(x, v) = (y, \cos \tau)$ is so that $y$ is the point where the ball first hits the boundary, and $\cos \tau$ is the angle at which the ball leaves after bouncing off.
 
   We can think of $X \times (-1, 1)$ as the unit ball in the cotangent, and $\omega = \d x \wedge \d v$ is the canonical symplectic form. We claim that $\varphi$ is area preserving. To show this, we find a generating function $f$ for $\varphi$. We define $f: X \times X \to \R$ by
   \[
@@ -511,7 +524,7 @@ Similarly, one can show that $f_3$ is smooth and is a generating function for $\
   Thus, up to a sign, this is the sum of lengths of the ``generalized polygon'' with vertices $(x_1, \ldots, x_N)$.
 \end{eg}
 
-Let us think a bit more about the closed annulus $A = S^1 \times [-1, 1]$. If $\varphi: A \to A$ is an area preserving function generated by $f: S^1 \times S^1 \to \R$, then the number of fixed points of $\varphi$ is the number of critical points of $\psi(x) = f(x, x)$. Since every function has at least a maximum and a minimum, ther eare at least two critical points of $\psi$. But there is a more general statement.
+Let us think a bit more about the closed annulus $A = S^1 \times [-1, 1]$. If $\varphi: A \to A$ is an area preserving function generated by $f: S^1 \times S^1 \to \R$, then the number of fixed points of $\varphi$ is the number of critical points of $\psi(x) = f(x, x)$. Since every function has at least a maximum and a minimum, there are at least two critical points of $\psi$. But there is a more general statement.
 \begin{thm}[Poincar\'e's last geometric theorem (Birkhoff, 1925)]\index{Poincar\'e's last geometric theorem}
   Let $\varphi: A \to A$ be an area-preserving diffeomorphism such that $\varphi$ preserves the boundary components, and twists them in opposite directions. Then $\varphi$ has at least two fixed points.
 \end{thm}
@@ -527,7 +540,7 @@ Thus, how close $\varphi$ is to $\id_M$ is the same as how close $\grph \varphi$
 
 An equivalent theorem is the following
 \begin{thm}[Weinstein]
-  Let $M$ be a $2n$-dimensional manifold, $X$ an $n$-dimensional compact submanifold, and $i: X \hookrightarrow M$ the inclusion, and symplectic forms $\omega_0, \omega_1$ on $M$ such that $i^* \omega_0 = i^* \omega_1 = 0$, i.e.\ $X$ is Lagrangian with respect to both symplectic structures. Then there exists neighbourhoods $\mathcal{U}_0, \mathcal{U}_1$ of $X$ in $M$ such that $\rho|_X = \id_X $ and $\rho^* \omega_1 = \omega_0$.
+  Let $M$ be a $2n$-dimensional manifold, $X$ $n$-dimensional compact submanifold, and $i: X \hookrightarrow M$ the inclusion, and symplectic forms $\omega_0, \omega_1$ on $M$ such that $i^* \omega_0 = i^* \omega_1 = 0$, i.e.\ $X$ is Lagrangian with respect to both symplectic structures. Then there exists neighbourhoods $\mathcal{U}_0, \mathcal{U}_1$ of $X$ in $M$ such that $\rho|_X = \id_X $ and $\rho^* \omega_1 = \omega_0$.
 \end{thm}
 
 \begin{proof}[Proof of equivalence]
@@ -563,7 +576,7 @@ An equivalent theorem is the following
 \end{proof}
 
 \begin{proof}[Proof sketch of lemma]
-  We first claim that for $V$ s vector space, $\Omega$ a symplectic form, $U$ a Lagrangian subspace and $W$ any complement of $U$, there is a canonical way to convert $W$ into a Lagrangian complement of $V$, by taking the linear map $A: W \to U$ such that $\Omega(A\omega, \ph) = - \frac{1}{2} \Omega(w, \ph)$, and then taking
+  We first claim that for $V$ s vector space, $\Omega$ a symplectic form, $U$ a Lagrangian subspace and $W$ any complement of $U$, there is a canonical way to convert $W$ into a Lagrangian complement of $V$, by taking the linear map $A: W \to U$ such that $\Omega(A\omega, \ph) = - \frac{1}{2} \Omega(w, \ph)$, and then taking % this might be wrong
   \[
     W' = (I - A) W.
   \]
@@ -613,5 +626,534 @@ Note that the fixed points of $\varphi$ correspond to period-1 orbits of $\rho_t
 
 In the case where $h_t$ is actually not time dependent, Arnold's conjecture is easy to prove.
 
-\printindex
+\subsection{Almost complex structures}
+We shall discuss almost complex structures. As before, we first talk about the algebraic side of the story, where we work with vector spaces.
+\begin{defi}[Complex structure]\index{complex structure}
+  Let $V$ be a vector space. A \emph{complex structure} is a linear $J: V \to V$ with $J^2 = -1$.
+\end{defi}
+Here we call it a complex structure. When we move on to manifolds, we will call this ``almost complex'', and a complex structure is a stronger condition.
+
+\begin{lemma}
+  There is a correspondence between real vector spaces with a complex structure and complex vector spaces, where $J$ acts as multiplication by $i$.
+\end{lemma}
+
+\begin{defi}[Compatible complex structure]\index{compatible complex structure}
+  Let $(V, \Omega)$ be a symplectic vector space, and $J$ a complex structure on $V$. We say $J$ is \emph{compatible} with $\Omega$ if $G_J(u, v) = \Omega(u, Jv)$ is an inner product. Equivalently, we need
+  \[
+    \Omega(Ju, Jv) = \Omega(u, v),\quad \Omega(v, Jv) \geq 0
+  \]
+  with equality iff $v = 0$.
+\end{defi}
+
+\begin{eg}
+  On the standard symplectic vector space $(\R^{2n}, \Omega)$, we set
+  \[
+    J_0(e_i) = f_i,\quad J_0(f_i) = - e_i.
+  \]
+  We can then check that this is compatible with the symplectic structure, and in fact gives the standard inner product.
+\end{eg}
+
+\begin{prop}[Polar decomposition]\index{polar decomposition}
+  Let $(V, \Omega)$ be a symplectic vector space, and $G$ an inner product on $V$. Then from $G$, we can \emph{canonically} construct a compatible complex structure $J$ on $(V, \Omega)$. If $G = G_{J}$ for some $J$, then this process returns $J$.
+\end{prop}
+
+Note that in general, $G_J(u, v) = \Omega(u, Jv) \not= G(u, v)$.
+\begin{proof}
+  Since $\Omega, G$ are non-degenerate, we know
+  \[
+    \Omega(u, v) = G(u, Av)
+  \]
+  for some $A: V \to V$. If $A^2 = -1$, then we are done, and set $J = A$. In general, we also know that $A$ is skew-symmetric, i.e.\ $G(Au, v) = G(u, -Av)$, which is clear since $\omega$ is anti-symmetric. Since $AA^t$ is symmetric and positive definite, it makes sense to write down $\sqrt{AA^T}$ (e.g.\ by diagonalizing), and we take
+  \[
+    J = \sqrt{AA^t}^{-1} A = \sqrt{-A^2}^{-1} A.
+  \]
+  It is clear that $J^2 = -1$, since $A$ commutes with $\sqrt{AA^t}$, so this is a complex structure. We can write this as $A = \sqrt{AA^T} J$, and this is called the \emph{(left)} \term{polar decomposition} of $A$.
+
+  We now check that $J$ is a compatible, i.e.\ $G_J(u, v) = \Omega(u, Jv)$ is symmetric and positive definite. But
+  \[
+    G_J(u, v) = G(u, \sqrt{AA^t}v),
+  \]
+  and we are done since $\sqrt{AA^t}$ is positive and symmetric.
+\end{proof}
+
+Now let $(V, \Omega)$ be a symplectic vector space, and \term{$\mathcal{J}(V, \Omega)$} the space of all compatible complex structures on $(V, \Omega)$.
+
+\begin{prop}
+  $\mathcal{J}(V, \Omega)$ is path-connected.
+\end{prop}
+
+\begin{proof}
+  Let $J_0, J_1 \in \mathcal{J}(V, \Omega)$. Then this induces inner products $G_{J_0}, G_{J_1}$. Let $G_t = (1 - t) G_{J_0} + t G_{J_1}$ be a smooth family of inner products on $V$. Then apply polar decomposition to get a family of complex structures that start from $J_0$ to $J_1$.
+\end{proof}
+A quick adaptation of the proof shows it is in fact contractible.
+
+We now move on to the case of manifolds.
+
+\begin{defi}[Almost complex structure]\index{almost complex structure}
+  An \emph{almost complex structure} $J$ on a manifold is a smooth field of complex structures on the tangent space $J_p: T_p M \to T_p M$, $J_p^2 = -1$.
+\end{defi}
+
+\begin{eg}
+  Complex manifolds have canonical almost complex structures. The converse need not hold. For example, $\CP^2 \# \CP^2 \# \CP^2$ is almost complex but not complex.
+\end{eg}
+
+\begin{defi}[Integrable almost complex structure]\index{integrable almost complex structures}\index{almost complex structure!integrable}
+  An almost complex structure on $M$ is called \emph{integrable} if it is induced by a complex structure.
+\end{defi}
+
+\begin{defi}[Compatible almost complex structure]\index{compatible almost complex structure}\index{almost complex structure!compatible}
+  An almost complex structure $J$ on $M$ is \emph{compatible} with a symplectic structure $\omega$ if $J_p$ is compatible with $\omega_p$ for all $p \in M$. In this case, $(\omega, g_J, J)$ is called a \emph{compatible triple}.
+\end{defi}
+Any two of the structures determine the three, and this is contained in the fact that the intersection of any two of $O(2n)$, $\Sp(2n, \R)$ and $\GL(n, \C)$ is $\U(n)$.
+
+\begin{prop}
+  Let $(M, \omega)$ be a symplectic manifold, and $g$ a metric on $M$. Then from $g$ we can canonically construct a compatible almost complex structure $J$.
+\end{prop}
+
+\begin{proof}
+  Perform polar decomposition pointwise.
+\end{proof}
+
+As before, note that in general, $g_J(\ph, \ph)\not= g(\ph, \ph)$.
+
+\begin{cor}
+  Any symplectic manifold has a compatible almost complex structure.
+\end{cor}
+
+The converse does not hold. For example, $S^6$ is almost complex but not symplectic.
+
+Again we let $\mathcal{J}(M, \omega)$ be the space of all almost complex structures on $(M, \omega)$ compatible with $\omega$.
+\begin{prop}
+  $J(M, \omega)$ is contractible.
+\end{prop}
+\begin{proof}
+  Same proof as before.
+\end{proof}
+
+\begin{prop}
+  Let $J$ be an almost complex structure on $M$ that is compatible with $\omega_0$ and $\omega_1$. Then $\omega_0$ and $\omega_1$ are deformation equivalent.
+\end{prop}
+
+\begin{proof}
+  Check that $\omega_t = (1 - t) \omega_0 + t \omega_1$ works, which is non-degenerate since $\omega_t(\ph, J\ph)$ is a positive linear combination of inner products, hence is non-degenerate.
+\end{proof}
+
+We shall not prove the following theorem:
+\begin{thm}[Gromov]
+  Let $(M, J)$ be an almost complex manifold with $M$ open, i.e.\ $M$ has no closed connected components. Then there exists a symplectic form $\omega$ in any even $2$-cohomology class and such that $J$ is homotopic to an almost complex structure compatible with $\omega$.\fakeqed
+\end{thm}
+
+\begin{prop}
+  Let $(M, \omega)$ be a symplectic manifold, $J$ a compatible almost complex structure. If $X$ is an almost complex submanifold of $(M, J)$, i.e.\ $J(TX) = TX$, then $X$ is a symplectic submanifold of $(M, \omega)$.
+\end{prop}
+
+\begin{proof}
+  We only have to check $\omega|_{TX}$ is non-degenerate, but $\Omega(\ph, J\ph)$ is a metric, so is in particular non-degenerate.
+\end{proof}
+
+\subsection{Dolbeault theory}
+Let $(M, J)$ be an almost complex manifold. We can then complexify the tangent bundle to get $TM \otimes \C \to M$. We extend $J$ linearly to $TM \otimes \C$. Then the eigenvalues of $J_p$ are $\pm i$. We write \term{$T_{1, 0}$} for the $+i$ eigenspace of $J$, and \term{$T_{0, 1}$} the $-i$-eigenspace of $J$. These are called the \term{$J$-holomorphic tangent vectors}\index{holomorphic tangent vector} and the \term{$J$-anti-holomorphic tangent vectors}\index{anti-holomorphic tangent vector}. Then we have a splitting
+\[
+  TM \otimes \C \overset{\sim}{\to} T_{1, 0} \oplus T_{0, 1}.
+\]
+The projections are given by
+\begin{align*}
+  \pi_{1, 0} (w) &= \frac{1}{2} (w - i J w)\\
+  \pi_{0, 1} (w) &= \frac{1}{2} (w + i J w).
+\end{align*}
+We similarly have the cotangent bundle $T^*M \otimes \C \to M$ and we again have the map $J_p^*: T^*M \otimes \C \to T^*M \otimes \C$ that squares to zero, and this has eigenspaces \term{$T^{1, 0}$} and \term{$T^{0, 1}$} of eigenvalues $i$ and $-i$ respectively. These are the \term{complex linear cotangent vectors} and \term{complex anti-linear cotangent vectors}. We similarly have a splitting
+\[
+  (\pi^{1, 0}, \pi^{0, 1}): T^*M \otimes \C \to T^{1, 0} \oplus T^{0, 1}.
+\]
+Given these, we can decompose\index{$\Lambda^{\ell, m}$}
+\[
+  \exterior^k (T^* M \otimes \C) = \exterior^k (T^{1, 0} \oplus T^{0, 1}) = \bigoplus_{\ell + m = k} \left(\exterior^\ell T^{1, 0}\right) \otimes \left(\exterior^m T^{0, 1}\right) \equiv \bigoplus_{\ell + m = k} \Lambda^{\ell, m}.
+\]
+We write\index{$\Omega^{\ell, m}$}\index{$\Omega^k(M, \C)$}
+\begin{align*}
+  \Omega^k (M, \C) &= \text{sections of }\Lambda^k (T^* M \otimes \C)\\
+  \Omega^{\ell, m}(M, \C) = \text{sections of }\Lambda^{\ell, m}.
+\end{align*}
+So
+\[
+  \Omega^k(M, \C) = \bigoplus_{\ell + m = k} \Omega^{\ell, m} (M, \C).
+\]
+The sections in $\Omega^{\ell, m}(M, \C)$ are called \term{forms of type $(\ell, m)$}.
+
+As always, we have projections
+\[
+  \pi^{\ell, m}: \exterior^k (T^*M \otimes \C ) \to \Lambda^{\ell, m}.
+\]
+Combining the exterior derivative $\d: \Omega^k(M, \C) \to \Omega^{k - 1}(M, \C)$ with projections yield the $\partial$ and $\bar{\partial}$ operators
+\begin{align*}
+  \partial: \Omega^{\ell, m} &\to \Omega^{\ell + 1, m}\\
+  \bar{\partial}: \Omega^{\ell, m} &\to \Omega^{\ell, m + 1}.
+\end{align*}
+Observe that for functions $f$, we have $\d f = \partial f + \bar{\partial} f$, but this is not necessarily true in general.
+
+\begin{defi}[$J$-holomorphic]\index{$J$-holomorphic}\index{$J$-anti-holomorphic}
+  We say a function $f$ is \emph{$J$-holomorphic} if $\bar{\partial} f = 0$, and \emph{$J$-anti-holomorphic} if $\partial f = 0$.
+\end{defi}
+
+A natural question is, is the sequence
+\[
+  \begin{tikzcd}
+    \Omega^{\ell, m} \ar[r, "\bar{\partial}"] &
+    \Omega^{\ell, m + 1} \ar[r, "\bar{\partial}"] &
+    \Omega^{\ell, m + 2} \ar[r, "\bar{\partial}"] &
+    \cdots
+  \end{tikzcd}
+\]
+a chain complex? i.e.\ is $\bar{\partial}^2 = 0$?
+\begin{thm}[Newlander--Nirenberg]\index{Newlander--Nirenberg}
+  The following are equivalent:
+  \begin{itemize}
+    \item $\bar{\partial}^2 = 0$
+    \item $\partial^2 = 0$
+    \item $\d = \partial + \bar{\partial}$
+    \item $J$ is integrable
+    \item $\mathcal{N} = 0$,
+  \end{itemize}
+  where $\mathcal{N}$ is the \term{Nijenhuis torsion}
+  \[
+    \mathcal{N}(X, Y) = [JX, JY] - J[JX, Y] - J[X, JY] - [X, Y].
+  \]
+\end{thm}
+If $J$ is integrable, so $\bar{\partial}^2 = 0$, then we have a chain complex, and we have homology groups
+\[
+  H^{\ell, m}_{\Dolb} (M) = \frac{\ker(\bar{\partial}: \Omega^{\ell, m} \to \Omega^{\ell, m + 1})}{\im (\bar{\partial}: \Omega^{\ell, m - 1} \to \Omega^{\ell, m})}.
+\]
+Suppose $M$ is a complex manifold with local coordinates $z_1, \ldots, z_n$ on $U \subseteq M$. We have real coordinates $\{x_i, y_i\}$ given by
+\[
+  z_i = x_i + i y_i.
+\]
+The tangent space is spanned by $\frac{\partial}{\partial x_i}, \frac{\partial }{\partial y_i}$. We define $J$ by
+\[
+  J_p\left(\frac{\partial}{\partial x_j}\right) = \frac{\partial}{\partial y_j},\quad J_p\left(\frac{\partial}{\partial y_j}\right) = - \frac{\partial}{\partial x_j}.
+\]
+The Cauchy--Riemann equations imply this is globally well-defined. This $J$ is called the \term{canonical almost-complex structure} on the complex manifold $M$.
+
+On $U$, we can define
+\begin{align*}
+  \frac{\partial}{\partial z_j} &= \frac{1}{2} \left(\frac{\partial}{\partial x_j} - i \frac{\partial}{\partial y_j}\right)\\
+  \frac{\partial}{\partial \bar{z}_j} &= \frac{1}{2} \left(\frac{\partial}{\partial x_j} + i \frac{\partial}{\partial y_j}\right).
+\end{align*}
+These are also globally well-defined. We similarly define their duals
+\begin{align*}
+  \d z_j &= \d x_j + i \d y\\
+  \d \bar{z}_j &= \d x_j - i \d y.
+\end{align*}
+Then $T_{1, 0}$ is spanned by the $\frac{\partial}{\partial z_j}$; $T_{0, 1}$ is spanned by the $\frac{\partial}{\partial \bar{z}_j}$; $T^{1, 0}$ is spanned by the $\d z_j$ and $T^{0, 1}$ is spanned by the $\d \bar{z}_j$.
+
+We have
+\[
+  \Lambda^{\ell, m} = \C\{\d z_I \wedge \d z_K : |I| = \ell, |K| = m\}
+\]
+and
+\[
+  \Omega^{\ell, m} = \left\{\sum_{|I| = \ell, |K| = m} b_{I, K} \d z_I \wedge \d \bar{z}_K : b_{IK} \in C^\infty(U, \C)\right\}.
+\]
+Now if $\beta \in \Omega^k(M, \C)$, we can write
+\[
+  \beta = \sum_{\ell + m = k} \left(\sum_{|I| = \ell, |K| = m} b_{I, K} \d z_I \wedge \d \bar{z}_K\right).
+\]
+So
+\begin{align*}
+  \d \beta &= \sum_{\ell + m = k} \left(\sum_{|I| = \ell, |K| = m} \d b_{I, K} \d z_I \wedge \d \bar{z}_K\right)\\
+  &= \sum_{\ell + m = k} \left(\sum_{|I| = \ell, |K| = m} (\partial + \bar{\partial}) b_{I, K} \d z_I \wedge \d \bar{z}_K\right)\\
+  &= (\partial + \bar{\partial}) \sum_{\ell + m = k} \left(\sum_{|I| = \ell, |K| = m} b_{I, K} \d z_I \wedge \d \bar{z}_K\right)
+\end{align*}
+Thus, on a complex manifold, $\d = \partial + \bar{\partial}$.
+
+Finally, if $\beta \in \Omega^{m, \ell}$, then
+\[
+  0 = \d^2 \beta = \partial^2 \beta + (\partial \bar{\partial} + \bar{\partial} \partial) \beta + \bar{\partial}^2 \beta.
+\]
+Since all the terms are in different degrees, it follows that $\partial^2 = \bar{\partial}^2 = \partial\bar{\partial} + \bar{\partial}\partial = 0$.
+
+Back to symplectic manifolds, suppose $(M, \omega)$ is a symplectic manifold, and $J$ a compatible almost complex structure. We asked if we find an \emph{integrable} compatible $J$, and the answer is not always.
+\begin{defi}[K\"ahler manifold]\index{K\"ahler manifold}
+  A \emph{K\"ahler manifold} is a symplectic manifold equipped with a compactible integrable almost complex structure. Then $\omega$ is called a \term{K\"ahler form}.
+\end{defi}
+
+Let $(M, \omega, J)$ be a K\"ahler manifold. Since $(M, J)$ is a complex manifold, we have the Dolbeault cohomology groups $H^{\ell, m}_{\Dolb}$. We can write our symplectic form as
+\[
+  \omega \in \Omega^2(M) \subseteq \Omega^2(M, \C) = \Omega^{2, 0} \oplus \Omega^{1, 1} \oplus \Omega^{0, 2}.
+\]
+On a complex chart $(U, z_1, \ldots, z_n)$, we can write
+\[
+  \omega = \sum_{j < k} a_{jk} \;\d z_j \wedge \d z_k + \sum_{j, k} + b_{jk} \d z_j \wedge \d \bar{z}_j + \sum_{j < k} c_{jk} \d \bar{z}_j \wedge \d \bar{z}_k.
+\]
+The compatibility condition implies $\omega(\ph, J\ph)$ is symmetric. We then have
+\[
+  J^* \omega(u, v) = \omega(Ju, Jv) = \omega(v, JJu) = - \omega(v, -u) = \omega(u, v).
+\]
+So $J^* \omega = \omega$. now observe that
+\[
+  J^* \d z_j = \d z_j \circ J = i \d z_j,\quad J^* \d \bar{z}_k = - i \d \bar{z}_k.
+\]
+Then
+\[
+  J^* \omega = \sum_{j < k}(-1) a_{jk}\; \d z_j \wedge \d z_k + \sum_{j, k} b_{jk}\; \d z_j \wedge \d \bar{z}_k + \sum_{j < k} (-1) c_{jk} \;\d \bar{z}_j \wedge \d \bar{z}_k.
+\]
+Then $J^* \omega = \omega$ implies $a_{jk} = c_{jk} = 0$. So we know that $\omega \in \Omega^{1, 1}$.
+
+The closedness implies
+\[
+  0 = \d \omega = \partial \omega + \bar{\partial} \omega = 0.
+\]
+So we have $\partial \omega = \bar{\partial} \omega = 0$. So in particular $\omega \in H^{1, 1}_{\Dolb}(M)$.
+
+We also know that $\omega$ is real-valued, so that $\bar{\omega} = \omega$. For convenience, we write
+\[
+  b_{jk} = \frac{i}{2} h_{jk},
+\]
+and so
+\[
+  \omega = \frac{i}{2} \sum_{j, k} h_{jk} \;\d z_j \wedge \d \bar{z}_k.
+\]
+Then we have
+\[
+  \bra{\omega} = -\frac{i}{2} \sum_{j, k}\overline{h_{jk}} \d \bar{z}_j \wedge \d z_k = \frac{i}{2} \sum_{j, k} \overline{h_{jk}} \;\d z_k \wedge \bar{z}_j.
+\]
+So we have
+\[
+  \overline{h}_{kj} = h_{jk}.
+\]
+Finally, we try to understand the non-degeneracy condition $\omega^{\wedge n} \not= 0$. We have
+\[
+  \omega^n = \left(\frac{i}{2}\right)^n n! \det(h_{jk}) \;\d z_1 \wedge \d \bar{z}_1 \wedge \cdots \wedge \d z_n \wedge \d \bar{z}_n.
+\]
+So we know $\det(h_{jk}) \not= 0$, and so $h_{jk}$ is a non-singular Hermitian matrix.
+
+Finally, compatibility requires $\omega(v, Jv) > 0$. We say $\omega$ is \term{tamed}. We write
+\[
+  v = \sum_j a_j \frac{\partial}{\partial z_j} + b_j \frac{\partial}{\partial \bar{z}_j}.
+\]
+Then we have
+\[
+  Jv = i \left(\sum_j a_j \frac{\partial}{\partial z_j} - b_j \frac{\partial}{\bar{z}_j}\right).
+\]
+So we have
+\[
+  \omega(v, Jv) = \frac{i}{2} \sum h_{jk} (-ia_j b_k - ia_j b_k) = \sum h_{jk} a_j b_k > 0.
+\]
+So the conclusion is that $h_{jk}$ is positive definite.
+
+The conclusion is that a K\"ahler form $\omega$ on a complex manifold $M$ is a $\partial$- and $\bar{\partial}$-closed form of type $(1, 1)$ which on a local chart is given by
+\[
+  \omega = \frac{i}{2} \sum_{j, k} h_{jk} \;\d z_j \wedge \d \bar{z}_k
+\]
+where at each point, the matrix $(h_{jk})$ is Hermitian and positive definite.
+
+To construct K\"ahler forms, we make the following definition:
+\begin{defi}[Strictly plurisubharmonic (spsh)]\index{strictly plurisubharmonic}\index{spsh}
+  $\rho$ is strictly plurisubharmonic (spsh) if locally, $\left(\frac{\partial^2 \rho}{\partial z_j \partial \bar{z}_k}\right)$ is positive definite.
+\end{defi}
+\begin{prop}
+  Let $M$ be a complex manifold, and $\rho \in C^\infty(M; \R)$ strictly plurisubharmonic. Then
+  \[
+    \omega = \frac{i}{2} \partial \bar{\partial} \rho
+  \]
+  is a K\"ahler form.
+\end{prop}
+We call $\rho$ the \term{K\"ahler potential} for $\omega$.
+\begin{proof}
+  $\omega$ is indeed a $2$-form of type (1, 1). Since $\partial^2 = \bar{\partial}^2 = 0$, we know $\partial \omega = \bar{\partial} \omega = 0$. We also have
+  \[
+    \omega = \frac{i}{2} \sum_{j, k} \frac{\partial^2 \rho}{\partial z_j \partial \bar{z}_k}\;\d z_j\wedge \d \bar{z}_k,
+  \]
+  and the matrix is Hermitian positive definite.
+\end{proof}
+
+\begin{eg}
+  If $M = \C^n \cong \R^{2n}$, and
+  \[
+    \rho(\mathbf{z}) = |\mathbf{z}|^2 = \sum z_k \bar{z}_k,
+  \]
+  then
+  \[
+    h_{jk} = \frac{\partial^2}{\partial z_j \partial \bar{z}_k} = \delta_{jk}.
+  \]
+  So this is strictly plurisubharmonic. Then
+  \begin{align*}
+    \omega &= \frac{i}{2} \sum \d z_j \wedge \d \bar{z}_k \\
+    &= \frac{i}{2} \sum \d (x_j + i y_j) \wedge \d (x_k - i y_k)\\
+    &= \sum \d x_k \wedge \d y_k,
+  \end{align*}
+  which is the standard symplectic form. So $(\C^n, \omega)$ is K\"ahler and $\rho = |z|^2$ is a (global) K\"ahler potential for $\omega_0$.
+\end{eg}
+
+There is a local converse to this result.
+
+\begin{prop}
+  Let $M$ be a complex manifold, $\omega$ a closed real-valued $(1, 1)$-form and $p \in M$, then there exists a neighbourhood $U$ of $p$ in $M$ and a $\rho \in C^\infty(U, \R)$ such that
+  \[
+    \omega = i \partial \bar{\partial} \rho\text{ on }U.
+  \]
+\end{prop}
+
+\begin{proof}
+  This uses the holomorphic version of the Poincar\'e lemma.
+\end{proof}
+
+When $\rho$ is K\"ahler, such a $\rho$ is called a \term{local K\"ahler potential} for $\omega$.
+
+Note that it is not possible to have a global K\"ahler potential on a closed K\"ahler manifold, because if $\omega = \frac{i}{2}\partial \bar{\partial} \rho$, then
+\[
+  \omega = \d \left(\frac{i}{2} \bar{\partial} \rho\right)
+\]
+is exact, and we know symplectic forms cannot be exact.
+
+\begin{eg}
+  Let $M = \C^n$ and
+  \[
+    \rho(z) = \log (|z|^2 + 1).
+  \]
+  It is an exercise to check that $\rho$ is strictly plurisubharmonic. Then
+  \[
+    \omega_{FS} = \frac{i}{2} \partial \bar{\partial} (\log(|z^2| + 1))
+  \]
+  is another K\"ahler form on $\C^n$, called the \term{Fubini--Study form}.
+\end{eg}
+The reason this is interesting is that it allows us to put a K\"ahler structure on $\CP^n$.
+\begin{eg}
+  Let $M = \CP^n$. Using homogeneous coordinates, this is covered by the open sets
+  \[
+    U_j = \{[z_0, \ldots, z_n] \in \CP^n \mid z_j \not= 0\}.
+  \]
+  with the chart given by
+  \begin{align*}
+    \varphi_j: U_j &\to \C^n\\
+    [z_0, \ldots, z_n] &\mapsto \left(\frac{z_0}{z_j}, \ldots, \frac{z_{j - 1}}{z_j}, \frac{z_{j + 1}}{z_j}, \ldots, \frac{z_n}{z_j}\right).
+  \end{align*}
+  We claim that $\varphi_j^* \omega_{FS} = \varphi_k^* \omega_{FS}$. Thus, these glue to give the \term{Fubini--Study form} on $\CP^n$, making it a K\"ahler manifold.
+\end{eg}
+
+\begin{prop}
+  Let $(M, \omega)$ be a complex K\"ahler manifold. If $X \subseteq M$ is a complex submanifold, then $(X, i^* \omega)$ is K\"ahler, and this is called a \term{K\"ahler submanifold}.
+\end{prop}
+
+\begin{proof}
+  Since $X$ is an almost complex submanifold, we know that $(X, i^* \omega)$ is symplectic and compatible with the almost complex structure.
+\end{proof}
+We also observe that the restriction of a K\"ahler potential to a complex submanifold is a K\"ahler potential.
+
+\begin{eg}
+  All complex submanifolds of $\C^n$ and $\CP^n$ are K\"ahler manifolds. In particular, all smooth complex projective varieties are K\"ahler.
+\end{eg}
+
+\section{Overview of Hodge theory}
+Let $M$ be a complex manifold of real dimension $2n$. Then
+\[
+  \Omega^k(M; \C) = \bigoplus_{p + q = k} \Omega^{p, q}.
+\]
+We have a chain complex
+\[
+  0 \to \Omega^{p, 0} \overset{\bar{\partial}}{\to} \Omega^{p, 1} \overset{\bar{\partial}}{\to} \cdots \overset{\bar{\partial}}{\to} \Omega^{p, 2n - p} \to 0.
+\]
+We defined the Dolbeault cohomology groups
+\[
+  H_{\Dolb}^{p, q}(M) = \frac{\ker \bar{\partial}}{\im \bar{\partial}}.
+\]
+\begin{thm}[Hodge decomposition theorem]\index{Hodge decomposition theorem}
+  Let $(M, \omega)$ be a compact K\"haler manifold. Then
+  \[
+    H^k_{\dR} \cong \bigoplus_{p + q = k} H^{p, q}_{\Dolb}(M).
+  \]
+\end{thm}
+
+
+\subsection{Hodge theory for real manifolds}
+Let $V$ be a real orientable vector space of dimension $n$ with inner product $G(\cdot, \cdot)$. Then $G$ induces an inner product on each $\Lambda^k = \exterior^k (V)$, denoted $\bra \ph, \ph\ket$, defined by
+\[
+  \bra v_1 \wedge \cdots \wedge v_k, w_1 \wedge \cdots \wedge w_k\ket = \det (G(v_i, w_j))_{i, j}
+\]
+Let $e_1, \ldots, e_n$ be an oriented orthonormal basis for $V$. Then $\{e_{j_1} \wedge \cdot \wedge e_{j_k} : 1 \leq j_1 < \cdots < j_k \leq m\}$ is an orthonormal basis for $\Lambda^k$.
+\begin{defi}[Hodge star]\index{hodge star}
+  The Hodge $*$-operator \index{$*$}$*: \Lambda^k \to \Lambda^{m - k}$ is defined by the relation
+  \[
+    \alpha \wedge *\beta = \bra \alpha, \beta\ket\; e_1 \wedge \cdots \wedge e_m.
+  \]
+\end{defi}
+This is the composition of two isomorphisms
+\begin{align*}
+  \Lambda^k & \to (\Lambda^k)^*\\
+  \beta &\mapsto \bra \ph, \beta \ket
+\end{align*}
+and
+\begin{align*}
+  \Lambda^{m - k} &\to (\Lambda^k)^*\\
+  \gamma &\mapsto f_\gamma(\ph),
+\end{align*}
+where
+\[
+  \alpha \wedge \gamma = f_\gamma(\alpha) \; e_1 \wedge \cdots \wedge e_m.
+\]
+This has the following properties:
+\begin{prop}\leavevmode
+  \begin{itemize}
+    \item $*(e_1 \wedge \cdots \wedge e_k) = e_{k + 1} \wedge \cdots \wedge e_m$
+    \item $*(e_{k + 1} \wedge \cdots \wedge e_m) = (-1)^{k(m - k)} e_1 \wedge \cdots \wedge e_k$.
+    \item $** =\alpha = (-1)^{k(m - k)}\alpha$ for $\alpha \in \Lambda^k$.\fakeqed
+  \end{itemize}
+\end{prop}
+Let $(M, g)$ be a compact real oriented Riemannian manifold of dimension $m$. Then $g$ induces an isomorphism $TM \cong T^*M$, and induces an inner product on each $T_p^* M$, which we will still denote $g_p$. This induces an inner product on each $\exterior^k T_p^*M$, which we will denote $\bra \ph, \ph \ket$.
+
+
+The Riemannian metric and orientation gives us a volume form $\Vol \in \Omega^m(M)$, defined locally by
+\[
+  \Vol_p(e_1 \wedge \cdots \wedge e_m),
+\]
+where $e_1, \ldots, e_m$ is an oriented basis of $T_p^*M$. This induces an $L^2$-inner product on $\Omega^k(M)$,
+\[
+  \bra \alpha, \beta\ket_{L^2} = \int_M \bra \alpha, \beta\ket\;\Vol.
+\]
+Now apply Hodge $*$-operator to each $(V, G) = (T_p^* M, g_p)$ and $p \in M$. We then get
+\begin{defi}[Hodge star operator]\index{Hodge star}\index{$*$}
+  The \emph{Hodge $*$-operator} on forms $*: \Omega^k(M) \to \Omega^{m - k}(M)$ is defined by the equation
+  \[
+    \alpha \wedge (*\beta) = \bra \alpha ,\beta\ket \; \Vol.
+  \]
+\end{defi}
+
+We again have some immediate properties.
+\begin{prop}\leavevmode
+  \begin{enumerate}
+    \item $**\alpha = (-1)^{k(m - k)} \alpha$ for $\alpha \in \Omega^k(M)$.
+    \item $*1 = \Vol$
+  \end{enumerate}
+\end{prop}
+
+\begin{defi}[Codifferential operator]\index{codifferential operator}\index{$\delta$}
+  We define the \emph{codifferential operator} to be
+  \[
+    \delta = (-1)^{m(k + 1) + 1} *\d * : \Omega^k \to \Omega^{k - 1}.
+  \]
+\end{defi}
+
+We immediately see that
+\begin{prop}
+  $\delta^2 = 0$.
+\end{prop}
+
+\begin{prop}
+  $\delta$ is the $L^2$-formal adjoint of $d$, i.e.
+  \[
+    \bra \d \alpha, \beta\ket_{L^2} = \bra \alpha, \delta \beta\ket_{L^2}
+  \]
+  for all $\alpha \in \Omega^k$ and $\beta \in \Omega^{k + 1}$.
+\end{prop}
+This explains the funny sign we have on $\delta$.
+
+\begin{proof}
+  \begin{align*}
+    \bra \d \alpha, \beta \ket_{L^2} &= \int_M \d \alpha \wedge * \beta\\
+    &= \int_M \d (\alpha \wedge *\beta) - (-1)^k \int_M \alpha \wedge \d (*\beta)\\
+    &= (-1)^{k + 1} \int_M \alpha \wedge \d (*\beta)\tag{Stokes'}\\
+    &= (-1)^{k + 1} \int_M (-1)^{(m - k)k} \alpha \wedge **\d (*\beta)\\
+    &= (-1)^{k + 1 + (m - k)k} \int_M \bra \alpha, *\d*\beta\ket\\
+    &= \int_M \bra \alpha, \delta \beta \ket\;\Vol\qedhere
+  \end{align*}
+\end{proof}
 \end{document}
