@@ -12,6 +12,9 @@
 \DeclareMathOperator\hcap{hcap}
 \newcommand\SLE{\mathrm{SLE}}
 \newcommand\rad{\mathrm{Rad}}
+\newcommand\dist{\mathrm{dist}}
+
+\usepackage[first=0,last=1, seed=173]{lcg}
 
 \begin{document}
 \maketitle
@@ -158,15 +161,30 @@ We write $\mathcal{U}$\index{$\mathcal{U}$} for the collection of conformal tran
   f(z) = z + \sum_{n = 2}^\infty a_n z^n.
 \]
 \begin{thm}[Koebe-1/4 theorem]\index{Koebe-1/4 theorem}
-  If $F \in \mathcal{U}$ and $0 < r \leq 1$, then $B(0, r/4) \subseteq f(r, \D)$.
+  If $f \in \mathcal{U}$ and $0 < r \leq 1$, then $B(0, r/4) \subseteq f(r\D)$.
 \end{thm}
+This says $f$ cannot look like this:
+\begin{center}
+  \begin{tikzpicture}[scale=1.5]
+    \draw [-latex'] (-1, 0) -- (1, 0);
+    \draw [-latex'] (0, -1) -- (0, 1);
+
+    \draw [fill=mblue, fill opacity=0.5] circle [radius=0.5];
+
+    \draw (1.3, 0.1) edge [bend left, ->] node [pos=0.5, above] {$f$} (2.7, 0.1);
+
+    \draw [-latex'] (3, 0) -- (5, 0);
+    \draw [-latex'] (4, -1) -- (4, 1);
+    \draw [fill=mblue, fill opacity=0.5] (4, 0) ellipse (0.65 and 0.12);
+  \end{tikzpicture}
+\end{center}
 By scaling it suffices to prove this for the case $r = 1$. This follows from the following result:
-\begin{prop}
+\begin{thm}
   If $f \in \mathcal{U}$, then $|a_2| \leq 2$.
-\end{prop}
+\end{thm}
 The proof of this proposition will involve quite some work. So let us just conclude the theorem from this.
-\begin{proof}[Proof of theorem]
-  Suppose $f: \D to D$ is in $\mathcal{U}$, and $z_0 \not \in D$. We shall show that $|z_0| \geq \frac{1}{4}$. Consider the function
+\begin{proof}[Proof of Koebe-1/4 theorem]
+  Suppose $f: \D \to D$ is in $\mathcal{U}$, and $z_0 \not \in D$. We shall show that $|z_0| \geq \frac{1}{4}$. Consider the function
   \[
     \tilde{f}(z) = \frac{z_0 f(z)}{z_0 - f(z)}.
   \]
@@ -185,8 +203,119 @@ The proof of this proposition will involve quite some work. So let us just concl
   By the triangle inequality, we must have $|z_0^{-1}| \leq 4$, hence $|z_0| \geq \frac{1}{4}$.
 \end{proof}
 
-% finish % something
+The 1/4 theorem bounds the distortion in terms of the value of $f'(0)$. Conversely, if we know how much the distortion is, we can use the theorem to derive bounds on $f'(0)$.
+\begin{cor}
+  Let $D, \tilde{D}$ be domains and $z \in D$, $\tilde{z} \in \tilde{D}$. If $f: D \to \tilde{D}$ is a conformal transformation with $f(z) = \tilde{z}$, then
+  \[
+    \frac{\tilde{d}}{4d} \leq |f'(z)| \leq \frac{4\tilde{d}}{d},
+  \]
+  where $d = \dist(z, \partial D)$ and $\tilde{d} = \dist(\tilde{z}, \partial \tilde{D})$.
+\end{cor}
 
+\begin{proof}
+  By translation, scaling and rotation, we may assume that $z = \tilde{z} = 0$, $d = 1$ and $f'(0) = 1$. Then we have
+  \[
+    \tilde{D} = f(D) \supseteq f(\D) \supseteq B(0, 1/4).
+  \]
+  So $\tilde{d} \geq \frac{1}{4}$, as desired. The other bound follows by considering $f^{-1}$.
+\end{proof}
+We now proceed to prove the theorem. We first obtain a bound on area, using IA Vector Calculus:
+\begin{prop}
+  Let $f \in \mathcal{U}$. Then
+  \[
+    \area(f(\D)) = \pi \sum_{n = 1}^\infty n |a_n|^2.
+  \]
+\end{prop}
+
+\begin{proof}
+  In the ideal world, we will have something that helps us directly compute $\area(f(\D))$. However, for the derivation to work, we need to talk about what $f$ does to the boundary of $\D$, but that is not necessarily well-defined. So we compute $\area(f(r\D))$ for $r < 1$ and then take the limit $r \to 1$.
+
+  So fix $r \in (0, 1)$, and define the curve $\gamma(\theta) = f(re^{i\theta})$ for $\theta \in [0, 2\pi]$. Then we can compute
+  \begin{align*}
+    \frac{1}{2i} \int_\gamma \bar{z} \;\d z &= \frac{1}{2i} \int_\gamma (x - iy) (\d x + i\;\d y)\\
+    &= \frac{1}{2i} \int_\gamma (x - iy) \;\d x + (ix + y)\;\d y\\
+    &= \frac{1}{2i} \iint_{f(r\D)} 2i\;\d x\;\d y\\
+    &= \area(f(r\D)),
+  \end{align*}
+  using Green's theorem. We can also compute the left-hand integral directly as
+  \begin{align*}
+    \frac{1}{2i} \int_\gamma \bar{z}\;\d z &= \frac{1}{2i} \int_0^{2\pi} \overline{f(re^{i\theta})} f'(re^{i\theta}) i re^{i\theta }\;\d \theta\\
+    &= \frac{1}{2i} \int_0^{2\pi} \left(\sum_{n = 1}^\infty \bar{a}_n r^n e^{-i\theta n}\right) \left(\sum_{n = 1}^\infty a_n nr^{n - 1} e^{i\theta (n - 1)}\right) ir e^{i\theta}\;\d \theta\\
+    &= \pi \sum_{n = 1}^\infty r^{2n} |a_n|^2 n.\qedhere
+  \end{align*}
+\end{proof}
+
+\begin{defi}[Compact hull]\index{compact hull}
+  A \emph{compact hull} is a connected compact set $K \subseteq \C$ with more than one point such that $\C \setminus K$ is connected.
+\end{defi}
+
+We want to obtain a similar area estimate for compact hulls. By the Riemann mapping theorem, if $K$ is a compact hull, then there exists a unique conformal transformation $F: \C \setminus \bar{\D}$ to $\C \setminus K$ that fixes infinity and has positive derivative at $\infty$, i.e.\ $\lim\limits_{z \to \infty} F(z)/z > 0$. Let $\mathcal{H}$ be the set of compact hulls containing $0$ with $\lim\limits_{z\to \infty} F(z)/z = 1$. If $K \in \mathcal{H}$, then the Laurent expansion of the corresponding $F$ is
+\[
+  F(z) = z + b_0 + \sum_{n = 1}^\infty \frac{b_n}{z^n}.
+\]
+Observe there is a correspondence between the space of such $F$ and $\mathcal{U}$ by sending $F$ to $1/F(1/z)$, and vice versa.
+\begin{prop}
+  If $K \in \mathcal{H}$, then
+  \[
+    \area (K) = \pi \left(1 - \sum_{n = 1}^\infty n|b_n|^2\right).
+  \]
+\end{prop}
+Observe that the area is always non-negative. So in particular, we obtain the bound
+\[
+  \sum_{n = 1}^\infty n |b_n|^2 \leq 1.
+\]
+In particular, $|b_1| \leq 1$. This will be how we ultimately bound $|a_2|$.
+\begin{proof}
+  The proof is essentially the same as last time. Let $r > 1$, and let $K_r = F(r \bar{\D})$ (or, if you wish $\C \setminus F(\C \setminus r\bar{\D})$), and $\gamma(\theta) = F(r e^{i\theta})$. As in the previous proposition, we have
+  \begin{align*}
+    \area(K_r) &= \frac{1}{2i} \int_\gamma \bar{z} \;\d z\\
+    &= \frac{1}{2i} \int_0^{2\pi} \overline{F(re^{i\theta})}F'(re^{i\theta}) ir e^{i\theta}\;\d \theta\\
+    &= \pi \left(r^2 - \sum_{n = 1}^\infty n |b_n|^2 r^{-2n}\right).
+  \end{align*}
+  Then take the limit as $r \to 1$.
+\end{proof}
+By the correspondence we previously noted, this gives us some estimates on the coefficients of any $f \in \mathcal{U}$. It turns out applying this estimate directly is not good enough. Instead, we want to take the square root of $f(z^2)$.
+
+\begin{lemma}
+  Let $f \in \mathcal{U}$. Then there exists an odd function $h \in \mathcal{U}$ with $h(z)^2 = f(z^2)$.
+\end{lemma}
+
+\begin{proof}
+  Note that $f(0) = 0$ by assumption, so taking the square root can potentially be problematic, since $0$ is a branch point. To get rid of the problem, define the function
+  \[
+    \tilde{f}(z) =
+    \begin{cases}
+      \frac{f(z)}{z} & z \not =0\\
+      f'(0) & z = 0
+    \end{cases}.
+  \]
+  Then $\tilde{f}$ is non-zero and conformal in $\D$, and so there is a function $g$ with $g(z)^2 = \tilde{f}(z)$. We then set
+  \[
+    h(z) = z g(z^2).
+  \]
+  Then $h$ is odd and $h^2 = z^2 g(z^2)^2 = f(z^2)$. It is also immediate that $h(0) = 0 $ and $h'(0) = 1$. We need to show $h$ is injective on $\D$. If $z_1, z_2 \in \D$ with $h(z_1) = h(z_2)$, then
+  \[
+    z_1 g(z_1^2) = z_2 g(z_2^2).\tag{$*$}
+  \]
+  By squaring, we know
+  \[
+    z_1^2 \tilde{f}(z_1^2) = z_2^2 \tilde{f}(z_2)^2.
+  \]
+  Thus, $f(z_1^2) = f(z_2^2)$ and so $z_1^2 = z_2^2$. But then $(*)$ implies $z_1 = z_2$. So $h$ is injective, and hence $h \in \mathcal{U}$.
+\end{proof}
+
+We can now prove the desired theorem.
+\begin{proof}[Proof of theorem]
+  We can Taylor expand
+  \[
+    h(z) = z + c_3 z^3 + c_5 z^5 + \cdots.
+  \]
+  Then comparing $h(z)^2 = f(z^2)$ implies
+  \[
+    c_3 = \frac{a_2}{2}.
+  \]
+  Setting $g(z) = \frac{1}{h(1/z)}$, we find that the $z^{-1}$ coefficient of $g$ is $-\frac{a_2}{2}$, and as we previously noted, this must be $\leq 1$.
+\end{proof}
 \subsection{Half-plane capacity}
 \begin{defi}[Compact $\H$-hull]\index{compact $\H$-hull}
   A set $A \subseteq \H$ is called a \emph{compact $\H$-hull} if $A$ is compact, $A = \H \cap \bar{A}$ and $\H \setminus A$ is simply connected. We write $\mathcal{Q}$\index{$\mathcal{Q}$} for the collection of compact $\H$-hulls.
@@ -734,7 +863,7 @@ In It\^o's formula, we want to do the same thing but with Brownian motion. Suppo
 \]
 When we do a Taylor expansion of this, we have to be a bit more careful than before, as we cannot ignore all the higher order terms. The point is that the quadratic variation of $B_t$ is non-zero. We write this as
 \[
-  f(0) + \sum_{k = 1}^n \Big[f'(B_{t_{k - 1}}) (B_{t_k} - B_{t_{k - 1}}) + \frac{1}{2} f''(B_{t_{k - 1}}) (B_{t_k} - B_{t_{k - 1}})^2 + o((B_{t_k} + B_{t_{k - 1}})^2)\Big].
+  f(0) + \sum_{k = 1}^n \Big[f'(B_{t_{k\!-\!1}}) (B_{t_k} - B_{t_{k\!-\!1}}) + \frac{1}{2} f''(B_{t_{k\!-\!1}}) (B_{t_k} - B_{t_{k\!-\!1}})^2 + o((B_{t_k} + B_{t_{k\!-\!1}})^2)\Big].
 \]
 Taking the limit, and using that $\E[(B_{t_k} - B_{t_{k - 1}})^2] = t_k - t_{k - 1}$, we get
 \[
@@ -836,7 +965,8 @@ This agrees with what we expect from the recurrence of Brownian motion, for inte
   Consider the process $U_t^{2 - d}$. By It\^o's formula, we have
   \begin{align*}
     U_t^{2 - d} &= U_0^{2 - d} + \int_0^t (2 - d) U_s^{1 - d} \;\d U_s + \frac{1}{2} \int_0^t (2 - d) (1 - d) U_s^{-d} \;\d [U]_s\\
-    &= U_0^{2 - d} + \int_0^t (2 - d) U_s^{1 - d} \;\d \tilde{B}_t + \int_0^t \frac{(2 - d)(d - 1)}{2 U_s} U_s^{1 - d}\;\d s + \frac{1}{2} \int_0^t (2 - d)(1 - d) U_s^{-d}\;\d s\\
+    &= U_0^{2 - d} + \int_0^t (2 - d) U_s^{1 - d} \;\d \tilde{B}_t + \int_0^t \frac{(2 - d)(d - 1)}{2 U_s} U_s^{1 - d}\;\d s \\
+    &\hphantom{aaaaaaaaa}+ \frac{1}{2} \int_0^t (2 - d)(1 - d) U_s^{-d}\;\d s\\
     &= U_0^{2 - d} + \int_0^t (2 - d) U_s^{1 - d}\;\d \tilde{B}_s.
   \end{align*}
   Therefore $U_t$ is a continuous local martingale.
@@ -909,5 +1039,264 @@ So we get that $V_t^\times/\sqrt{\kappa} \sim BES^d$, with $d = 1 + 4/\kappa$. N
 \end{proof}
 
 We saw that if $\kappa > 4$, then $\SLE_\kappa$ intersects $\partial \H$. We will show that when $\kappa \geq 8$, $\SLE_\kappa$ fills $\partial \H$, and when $\kappa \in (4, 8)$, it doesn't.
+
+In the second example sheet, we will show that $\SLE_\kappa$ is space-filling for $\kappa \geq 8$.
+
+Now assume $\kappa > 4$. Recall that
+\[
+  \partial_t g_t(z) = \frac{z}{g_t(z) - U_t},\quad g_0(z) = z,
+\]
+where $U_t = \sqrt{\kappa} B_t$ and $B$ is a standard Brownian motion. We defined
+\[
+  V_t^x = g_t(x) - U_t
+\]
+for all $x \in \R$ , and then
+\[
+  V_t^x /\sqrt{\kappa} \sim \mathrm{BES}^d,\quad d = 1 + \frac{4}{k}.
+\]
+We set
+\[
+  \tau_x = \inf \{t \geq 0: V_t^x = 0\},
+\]
+the first time that $x$ is separated from infinity by the SLE curve $\gamma$.
+
+We fix $0 < x < y$, and set
+\[
+  g(x, y)  =\P[\tau_x = \tau_y].
+\]
+In other words, $g(x, y)$ is the probaiblity that both $x$ and $y$ are separated from $\infty$ at the same time. Our goal is to show that $g(x, y) > 0$ for $\kappa \in (4, 8)$, and $g(x, y) = 0$ for $\kappa \geq 8$. The interpretation is that for $\kappa \in (4, 8)$, the curve $\gamma$ has ``holes'', and so it is possible to cut off separated points at the same time, and for $\kappa \geq 8$, the curve is ``boundary filling''.
+
+To see this, observe that $g(x, y) = g(1, y/x)$ as $\SLE_\kappa$ is scale-invariant. Moreover, $g(1, r) \to 0$ as $r \to \infty$, since $\P[\tau_1 < t] \to 1$ as $t \to \infty$, but $\P[\tau_r < t] \to 0$ as $r \to \infty$ with $t$ fixed.
+
+\begin{defi}[Equivalent events]\index{equivalent events}
+  We say two events $A, B$ are \emph{equivalent} if
+  \[
+    \P[A \setminus B] = \P[B \setminus A] = 0,
+  \]
+\end{defi}
+
+\begin{prop}
+  For $r > 1$, the event $\{\tau_r = \tau_1\}$ is equivalent to the event
+  \[
+    \sup_{t < \tau_1} \frac{V_{t^r} - V_t^1}{V_t^1} < \infty.\tag{$*$}
+  \]
+\end{prop}
+
+\begin{proof}
+  If $(*)$ happens, then we cannot have that $\tau_1 < \tau_r$, or else the supremumi s infinite. So $(*) \subseteq \{\tau_1 = \tau_r\}$.
+
+  On the other hand, if $M > 0$, then consider
+  \[
+    P \equiv \P\left[\tau_1 = \tau_r \mid \sup_{t < \tau_1} \frac{V_t^r - V_t^1}{V_t^1} \geq M\right] = \P[\tau_1 = \tau_r \mid \sigma_M < \tau_1],
+  \]
+  where
+  \[
+    \sigma_M = \inf \left\{t \geq 0: \frac{V_t^r - V_t^1}{V_t^1}\right\}.
+  \]
+  Now by the conformal Markov property, we have that
+  \[
+    P = g(1, M + 1) \to 0
+  \]
+  as $M \to \infty$.
+
+  So we know that
+  \[
+    \P\left[\tau_1 = \tau_r, \sup_{t < \tau_1} \frac{V_t^r - V_t^1}{V_t'} = \infty\right] = 0.
+  \]
+  So the claim follows.
+\end{proof}
+
+So we need to show that
+\[
+  \P\left[\sup_{t < \tau_1} \frac{V_t^r - V_t^1}{V_t^1} < \infty\right] 
+  \begin{cases}
+    >0 & \kappa \in (4, 8)\\
+    =0 & k \geq 8
+  \end{cases}.
+\]
+We will prove this using stochastic calculus techniques. Since ratios are hard, we instead consider
+\[
+  Z_t = \log \left(\frac{V_t^r - V_t^1}{V_t^1}\right).
+\]
+We can then compute
+\[
+  \d Z_t = \left[\left(\frac{3}{2} - d\right)\frac{1}{(V_t1)^2} + \left(\frac{d - 1}{2}\right) \frac{V_t^r - V_t^1}{(V_t^1)^2 V_t^r}\right] \;\d t - \frac{1}{V_t^1} \;\d B_t,\quad Z_0 = \log (r - 1).
+\]
+Here we can already see why $\kappa = 8$ is special, since it corresponds to $d = \frac{3}{2}$.
+
+When faced with such complex equations, it is usually wise to perform a time change. Here we set
+\[
+  t = \int_0^{\sigma(t)} \frac{1}{(V_s^1)^2} \;\d s \Leftrightarrow \d t = \frac{\d \sigma(t)}{(V_{\sigma(t)^1})^2}.
+\]
+So
+\[
+  t \mapsto \tilde{B}_t = - \int_0^{\sigma(t)} \frac{1}{V_s^1} \;\d B_s
+\]
+is a continuous local martingale, with
+\[
+  [\tilde{B}]_t = \left[ - \int_0^{\sigma(t)} \frac{1}{V_s^1} \;\d B_s\right]_t = \int_0^{\sigma(t)} \frac{1}{(V_s^1)^2}\;\d s = t.
+\]
+So by the L\'evy characterization, we know that $\tilde{B}_t$ is a Brownian motion.
+
+Now let
+\[
+  \tilde{Z}_t = Z_{\sigma(t)}.
+\]
+Then we have
+\[
+  \d \tilde{Z}_t = \left[ \left(\frac{3}{2} - d\right) + \left(\frac{d - 1}{2}\right) \frac{V_{\sigma(t)}^r - V_{\sigma(t)}^1}{V_\sigma(t)^r}\right] \;\d t + \d \tilde{B}_t.
+\]
+In integral form, we get
+\begin{align*}
+  \tilde{Z}_t &= \tilde{Z}_0 = \tilde{Z}_0 + \tilde{B}_t + \left(\frac{3}{2} - d\right)t + \frac{d - 1}{2} \int_0^t \frac{V_{\sigma(s)}^r - V_{\sigma(s)}^1}{ V_{\sigma(s)}^r}\;\d s\\
+  &\geq \tilde{Z}_0 + \tilde{B}_t + \left(\frac{3}{2} - d\right)t.
+\end{align*}
+Now if $\kappa \geq 8$, then $d = 1 + \frac{4}{\kappa} \leq \frac{3}{2}$. So we have
+\[
+  \tilde{Z}_t \geq \tilde{Z}_0 + \tilde{B}_t.
+\]
+So we find that
+\[
+  \sup_t \tilde{Z}_t \geq \tilde{Z}_0 + \sup_t \tilde{B}_t = + \infty.
+\]
+So we find that
+\[
+  \sup_{t < \tau_1} \frac{V_t^r - V_t^1}{V_t^1} = \infty.
+\]
+So $g(x, y) = 0$ for all $0 < x < y$ if $\kappa \geq 8$.
+
+Now if $\kappa \in (4, 8)$, fix $\varepsilon > 0$, and assume that $r = 1 + \frac{\varepsilon}{2}$, so that $\tilde{Z}_0 = \log (r - 1) = \log (\varepsilon/2)$. We will show that for small $\varepsilon$, we have $g(1, r) > 0$. In fact, it is always positive, which is to be shown on the example sheet.
+
+We let
+\[
+  \tau = \inf \{t > 0 : \tilde{Z}_t = \log \varepsilon\}.
+\]
+Then
+\begin{align*}
+  \tilde{Z}_{t \wedge \tau} &= \tilde{Z}_0 + \tilde{B}_{t \wedge \tau} + \left(\frac{3}{2} - d\right) t\wedge \tau  + \frac{d - 1}{2} \int_0^{t \wedge \tau} \frac{V_{\sigma(s)}^r - V_{\sigma(s)}^1}{V_{\sigma(s)}^r}\;\d s\\
+  &\leq \tilde{Z}_0 + \tilde{B}_{t \wedge \tau} + \left(\frac{3}{2} - d \right) t \wedge \tau + \frac{d - 1}{2} \int_0^{t \wedge \tau} e^{\tilde{Z}_s}\;\d s\\
+  &\leq \tilde{Z}_0 + \tilde{B}_{t \wedge \tau} + \left(\frac{3}{2} - d \right) t \wedge \tau - \left(\frac{d - 1}{2}\right)(t \wedge \tau)\varepsilon\\
+  &= \tilde{Z}_0t + \tilde{B}_{t \wedge \tau} + \left[\left(\frac{3}{2} - d\right) + \left(\frac{d - 1}{2}\right)\varepsilon \right] (t \wedge \tau).
+\end{align*}
+We let
+\[
+  Z_t^*= \tilde{Z}_0t + \tilde{B}_{t} + \left[\frac{3}{2} - d + \frac{d - 1}{2}\varepsilon \right] t.
+\]
+We then have shown that
+\[
+  Z_{t \wedge \tau}^* \geq \tilde{Z}_{t \wedge \tau}.
+\]
+We assume that $\varepsilon > 0$ is such that $\left(\frac{3}{2} - d + \frac{d - 1}{2} \varepsilon\right) < 0$. Then $Z_t^*$ is a Brownian motion with a negative drift, starting from $\log \frac{\varepsilon}{2}$, so (by the second example sheet), we have
+\[
+  \P \left(\sup_{t \geq 0} Z_t^* < \log \varepsilon\right) > 0.
+\]
+So we know that
+\[
+  \P\left[ \sup_{t \geq 0} \tilde{Z}_t < \log \varepsilon \right] > 0.
+\]
+So we have
+\[
+  g\left(1, 1 + \frac{\varepsilon}{2}\right) > 0.
+\]
+So far, we only defined $\SLE_\kappa$ in the upper half plane $\H$ from $0$ to $\infty$. But we can define SLE in really any simply connected domain.
+
+If $D \subseteq \C$ is a simply connected domain, and $x, y \in \partial D$ are distinct, then there exists a conformal transformation $\varphi: \H \to D$ with $\varphi(0) = x$ and $\varphi(\infty) = y$.
+
+An $\SLE_\kappa$ in $D$ from $x$ to $y$ is defined by setting it to be $\gamma = \varphi(\tilde{``g})$, where $\tilde{\gamma}$ is an $\SLE_\kappa$ in $\H$ from $0$ to $\infty$. On the second example sheet, we check that this definition is well-defined, i.e.\ it doesn't depend on the choice of the conformal transformation. 
+\section{Scaling limit of critical percolation}
+The reason we care about SLE is that they come from scaling limits of certain discrete models. In this chapter, we want to know which $\SLE_\kappa$ corresponds to the scaling limit of critical percolation.
+
+Let $D \subseteq \C$ be simply connected, and $x, y \in \partial D$ distinct. Consider the critical $p = \frac{1}{2}$ percolation interface on the hexagonal lattice  with hexagons of size $\varepsilon > 0$ contained in $D$, with all hexagons which intersect the clockwise arc of $\partial D$ from $x$ to $y$ be black and along the counterclockwise arc white.
+\begin{center}
+  \begin{tikzpicture}
+    \begin{scope}[scale=0.15]
+      % seed 173
+      \foreach \i in {-7,...,7}  {
+        \foreach \j in {-7,...,7} {
+          \rand
+          \draw [fill, fill opacity=\arabic{rand}] (\i*3, \j*1.732) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1);
+          \rand
+          \draw [fill, fill opacity=\arabic{rand}] (\i*3 + 1.5, \j*1.732 - 0.866) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1);
+        }
+      }
+        \foreach \j in {-7,...,7} {
+          \draw [fill] (-7*3, \j*1.732) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1);
+          \draw [fill=white] (7*3 + 1.5, \j*1.732 - 0.866) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1);
+        }
+
+      \foreach \i in {-7,...,0}  {
+        \draw [fill] (\i*3, -8*1.732) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1);
+        \draw [fill] (\i*3 + 1.5, -8*1.732 - 0.866) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1);
+        \draw [fill] (\i*3, 8*1.732) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1);
+        \draw [fill] (\i*3 + 1.5, 8*1.732 - 0.866) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1);
+      }
+      \foreach \i in {1,...,7}  {
+        \draw (\i*3, -8*1.732) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1);
+        \draw (\i*3 + 1.5, -8*1.732 - 0.866) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1);
+        \draw (\i*3, 8*1.732) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1);
+        \draw (\i*3 + 1.5, 8*1.732 - 0.866) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1);
+      }
+
+      \node [circ, morange] at (3, -13.866) {};
+      \node [below] at (3, -13.866) {$x$};
+      \node [circ, morange] at (2.5, 14.866) {};
+      \node [above] at (2.5, 14.866) {$y$};
+
+      \draw [morange, very thick] (3, -13.866) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1) -- ++(240:1) -- ++(180:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(60:1) -- ++(0:1) -- ++(60:1) -- ++(0:1) -- ++(60:1) -- ++(0:1) -- ++(300:1) -- ++(0:1) -- ++(300:1) -- ++(0:1) -- ++(300:1) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(60:1) -- ++(0:1) -- ++(300:1) -- ++(0:1) -- ++(300:1) -- ++(0:1) -- ++(300:1) -- ++(0:1) -- ++(60:1) -- ++(0:1) -- ++(60:1) -- ++(0:1) -- ++(300:1) -- ++(240:1) -- ++(300:1) -- ++(240:1) -- ++(180:1) -- ++(240:1) -- ++(300:1) -- ++(0:1) -- ++(60:1) -- ++(0:1) -- ++(60:1) -- ++(0:1) -- ++(300:1) -- ++(240:1) -- ++(180:1) -- ++(240:1) -- ++(180:1) -- ++(240:1) -- ++(300:1) -- ++(240:1) -- ++(180:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1) -- ++(0:1) -- ++(300:1) -- ++(240:1) -- ++(300:1) -- ++(0:1) -- ++(60:1) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(0:1) -- ++(300:1) -- ++(240:1) -- ++(300:1) -- ++(240:1) -- ++(300:1) -- ++(0:1) -- ++(60:1) -- ++(0:1) -- ++(300:1) -- ++(0:1) -- ++(300:1) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(0:1) -- ++(300:1) -- ++(0:1) -- ++(60:1) -- ++(0:1) -- ++(300:1) -- ++(240:1) -- ++(300:1) -- ++(240:1) -- ++(300:1) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(60:1) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1) -- ++(240:1) -- ++(300:1) -- ++(240:1) -- ++(300:1) -- ++(240:1) -- ++(300:1) -- ++(240:1) -- ++(180:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(180:1) -- ++(240:1) -- ++(180:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1) -- ++(240:1) -- ++(180:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1) -- ++(0:1) -- ++(300:1) -- ++(240:1) -- ++(180:1) -- ++(240:1) -- ++(180:1) -- ++(120:1) -- ++(180:1) -- ++(240:1) -- ++(300:1) -- ++(240:1) -- ++(300:1) -- ++(240:1) -- ++(180:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(180:1) -- ++(120:1) -- ++(60:1) -- ++(0:1) -- ++(300:1) -- ++(0:1) -- ++(300:1) -- ++(0:1) -- ++(60:1) -- ++(0:1) -- ++(300:1) -- ++(0:1) -- ++(60:1) -- ++(120:1) -- ++(180:1) -- ++(120:1);
+    \end{scope}
+  \end{tikzpicture}
+\end{center}
+Then there exists a unique interface $\gamma_\varepsilon$ that connects $x$ to $y$ with the property that the black hexagons on its left and white on its right. It was conjectured (and now proved by Smirnov) that the limit of the law of $\gamma_\varepsilon$ exists in distribution and is conformally invariant.
+
+This means that if $\tilde{D}$ is another simply connected domain, and $\tilde{x}, \tilde{y} \in \partial \tilde{D}$ are distinct, then $\varphi: D \to \tilde{D}$ is a conformal transformation with $\varphi(x) = \tilde{x}$, $\varphi(y) = \tilde{y}$, then $\varphi(\gamma)$ is equal in distribution of the scaling limit of percolation in $\tilde{D}$ from $\tilde{x}$ to $\tilde{y}$.
+
+Also, percolation also satisfies a natural Markov property: if we condition on $\gamma_\varepsilon$ up to a given time $t$, then the rest of $\gamma_\varepsilon$ is a percolation exploration in the remaining domain. The reason for this is very simple --- the path only determines the colours of the hexagons right next to it, and the others are still randomly distributed independently.
+
+If we assume these two properties, then the limiting path $\gamma$ satisfies the conformal Markov property, and so must be an $\SLE_\kappa$. So the question is, what is $\kappa$?
+
+This is a very common things. We have many discrete model. For some reason, they are supposed to be conformally invariant in the scaling limit and have a Markov property. So we know it is an $\SLE_\kappa$. Then looking at the discrete model, we can deduce some properties about $\gamma$, and this tells us something about which $\kappa$ value it should take.
+
+In the case of percolation, we have the ``locality'' property, and we will see that $\SLE_6$ is the only SLE that satisfies this locality property.
+
+Fix a simply-connected domain $D$ in $\H$ (for simplicity), and assume that $0 \in \partial D$. Suppose we do a percolation exploration in $D$ with black boundary conditions on the clockwise arc of $\partial D$ from $0$ to $y$ and white boundary conditions on the counterclockwise arc. If we think about this a bit, this would be equal in distribution as what we would have got if we performed a percolation exploration on $\H$ with black boundary conditions on $\R_{<0}$ and white boundary conditions on $\R_{>0}$, if we generate the path up until $\partial D \setminus \partial \H$. In other words, $\gamma$ doesn't feel the boundary conditions until it hits the boundary. This is known as \term{locality}.
+
+It should then be true that the corresponding $\SLE_\kappa$ should have an analogous property. To be precise, we want to find a value of $\kappa$ so that the following is true: If $\gamma$ is an $\SLE_\kappa$ in $\H$ from $0$ to $\infty$, run up until it first hits $\partial D \setminus \partial \H$, then $\psi(\gamma)$ is a (stopped) $\SLE_\kappa$ in $\H$ from $0$ to $\infty$ where $\psi: D \to \H$ is a conformal transformation with $\psi(0) = 0$, $\psi(y) = \infty$. This is the \term{locality property}. We will show that locality holds precisely for $\kappa = 6$.
+
+Suppose that $(A_t)$ is a non-decreasing family of compact hulls, parametrized by capacity, locally growing with $A_0 = \emptyset$. In other words, $(A_t) \in \mathcal{A}$. We let
+\[
+  \tilde{A}_t = \psi(A_t).
+\]
+The $\tilde{A}_t$ is a family of compact $\H$-hulls that are non-decreasing, locally growing, and $A_0 = \emptyset$. However, in general, this is not going to be parametrized by capacity. Let
+\[
+  \tilde{a}(t) = \hcap(\tilde{A}_t).
+\]
+Let $\tilde{g}_T = g_{\tilde{A}_t}$ be the unique conformal transformation $\H \setminus \tilde{A}_t \to \H$ with $\tilde{g}_t(z) - z \to 0$. Then
+\[
+  \partial_t \tilde{g}_t (z) = \frac{\partial_t \tilde{a}_t}{\tilde{g}_t(z) - \tilde{U}_t},\quad \tilde{g}_0(z),
+\]
+where $U_t$ is the Loewner driving function for $(A_t)$ and
+\[
+  \tilde{U}_t = \psi_t(U_t),\quad \psi_t = \tilde{g}_t \circ \psi \circ g_t^{-1},\quad g_t = g_{A_t}.
+\]
+To see this, recall that if $A_t$ is $\gamma([0, t])$ for a curve $\gamma$, then $U_t = g_t(\gamma(t))$. Then we have
+\[
+  \tilde{a}(t) = \int_0^t \gamma(\psi_t'(U_s))^2\;\d s.
+\]
+This is shown in the second example sheet (recall that $\hcap(rA) = r^2 \hcap(A)$). 
+
+We now want to understand what happens when we put $U_t = \sqrt{\kappa} B_t$.
+\begin{prop}
+  The maps $(\psi_t)$ satisfy
+  \[
+    \partial_t \psi_t(z) = 2 \left(\frac{(\psi_t'(U_t))^2}{\psi_t(z) - \psi_t(U_t)} - \psi_t' (U_t) \frac{1}{z - U_t}\right).
+  \]
+  In particular, at $z = U_t$, we have
+  \[
+    \partial_t \psi_t(U_t) = \lim_{z \to U_t} \partial_t \psi_t (z) = -3 \psi_t''(U_t).
+  \]
+\end{prop}
+
+
+
 \printindex
 \end{document}
