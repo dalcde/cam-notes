@@ -1766,6 +1766,147 @@ Note that the quadratic variation does not change since
 \]
 along a subsequence.
 
+\section{Stochastic differential equations}
+\subsection{Definitions}
+Recall from the introduction that we wanted to study equations of the form
+\[
+  \dot{x}(t) = F(x(t)) + \eta(t),
+\]
+where $\eta(t)$ is white noise. We can now interpret this equation as
+\[
+  \d X_t = F(x_t)\;\d t + \d B_t,
+\]
+or equivalently, in integral form,
+\[
+  X_t - X_0 = \int_0^T F(X_s) \;\d s+ B_t.
+\]
+More generally,
+\begin{defi}[Stochastic differential equation]\index{stochastic differential equation}
+  Let $d, m \in \N$, $b:\R_+ \times \R^d \to \R^d$, $\sigma: \R_+ \times \R^d \to \R^{d \times m}$ be locally bounded (and measurable). A solution to the stochastic differential equation $E(\sigma, b)$ given by
+  \[
+    \d X_t = b(t, X_t) \;\d t + \sigma(t, X_t) \;\d B_t
+  \]
+  consists of
+  \begin{enumerate}
+    \item A filtered probability space $(\Omega, \mathcal{F}, (\mathcal{F}_t), \P)$ obeying the usual conditions
+    \item An $m$-dimensional Brownian motion $B$ with $B_0 = 0$
+    \item An $(\mathcal{F}_t)$-adapted continuous process $X$ with values in $\R^d$ such that
+      \[
+        X_t = X_0 + \int_0^t \sigma(s, X_s) \;\d B_s + \int_0^t b(s, X_s) \;\d s.
+      \]
+  \end{enumerate}
+  If $X_0 = x \in \R^d$, then we say $X$ is a solution to $E_x(\sigma, b)$. It is a \emph{strong} solution if it is adapted with respect to the canonical filtration of $B$.
+\end{defi}
+
+\begin{defi}[Existence and uniqueness of solutions]
+  For the stochastic differential equation $E(\sigma, b)$, we say there is 
+  \begin{itemize}
+    \item \term{weak solution} if for every $x \in \R^d$, there is a solution to $E_x(\sigma, b)$.
+    \item \term{uniqueness in law} if for every $x \in \R^d$, all solutions to $E_x(\sigma, b)$ have the same distribution.
+    \item \term{pathwise uniqueness} if when $(\Omega, \mathcal{F}, (\mathcal{F}_t), \P)$ and $B$ are fixed, any two solutions $X, X'$ with $X_0 = X_0'$ are indistinguishable.
+  \end{itemize}
+\end{defi}
+The basic question to ask is how are the two notions of uniqueness related?
+\begin{eg}[Tanaka]\index{Tanaka equation}
+  The stochastic differential equation
+  \[
+    \d X_t = \sgn(X_t) \;\d B_t,\quad X_0 = x,
+  \]
+  where
+  \[
+    \sgn(x) =
+    \begin{cases}
+      +1 & x > 0\\
+      -1 & x \leq 0
+    \end{cases}
+  \]
+  has a weak solution which is unique in law, but pathwise uniqueness fails.
+
+  To see the existence of solutions, let $X$ be a one-dimensional Brownian motion with $X_0 = x$, and set
+  \[
+    B_t = \int_0^t  \sgn(X_s) \;\d X_s,
+  \]
+  which is well-defined because $\sgn(X_s)$ is previsible and left-continuous. Then we have
+  \[
+    x + \int_0^t \sgn(X_s)\;\d B_s = x + \int_0^t \sgn(X_s)^s \;\d X_s = x + X_t - X_0 = X_t.
+  \]
+  So it remains to show that $B$ is a Brownian motion. We already know that $B$ is a continuous local martingale, so by L\'evy's characterization, it suffices to show its quadratic variation is $t$. We simply compute
+  \[
+    \bra B, B\ket_t = \int_0^t \d \bra X_s, X_s\ket \;\d s = t.
+  \]
+  So there is weak existence. The same argument shows that any solution is a Brownian motion, so we have uniqueness in law.
+
+  Finally, observe that if $x = 0$ and $X$ is a solution, then $-X$ is also a solution with the same Brownian motion. Indeed,
+  \[
+    -X_t = \int_0^t \sgn(X_s) \;\d B_s = \int_0^t \sgn(-X_s)\;\d B_s + 2 \int_0^t \mathbf{1}_{X_s = 0} \;\d B_s,
+  \]
+  where the second term vanishes, since it is a continuous local martingale with quadratic variation $\int_0^t \mathbf{1}_{X_s = 0} \;\d s = 0$ because the zero set of Brownian motion has Lebesgue measure $0$ almost surely.
+  
+  So pathwise uniqueness does not hold.
+\end{eg}
+
+It turns out it is true that pathwise uniqueness implies uniqueness in law.
+\begin{thm}[Yamada--Watanabe]\index{Yamada--Watanabe}
+  Assume weak existence and pathwise uniqueness holds. Then
+  \begin{enumerate}
+    \item Uniqueness in law holds.
+    \item For every $(\Omega, \mathcal{F}, (\mathcal{F}_t), \P)$ and $B$ and any $x \in \R^d$, there is a unique strong solution to $E_x(a, b)$.\fakeqed
+  \end{enumerate}
+\end{thm}
+We will not prove this, since we will not actually need it.
+
+\subsection{Lipschitz coefficients}
+In the previous example, we constructed a solution by guessing an $X$ and then showing that the resulting $B$ is a Brownian motion. We can also use Girsanov's theorem to construct solutions. If we are lazy, we can apply the following theorem:
+\begin{defi}[Lipschitz coefficients]\index{Lipschitz coefficients}
+  The coefficients $b: \R_+ \times \R^d \to \R^d$, $\sigma: \R_+ \times \R^d \to \R^{d \times m}$ are Lipschitz in $x$ if there exists a constant $K > 0$ such that for all $t \geq 0$ and $x, y \in \R^d$, we have
+  \begin{align*}
+    |b(t, x) -- b(t, y)| &\leq K|x - y|\\
+    |\sigma(t, x) - \sigma(t, y)| &\leq |x - y|
+  \end{align*}
+\end{defi}
+
+\begin{thm}
+  Assume $b, \sigma$ are Lipschitz in $x$. Then there is pathwise uniqueness for the $E(\sigma, b)$ and for every $(\Omega, \mathcal{F}, (\mathcal{F}_t), \P)$ satisfying the usual conditions and every $(\mathcal{F}_t)$-Brownian motion $B$, for every $x \in \R^d$, there exists a unique strong solution to $E_x(\sigma, b)$.
+\end{thm}
+
+\begin{proof}
+  To simplify notation, we assume $m = d = 1$.
+
+  To prove pathwise uniqueness, let $X, X'$ be two solutions with $X_0 = X_0'$. We first impose some stopping times
+  \[
+    S = \inf \{t \geq 0: |X_t| \geq n\text{ or }|X_t'| \geq n\}.
+  \]
+  By continuity, $S \to \infty$ as $n \to \infty$. Then
+  \begin{align*}
+    X_{t \wedge S} &= X_0 + \int_0^{t \wedge S} \sigma(s, X_s)\;\d B_s + \int_0^{t \wedge S} b(s, X_s)\;\d s\\
+    X'_{t \wedge S} &= X_0 + \int_0^{t \wedge S} \sigma(s, X_s')\;\d B_s + \int_0^{t \wedge S} b(s, X_s')\;\d s.
+  \end{align*}
+  Fix a deterministic $T > 0$. Then for $t \in [0, T]$, (using $(a + b)^2 \leq 2a^2 + 2b^2$), we have
+  \begin{align*}
+    \E ((X_{t \wedge S} - X'_{t \wedge S})^2) &\leq 2 \E \left(\left(\int_0^{t \wedge S} (\sigma(s, X_s) - \sigma(s, X_s'))\;\d B_s\right)^2\right) + 2 \E \left(\left(\int_0^{t \wedge S} (b(s, X_s) - b(s, X_s'))\;\d s\right)^2 \right)\\
+    &\leq \E \left(\int_0^{t \wedge S} (\sigma(s, X_s) - \sigma(s, X_s'))^2\;\d s\right) + 2T \E \left(\int_0^{t \wedge s} (b(s, X_s) - b(s, X_s'))^2\;\d s\right)\\
+    &\leq 2K^2 (1 + T) \E \left(\int_0^{t \wedge S} |X_s - X_s'|^2 \;\d s\right)\\
+    &= 2K^2 (1 + T) \int_0^t \E (|X_{s \wedge S} - X'_{s \wedge S}|^2)\;\d s.
+  \end{align*}
+  Writing
+  \[
+    h(t) = \E((X_{t \wedge S} - X_{t \wedge S}')^2),
+  \]
+  we know
+  \[
+    h(t) \leq 4n^2,\quad h(t) \leq c \int_0^t h(s)\;\d s
+  \]
+  with $c = 2K^2(1 + T)$ for $t \leq T$, which is a constant. By Gr\"onwall's lemma, we have
+  \[
+    h(t) \leq h(0) e^{ct} = 0.
+  \]
+  So we have proved that 
+  \[
+    \E(|X_{t \wedge S} - X_{t \wedge S}'|)^2 = 0
+  \]
+  for every $t \in [0, T]$. Take $n \to \infty$ and $T \to \infty$, we know we have pathwise uniqueness.
+\end{proof}
+
 
 \printindex
 \end{document}

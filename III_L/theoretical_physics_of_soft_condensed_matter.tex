@@ -1554,12 +1554,12 @@ is the chemical potential of a particle in $V(x)$, as promised. Observe that
     The multiplicative (i.e.\ non-constant) noise term is problematic. To understand multiplicative noise, we need advanced stochastic calculus (It\^o/Stratonovich). In this course (and in many research papers), we avoid multiplicative noise.
 \end{itemize}
 
-\subsection{From one particle to many}
-Suppose we have $N$ non-interacting colloids in $V(x)$. What we are interested in is some kind of coarse grained density $\rho(x, t)$. If there are non-interacting, we can simply multiply together these distributions, and we have
+\subsection{Field theories}
+Suppose now that we have $N$ non-interacting colloids under the same potential $V(x)$. As usual, we model this by some coarse-grained density field $\rho(x, t)$. If we assume that the particles do not interact, then the expected value of this density is just given by
 \[
-  \bra \rho\ket = NP,\quad \bra \dot{\rho}\ket = N \dot{P}_1.
+  \bra \rho\ket = NP_1,\quad \bra \dot{\rho}\ket = N \dot{P}_1.
 \]
-If this is the case, then we have
+Then our previous discussion entails $\dot{\rho}$ evolves by
 \[
   \dot{\rho} = - \nabla \cdot \mathbf{J},
 \]
@@ -1567,31 +1567,24 @@ where
 \[
   \bra \mathbf{J}\ket = - \rho \tilde{M} \nabla \mu,\quad \mu = k_B T \log \rho + V(x).
 \]
-With interactions, we set $\mu = \frac{\delta F}{\delta \rho}$, and see what happens. This is phenomenological, but well-motivated.
 
-But setting $\mathbf{J} = \bra \mathbf{J}\ket$ neglects fluctuations in particle current. These equations only give us a \emph{hydrodynamic level} (deterministic) equation of motion for $\rho$. This evolves to a mean field solution, where $\mu$ becomes a constant and $F[\rho]$ goes to its minimum at fixed $N = \int \rho(\mathbf{r}, t) \;\d \mathbf{r}$.
-
-Contrast $P_1$, the probability density for $1$ particle, which \emph{does} have a deterministic equation, which is equivalent to Langevin for paths; with $\rho$, a particle density, which is \emph{not} a probability density, and this is a fluctuating quantity. We need a Langevin equation for $\rho$ whose average will be what we have above.
-
-Instead of the mean field solution, we require the Boltzmann distribution, namely the steady state probability distribution is
+If we wish to consider a general, interacting field, then we can take the same equations, but set
 \[
-  P_{ss}[\rho] = \mathcal{N} e^{-\beta F[\rho]}.
+  \mu = \frac{\delta F}{\delta \rho}
 \]
-This requires
-\[
-  \dot{\rho} = - \nabla \cdot \mathbf{J},
-\]
-which is always the case since $\rho$ is conserved, but now
+instead.
+
+Note that these are hydrodynamic level equations for $\rho$, i.e.\ they only tell us what happens to $\bra \rho\ket$. If we put $\mathbf{J} = \bra \mathbf{J}\ket$, then we get a mean field solution that evolves to the minimum of the free energy. To understand the stochastic evolution of $\rho$ itself, we put
 \[
   \mathbf{J} = - \rho \tilde{M} \nabla \mu + \mathbf{j},
 \]
-where $\mathbf{j}$ is a \term{noise current}. This is the Langevin equation for a fluctuating field $\rho(\mathbf{r}, t)$.
+where $\mathbf{j}$ is a \term{noise current}. This is the \term{Langevin equation} for a fluctuating field $\rho(\mathbf{r}, t)$.
 
-We can fix the distribution of $\mathbf{j}$ by requiring detailed balance as before. We will implement this for a constant $M = \rho \tilde{M}$. We call this the \term{collective mobility} This is what we have to do to avoid having multiplicative noise in our system. While this doesn't seem very physical, this makes more sense, for example, when we are looking at fluctuations about a fixed density.
+We can fix the distribution of $\mathbf{j}$ by requiring detailed balance as before. We will implement this for a constant $M = \rho \tilde{M}$, called the \term{collective mobility}. This is what we have to do to avoid having multiplicative noise in our system. While this doesn't seem very physical, this is reasonable in situations where we are looking at small fluctuations about a fixed density, for example.
 
 As before, we assume $\mathbf{j}(r, t)$ is Gaussian white noise, so
 \[
-  \P[\mathbf{j}(\mathbf{r}, t)] = \mathcal{N} \exp \left(-\frac{1}{2\sigma^2} \int_{t_1}^{t_2} \d t\int \d \mathbf{r} |\mathbf{j}(\mathbf{r}, t)|^2\right).
+  \P[\mathbf{j}(\mathbf{r}, t)] = \mathcal{N} \exp \left(-\frac{1}{2\sigma^2} \int_{t_1}^{t_2} \d t\int \d \mathbf{r}\; |\mathbf{j}(\mathbf{r}, t)|^2\right).
 \]
 This corresponds to
 \[
@@ -1615,10 +1608,8 @@ We consider the backwards part and get
 \]
 Then
 \[
-  \log \frac{\P_F}{\P_B} = - \frac{2M}{\sigma^2} \int_{t_1}^{t_2} \d t \int \d \mathbf{r} \mathbf{J} \cdot \nabla \mu.
+  \log \frac{\P_F}{\P_B} = - \frac{2M}{\sigma^2} \int_{t_1}^{t_2} \d t \int \d \mathbf{r}\;\mathbf{J} \cdot \nabla \mu.
 \]
-This is fixed by the principle of detailed balance.
-
 We integrate by parts in space to write
 \[
   \int \d \mathbf{r}\; \mathbf{J} \cdot \nabla \mu = - \int \d \mathbf{r}\; (\nabla \cdot \mathbf{J}) \mu = \int \d \mathbf{r} \left(\dot{\rho} \frac{\delta F}{\delta \rho}\right) = \frac{\d F[\rho]}{\d t}.
@@ -1640,15 +1631,15 @@ So our final many-body Langevin equation is
   \dot{\rho} &= - \nabla \cdot \mathbf{J}\\
   \mathbf{J} &= - M \nabla \left(\frac{\delta F}{\delta \rho}\right) + \sqrt{2k_B T M} \Lambda,
 \end{align*}
-where $\Lambda$ is spatiotemporal unit white noise. A constant $M$ avoids multiplicative white noise.
+where $\Lambda$ is spatiotemporal unit white noise. As previously mentioned, a constant $M$ avoids multiplicative white noise.
 
 In general, we get the same structure for any other diffusive system, such as $\phi(\mathbf{r}, t)$ in a binary fluid.
-\subsubsection*{Langevin to Fokker--Planck}
-For one particle, we had the Langevin equation
+
+We might want to get a Fokker--Planck equation for our field theory. First recap what we did. For one particle, we had the Langevin equation
 \[
   \dot{x} = - \tilde{M} \nabla V + \sqrt{2k_B T \tilde{M}} \Lambda,
 \]
-and this became the equation
+and we turned this into a Fokker--Planck equation
 \begin{align*}
   \dot{P} &= - \nabla \cdot \mathbf{J}\\
   \mathbf{J} &= -P \tilde{M} \nabla \mu\\
@@ -1675,21 +1666,21 @@ The advantage of the Langevin equation is that it is easy to understand the mean
 In this course, we take the compromise and use the Langevin equation with constant $M$.
 
 \section{Model B}
-We now wish to understand the dynamics of a particular model of binary fluid --- Model B. This is a pure diffusion system with no fluid flow. This has a scalar composition field $\phi(\mathbf{r})$, and we have
+We now apply this theory to model some concrete systems. We shall first consider a simple model of binary fluids. We assume that diffusion happens but without fluid flow. As before, this is modeled by a scalar composition field $\phi(\mathbf{r})$, and evolves under the equations
 \begin{align*}
   \dot{\phi} &= - \nabla \cdot \mathbf{J}\\
   \mathbf{J} &= - M \nabla \mu + \sqrt{2k_B TM} \boldsymbol \Lambda\\
   \mu &= \frac{\delta F}{\delta \phi}.
 \end{align*}
-We choose the same Landau--Ginzburg free energy as we always have,
+Recall that the system is modelled under the Landau--Ginzburg free energy
 \[
-  F[\phi] = \int \left(\underbrace{\frac{a}{2} \phi^2 + \frac{b}{4}\phi^4}_f + \frac{\kappa}{2} (\nabla \phi)^2\right)\;\d \mathbf{r}.
+  F[\phi] = \int \Big(\underbrace{\frac{a}{2} \phi^2 + \frac{b}{4}\phi^4}_f + \frac{\kappa}{2} (\nabla \phi)^2\Big)\;\d \mathbf{r}.
 \]
 We then have
 \[
   \mu = a \phi + b \phi^3 - \kappa \nabla^2 \phi.
 \]
-The mean field theory for equilibrium has the usual picture
+As before, the mean field theory for equilibrium looks like
 \begin{center}
   \begin{tikzpicture}
     \draw [->] (-2.3, 0) -- (2.3, 0) node [right] {$\bar{\phi}$};
@@ -1725,14 +1716,20 @@ Here $\pm \phi_S$ are the spinodals, where the second derivative changes sign. T
   \end{tikzpicture}
 \end{center}
 Here $\bar{\phi}$ is the global composition, which is a control variable.
+
+In the past, we discussed what the field looks like in each region when we are at equilibrium. At (1), the system is in a uniform phase that is globally stable. If we set up our system at (1), and then rapidly change the temperature so that we lie in (2) or (3), then we know that after the system settles, we will have a phase separated state. However, how this transition happens is not something mean field theory tells us. Heuristically, we expect
+
 \begin{itemize}
-  \item In (1), we have $|\bar{\phi}| > \phi_B$. Then have a uniform phase which is globally stable.
-  \item In (2), we have $|\bar{\phi}| < \phi_S$. Then $f''(\phi) < 0$ implies local instability. This is \term{spinodal behaviour}.
-  \item In (3), we have $\phi_S < |\bar{\phi}| < \phi_B$. A uniform phase is locally stable, but not globally. To reach phase separated, we need nucleation and growth. This will require the contribution of noise.
+  \item In (2), we have $|\bar{\phi}| < \phi_S$, and $f''(\phi) < 0$ implies local instability. The system rapidly becomes phase separated. This is \term{spinodal behaviour}.
+  \item In (3), we have $\phi_S < |\bar{\phi}| < \phi_B$. A uniform phase is locally stable, but not globally. To reach the phase separated state, we need nucleation and growth to occur, and requires the contribution of noise.
 \end{itemize}
 We now study these in detail.
 \subsubsection*{Regime 1}
-First consider the regime (1). Consider small fluctuations about $\phi(r) = \bar{\phi}$, so we write $\phi = \bar{\phi} + \tilde{\phi}(\mathbf{r})$. We can then write
+We know that regime (1) is stable, and we shall see how it responds to perturbation about $\phi(r) = \bar{\phi}$. Put
+\[
+  \phi = \bar{\phi} + \tilde{\phi}(\mathbf{r}).
+\]
+We can then write
 \[
   \mu = \frac{\delta F}{\delta \phi} = \frac{\partial f}{\partial \phi} - \kappa \nabla^2 \phi = f'(\bar{\phi}) + \tilde{\phi} f''(\bar{\phi}) - \kappa \nabla^2 \tilde{\phi}.
 \]
@@ -1753,35 +1750,34 @@ where we have
 \[
   \dot{x} = - \tilde{M} \kappa x + \sqrt{2k_B T \tilde{M}} \Lambda.
 \]
-Refer to example sheet 2 problems 8 and 9, where we computed
-\[
-  S(q, t) \equiv \bra \phi_\mathbf{q}(0) \phi_{-\mathbf{q}} (t)\ket = S(q) e^{-r(q) t},
-\]
-where
-\[
-  r(q) = Mq^2(f'' + \kappa q^2).
-\]
-Here $s(q)$ is the equilibrium equal time static correlator, which is
-\[
-  \frac{k_B T}{f'' + \kappa q^2}.
-\]
-This \term{$S(\mathbf{q}, t)$} is called the \term{dynamic structure factor}, which can be measured by light scattering.
-\subsubsection*{Regime 2}
-In the second regime, we have the same equation
-\[
-  \dot{\phi}_{\mathbf{q}} = - M q^2 (f'' + \kappa q^2)\phi_\mathbf{q} + i\mathbf{q} \cdot \sqrt{2k_B TM} \boldsymbol\Lambda_{\mathbf{q}}.
-\]
-but crucially, $f''(\bar{\phi}) < 0$. So when $q^2 < - \frac{f''}{\kappa}$, the system is unstable.
+Indeed, we can think of our system as an infinite family of decoupled harmonic oscillators, and solve each of them independently.
 
-We first ignore the noise by averaging the equation to get
+In the second example sheet, we compute
+\[
+  S(\mathbf{q}, t) \equiv \bra \phi_\mathbf{q}(0) \phi_{-\mathbf{q}} (t)\ket = S(q) e^{-r(q) t},
+\]
+This \term{$S(\mathbf{q}, t)$} is called the \term{dynamic structure factor}, which can be measured by light scattering. This doesn't say the fluctuations go away completely --- we expect there to be fluctuations all the time. What this says is that fluctuations at late times come completely from the random noise, and not the initial fluctuations.
+
+%Here $s(q)$ is the equilibrium equal time static correlator, which is
+%\[
+%  \frac{k_B T}{f'' + \kappa q^2}.
+%\]
+\subsubsection*{Regime 2}
+Consider the case where we are in the second regime. As before, we have the equation
+\[
+  \dot{\phi}_{\mathbf{q}} = - \underbrace{M q^2 (f'' + \kappa q^2)}_{r(q)}\phi_\mathbf{q} + i\mathbf{q} \cdot \sqrt{2k_B TM} \boldsymbol\Lambda_{\mathbf{q}},
+\]
+but crucially, now $f''(\bar{\phi}) < 0$, so it is possible to have $r(q) < 0$. The system is unstable.
+
+If we ignore the noise by averaging the equation, then we get
 \[
   \bra \dot{\phi}_\mathbf{q}\ket = - r(q) \bra \phi_q\ket.
 \]
-Observe that $-r(q) > 0$ at $q < \sqrt{\frac{-f''}{\kappa}}$. This is the growth rate of the perturbations. So if we have a noisy initial state $\phi_\mathbf{q}(0)$, then we have
+So if we have a noisy initial state $\phi_\mathbf{q}(0)$, then the perturbation grows as
 \[
   \bra \phi_\mathbf{q}(t)\ket = \phi_\mathbf{q}(0) e^{-r(q)t}.
 \]
-The is an amplification of the initial noise. Because of this, the noise becomes irrelevant at late times.
+When $r(q) < 0$, then this amplifies the initial noise. In this world, even if we start with a perfectly uniform $\phi$, noise terms will kick in and get amplified over time. Moreover, since we have an exponential growth, the earliest noise gets amplified the most, and at late times, the new perturbations due to the noise are negligible.
 
 We can plot our $r(q)$ as follows:
 \begin{center}
@@ -1793,7 +1789,7 @@ We can plot our $r(q)$ as follows:
     \draw [dashed] (2.236, -1) -- (2.236, 0) node [above] {$q^*$};
   \end{tikzpicture}
 \end{center}
-the maximally unstable mode $q^*$ is given by the solution to $r'(q^*) = 0$, which we can easily check to be given by
+The maximally unstable mode $q^*$ is given by the solution to $r'(q^*) = 0$, which we can easily check to be given by
 \[
   q^* = \sqrt{\frac{-f''}{2\kappa}}.
 \]
@@ -1831,17 +1827,17 @@ So we see a growth of random structure with scale $L \sim \pi/q^*$. This process
     \draw [-latex'] (2.21, 0.6) -- (1.7, 0.7);
   \end{tikzpicture}
 \end{center}
-At intermediate $t$, the quartic terms are going to kick in. An informal use of variational theory says we should replace $f''$ by $\bar{f}''$.
+Note that this computation was done on the assumption that $\tilde{\phi}$ is small, where we ignored the quadratic terms. At intermediate $t$, as these phase separated states grow, the quartic terms are going to kick in. An informal use of variational theory says we should replace $f''$ by $\bar{f}''$.
 \[
   \bar{f}'' = f'' + \frac{3b}{(2\pi)^4} \int^{q_{max}} S_q(t) \;\d^d \mathbf{q}.
 \]
-This says $\bar{f}''$ is less negative as the fluctuations grow. So
+This says $\bar{f}''$ is less negative as the fluctuations grow. Since
 \[
   q^* = \sqrt{\frac{-\bar{f}''}{2k}},
 \]
-and this moves to a smaller $q$. So $L(t) \sim \pi/q^*(t)$ starts decreasing. This is called \term{domain growth}.
+this moves to a smaller $q$. So $L(t) \sim \pi/q^*(t)$ starts increasing. This is called \term{domain growth}.
 
-In the late stages, we have regions of $\phi \approx \pm \phi_B$, so it is almost in equilibrium locally. We are well away from the exponential growth regime, and the driving force for domain growth is the reduction of interfacial area. We can estimate the free energy (per unit volume) as
+In the late stages, we have large regions of $\phi \approx \pm \phi_B$, so it is almost in equilibrium locally. We are well away from the exponential growth regime, and the driving force for domain growth is the reduction of interfacial area. We can estimate the free energy (per unit volume) as
 \[
   \frac{F}{V} = \frac{\sigma A(t)}{V},
 \]
@@ -2539,9 +2535,86 @@ Note that if we take the hedgehog, and rotate every bar by 90 degrees, then we g
 
 In general, for nematic liquid crystals, these can dissociate into two $q = \frac{1}{2}$ vortices, and this tends to happen for energetic reasons, since this reduces elastic energy
 \[
-  F_{ell} = \frac{\kappa}{2} \lambda^2 |(\nabla \cdot n)n + \mathbf{n} \cdot \nabla \mathbf{n}|^2.
+  F_{ell} = \frac{\kappa}{2} |\nabla \cdot Q|^2 \sim \frac{\kappa}{2} \lambda^2 |(\nabla \cdot n)n + \mathbf{n} \cdot \nabla \mathbf{n}|^2.
 \]
 If we double the charge, we double the $Q$ tensor. Since this term is quadratic in the gradient, putting two defects together doubles the energy. In general, topological defects tend to dissociate to smaller $q$-values.
 
+Recall that in 2 dimensions, at early stages, we have
+\[
+  Q \to 2\lambda (\mathbf{n} \mathbf{n} - \frac{1}{2}\mathbf{1}).
+\]
+This $\mathbf{n}(\mathbf{r})$ is random, and is uniform subject to topological defects. These defects cannot be ironed out locally. All topological defects with $|q| > \frac{1}{2}$ dissociate. So we effectively have a gas of $q = \pm \frac{1}{2}$ topological defects that are left over from the initial conditions.
+
+We then have a late stage process where opposite charges attract and then annihilate. So the system becomes more and more ordered as a nematic. We can estimate the energy of an isolated defect as
+\[
+  \frac{\tilde{\kappa}}{2} |(\nabla \cdot \mathbf{n}) \mathbf{n} + \nabla \mathbf{n}|^2,
+\]
+where $\tilde{\kappa} = \kappa \lambda^2$. Dimensionally, we have
+\[
+  \nabla \sim \frac{1}{r}.
+\]
+So we have an energy
+\[
+  E \sim \tilde{\kappa} \int \frac{1}{r^2} \;\d \mathbf{r} \simeq \tilde{\kappa} \log \left(\frac{L}{r_0}\right),
+\]
+where $L$ is the mean spacing and $r_0$ is some kind of core radius. The point is that as we zoom close enough to the core of the signularity, $\lambda$ is no longer constant and our above energy estimate fails. In fact, $\lambda \to 0$ at the core.
+
+Recall that the electrostatic energy in two dimensions is given by a similar equation. Thus, this energy is Coulombic, with force $\propto \frac{\tilde{\kappa}}{R}$.
+
+The defects move with overdamped motion, with the velocity being proportional to the force. So
+\[
+  \dot{R} \sim  \frac{1}{R},\quad \dot{L} \propto \frac{1}{L}.
+\]
+So
+\[
+  L(t) \sim t^{1/2}.
+\]
+This is the scaling law for nematic defect coarsening in 2 dimensions.
+
+\subsection{Topological defects in three dimensions}
+in three dimensions, the same defects become lines, i.e.\ they are obtained by taking the product of our previous defects with a line. Separated at a distance $R$, the interaction force remains $\tilde{\kappa}/R$ per unit length. So we have
+\[
+  \mathbf{v} \propto \frac{\text{force}}{\text{unit length}},
+\]
+and so we similarly have
+\[
+  L(t) \sim t^{1/2}.
+\]
+However, in three dimensions, the $q = \pm \frac{1}{2}$ defects are \emph{the same} topologically. In other words, we can change $+q$ to $-q$ via local out-of-plane rotation of $\mathbf{n}$.
+
+This is best seen in a slightly more formal manner, via the theory of homotopy classes.
+
+To understand this, begin with an order parameter space $\mathcal{M}$, which is the space of possible orientations of our rods.
+\begin{eg}
+  When the order parameter is an $n$-component spin vector, then $\mathcal{M} = S^{n - 1}$, the unit sphere in $n$-dimensions. Note that we need not have $n = d$.
+\end{eg}
+
+\begin{eg}
+  For nematics in $d$-dimensions, we have $\mathcal{M} = \RP^{d - 1}$.
+\end{eg}
+
+Specifying the order parameter on a domain $D$ enclosing a defect core create a map $D \to \mathcal{M}$.
+
+The image of $D$ is then a closed loop in $M$. Two mappings $f_1, f_2$, are \term{homotopic} if they can be continuously deformed into each other. Defects lie in the same \term{homotopy class} if maps for all $D$'s enclosing them are homotopic.
+
+Suppose we have two defects $D_1, D_2$, then we can consider a path $D_3$ that goes around both of the defects, and there is an obvious sense in which $D_3 = D_1 + D_2$.  Thus, topological defects form a group under addition. For example, in two dimensions, $q_{1 + 2} = q_1 + q_2$.
+
+The \term{fundamental group} $\pi_1(\mathcal{M})$ is the group of all possible such defects when $D$ is a closed loop. Also, $\pi_n(\mathcal{M})$  describes $n$-dimensional enclosing surfaces.
+
+\begin{eg}
+  In two dimensions, $\pi_1(\RP^1) = \Z$, and the generator of $\pi_1(\RP^1)$ is the charge $\frac{1}{2}$ topological defect.
+\end{eg}
+
+\begin{eg}
+  In three dimensions, $\pi_1(\RP^2) = \Z/2\Z$, and so the $q = \pm \frac{1}{2}$ maps are the same.
+\end{eg}
+
+The outcome is that 3D nematics support single defects (disclination line). Two disclinations can annihilate or appear out of nothing, and any even number can eventually disappear.
+
+We can have disclination loops. These then correspond to homotopy classes of maps $T^2 \to \mathcal{M}$, which bijects with $\pi_1(\mathcal{M})^2$.
+
+% some loops
+
+If we view this from a distance, this looks like a 3d hedgehog, i.e.\ $\mathbf{n} = \mathbf{r}$ on a sphere. If we shrink the loop to zero, then we get a point defect. This lies in $\pi_2(\mathcal{M})$.
 \printindex
 \end{document}
