@@ -1799,7 +1799,7 @@ More generally,
 \end{defi}
 
 \begin{defi}[Existence and uniqueness of solutions]
-  For the stochastic differential equation $E(\sigma, b)$, we say there is 
+  For the stochastic differential equation $E(\sigma, b)$, we say there is
   \begin{itemize}
     \item \term{weak solution} if for every $x \in \R^d$, there is a solution to $E_x(\sigma, b)$.
     \item \term{uniqueness in law} if for every $x \in \R^d$, all solutions to $E_x(\sigma, b)$ have the same distribution.
@@ -1824,7 +1824,7 @@ The basic question to ask is how are the two notions of uniqueness related?
 
   To see the existence of solutions, let $X$ be a one-dimensional Brownian motion with $X_0 = x$, and set
   \[
-    B_t = \int_0^t  \sgn(X_s) \;\d X_s,
+    B_t = \int_0^t \sgn(X_s) \;\d X_s,
   \]
   which is well-defined because $\sgn(X_s)$ is previsible and left-continuous. Then we have
   \[
@@ -1841,7 +1841,7 @@ The basic question to ask is how are the two notions of uniqueness related?
     -X_t = \int_0^t \sgn(X_s) \;\d B_s = \int_0^t \sgn(-X_s)\;\d B_s + 2 \int_0^t \mathbf{1}_{X_s = 0} \;\d B_s,
   \]
   where the second term vanishes, since it is a continuous local martingale with quadratic variation $\int_0^t \mathbf{1}_{X_s = 0} \;\d s = 0$ because the zero set of Brownian motion has Lebesgue measure $0$ almost surely.
-  
+
   So pathwise uniqueness does not hold.
 \end{eg}
 
@@ -1900,13 +1900,294 @@ In the previous example, we constructed a solution by guessing an $X$ and then s
   \[
     h(t) \leq h(0) e^{ct} = 0.
   \]
-  So we have proved that 
+  So we have proved that
   \[
     \E(|X_{t \wedge S} - X_{t \wedge S}'|)^2 = 0
   \]
   for every $t \in [0, T]$. Take $n \to \infty$ and $T \to \infty$, we know we have pathwise uniqueness.
+
+  We now prove existence of solutions. We fix $(\Omega, \mathcal{F}, (\mathcal{F}_t)_t)$ and $B$, and define
+  \[
+    F(X)_t = X_0 + \int_0^t \sigma(s, X_s)\;\d B_s + \int_0^t 
+  \]
+  Then $X$ is a solution to $E_x(a, b)$ iff $F(X) = X$ and $X_0 = x$. To find a fixed point, we use Picard iteration. We fix $T > 0$, and take $X$ to be the space of continuous adapted processes with
+  \[
+    \|X\|_T = \E\left(\sup_{t \leq T} |X_t|^2\right)^{1/2}.
+  \]
+  In particular, if $X$ is a martingale, then this is the same as the norm on the space of $L^2$-bounded martingales by Doob's inequality. Then
+  \[
+    B = \{X: \Omega \times [0, T] \to \R: \|X\|_T < \infty\}
+  \]
+  is a Banach space.
+  \begin{claim}
+    \[
+      \|F(X) - F(Y)\|_T^2 \leq (2T + 8)K^2 \int_0^T \|X - Y\|_t \;\d t
+    \]
+  \end{claim}
+  We can replace $\|\ph\|_t$ with $\|\ph\|_T$ and then we get an extra $T$ factor. However, this doesn't look like a contraction mapping unless $T$ is very small. Fortunately, with the current form, we can iterate it to get a factor of $\frac{1}{n!}$, as we did in the proof of the Picard--Lindel\"of theorem.
+
+  To prove the claim, we use the definition to write
+  \[
+    \|F(X) - F(Y)\|^2 \leq 2 \E \left(\sup_{t \leq T} \left|\int_0^t b(s, X-s) - b(s, Y_s)\;\d s\right|^2\right) + 2 \E \left(\sup_{t \leq T} \left|\int_0^t(\sigma(s, X_s) - \sigma(s, Y_s))\;\d B_s\right|^2\right).
+  \]
+  We can bound the first term with Cauchy--Schwartz by
+  \[
+    T \E \left(\int_0^T |b(s, X_s) - b(s, Y_s)|^2 \right) \leq TK^2 \int_0^T \|X -Y \|_t^2 \;\d t.
+  \]
+  To bound the second term, we use Doob's inequality to bound it by
+  \[
+    4 \E \left(\int_0^T |\sigma(s, X_s) - \sigma(s, Y_s)|^2 \;\d s\right) \leq 4K^2 \int_0^T \|X - Y\|_t^2\;\d t.
+  \]
+  \begin{claim}
+    $\|F(0)\|_T < \infty$.
+  \end{claim}
+  We have
+  \[
+    F(0)_t = X_0 + \int_0^t b(s, 0)\;\d s + \int_0^t \sigma(s, 0)\;\d B_s.
+  \]
+  So
+  \[
+    \|F(0)\|_T \leq |X_0| + \left\| \int_0^t b(s, 0) \;\d s\right\| + \left\| \int_0^t \sigma(s, 0) \;\d B_s\right\|_T.
+  \]
+  The first two terms are constant, and we can bound the last by Doob's inequality
+  \[
+    \left\| \int_0^t \sigma(s, 0) \;\d B_s\right\|_T \leq 2 \E \left(\left|\int_0^T \sigma(s, 0) \;\d B_s\right|^2\right) \leq 2 \int_0^T \sigma(s, 0)^2 \;\d s,
+  \]
+  where the last equality follows from the It\^o isometry.
+
+  To define a solution $E_x(\sigma, b)$ for all $t$, let $X_t^0 = x$ for all $t$, and set
+  \[
+    X^{i + 1} = F(X^i).
+  \]
+  Then we have
+  \[
+    \|X^{i + 1} - X^i\|_T^2 \leq CT \int_0^T \|X^i - X^{i - 1}\|_t \;\d t \leq \cdots \leq \|X^1 - X^0\|_T \left(\frac{CT^i}{i!}\right).
+  \]
+  So we find that
+  \[
+    \sum_{i = 1}^\infty \|X^i - X^{i - 1}\|_T^2 < \infty
+  \]
+  for all $T$. So $X^i$ converges to $X$ almost surely and uniformly on $[0, T]$, and $F(X) = X$.
+\end{proof}
+\subsection{Examples of stochastic differential equations}
+\begin{eg}[The \term{Oinstein--Uhlenbeck process}]
+  Let $\lambda > 0$. Then the Oinstein--Uhlenbeck process is the solution to
+  \[
+    \d X_t = - \lambda X_t \;\d t + \d B_t.
+  \]
+  The solution exists by the previous theorem. By It\^o's formula applied to $e^{\lambda t} X_t$, we get
+  \[
+    \d (e^{\lambda t} X_t) = e^{\lambda t} \d X_t + \lambda e^{\lambda t} X_t \;\d t = \d B_t.
+  \]
+  So we find that
+  \[
+    X_t = e^{-\lambda t} X_0 + \int_0^t e^{-\lambda (t - s)}\;\d B_s.
+  \]
+  Observe that the integrand is deterministic. So we can in fact interpret this as an Wiener integral.
+\end{eg}
+
+\begin{fact}
+  If $X_0 = x \in \R$ is fixed, then $(X_t)$ is a Gaussian process, i.e.\ $(X_{t_i})_{i = 1}^n $ is jointly Gaussian for all $t_1 < \cdots < t_n$. Any Gaussian process is determined by the mean and covariance, and in this case, we have
+  \[
+    \E X_t = e^{-\lambda t} x,\quad \cov(X_t, X_s) = \frac{1}{2\lambda} \left(e^{-\lambda |t - s|} - e^{-\lambda |t + s|}\right)
+  \]
+\end{fact}
+
+\begin{proof}
+  We only have to compute the covariance. By the It\^o isometry, we have
+  \begin{align*}
+    \E ((X_t - \E X_t) (X_s - \E X_s)) &= \E \left(\int_0^t e^{-\lambda (t - u)}\;\d B_u \int_0^s e^{-\lambda (s - u)}\;\d B_u\right)\\
+    &= e^{-\lambda (t + s)} \int_0^{t \wedge s} e^{\lambda u}\;\d u.\qedhere
+  \end{align*}
+\end{proof}
+In particular,
+\[
+  X_t \sim N\left(e^{-\lambda t}x, \frac{1 - e^{-2\lambda t}}{2 \lambda}\right) \to N\left(0, \frac{1}{2\lambda}\right).
+\]
+\begin{fact}
+  If $X_0 \sim N(0, \frac{1}{2\lambda})$, then $(X_t)$ is a centered Gaussian process with stationary covariance, i.e.\ the covariance depends only on time differences:
+  \[
+    \cov(X_t, X_s) = \frac{1}{2\lambda} e^{-\lambda |t - s|}.
+  \]
+\end{fact}
+The difference is that in the deterministic case, the $\E X_t$ cancels the first $e^{-\lambda t} X_0$ term, while in the non-deterministic case, it doesn't.
+
+In general, determining the long-time behaviour of an SDE is non-trivial.
+
+\subsubsection*{Dyson Brownian motion}
+\index{Dyson Brownian motion}
+Let $\mathcal{H}_N$ be an inner product space of real symmetric $N \times N$ matrices with inner product $N \Tr(HK)$ for $H, K \in \mathcal{H}_N$. Let $H^1, \ldots, H^{\dim(\mathcal{H}_N)}$ be an orthonormal basis for $\mathcal{H}_N$.
+
+\begin{defi}[Gaussian orthogonal ensemble]\index{Gaussian orthogonal ensemble}
+  The \emph{Gaussian Orthogonal Ensemble} GOE$_N$ is the standard Gaussian measure on $\mathcal{H}_N$, i.e.\ $H \sim \mathrm{GOE}_N$ if
+  \[
+    H = \sum_{r = 1}^{\dim \mathcal{H}_n} H^i X^i
+  \]
+  where each $X^i$ are iid standard normals.
+\end{defi}
+
+We now replace each $X^i$ by a Oinstein--Uhlenbeck process with $\lambda = \frac{1}{2}$. Then GOE$_N$ is invariant under the process.
+
+\begin{thm}
+  The eigenvalues $\lambda_1(t) \leq \cdots \leq \lambda_N(t)$ satisfies
+  \[
+    \d \lambda_t^i = \left(-\frac{\lambda^i}{2} + \frac{1}{N} \sum_{j \not= i} \frac{1}{\lambda_i - \lambda_j}\right)\;\d t + \sqrt{\frac{2}{N\beta}}\;\d B^i.
+  \]
+  Here $\beta = 1$, but if we replace symmetric matrices by Hermitian ones, we get $\beta = 2$; if we replace symmetric matrices by symplectic ones, we get $\beta = 4$.
+\end{thm}
+This follows from It\^o's formula and formulas for derivatives of eigenvalues.% read more about this.
+
+\subsubsection*{Geometric Brownian motion}
+\index{Geometric Brownian motion}
+Let $\sigma > 0$ and $t \in \R$. Then
+\[
+  \d X_t = \sigma X_t \;\d B_t + r X_t \;\d t.
+\]
+We apply It\^o's formula to $\log X_t$ to find that
+\[
+  X_t = X_0 \exp \left(\sigma B_t + \left(r - \frac{\sigma^2}{2}\right)t\right).
+\]
+\subsubsection*{Bessel processes}
+\index{Bessel process}
+Let $B = (B^1, \ldots, B^d)$ be a $d$-dimensional Brownian motion. Then
+\[
+  X_t = |B_t|
+\]
+satisfies the stochastic differential equation
+\[
+  \d X_t = \frac{d - 1}{2X_t} \;\d B_T % check
+\]
+if $t < \inf\{t \geq 0: X_t = 0\}$.
+
+\subsection{Representations of solutions to PDEs}
+\begin{prop}
+  Assume that $b: \R^d \to \R$ and $\sigma: \R^d \to \R^{d \times m}$ are measurable locally bounded functions. Let $x \in \R^d$. Assume that $X$ is a solution $E_x(\sigma, b)$.  Then for every $f: \R_+ \times \R^d \to \R$ that is $C^1$ in $\R_+$ and $C^2$ in $\R^d$, the process
+  \[
+    M_t^f = f(t, X_t) - f(0, X_0) - \int_0^t \left(\frac{\partial}{\partial s} + L\right)f(s, X_s)\;\d s
+  \]
+  is a continuous local martingale, where
+  \[
+    Lf(y) = \frac{1}{2} \sum_{i, j = 1}^n a_{ij}(y) \frac{\partial^2 f}{\partial y_i \partial y^j} + \sum_{i = 1}^d b_i (y) \frac{\partial f}{\partial y_i},
+  \]
+  is the generalized Laplacian, where $a(y) = \sigma(y) \sigma^T(y)$.\fakeqed
+\end{prop}
+The proof is in the example sheet, and is just an application of It\^o's formula.
+
+We can apply this to the \term{Dirichlet--Poisson problem}. Let $U \subseteq \R^d$ be non-empty, bounded and open. Let $f \in C_b(U)$ and $g \in C_b(\partial U)$. The Dirichlet--Poisson problem asks for $c \in C^2(\bar{U} = C^2(U) \cap C(\bar{U})$ such that
+\begin{align*}
+  -Lu(x) &= f(x) & u \in U\\
+  u(x) &= g(x) & x \in \partial U.
+\end{align*}
+If $f = 0$, this is called the \term{Dirichlet problem}, and if $g = 0$, this is called the \term{Poisson problem}.
+
+For this PDE to have a solution, a very useful condition is an ellipticity condition.
+\begin{defi}[Uniformly elliptic]\index{uniformly elliptic}
+  We say $a: \bar{U} \to \R^{d \times d}$ is \emph{uniformly elliptic} if there is a constant $c > 0$ such that for all $\xi \in \R^d$ and $x \in \bar{U}$, we have
+  \[
+    \xi^T a(x) \xi \geq c |\xi|^2.
+  \]
+\end{defi}
+If $a$ is symmetric, this is the same as asking for the smallest eigenvalue of $a$ to be bounded away from $0$.
+\begin{thm}
+  Assume $U$ has a smooth boundary (or satisfies the exterior cone condition), that $a, b$ are H\"older continuous and that $a$ is uniformly elliptic. Then for every H\"older continuous $f: \bar{U} \to \R$ and any continuous $g: \partial U \to \R$, the Dirichlet--Poisson process has a solution.\fakeqed
+\end{thm}
+
+\begin{thm}
+  Let $\sigma$ and $b$ be bounded measurable and $\sigma \sigma^T$ uniformly elliptic, $U \subseteq \R^d$ as above. Let $u$ be a solution to the Dirichlet Poisson problem and $X$ a solution to $E_x(\sigma, b)$ for some $x \in \R^d$. Define the stopping time
+  \[
+    T_U = \inf \{t \geq 0: X_t \not \in U\}.
+  \]
+  Then $\E T_U < \infty$ and
+  \[
+    u(x) = \E_x\left(g(X_{T_U}) + \int_0^{T_U} f(X_s)\;\d s\right).
+  \]
+  In particular, the solution to the PDE is unique.
+\end{thm}
+
+\begin{proof}
+  Let
+  \[
+    T_n = \inf \{ t \geq 0 : X_t \not \in U_n\},\quad U_n = \left\{x \in U: \dist(x, \partial U) > \frac{1}{n}\right\}.
+  \]
+  There is $u_n \in C_b^2(\R^d)$ such that $u|_{U_n} = u_n|_{U_n}$. Let
+  \[
+    M^n_t = (M^{u_n})^{T_n}_t = u(X_{t \wedge T_n}) - u_n(X_0) - \int_0^{t \wedge T_n} Lu_n(X_s)\;\d s
+  \]
+  is a bounded (on compact intervals) local martingale, hence a true martingale. Then for $x \in U$ and $n$ large enough, the martingale property implies
+  \[
+    u(x) = u_n(x) =\E \left(u(X_{t \wedge T_n)} - \int_0^{t \wedge T_n} Lu(X_s)\;\d s\right) = \E (u(X_{t \wedge T_n}) + f(X_s)).
+  \]
+  We would be done if we can take $n \to \infty$. We claim that $\E T_U < \infty$. Note that this does not depend on $f$ and $g$. So we can take $f = 1$ and $g = 0$. Then the corresponding solution $v$ satisfies
+  \[
+    \E (t \wedge T_n) = \E \left(- \int_0^{t \wedge T_n} Lv(X_s)\;\d s\right) = v(x) - \E(v(X_{t \wedge T_n})).
+  \]
+  Since $v$ is bounded, by dominated/monotone convergence, we can take the limit to get
+  \[
+    \E (T_U) < \infty.
+  \]
+  Thus, $t \wedge T_n \to T_U$ as $t \to \infty$ and $n \to \infty$. Since
+  \[
+    \E \left(\int_0^{T_U} |f(X_s)|\;\d s\right) \leq \|f\|_\infty \E T_U < \infty,
+  \]
+  by the dominated convergence theorem, we know
+  \[
+    \E \left(\int_0^{t \wedge T_n} f(X_s)\;\d s \right) \to \E \left(\int_0^{T_U} f(X_s)\;\d s\right).
+  \]
+  Since $u$ is continuous on $\bar{U}$, we also have
+  \[
+    \E (u(X_{t \wedge T_n})) \to \E(u(T_u)) = \E(g(T_u)).
+  \]
 \end{proof}
 
+We can also use SDE's to solve the Cauchy problem for parabolic equations. For $f \in C_b^2(\R^d)$, we want to find $u: \R_+ \times \R^d \to \R$ that is $C^1$ in $\R_+$ and $C^2$ in $\R^d$ such that
+\[
+  \frac{\partial u}{\partial t} &= Lu & \text{on }(0, \infty) \times \R^d\\
+  u(0, \ph) &= f &\text{on }\R^d
+\]
+\begin{thm}
+  For every $f \in C_b^2(\R^d)$, there exists a solution to the Cauchy problem.\fakeqed
+\end{thm}
+
+\begin{thm}
+  Let $u$ be a solution to the Cauchy problem. Let $X$ be a solution to $E_x(\sigma, b)$ for $x \in \R^d$ and $0 \leq s \leq t$. Then
+  \[
+    \E_x(f(X_t) \mid \mathcal{F}_s) = u(t - s, X_s).
+  \]
+  In particular,
+  \[
+    u(t, x) = \E_x(f(X_t)).
+  \]
+\end{thm}
+In particular, this implies $X_t$ is a continuous Markov process.
+
+This gives a close connection between the heat equation and ``generalized Brownian motion''.
+
+\begin{proof}
+  The martingale has $\frac{\partial}{\partial t} + L$, but the heat equation has $\frac{\partial}{\partial t} - L$. So we set $g(s, x) = u(t - s, x)$. Then
+  \[
+    \left(\frac{\partial}{\partial s} + L\right) g(s, x) = - \frac{\partial}{\partial t} u(t - s, x) + Lu(t - s, x) = 0.
+  \]
+  Then $g(s, X_s) - g(0, X_0)$ is a martingale (boundedness is an exercise). Then
+  \[
+    u(t - s, X_s) = g(s, X_s) = \E (g(t, X_t) \mid \mathcal{F}_s) = \E(u(0, X_t) \mid \mathcal{F}_s) = \E(f(X_t) \mid X_s).\qedhere
+  \]
+\end{proof}
+
+The final connection is the so-called Feynman--Kac formula.
+\begin{thm}[Feynman--Kac formula]\index{Feynman--Kac formula}
+  Let $f \in C_b^2(\R^d)$ and $V \in C_b(\R^d)$ and suppose that $u: \R_+ \times \R^d \to \R$ satisfies
+  \begin{align*}
+    \frac{\partial u}{\partial t} &= Lu + Vu & \text{on }\R_+ \times \R^d\\
+    u(0, \ph) &= f &\text{on } \R^d.
+  \end{align*}
+  Here $Vu = V(x) u(x)$. If $L$ is the Laplacian, then this is the Schr\"odinger equation, which is why Feynman was thinking about this.
+
+  Then for all $t > 0$ and $x \in \R^d$, and $X$ a solution to $\E_x(\sigma, b)$. Then
+  \[
+    u(t, x) = \E_x\left(f(X_t) \exp \left(\int_0^t V(X_s)\;\d s\right)\right).\fakeqed
+  \]
+\end{thm}
+In quantum mechanics, a basic problem is to estimate the lowest eigenvalue of the Schr\"odinger operator, which is the ground state energy. This is hard. This gives a means to do that, as this gives a formula to calculate $e^{-tH}$, since $\frac{1}{t} (e^{-tH} - 1)$ converges to the lowest eigenvalue.
 
 \printindex
 \end{document}
