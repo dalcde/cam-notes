@@ -8,7 +8,7 @@
 \def\ncoursehead {Soft Condensed Matter}
 
 \input{header}
-
+\usepackage{tikz-3dplot}
 \newcommand\splus{\!{\vphantom{\prod}}^+}
 \begin{document}
 \maketitle
@@ -246,7 +246,7 @@ The mean noise will always be zero, and we must determine the variance. The key 
 
 \begin{eg}
   If we want to describe a binary fluid, i.e.\ a mixture of two fluids, we introduce a further composition function $\phi$ that describes the (local) proportion of the fluids present.
-  
+
   If we think about liquid crystals, then we need to add the molecular orientation.
 \end{eg}
 
@@ -345,11 +345,11 @@ where we sum over all states that coarse-grain to $\psi$. We can similarly defin
 \]
 The probability of being in a state $\psi$ is then
 \[
-  \P[\psi] = \frac{e^{-\beta F[\psi]}}{Z_{TOT}},\quad Z_{TOT} = \int e^{-\beta F[\psi]} \;\D [\psi].
+  \P[\psi] = \frac{e^{-\beta F[\psi]}}{Z_{\mathrm{TOT}}},\quad Z_{\mathrm{TOT}} = \int e^{-\beta F[\psi]} \;\D [\psi].
 \]
 What we have on the end is a \emph{functional integral}, where we integrate over all possible values of $\psi$. We shall go into details later. We then have
 \[
-  F_{TOT} = -k_B T \log Z_{TOT}.
+  F_{\mathrm{TOT}} = -k_B T \log Z_{\mathrm{TOT}}.
 \]
 In theory, one can obtain $F[\psi]$ by explicitly doing a coarse graining of the macroscopic laws.
 
@@ -371,7 +371,7 @@ In theory, one can obtain $F[\psi]$ by explicitly doing a coarse graining of the
 In practice, since the microscopic laws aren't always accessible anyway, what is more common is to take a phenomenological approach, namely we write down a Taylor expansion of $F[\psi]$, and then empirically figure out what the coefficients should be, as a function of temperature and other parameters. In many cases, the signs of the first few coefficients dictate the overall behaviour of the system, and phase transition occurs when the change in temperature causes the coefficients to switch signs.
 
 \section{Mean field theory}
-In this chapter, we explore the mean field theory of two physical systems --- binary fluids and nematic liquid crystals. In mean field theory, what we do is we write down the free energy of the system, and then find a state $\phi$ that minimizes the free energy. By the Boltzmann distribution, this would be the ``most likely state'' of the system, and we can pretend $F_{TOT} = F[\phi]$.
+In this chapter, we explore the mean field theory of two physical systems --- binary fluids and nematic liquid crystals. In mean field theory, what we do is we write down the free energy of the system, and then find a state $\phi$ that minimizes the free energy. By the Boltzmann distribution, this would be the ``most likely state'' of the system, and we can pretend $F_{\mathrm{TOT}} = F[\phi]$.
 
 This is actually not a very robust system, since it ignores all the fluctuations about the minimum, but gives a good starting point for understanding the system.
 
@@ -467,11 +467,11 @@ In general the mean-field phase diagram looks like
     \draw (-2, 3) node [above] {$a$} -- (-2, 0) node [below] {$-1$} -- (2, 0) node [below] {$1$} node [right] {$\bar \phi$} -- (2, 3);
     \node [left] at (-2, 2.5) {$a(T) = 0$};
 
-    \draw [domain=2.5:0.2, samples=40] plot [smooth] ({sqrt (2.5 - \x)}, \x);
-    \draw [domain=2.5:0.2, samples=40] plot [smooth] ({-sqrt (2.5 - \x)}, \x);
+    \draw [domain=2.5:0.2, samples=40, mblue, semithick] plot [smooth] ({sqrt (2.5 - \x)}, \x);
+    \draw [domain=2.5:0.2, samples=40, mblue, semithick] plot [smooth] ({-sqrt (2.5 - \x)}, \x);
 
-    \draw [dashed, domain=0.2:2.5] plot [smooth] ({sqrt ((2.5 - \x)/3)}, \x);
-    \draw [dashed, domain=0.2:2.5] plot [smooth] ({-sqrt ((2.5 - \x)/3)}, \x);
+    \draw [dashed, domain=0.2:2.5, mred, semithick] plot [smooth] ({sqrt ((2.5 - \x)/3)}, \x);
+    \draw [dashed, domain=0.2:2.5, mred, semithick] plot [smooth] ({-sqrt ((2.5 - \x)/3)}, \x);
     \draw (-2.05, 2.5) -- (-1.95, 2.5);
   \end{tikzpicture}
 \end{center}
@@ -728,21 +728,14 @@ and call it the \term{chemical potential}. If instead $\phi$ is not conserved, e
 \]
 and call it the \emph{molecular field}.
 
-In the case where $\phi$ is conserved, we have the conservation law
+We will later see that in the case where $\phi$ is conserved, $\phi$ evolves according to the equation
 \[
-  \dot{\phi} = - \nabla \cdot J.
+  \dot{\phi} = - \nabla \cdot J,\quad J \propto -D \nabla \mu,
 \]
-This $J$ is then given by an equation of the form
-\[
-  J \propto -D \nabla \mu,
-\]
-where $D$ is the diffusivity.
-
-The non-conserved case is simpler. We have
+where $D$ is the diffusivity. The non-conserved case is simpler, with equation of motion given by.
 \[
   \dot{Q} = - \Gamma H.
 \]
-This is local relaxation.
 
 Let us go back to the scalar field $\phi(\mathbf{r})$. Consider a small displacement
 \[
@@ -757,13 +750,13 @@ Then
   \delta \phi(\mathbf{r}) = \phi'(\mathbf{r}) - \phi(\mathbf{r}) = - \mathbf{u} \cdot \nabla \phi(\mathbf{r}) + O(u^2).
 \]
 Then
-\begin{align*}
-  \delta F &= \int \delta \phi \frac{\delta F}{\delta \phi}\;\d \mathbf{r} \\
-  &= -\int \mu \mathbf{u} \cdot \nabla \phi \;\d \mathbf{r}\\
-  &= \int \phi \nabla \cdot (\mu \mathbf{u})\;\d \mathbf{r}\\
-  &= \int (\phi \nabla \mu)\cdot \mathbf{u}\;\d \mathbf{r}\\
-  &= \int (\phi \nabla_j \mu)u_j\;\d \mathbf{r}.
-\end{align*}
+\begin{multline*}
+  \delta F = \int \delta \phi \frac{\delta F}{\delta \phi}\;\d \mathbf{r}
+  = -\int \mu \mathbf{u} \cdot \nabla \phi \;\d \mathbf{r}\\
+  = \int \phi \nabla \cdot (\mu \mathbf{u})\;\d \mathbf{r}
+  = \int (\phi \nabla \mu)\cdot \mathbf{u}\;\d \mathbf{r}
+  = \int (\phi \nabla_j \mu)u_j\;\d \mathbf{r}.
+\end{multline*}
 using incompressibility.
 
 We can think of the free energy change as the work done by stress,
@@ -783,37 +776,43 @@ So $\mu$ also contains the ``mechanical information''.
 \subsection{Functional integrals}
 Given a coarse-grained $\psi$, we have can define the total partition function
 \[
-  e^{-\beta F_{TOT}} = Z_{TOT} = \int e^{-\beta F[\psi]} \;\D [\psi],
+  e^{-\beta F_{\mathrm{TOT}}} = Z_{\mathrm{TOT}} = \int e^{-\beta F[\psi]} \;\D [\psi],
 \]
-where $\D [\psi]$ is the ``sum over all field configurations''. In mean field theory, we approximate this $F_{TOT}$ by replacing the functional integral by the value of the integrand at its maximum, i.e.\ taking the minimum value of $F[\psi]$. What we are going to do now is to evaluate the functional integral ``honestly'', and this amounts to taking into account fluctuations around the minimum (since those far away from the minimum should contribute really little).
+where $\D [\psi]$ is the ``sum over all field configurations''. In mean field theory, we approximate this $F_{\mathrm{TOT}}$ by replacing the functional integral by the value of the integrand at its maximum, i.e.\ taking the minimum value of $F[\psi]$. What we are going to do now is to evaluate the functional integral ``honestly'', and this amounts to taking into account fluctuations around the minimum (since those far away from the minimum should contribute very little).
 
-To make sense of the integral, we use the fact that the space of all $\psi$ has a countable basis, given by the Fourier modes. We define $\psi_\mathbf{q}$ by setting
+To make sense of the integral, we use the fact that the space of all $\psi$ has a countable orthonormal basis. We assume we work in $[0, L]^q$ of volume $V = L^q$ with periodic boundary conditions. We can define the Fourier modes
 \[
   \psi_\mathbf{q} = \frac{1}{\sqrt{V}} \int \psi(\mathbf{r}) e^{-i\mathbf{q}\cdot \mathbf{r}}\;\d \mathbf{r},
 \]
-where $V = L^q$ is our region with periodic boundary conditions. Note that in such a periodified world, $\mathbf{q}$ can only take on a set of discrete values. The protocol is to keep $V < \infty$ until we are done with all calculations, and then take the thermodynamic limit $V \to \infty$ if we want. In this limit, the sum over $\mathbf{q}$ becomes an integral, and it is harder to make sense of $\D[\psi]$.
+Since we have periodic boundary conditions, $\mathbf{q}$ can only take on a set of discrete values. Moreover, molecular physics or the nature of coarse-graining usually implies there is some ``maximum momentum'' $q_{max}$, above which the wavelengths are too short to make physical sense (e.g.\ vibrations in a lattice of atoms cannot have wavelengths shorter than the lattice spacing). Thus, we assume $\psi_\mathbf{q} = 0$ for $|\mathbf{q}| > q_{max}$. This leaves us with finitely many degrees of freedom.
 
-The normalization of $\psi_\mathbf{q}$ is chosen so that
+The normalization of $\psi_\mathbf{q}$ is chosen so that \term{Parseval's theorem} holds:
 \[
   \int |\psi|^2 \;\d \mathbf{r} = \sum_{\mathbf{q} } |\psi_\mathbf{q}|^2.
 \]
-This is known as \term{Parseval's theorem}. We can then define
+We can then define
 \[
   \D [\psi] = \prod_{\mathbf{q}} \;\d \psi_\mathbf{q}.
 \]
+Since we imposed a $q_{max}$, this is a finite product of measures, and is well-defined.
+
+In some sense, $q_{max}$ is arbitrary, but for most cases, it doesn't really matter what $q_{max}$ we choose. Roughly speaking, at really short wavelengths, the behaviour of $\psi$ no longer depends on what actually is going on in the system, so these modes only give a constant shift to $F$, independent of interesting, macroscopic properties of the system. Thus, we will mostly leave the cutoff implicit, but it's existence is important to keep our sums convergent.
+
+It is often the case that after doing calculations, we end up with some expression that sums over the $\mathbf{q}$'s. In such cases, it is convenient to take the limit $V \to \infty$ so that the sum becomes an integral, which is easier to evaluate.
+
 An infinite product is still bad, but usually molecular physics or the nature of coarse graining imposes a maximum $q_{max}$, and we take the product up to there. In most of our calculations, we need such a $q_{max}$ to make sense of our integrals, and that will be left implicit. Most of the time, the results will be independent of $q_{max}$ (for example, it may give rise to a constant shift to $F$ that is independent of all the variables of interest).
 
-Another point to note is that if $\psi$ is a real variable, then not all $\psi_\mathbf{q}$ are independent. They are related by
+Before we start computing, note that a significant notational annoyance is that if $\psi$ is a real variable, then $\psi_\mathbf{q}$ will still be complex in general, but they will not be independent. Instead, we always have
 \[
   \psi_\mathbf{q} = \psi_{-\mathbf{q}}^*.
 \]
 Thus, we should only multiply over half of the possible $\mathbf{q}$'s, and we usually denote this by something like $\prod^+_{\mathbf{q}}$.
 
-In practice, there is only one integral like this that can be done, namely when $\beta F$ is a quadratic form. Consider a free energy of the form
+In practice, there is only one path integral we are able to compute, namely when $\beta F$ is a quadratic form, i.e.
 \[
   \beta F = \frac{1}{2} \int \phi(\mathbf{r}) G(\mathbf{r} - \mathbf{r}') \phi(\mathbf{r}')\;\d \mathbf{r}\;\d \mathbf{r}' - \int h(\mathbf{r}) \phi(\mathbf{r})\;\d \mathbf{r}.
 \]
-We can think of the gradient terms we previously had as localizations of first-order approximations to the non-local interactions. Taking the Fourier transform, we get
+Note that this expression is non-local, but has no gradient terms. We can think of the gradient terms we've had as localizations of first-order approximations to the non-local interactions. Taking the Fourier transform, we get
 \[
   \beta F[\psi_\mathbf{q}] = \frac{1}{2} \sum_q G(\mathbf{q}) \phi_\mathbf{q} \phi_{-\mathbf{q}} - \sum_\mathbf{q} h_\mathbf{q} \phi_\mathbf{q}.
 \]
@@ -822,12 +821,12 @@ We can think of the gradient terms we previously had as localizations of first-o
   \[
     \beta F[\phi] = \int \left\{\xi \phi^2 - h \phi + \frac{\kappa}{2} (\nabla \phi)^2 + \frac{\gamma}{2} (\nabla^2 \phi)^2\right\}\;\d \mathbf{r}
   \]
-  and then we set $b = 0$ since this is the scenario we know how to deal with. We will later see how we can put it back. The $\gamma$ term is necessary because we will be interested in the case where $\kappa$ is negative.
+  The $\gamma$ term is new, and is necessary because we will be interested in the case where $\kappa$ is negative.
 
   We can now take the Fourier transform to get
   \begin{align*}
-    \beta F \{\phi_\mathbf{q}\} &= \frac{1}{2} \sum_\mathbf{q} (a + \kappa q^2 + \gamma q^4) \phi_\mathbf{q} \phi_{-\mathbf{q}} - \sum_\mathbf{q} h_\mathbf{q} \phi_\mathbf{q}.\\
-    &= \sum_\mathbf{q}\splus (a + \kappa q^2 + \gamma q^4) \phi_\mathbf{q} \phi_{-\mathbf{q}} - \sum_\mathbf{q} h_\mathbf{q} \phi_\mathbf{q}.
+    \beta F \{\phi_\mathbf{q}\} &= \frac{1}{2} \sum_\mathbf{q}\splus (a + \kappa q^2 + \gamma q^4) \phi_\mathbf{q} \phi_{-\mathbf{q}} - \sum_\mathbf{q}\splus h_\mathbf{q} \phi_\mathbf{q}.\\
+    &= \sum_\mathbf{q}\splus (a + \kappa q^2 + \gamma q^4) \phi_\mathbf{q} \phi_{-\mathbf{q}} - \sum_\mathbf{q}\splus h_\mathbf{q} \phi_\mathbf{q}.
   \end{align*}
   So our $G(\mathbf{q})$ is given by
   \[
@@ -836,8 +835,8 @@ We can think of the gradient terms we previously had as localizations of first-o
 \end{eg}
 To actually perform the functional integral, first note that if $h \not= 0$, then we can complete the square so that the $h$ term goes away. So we may assume $h = 0$. We then have
 \begin{align*}
-  Z_{TOT} &= \int \left[ \prod_{\mathbf{q}}\splus \;\d \phi_\mathbf{q}\right] e^{-\beta F\{\phi_\mathbf{q}\}}\\
-  &= \prod_\mathbf{q}\splus \int \d \phi_\mathbf{q} e^{-|\phi_\mathbf{q}|^2 G(q)}
+  Z_{\mathrm{TOT}} &= \int \left[ \prod_{\mathbf{q}}\splus \;\d \phi_\mathbf{q}\right] e^{-\beta F\{\phi_\mathbf{q}\}}\\
+  &= \prod_\mathbf{q}\splus \int \d \phi_\mathbf{q}\;e^{-|\phi_\mathbf{q}|^2 G(q)}
 \end{align*}
 Each individual integral can be evaluated as
 \[
@@ -845,7 +844,7 @@ Each individual integral can be evaluated as
 \]
 where $\phi_\mathbf{q} = \rho e^{i\theta}$. So we find that
 \[
-  Z_{TOT} = \prod_\mathbf{q}\splus \frac{\pi}{G(q)},
+  Z_{\mathrm{TOT}} = \prod_\mathbf{q}\splus \frac{\pi}{G(q)},
 \]
 and so
 \[
@@ -865,17 +864,14 @@ There are many quantities we can compute from the free energy.
   \[
     \frac{1}{Z_T} \frac{\partial Z_T}{\partial G(\mathbf{k})} = - \frac{\partial \log Z_T}{\partial G(\mathbf{k})} = \frac{1}{G(k)}.
   \]
-  Note that we could also have done this explicitly using the product expansion.
+  We could also have done this explicitly using the product expansion.
 
   This $S(k)$ is measured in scattering experiments. In our previous example, for small $k$ and $\kappa > 0$, we have
   \[
-    S(q) = \frac{1}{a + \kappa k^2 + \gamma k^4} \approx \frac{a^{-1}}{1 + k^2 \xi^2},
-  \]
-  where $\xi$ is the \term{correlation length}, given by
-  \[
+    S(q) = \frac{1}{a + \kappa k^2 + \gamma k^4} \approx \frac{a^{-1}}{1 + k^2 \xi^2},\quad
     \xi = \sqrt{\frac{\kappa}{a}}.
   \]
-  We can return to real space by
+  where $\xi$ is the \term{correlation length}. We can return to real space by
   \begin{align*}
     \bra \phi^2(\mathbf{r})\ket &= \frac{1}{V} \left\bra \int |\phi(\mathbf{r})|^2 \;\d \mathbf{r}\right\ket \\
     &= \frac{1}{V} \sum_q \bra \phi_\mathbf{q}|^2\ket\\
@@ -887,41 +883,36 @@ There are many quantities we can compute from the free energy.
 \subsection{The variational method}
 The variational method is a method to estimate the partition function
 \[
-  e^{-\beta F_{TOT}} = \int e^{-\beta F[\phi]} \;\D [\phi]
+  e^{-\beta F_{\mathrm{TOT}}} = \int e^{-\beta F[\phi]} \;\D [\phi]
 \]
-when $F$ is not Gaussian. To simplify notation, we will set $\beta = 1$. It is common to make a notational change, where we replace $F_{TOT}$ with $F$ and $F[\phi]$ with $H[\phi]$. We then want to estimate
+when $F$ is not Gaussian. To simplify notation, we will set $\beta = 1$. It is common to make a notational change, where we replace $F_{\mathrm{TOT}}$ with $F$ and $F[\phi]$ with $H[\phi]$. We then want to estimate
 \[
-  e^{-F_{TOT}} = \int e^{-F[\phi]}\;\D [\phi].
+  e^{-F_{\mathrm{TOT}}} = \int e^{-F[\phi]}\;\D [\phi].
 \]
-The idea is to
 % What can we do when our free energy is not quadratic? What we previously did was to do mean field theory, but we know this fails near the critical point. In Statistical Field Theory, we used renormalization group methods. Here we go for something in between, namely the variational method. In condensed matter physics, this is known as \term{Hartree theory}, and in QFT it is known as ``\term{1-loop self consistency}''. This theory handles large Gaussian fluctuations well, and we shall use it to study smectic liquid crystals.
-
-For simplicity, we set $\beta = 1$. Then we can write
-\[
-  e^{-F_{TOT}} = \int e^{-F[\phi]}\;\D [\phi].
-\]
-We now make a notation change, where we write $F_{TOT}$ as $F$, and we now write $F[\phi]$ as $H[\phi]$ instead, called \term{the effective Hamiltonian}. In this notation, we write
+We now make a notation change, where we write $F_{\mathrm{TOT}}$ as $F$, and $F[\phi]$ as $H[\phi]$ instead, called \term{the effective Hamiltonian}. In this notation, we write
 \[
   e^{-F} = \int e^{-H[\phi]} \;\D [\phi].
 \]
-In the variational method, we introduce a \term{trial Hamiltonian} $H_0[\phi]$, which is one we understand well. We can similarly define
+The idea of the variational method is to find some upper bounds on $F$ in terms of path integrals we \emph{can} do, and then take the best upper bound as our approximation to $F$.
+
+Thus, we introduce a \term{trial Hamiltonian} $H_0[\phi]$, and similarly define
 \[
   e^{-F_0} = \int e^{-H_0[\phi]} \;\D [\phi].
 \]
 We can then write
-\begin{align*}
-  e^{-F} &= \frac{e^{-F_0}}{\int e^{-H_0}\;\D [\phi]} \int e^{-H_0} e^{-(H - H_0)}\;\D [\phi] \\
-  &= e^{-F_0} \bra e^{-(H - H_0)} \ket_0,
-\end{align*}
-where we are taking the average over the trial distribution. Taking the logarithm, we end up with
+\[
+  e^{-F} = \frac{e^{-F_0}}{\int e^{-H_0}\;\D [\phi]} \int e^{-H_0} e^{-(H - H_0)}\;\D [\phi] = e^{-F_0} \bra e^{-(H - H_0)} \ket_0,
+\]
+where the subscript $0$ denotes the average over the trial distribution. Taking the logarithm, we end up with
 \[
   F = F_0 - \log \bra e^{-(H - H_0)}\ket_0.
 \]
-So far, everything is exact, and this manipulation doesn't help much. The useful approximation comes from observing that the function $\log$ is concave. In other words,
+So far, everything is exact. It would be nice if we can move the logarithm inside the expectation to cancel out the exponential. While the result won't be exactly equal, the fact that $\log$ is concave, i.e.
 \[
   \log (\alpha A + (1 - \alpha) B) \geq \alpha \log A + (1 - \alpha) \log B.
 \]
-Hence by Jensen's inequality, we have
+Thus Jensen's inequality tells us
 \[
   \log \bra Y \ket_0 \geq \bra \log Y \ket_0.
 \]
@@ -931,7 +922,7 @@ Applying this to our situation gives us an inequality
 \]
 This is the \term{Feynman--Bogoliubov inequality}.
 
-To use this, we have to choose the trial distribution $H_0$ simple enough to actually do calculations (i.e.\ Gaussian), but include variational parameters in $H_0$. We then minimize the quantity $F_0 - \bra H_0\ket + \bra H\ket_0$ over our variational parameters, and this gives us an upper bound on $F$. We then take this to be our best estimate of $F$.
+To use this, we have to choose the trial distribution $H_0$ simple enough to actually do calculations (i.e.\ Gaussian), but include variational parameters in $H_0$. We then minimize the quantity $F_0 - \bra H_0\ket + \bra H\ket_0$ over our variational parameters, and this gives us an upper bound on $F$. We then take this to be our best estimate of $F$. If we are brave, we can take this minimizing $H_0$ as an approximation of $H$, at least for some purposes.
 
 \subsection{Smectic liquid crystals}
 We use this to talk about the isotropic to smectic transition in liquid crystals. The molecules involved often have two distinct segments. For example, we may have soap molecules that look like this:
@@ -1106,15 +1097,15 @@ We can also compute
 \[
   \bra H\ket_0 = \sum_\mathbf{q} \splus \frac{1}{J(q)} G(q) + \frac{b}{4V} \underbrace{\sum_{\mathbf{q}_1, \mathbf{q}_2, \mathbf{q}_3}\bra \phi_{\mathbf{q}_1} \phi_{\mathbf{q}_2} \phi_{\mathbf{q}_3} \phi_{-(\mathbf{q}_1 \mathbf{q}_2 \mathbf{q}_3)}\ket_0}.
 \]
-In the Gaussian model, each $\phi_\mathbf{q}$ is a zero mean Gaussian random variables, which have certain nice properties. This is known as \term{Wick's theorem}, which tells us
+In the Gaussian model, each $\phi_\mathbf{q}$ is a zero mean Gaussian random variables, which have certain nice properties. \term{Wick's theorem} tells us we have
 \[
   \bra abcd \ket_0 = \bra ab\ket_0 \bra cd\ket_0 + \bra ac\ket_0 \bra bd\ket_0 + \bra ad\ket_0 \bra bc\ket_0.
 \]
-We also have
+Applying this, together with the result
 \[
-\bra \phi_{\mathbf{q}_1} \phi_{\mathbf{q}_0}\ket_0 = \bra |\phi_\mathbf{q}|^2 \ket_0 \delta_{\mathbf{q}_1, - \mathbf{q}_2}.
+  \bra \phi_{\mathbf{q}_1} \phi_{\mathbf{q}_0}\ket_0 = \bra |\phi_\mathbf{q}|^2 \ket_0 \delta_{\mathbf{q}_1, - \mathbf{q}_2},
 \]
-This gives the result
+we obtain
 \[
   U = 3 \left[\sum_\mathbf{q} \bra |\phi_\mathbf{q}|^2\ket_0\right]^2 = 12 \left[\sum_\mathbf{q} \splus \frac{1}{J(q)}\right]^2.
 \]
@@ -1142,69 +1133,105 @@ For large $V$, we can replace the sum by an integral, and we have
 \[
   J(q) = G(q) + \frac{3b}{(2\pi)^d} \int \frac{\d \mathbf{q}'}{J(\mathbf{q}')}.
 \]
-It is very important that the second term is not a function of $\mathbf{q}$. So what we have got is that $J(q)$ is a constant plus $G(q)$. Informally, there is another way of viewing these types of calculations. This is a self-consistent treatment of the quartic. This is equivalent to making the following ad hoc approximation inside the Landau--Ginzburg theory.
+It is very important that once we have fixed $J(\mathbf{q})$, the second term is a constant. Writing
 \[
-  \int \left\{ \frac{a}{2} \phi^2 + \frac{b}{4} \phi^4\right\} \;\d \mathbf{r} \mapsto \int \left\{ \frac{a}{2} \phi^2 + \frac{3b}{2} \bra \phi^2 \ket \phi^2\right\}\;\d \mathbf{r}'
+  C = \frac{2}{V} \sum_{\mathbf{q}'} \splus \frac{1}{J(q')} = \frac{1}{(2\pi)^d} \int \frac{\d \mathbf{q}'}{J(\mathbf{q}')},
 \]
-While $\bra \phi^2\ket = \bra \phi(\mathbf{r})^2\ket$ is the average over all ensembles at a fixed point $\mathbf{r}$, it is equal to what we get by averaging over all points, so
+we can then say the minimum is given by $J(q) = G(q) + 3bC$. Thus, solving for $J(q)$ is equivalent to finding a $C$ such that
+\[
+  C = \frac{1}{(2\pi)^d} \int \frac{\d \mathbf{q}'}{G(q) + 3bC}.
+\]
+This is a \term{self-consistency equation} for $C$ (and hence $J$).
+
+There is a very concrete interpretation of $C$. Recall that $\bra \phi^2\ket$ is the average value of $\phi^2$ at some point $\mathbf{r}$ (which is independent of $\mathbf{r}$. So we can compute
 \[
   \bra \phi(\mathbf{r})^2\ket = \frac{1}{V} \int \bra \phi(\mathbf{r})^2\ket \;\d \mathbf{r} = \frac{1}{V} \sum_q \bra |\phi_\mathbf{q}|^2 \ket = \frac{1}{V} \sum_{\mathbf{q}} \frac{1}{J(\mathbf{q})}.
 \]
-The only perhaps sightly tricky part if we were to just do this ad hoc is to get the factor of $\frac{3b}{2}$ right.
+Thus, what our computation above amounts to is that we replaced $G(q)$ by $G(q) + 3b \bra \phi^2\ket$.
 
-In our original model, we have
+A good way to think about this is that we are approximating the $\phi^4$ term in the free energy by
 \[
-  G(q) = \tau + \alpha(q - q_0)^2.
+  \frac{b}{4} \phi^4 \approx \frac{3b}{2} \bra \phi^2\ket \phi^2.
 \]
-We then have
+We have to pick a value so that this approximation is consistent. We view the $\bra \phi^2\ket$ above as just another constant, so that the free energy is now a Gaussian. We can compute the expectation of $\phi^2$ using this free energy, and then we find that
 \[
-  J(q) = \bar{\tau} + \alpha (q - q_0)^2,
+  \bra \phi^2\ket = \frac{1}{(2\pi)^d} \int \frac{\d \mathbf{q}'}{G(q) + 3b \bra \phi^2\ket}.
 \]
-where
+This is the self-consistency equation as above.
+
+We could have done the approximation above without having to through the variational method, but the factor of $\frac{3b}{2}$ is then no longer obvious.
+
+%The factor of $\frac{3b}{2}$ is motivated by the previous calculation. Using this, we then treat $\bra\phi^2\ket$ as a constant and do our path integral calculation as before. Note that in principle, $\bra \phi^2\ket$ is a function of position, namely the expected value of $\phi^2$ at position $\mathbf{r}$. But this, of course, does not depend on $\mathbf{r}$. So we have
+%\[
+%  \bra \phi^2\ket = \bra \phi(\mathbf{r})^2\ket = \frac{1}{V} \int \bra \phi(\mathbf{r})^2\ket \;\d \mathbf{r} = \frac{1}{V} \sum_q \bra |\phi_\mathbf{q}|^2 \ket = \frac{1}{V} \sum_{\mathbf{q}} \frac{1}{G(q) + \bra \phi^2\ket},
+%\]
+%where the last equality follows from our previous calculations. Finding a value of $\bra \phi^2\ket$ that makes this equation consistent is exactly the same as solving for $C$ above. This $C$ has a very concrete interpretation.
+%Informally, there is another way of viewing these types of calculations. This is a self-consistent treatment of the quartic. This is equivalent to making the following ad hoc approximation inside the Landau--Ginzburg theory.
+%\[
+%  \int \left\{ \frac{a}{2} \phi^2 + \frac{b}{4} \phi^4\right\} \;\d \mathbf{r} \mapsto \int \left\{ \frac{a}{2} \phi^2 + \frac{3b}{2} \bra \phi^2 \ket \phi^2\right\}\;\d \mathbf{r}'
+%\]
+%While $\bra \phi^2\ket = \bra \phi(\mathbf{r})^2\ket$ is the average over all ensembles at a fixed point $\mathbf{r}$, it is equal to what we get by averaging over all points, so
+%\[
+%  \bra \phi(\mathbf{r})^2\ket = \frac{1}{V} \int \bra \phi(\mathbf{r})^2\ket \;\d \mathbf{r} = \frac{1}{V} \sum_q \bra |\phi_\mathbf{q}|^2 \ket = \frac{1}{V} \sum_{\mathbf{q}} \frac{1}{J(\mathbf{q})}.
+%\]
+%The only perhaps sightly tricky part if we were to just do this ad hoc is to get the factor of $\frac{3b}{2}$ right.
+
+To solve this self-consistency equation, or at least understand it, it is convenient to think in terms of $\tau$ instead. If we write our $G(q)$ as
+\[
+  G(q) = \tau + \alpha(q - q_0)^2,
+\]
+then we have
+\[
+  J(q) = \bar{\tau} + \alpha (q - q_0)^2,\quad \bar{\tau} = 3b \bra \phi^2\ket.
+\]
+The self-consistency equation now states
 \[
   \bar{\tau} = \tau + \frac{3b}{(2\pi)^d} \int \frac{\d^d \mathbf{q}}{\bar{\tau} + \alpha(q - q_0)^2}.
 \]
-We now have to solve this for $\bar{\tau}$. Close to the critical point, $\bar{\tau}$ is small. When $d = 3$, we have
+We are interested in what happens near the critical point. In this case, we expect $\bar{\tau}$ to be small, and hence the integral is highly peaked near $0$. In $d = 3$, we can make the approximation.
+\begin{multline*}
+  \frac{3b}{(2\pi)^3} \int \frac{\d^3 \mathbf{q}}{\bar{\tau} + \alpha (q - q_0)^2} = \frac{3b}{2\pi^2} \int_0^\infty \frac{q^2\; \d q}{\bar{\tau} + \alpha (q - q_0)^2}\\
+  \approx \frac{3bq_0^2}{2\pi^2} \int_0^\infty \frac{\d q}{\bar{\tau} + \alpha (q - q_0)^2}.
+\end{multline*}
+While there is a nasty integral to evaluate, we can make the substitution $q \mapsto \bar{\tau} q$ to bring the dependency on $\bar{\tau}$ outside the integral, and obtain
 \[
-  \frac{3b}{(2\pi)^d} \int \frac{\d^d q}{\bar{\tau} + \alpha (q - q_0)^2} \approx q_0^2 \frac{3b}{2\pi^2} \int_0^\infty \frac{\d q}{\bar{\tau} + \alpha (q - q_0)^2},
+  \bar{\tau} = \tau + \frac{sb}{\sqrt{\bar{\tau}}},\quad s = \frac{3q_0^2}{2\pi^2} \frac{1}{\sqrt{\alpha}} \int_0^\infty \frac{\d y}{1 + y^2} \sim \frac{q_0^2}{\sqrt{\alpha}}.
 \]
-using the fact that the integral is largely peaked at $q = q_0$ (we would normally have a $q^2$ inside the integral rather than a $q_0^2$ outside). % this needs a cutoff to make sense
-
-By non-dimensionalizing, we can write
-\[
-  \bar{\tau} = \tau + \frac{sb}{\sqrt{\bar{\tau}}},\quad s = \frac{3q_0^2}{2\pi^2} \frac{1}{\sqrt{\alpha}} \int_0^\infty \frac{\d y}{1 + y^2} \sim \frac{q_0^2}{\sqrt{\alpha}}. % mass renormalization
-\]
-Note that $\bar{\tau}$ can never approach zero! This means we can never have a continuous transition. At small $\bar{\tau}$, we have large fluctuations, but self-limiting arises on shell $q = q_0$. We have many modes contributing to the Gaussian approximation. The quantity
+The precise value of $s$ does not matter. The point is that it is constant independent of $\bar{\tau}$. From this, we see that $\bar{\tau}$ can never reach zero! This means we can never have a continuous transition. At small $\bar{\tau}$, we will have large fluctuations, and the quantity
 \[
   \bra |\phi_\mathbf{q}|^2 \ket = S(q) = \frac{1}{\bar{\tau} + \alpha(q - q_0)^2}
 \]
-does not diverge at $q = q_0$. So the isotropic-smectic transition must be discontinuous.
+becomes large but finite. Note that since $\bar{\tau}$ is finite, this sets some sort of length scale where all $q$ with $|q - q_0| \sim \bar{\tau}$ have large amplitudes.
 
-The idea is that fluctuations induces first-order transitions.
+We can think of the above computation as looking at neighbourhoods of the $\phi = 0$ vacuum, as that is what the variational methods see. So $\bar{\tau}$ never vanishes in this regime, we would expect a discontinuous isotropic-smectic transition that happens ``far away'' from this vacuum.
 
-Consider fluctuations about an ordered state, $\phi = \phi_0 + \delta \phi$, and we set
+Consider fluctuations about an ordered state, $\phi = \phi_0 + \delta \phi$, where
 \[
   \phi_0 = A \cos q_0 z.
 \]
-A formal approach to this would be to set
-\[
-  H_0 = \sum_{\mathbf{q}} \splus J(q) + hA,
-\]
-where we think of $h$ as a Lagrangian multiplier for $A$. We minimize $\tilde{F}(A)$ over $J(q)$. Then $\tilde{F}(A)$ replaces
-\[
-  F_{MFT}(A) = \frac{V}{4} \left[\tau A^2 + \frac{3b}{8} A^4\right].
-\]
-This is actually quite messy, so let us do a heuristic version instead. For $A = 0$, we had
+We can do computations similar to what we did above by varying $\delta \phi$, and obtain a $\tilde{F}(A)$. Then the global minimum over all $A$ then gives us the ``true'' ground state. Instead of doing that, which is quite messy, we use the heuristic version instead. For $A = 0$, we had
+%
+%A formal approach to this would be to set
+%\[
+%  H_0 = \sum_{\mathbf{q}} \splus J(q) + hA,
+%\]
+%where we think of $h$ as a Lagrangian multiplier for $A$. We minimize $\tilde{F}(A)$ over $J(q)$. Then $\tilde{F}(A)$ replaces
+%\[
+%  F_{MFT}(A) = \frac{V}{4} \left[\tau A^2 + \frac{3b}{8} A^4\right].
+%\]
+%This is actually quite messy, so let us do a heuristic version instead. For $A = 0$, we had
 \[
   \tau = \bar{\tau} + 3b \bra \overline{\phi(\mathbf{r})^2}\ket.
 \]
-We can apply this for finite $A$. Then the quartic piece, where the $\phi^4$ term now has an extra contribution. So we have
+For finite $A$, the quartic term now has an extra contribution, and we bet
 \[
   \bar{\tau} = \tau + \frac{sb}{\sqrt{\bar{\tau}}} + \frac{3b A^2}{2}.
 \]
-If $A$ is small enough, then fluctuations dominate, and the transition is first order. For large $A$, the fluctuation terms are irrelevant, and mean field theory is good.
-
-We can compare our mean field solution with what we have got here for $\tau < 0$:
+Compare this with mean field theory, where we have
+\[
+  F_{MFT}(A) = \frac{V}{4} \left[\tau A^2 + \frac{3b}{8} A^4\right].
+\]
+We see that for small $A$, the fluctuations are large, and mean field theory is quite off. For large $A$, the fluctuation terms are irrelevant and mean field theory is a good approximation. Thus, we get
 \begin{center}
   \begin{tikzpicture}[xscale=3]
     \draw [->] (0, 0) -- (2.3, 0) node [right] {$A$};
@@ -1218,7 +1245,7 @@ We can compare our mean field solution with what we have got here for $\tau < 0$
   \end{tikzpicture}
 \end{center}
 
-We see that as $\tau$ decreases, the minimum discontinuously jumps from $A = 0$ to a finite value of $A$. Observe that mean field theory is approached at large $A$.
+We see that as $\tau$ decreases, the minimum discontinuously jumps from $A = 0$ to a finite value of $A$. Mean field theory is approached at large $A$.
 
 We can then plot the minimum value of $A$ as a function of $\tau$:
 \begin{center}
@@ -1242,12 +1269,12 @@ We have not calculated $A_c$ or $\tau_c$, but it can be done. We shall not do th
 \]
 It turns out the variational approach finally breaks down for $\tau < \tau_H \sim -s^{3/4} b^{1/2}$. We have $\tau_H \ll \tau_c$ if $b \ll \sqrt{s}$. The reason this breaks down is that at low enough temperatures, the fluctuations from the quartic terms become significant, and our Gaussian approximation falls apart.
 
-To find $\tau_H$, we need to compute some leading corrections to $\tilde{F}$, as Brazovskii did. This is very rarely done. Most people don't bother to check how big the corrections to the approximation are. Thus, there is no reason to believe our theories are accurate. For example, if we do this for the Ising model, then everything goes wrong, because there is no regime where it is reasonable. So the self-consistent approach remains ad-hoc. However, in our case, it is asymptotically correct at small $b$.
+To figure out what $\tau_H$ is, we need to find leading corrections to $\tilde{F}$, as Brazovskii did. In general, there is no reason to believe $\tau_H$ is large or small. For example, this method breaks down completely for the Ising model, and is correct in no regime at all. In general, the self-consistent approach here is ad hoc, and one has to do some explicit error analysis to see if it is actually good.
+
+%To find $\tau_H$, we need to compute some leading corrections to $\tilde{F}$, as Brazovskii did. This is very rarely done. Most people don't bother to check how big the corrections to the approximation are. Thus, there is no reason to believe our theories are accurate. For example, if we do this for the Ising model, then everything goes wrong, because there is no regime where it is reasonable. So the self-consistent approach remains ad-hoc. However, in our case, it is asymptotically correct at small $b$.
 
 \subsubsection*{Brazovskii transition with cubic term}
-What happens when we have a cubic term? This would give an $A^3$ term at mean field level, which gives a discontinuous transition, but in a completely different way.
-
-Let us plot a phase diagram with two parameters $\tau$ and $c$. In mean field theory, we get
+What happens when we have a cubic term? This would give an $A^3$ term at mean field level, which gives a discontinuous transition, but in a completely different way. We shall just state the results here, using a phase diagram with two parameters $\tau$ and $c$. In mean field theory, we get
 \begin{center}
   \begin{tikzpicture}
     \draw [->] (-0.5, 0) -- (3, 0) node [right] {$c$};
@@ -1262,27 +1289,7 @@ Let us plot a phase diagram with two parameters $\tau$ and $c$. In mean field th
     \node at (2, 0.5) {H};
   \end{tikzpicture}
 \end{center}
-where H is a hexagonal phase.
-
-The self-consistent version instead looks like
-\begin{center}
-  \begin{tikzpicture}
-    \draw [->] (-0.5, 0) -- (3, 0) node [right] {$c$};
-    \draw [->] (0, -2) -- (0, 2) node [right] {$\tau$};
-
-    \draw (0, -0.5) -- (1.7, -0.5) -- (3, 0.4);
-    \draw (1.7, -0.5) -- (3, -1.4);
-
-    \node at (1, 0.8) {I};
-    \node at (1, -1.5) {S};
-    \node at (2.5, -0.5) {H};
-
-    \draw (1.7, -0.06) -- (1.7, 0.06) node [above] {\small$\tilde{c}$};
-  \end{tikzpicture}
-\end{center}
-Here $c$ only matters above a threshold $\tilde{c}$.
-
-The hexagonal phase looks like this:
+where H is a hexagonal phase, which looks like
 \begin{center}
   \begin{tikzpicture}
     \begin{scope}[shift={(0.3, 0)}]
@@ -1340,9 +1347,25 @@ The hexagonal phase looks like this:
     \draw [gray](0.3, 0) -- (1, -0.5) -- (2, -0.5) -- (2.7, 0) -- (2, 0.5) -- (1, 0.5) -- cycle;
   \end{tikzpicture}
 \end{center}
-where each cylinder contains a high concentration of a fixed end of the molecule.
+where each cylinder contains a high concentration of a fixed end of the molecule. This is another liquid crystal, with two crystal directions and one fluid directions.
 
-This is another liquid crystal, with two crystal directions and one fluid directions.
+The self-consistent version instead looks like
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (-0.5, 0) -- (3, 0) node [right] {$c$};
+    \draw [->] (0, -2) -- (0, 2) node [right] {$\tau$};
+
+    \draw (0, -0.5) -- (1.7, -0.5) -- (3, 0.4);
+    \draw (1.7, -0.5) -- (3, -1.4);
+
+    \node at (1, 0.8) {I};
+    \node at (1, -1.5) {S};
+    \node at (2.5, -0.5) {H};
+
+    \draw (1.7, -0.06) -- (1.7, 0.06) node [above] {\small$\tilde{c}$};
+  \end{tikzpicture}
+\end{center}
+Here $c$ only matters above a threshold $\tilde{c}$.
 
 \section{Dynamics}
 We now want to understand \emph{dynamics}, namely if we have a system out of equilibrium, how will it evolve in time? Physically, such situations are usually achieved by rapidly modifying external parameters of a system. For example, if the system is temperature-dependent, one may prepare a sample at high temperature so that the system is in a homogeneous state, and then quench the system by submerging it in water to lower the temperature rapidly. The system will then slowly evolve towards equilibrium.
@@ -1836,7 +1859,7 @@ So we see a growth of random structure with scale $L \sim \pi/q^*$. This process
     \draw [-latex'] (2.21, 0.6) -- (1.7, 0.7);
   \end{tikzpicture}
 \end{center}
-Note that this computation was done on the assumption that $\tilde{\phi}$ is small, where we ignored the quadratic terms. At intermediate $t$, as these phase separated states grow, the quartic terms are going to kick in. An informal use of variational theory says we should replace $f''$ by $\bar{f}''$.
+Note that this computation was done on the assumption that $\tilde{\phi}$ is small, where we ignored the quadratic terms. At intermediate $t$, as these phase separated states grow, the quartic terms are going to kick in. An informal use of variational theory says we should replace $f''$ by $\bar{f}''$, where
 \[
   \bar{f}'' = f'' + \frac{3b}{(2\pi)^4} \int^{q_{max}} S_q(t) \;\d^d \mathbf{q}.
 \]
@@ -1861,15 +1884,15 @@ but it doesn't really matter what this is. The ultimate configuration with minim
 We will not derive this yet, because this result is shared with the late time behaviour of the third regime, and we will discuss this at that point.
 
 \subsubsection*{Regime 3}
-Finally, consider the third regime. Suppose we have $\bar{\phi} = -\phi_B + \delta$, where $\delta$ is small. This is locally stable, so $r(q) > 0$ for all $q$. But this is globally unstable, and we prefer phase separation. Only noise can overcome the \term{nucleation barrier}. But what is the path? In other words, what is the typical way a uniform phase manages to go into phase separation?
+Finally, consider the third regime. Suppose we have $\bar{\phi} = -\phi_B + \delta$, where $\delta$ is small. The system is locally stable, so $r(q) > 0$ for all $q$. On the other hand, it is globally unstable, so phase separation is preferred. To achieve phase separation, we must overcome a \term{nucleation barrier}, and we must rely on noise to do that.
 
-Formally, we can inspect the path probabilities
+To understand how the process will look like, formally, we can inspect the path probabilities
 \[
   \P[\phi(\mathbf{r}, t)] = \mathcal{N} \exp \left(-\frac{\beta}{4M} \int |\mathbf{J} + M \nabla \mu|^2 \;\d \mathbf{r} \;\d t\right)
 \]
-given by the Langevin equation. We seek to find the most likely trajectory from the initial to the final state. If one is a field theorist, then this is called the \term{instanton path}, and in statistical physics, this is called \term{large deviation theory}. Instead of doing this, we use our physical intuition to guide ourselves.
+given by the Langevin equation. We seek to find the most likely trajectory from the initial to the final state. In field theory, this is called the \term{instanton path}, and in statistical physics, this is called \term{large deviation theory}. Instead of doing this, we use our physical intuition to guide ourselves.
 
-Heuristically, we expect that if we start with a uniform phase $\phi = -\phi_B + \delta$, then at some point, there will be some random small droplet with $\phi = +\phi_B$ of radius $R$. We then hope that $R$ increases until we have full phase separation. The key question is --- how unlikely is this process?
+Heuristically, we expect that if we start with a uniform phase $\phi = -\phi_B + \delta$, then at some point, there will be some random small droplet with $\phi = +\phi_B$ of small radius $R$. This is already unlikely, but after this, we need $R$ to increase until we have full phase separation. The key question is --- how unlikely is this process?
 \begin{center}
   \begin{tikzpicture}[scale=0.8]
     \draw (0, 0) rectangle (2, 2);
@@ -1892,7 +1915,7 @@ Heuristically, we expect that if we start with a uniform phase $\phi = -\phi_B +
     \end{scope}
   \end{tikzpicture}
 \end{center}
-The idea is to consider the cost of having a droplet of radius $R$. First consider the cost of having an interface, which is $4 \pi \sigma R^2$. However, we also want a droplet with large volume, so we get a cubic term $\sim -R^3$ with negative contribution. If we add these two together, we get a barrier:
+The idea is to consider the cost of having a droplet of radius $R$. First there is the cost of having an interface, which is $4 \pi \sigma R^2$. However, the fact that we have $+\phi_B$ areas is energetically favorable, and this grows as the volume. So we get a cubic term $\sim -R^3$. If we add these two together, we get a barrier:
 \begin{center}
   \begin{tikzpicture}
     \draw [->] (0, 0) -- (4, 0) node [right] {$R$};
@@ -1904,10 +1927,12 @@ The idea is to consider the cost of having a droplet of radius $R$. First consid
     \draw [dashed] (2.222, 1.6461) -- (0, 1.6461) node [left] {$F^*$};
   \end{tikzpicture}
 \end{center}
-Here $R^*$ is the critical radius, and $F^*$ is the free energy barrier. The noise-induced rate, which is the rate of getting over the barrier, is $\sim e^{-\beta F^*}$.
+Once $R > R^*$, it is then energetically favorable for the radius to continue increasing, and then we can easily reach phase separation. To reach this, we must rely on noise to push us over this barrier, and this noise-induced rate is $\sim e^{-\beta F^*}$. To see what happens afterwards, we need to better understand how droplets work.
 
 \subsubsection*{Droplet in equilibrium}
-Consider the equilibrium of a droplet with its ``vapour''. If $\phi$ is just close to $-\phi_B$, then there will be a small spherical droplet of $+\phi_B$ of radius $R$, and the rest being at $-\phi_B$. So we have two bulk phases separated by a curved surface (contrast this to the case where $\phi = 0$, where we would have a horizontal interface).
+The mechanics of a droplet is slightly less straightforward than what one might hope, due to the presence of surface tension that tries to compress the droplet. The result is that the value of $\phi$ inside and outside the droplet is not exactly $\pm \phi_B$, but with a shift.
+
+For simplicity, we shall first consider an \emph{equilibrium} system with a droplet. This is achieved by having a large box of fluid with $\bar{\phi}$ just slightly above $-\phi_B$. Then in the phase separated state, the $+\phi_B$ phase will lump together in a droplet (if we had $\bar{\phi} = 0$, then we would have a horizontal interface).
 \begin{center}
   \begin{tikzpicture}
     \draw (0, 0) rectangle (3, 3);
@@ -1916,7 +1941,7 @@ Consider the equilibrium of a droplet with its ``vapour''. If $\phi$ is just clo
     \node at (2.4, 2.4) {$1$};
   \end{tikzpicture}
 \end{center}
-Within each region $1$ and $2$, our $\phi$ is constant, so the term that contributes to the free energy is
+Within each region $1$ and $2$, the value of $\phi$ is constant, so the term that contributes to the free energy is
 \[
   f (\phi) = \frac{a}{2} \phi^2 + \frac{b}{4} \phi^4.
 \]
@@ -1931,14 +1956,16 @@ We would expect $1$ and $2$ to respectively be located at
     \draw (1.24, -0.65) -- (1.24, -0.85) node [below] {$2$};
   \end{tikzpicture}
 \end{center}
-Note that when we have a spherical interface, $1$ and $2$ are not exactly at $\pm \phi_B$. To understand this, Consider the \term{bulk chemical potential}
+When we have a spherical interface, $1$ and $2$ are not exactly at $\pm \phi_B$. To see this, Consider the \term{bulk chemical potential}
 \[
   \mu = \frac{\partial f}{\partial \phi},
 \]
- The thermodynamic pressure is then
+The thermodynamic pressure is then
 \[
   \Pi = \mu \phi - f.
 \]
+This is the negative of the $y$-intercept of the tangent line at $\phi$.
+
 If we have a flat interface, which we can think of as the limit $R \to \infty$, then we require
 \[
   \mu_1^{bulk} = \mu_2^{bulk},\quad \Pi_1^{bulk} = \Pi_2^{bulk}.
@@ -1957,13 +1984,13 @@ This means the points 1, 2 have a common tangent
   \end{tikzpicture}
 \end{center}
 
-If we have a droplet, then there is surface tension. Consider an imaginary interface between the upper and lower interface. Then the pressure difference tries to move the upper hemisphere up, and contributes a force of $(\Pi_2 - \Pi_1) \pi R^2$, while the interfacial tension pulls the boundary down by $2\pi R \sigma$. So we require
+If we have a droplet, then there is surface tension. Consider an imaginary interface between the upper and lower interface. Then the pressure difference tries to move the upper hemisphere up, and contributes a force of $(\Pi_2 - \Pi_1) \pi R^2$, while the interfacial tension pulls the boundary down by $2\pi R \sigma$. In general, in $d$ dimensions, we require
 \[
   \Pi_2 = \Pi_1 + \frac{\sigma}{R}(d - 1)
 \]
-in $d$ dimensions. This is called the \term{Laplace pressure}.
+This is called the \term{Laplace pressure}.
 
-In the static equilibrium, we have $\mathbf{J} = 0$. So $\nabla \mu = 0$, and so $\mu_1 = \mu_2$. Thus, we have $\psi_1 = -\phi_B + \delta_1 $ and $\psi_2 = +\phi_B + \delta_2$, such that $f$ has the same slope at $\phi_1$ and $\phi_2$.
+In static equilibrium, we still require $\mu_1 = \mu_2$, since this is the same as saying $\mathbf{J} = \nabla \mu = 0$. So $f$ has the same slope at $\phi_1$ and $\phi_2$. However, the two tangent lines no longer have a common intercept, but they are separated by $\frac{\sigma}{R}(d - 1)$. So it looks like
 \begin{center}
   \begin{tikzpicture}
     \draw [->] (-2.3, 0) -- (2.3, 0) node [right] {$\phi$};
@@ -1981,10 +2008,10 @@ In the static equilibrium, we have $\mathbf{J} = 0$. So $\nabla \mu = 0$, and so
   \end{tikzpicture}
 \end{center}
 
-For large $R$, we expect $\delta$ to be small. So we can approximate
+To solve for this, we take the approximation that $\delta$ is small for $R$ decently large. Then we can write
 \begin{align*}
-  f_1 &= f(-\phi_B + \delta_1) \approx \frac{1}{2} f''(-\phi_B) + \delta_1^2 + f(-\phi_B)\\
-  f_2 &= f(+\phi_B + \delta_2) \approx \frac{1}{2} f''(+\phi_B) + \delta_1^2 + f(+\phi_B).
+  f_1 &= f(-\phi_B + \delta_1) \approx \frac{1}{2} f''(-\phi_B) \delta_1^2 + f(-\phi_B)\\
+  f_2 &= f(+\phi_B + \delta_2) \approx \frac{1}{2} f''(+\phi_B) \delta_1^2 + f(+\phi_B).
 \end{align*}
 So $\mu_i = \alpha \delta_i$, where $\alpha = f''(\pm\phi_B)$. So we find that up to first order, $\delta_1 = \delta_2$.
 
@@ -1998,14 +2025,15 @@ Similarly, we have $\Pi_2 = +\alpha \delta \phi_B$. So
 \]
 Since this equals $-(d - 1)\frac{\sigma}{R}$, we have
 \[
-  \delta = \frac{1}{2\alpha \phi_B}(d - 1) \frac{\sigma}{R}.
+  \delta = \frac{d - 1}{2\alpha \phi_B} \cdot \frac{\sigma}{R}.
 \]
 
-\subsubsection*{Hydrodynamic level mean field theory for multiple droplet}
-We now want to understand what happens when we have multiple droplets. The way multiple droplets interact is that once we have a droplet of large $\phi$, then the average $\phi$ outside of the droplet will decrease. So to begin understanding this scenario, we first see how a droplet reacts when the relative density of the outside bath is not what it expects.
+\subsubsection*{Multiple droplet dynamics}
+We now move on to understand multiple droplet dynamics. This is relevant because we expect that noise will produce multiple droplets around the fluid, which will then interact and combine to a single phase separated state.
 
-So suppose we have a (3D) droplet of radius $R$ inside a bath with $\phi = - \phi_B + \varepsilon$. This $\varepsilon$ is called the \term{supersaturation}. Note that to have a droplet of radius $R$, the value of $\phi$ inside and immediately outside the droplet must be $\pm \phi_B + \delta$, where $\delta = \delta(R)$ is the value we previously computed.
-Outside of the droplet, the value of $\phi$ will slowly decay to $\varepsilon$. Thus, outside of the droplet, we write
+The way droplets interact with each other is that once we have a droplet of large $\phi$, then the average $\phi$ outside of the droplet will decrease. So to begin understanding this scenario, we first see how a droplet reacts when the relative density of the outside bath is not what it expects.
+
+So suppose we have a (3D) droplet of radius $R$ inside a bath with $\phi = - \phi_B + \varepsilon$, where $\varepsilon \not= \delta = \delta(R)$. This $\varepsilon$ is called the \term{supersaturation}. Note that to have a droplet of radius $R$, the value of $\phi$ inside and immediately outside the droplet must be $\pm \phi_B + \delta$. Outside of the droplet, the value of $\phi$ will slowly decay to $-\phi_B + \varepsilon$. Thus, outside of the droplet, we write
 \[
   \phi(\mathbf{r}) = -\phi_B+ \tilde{\phi}(\mathbf{r}),
 \]
@@ -2052,7 +2080,7 @@ where
 \]
 So if we have a bath containing many droplets, then the big droplets grow and the small droplets shrink. Indeed, the interfacial tension penalizes small droplets more heavily than large droplets.
 
-To understand exactly how these grow, we make a scaling ansatz, that there is only one length scale set by $\bar{R}$, the mean droplet size, which is also the mean droplet separation. Then we have
+To understand exactly how these grow, we make a scaling ansatz that there is only one length scale, namely the mean droplet size $\bar{R}$. Then we have
 \[
   \dot{\bar{R}} \approx \frac{1}{2\phi_B} \frac{\alpha M}{\bar{R}} (\varepsilon - \delta(\bar{R})).
 \]
@@ -2072,13 +2100,14 @@ We have the same scaling for non-droplet geometries, e.g.\ spinodal decompositio
 \[
   L(t) \sim \left(\frac{M\sigma}{\phi_B^2} t\right)^{1/3}.
 \]
-How can we stop this from happening? This is essential for storage stability of emulsions. One way is to add trapped species insoluble in the continuous phase, e.g.\ polymers or salt. Then we have
+
+In practice, we often want to stop this from happening. One way to do so is to add trapped species insoluble in the continuous phase, e.g.\ polymers or salt. If there are $N$ particles inside the droplet exerting ideal gas pressure, then we have
 \[
   \Pi_2 - \Pi_1 = \frac{2\sigma}{R} + \frac{Nk_B T}{4/3 \pi R^3},
 \]
-where we assume we have ideal gas pressure. We again have $\mu_1 = \mu_2$. We now have $N$ fixed. This ends up giving a new boundary condition at $R^+$,
+We again have $\mu_1 = \mu_2$. This ends up giving a new boundary condition at $R^+$,
 \[
-  \tilde{\phi}(R^+) = \frac{\sigma}{\alpha R \phi_B} - \frac{3N k_B T}{8 \alpha \phi_B \pi R^3} = \frac{1}{2 \alpha \phi_B} (\Pi_{Lap} - \Pi_{sol})
+  \tilde{\phi}(R^+) = \frac{\sigma}{\alpha R \phi_B} - \frac{3N k_B T}{8 \alpha \phi_B \pi R^3} = \frac{1}{2 \alpha \phi_B} (\Pi_{\mathrm{Lap}} - \Pi_{\mathrm{sol}})
 \]
 The first term is the Laplace pressure just as before, while the second term is the extra term from the trapped species.
 
@@ -2086,84 +2115,94 @@ If we put this back into the system of equations before, then we have a new equa
 \[
   \dot{R} = \frac{1}{2 \phi_B} \left( \frac{\alpha M}{R} \left(\varepsilon - \frac{\sigma}{\alpha \phi_B R} + \frac{3 N k_B T}{8 \alpha \phi_B \pi R^3}\right)\right).
 \]
-% insert plot
-
+\begin{center}
+  \begin{tikzpicture}
+    \draw [->] (0, 0) -- (4, 0) node [right] {$R$};
+    \draw [->] (0, -1) -- (0, 2) node [above] {$\dot{R}$};
+    \draw [mblue, semithick, domain=0.65:1.5] plot (\x, {1/\x (1 - 3/\x + 1.5/\x^3)});
+    \draw [mblue, semithick, domain=1.5:4] plot (\x, {1/\x (1 - 3/\x + 1.5/\x^3)});
+    \node [circ] at (0.832, 0) {};
+    \node [anchor = north east] at (0.832, 0) {$R_s$};
+  \end{tikzpicture}
+\end{center}
 We now see that there is a stable fixed point $R_s$, and further shrinkage is prevented by the presence of the trapped species that will be further compressed by shrinking. Thus, if we manage to produce a system with all droplets of size $< R^*$, then we end up with a lot of small but finite size droplets $R_s$.
 
 \section{Model H}
-Model B was purely diffusion, in the sense that we never talked about the velocity of a flowing fluid. We now want to consider fluid flow as well. The equation is then
+Model B was purely diffusive, and the only way $\phi$ can change is by diffusion. Often, in real life, fluid can flow as well. If the fluid has a velocity $\mathbf{v}$, then our equation is now
 \[
   \dot{\phi} + \mathbf{v} \cdot \nabla \phi = - \nabla \cdot \mathbf{J}.
 \]
-The $\mathbf{v} \cdot \nabla \phi$ is the \term{advection term}. Our current $\mathbf{J}$ is the same as before, with
+The $\mathbf{v} \cdot \nabla \phi$ is called the \term{advection term}. Our current $\mathbf{J}$ is the same as before, with
 \[
   \mathbf{J} = -M \frac{\delta F}{\delta \phi} + \sqrt{2k_B T M} \boldsymbol\Lambda.
 \]
-We now need an equation for $\mathbf{v}$, which will be like the Navier--Stokes equation. We will assume the flow is incompressible, so
+We also need an evolution equation for $\mathbf{v}$, which will be the Navier--Stokes equation with some noise term. We assume flow is incompressible, so $\nabla \cdot \mathbf{v} = 0$. We then have the Cauchy equation with stress tensor $\Sigma^{\mathrm{TOT}}$, given by
 \[
-  \nabla \cdot \mathbf{v} = 0
-.\]
-We also have the Cauchy equation with stress tensor $\Sigma^{TOT}$. Then we have
-\[
-  \rho(\dot{\mathbf{v}} + \mathbf{v} \cdot \nabla \mathbf{v}) = \nabla \cdot \Sigma^{TOT} + \text{body forces},
+  \rho(\dot{\mathbf{v}} + \mathbf{v} \cdot \nabla \mathbf{v}) = \nabla \cdot \Sigma^{\mathrm{TOT}} + \text{body forces}.
 \]
-but we will forget about the body forces for our purposes. This is essentially the momentum conservation equation, where $- \Sigma^{TOT}$ is the momentum flux tensor.
+We will assume there is no body force. This is essentially the momentum conservation equation, where $- \Sigma^{\mathrm{TOT}}$ is the momentum flux tensor.
 
-What does the $\Sigma^{TOT}$ look like? We can write it as
+Of course, this description is useless if we don't know what $\Sigma^{\mathrm{TOT}}$ looks like. It is a sum of four contributions:
 \[
-  \Sigma^{TOT} = \Sigma^p + \Sigma^\eta + \Sigma^\phi + \Sigma^N.
+  \Sigma^{\mathrm{TOT}} = \Sigma^p + \Sigma^\eta + \Sigma^\phi + \Sigma^N.
 \]
-The first term is the \term{pressure} term, given by
-\[
-  \Sigma_{ij}^p = - P \delta_{ij}.
-\]
-We can think of this $P$ as the Lagrange multiplier on $\nabla \cdot \mathbf{v} = 0$. The second term
-\[
-  \Sigma_{ij}^\eta = \eta (\nabla_i v_j + \nabla_j v_i)
-\]
-is the \term{viscous stress}, where for simplicity, we assume a constant viscosity $\eta$. More generally, we may have $\eta$ a function of the composition $\phi$. The next term is the \term{$\phi$-stress}
-\[
-  \Sigma^\phi = - \Pi \delta_{ij} - \kappa (\nabla_i \phi) (\nabla_j \phi),\quad \Pi = \phi \mu - F.
-\]
-This is of the form so that
-\[
-  \nabla \cdot \Sigma^\phi = - \phi \nabla \mu.
-\]
-This is going to make the fluid move around. The final part is a \term{noise stress} $\Sigma_{ij}^N (\mathbf{r}, t)$ with
-\[
-  \bra \Sigma_{ij}^N (\mathbf{r}, t) \Sigma_{k\ell}^N (\mathbf{r}', t')\ket = 2k_B T \eta \left(\delta_{ik} \delta_{j\ell} + \delta_{i\ell} \delta_{jk} - \frac{2}{3} \delta_{ij} \delta_{k\ell}\right) \delta(\mathbf{r} - \mathbf{r}') \delta(t - t').
-\]
-The last term $\delta_{ij} \delta_{k\ell}$ tells us the noise should not cause any compression. This is a white noise from the $\eta$ term, via the fluctuation dissipation theorem.
-
+\begin{itemize}
+  \item The $\Sigma^p$ term is the \term{pressure} term, given by
+    \[
+      \Sigma_{ij}^p = - P \delta_{ij}.
+    \]
+    We should think of this $P$ as a Lagrange multiplier for incompressibility.
+  \item The $\Sigma^{\eta}$ term is the \term{viscous stress}, which we can write as
+    \[
+      \Sigma_{ij}^\eta = \eta (\nabla_i v_j + \nabla_j v_i)
+    \]
+    For simplicity, we assume we have a constant viscosity $\eta$. In general, it could be a function of the composition.
+  \item The $\Sigma^{\phi}$ term is the \term{$\phi$-stress}, given by
+    \[
+      \Sigma^\phi = - \Pi \delta_{ij} - \kappa (\nabla_i \phi) (\nabla_j \phi),\quad \Pi = \phi \mu - F.
+    \]
+    This is engineered so that
+    \[
+      \nabla \cdot \Sigma^\phi = - \phi \nabla \mu.
+    \]
+    This says a non-constant chemical potential causes things to move to even that out.
+  \item The final term is a \term{noise stress} with
+    \[
+      \bra \Sigma_{ij}^N (\mathbf{r}, t) \Sigma_{k\ell}^N (\mathbf{r}', t')\ket = 2k_B T \eta \left(\delta_{ik} \delta_{j\ell} + \delta_{i\ell} \delta_{jk} - \frac{2}{3} \delta_{ij} \delta_{k\ell}\right) \delta(\mathbf{r} - \mathbf{r}') \delta(t - t').
+    \]
+    The last term $\delta_{ij} \delta_{k\ell}$ is there to ensure the noise does not cause any compression. This is a white noise term whose variance is determined by the fluctuation dissipation theorem.
+\end{itemize}
 We can then compute
 \begin{align*}
-  \nabla \cdot \Sigma^{TOT} &= \nabla \cdot \Sigma^P + \nabla \cdot \Sigma^\eta + \nabla \cdot \Sigma^\phi + \nabla \cdot \Sigma^N\\
+  \nabla \cdot \Sigma^{\mathrm{TOT}} &= \nabla \cdot \Sigma^P + \nabla \cdot \Sigma^\eta + \nabla \cdot \Sigma^\phi + \nabla \cdot \Sigma^N\\
   &= - \nabla P + \eta \nabla^2 \mathbf{v} + - \phi \nabla \mu + \nabla \cdot \Sigma^N
 \end{align*}
-Hence Model H has
+Hence Model H has equations
 \begin{align*}
   \dot{\phi} + \mathbf{v} \cdot \nabla \phi &=- \nabla \cdot \mathbf{J}\\
   \mathbf{J} &= -M \nabla \mu + \sqrt{2k_B T M} \boldsymbol\Lambda\\
-  \nabla \cdot \mathbf{u} &= 0\\
+  \nabla \cdot \mathbf{v} &= 0\\
   \rho (\dot{\mathbf{v}} + \mathbf{v} \cdot \nabla \mathbf{v}) &= \eta \nabla^2 \mathbf{v} - \nabla P - \phi \nabla \mu + \nabla \cdot \Sigma^N.
 \end{align*}
-We now have some new physics, compared to Model B:
+Compared to Model B, we have the following new features:
 \begin{enumerate}
   \item $-\phi\nabla \mu$ drives deterministic fluid flow.
   \item $\Sigma^N$ drives a \emph{random} flow.
-  \item Fluid flows advect $\phi$.
+  \item Fluid flow advects $\phi$.
 \end{enumerate}
-What sort of things can happen here? We will see that (i) and (iii) gives us enhanced coarsening of bicontinuous states. Note that this doesn't have any effect on isolated/disconnected droplet states, since in a spherically symmetric setting, $\phi \nabla \mu$ and $\nabla P$ will be radial, and so $\nabla \cdot \mathbf{v} = 0$ implies $\mathbf{v} = 0$. In other words, for $\phi \nabla \mu$ to drive a flow, we must have some symmetry breaking.
+How does this affect the coarsening dynamics? We will see that (i) and (iii) gives us enhanced coarsening of bicontinuous states. However, this does not have any effect on isolated/disconnected droplet states, since in a spherically symmetric setting, $\phi \nabla \mu$ and $\nabla P$ will be radial, and so $\nabla \cdot \mathbf{v} = 0$ implies $\mathbf{v} = 0$. In other words, for $\phi \nabla \mu$ to drive a flow, we must have some symmetry breaking.
 
-What does the noise term do? In Model B, we had a noise term in the flux, but with a random fluid flow, (ii) and (iii) combine to give us Brownian motion of droplets. Such a random motion will have $\bra r^2\ket \propto Dt$, where
+Of course, this symmetry breaking is provided by the noise term in (ii). The result is that the droplets will undergo Brownian motion with $\bra r^2\ket \sim Dt$, where
 \[
   D = \frac{k_B T}{4\pi \eta R}
 \]
-is the diffusion constant. If we think about the Ostwald problem, then even if we manage to stop the small droplets from shrinking, they may collide and combine to form larger droplets. This forms a new channel for instability, and separate measures to prevent this.
+is the diffusion constant.
 
-What happens when they do coalesce? We again assume there is one length scale $\bar{R}(t)$. So this determines the size and separation of droplets. We can then calculate the collision time
+If we think about the Ostwald process, even if we manage to stop the small droplets from shrinking, they may collide and combine to form larger droplets. This forms a new channel for instability, and separate measures are needed to prevent this. For example, we can put charged surfactants that prevent collisions.
+
+We can roughly estimate the time scale of this process. We again assume there is one length scale $\bar{R}(t)$, which determines the size and separation of droplets. We can then calculate the collision time
 \[
-  \nabla t \simeq \frac{\bar{R}^2}{D(\bar{R})} \sim \bar{R}^3 \frac{\eta}{k_B T}.
+  \Delta t \simeq \frac{\bar{R}^2}{D(\bar{R})} \sim \bar{R}^3 \frac{\eta}{k_B T}.
 \]
 Each collision doubles the volume, and so $\bar{R} \to 2^{1/3} \bar{R}$. Taking the logarithm, we have
 \[
@@ -2193,29 +2232,43 @@ Recall that in the Ostwald process, droplets grew by diffusion of molecules, and
 \]
 It makes sense that they have the same scaling law, because ultimately, we are still doing diffusion on different scales.
 
-To prevent diffusion limited coalescence, we need a barrier to coalescence. For example, we can put charged surfactants, which prevents collisions.
+\subsubsection*{Bicontinuous states}
+We now see what the fluid flow does to bicontinuous states. 
+\begin{center}
+  \begin{tikzpicture}
+    \draw (0, 0) rectangle (3, 3);
+    \draw [fill=mblue, fill opacity=0.3] plot [smooth] coordinates {(0.7, 0) (0.5, 0.9) (0.8, 1.5) (1, 2.5) (3, 2.3)} -- (3, 3) -- (0, 3) -- (0, 0);
 
-\subsection{Domain growth via flow}
-Suppose again we have bicontinuous fluid in three dimensions.
-% insert picture
+    \draw [fill=mblue, fill opacity=0.3] (1.4, 0.7) circle [radius=0.3];
 
-We have a domain size $L(t)$. Again we assume we have a single length scale. As time goes on, we expect $L(t)$ to increase with time. Since there is only one length scale, it should not be surprising that
+    \draw [fill=mblue, fill opacity=0.3] plot[smooth] coordinates {(3, 1.8) (1.8, 2) (1.7, 1.5) (3, 1.2)};
+
+    \draw [fill=mblue, fill opacity=0.3] plot[smooth] coordinates {(3, 0.5) (2.3, 0.8) (2.2, 0.2) (2.6, 0)} -- (3, 0);
+
+    \draw [-latex'] (1.7, 0.7) -- (2.21, 0.6) node [pos=0.5, above] {\small $L$};
+    \draw [-latex'] (2.21, 0.6) -- (1.7, 0.7);
+  \end{tikzpicture}
+\end{center}
+
+Again assume we have a single length scale $L(t)$, given by the domain size. Again we assume we have a single length scale. As time goes on, we expect $L(t)$ to increase with time.
+
+A significant factor in the evolution of the bicontinuous phase is the Laplace pressure, which is ultimately due to the curvature $K$. Since there is only one length scale, we must have
 \[
   \dot{K} \sim v.
 \]
-We can think about the scale of the Laplace pressure as well, which is driven by interfacial curvature. This varies a lot throughout the system, but on the whole, it scales as $\sim \frac{\sigma}{L}$. The basic ideal is that spindly domains shrink and large ones grow, to reduce interfacial area.
+The Laplace pressure then scales as $\sim \frac{\sigma}{L}$.
 
-The noise terms $\Sigma^N$ matter at early times only. At late times, the domains grow deterministically from random initial conditions. How does $L(t)$ scale? The equation of motion of the flow is
+The noise terms $\Sigma^N$ matter at early times only. At late times, the domains grow deterministically from random initial conditions. The key question is how $L(t)$ scales with time. The equation of motion of the flow is
 \[
   \rho(\dot{\mathbf{v}} + \mathbf{v} \cdot \nabla \mathbf{v}) = \eta \nabla^2 \mathbf{v} - \nabla P - \phi \nabla \mu,
 \]
-We make single length scale approximations as before, so that $v \sim \dot{L}$ and $\nabla \sim L^{-1}$. Then
+We make single length scale approximations as before, so that $v \sim \dot{L}$ and $\nabla \sim L^{-1}$. Then we have an equation of the form.
 \[
   \rho \ddot{L} + \rho \frac{\dot{L}^2}{L} \sim \eta \frac{\dot{K}}{L^2} + \text{Lagrange multiplier} + \frac{\sigma}{L^2}\tag{$*$} % align as above.
 \]
-where we recall that at curved interfaces, $\mu \sim \pm \frac{\sigma}{R}$. Here we have a single variable $L(t)$, and three dimensionful parameters $\rho, \eta, \sigma$. The final parameter $\sigma$ depends on the coefficients $a, b, \kappa$ in $F$, but these $a, b, \kappa$ do not enter separately, but only via the combination $\sigma = \left(-\frac{8 \kappa a^3}{9b^2}\right)^{1/2}$, and not via the interfacial thickness $\xi = \left(-\frac{2\kappa}{a}\right)^{1/2}$. This is not surprising, since the interfacial thickness is very small relative to the length scale $L(t)$.
-
-We now do some dimensional analysis. In $d$ dimensions, we have
+where we recall that at curved interfaces, $\mu \sim \pm \frac{\sigma}{R}$. Here we have a single variable $L(t)$, and three dimensionful parameters $\rho, \eta, \sigma$.
+%Note that $\sigma$ depends on the coefficients $a, b, \kappa$ in $F$, but these $a, b, \kappa$ do not enter separately. They only do so via the combination $\sigma = \left(-\frac{8 \kappa a^3}{9b^2}\right)^{1/2}$, and not via the interfacial thickness $\xi = \left(-\frac{2\kappa}{a}\right)^{1/2}$. This is not surprising, since the interfacial thickness is very small relative to the length scale $L(t)$.
+We can do some dimensional analysis. In $d$ dimensions, we have
 \[
   \rho = ML^{-d},\quad \eta = M L^{2 - d} T^{-1},\quad \sigma = ML^{3 - d} T^{-2}.
 \]
@@ -2259,73 +2312,77 @@ If we think about this, we see there are two regimes,
     \]
     This is called the \term{inertial hydrodynamic regime}, \term{IH}. In this regime, interfacial energy is converted into kinetic energy, and then only ``later'' dissipated by $\eta$.
 \end{enumerate}
-Essentially, in the first regime, the system is overdamped. This happens until $t \sim t_0$, and then the right-hand side becomes big and takes over, until the viscous term finally takes over.
+Essentially, in the first regime, the system is overdamped. This happens until the right-hand side becomes big and takes over, until the viscous term finally takes over. In practice, it is difficult to reach the last regime in a lab, since the time it takes is often $\sim 10^4$.
 
-The outcome for $d = 3$ is
-\begin{center}
-  \begin{tikzpicture}
-    \draw [->] (0, 0) -- (4, 0) node [right] {$\log (t/t_0)$};
-    \draw [->] (0, 0) -- (0, 3) node [above] {$\log (L/K_0)$};
-
-
-  \end{tikzpicture}
-\end{center}
-The crossover is at $\frac{t^*}{t_0} \sim O(1)$.
-
-In practice, it is difficult to reach the last region in a lab, since this $O(1)$ number is $\sim 10^4$.
+%The outcome for $d = 3$ is
+%\begin{center}
+%  \begin{tikzpicture}
+%    \draw [->] (0, 0) -- (4, 0) node [right] {$\log (t/t_0)$};
+%    \draw [->] (0, 0) -- (0, 3) node [above] {$\log (L/K_0)$};
+%
+%
+%  \end{tikzpicture}
+%\end{center}
+%The crossover is at $\frac{t^*}{t_0} \sim O(1)$.
 
 \subsubsection*{Droplet vs bicontinuous}
-Recall we had the phase diagram
-\begin{center}
-  \begin{tikzpicture}
-    \draw (-2, 3) node [above] {$a$} -- (-2, 0) node [below] {$-1$} -- (2, 0) node [below] {$1$} node [right] {$\bar \phi$} -- (2, 3);
+In general, when do we expect a bicontinuous phase and when do we expect a droplet phase?
+%Recall we had the phase diagram
+%\begin{center}
+%  \begin{tikzpicture}
+%    \draw (-2, 3) node [above] {$a$} -- (-2, 0) node [below] {$-1$} -- (2, 0) node [below] {$1$} node [right] {$\bar \phi$} -- (2, 3);
+%
+%    \draw [domain=2.5:0.2, samples=40] plot [smooth] ({sqrt (2.5 - \x)}, \x);
+%    \draw [domain=2.5:0.2, samples=40] plot [smooth] ({-sqrt (2.5 - \x)}, \x);
+%
+%    \draw [dashed, domain=0.2:2.5] plot [smooth] ({sqrt ((2.5 - \x)/3)}, \x);
+%    \draw [dashed, domain=0.2:2.5] plot [smooth] ({-sqrt ((2.5 - \x)/3)}, \x);
+%    \draw (-2.05, 2.5) -- (-1.95, 2.5);
+%  \end{tikzpicture}
+%\end{center}
+%Suppose we start with a global composition $\bar{\phi}$ at large $a$, and quench the system so that we are now in the spinodal region. The conservation laws require
+%\begin{align*}
+%  - \phi_B V_a + \phi_B V_2 &= \bar\phi V\\
+%  V_1 + V_2 &= V
+%\end{align*}
+%
+%We can then define the \term{phase volume}
+%\[
+%  \psi = \frac{V_2}{ V},
+%\]
+%which we can find by
+%\[
+%  \psi = \frac{1}{2} \left(1 + \frac{\bar{\phi}}{\phi_B}\right).
+%\]
+%When this is sufficiently far away from $\frac{1}{2}$, we have droplets, and when this is close to $\frac{1}{2}$, we have a bicontinuous medium.
 
-    \draw [domain=2.5:0.2, samples=40] plot [smooth] ({sqrt (2.5 - \x)}, \x);
-    \draw [domain=2.5:0.2, samples=40] plot [smooth] ({-sqrt (2.5 - \x)}, \x);
+\begin{itemize}
+  \item In three dimensions, the rule of thumb is that if $\psi \sim 0.4 \text{ to }0.6$, then we always get a bicontinuous medium. If $\psi < 0.3$ or $>0.7$, then we get droplets always. In between these two regions, we initially have bicontinuous medium, which essentially de-percolates into droplets.
+  \item In two dimensions, things are different. In the fully symmetric case, with a constant $\eta$ throughout, and $F$ is strictly symmetric ($F(\phi) = F(-\phi)$), the \emph{only} case where we have bicontinuous phase is on the $\psi = \frac{1}{2}$ line.
+\end{itemize}
 
-    \draw [dashed, domain=0.2:2.5] plot [smooth] ({sqrt ((2.5 - \x)/3)}, \x);
-    \draw [dashed, domain=0.2:2.5] plot [smooth] ({-sqrt ((2.5 - \x)/3)}, \x);
-    \draw (-2.05, 2.5) -- (-1.95, 2.5);
-  \end{tikzpicture}
-\end{center}
-Suppose we start with a global composition $\bar{\phi}$ at large $a$, and quench the system so that we are now in the spinodal region. The conservation laws require
-\begin{align*}
-  - \phi_B V_a + \phi_B V_2 &= \bar\phi V\\
-  V_1 + V_2 &= V
-\end{align*}
+%Note that for droplets, we have $\psi \sim \frac{R^3}{L^3}$, where $R$ is the droplet size and $L$ is the droplet separation. Since we have a fixed $\psi$, it follows that $R \sim L$.
 
-We can then define the \term{phase volume}
-\[
-  \psi = \frac{V_2}{ V},
-\]
-which we can find by
-\[
-  \psi = \frac{1}{2} \left(1 + \frac{\bar{\phi}}{\phi_B}\right).
-\]
-When this is sufficiently far away from $\frac{1}{2}$, we have droplets, and when this is close to $\frac{1}{2}$, we have a bicontinuous medium.
 
-In three dimensions, the rule of thumb is that if $\psi \sim 0.4 \text{ to }0.6$, then we always get a bicontinuous medium. If $\psi < 0.3$ or $>0.7$, then we get droplets always. In between these two regions, we initially have bicontinuous medium, which essentially de-percolates into droplets.
-
-Note that for droplets, we have $\psi \sim \frac{R^3}{L^3}$, where $R$ is the droplet size and $L$ is the droplet separation. Since we have a fixed $\psi$, it follows that $R \sim L$.
-
-In two dimensions, things are different, and this is mostly a topological issue. In the fully symmetric case, we have a constant $\eta$ throughout, and $F$ is strictly symmetric $F(\phi) = f(-\phi)$. Then \emph{only} on the $\psi = \frac{1}{2}$ line do we have bicontinuity. This follows for symmetry reasons. % like in percolation theory.
-
-We can get a ``mixed'' Ostwald and fluid flow, and is complicated and difficult to understand.
+%We can get a ``mixed'' Ostwald and fluid flow, and is complicated and difficult to understand.
 
 \section{Liquid crystals hydrodynamics}
-Model $H$ was the case of a scalar order parameter coupled to a fluid flow. What is the Model H-level description of nematic liquid crystals? On the hydrodynamic level, we can neglect noise. There are two cases:
+\subsection{Liquid crystal models}
+We finally turn to the case of liquid crystals. In this case, our order parameter no longer takes a scalar value, and interesting topological phenomena can happen. We first write down the theory in detail, and then discuss coarsening behaviour of liquid crystals. We will describe the coarsening purely via geometric means, and the details of the model are not exactly that important.
+
+Recall that there are two types of liquid crystals:
 \begin{enumerate}
   \item Polar liquid crystals, where the molecules have ``direction'', and the order parameter is $\mathbf{p}$, a vector, which is orientational but not positional.
   \item Nematic liquid crystals, where the molecules are like a cylinder, and there is an order parameter $\boldsymbol\Theta$.
 \end{enumerate}
 
-We will do the polar case only, and we will just quote the answers for the nematic case.
+We will do the polar case only, and just quote the answers for the nematic case.
 
 As before, we have to start with a free energy
 \[
   F = \int \left\{\frac{a}{2} |\mathbf{p}|^2 + \frac{b}{4} |\mathbf{p}|^4 + \frac{\kappa}{2} (\nabla_i \mathbf{p}_j)(\nabla_i p_j)\right\}\;\d \mathbf{r} \equiv \int \F \;\d \mathbf{r}.
 \]
-The first two terms are needed to go from an isotropic to a polar phase. Note that
+The first two terms are needed for the isotropic-polar transition to occur. Note that
 \begin{enumerate}
   \item $F[\mathbf{p}] = F[-\mathbf{p}]$, so we have no cubic term.
   \item A linear term would correspond to the presence of an external field, e.g.\ magnetic field.
@@ -2348,11 +2405,15 @@ where $\D$ is some sort of comoving derivative. For the scalar field, we had
 \[
   \frac{\D \phi}{\D t} = \dot{\phi} + \mathbf{v} \cdot \nabla \phi.
 \]
-Note that the advective term is trilinear, being first order in $\mathbf{v}$, $\nabla$ and $\phi$. For $\mathbf{p}$, there is certainly something like this going on. If we have a translation, then $\mathbf{p}$ gets incremented by $\Delta \mathbf{p} = \mathbf{v} \cdot \nabla \mathbf{p} \Delta t$, as for a scalar.
+Note that the advective term is trilinear, being first order in $\mathbf{v}$, $\nabla$ and $\phi$. For $\mathbf{p}$, there is certainly something like this going on. If we have a translation, then $\mathbf{p}$ gets incremented by
+\[
+  \Delta \mathbf{p} = \mathbf{v} \cdot \nabla \mathbf{p}\;\Delta t,
+\]
+as for a scalar.
 
 There is at least one more thing we should think about, namely if $\mathbf{v}$ is rotational, then we would expect this to rotate $\mathbf{p}$ as well. We have the corotational term
 \[
-  \Delta \mathbf{p} = \boldsymbol\omega \wedge \mathbf{p} \Delta t,
+  \Delta \mathbf{p} = \boldsymbol\omega \wedge \mathbf{p}\;\Delta t,
 \]
 where $\boldsymbol\omega$ is the angular velocity of the fluid, given by
 \[
@@ -2364,47 +2425,45 @@ It turns out in general, there is one more contribution to the advection, given 
 \[
   \Delta \mathbf{p} = - \xi \D \cdot \mathbf{p} \Delta t
 \]
-with $\D_{ij} = \frac{1}{2} (\nabla_i v_j + \nabla_j v_i)$ and $\xi$ a parameter. This is the irrotational part of the derivative. The reason is that in a general flow, $\mathbf{p}$ needn't simply rotate with $\boldsymbol\omega$. Instead, it typically aligns along streamlines. Therefore, we have
+with $\D_{ij} = \frac{1}{2} (\nabla_i v_j + \nabla_j v_i)$ and $\xi$ a parameter. This is the irrotational part of the derivative. The reason is that in a general flow, $\mathbf{p}$ needn't simply rotate with $\boldsymbol\omega$. Instead, it typically aligns along streamlines. In total, we have
 \[
   \frac{\D \mathbf{p}}{\D t} = (\partial_t + \mathbf{v} \cdot \nabla) \mathbf{p} + \Omega \cdot \mathbf{p} - \xi \D \cdot \mathbf{p}.
 \]
 The parameter $\xi$ is a molecular parameter, which depends on the liquid crystal. The $\xi = 1$ case is called \term{no slip}, and the $\xi = 0$ case is called \term{full slip}.
 
-Then the hydrodynamic equation becomes
+With this understanding, we can write the hydrodynamic equation as
 \[
   \frac{\D \mathbf{p}}{\D t} = - \Gamma \mathbf{h},\quad \mathbf{h} = \frac{\delta F}{\delta \mathbf{p}}.
 \]
-We now need an equation of motion for $\mathbf{v}$. We simply take
+We next need an equation of motion for $\mathbf{v}$. We can simply
 \[
   \rho(\partial_t +\mathbf{v} \cdot \nabla) \mathbf{v} = \eta \nabla^2 \mathbf{v} - \nabla P + \nabla \cdot \Sigma^p,
 \]
-where $\Sigma^p$ is a stress tensor coming from the order parameter (compare this with $- \phi \nabla \mu$). If we look at the free energy change in an ``advective'' elastic distortion, we get
-\[
-  \delta F = \int \frac{\delta F}{``d \mathbf{p}} \cdot \dot{p} \Delta t \;\d \mathbf{r} = \Delta t \int \mathbf{h} \cdot \mathbf{p} \;\d \mathbf{r},
-\]
-where we pick
+where $\Sigma^p$ is a stress tensor coming from the order parameter.
+
+To figure out what $\Sigma^p$ should be, we can consider what happens when we have an ``advective'' elastic distortion. In this case, we have $\frac{\D \mathbf{p}}{\D t} = 0$, so we have
 \[
   \dot{\mathbf{p}} = - \mathbf{v} \cdot \nabla \mathbf{p} - \Omega \cdot \mathbf{p} + \xi \D \cdot \mathbf{p},
 \]
-so that $\frac{\D \mathbf{p}}{\D t} = 0$. This mean our change is only advective with no relaxation. This must obey
+The free energy change is then
+\[
+  \delta F = \int \frac{\delta F}{\delta \mathbf{p}} \cdot \dot{\mathbf{p}}\; \Delta t \;\d \mathbf{r} = \Delta t \int \mathbf{h} \cdot \mathbf{p} \;\d \mathbf{r},
+\]
+On the other hand, the free energy change must also be given by
 \[
   \delta F = \int \Sigma_{ij}^{\mathbf{p}} \nabla_i u_j(\mathbf{r}) \;\d \mathbf{r},
 \]
-the product of the stress and strain tensors. By matching these two expressions, we see (cf.\ example sheet 3) that we have
+the product of the stress and strain tensors. By matching these two expressions, we see that we can write
 \[
   \Sigma_{ij}^p = \Sigma_{ij}^{(1)} + \Sigma_{ij}^{(2)} + \Sigma_{ij}^{(3)},
 \]
-with
-\begin{align*}
-  \nabla_i \Sigma_{ij}^{(1)} &= - p_k \nabla_j h_k\\
-  \Sigma_{ij}^{(2)} &= \frac{1}{2} (p_i h_j - p_j h_i)\\
-  \Sigma_{ij}^{(2)} &= \frac{\xi}{2} (p_i h_j + p_j h_i).
-\end{align*}
-So hydrodynamic equations for a polar liquid crystal are
-\begin{align*}
-  (\partial_t + \mathbf{v} \cdot \nabla)\mathbf{p} &= - \Omega \cdot \mathbf{p} + \xi \D \cdot \mathbf{p} - \Gamma \mathbf{h},\quad \mathbf{h} = \frac{\delta F}{\delta \mathbf{p}}\\
-  \rho (\partial_t + \mathbf{v} \cdot \nabla)\mathbf{v} &= \eta \nabla^2 \mathbf{v} - \nabla P + \nabla \cdot \Sigma^p.
-\end{align*}
+where
+\[
+  \nabla_i \Sigma_{ij}^{(1)} = - p_k \nabla_j h_k,\quad
+  \Sigma_{ij}^{(2)} = \frac{1}{2} (p_i h_j - p_j h_i),\quad
+  \Sigma_{ij}^{(2)} = \frac{\xi}{2} (p_i h_j + p_j h_i).
+\]
+
 Analogous results for a nematic liquid crystal holds, whose derivation is a significant pain. We have
 \[
   \frac{\D Q}{\D t} = - \Gamma H,\quad H_{ij} = \frac{\delta F}{\delta Q_{ij}} - \left( \Tr\frac{\delta F}{\delta Q}\right) \frac{\delta_{ij}}{d}.
@@ -2413,7 +2472,7 @@ The second term in $H$ is required to ensure $Q$ remains traceless.
 
 The total derivative is given by
 \[
-  \frac{\D Q}{\D t} = (\partial_t + \mathbf{v} \cdot \nabla) Q + (\Omega \cdot Q - Q \cdot \omega) + \xi (\D \cdot Q + Q \cdot D) - 2\xi \left(Q + \frac{\mathbf{1}}{d}\right) \Tr(Q \cdot \nabla \mathbf{v})
+  \frac{\D Q}{\D t} = (\partial_t + \mathbf{v} \cdot \nabla) Q + (\Omega \cdot Q - Q \cdot \omega) + \xi (\D \cdot Q + Q \cdot D) - 2\xi \left(Q + \frac{\mathbf{1}}{d}\right) \Tr(Q \cdot \nabla \mathbf{v}).
 \]
 The terms are the usual advection term, rotation, alignment/slip and tracelessness terms respectively. The Navier--Stokes equation involves a stress term
 \[
@@ -2424,33 +2483,46 @@ where
   \nabla_k \Sigma^{Q, 1}_{k, \ell} &= - Q_{ij} \nabla_\ell H_{ij}\\
   \Sigma^{Q, 2} &= Q \cdot H - H \cdot Q - \xi \left(\frac{2}{3} H + 2 \widehat{QH} - 2 Q \tr (Q H)\right),
 \end{align*}
-where the hat denotes the traceless symmetric part. The rest of the Navier--Stokes equations is the same.
+with the hat denoting the traceless symmetric part. The rest of the Navier--Stokes equations is the same.
 
 \subsection{Coarsening dynamics for nematics}
-We will discuss the coarsening dynamics for nematic liquid crystals. The polar liquid crystals are similar.
+We will discuss the coarsening dynamics for nematic liquid crystals, and indicate how polar liquid crystals are different when appropriate. As before, we begin with a completely disordered phase with $Q = 0$, and then quench the system by dropping the temperature quickly. The liquid crystals then want to arrange themselves. Afterwards, we local have
+\[
+  Q = 
+  \begin{pmatrix}
+    \lambda & 0 & 0\\
+    0 & - \lambda/2 & 0\\
+    0 & 0 & -\lambda/2
+  \end{pmatrix}
+\]
+with free energy $f(\lambda)$. If the quench is deep enough, we have spinodal-like instability, and we quickly get locally ordered. Coordinate-independently, we can write
+\[
+  Q = \hat{\lambda} \left(n_i n_j - \frac{1}{3} \delta_{ij}\right).
+\]
+Since all this ordering is done locally, the principal axis $\mathbf{n}$ can vary over space. There is then a slower process that sorts out global ordering, driven by the elastic part of the free energy.
 
-We begin with a completely disordered phase with $Q = 0$, and then quench the system by dropping the temperature quickly. The liquid crystals then want to arrange themselves. Under a shallow quench, locally $Q = \diag(\lambda, -\lambda/2, -\lambda/2)$ with free energy $f(\lambda)$, we previously saw that there is still an energy barrier to overcome, and so we have to deal with nucleation.
-
-For a deep quench, we no longer have an energy barrier, and we have spinodal-like local instability. We have
-\[
-  \frac{\D Q}{\D t} = - \Gamma H,\quad H = \frac{\partial f}{\partial Q} - \kappa \nabla^2 Q.
-\]
-Going into Fourier space, the fastest growth occur at $q \to 0$, because of the second term which only slows us down at large $q$. This has a growth rate $r(0)$. So on a time scale of $r(0)^{-1}$, we know that $Q \to \diag(\lambda, -\lambda/2, -\lambda/2)$ almost everywhere. In other words,
-\[
-  Q = \hat{\lambda} \left(n_i n_j - \frac{1}{3} \delta_{ij}\right)
-\]
-However, in general, we expect the principal axes to depend on the point, since these orderings happen at different points independently. So we have $\mathbf{n} = \mathbf{n}(\mathbf{r})$. So we have a quick process that sorts out the local ordering, then there is a slow process that sorts out the global ordering. This is driven by the elastic part of the free energy. Recall that
-\[
-  \F = a \Tr(Q^2) + b (\Tr Q^2)^2 + b (\Tr Q^4) + c (\Tr Q^2) + \frac{\kappa}{2} (\nabla \cdot Q)^2,
-\]
-and the elastic term is the last one. So
-\[
-  \frac{\D Q}{\D t} = - \Gamma \frac{\delta F_{el}}{\delta Q} \sim - \nabla \nabla(\text{something}).
-\]
+%we previously saw that there is still an energy barrier to overcome, and so we have to deal with nucleation.
+%
+%For a deep quench, we no longer have an energy barrier, and we have spinodal-like local instability. We have
+%\[
+%  \frac{\D Q}{\D t} = - \Gamma H,\quad H = \frac{\partial f}{\partial Q} - \kappa \nabla^2 Q.
+%\]
+%Going into Fourier space, the fastest growth occur at $q \to 0$, because of the second term which only slows us down at large $q$. This has a growth rate $r(0)$. So on a time scale of $r(0)^{-1}$, we know that $Q \to \diag(\lambda, -\lambda/2, -\lambda/2)$ almost everywhere. In other words,
+%\[
+%  Q = \hat{\lambda} \left(n_i n_j - \frac{1}{3} \delta_{ij}\right)
+%\]
+%However, in general, we expect the principal axes to depend on the point, since these orderings happen at different points independently. So we have $\mathbf{n} = \mathbf{n}(\mathbf{r})$. So we have a quick process that sorts out the local ordering, then there is a slow process that sorts out the global ordering. This is driven by the elastic part of the free energy. Recall that
+%\[
+%  \F = a \Tr(Q^2) + b (\Tr Q^2)^2 + b (\Tr Q^4) + c (\Tr Q^2) + \frac{\kappa}{2} (\nabla \cdot Q)^2,
+%\]
+%and the elastic term is the last one. So
+%\[
+%  \frac{\D Q}{\D t} = - \Gamma \frac{\delta F_{el}}{\delta Q} \sim - \nabla \nabla(\text{something}).
+%\]
 % like conserved quantity % goldstone's theorem, spontaneous symmetry breaking
-So this is slower.
 
-Compare this with Model B/H: at early times, we have $\phi: \pm \phi_B$, but we get domain walls between the $\pm \phi_B$ phases. The late time dynamics is governed by the slow coarsening of these domain walls. This is an examples of a \term{topological defect}, i.e.\ a structure of reduced dimensionality $D < d$ (e.g.\ the dimension of the domain wall is one less than the dimension of the total space), which connects different ground states (i.e.\ minima of $F$). These cannot be removed by any local process.
+
+Compare this with Model B/H: at early times, we have $\phi: \pm \phi_B$, but we get domain walls between the $\pm \phi_B$ phases.
 \begin{center}
   \begin{tikzpicture}
     \draw [->] (-3, 0) -- (3, 0) node [right] {$x$};
@@ -2463,10 +2535,13 @@ Compare this with Model B/H: at early times, we have $\phi: \pm \phi_B$, but we 
 
   \end{tikzpicture}
 \end{center}
+The late time dynamics is governed by the slow coarsening of these domain walls. The key property of this is that it has reduced dimensionality, i.e.\ the domain wall is $2$ dimensional while space is $3$ dimensional, and it connects two different grounds states (i.e.\ minima of $F$).
 
-We can move the domain wall around, but there is no local change that allows us to remove it. What are the analogous structures in a nematic liquid crystal?
+The domain wall can be moved around, but there is no local change that allows us to remove it. They can only be removed by ``collision'' of domain walls.
 
-We will first do this informally. We first do this in two dimensions. First note that there are no line defects, i.e.\ there is nothing like a domain wall before. The reason is that if we try to construct a domain wall
+Analogous structures are present for nematic liquid crystals. The discussion will largely involve us drawing pictures. For now, we will not do this completely rigorously, and simply rely on our intuitive understanding of when defects can or cannot arise. We later formalize these notions in terms of homotopy groups.
+
+We first do this in two dimensions, where defects have dimension $< 2$. There can be no line defects like a domain wall. The reason is that if we try to construct a domain wall
 \begin{center}
   \begin{tikzpicture}
     \draw (-2, -2) rectangle (2, 2);
@@ -2479,7 +2554,7 @@ We will first do this informally. We first do this in two dimensions. First note
      }
   \end{tikzpicture}
 \end{center}
-this can relax locally to become
+then this can relax locally to become
 \begin{center}
   \begin{tikzpicture}
     \draw (-2, -2) rectangle (2, 2);
@@ -2493,34 +2568,34 @@ this can relax locally to become
   \end{tikzpicture}
 \end{center}
 
-On the other hand, we can have \term{point defects}, which are of dimension $d - 2 = 0$:
+On the other hand, we can have \term{point defects}, which are $0$-dimensional. Two basic ones are as follows:
 \begin{center}
   \begin{tikzpicture}
     \node [circ] {};
-    \draw [loosely dashed] (-1.732, -0.8) edge [bend right] (-0.2, 2);
-    \draw [loosely dashed] (-1.732, -0.3) edge [bend right] (-0.7, 2);
-    \draw [loosely dashed, rotate=120] (-1.732, -0.8) edge [bend right] (-0.2, 2);
-    \draw [loosely dashed, rotate=120] (-1.732, -0.3) edge [bend right] (-0.7, 2);
-    \draw [loosely dashed, rotate=240] (-1.732, -0.8) edge [bend right] (-0.2, 2);
-    \draw [loosely dashed, rotate=240] (-1.732, -0.3) edge [bend right] (-0.7, 2);
+    \draw [mblue, semithick, loosely dashed] (-1.732, -0.8) edge [bend right] (-0.2, 2);
+    \draw [mblue, semithick, loosely dashed] (-1.732, -0.3) edge [bend right] (-0.7, 2);
+    \draw [mblue, semithick, loosely dashed, rotate=120] (-1.732, -0.8) edge [bend right] (-0.2, 2);
+    \draw [mblue, semithick, loosely dashed, rotate=120] (-1.732, -0.3) edge [bend right] (-0.7, 2);
+    \draw [mblue, semithick, loosely dashed, rotate=240] (-1.732, -0.8) edge [bend right] (-0.2, 2);
+    \draw [mblue, semithick, loosely dashed, rotate=240] (-1.732, -0.3) edge [bend right] (-0.7, 2);
 
     \node [below] at (0, -1.8) {$q = -\frac{1}{2}$};
     \begin{scope}[shift={(6, 0)}]
       \node [circ] {};
 
-      \draw [loosely dashed] (0, 0) -- (0, 2);
+      \draw [mblue, semithick, loosely dashed] (0, 0) -- (0, 2);
 
-      \draw [loosely dashed] (-0.5, 2) -- (-0.5, 0) arc (180:360:0.5) -- (0.5, 2);
-      \draw [loosely dashed] (-1, 2) -- (-1, 0) arc (180:360:1) -- (1, 2);
-      \draw [loosely dashed] (-1.5, 2) -- (-1.5, 0) arc (180:360:1.5) -- (1.5, 2);
-      \node [below] at (0, -1.8) {$q = \frac{1}{2}$};
+      \draw [mblue, semithick, loosely dashed] (-0.5, 2) -- (-0.5, 0) arc (180:360:0.5) -- (0.5, 2);
+      \draw [mblue, semithick, loosely dashed] (-1, 2) -- (-1, 0) arc (180:360:1) -- (1, 2);
+      \draw [mblue, semithick, loosely dashed] (-1.5, 2) -- (-1.5, 0) arc (180:360:1.5) -- (1.5, 2);
+      \node [below] at (0, -1.8) {$q = +\frac{1}{2}$};
     \end{scope}
   \end{tikzpicture}
 \end{center}
 
-We can classify these as follows --- when we go around the defect once, what happens to our order parameter? In the first case, we have a half turn in the opposite sense to the ``circuit'' around the defect, and in the second case, there is a half turn in the same sense. We say these have topological charges $-\frac{1}{2}$ and $\frac{1}{2}$ instead. We see that $\frac{1}{2}$ is a \term{quantum} of a topological charge. If we have a polar liquid crystal instead, then the quantum is $1$.
+The charge $q$ can be described as follows --- we start at a point near the defect, and go around the defect once. When doing so, the direction of the order parameter turns. After going around the defect once, in the $q = -\frac{1}{2}$, the order parameter made a half turn in the opposite sense to how we moved around the defect. In the $q = +\frac{1}{2}$ case, they turned in the same sense. 
 
-We can have $q = \pm 1$, $q = \frac{3}{2}$ charges as well:
+We see that $q \pm \frac{1}{2}$ are the smallest possible \term{topological charge}, and is a \term{quantum} of a charge. In general, we can have defects of other charges. For example, here are two $q = +1$ charges:
 
 \begin{center}
   \begin{tikzpicture}
@@ -2540,19 +2615,19 @@ We can have $q = \pm 1$, $q = \frac{3}{2}$ charges as well:
   \end{tikzpicture}
 \end{center}
 
-Note that if we take the hedgehog, and rotate every bar by 90 degrees, then we get a vortex. So these are $q = +1$ defects.
+Both of these are $q = +1$ defects, and they can be continuously deformed into each other, simply by rotating each bar by $90^\circ$. For polar liquid crystals, the quantum of a charge is $1$.
 
-In general, for nematic liquid crystals, these can dissociate into two $q = \frac{1}{2}$ vortices, and this tends to happen for energetic reasons, since this reduces elastic energy
+If we have defects of charge greater than $\pm \frac{1}{2}$, then they tend to dissociate into multiple $q = \pm \frac{1}{2}$ defects. This is due to energetic reasons. The elastic energy is given by
 \[
-  F_{ell} = \frac{\kappa}{2} |\nabla \cdot Q|^2 \sim \frac{\kappa}{2} \lambda^2 |(\nabla \cdot n)n + \mathbf{n} \cdot \nabla \mathbf{n}|^2.
+  F_{\mathrm{ell}} = \frac{\kappa}{2} |\nabla \cdot Q|^2 \sim \frac{\kappa}{2} \lambda^2 |(\nabla \cdot \mathbf{n})\mathbf{n} + \mathbf{n} \cdot \nabla \mathbf{n}|^2.
 \]
 If we double the charge, we double the $Q$ tensor. Since this term is quadratic in the gradient, putting two defects together doubles the energy. In general, topological defects tend to dissociate to smaller $q$-values.
 
-Recall that in 2 dimensions, at early stages, we have
+To recap, after quenching, at early stages, we locally have
 \[
   Q \to 2\lambda (\mathbf{n} \mathbf{n} - \frac{1}{2}\mathbf{1}).
 \]
-This $\mathbf{n}(\mathbf{r})$ is random, and is uniform subject to topological defects. These defects cannot be ironed out locally. All topological defects with $|q| > \frac{1}{2}$ dissociate. So we effectively have a gas of $q = \pm \frac{1}{2}$ topological defects that are left over from the initial conditions.
+This $\mathbf{n}(\mathbf{r})$ is random, and tend to vary continuously. However, topological defects are present, which cannot be ironed out locally. All topological defects with $|q| > \frac{1}{2}$ dissociate quickly, and we are left with $q = \pm \frac{1}{2}$ defects floating around.
 
 We then have a late stage process where opposite charges attract and then annihilate. So the system becomes more and more ordered as a nematic. We can estimate the energy of an isolated defect as
 \[
@@ -2566,11 +2641,9 @@ So we have an energy
 \[
   E \sim \tilde{\kappa} \int \frac{1}{r^2} \;\d \mathbf{r} \simeq \tilde{\kappa} \log \left(\frac{L}{r_0}\right),
 \]
-where $L$ is the mean spacing and $r_0$ is some kind of core radius. The point is that as we zoom close enough to the core of the signularity, $\lambda$ is no longer constant and our above energy estimate fails. In fact, $\lambda \to 0$ at the core.
+where $L$ is the mean spacing and $r_0$ is some kind of core radius of the defect. The core radius reflects the fact that as we zoom close enough to the core of the signularity, $\lambda$ is no longer constant and our above energy estimate fails. In fact, $\lambda \to 0$ at the core.
 
-Recall that the electrostatic energy in two dimensions is given by a similar equation. Thus, this energy is Coulombic, with force $\propto \frac{\tilde{\kappa}}{R}$.
-
-The defects move with overdamped motion, with the velocity being proportional to the force. So
+Recall that the electrostatic energy in two dimensions is given by a similar equation. Thus, this energy is Coulombic, with force $\propto \frac{\tilde{\kappa}}{R}$. Under this force, the defects move with overdamped motion, with the velocity being proportional to the force. So
 \[
   \dot{R} \sim \frac{1}{R},\quad \dot{L} \propto \frac{1}{L}.
 \]
@@ -2581,87 +2654,122 @@ So
 This is the scaling law for nematic defect coarsening in 2 dimensions.
 
 \subsection{Topological defects in three dimensions}
-in three dimensions, the same defects become lines, i.e.\ they are obtained by taking the product of our previous defects with a line. Separated at a distance $R$, the interaction force remains $\tilde{\kappa}/R$ per unit length. So we have
-\[
-  \mathbf{v} \propto \frac{\text{force}}{\text{unit length}},
-\]
+In three dimensions, we also have defects of the above kind lying along a line.
+\begin{center}
+  \tdplotsetmaincoords{74}{60}
+  \begin{tikzpicture}[tdplot_main_coords]
+
+    \foreach \z in {0,1.2,2.4}{
+      \begin{scope}[shift={(0,0,\z)}]
+        \draw [mblue, semithick, loosely dashed] (0, 0, 0) -- (0, 2, 0);
+        \draw [mblue, semithick, loosely dashed] (-0.5, 2, 0) -- (-0.5, 0) arc (180:360:0.5) -- (0.5, 2, 0);
+        \draw [mblue, semithick, loosely dashed] (-1, 2, 0) -- (-1, 0) arc (180:360:1) -- (1, 2, 0);
+        \draw [mblue, semithick, loosely dashed] (-1.5, 2, 0) -- (-1.5, 0) arc (180:360:1.5) -- (1.5, 2, 0);
+      \end{scope}
+    }
+    \draw [mred, thick] (0, 0, -0.8) -- (0, 0, 3.2);
+
+  \end{tikzpicture}
+\end{center}
+For such line defects, everything we said so far carries through --- separated at a distance $R$, the interaction force is $\frac{\tilde{\kappa}}{R}$ and so
 and so we similarly have
 \[
   L(t) \sim t^{1/2}.
 \]
-However, in three dimensions, the $q = \pm \frac{1}{2}$ defects are \emph{the same} topologically. In other words, we can change $+q$ to $-q$ via local out-of-plane rotation of $\mathbf{n}$.
+However, in three dimensions, the $q = \pm \frac{1}{2}$ defects are \emph{the same} topologically. In other words, we can change $+q$ to $-q$ via continuous, local deformations. This involves rotating out to the $z$ direction, which is not available in two dimensions. While it is possible to visually understand how this works, it is difficult to draw on paper, and it is also evident that we should proceed in more formal manners to ensure we understand exactly how these things work.
 
-This is best seen in a slightly more formal manner, via the theory of homotopy classes.
-
-To understand this, begin with an order parameter space $\mathcal{M}$, which is the space of possible orientations of our rods.
+To begin, we have a space $\mathcal{M}$ of order parameters. In our case, this is the space of all possible orientations of rods. 
 \begin{eg}
-  When the order parameter is an $n$-component spin vector, then $\mathcal{M} = S^{n - 1}$, the unit sphere in $n$-dimensions. Note that we need not have $n = d$.
+  In the case of a polar liquid crystal in $d$ dimensions, we have $\mathcal{M} = S^{d - 1}$, the $(d - 1)$-dimensional unit sphere.
 \end{eg}
 
 \begin{eg}
-  For nematics in $d$-dimensions, we have $\mathcal{M} = \RP^{d - 1}$.
+  For nematic liquid crystals in $d$-dimensions, we have $\mathcal{M} = \RP^{d - 1}$, which is obtained from $S^{d - 1}$ by identifying antipodal points.
 \end{eg}
 
-Specifying the order parameter on a domain $D$ enclosing a defect core create a map $D \to \mathcal{M}$.
+When we discussed the charge of a topological defect, we picked a loop around the singularity and see what happened when we went around a defect. So we pick a domain $D$ that encloses a defect core, and consider the map $f: D \to \mathcal{M}$ that assigns to each point the order parameter at that point. In our cases, $D$ is a circle $S^1$, and so $f$ is a loop in $M$.
 
-The image of $D$ is then a closed loop in $M$. Two mappings $f_1, f_2$, are \term{homotopic} if they can be continuously deformed into each other. Defects lie in the same \term{homotopy class} if maps for all $D$'s enclosing them are homotopic.
+We say two mappings $f_1, f_2$, are \term{homotopic} if they can be continuously deformed into each other. Defects lie in the same \term{homotopy class} if maps for all $D$'s enclosing them are homotopic. The \emph{fundamental group} $\pi_1(\mathcal{M})$ is the set of all homotopy classes of maps $S^1 \to \mathcal{M}$. This encodes the set of all possible charges.
 
-Suppose we have two defects $D_1, D_2$, then we can consider a path $D_3$ that goes around both of the defects, and there is an obvious sense in which $D_3 = D_1 + D_2$. Thus, topological defects form a group under addition. For example, in two dimensions, $q_{1 + 2} = q_1 + q_2$.
+Since we call it a fundamental \emph{group}, it had better have a group structures. If we have two defects, we can put them next to each other, and pick a new circle that goes around the two defects. This then gives rise to a new homotopy class $S^1 \to \mathcal{M}$.
 
-The \term{fundamental group} $\pi_1(\mathcal{M})$ is the group of all possible such defects when $D$ is a closed loop. Also, $\pi_n(\mathcal{M})$ describes $n$-dimensional enclosing surfaces.
+More generally, if we consider $d - n$-dimensional defects, then we can enclose the defect with a sphere of dimension $n - 1$. The corresponding classes live in the higher homotopy groups $\pi_{n - 1}(\mathcal{M})$.
 
 \begin{eg}
-  In two dimensions, $\pi_1(\RP^1) = \Z$, and the generator of $\pi_1(\RP^1)$ is the charge $\frac{1}{2}$ topological defect.
+  Observe that $\RP^1$ is actually just $S^1$ in disguise, and so $\pi_1(\RP^1) = \Z$. The generator of $\pi_1(\RP^1)$ is the charge $\frac{1}{2}$ topological defect.
 \end{eg}
 
 \begin{eg}
-  In three dimensions, $\pi_1(\RP^2) = \Z/2\Z$, and so the $q = \pm \frac{1}{2}$ maps are the same.
+  We can visualize $\RP^2$ as a certain quotient of the disk, namely
+  \begin{center}
+    \begin{tikzpicture}
+      \fill [mgreen, opacity=0.1] (1, 0) circle [radius=1];
+      \draw [mblue, ->-=0.54] (0, 0) arc (180:0:1);
+      \draw [mred, ->-=0.54] (2, 0) arc (0:-180:1);
+      \node [circ] {};
+      \node [circ] at (2, 0) {};
+    \end{tikzpicture}
+  \end{center}
+  where we identify the two arcs in the boundary according to the arrow. Observe that the two marked points are in fact the same point under the identification. If we have a path from the first point to the second point, then this would be considered a loop in $\RP^2$, and this is the $q = \frac{1}{2}$ defect.
+  
+  Observe that in the two-dimensional case, the $q = \pm \frac{1}{2}$ defects correspond to going along the top arc and bottom arc from the left to right respectively. In $\RP^2$, there is then a homotopy between these two paths by going through the disk. So in $\RP^2$, they lie in the same homotopy class.
+
+  In general, it is easy to see that $\pi_1(\RP^2) = \Z/2\Z$, so $q = \frac{1}{2}$ is the unique non-trivial defect.
 \end{eg}
+This is particularly interesting, because two $q = \frac{1}{2}$ defects can merge and disappear! Similarly, what you would expect to be a $q = 1$ defect could locally relax to become trivial.
 
-The outcome is that 3D nematics support single defects (disclination line). Two disclinations can annihilate or appear out of nothing, and any even number can eventually disappear.
-
-We can have disclination loops. These then correspond to homotopy classes of maps $T^2 \to \mathcal{M}$, which bijects with $\pi_1(\mathcal{M})^2$.
+Observe that in our ``line defects'', the core can actually form a loop instead. We can also have point defects that correspond to elements in $\pi_2(\mathcal{M}) \cong \Z$. It is an exercise to draw some pictures yourself to see how these look.
 
 % some loops
-
-If we view this from a distance, this looks like a 3d hedgehog, i.e.\ $\mathbf{n} = \mathbf{r}$ on a sphere. If we shrink the loop to zero, then we get a point defect. This lies in $\pi_2(\mathcal{M})$.
-
-If we have polar liquid crystals, then our maps take values in $S^n$, and so we are looking at homotopy groups of spheres. 
-
+%
+%If we view this from a distance, this looks like a 3d hedgehog, i.e.\ $\mathbf{n} = \mathbf{r}$ on a sphere. If we shrink the loop to zero, then we get a point defect. This lies in $\pi_2(\mathcal{M})$.
+%
+%If we have polar liquid crystals, then our maps take values in $S^n$, and so we are looking at homotopy groups of spheres.
+%
 % insert examples
+%
+%Since $\pi_1(S^2) = 0$ but $\pi_2(S^2) = \Z$, we get point defects but not line defects.
 
-Since $\pi_1(S^2) = 0$ but $\pi_2(S^2) = \Z$, we get point defects but not line defects.
 \section{Active Soft Matter}
-We want to think about \term{motile} particles, which are particles that are self-propelled. For example, micro-organisms such as bacteria and algae can move by themselves, and so can synthetic microswimmers. For example, we can make a sphere and coat it with gold and platinum on two sides
+We shall finish the course by thinking a bit about \term{motile} particles. These are particles that are self-propelled. For example, micro-organisms such as bacteria and algae can move by themselves. There are also synthetic microswimmers. For example, we can make a sphere and coat it with gold and platinum on two sides
 \begin{center}
-  \begin{tikzpicture}
+  \begin{tikzpicture}[scale=0.5] 
+    \fill [morange, opacity=0.15] (0, 1) arc(90:270:1);
+    \fill [black, opacity=0.1] (0, 1) arc(90:-90:1);
     \draw circle [radius=1];
     \draw (0, -1) -- (0, 1);
     \node [right] at (1, 0) {Pt};
     \node [left] at (-1, 0) {Au};
   \end{tikzpicture}
 \end{center}
-We put this in H$_2$O$_2$. These are asymmetric catalysts of the breakdown 2H$_2$O$_2$ $\to$ 2H$_2$O + O$_2$, and the gradient in reaction rates causes motion. In both cases, the motion is propelled by some fuel. The conversion of fuel into motion implies we have entropy production. So we have ``microscopic dynamics''. There is no Newton's laws or Lagrangian mechanics and no time reversal symmetry.
+We put this in hydrogen peroxide H$_2$O$_2$. Platinum is a catalyst of the decomposition
+\begin{center}
+  2H$_2$O$_2$ $\to$ 2H$_2$O + O$_2$,
+\end{center}
+and this reaction will cause the swimmer to propel forward in a certain direction. This reaction implies that entropy is constantly being produced, and this cannot be captured adequately by Newtonian or Lagrangian mechanics on a macroscopic scale.
 
-There are consequences here for steady state behaviour:
+Two key consequences of this are:
 \begin{enumerate}
   \item There is no Boltzmann distribution.
   \item The principle of detailed balance, which is a manifestation of time reversal symmetry, no longer holds.
 \end{enumerate}
-Hence steady-state fluxes are allowed.
+
 \begin{eg}
   Take bacteria in microfluidic enclosure with funnel gates:
   \begin{center}
     \begin{tikzpicture}
       \draw (0, 0) rectangle (2, 2);
       \foreach \y in {0.2, 0.4, 0.6, 0.8} {
-        \draw (0.9, \y - 0.1) -- (1.1, \y) -- (0.9, \y + 0.1);
+        \draw (0.9, \y - 0.07) -- (1.1, \y) -- (0.9, \y + 0.07);
       }
       \foreach \y in {1.2, 1.4, 1.6, 1.8} {
-        \draw (1.1, \y - 0.1) -- (0.9, \y) -- (1.1, \y + 0.1);
-      } % draw rotation arrows
+        \draw (1.1, \y - 0.07) -- (0.9, \y) -- (1.1, \y + 0.07);
+      }
+      \draw [-latex, mred, thick] (1.4, 1.33) arc(90:-90:0.3);
+      \draw [-latex, mred, thick] (0.6, 0.67) arc(270:90:0.3);
     \end{tikzpicture}
   \end{center}
+
   In this case, we expect there to be a rotation of particles if they are self-propelled, since it is easier to get through one direction than the other. Contrast this with the fact that there is no current in the steady state for any thermal equilibrium system. The difference is that Brownian motion has independent increments, but self-propelled particles tend to keep moving in the same direction.
 
   Note also that we have to have to break spatial symmetry for this to happen. This is an example of the \term{Ratchet theorem}, namely if we have broken time reversal symmetry pathwise, and broken spatial symmetry, then we can have non-zero current.
@@ -2672,59 +2780,58 @@ If we want to address this type of system in the language we have been using, we
   \item Start with models of passive soft matter (e.g.\ Model B and Model H), and add \emph{minimal terms} to explicitly break time reversal phenomenologically.
 \end{enumerate}
 
-\begin{eg}
-  Start with Model B, which has a diffusive, symmetric scalar field $\phi$ with phase separation:
-  \begin{align*}
-    \dot{\phi} &= - \nabla \cdot \mathbf{J}\\
-    \mathbf{J} &= - \nabla \tilde{\mu} + \sqrt{2D} \boldsymbol\Lambda.
-  \end{align*}
-  We took
-  \[
-    F = \int \left\{\frac{a}{2} + \frac{b}{4} \phi^4 + \frac{\kappa}{2} (\nabla \phi)^2 \right\} \;\d \mathbf{r}.
-  \]
-  To model our system without time reversal symmetry, we put
-  \[
-    \tilde{\mu} = \frac{\delta F}{\delta \phi} + \lambda (\nabla \phi)^2.
-  \]
-  The new term breaks the time reversal structure. These equations are called \term{active Model B}. Another way to destroy time reversal symmetry is by replacing the white noise with something else, but that is complicated
+Of course, we are going to proceed phenomenologically.
+\subsubsection*{Active Model B}
+Start with Model B, which has a diffusive, symmetric scalar field $\phi$ with phase separation:
+\begin{align*}
+  \dot{\phi} &= - \nabla \cdot \mathbf{J}\\
+  \mathbf{J} &= - \nabla \tilde{\mu} + \sqrt{2D} \boldsymbol\Lambda.
+\end{align*}
+We took
+\[
+  F = \int \left\{\frac{a}{2} + \frac{b}{4} \phi^4 + \frac{\kappa}{2} (\nabla \phi)^2 \right\} \;\d \mathbf{r}.
+\]
+To model our system without time reversal symmetry, we put
+\[
+  \tilde{\mu} = \frac{\delta F}{\delta \phi} + \lambda (\nabla \phi)^2.
+\]
+The new term breaks the time reversal structure. These equations are called \term{active Model B}. Another way to destroy time reversal symmetry is by replacing the white noise with something else, but that is complicated
 
-  Note that 
-  \begin{enumerate}
-    \item $(\nabla \phi)^2$ is not the functional derivative of any $F$. This breaks the free energy structure, and 
-      \[
-        \frac{\P_F}{\P_B} \not= e^{-\beta (F_2 - F_1)}
-      \]
-      for any $F[\phi]$. So time reversal symmetric is broken barring miracles.
-    \item We cannot achieve the breaking by introducing a polynomial term, since if $g(\phi)$ is a polynomial, then
-      \[
-        g(\phi) = \frac{\delta}{\delta \phi} \int \d \mathbf{r} \left(\int^\phi g(u)\;\d u\right).
-      \]
-      So gradient terms are required to break time reversal symmetry. We will later see this is not the case for liquid crystals.
-    \item The active model B is agnostic about the cause of phase separation at $a < 0$. There are two possibilities:
-      \begin{enumerate}
-        \item We can have attractive interactions
-        \item We can have repulsive interactions plus motile particles: if two particles collide head-on, then we have pairwise jamming. They then move together for a while, and this impersonates attraction. This is called \term{MIPS} --- \term{mobility-induced phase separation}. It is possible to study this at a particle level, but we shall not.
-      \end{enumerate}
-    \item The dynamics of coarsening during phase separation turns out to be similar, with $L(t) \sim t^{1/3}$. The Ostwald--like process remains intact.
-    \item The coexistence conditions are altered. We previously found the coexistence conditions simply by global free energy minimization. In the active case, we can't do free energy minimization, but we can still solve the equations of motion explicitly. In this case, instead of requiring a common tangent, we have equal slope but different intercepts, where we set
-      \[
-        (\mu \phi - f)_1 = (\mu \phi - f)_2 + \Delta.
-      \]
-      This is found by solving $\mathbf{J} = 0$, so
-      \[
-        \tilde{\mu} = \frac{\partial f}{\partial \phi} - \kappa \nabla^2 \phi + \lambda (\nabla \phi)^2 =\text{const}.
-      \]
-    \item There is a further extension, active model B+, where we put
-      \[
-        \mathbf{J} = -\nabla \tilde{\mu} + \sqrt{2D} \boldsymbol\Lambda + \zeta (\nabla^2 \phi) \nabla \phi.
-      \]
-      This extra term is similar to $\nabla (\lambda (\nabla \phi)^2)$ in that it has two $\phi$'s and three $\nabla$'s, and they are equivalent in 1 dimension, but in 1 dimension only. This changes the coarsening process significantly. For example, Ostwald can stop at finite $R$ (see arXiv:1801.07687).
-  \end{enumerate}
-\end{eg}
+Note that
+\begin{enumerate}
+  \item $(\nabla \phi)^2$ is not the functional derivative of any $F$. This breaks the free energy structure, and
+    \[
+      \frac{\P_F}{\P_B} \not= e^{-\beta (F_2 - F_1)}
+    \]
+    for any $F[\phi]$. So time reversal symmetric is broken barring miracles.
+  \item We cannot achieve the breaking by introducing a polynomial term, since if $g(\phi)$ is a polynomial, then
+    \[
+      g(\phi) = \frac{\delta}{\delta \phi} \int \d \mathbf{r} \left(\int^\phi g(u)\;\d u\right).
+    \]
+    So gradient terms are required to break time reversal symmetry. We will later see this is not the case for liquid crystals.
+  \item The active model B is agnostic about the cause of phase separation at $a < 0$. There are two possibilities:
+    \begin{enumerate}
+      \item We can have attractive interactions
+      \item We can have repulsive interactions plus motile particles: if two particles collide head-on, then we have pairwise jamming. They then move together for a while, and this impersonates attraction. This is called \term{MIPS} --- \term{mobility-induced phase separation}. It is possible to study this at a particle level, but we shall not.
+    \end{enumerate}
+  \item The dynamics of coarsening during phase separation turns out to be similar, with $L(t) \sim t^{1/3}$. The Ostwald--like process remains intact.
+  \item The coexistence conditions are altered. We previously found the coexistence conditions simply by global free energy minimization. In the active case, we can't do free energy minimization, but we can still solve the equations of motion explicitly. In this case, instead of requiring a common tangent, we have equal slope but different intercepts, where we set
+    \[
+      (\mu \phi - f)_1 = (\mu \phi - f)_2 + \Delta.
+    \]
+    This is found by solving $\mathbf{J} = 0$, so
+    \[
+      \tilde{\mu} = \frac{\partial f}{\partial \phi} - \kappa \nabla^2 \phi + \lambda (\nabla \phi)^2 =\text{const}.
+    \]
+  \item There is a further extension, active model B+, where we put
+    \[
+      \mathbf{J} = -\nabla \tilde{\mu} + \sqrt{2D} \boldsymbol\Lambda + \zeta (\nabla^2 \phi) \nabla \phi.
+    \]
+    This extra term is similar to $\nabla (\lambda (\nabla \phi)^2)$ in that it has two $\phi$'s and three $\nabla$'s, and they are equivalent in 1 dimension, but in 1 dimension only. This changes the coarsening process significantly. For example, Ostwald can stop at finite $R$ (see arXiv:1801.07687).
+\end{enumerate}
 
-\subsection{Active liquid crystals}
 \subsubsection*{Active polar liquid crystals}
-Consider first a polar system. Then the order parameter is $\mathbf{p}$. In the simplest case, we have the field is relaxational with $\mathbf{v} = \mathbf{0}$. The hydrodynamic level equation is
+Consider first a polar system. Then the order parameter is $\mathbf{p}$. In the simplest case, the field is relaxational with $\mathbf{v} = \mathbf{0}$. The hydrodynamic level equation is
 \[
   \dot{\mathbf{p}} = - \Gamma \mathbf{h},\quad \mathbf{h} = \frac{\delta F}{\delta \mathbf{p}}.
 \]
@@ -2750,83 +2857,136 @@ The Navier--Stokes/Cauchy equation is now
 \]
 where as before,
 \[
-  \nabla \cdot \Sigma^{(p)} = - p_i \nabla_j h_j  + \nabla_i \left(\frac{1}{2} (p_i h_j - p_j h_i) + \frac{\xi}{2}(p_i h_j + p_j h_i)\right).
+  \nabla \cdot \Sigma^{(p)} = - p_i \nabla_j h_j + \nabla_i \left(\frac{1}{2} (p_i h_j - p_j h_i) + \frac{\xi}{2}(p_i h_j + p_j h_i)\right).
 \]
 and we have a new term $\Sigma^A$ given by the active stress, and the lowest order term is $\zeta p_i p_j$. This is a new mechanical term that is incompatible with $F$. We then have
 \[
   \nabla \cdot \Sigma^A = (\nabla \cdot \mathbf{p}) \mathbf{p}.
 \]
-We an think of this as an effective body force in the Navier--Stokes equation. In situations like
+We can think of this as an effective body force in the Navier--Stokes equation. The effect is that we have forces whenever we have situations looking like
 \begin{center}
   \begin{tikzpicture}
     \draw [->] (0, 0) -- (1, 0);
     \draw [->] (0, 0.2) -- (1, 0.4);
     \draw [->] (0, -0.2) -- (1, -0.4);
 
+    \node at (2, 0) {or};
     \draw [<-] (3, 0) -- (4, 0);
     \draw [<-] (3, 0.2) -- (4, 0.4);
     \draw [<-] (3, -0.2) -- (4, -0.4);
 
   \end{tikzpicture}
 \end{center}
-we have a force acting to the right for $\zeta > 0$.
+In these cases, We have a force acting to the right for $\zeta > 0$, and to the left if $\zeta < 0$.
 
 These new terms give spontaneous flow, symmetric breaking and macroscopic fluxes. At high $w, \zeta$, we get chaos and turbulence.
 \subsubsection*{Active nematic liquid crystals}
 In the nematic case, there is no self-advection. So we can't make a velocity from $Q$. We again have
 \[
-  \frac{\D Q}{\D t} = - \Gamma H,
-\]
-where
-\[
+  \frac{\D Q}{\D t} = - \Gamma H,\quad
   H = \left[\frac{\delta F}{\delta Q}\right]^{\text{traceless}}.
 \]
-We have
+where $\frac{\D Q}{\D t}$ is given by
 \[
-  \frac{\D Q}{\D t} = (\partial_t + \mathbf{v} \cdot \nabla) Q + S(Q, K, \xi),
+  \frac{\D Q}{\D t} = (\partial_t + \mathbf{v} \cdot \nabla) Q + S(Q, K, \xi).
 \]
-where $K = \nabla v$ and
+Here $K = \nabla v$ and
 \[
   S = (-\Omega \cdot Q - Q \cdot \Omega) - \xi (D \cdot Q + Q \cdot D) + 2 \xi \left(Q + \frac{1}{d}\right) \Tr(Q \cdot K)
 \]
-This is unchanged by activity or self propulsion. Thus, at lowest order, all the self-propelled motion can do is the active stress term. The leading-order stress is
+Since there is no directionality as in the previous case, the material derivative will remain unchanged with active matter. Thus, at lowest order, all the self-propelled motion can do is to introduce an active stress term. The leading-order stress is
 \[
   \Sigma^A = \zeta Q.
 \]
-This breaks the free energy structure, because if we take a uniform nematic, then the passive stress vanishes, since it comes from elastic distortions only, but the active stress does not. The reason we expect this is that if the rods like to move on their own, we get local flow fields around each particle. % insert uniform nematic picture.
+This breaks the free energy structure. Indeed, if we have a uniform nematic, then the passive stress vanishes, because there is no elastic distortion at all. However, the active stress does not since $\zeta Q \not= 0$. Physically, the non-zero stress is due to the fact that the rods tend to generate local flow fields around themselves to propel motion, and these remain even in a uniform phase.
 
-The effect body force density is
+After introducing this, the effective body force density is
 \[
   \mathbf{f} = \nabla \cdot \Sigma^A = \zeta \nabla \cdot Q \sim \zeta \lambda (\nabla \cdot \mathbf{n}) \mathbf{n}.
 \]
-This is effectively the same as the case of the polar case.
-
-Now suppose we start with something locally uniform.
+This is essentially the same as the case of the polar case. Thus, if we see something like
 \begin{center}
   \begin{tikzpicture}
-    \foreach \y in {0,0.5,1,1.5,2,2.5,3}{ 
-      \draw (0, \y) -- (1, \y);
+    \draw (0, 0) -- (1, 0);
+    \draw (0, 0.2) -- (1, 0.4);
+    \draw (0, -0.2) -- (1, -0.4);
+  \end{tikzpicture}
+\end{center}
+then we have a rightward force if $\zeta > 0$ and leftward force if $\zeta < 0$. 
+
+This has important physical consequences. If we start with a uniform phase, then we expect random noise to exist, and then the active stress will destablize the system. For example, if we start with
+\begin{center}
+  \begin{tikzpicture}
+    \foreach \x in {0,0.3,...,3.0}{
+      \draw (\x, 0) -- (\x, 1);
     }
   \end{tikzpicture}
 \end{center}
-If this is deformed as follows:
-% insert picture
+and a local deformation happens:
+\begin{center}
+  \begin{tikzpicture}
+    \foreach \x in {0,1.8,3.6}{
+      \draw (\x-0.2, 0) -- (\x - 0.3, 1);
+      \draw (\x, 0) -- (\x, 1);
+      \draw (\x+0.2, 0) -- (\x + 0.3, 1);
+    }
+    \foreach \x in {0.9,2.7}{
+      \draw (\x-0.2, 1) -- (\x - 0.3, 0);
+      \draw (\x, 0) -- (\x, 1);
+      \draw (\x+0.2, 1) -- (\x + 0.3, 0);
+    }
+  \end{tikzpicture}
+\end{center}
+then in the $\zeta > 0$ case, this will just fall apart. Conversely, bends are destabilized for $\zeta < 0$. Either case, there is a tendency for these things to be destabilized, and a consequence is that active nematics are never stably uniform for large systems. Typically, we get spontaneous flow.
 
-then this is destablizing for $\zeta > 0$. Conversely, bends are destabilized for $\zeta < 0$. Either case, there is a tendency for these things to be destabilized, and a consequence is that active nematics are never stably uniform for large systems. Typically, we get spontaneous flow.
+To understand this more, we can explicitly describe how the activity parameter $\zeta$ affects the local flow patterns. Typically, we have the following two cases:
+\begin{center}
+  \begin{tikzpicture}
+    \draw (-0.2, 1) -- (-0.2, 0) arc(180:360:0.2 and 0.05) -- (0.2, 1);
+    \draw (0, 1) ellipse (0.2 and 0.05);
+    \draw [densely dashed] (-0.2, 0) arc(180:0:0.2 and 0.05);
 
-We can say a bit more about the activity parameter $\zeta$. The sign depends on local flow patterns. One possibility is a contractile, with axial in and equatorial out. This has $\zeta > 0$.
+    \draw [decoration={markings, mark=at position 0.4 with {\arrowreversed[scale=1.2]{latex'}}}, postaction={decorate}] (0.3, -0.3) .. controls (0.3, -0.1) and (0.4, 0.3) .. (0.8, 0.3);
+    \draw [decoration={markings, mark=at position 0.4 with {\arrowreversed[scale=1.2]{latex'}}}, postaction={decorate}] (-0.3, -0.3) .. controls (-0.3, -0.1) and (-0.4, 0.3) .. (-0.8, 0.3);
+    \draw [decoration={markings, mark=at position 0.4 with {\arrowreversed[scale=1.2]{latex'}}}, postaction={decorate}] (-0.3, 1.3) .. controls (-0.3, 1.1) and (-0.4, 0.7) .. (-0.8, 0.7);
+    \draw [decoration={markings, mark=at position 0.4 with {\arrowreversed[scale=1.2]{latex'}}}, postaction={decorate}] (0.3, 1.3) .. controls (0.3, 1.1) and (0.4, 0.7) .. (0.8, 0.7);
 
- % insert picture
-Reversing this gives an equatorial in, axial out system, and is called extensile. This has $\zeta < 0$.
+    \node at (0, -1) {$\zeta > 0$};
+    \node at (0, -1.4) {contractile};
+    \begin{scope}[shift={(3, 0)}]
+      \draw (-0.2, 1) -- (-0.2, 0) arc(180:360:0.2 and 0.05) -- (0.2, 1);
+      \draw (0, 1) ellipse (0.2 and 0.05);
+      \draw [densely dashed] (-0.2, 0) arc(180:0:0.2 and 0.05);
 
+      \draw [decoration={markings, mark=at position 0.6 with {\arrow[scale=1.2]{latex'}}}, postaction={decorate}] (0.3, -0.3) .. controls (0.3, -0.1) and (0.4, 0.3) .. (0.8, 0.3);
+      \draw [decoration={markings, mark=at position 0.6 with {\arrow[scale=1.2]{latex'}}}, postaction={decorate}] (-0.3, -0.3) .. controls (-0.3, -0.1) and (-0.4, 0.3) .. (-0.8, 0.3);
+      \draw [decoration={markings, mark=at position 0.6 with {\arrow[scale=1.2]{latex'}}}, postaction={decorate}] (-0.3, 1.3) .. controls (-0.3, 1.1) and (-0.4, 0.7) .. (-0.8, 0.7);
+      \draw [decoration={markings, mark=at position 0.6 with {\arrow[scale=1.2]{latex'}}}, postaction={decorate}] (0.3, 1.3) .. controls (0.3, 1.1) and (0.4, 0.7) .. (0.8, 0.7);
+
+      \node at (0, -1) {$\zeta < 0$};
+      \node at (0, -1.4) {extensile};
+    \end{scope}
+  \end{tikzpicture}
+\end{center}
 Suppose we take an active liquid crystal and put it in a shear flow. A rod-like object tends to align along the extension axis, at a $45^\circ$ angle.
-% insert picture
 
-If the liquid crystal is active, then we expect the local flows to interact with the shear flow.
+\begin{center}
+  \begin{tikzpicture}
+    \begin{scope}[rotate=-45]
+      \draw (-0.2, 0.5) -- (-0.2, -0.5) arc(180:360:0.2 and 0.05) -- (0.2, 0.5);
+      \draw (0, 0.5) ellipse (0.2 and 0.05);
+      \draw [densely dashed] (-0.2, -0.5) arc(180:0:0.2 and 0.05);
+    \end{scope}
 
-Suppose the shear rate is $v_x = y g$. Then the viscous stress is
+    \draw [->] (1, -1) -- (-1, -1);
+    \draw [<-] (1, 1) -- (-1, 1);
+
+  \end{tikzpicture}
+\end{center}
+
+If the liquid crystal is active, then we expect the local flows to interact with the shear flow. Suppose the shear rate is $v_x = y g$. Then the viscous stress is
 \[
-  \Sigma^\eta = \eta g 
+  \Sigma^\eta = \eta g
   \begin{pmatrix}
     0 & 1\\
     1 & 0
@@ -2834,45 +2994,80 @@ Suppose the shear rate is $v_x = y g$. Then the viscous stress is
 \]
 We have
 \[
-  \Sigma^A \propto \zeta \lambda \left(\mathbf{n}\mathbf{n} - \frac{\mathbf{1}}{d}\right) = \zeta \lambda 
+  \Sigma^A \propto \zeta \lambda \left(\mathbf{n}\mathbf{n} - \frac{\mathbf{1}}{d}\right) = \zeta \lambda
   \begin{pmatrix}
     0 & 1\\
     1 & 0
-  \end{pmatrix},
+  \end{pmatrix}
 \]
 if $\mathbf{n}$ is at $45^\circ$ exactly. Note that the sign of $\zeta$ affects whether it reinforces or weakens the stress.
 
-Observe that $\Sigma^A$ does not depend on the shear rate. So in the contractile case, the total stress looks like
+A crucial property is that $\Sigma^A$ does not depend on the shear rate. So in the contractile case, the total stress looks like
 \begin{center}
   \begin{tikzpicture}
-    \draw [->] (-2, 0) -- (2, 0) node [right] {$g$};
-    \draw [->] (0, -2) -- (0, 2) node [above] {$\Sigma_{TOT}$};
+    \draw [->] (-3, 0) -- (3, 0) node [right] {$g$};
+    \draw [->] (0, -2) -- (0, 2) node [above] {$\Sigma_{\mathrm{TOT}}$};
 
-    \draw [mblue] (-2, -2) -- (0, -1) -- (0, 1) -- (2, 2);
+    \draw [mblue, thick] (-3, -1.5) -- (0, -1) -- (0, 1) -- (3, 1.5);
   \end{tikzpicture}
 \end{center}
 In the extensile case, however, we have
 \begin{center}
   \begin{tikzpicture}
-    \draw [->] (-2, 0) -- (2, 0) node [right] {$g$};
-    \draw [->] (0, -2) -- (0, 2) node [above] {$\Sigma_{TOT}$};
+    \draw [->] (-3, 0) -- (3, 0) node [right] {$g$};
+    \draw [->] (0, -2) -- (0, 2) node [above] {$\Sigma_{\mathrm{TOT}}$};
 
-    \draw [mblue] (-2, -2) -- (0, 1) -- (0, -1) -- (2, 2); % insert intercepts $\pm g^*$
+    \draw [mblue, thick] (-3, -0.5) -- (0, 1) -- (0, -1) -- (3, 0.5); % insert intercepts $\pm g^*$
+
+    \node [circ] at (2, 0) {};
+    \node [below] at (2, 0) {$g^*$};
   \end{tikzpicture}
 \end{center}
 
-The consequence is that at zero applied stress, we want to have bits at $-g^*$ and bits at $g^*$. This gives rise to a spontaneous flow of the form
+This is very weird, and leads to spontaneous flow \emph{at zero applied stress} of the form
+\begin{center}
+  \begin{tikzpicture}
+    \draw (-2, -1) -- (2, -1);
+    \draw (-2, 1) -- (2, 1);
+
+    \draw (-0.5, -1) -- (0.5, 0) -- (-0.5, 1);
+
+    \foreach \y in {0.1,0.3,...,0.9} {
+      \draw [-latex](-0.5, 1-\y) -- (-0.5 + \y, 1-\y);
+      \draw [-latex](-0.5, \y-1) -- (-0.5 + \y, \y-1);
+    }
+  \end{tikzpicture}
+\end{center}
+%The consequence is that at zero applied stress, we want to have bits at $-g^*$ and bits at $g^*$. This gives rise to a spontaneous flow of the form
 
 \subsubsection*{Defect motion in active nematics}
-For simplicity, work in two dimensions. We have two simple defects
+For simplicity, work in two dimensions. We have two simple defects as before
+\begin{center}
+  \begin{tikzpicture}[scale=0.5]
+    \node [circ] {};
+    \draw [mblue, semithick, loosely dashed] (-1.732, -0.8) edge [bend right] (-0.2, 2);
+    \draw [mblue, semithick, loosely dashed] (-1.732, -0.3) edge [bend right] (-0.7, 2);
+    \draw [mblue, semithick, loosely dashed, rotate=120] (-1.732, -0.8) edge [bend right] (-0.2, 2);
+    \draw [mblue, semithick, loosely dashed, rotate=120] (-1.732, -0.3) edge [bend right] (-0.7, 2);
+    \draw [mblue, semithick, loosely dashed, rotate=240] (-1.732, -0.8) edge [bend right] (-0.2, 2);
+    \draw [mblue, semithick, loosely dashed, rotate=240] (-1.732, -0.3) edge [bend right] (-0.7, 2);
 
-% insert pictures
+    \node [below] at (0, -1.8) {$q = -\frac{1}{2}$};
+    \begin{scope}[shift={(6, 0)}]
+      \node [circ] {};
 
+      \draw [mblue, semithick, loosely dashed] (0, 0) -- (0, 2);
+
+      \draw [mblue, semithick, loosely dashed] (-0.5, 2) -- (-0.5, 0) arc (180:360:0.5) -- (0.5, 2);
+      \draw [mblue, semithick, loosely dashed] (-1, 2) -- (-1, 0) arc (180:360:1) -- (1, 2);
+      \draw [mblue, semithick, loosely dashed] (-1.5, 2) -- (-1.5, 0) arc (180:360:1.5) -- (1.5, 2);
+      \node [below] at (0, -1.8) {$q = +\frac{1}{2}$};
+    \end{scope}
+  \end{tikzpicture}
+\end{center}
 Note that the $q = -\frac{1}{2}$ charge is symmetric, and so by symmetry, there cannot be a net body stress. However, in the $q = +\frac{1}{2}$ defect, we have a non-zero effective force density.
 
-So the defects themselves are like quasi-particles that are themselves active. We see that cntractile rods move in the direction  of the opening, and the extensile goes in the other direction. The outcome of this is self-sustaining ``turbulent'' motion, and defect pairs $\pm \frac{1}{2}$ are formed \emph{locally}. The $-\frac{1}{2}$ stay put and the $+\frac{1}{2}$ ones self-propel. When defect pairs are spontaneously produced, half of them will swim apart. 
-
-% maybe insert some pictures.
+So the defects themselves are like quasi-particles that are themselves active. We see that contractile rods move in the direction of the opening, and the extensile goes in the other direction. The outcome of this is self-sustaining ``turbulent'' motion, with defect pairs $\pm \frac{1}{2}$ are formed \emph{locally}. The $-\frac{1}{2}$ stay put and the $+\frac{1}{2}$ ones self-propel, and depending on exactly how the defect pairs are formed, the $+\frac{1}{2}$ defect will fly away.
 
 Experimental movies of these can be found in \emph{T. Sanchez Nature 491, 431 (2012)}. There are also simulations in \emph{T. Shendek, et al, Soft Matter 13, 3853 (2017)}.
 
