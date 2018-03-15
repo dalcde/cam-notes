@@ -77,9 +77,14 @@ Currently, the notes for the following subjects are available.
  - Algebras (2017, C. J. B. Brookes)
  - Logic (2017, T. E. Forster)
  - Modular Forms and L-functions (2017, A. J. Scholl)
+ - Positivity in Algebraic Geometry (2018, S. Svaldi)
  - Ramsey Theory (2017, B. P. Narayanan)
  - Riemannian Geometry (2017, A. G. Kovalev)
+ - Schramm–Loewner Evolutions (2018, J. Miller)
+ - Stochastic Calculus and Applications (2018, R. Bauerschmidt)
+ - Symplectic Geometry (2018, A. R. Pires)
  - The Standard Model (2017, C. E. Thomas)
+ - Theoretical Physics of Soft Condensed Matter (2018, M. E. Cates)
 
 ### Easter Term
  - Classical and Quantum Solitons (2017, N. S. Manton and D. Stuart)
@@ -88,5 +93,7 @@ Currently, the notes for the following subjects are available.
 ### Michaelmas Term
  - Topics in Geometric Group Theory (2017, H. Wilton)
 
+### Lent Term
+ - Topics in Number Theory (2018, A. J. Scholl)
 ### Easter Term
  - Bounded Cohomology (2017, M. Burger)
