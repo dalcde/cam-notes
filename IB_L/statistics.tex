@@ -96,8 +96,8 @@ Instead, a commonly used measure is the \emph{mean squared error}.
 \end{defi}
 We can express the mean squared error in terms of the variance and bias:
 \begin{align*}
-  \E_\theta[(\hat{\theta} - \theta)^2] &= \E_\theta[(\hat{\theta} - E_\theta(\hat{\theta}) + \E_\theta(\hat{\theta}) - \theta)^2]\\
-  &= \E_\theta[(\hat{\theta} - E_\theta(\hat{\theta}))^2] + [\E_\theta(\hat{\theta}) - \theta]^2 + 2[\E_\theta(\hat{\theta}) - \theta]\E_\theta[\hat{\theta} - \E_\theta(\hat{\theta})]\\
+  \E_\theta[(\hat{\theta} - \theta)^2] &= \E_\theta[(\hat{\theta} - \E_\theta(\hat{\theta}) + \E_\theta(\hat{\theta}) - \theta)^2]\\
+  &= \E_\theta[(\hat{\theta} - \E_\theta(\hat{\theta}))^2] + [\E_\theta(\hat{\theta}) - \theta]^2 + 2\E_{\theta}[\E_\theta(\hat{\theta}) - \theta]\underbrace{\E_\theta[\hat{\theta} - \E_\theta(\hat{\theta})]}_{0}\\
   &= \var(\hat{\theta}) + \bias^2(\hat{\theta}).
 \end{align*}
 If we are aiming for a low mean squared error, sometimes it could be preferable to have a biased estimator with a lower variance. This is known as the ``bias-variance trade-off''.
@@ -236,7 +236,7 @@ There is a convenient theorem that allows us to find sufficient statistics.
 
 Note that sufficient statistics are not unique. If $T$ is sufficient for $\theta$, then so is any 1-1 function of $T$. $\mathbf{X}$ is always sufficient for $\theta$ as well, but it is not of much use. How can we decide if a sufficient statistic is ``good''?
 
-Given any statistic $T$, we can partition the sample space $\mathcal{X}^n$ into sets $\{\mathbf{x}\in \mathcal{X}: T(\mathbf{X}) = t\}$. Then after an experiment, instead of recording the actual value of $\mathbf{x}$, we can simply record the partition $\mathbf{x}$ falls into. If there are less partitions than possible values of $\mathbf{x}$, then effectively there is less information we have to store.
+Given any statistic $T$, we can partition the sample space $\mathcal{X}^n$ into sets $\{\mathbf{x}\in \mathcal{X}: T(\mathbf{x}) = t\}$. Then after an experiment, instead of recording the actual value of $\mathbf{x}$, we can simply record the partition $\mathbf{x}$ falls into. If there are less partitions than possible values of $\mathbf{x}$, then effectively there is less information we have to store.
 
 If $T$ is sufficient, then this data reduction does not lose any information about $\theta$. The ``best'' sufficient statistic would be one in which we achieve the maximum possible reduction. This is known as the \emph{minimal sufficient statistic}. The formal definition we take is the following:
 
@@ -318,7 +318,7 @@ Using this theorem, given any estimator, we can find one that is a function of a
 
   We start with an easy estimator $\theta$ is $\tilde{\theta} = 1_{X_1 = 0}$, which is unbiased (i.e.\ if we observe nothing in the first observation period, we assume the event is impossible). Then
   \begin{align*}
-    \E[\tilde{\theta}\mid T = t] &= \P\left(X_1 = 0\mid \sum_1^n X_i = t\right)\\
+    \E[\tilde{\theta}\mid T = t] &= \P\left(X_1 = 0 \mid \sum_1^n X_i = t\right)\\
     &= \frac{\P(X_1 = 0)\P(\sum_2^n X_i = t)}{\P(\sum_1^n X_i = t)}\\
     &= \left(\frac{n - 1}{n}\right)^t.
   \end{align*}
@@ -340,7 +340,7 @@ Using this theorem, given any estimator, we can find one that is a function of a
 \subsection{Likelihood}
 There are many different estimators we can pick, and we have just come up with some criteria to determine whether an estimator is ``good''. However, these do not give us a systematic way of coming up with an estimator to actually use. In practice, we often use the \emph{maximum likelihood estimator}.
 
-Let $X_1, \cdots , X_n$ be random variables with joint pdf/pmg $f_\mathbf{X}(\mathbf{x}\mid \theta)$. We observe $\mathbf{X} = \mathbf{x}$.
+Let $X_1, \cdots , X_n$ be random variables with joint pdf/pmf $f_\mathbf{X}(\mathbf{x}\mid \theta)$. We observe $\mathbf{X} = \mathbf{x}$.
 
 \begin{defi}[Likelihood]
   For any given $\mathbf{x}$, the \emph{likelihood} of $\theta$ is $\like(\theta) = f_\mathbf{X}(\mathbf{x} \mid \theta)$, regarded as a function of $\theta$. The \emph{maximum likelihood estimator} (mle) of $\theta$ is an estimator that picks the value of $\theta$ that maximizes $\like (\theta)$.
@@ -437,7 +437,7 @@ It is important to know that having observed some data $\mathbf{x}$ and calculat
 
   We know $\bar X \sim N(\theta, \frac{1}{n})$, so that $\sqrt{n}(\bar X - \theta)\sim N(0, 1)$.
 
-  Let $z_1, z_2$ be such that $\phi(z_2) - \phi(z_1) = 0.95$, where $\phi$ is the standard normal distribution function.
+  Let $z_1, z_2$ be such that $\Phi(z_2) - \Phi(z_1) = 0.95$, where $\Phi$ is the standard normal distribution function.
 
   We have $\P[z_1 < \sqrt{n}(\bar X - \theta) < z_2] = 0.95$, which can be rearranged to give
   \[
@@ -457,7 +457,7 @@ The above example illustrates a common procedure for finding confidence interval
 \end{itemize}
 Usually $c_1, c_2$ are percentage points from a known standardised distribution, often equitailed. For example, we pick $2.5\%$ and $97.5\%$ points for a $95\%$ confidence interval. We could also use, say $0\%$ and $95\%$, but this generally results in a wider interval.
 
-Note that if $(A(\mathbf{x}), B(\mathbf{x}))$ is a $100\gamma\%$ confidence interval for $\theta$, and $T(\theta)$ is a monotone increasing function of $\theta$, then $(T(A(\mathbf{x})), T(B(\mathbf{x})))$ is a $100\gamma\%$ confidence interval for $T(\theta)$.
+Note that if $(A(\mathbf{X}), B(\mathbf{X}))$ is a $100\gamma\%$ confidence interval for $\theta$, and $T(\theta)$ is a monotone increasing function of $\theta$, then $(T(A(\mathbf{X})), T(B(\mathbf{X})))$ is a $100\gamma\%$ confidence interval for $T(\theta)$.
 \begin{eg}
   Suppose $X_1, \cdots, X_{50}$ are iid $N(0, \sigma^2)$. Find a $99\%$ confidence interval for $\sigma^2$.
 
@@ -489,7 +489,7 @@ Note that if $(A(\mathbf{x}), B(\mathbf{x}))$ is a $100\gamma\%$ confidence inte
 
   By the Central Limit theorem, $\hat{p}$ is approximately $N(p, p(1 - p)/n)$ for large $n$.
 
-  So $\displaystyle \frac{\sqrt{n}(\hat{p} - p)}{\sqrt{p(1 - p)}}$ is approximately $N(0, 1)$ for large $n$. So we have
+  So $\displaystyle \frac{\sqrt{n}(\hat{p} - p)}{\sqrt{p(1 - p)}}$ is approximately $N(0, 1)$ for large $n$. So letting $z_{(1-\gamma) / 2}$ be the solution to $\Phi(z_{(1-\gamma) / 2}) - \Phi(-z_{(1-\gamma) / 2}) = 1 - \gamma$, we have
   \[
     \P\left(\hat p - z_{(1 - \gamma)/2}\sqrt{\frac{p(1 - p)}{n}} < p < \hat{p} + z_{(1 - \gamma)/2}\sqrt{\frac{p(1 - p)}{n}}\right)\approx \gamma.
   \]
@@ -527,7 +527,7 @@ Note that if $(A(\mathbf{x}), B(\mathbf{x}))$ is a $100\gamma\%$ confidence inte
 \end{eg}
 
 \subsection{Bayesian estimation}
-So far we have seen the \emph{frequentist} approach to a statistical inference, i.e.\ inferential statements about $\theta$ are interpreted in terms of repeat sampling. For example, the confidence interval is what's the probability that the interval will contain $\theta$, not the probability that $\theta$ lies in the interval.
+So far we have seen the \emph{frequentist} approach to a statistical inference, i.e.\ inferential statements about $\theta$ are interpreted in terms of repeat sampling. For example, the percentage confidence in a confidence interval is the probability that the interval will contain $\theta$, not the probability that $\theta$ lies in the interval.
 
 In contrast, the Bayesian approach treats $\theta$ as a random variable taking values in $\Theta$. The investigator's information and beliefs about the possible values of $\theta$ before any observation of data are summarised by a \emph{prior distribution} $\pi(\theta)$. When $\mathbf{X} = \mathbf{x}$ are observed, the extra information about $\theta$ is combined with the prior to obtain the \emph{posterior distribution} $\pi(\theta\mid \mathbf{x})$ for $\theta$ given $\mathbf{X} = \mathbf{x}$.
 
@@ -560,9 +560,9 @@ It should be clear that the data enters through the likelihood, so the inference
 
   Let $X = 1$ denote the event that I observe a head, $X = 0$ if a tail. Let $\theta$ denote the probability of a head. So $\theta$ is either 0.25, 0.5 or 0.75.
 
-  Our prior distribution is $\theta(\theta = 0.25) = \pi(\theta = 0.5) = \pi(\theta = 0.75) = 1/3$.
+  Our prior distribution is $\pi(\theta = 0.25) = \pi(\theta = 0.5) = \pi(\theta = 0.75) = 1/3$.
 
-  The probability mass function $f_X(x\mid \theta) = \theta^x(1 - \theta)^{1 - x}$. So we have to following results:
+  The probability mass function $f_X(x\mid \theta) = \theta^x(1 - \theta)^{1 - x}$. So we have the following results:
   \begin{center}
     \begin{tabular}{ccccc}
       \toprule
@@ -605,7 +605,7 @@ It should be clear that the data enters through the likelihood, so the inference
   This leads to a different conclusion than a frequentist analysis. Since nobody has died so far, the mle is $0$, which does not seem plausible. Using a Bayesian approach, we have a higher mean than $0$ because we take into account the data from other hospitals.
 \end{eg}
 
-For this problem, a beta prior leads to a beta posterior. We say that the beta family is a \emph{conjugate} family of prior distribution for Bernoulli samples.
+For this problem, a beta prior leads to a beta posterior. We say that the beta family is a \emph{conjugate} family of prior distributions for Bernoulli samples.
 
 Suppose that $a = b = 1$ so that $\pi (\theta) = 1$ for $0 < \theta < 1$ --- the uniform distribution. Then the posterior is $\betaD(\sum x_i + 1, n - \sum x_i + 1)$, with properties
 \begin{center}
@@ -668,7 +668,7 @@ Now $h'(a) = 0$ if
 This occurs when each side is $1/2$. So $\hat{\theta}$ is the \emph{posterior median}.
 
 \begin{eg}
-  Suppose that $X_1, \cdots , X_n$ are iid $N(\mu, 1)$, and that a prior $\mu\sim N(0, \tau^{-2})$ for some $\tau^{-2}$. So $\tau$ is the certainty of our prior knowledge.
+  Suppose that $X_1, \cdots , X_n$ are iid $N(\mu, 1)$, and that a priori $\mu\sim N(0, \tau^{-2})$ for some $\tau^{-2}$. So $\tau$ is the certainty of our prior knowledge.
 
   The posterior is given by
   \begin{align*}
@@ -676,10 +676,10 @@ This occurs when each side is $1/2$. So $\hat{\theta}$ is the \emph{posterior me
     &\propto \exp\left[-\frac{1}{2}\sum(x_i - \mu)^2\right]\exp\left[-\frac{\mu^2\tau^2}{2}\right]\\
     &\propto \exp\left[-\frac{1}{2}(n + \tau^2)\left\{\mu - \frac{\sum x_i}{n + \tau^2}\right\}^2\right]
   \end{align*}
-  which is a normal distribution. So the posterior distribution of $\mu$ given $\mathbf{x}$ is a normal distribution with mean $\sum x_i/(n + \tau^2)$ and variance $1/(n + \tau^2)$.
+  since we can regard $n$, $\tau$ and all the $x_i$ as constants in the normalisation term, and then complete the square with respect to $\mu$. So the posterior distribution of $\mu$ given $\mathbf{x}$ is a normal distribution with mean $\sum x_i/(n + \tau^2)$ and variance $1/(n + \tau^2)$.
 
   The normal density is symmetric, and so the posterior mean and the posterior media have the same value $\sum x_i/(n + \tau^2)$.
-
+  
   This is the optimal estimator for both quadratic and absolute loss.
 \end{eg}
 
@@ -698,7 +698,7 @@ This occurs when each side is $1/2$. So $\hat{\theta}$ is the \emph{posterior me
 
   Under absolute error loss, $\hat{\lambda}$ solves
   \[
-    \int_0^{\lambda} \frac{(n + 1)^{\sum x_i + 1}\lambda^{\sum x_i}e ^{-(n + 1)\lambda}}{(\sum x_i)!}\;\d \lambda = \frac{1}{2}.
+    \int_0^{\hat{\lambda}} \frac{(n + 1)^{\sum x_i + 1}\lambda^{\sum x_i}e ^{-(n + 1)\lambda}}{\left(\sum x_i\right)!}\;\d \lambda = \frac{1}{2}.
   \]
 \end{eg}
 
